@@ -1,7 +1,7 @@
 """국토부 송도동 아파트 실거래 원문 XML → 공개 가능한 JSON 스냅샷."""
 from __future__ import annotations
 import argparse
-from collections import defaultdict
+from collections import defaultdict, Counter
 from datetime import datetime, timezone, timedelta
 import hashlib
 import json
@@ -17,6 +17,7 @@ from xml.etree import ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'data' / 'trades.json'
+NEW_OUTPUT = ROOT / 'data' / 'new_trades.json'
 KST = timezone(timedelta(hours=9))
 DISTRICT_CODE = '28185'  # 인천광역시 연수구 (송도동은 이 법정동 권역에 속함)
 ENDPOINTS = {
@@ -194,6 +195,78 @@ def unique_ids(records):
     return records
 
 
+
+# 국토부 거래 API는 개별 거래의 실제 신고일/공개일을 반환하지 않습니다.
+# 첫 관측일은 '이전 수집에는 없지만 이번 수집에는 나타난' 날의 KST 날짜입니다.
+# 해제여부/갱신정보/등기일 수정만으로는 신규로 분류하지 않도록 ID와 분리합니다.
+IDENTITY_FIELDS = ('contract_date', 'building', 'area_m2', 'floor',
+                   'type', 'amount_10k', 'deposit_10k', 'monthly_10k')
+
+
+def public_identity(record):
+    return json.dumps([record.get(field, '') for field in IDENTITY_FIELDS],
+                      ensure_ascii=False, separators=(',', ':'))
+
+
+def newly_detected(previous, current):
+    """동일 조건의 중복 신고가 추가되면 추가된 개수만 계산."""
+    previous_counts = Counter(public_identity(record) for record in previous)
+    current_counts = defaultdict(int)
+    result = []
+    for record in current:
+        key = public_identity(record)
+        current_counts[key] += 1
+        if current_counts[key] > previous_counts[key]:
+            result.append(record)
+    return result
+
+
+def load_new_history():
+    try:
+        saved = json.loads(NEW_OUTPUT.read_text(encoding='utf-8'))
+        return saved.get('records', []) if isinstance(saved.get('records'), list) else []
+    except (ValueError, OSError, TypeError, AttributeError):
+        return []
+
+
+def publish_newly_detected(new_records, *, now, failed, missing):
+    """최근 31일 동안 처음 발견한 공개 실거래 기록을 일자별 보존."""
+    first_seen_date = now.date().isoformat()
+    first_seen_at = now.isoformat(timespec='seconds')
+    cutoff = (now.date() - timedelta(days=30)).isoformat()
+    existing = [record for record in load_new_history()
+                if isinstance(record, dict)
+                and cutoff <= str(record.get('first_seen_date', '')) <= first_seen_date]
+    additions = [{**record, 'first_seen_date': first_seen_date,
+                  'first_seen_at': first_seen_at} for record in new_records]
+    combined = existing + additions
+    combined.sort(key=lambda x: (x.get('first_seen_date', ''),
+                                  x.get('contract_date', ''),
+                                  x.get('building', '')), reverse=True)
+    counts = defaultdict(lambda: {'매매': 0, '전세': 0, '월세': 0})
+    for record in combined:
+        kind = record.get('type')
+        if kind in ('매매', '전세', '월세'):
+            counts[record['first_seen_date']][kind] += 1
+    payload = {
+        'schema_version': 1,
+        'area': '인천 연수구 송도동',
+        'state': 'partial' if failed or missing else 'ok',
+        'checked_at': first_seen_at,
+        'date_basis': '신규 공개 확인일(앱 수집에서 처음 발견한 날)',
+        'note': '계약일이나 정부의 정확한 공개일이 아닙니다. 이전 조회에는 없었으나 이번 조회에 처음 나타난 거래입니다. 실제 공개 시점보다 늦게 발견될 수 있고, 정정 거래가 신규로 분류될 가능성이 있습니다.',
+        'retention_days': 31,
+        'count': len(combined),
+        'counts_by_day': dict(sorted(counts.items(), reverse=True)),
+        'errors': failed[:30],
+        'missing_buckets': missing,
+        'records': combined,
+    }
+    NEW_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    NEW_OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + chr(10), encoding='utf-8')
+    return payload
+
+
 def load_existing():
     if not OUTPUT.exists(): return {}
     old = json.loads(OUTPUT.read_text(encoding='utf-8'))
@@ -215,6 +288,8 @@ def update(*, months=12, key=None, request=http_request, now=None):
             snapshots[f'{month}:{category}'].append(record)
     failures = []
     successes = 0
+    newest = []
+    had_previous_snapshot = bool(old.get('checked_at'))
     unavailable_categories = set()
     for month in recent_months(months, today=now):
         for category in ('매매','임대'):
@@ -224,7 +299,12 @@ def update(*, months=12, key=None, request=http_request, now=None):
             try:
                 raw = fetch_month(request, category, month, key)
                 normalized = [result for row in raw if (result := normalize(row, category, month))]
-                snapshots[bucket] = unique_ids(normalized)
+                normalized = unique_ids(normalized)
+                # 기존 자료가 없는 처음 조회나 빠져 있던 과거 월은 일일 신규로 오판하지 않음.
+                # 매월 1일 새 계약월은 이전 정상 스냅샷이 있으면 관측 시작일부터 신규 인정.
+                if had_previous_snapshot and (bucket in snapshots or month == now.strftime('%Y%m')):
+                    newest.extend(newly_detected(snapshots.get(bucket, []), normalized))
+                snapshots[bucket] = normalized
                 successes += 1
                 print(f'{bucket}: {len(normalized)}건 (연수구 전체 조회 {len(raw)}건)')
             except Exception as exc:
@@ -258,6 +338,8 @@ def update(*, months=12, key=None, request=http_request, now=None):
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(out, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+    news = publish_newly_detected(newest, now=now, failed=failures, missing=missing)
+    print(f"신규 공개 확인 {len(newest)}건 / 최근 31일 누적 {news['count']}건")
     return out
 
 
