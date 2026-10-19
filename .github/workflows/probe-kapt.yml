@@ -15,25 +15,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Confirm current K-apt V5 basic and detail responses
+      - name: Audit Yeonsu apartment listing coverage and Songdo code filters
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
         run: |
           python - <<'PY'
-          import os
+          import os,collections
           from scripts import collect_complexes as k
-          key=os.environ.get('DATA_GO_KR_SERVICE_KEY')
-          listing=k.call_api(k.LIST_URL,{'sigunguCode':'28185','numOfRows':10,'pageNo':1,'_type':'json'},key)
-          rows,total=k.unpack(listing)
-          if not rows: raise RuntimeError('No K-apt list rows')
-          code=rows[0]['kaptCode']
-          print('K-apt list verified:',len(rows),'rows of',total,flush=True)
-          for typ,old_url in [('basic',k.BASIC_URL),('detail',k.DETAIL_URL)]:
-              url=old_url.replace('V4','V5')
-              obj=k.call_api(url,{'kaptCode':code,'dataType':'JSON'},key)
-              header=obj.get('response',obj).get('header',{})
-              items,count=k.unpack(obj)
-              print(typ,'V5 resultCode',header.get('resultCode'),'items',len(items),'keys',sorted(items[0]) if items else [],flush=True)
-              if not items: raise RuntimeError(typ+' V5 API has no result')
-          print('AUTHENTICATED K-apt LIST+BASIC+DETAIL V5 OK',flush=True)
+          key=os.environ['DATA_GO_KR_SERVICE_KEY']
+          data=k.call_api(k.LIST_URL,{'sigunguCode':'28185','numOfRows':500,'pageNo':1,'_type':'json'},key)
+          rows,total=k.unpack(data)
+          codes=collections.Counter(str(x.get('bjdCode','')) for x in rows)
+          print('K-apt district listing rows',len(rows),'declared',total,flush=True)
+          print('Legal-dong code distribution',codes.most_common(25),flush=True)
+          filtered=[x for x in rows if str(x.get('bjdCode','')).startswith('28185106')]
+          print('Songdo legal code prefix matches',len(filtered),'exact10digit',sum(str(x.get('bjdCode',''))=='2818510600' for x in filtered),flush=True)
+          print('Sample matching names/codes',[(x.get('kaptName'),x.get('bjdCode')) for x in filtered[:20]],flush=True)
+          print('Other Songdo-named complexes',[(x.get('kaptName'),x.get('bjdCode')) for x in rows if '송도' in str(x.get('kaptName')) and x not in filtered][:18],flush=True)
           PY
