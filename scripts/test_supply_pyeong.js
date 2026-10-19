@@ -49,12 +49,14 @@ assert.equal(get("displayExclusiveArea(84.9,apt_f13)"),'전용 84.9㎡ (약 35�
 assert.equal(get("displayExclusiveArea(84.9,apt_f14)"),'전용 84.9㎡ (약 35평형)');
 assert.equal(get("displayExclusiveArea(84.9,apt_f15)"),'전용 84.9㎡ (약 35평형)');
 assert.equal(get("displayExclusiveArea(84.65,apt_skcentral)"),'전용 84.65㎡ (약 33평형)');
-assert.equal(get("displayExclusiveArea(84.98,apt_artwin)"),'전용 84.98㎡ (약 37평형)');
-assert.equal(get("displayExclusiveArea(80.05,apt_central3)"),'전용 80.05㎡ (약 34평형)');
+assert.equal(get("displayExclusiveArea(84.98,apt_artwin)"),'전용 84.98㎡ (약 36평형)');
+assert.equal(get("displayExclusiveArea(80.05,apt_central3)"),'전용 80.05㎡ (약 33평형)');
+assert.equal(get("displaySupplyType(apt_central3,'111')"),'전용 80.05㎡ (약 33평형) · 공급 111㎡');
+assert.equal(get("displaySupplyType(apt_artwin,'152')"),'전용 106.78㎡ (약 45평형) · 공급 152㎡');
 const pOther=rows.find(x=>x.id==='kapt-a10020270');
 env.unknown=pOther;
 assert.equal(get("displayExclusiveArea(84.9,unknown)"),'전용 84.9㎡','Never invent supply pyeong for unverified area');
-assert.equal(get("displaySupplyType(apt_artwin,'120B')"),'전용 84.98㎡ (약 37평형) · 공급 120B㎡');
+assert.equal(get("displaySupplyType(apt_artwin,'120B')"),'전용 84.98㎡ (약 36평형) · 공급 120B㎡');
 assert.equal(get("displaySupplyType(apt_skcentral,'109B')"),'전용 84.78㎡ (약 33평형) · 공급 109B㎡');
 function canonical(s){return String(s||'').normalize('NFKC').toUpperCase().replace(/[^0-9A-Z가-힣]/g,'').replace(/^송도/,'').replace(/아파트$/,'')}
 const names=new Map();
