@@ -15,6 +15,7 @@ from urllib.error import HTTPError,URLError
 from urllib.parse import urlencode,unquote,urlparse
 from urllib.request import urlopen,Request
 from xml.etree import ElementTree as ET
+from collect_registry_maintenance import collect_registry,collect_maintenance
 
 ROOT=Path(__file__).resolve().parents[1]
 TARGET=ROOT/'data'/'public_services.json'
@@ -258,12 +259,14 @@ def collect_subscriptions(key,opener=None,today=None,days_back=420):
         note='한국부동산원 청약홈 공식 모집공고일 기준 인천광역시 전체 소재 공고. 접수일 미기재는 별도 확인 필요. 접수 마감 공고도 지난 공고 탭에서 조회 가능.',
         window_start=start,window_end=end,records=records)
 
-def update_snapshot(path,school=None,office=None,subscriptions=None):
+def update_snapshot(path,school=None,office=None,subscriptions=None,registry=None,maintenance=None):
     current=json.loads(path.read_text(encoding='utf-8'))
     if current.get('schema_version')!=1:raise RuntimeError('Snapshot schema mismatch')
     if school is not None:current['schools']=school
     if office is not None:current['office_rents']=office
     if subscriptions is not None:current['subscriptions']=subscriptions
+    if registry is not None:current['building_registry']=registry
+    if maintenance is not None:current['maintenance']=maintenance
     current['updated_at']=fresh_date()
     temp=path.with_suffix('.json.tmp')
     temp.write_text(json.dumps(current,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
@@ -271,11 +274,11 @@ def update_snapshot(path,school=None,office=None,subscriptions=None):
 
 def main():
     a=argparse.ArgumentParser()
-    a.add_argument('--mode',choices=['schools','offices','subscriptions','all'],default='all')
+    a.add_argument('--mode',choices=['schools','offices','subscriptions','buildings','maintenance','complexinfo','all'],default='all')
     a.add_argument('--months',type=int,default=6)
     args=a.parse_args()
     if not 1<=args.months<=12:raise ValueError('months must be 1..12')
-    school=office=subscriptions=None
+    school=office=subscriptions=registry=maintenance=None
     if args.mode in ('schools','all') and os.environ.get('NEIS_EDU_KEY'):
         school=collect_schools(os.environ['NEIS_EDU_KEY'])
         print('NEIS 송도 학교 기본정보',len(school['records']),'곳')
@@ -290,10 +293,26 @@ def main():
         print('청약홈 인천 분양공고',len(subscriptions['records']),'건')
     elif args.mode in ('subscriptions','all'):
         print('청약홈 API 인증키 미설정: 기존 상태 유지')
-    if school is None and office is None and subscriptions is None:
+    if args.mode in ('buildings','maintenance','complexinfo','all'):
+        key=os.environ.get('DATA_GO_KR_SERVICE_KEY','')
+        if key:
+            catalog=json.loads((ROOT/'data'/'complexes.json').read_text(encoding='utf8'))
+            complexes=catalog.get('records',[])
+            if args.mode in ('buildings','complexinfo','all'):
+                try:
+                    registry=collect_registry(complexes,key)
+                    print('건축물대장 확인 단지',len(registry['records']),'건; 대상',registry['scanned'])
+                except RuntimeError as e:print('건축물대장 별도 수집 실패 · 기존 자료 유지: '+str(e)[:90])
+            if args.mode in ('maintenance','complexinfo','all'):
+                try:
+                    maintenance=collect_maintenance(complexes,key)
+                    print('K-apt 공용관리비 항목 확인 단지',len(maintenance['records']),'건; 대상',maintenance['scanned'])
+                except RuntimeError as e:print('공동주택 관리비 별도 수집 실패 · 기존 자료 유지: '+str(e)[:90])
+        else:print('공공데이터 API 인증키 미설정: 기존 자료 유지')
+    if all(x is None for x in (school,office,subscriptions,registry,maintenance)):
         print('실행 가능한 신규 서비스 없음: 파일 변경 안 함')
         return
-    update_snapshot(TARGET,school,office,subscriptions)
+    update_snapshot(TARGET,school,office,subscriptions,registry,maintenance)
     print('기존 미승인 서비스·검증값 보존; 새 인증키는 출력하지 않음')
 
 if __name__=='__main__':
