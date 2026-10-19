@@ -58,6 +58,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
   <div id="nearbyStats" class="nearbyStats"></div>
   <div id="nearbyTrades"><div class="empty">데이터를 불러오면 거래가 표시됩니다.</div></div>
   <button id="nearbyMore" class="btn alt hidden" type="button" onclick="showMoreNearby()">거래 더 보기</button>
+  <button class="btn alt" type="button" onclick="document.getElementById('nearbyCards').scrollIntoView({behavior:'smooth',block:'start'})">↑ 다른 주변단지 선택</button>
   <p class="tiny">계약일 기준 정렬 · 신고 지연·정정·해제 가능 · 국토교통부 아파트 매매·전월세 공개 자료</p>
  </div>
 </div>
@@ -300,8 +301,12 @@ function renderNew(){
   $('newContent').innerHTML='<div class="empty">첫 신규 공개 확인 기록을 기다리고 있습니다.</div>';
   return;
  }
- const count=(data.counts_by_day||{})[day]||{};
- const sale=Number(count['매매']||0), lease=Number(count['전세']||0), monthly=Number(count['월세']||0);
+ const onlyFavorites=$('newFavoriteFilter').value==='favorites';
+ const dayRows=(data.records||[]).filter(x=>x.first_seen_date===day&&
+  (!onlyFavorites||favoriteIdForBuilding(x.building)));
+ const sale=dayRows.filter(x=>x.type==='매매').length;
+ const lease=dayRows.filter(x=>x.type==='전세').length;
+ const monthly=dayRows.filter(x=>x.type==='월세').length;
  const total=sale+lease+monthly;
  $('newCounts').innerHTML='<span class="pill">신규 확인 총 '+number(total)+'건</span>'+
   '<span class="pill">매매 '+number(sale)+'건</span>'+
@@ -309,9 +314,9 @@ function renderNew(){
   '<span class="pill">월세 '+number(monthly)+'건</span>';
  $('newStatus').textContent='선택일 '+day+' · 새로 발견한 공개 거래 ('+
   (data.state==='partial'?'일부 수집 실패':'수집 정상')+') · 마지막 확인 '+prettyTime(data.checked_at);
- const type=$('newType').value, q=$('newAptFilter').value.trim().toLowerCase(), onlyFavorites=$('newFavoriteFilter').value==='favorites';
- const rows=(data.records||[]).filter(x=>x.first_seen_date===day&&(!onlyFavorites||favoriteIdForBuilding(x.building))&&
-  (!type||x.type===type)&&(!q||(x.building||'').toLowerCase().includes(q)));
+ const type=$('newType').value, q=$('newAptFilter').value.trim().toLowerCase();
+ const rows=dayRows.filter(x=>(!type||x.type===type)&&
+  (!q||(x.building||'').toLowerCase().includes(q)));
  if(!rows.length){
   $('newContent').innerHTML='<div class="empty">선택한 날짜와 조건에 새로 확인된 거래가 없습니다.<br>이는 실제로 그날 공개된 거래가 없었다는 뜻은 아닙니다.</div>';
   return;
