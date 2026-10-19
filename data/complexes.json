@@ -2,7 +2,7 @@
   "schema_version": 1,
   "state": "verified_partial",
   "updated_at": "2026-10-20",
-  "note": "기존 K-apt 등록단지 및 13개 관심단지를 보존하고 실거래에 등장한 이름 중 검증된 기존 아파트 표기들을 aliases로 연결. K-apt에서 누락되거나 여러 단지로 합산된 공동주택 중 별도 주소·세대수가 확인되는 12개 단지를 독립 등록. 송도더샵엑스포 합계 1,337세대는 검색 중복 방지용 관리항목으로만 유지. EV·관리사무소 등 미확인 정보는 비워둠. 추가로 인천송도힐스테이트 3·4·5·6단지 및 더퍼스트시티송도, 스위트리아송도 객관적 기본정보를 단지별 공개자료로 등록. K-apt 통합 관리단지 합계는 별도 표시. 2026-10-19 사용자 네이버페이 부동산 화면 5건 대조: 엑스포10, 아리스타프라임 주소, 이안송도 주차·연락처, 월드메르디앙 4개동·주차145 등 보정. 용적률·건폐율은 수집 의무항목이 아니고 가족용 기본화면에서 숨김. 공급면적 평형 대응표는 단지별 출처에서 공급·전용이 함께 확인된 타입만 기록하며, 실거래 전용㎡는 변환하지 않고 실무 평형만 공급면적에서 계산. 자료 없는 단지는 임의 환산 금지. 전용면적 타입은 국토교통부 실거래 자료에서 단지명 고유일치 및 면적 검증 후 관측된 값입니다. 실거래가 없는 타입은 누락될 수 있고 공급면적 평형은 별도 검증 대응표로만 표시합니다.",
+  "note": "기존 K-apt 등록단지 및 13개 관심단지를 보존하고 실거래에 등장한 이름 중 검증된 기존 아파트 표기들을 aliases로 연결. K-apt에서 누락되거나 여러 단지로 합산된 공동주택 중 별도 주소·세대수가 확인되는 12개 단지를 독립 등록. 송도더샵엑스포 합계 1,337세대는 검색 중복 방지용 관리항목으로만 유지. EV·관리사무소 등 미확인 정보는 비워둠. 추가로 인천송도힐스테이트 3·4·5·6단지 및 더퍼스트시티송도, 스위트리아송도 객관적 기본정보를 단지별 공개자료로 등록. K-apt 통합 관리단지 합계는 별도 표시. 2026-10-19 사용자 네이버페이 부동산 화면 5건 대조: 엑스포10, 아리스타프라임 주소, 이안송도 주차·연락처, 월드메르디앙 4개동·주차145 등 보정. 용적률·건폐율은 수집 의무항목이 아니고 가족용 기본화면에서 숨김. 공급면적 평형 대응표는 단지별 출처에서 공급·전용이 함께 확인된 타입만 기록하며, 실거래 전용㎡는 변환하지 않고 실무 평형만 공급면적에서 계산. 자료 없는 단지는 임의 환산 금지. 전용면적 타입은 국토교통부 실거래 자료에서 단지명 고유일치 및 면적 검증 후 관측된 값입니다. 실거래가 없는 타입은 누락될 수 있고 공급면적 평형은 별도 검증 대응표로만 표시합니다. 단지 자료에 명시된 거래실무 평형 호칭(예: 아트윈 120B=36평형)은 수학적 공급면적 반올림과 다를 수 있으며, 확인된 호칭을 우선 표시합니다.",
   "records": [
     {
       "id": "f13",
@@ -66,13 +66,15 @@
           "exclusive_m2": 84.9,
           "supply_m2": 117.09,
           "supply_label": "117A",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268",
+          "market_pyeong": 35
         },
         {
           "exclusive_m2": 84.94,
           "supply_m2": 117.12,
           "supply_label": "117B",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268",
+          "market_pyeong": 35
         },
         {
           "exclusive_m2": 95.87,
@@ -165,13 +167,15 @@
           "exclusive_m2": 84.9,
           "supply_m2": 117.08,
           "supply_label": "117A",
-          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472"
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472",
+          "market_pyeong": 35
         },
         {
           "exclusive_m2": 84.94,
           "supply_m2": 117.12,
           "supply_label": "117B",
-          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472"
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472",
+          "market_pyeong": 35
         },
         {
           "exclusive_m2": 95.81,
@@ -257,13 +261,15 @@
           "exclusive_m2": 84.9,
           "supply_m2": 117.1,
           "supply_label": "117A",
-          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F15BL-28420"
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F15BL-28420",
+          "market_pyeong": 35
         },
         {
           "exclusive_m2": 84.94,
           "supply_m2": 117.12,
           "supply_label": "117B",
-          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F15BL-28420"
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F15BL-28420",
+          "market_pyeong": 35
         },
         {
           "exclusive_m2": 95.81,
@@ -487,7 +493,8 @@
           "exclusive_m2": 125.51,
           "supply_m2": 157.02,
           "supply_label": "157",
-          "source_url": "https://fin.land.naver.com/articles/2526463087"
+          "source_url": "https://fin.land.naver.com/articles/2526463087",
+          "market_pyeong": 47
         }
       ]
     },
@@ -844,13 +851,15 @@
           "exclusive_m2": 84.65,
           "supply_m2": 109.69,
           "supply_label": "109A",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=118987"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=118987",
+          "market_pyeong": 33
         },
         {
           "exclusive_m2": 84.78,
           "supply_m2": 109.7,
           "supply_label": "109B",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=118987"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=118987",
+          "market_pyeong": 33
         }
       ]
     },
@@ -914,91 +923,106 @@
           "exclusive_m2": 84.98,
           "supply_m2": 120.92,
           "supply_label": "120B",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 36
         },
         {
           "exclusive_m2": 84.99,
           "supply_m2": 120.99,
           "supply_label": "120B-S",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 36
         },
         {
           "exclusive_m2": 84.98,
           "supply_m2": 120.93,
           "supply_label": "120B-H",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 36
         },
         {
           "exclusive_m2": 84.97,
           "supply_m2": 121.32,
           "supply_label": "121A",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 36
         },
         {
           "exclusive_m2": 84.99,
           "supply_m2": 121.31,
           "supply_label": "121A-H",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 36
         },
         {
           "exclusive_m2": 84.97,
           "supply_m2": 121.32,
           "supply_label": "121A-S",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 36
         },
         {
           "exclusive_m2": 106.78,
           "supply_m2": 152.05,
           "supply_label": "152",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 45
         },
         {
           "exclusive_m2": 106.78,
           "supply_m2": 152.05,
           "supply_label": "152H",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 45
         },
         {
           "exclusive_m2": 114.95,
           "supply_m2": 163.11,
           "supply_label": "163",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 49
         },
         {
           "exclusive_m2": 114.95,
           "supply_m2": 163.11,
           "supply_label": "163S",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 49
         },
         {
           "exclusive_m2": 114.95,
           "supply_m2": 163.11,
           "supply_label": "163H",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 49
         },
         {
           "exclusive_m2": 129.83,
           "supply_m2": 184.96,
           "supply_label": "184",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 55
         },
         {
           "exclusive_m2": 136.91,
           "supply_m2": 195.45,
           "supply_label": "195",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 59
         },
         {
           "exclusive_m2": 210.15,
           "supply_m2": 300.22,
           "supply_label": "300A",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 90
         },
         {
           "exclusive_m2": 210.1,
           "supply_m2": 302.22,
           "supply_label": "302B",
-          "source_url": "https://www.aldongsan.com/aptview.php?id=104544"
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 91
         }
       ]
     },
@@ -1057,19 +1081,22 @@
           "exclusive_m2": 80.05,
           "supply_m2": 111.44,
           "supply_label": "111",
-          "source_url": "https://fin.land.naver.com/articles/2527801637"
+          "source_url": "https://fin.land.naver.com/articles/2527801637",
+          "market_pyeong": 33
         },
         {
           "exclusive_m2": 102.49,
           "supply_m2": 140.96,
           "supply_label": "140",
-          "source_url": "https://fin.land.naver.com/articles/2527801637"
+          "source_url": "https://fin.land.naver.com/articles/2527801637",
+          "market_pyeong": 42
         },
         {
           "exclusive_m2": 110.85,
           "supply_m2": 152.05,
           "supply_label": "152",
-          "source_url": "https://fin.land.naver.com/articles/2527801637"
+          "source_url": "https://fin.land.naver.com/articles/2527801637",
+          "market_pyeong": 46
         }
       ]
     },
