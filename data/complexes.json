@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "state": "verified_partial",
-  "updated_at": "2026-10-19",
-  "note": "기존 K-apt 등록단지 및 13개 관심단지를 보존하고 실거래에 등장한 이름 중 검증된 기존 아파트 표기들을 aliases로 연결. K-apt에서 누락되거나 여러 단지로 합산된 공동주택 중 별도 주소·세대수가 확인되는 12개 단지를 독립 등록. 송도더샵엑스포 합계 1,337세대는 검색 중복 방지용 관리항목으로만 유지. EV·관리사무소 등 미확인 정보는 비워둠. 추가로 인천송도힐스테이트 3·4·5·6단지 및 더퍼스트시티송도, 스위트리아송도 객관적 기본정보를 단지별 공개자료로 등록. K-apt 통합 관리단지 합계는 별도 표시. 2026-10-19 사용자 네이버페이 부동산 화면 5건 대조: 엑스포10, 아리스타프라임 주소, 이안송도 주차·연락처, 월드메르디앙 4개동·주차145 등 보정. 용적률·건폐율은 수집 의무항목이 아니고 가족용 기본화면에서 숨김.",
+  "updated_at": "2026-10-20",
+  "note": "기존 K-apt 등록단지 및 13개 관심단지를 보존하고 실거래에 등장한 이름 중 검증된 기존 아파트 표기들을 aliases로 연결. K-apt에서 누락되거나 여러 단지로 합산된 공동주택 중 별도 주소·세대수가 확인되는 12개 단지를 독립 등록. 송도더샵엑스포 합계 1,337세대는 검색 중복 방지용 관리항목으로만 유지. EV·관리사무소 등 미확인 정보는 비워둠. 추가로 인천송도힐스테이트 3·4·5·6단지 및 더퍼스트시티송도, 스위트리아송도 객관적 기본정보를 단지별 공개자료로 등록. K-apt 통합 관리단지 합계는 별도 표시. 2026-10-19 사용자 네이버페이 부동산 화면 5건 대조: 엑스포10, 아리스타프라임 주소, 이안송도 주차·연락처, 월드메르디앙 4개동·주차145 등 보정. 용적률·건폐율은 수집 의무항목이 아니고 가족용 기본화면에서 숨김. 공급면적 평형 대응표는 단지별 출처에서 공급·전용이 함께 확인된 타입만 기록하며, 실거래 전용㎡는 변환하지 않고 실무 평형만 공급면적에서 계산. 자료 없는 단지는 임의 환산 금지.",
   "records": [
     {
       "id": "f13",
@@ -40,7 +40,51 @@
       "detail_source": "네이버페이 부동산 단지정보 (사용자 제공 내용)",
       "schools": [],
       "detail_checked_at": "2026-10-19",
-      "detail_note": "사용자가 네이버페이 부동산의 F13 단지 상세정보를 직접 제공한 값입니다. 전기차 충전대수 등 변동 가능한 시설 정보는 최신 현황 확인 권장"
+      "detail_note": "사용자가 네이버페이 부동산의 F13 단지 상세정보를 직접 제공한 값입니다. 전기차 충전대수 등 변동 가능한 시설 정보는 최신 현황 확인 권장",
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 68.96,
+          "supply_m2": 98.87,
+          "supply_label": "98B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+        },
+        {
+          "exclusive_m2": 68.72,
+          "supply_m2": 99.09,
+          "supply_label": "99A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+        },
+        {
+          "exclusive_m2": 84.9,
+          "supply_m2": 117.09,
+          "supply_label": "117A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+        },
+        {
+          "exclusive_m2": 84.94,
+          "supply_m2": 117.12,
+          "supply_label": "117B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+        },
+        {
+          "exclusive_m2": 95.87,
+          "supply_m2": 129.55,
+          "supply_label": "129B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+        },
+        {
+          "exclusive_m2": 95.81,
+          "supply_m2": 131.17,
+          "supply_label": "131A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+        },
+        {
+          "exclusive_m2": 108.08,
+          "supply_m2": 145.26,
+          "supply_label": "145",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+        }
+      ]
     },
     {
       "id": "f14",
@@ -83,7 +127,45 @@
       "detail_checked_at": "2026-10-19",
       "detail_note": "주차대수 출처 불일치: KB부동산 1229대, K-apt 기반 공개자료 1224대. 앱 표시값은 KB부동산 기준이며 최신 주차 현황은 관리사무소 확인 필요",
       "heating_detail": "지역난방 / 열병합",
-      "naver_sample_verified": "2026-10-19"
+      "naver_sample_verified": "2026-10-19",
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 59.98,
+          "supply_m2": 88.1,
+          "supply_label": "88A",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472"
+        },
+        {
+          "exclusive_m2": 68.72,
+          "supply_m2": 99,
+          "supply_label": "99A",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472"
+        },
+        {
+          "exclusive_m2": 84.9,
+          "supply_m2": 117.08,
+          "supply_label": "117A",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472"
+        },
+        {
+          "exclusive_m2": 84.94,
+          "supply_m2": 117.12,
+          "supply_label": "117B",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472"
+        },
+        {
+          "exclusive_m2": 95.81,
+          "supply_m2": 131.4,
+          "supply_label": "131A",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472"
+        },
+        {
+          "exclusive_m2": 108.08,
+          "supply_m2": 144.6,
+          "supply_label": "144",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472"
+        }
+      ]
     },
     {
       "id": "f15",
@@ -125,7 +207,45 @@
       "detail_checked_at": "2026-10-19",
       "detail_note": null,
       "heating_detail": "지역난방 / 열병합",
-      "naver_sample_verified": "2026-10-19"
+      "naver_sample_verified": "2026-10-19",
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 59.98,
+          "supply_m2": 88.1,
+          "supply_label": "88A",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F15BL-28420"
+        },
+        {
+          "exclusive_m2": 68.72,
+          "supply_m2": 99.1,
+          "supply_label": "99A",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F15BL-28420"
+        },
+        {
+          "exclusive_m2": 84.9,
+          "supply_m2": 117.1,
+          "supply_label": "117A",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F15BL-28420"
+        },
+        {
+          "exclusive_m2": 84.94,
+          "supply_m2": 117.12,
+          "supply_label": "117B",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F15BL-28420"
+        },
+        {
+          "exclusive_m2": 95.81,
+          "supply_m2": 131.3,
+          "supply_label": "131A",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F15BL-28420"
+        },
+        {
+          "exclusive_m2": 108.08,
+          "supply_m2": 144.6,
+          "supply_label": "144",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F15BL-28420"
+        }
+      ]
     },
     {
       "id": "m21",
@@ -166,7 +286,15 @@
       "detail_checked_at": "2026-10-19",
       "detail_note": "주차대수 출처 불일치: KB부동산 1113대, K-apt 기반 공개자료 1106대. 앱 표시값은 KB부동산 기준이며 최신 주차 현황은 관리사무소 확인 필요",
       "heating_detail": "지역난방 / 열병합",
-      "naver_sample_verified": "2026-10-19"
+      "naver_sample_verified": "2026-10-19",
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 84.92,
+          "supply_m2": 115.16,
+          "supply_label": "115C",
+          "source_url": "https://fin.land.naver.com/articles/2530240144"
+        }
+      ]
     },
     {
       "id": "m22",
@@ -206,7 +334,51 @@
       "detail_checked_at": "2026-10-19",
       "detail_note": null,
       "heating_detail": "지역난방 / 열병합",
-      "naver_sample_verified": "2026-10-19"
+      "naver_sample_verified": "2026-10-19",
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 72.59,
+          "supply_m2": 96.83,
+          "supply_label": "96",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        },
+        {
+          "exclusive_m2": 84.94,
+          "supply_m2": 113.91,
+          "supply_label": "113B",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        },
+        {
+          "exclusive_m2": 84.98,
+          "supply_m2": 114.28,
+          "supply_label": "114A",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        },
+        {
+          "exclusive_m2": 84.92,
+          "supply_m2": 115.16,
+          "supply_label": "115C",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        },
+        {
+          "exclusive_m2": 125.51,
+          "supply_m2": 157.32,
+          "supply_label": "157",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        },
+        {
+          "exclusive_m2": 148.72,
+          "supply_m2": 184.2,
+          "supply_label": "184",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        },
+        {
+          "exclusive_m2": 196.04,
+          "supply_m2": 245.33,
+          "supply_label": "245",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        }
+      ]
     },
     {
       "id": "m23",
@@ -287,7 +459,57 @@
       "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
       "detail_source_url": "https://apt.hilite.co.kr/apt/A10025853/",
       "detail_checked_at": "2026-10-19",
-      "detail_note": null
+      "detail_note": null,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 59.94,
+          "supply_m2": 91.74,
+          "supply_label": "91A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 59.53,
+          "supply_m2": 91.27,
+          "supply_label": "91B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 68.64,
+          "supply_m2": 101.25,
+          "supply_label": "101",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 84.05,
+          "supply_m2": 118.94,
+          "supply_label": "118A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 84.4,
+          "supply_m2": 118.87,
+          "supply_label": "118B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 84.51,
+          "supply_m2": 118.92,
+          "supply_label": "118C",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 95.18,
+          "supply_m2": 129.51,
+          "supply_label": "129",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 108.39,
+          "supply_m2": 146.32,
+          "supply_label": "146",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        }
+      ]
     },
     {
       "id": "centennial",
@@ -356,7 +578,51 @@
       "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
       "detail_source_url": "https://apt.hilite.co.kr/apt/A10023693/",
       "detail_checked_at": "2026-10-19",
-      "detail_note": null
+      "detail_note": null,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 70.92,
+          "supply_m2": 97.83,
+          "supply_label": "97",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        },
+        {
+          "exclusive_m2": 84.83,
+          "supply_m2": 114.73,
+          "supply_label": "114B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        },
+        {
+          "exclusive_m2": 84.53,
+          "supply_m2": 117.15,
+          "supply_label": "117C",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        },
+        {
+          "exclusive_m2": 84.97,
+          "supply_m2": 118.29,
+          "supply_label": "118A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        },
+        {
+          "exclusive_m2": 107.44,
+          "supply_m2": 141.7,
+          "supply_label": "141B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        },
+        {
+          "exclusive_m2": 107.45,
+          "supply_m2": 143.45,
+          "supply_label": "143A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        },
+        {
+          "exclusive_m2": 114.26,
+          "supply_m2": 150.5,
+          "supply_label": "150",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        }
+      ]
     },
     {
       "id": "prime25",
@@ -392,7 +658,33 @@
       "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
       "detail_source_url": "https://apt.hilite.co.kr/apt/A10024083/",
       "detail_checked_at": "2026-10-19",
-      "detail_note": null
+      "detail_note": null,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 107.6,
+          "supply_m2": 135.8,
+          "supply_label": "135C",
+          "source_url": "https://asil.kr/asil/agent/aptprice.jsp?apt=1500070242"
+        },
+        {
+          "exclusive_m2": 121.18,
+          "supply_m2": 154.15,
+          "supply_label": "154",
+          "source_url": "https://asil.kr/asil/agent/aptprice.jsp?apt=1500070242"
+        },
+        {
+          "exclusive_m2": 144.92,
+          "supply_m2": 177.85,
+          "supply_label": "177A",
+          "source_url": "https://asil.kr/asil/agent/aptprice.jsp?apt=1500070242"
+        },
+        {
+          "exclusive_m2": 195.5,
+          "supply_m2": 241.5,
+          "supply_label": "241",
+          "source_url": "https://asil.kr/asil/agent/aptprice.jsp?apt=1500070242"
+        }
+      ]
     },
     {
       "id": "skcentral",
