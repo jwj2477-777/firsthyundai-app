@@ -3,10 +3,10 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.join(__dirname,'..'),html=fs.readFileSync(path.join(root,'app/src/main/assets/index.html'),'utf8');
 const script=html.split('<script>')[1]?.split('</script>')[0];
-const editor=fs.readFileSync(path.join(root,'app/src/main/assets/catalog-editor.js'),'utf8');
+const editor=''; // editor functions are embedded in the WebView HTML script
 const catalog=JSON.parse(fs.readFileSync(path.join(root,'data/complexes.json'),'utf8'));
-new vm.Script(script);new vm.Script(editor);
-assert(html.includes('<script src="catalog-editor.js"></script>'));
+new vm.Script(script);
+assert(script.includes('function exportComplexCatalog()'));
 const elements=new Map(),storage=new Map(),alerts=[];
 function elt(id){
  if(!elements.has(id)){
@@ -38,7 +38,6 @@ const context=vm.createContext({
  alert:x=>alerts.push(x),confirm:()=>true,console,Date,URL:{},Blob:{}
 });
 vm.runInContext(script,context);
-vm.runInContext(editor,context);
 (async()=>{
  for(let i=0;i<25;i++)await Promise.resolve();
  const evalJS=q=>vm.runInContext(q,context);
