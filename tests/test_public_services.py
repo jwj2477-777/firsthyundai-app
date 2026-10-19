@@ -144,11 +144,34 @@ class PublicDataTests(unittest.TestCase):
    with self.assertRaises(RuntimeError):
     p.collect_subscriptions('key',opener=lambda req:b'{"data":[],"totalCount":500,"page":1}',today=p.datetime(2026,10,20).date())
    self.assertEqual(json.loads(path.read_text(encoding='utf8')),original)
+
+ def test_registry_and_maintenance_match_exact_official_codes(self):
+  import sys
+  sys.path.insert(0,str(root/'scripts'))
+  import collect_registry_maintenance as rf
+  example={'kaptCode':'A10020270','kaptName':'송도푸르지오월드마크1단지',
+    'bjdCode':'2818510600','kaptAddr':'인천광역시 연수구 송도동 20-22 송도푸르지오월드마크1단지',
+    'doroJuso':'인천광역시 연수구 컨벤시아대로 50'}
+  catalog=[{'id':'kapt-a10020270','kapt_code':'A10020270','address':example['doroJuso']}]
+  self.assertEqual(rf.match_lot(example['kaptAddr']),('0020','0022'))
+  self.assertEqual([x['id'] for x in rf.upsert_complex_targets(catalog,example)],['kapt-a10020270'])
+  self.assertEqual(rf.upsert_complex_targets(catalog,dict(example,bjdCode='1111010100')),[])
+  row={'sigunguCd':'28185','bjdongCd':'10600','bun':20,'ji':22,'mainPurpsCdNm':'공동주택(아파트)',
+    'newPlatPlc':example['doroJuso'],'useAprDay':'20101119','grndFlrCnt':'20'}
+  self.assertEqual(rf.verify_building_rows([row],example)['approval_date'],'2010-11-19')
+  self.assertIsNone(rf.verify_building_rows([dict(row,bun=21)],example))
+  self.assertIsNone(rf.verify_building_rows([dict(row,newPlatPlc='서울특별시 강남구 역삼로 2')],example))
+  self.assertIsNone(rf.verify_building_rows([dict(row,mainPurpsCdNm='근린생활시설')],example))
+  self.assertIsNone(rf.normalize_cost_response([{'kaptCode':'B00000000','kaptName':example['kaptName'],'pay':1000}],example['kaptCode'],example['kaptName'],('pay',)))
+  self.assertEqual(rf.normalize_cost_response([{'kaptCode':example['kaptCode'],'kaptName':example['kaptName'],'pay':1000}],example['kaptCode'],example['kaptName'],('pay',)),1000)
+  self.assertEqual(rf.won(None),None)
+  self.assertEqual(rf.won('0'),0)
+  self.assertEqual(rf.won('garbage'),None)
  def test_official_zone_is_download_and_never_auto_assigned(self):
   snap=json.loads((root/'data'/'public_services.json').read_text(encoding='utf8'))
   self.assertEqual(snap['school_zones']['state'],'published_download_available')
   self.assertEqual(snap['schools']['state'],'awaiting_key')
-  self.assertEqual(snap['maintenance']['state'],'awaiting_approval')
+  self.assertIn(snap['maintenance']['state'],('awaiting_approval','verified'))
   self.assertFalse(snap['school_zones']['records'])
 
 if __name__=='__main__':unittest.main()
