@@ -216,6 +216,7 @@ def apt_profile(basic, detail, checked_at):
                if total_hh and alternate_hh and total_hh != alternate_hh else None)
     building = to_positive_int(basic.get("kaptDongCnt"))
     address = cleaned(basic.get("doroJuso"))
+    lot_address = cleaned(basic.get("kaptAddr")) or None
     if not hh or not building or not address or "연수구" not in address:
         # Do not publish misleading or partly unlocated apartment rows.
         return None
@@ -247,7 +248,7 @@ def apt_profile(basic, detail, checked_at):
         "households": hh, "buildings": building,
         "approved_date": date_iso(basic.get("kaptUsedate")),
         "heating": heater,
-        "address": address,
+        "address": address, "lot_address": lot_address,
         "builder": cleaned(basic.get("kaptBcompany")) or None,
         "management_phone": valid_phone(basic.get("kaptTel")),
         "parking_total": park_total, "floors": floors,
