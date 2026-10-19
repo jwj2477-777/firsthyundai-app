@@ -271,12 +271,18 @@ def join_curated(curated, newly):
     output = list(curated)
     codes = {p.get("kapt_code") for p in curated if p.get("kapt_code")}
     aliases = {norm_name(v) for p in curated for v in [p.get("label", ""), *p.get("aliases", [])]}
-    addresses = {norm_name(p.get("address")) for p in curated if p.get("address")}
+    # Only the 13 validated favorite apartments override a K-apt item by address.
+    # Later reference-verified individual blocks may share an address with a
+    # K-apt *aggregate*, which must still be kept for provenance.
+    favorite_addresses = {norm_name(p.get("address")) for p in curated
+                          if p.get("address") and p.get("id") in {
+                              "f13","f14","f15","m21","m22","m23","avenue",
+                              "centennial","prime20","prime25","skcentral","artwin","central3"}}
     ids = {p["id"] for p in curated}
     for obj in newly:
         if obj["kapt_code"] in codes or obj["id"] in ids or norm_name(obj["label"]) in aliases:
             continue
-        if norm_name(obj.get("address")) in addresses:
+        if norm_name(obj.get("address")) in favorite_addresses:
             # Same address as a validated favorite => no duplicate.
             continue
         ids.add(obj["id"])
@@ -332,7 +338,17 @@ def main():
         raise PublicApiError("공개 단지 JSON 스키마가 잘못되었습니다")
     old = data["records"]
     curated = [r for r in old if r.get("catalog_source") != "kapt"]
+    previous_kapt = {r["kapt_code"]:r for r in old if r.get("catalog_source")=="kapt" and r.get("kapt_code")}
     records, count, failures = collect(curated, args.key)
+    for r in records:
+        prior = previous_kapt.get(r.get("kapt_code"))
+        if prior and r.get("catalog_source")=="kapt":
+            # Preserve the explicitly audited trade aliases, not arbitrary fuzzy labels.
+            known = [r["label"],*(prior.get("aliases") or [])]
+            r["aliases"] = list(dict.fromkeys(known))[:10]
+            for field in ("aggregate_only","detail_note","naver_complex_url"):
+                if field in prior:
+                    r[field] = prior[field]
     print("송도동 K-apt 본문 확인:", count, "건, 기존 보존:", len(curated),
           "건, 게시 단지:", len(records), "건, 조회실패:", failures)
     if args.dry_run:
