@@ -27,6 +27,30 @@ TOPICS = {
 MAX_ITEMS_PER_FEED = 45
 MAX_ENTRIES = 160
 
+# 지역 기사에는 송도와 직접 연결되는 지명/교통 키워드가 반드시 있어야 함.
+# 전국 부동산 정책은 송도 언급이 없어도 실무에 유효할 수 있음.
+LOCAL_NEWS = re.compile(r'송도|연수구|인천대입구|GTX\\s*[-–]?\\s*B|워터프런트', re.I)
+HOUSING_NEWS = re.compile(
+    r'주택|아파트|부동산|전세|월세|임대|분양|청약|입주|주담대|'
+    r'주택담보|대출|DSR|LTV|DTI|취득세|양도세|종부세|보유세|'
+    r'가계부채|코픽스|금리|토지거래|재건축|재개발|공급|국토부|국토교통부',
+    re.I,
+)
+SPAM_NEWS = re.compile(
+    r'카지노|바카라|토토|먹튀|슬롯|배팅|베팅|룰렛|홀덤|'
+    r'도박|스포츠북|온라인\\s*카지노|보너스\\s*게임',
+    re.I,
+)
+
+
+def relevant_news_title(title, category):
+    if SPAM_NEWS.search(title):
+        return False
+    if category in ('개발·교통', '분양·입주'):
+        return bool(LOCAL_NEWS.search(title))
+    return bool(HOUSING_NEWS.search(title))
+
+
 
 def rss_link(query):
     return 'https://news.google.com/rss/search?' + urlencode({'q': query+' when:7d','hl':'ko','gl':'KR','ceid':'KR:ko'})
@@ -148,7 +172,7 @@ def update(*, request=http_request, now=None):
                 raw=parse_rss(request(url), category, query)
                 # 피드 이상으로 7일보다 오래된 기사 제외
                 lower_bound=now-timedelta(days=8)
-                raw=[r for r in raw if lower_bound<=datetime.fromisoformat(r['published_at'])<=now+timedelta(hours=2)]
+                raw=[r for r in raw if lower_bound<=datetime.fromisoformat(r['published_at'])<=now+timedelta(hours=2) and relevant_news_title(r['title'],category)]
                 all_rows+=raw
                 success+=1
                 print(f'{category}/{query}: {len(raw)}건')
