@@ -1,6 +1,9 @@
 name: Sync Songdo K-apt Apartments (requires separate API approvals)
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/sync-kapt.yml']
 permissions:
   contents: write
 concurrency:
