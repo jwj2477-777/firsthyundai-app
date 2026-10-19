@@ -216,7 +216,7 @@ body.apartmentSheetActive{overflow:hidden}
   </div>
   <select id="nearbyType" class="hidden" aria-label="관심단지 내부 거래유형"><option value="">전체</option><option>매매</option><option>전세</option><option>월세</option></select>
   <div id="nearbyAreaPanel" class="hidden">
-    <label class="inputLabel" for="nearbyAreaSelect">평형 선택 (선택사항)</label>
+    <label class="inputLabel" for="nearbyAreaSelect">전용면적 선택 · 확인된 공급평형 병기</label>
     <select id="nearbyAreaSelect" onchange="renderNearbyDetails(true)" aria-label="관심단지 전용면적"><option value="">모든 전용면적 보기</option></select>
   </div>
   <div id="nearbyStats" class="nearbyStats"></div>
@@ -330,7 +330,7 @@ body.apartmentSheetActive{overflow:hidden}
     <label class="inputLabel" for="tradeBuildingSelect">어느 아파트를 보시겠어요?</label>
     <select id="tradeBuildingSelect" onchange="chooseTradeBuilding()" aria-label="실거래 아파트 선택"><option value="">아파트를 선택하세요</option></select>
     <div id="tradeAreaPanel" class="hidden">
-      <label class="inputLabel" for="tradeAreaSelect">평형 선택 (선택사항)</label>
+      <label class="inputLabel" for="tradeAreaSelect">전용면적 선택 · 확인된 공급평형 병기</label>
       <select id="tradeAreaSelect" onchange="setTradeArea()" aria-label="실거래 전용면적 선택"><option value="">모든 전용면적 보기</option></select>
     </div>
   </div>
@@ -695,6 +695,52 @@ function complexAreaStats(apt){
  }
  return [...groups.values()].sort((a,b)=>a.area-b.area);
 }
+// Real-estate pyeong types describe verified SUPPLY area, not contract exclusive area.
+function verifiedSupplyPairs(apt){
+ const labels=new Set(Array.isArray(apt?.supply_type_labels)?apt.supply_type_labels:[]);
+ return (Array.isArray(apt?.area_type_pairs)?apt.area_type_pairs:[]).filter(x=>
+  x&&typeof x.supply_label==='string'&&labels.has(x.supply_label)&&
+  /^[0-9]{2,3}(?:\.[0-9]{1,2})?[A-Za-z-]{0,4}$/.test(x.supply_label)&&
+  Number.isFinite(x.exclusive_m2)&&Number.isFinite(x.supply_m2)&&
+  x.exclusive_m2>0&&x.supply_m2>x.exclusive_m2&&
+  x.supply_m2/x.exclusive_m2<2.5&&Math.abs(parseFloat(x.supply_label)-x.supply_m2)<2);
+}
+function supplyPyeong(supplyM2){
+ const n=Number(supplyM2);
+ return Number.isFinite(n)&&n>0&&n<1000?Math.round(n/3.305785):null;
+}
+function supplyForExclusive(apt,exclusiveM2){
+ const area=Number(exclusiveM2);
+ if(!Number.isFinite(area)||area<=0)return null;
+ const pairs=verifiedSupplyPairs(apt).filter(x=>Math.abs(x.exclusive_m2-area)<=0.011);
+ if(!pairs.length)return null;
+ const py=[...new Set(pairs.map(x=>supplyPyeong(x.supply_m2)))];
+ if(py.length!==1||py[0]===null)return null;
+ return {pyeong:py[0],types:[...new Set(pairs.map(x=>x.supply_label))].sort()};
+}
+function catalogForTradeName(name){
+ const key=normalizeAptName(name);
+ if(!key)return null;
+ const matches=catalogRows().filter(p=>[p.label,...(Array.isArray(p.aliases)?p.aliases:[])]
+  .some(v=>normalizeAptName(v)===key));
+ return matches.length===1?matches[0]:null;
+}
+function displayExclusiveArea(area,apt){
+ const n=Number(area);
+ if(!Number.isFinite(n)||n<=0)return '전용면적 확인 필요';
+ const matched=supplyForExclusive(apt,n);
+ return '전용 '+number(Math.round(n*100)/100)+'㎡'+
+  (matched?' (약 '+matched.pyeong+'평형)':'');
+}
+function displaySupplyType(apt,label){
+ const match=verifiedSupplyPairs(apt).find(x=>x.supply_label===label);
+ if(match){
+  const py=supplyPyeong(match.supply_m2);
+  return '전용 '+number(match.exclusive_m2)+'㎡ (약 '+py+'평형) · 공급 '+label+'㎡';
+ }
+ const sqm=parseFloat(label),py=supplyPyeong(sqm);
+ return '공급 '+label+'㎡'+(py?' (약 '+py+'평형)':'')+' · 전용면적 미확인';
+}
 function displayComplexValue(v,suffix=''){
  return v===null||v===undefined||v===''?'확인 전':String(v)+suffix;
 }
@@ -840,9 +886,9 @@ function renderComplexes(){
    (p.detail_note?'<details class="details"><summary>자료 차이·확인사항 보기</summary><p class="complexSectionNote">'+escapeHtml(p.detail_note)+'</p></details>':'');
   const types=(Array.isArray(p.supply_type_labels)?p.supply_type_labels:[]).filter(v=>
    typeof v==='string'&&/^[0-9]{2,3}(?:\.[0-9]{1,2})?[A-Za-z-]{0,4}$/.test(v)).slice(0,45);
-  const typesView=types.length?'<div class="complexTypeList">'+types.map(v=>'<span>'+escapeHtml(v)+'㎡ (약 '+Math.round(parseFloat(v)/3.305785)+'평)</span>').join('')+'</div>':
+  const typesView=types.length?'<div class="complexTypeList">'+types.map(v=>'<span>'+escapeHtml(displaySupplyType(p,v))+'</span>').join('')+'</div>':
    '<div class="empty">아직 확인된 공급면적 타입이 없습니다. 원본 단지정보를 참고해 주세요.</div>';
-  const areaView='<p class="tiny">공급면적 기준이며 A/B 등 구조별 타입은 별도로 표시합니다. 평은 참고용 약값입니다.</p>'+typesView;
+  const areaView='<p class="tiny">㎡는 전용면적 기준, 약 ○평형은 공급면적 기준입니다. 공급↔전용 대응이 확인된 타입만 함께 표시하며 나머지는 공급타입만 안내합니다.</p>'+typesView;
   const stats=complexAreaStats(p),active=complexDealType;
   const dealButtons=[['','전체'],['매매','매매'],['전세','전세'],['월세','월세']]
    .map(([v,label])=>'<button type="button" class="'+(active===v?'active':'')+'" onclick="setComplexDealType(\''+v+'\')">'+label+'</button>').join('');
@@ -852,7 +898,7 @@ function renderComplexes(){
    (dealRows.length?dealRows.slice(0,35).map(g=>{
     const cnt=active==='매매'?g.sale:active==='전세'?g.lease:active==='월세'?g.monthly:g.total;
     return '<button type="button" class="complexTap" onclick="showComplexTrades(\''+p.id+'\','+g.area+',\''+active+'\')">'+
-     '<span><strong>전용 '+number(g.area)+'㎡</strong> <span class="sub">· 약 '+Math.round(g.area/3.305785)+'평</span></span>'+
+     '<span><strong>'+escapeHtml(displayExclusiveArea(g.area,p))+'</strong></span>'+
      '<span><strong>'+number(cnt)+'건</strong> <span class="sub">보기 ›</span></span></button>';
    }).join(''):'<div class="empty">해당 조건에 기록된 거래가 없습니다.</div>')+
    (dealRows.length>35?'<p class="tiny">목록이 길어 앞의 35개 면적만 표시했습니다. 전체 실거래가 탭을 이용해 주세요.</p>':'');
@@ -1635,6 +1681,8 @@ function createCatalogExport(){
   records:records.map(p=>({
    id:p.id,label:p.label,aliases:p.aliases,households:p.households??null,heating:p.heating??null,
    supply_type_labels:Array.isArray(p.supply_type_labels)?p.supply_type_labels:[],
+   area_type_pairs:verifiedSupplyPairs(p).map(x=>({exclusive_m2:x.exclusive_m2,supply_m2:x.supply_m2,
+    supply_label:x.supply_label,source_url:safeLink(x.source_url)||null})),
    area_types_m2:Array.isArray(p.area_types_m2)?p.area_types_m2:[],
    floorplans:Array.isArray(p.floorplans)?p.floorplans:[],
    source_url:p.source_url??null,last_verified:p.last_verified??null,naver_complex_url:p.naver_complex_url??null,
