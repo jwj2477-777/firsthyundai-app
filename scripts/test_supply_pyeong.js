@@ -34,7 +34,7 @@ const script=html.split('<script>',2)[1].split('</script>',1)[0];
 new vm.Script(script);
 assert(script.includes('const exclusiveAreas='),'Every apartment needs visible exclusive-size options');
 assert(script.includes('공급평형 확인 중'),'Unknown supply types must never be faked');
-assert(script.includes('공급평형 '+"'"+"), 'Unmatched KB supply types are visible in the UI');
+assert(script.includes('공급평형 '), 'Unmatched KB supply types are visible in the UI');
 assert(script.includes('실거래 관측'),'Users must understand observed trade sizes are not complete legal types');
 assert(!script.includes('Math.round(g.area/3.305785)'),'Exclusive-to-pyeong shortcut forbidden');
 const normalization=script.slice(script.indexOf('function normalizeAptName('),script.indexOf('const FAVORITE_MATCH='));
