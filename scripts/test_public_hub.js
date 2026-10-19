@@ -21,7 +21,11 @@ const ctx=vm.createContext({
 vm.runInContext(snippet,ctx);
 const run=q=>vm.runInContext(q,ctx);
 const missing=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13'})");
-assert(missing.includes('활용승인')&&missing.includes('건축물대장')&&missing.includes('공동주택 관리비'));
+assert(missing.includes('건축물대장')&&missing.includes('공동주택 관리비'));
+assert(missing.includes('아직 검증된 단지별 조회 자료가 없습니다.'), 'Unverified units must be clearly marked unavailable');
+assert(!missing.includes('공식 자료·신청'), 'Family users must never be sent to developer API signup pages');
+const addressed=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13',address:'인천광역시 연수구 컨벤시아대로252번길 70'})");
+assert(addressed.includes('카카오맵에서 주소 확인')&&addressed.includes('컨벤시아대로252번길 70'));
 assert(missing.includes('0원 또는 0건이 아닙니다'), 'Missing fee is clearly labeled unknown, not zero');
 assert(run('renderSchoolPublicInfo()').includes('배정학교가 아닙니다'));
 assert(run('renderSchoolPublicInfo()').includes('schoolzone.emac.kr'));
