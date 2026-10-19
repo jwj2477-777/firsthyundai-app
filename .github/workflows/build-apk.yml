@@ -9,6 +9,7 @@ on:
       - 'app/**'
       - 'scripts/test_family_mode.js'
       - 'scripts/test_complexes.js'
+      - 'scripts/test_catalog_editor.js'
       - 'build.gradle'
       - 'settings.gradle'
       - 'gradle.properties'
@@ -40,6 +41,8 @@ jobs:
           node scripts/test_family_mode.js
           node scripts/test_admin_guards.js
           node scripts/test_complexes.js
+          node --check app/src/main/assets/catalog-editor.js
+          node scripts/test_catalog_editor.js
       - name: Test password policy generation (disposable code)
         run: python3 scripts/test_family_policy.py
       - name: Test independent administrator policy
