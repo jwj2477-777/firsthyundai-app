@@ -61,26 +61,47 @@ def upsert_complex_targets(catalog,basic):
     return matches if len(matches)==1 and official_name else []
 
 def resolve_missing_kapt_codes(catalog,key,*,session=None,delay=0.04):
-    """Attach verified public K-apt codes to legacy manually curated blocks in memory.
-
-    Uses official K-apt listing/name shortlist; a single exact road-address and
-    legal-dong match is mandatory before linking. Never overwrites source JSON.
-    """
-    missing=[p for p in catalog if p.get('id') and not p.get('aggregate_only') and
-        not p.get('kapt_code') and p.get('address') and '연수구' in p['address']]
+    """Exact-address official matching for curated apartment blocks; no inference by name."""
+    missing=[p for p in catalog if p.get("id") and not p.get("aggregate_only") and
+        not p.get("kapt_code") and p.get("address") and "연수구" in p["address"]]
     if not missing:return list(catalog)
     stems=set()
     for p in missing:
-        for raw in [p.get('label',''),*(p.get('aliases') or [])]:
+        for raw in [p.get("label",""),*(p.get("aliases") or [])]:
             s=norm(raw)
-            s=re.sub(r'^(인천|송도|더샵)', '',s)
-            s=re.sub(r'(아파트|블럭|단지|블록|BL|F\d{1,2}BL)
-    resp=call_api('https://apis.data.go.kr/1613000/AptBasisInfoServiceV5/getAphusBassInfoV5',
-      {'kaptCode':code,'dataType':'JSON'},key,session=session)
-    rows,_=unpack(resp)
-    if len(rows)!=1 or str(rows[0].get('kaptCode',''))!=code:raise PublicApiError('K-apt 기본정보 불일치')
-    return rows[0]
+            s=re.sub(r"^(인천|송도|더샵)","",s)
+            for suffix in ("아파트","블럭","단지","블록","BL"):
+                if s.endswith(suffix):s=s[:-len(suffix)]
+            name=re.sub(r"[0-9]","",s)
+            if len(name)>=3:stems.add(name[:12])
+    listing=list_complexes(key,session=session,wait=delay)
+    candidates=[]
+    for row in listing:
+        code=str(row.get("kaptCode") or "")
+        name=norm(row.get("kaptName"))
+        if not re.fullmatch(r"A\d{8}",code) or not name:continue
+        if row.get("bjdCode") and str(row.get("bjdCode"))!="2818510600":continue
+        if any(stem in name for stem in stems):candidates.append(code)
+    if len(candidates)>160:raise RuntimeError("공식 단지명 후보 과다, 주소 매핑 보류")
+    verified={}
+    for code in sorted(set(candidates)):
+        try:basic=fetch_basic(key,code,session)
+        except PublicApiError:continue
+        if str(basic.get("bjdCode"))!="2818510600":continue
+        road=address_key(basic.get("doroJuso"))
+        hits=[p for p in missing if address_key(p["address"])==road]
+        if len(hits)==1:verified.setdefault(hits[0]["id"],set()).add(code)
+        time.sleep(delay)
+    mapping={id:next(iter(codes)) for id,codes in verified.items() if len(codes)==1}
+    print("공식 K-apt 도로명주소 대조 완료:",len(mapping),"단지")
+    return [dict(p,kapt_code=mapping[p["id"]]) if p.get("id") in mapping else p for p in catalog]
 
+def fetch_basic(key,code,session=None):
+    resp=call_api("https://apis.data.go.kr/1613000/AptBasisInfoServiceV5/getAphusBassInfoV5",
+      {"kaptCode":code,"dataType":"JSON"},key,session=session)
+    rows,_=unpack(resp)
+    if len(rows)!=1 or str(rows[0].get("kaptCode",""))!=code:raise PublicApiError("K-apt 기본정보 불일치")
+    return rows[0]
 def verify_building_rows(rows,basic):
     lot=match_lot(basic.get('kaptAddr'))
     if not lot:return None
