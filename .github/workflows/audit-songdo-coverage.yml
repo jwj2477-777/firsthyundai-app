@@ -1,0 +1,17 @@
+name: Audit Additional Songdo Apartments
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-songdo-coverage.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare distinct Songdo trade buildings against K-apt catalog
+        run: python scripts/audit_songdo_coverage.py
