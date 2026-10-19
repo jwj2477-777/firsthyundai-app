@@ -20,6 +20,10 @@ on:
       - 'scripts/test_mobile_navigation.js'
       - 'scripts/test_apartment_detail_navigation.js'
       - 'scripts/test_refresh_feedback.js'
+      - 'scripts/test_public_hub.js'
+      - 'scripts/collect_public_services.py'
+      - 'tests/test_public_services.py'
+      - 'data/public_services.json'
       - 'scripts/generate_launcher_icon.py'
       - 'scripts/test_launcher_safezone.py'
       - 'scripts/collect_complexes.py'
@@ -75,6 +79,7 @@ jobs:
           node scripts/test_mobile_navigation.js
           node scripts/test_apartment_detail_navigation.js
           node scripts/test_refresh_feedback.js
+          node scripts/test_public_hub.js
           node scripts/test_family_mode.js
           node scripts/test_admin_guards.js
           node scripts/test_complexes.js
