@@ -45,7 +45,12 @@ vm.runInContext(js,ctx);
  assert.equal(added.households,null,'Never invent unknown households');
  assert.equal(added.source_url,null,'Do not disguise public sale record as apartment facts source');
  run("switchPage('complexes')");
- assert(el('complexCards').innerHTML.includes('송도테스트신규아파트'));
+ el('complexSearch').value='송도테스트신규아파트';
+ run('renderComplexes()');
+ assert(el('complexCards').innerHTML.includes('송도테스트신규아파트'),
+   'Search must find new transaction-only complexes in long expanded catalogs');
+ el('complexSearch').value='';
+ run('renderComplexes()');
  run("setComplexDetailTab('sources')");
  assert(el('complexDetails').innerHTML.includes('네이버페이 부동산'));
  el('complexScope').value='favorites';run('renderComplexes()');
