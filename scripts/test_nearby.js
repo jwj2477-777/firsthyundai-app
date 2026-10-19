@@ -15,8 +15,8 @@ assert.ok(start >= 0 && end > start, 'Missing favorite mapping');
 const source = html.slice(start, end + endMarker.length);
 const result = vm.runInNewContext(source + '\n({groups:FAVORITE_APTS, lookup:favoriteIdForBuilding})');
 const {groups, lookup} = result;
-assert.equal(groups.length, 12, 'There must be exactly twelve favorite groups');
-assert.equal(new Set(groups.map(g => g.id)).size, 12, 'Favorite IDs must be distinct');
+assert.equal(groups.length, 13, 'Prime View 20 and 25 must be independent favorite groups');
+assert.equal(new Set(groups.map(g => g.id)).size, 13, 'Favorite IDs must be distinct');
 
 const expected = [
  ['f13','송도더샵퍼스트파크F13-1BL'],
@@ -27,8 +27,8 @@ const expected = [
  ['m23','송도더샵마스터뷰23-1BL'],
  ['avenue','송도더샵파크애비뉴'],
  ['centennial','더샵송도센터니얼'],
- ['prime','더샵송도프라임뷰20BL'],
- ['prime','더샵송도프라임뷰25BL'],
+ ['prime20','더샵송도프라임뷰20BL'],
+ ['prime25','더샵송도프라임뷰25BL'],
  ['skcentral','송도SK뷰센트럴'],
  ['artwin','송도아트윈푸르지오'],
  ['central3','더샵송도센트럴파크Ⅲ']
@@ -50,6 +50,6 @@ for(const row of data.records || []){
   matchCount++;
  }
 }
-assert.equal(matched.size, 12, 'Every favorite group should match at least one real trade');
+assert.equal(matched.size, 13, 'All 13 favorite apartments need matching real transactions');
 assert.ok(matchCount > 100, 'Most likely official name mapping or source JSON regression');
 console.log('Favorite mapping tests passed: '+groups.length+' groups, '+matchCount+' matching real transactions');
