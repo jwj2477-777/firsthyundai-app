@@ -4,7 +4,7 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),asse
 const root=path.resolve(__dirname,'..');
 const obj=JSON.parse(fs.readFileSync(path.join(root,'data/complexes.json'),'utf8'));
 assert(obj.records.length>=13);
-const rows=obj.records.filter(x=>x.catalog_source!=='kapt');
+const rows=obj.records.filter(x=>x.catalog_source!=='kapt'&&x.catalog_source!=='trades');
 assert.equal(rows.length,13,'All thirteen manually checked profiles must remain');
 assert.equal(new Set(rows.map(x=>x.id)).size,13);
 const required=['households','buildings','approved_date','parking_total','floors','floor_area_ratio',
