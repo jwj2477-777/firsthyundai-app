@@ -38,9 +38,12 @@ export default {
     if(request.method!=="GET")return answer({error:"method_not_allowed"},405);
     const url=new URL(request.url);
     if(url.pathname==="/health")return answer({ok:true,service:"firsthyundai-nearby",ready:!!env.KAKAO_REST_API_KEY});
-    if(url.pathname!=="/nearby")return answer({error:"not_found"},404);
-    const id=url.searchParams.get("complex")||"";
-    const cat=url.searchParams.get("category")||"";
+    // Accept path parameters as well: /nearby/f13/MT1 is reliable in mobile chat browsers.
+    const pathParts=url.pathname.split("/").filter(Boolean);
+    const pathLookup=pathParts.length===3&&pathParts[0]==="nearby";
+    if(url.pathname!=="/nearby"&&!pathLookup)return answer({error:"not_found"},404);
+    const id=pathLookup?pathParts[1]:(url.searchParams.get("complex")||"");
+    const cat=pathLookup?pathParts[2]:(url.searchParams.get("category")||"");
     if(!/^[a-zA-Z0-9_-]{1,64}$/.test(id)||!ALLOWED.has(cat)||
        [...url.searchParams.keys()].some(k=>!["complex","category"].includes(k)))
       return answer({error:"invalid_parameters"},400);
@@ -49,6 +52,7 @@ export default {
     // Conservative per-Cloudflare-location limiter; keep paid usage disabled and monitor quota.
     const quota=await env.NEARBY_RATE_LIMITER.limit({key:"firsthyundai-live-lookup"});
     if(!quota.success)return answer({error:"rate_limited",message:"조회가 많아 잠시 후 다시 시도해 주세요."},429);
+    let stage="catalog";
     try {
       const catalog=await readJson(CATALOG);
       if(catalog.schema_version!==1||!Array.isArray(catalog.records))throw Error("catalog_invalid");
@@ -59,6 +63,7 @@ export default {
       const headers={"Authorization":"KakaoAK "+env.KAKAO_REST_API_KEY,"Accept":"application/json"};
       const addrUrl=new URL(KAKAO+"search/address.json");
       addrUrl.search=new URLSearchParams({query:address,size:"1"}).toString();
+      stage="kakao_address";
       const geo=await readJson(addrUrl.toString(),{headers});
       const point=geo.documents?.[0];
       const x=Number(point?.x),y=Number(point?.y);
@@ -68,6 +73,7 @@ export default {
         category_group_code:cat,x:String(x),y:String(y),
         radius:"1500",size:"10",sort:"distance",page:"1"
       }).toString();
+      stage="kakao_category";
       const pois=await readJson(poiUrl.toString(),{headers});
       if(!Array.isArray(pois.documents))throw Error("invalid_places");
       const places=pois.documents.slice(0,10).map(p=>({
@@ -80,8 +86,12 @@ export default {
       return answer({schema_version:1,source:"Kakao Local",complex_id:id,category:cat,
         radius_m:1500,checked_at:new Date().toISOString(),places});
     } catch(error) {
-      // Don't log request headers or errors that could include keys.
-      return answer({error:"provider_unavailable",message:"카카오 실시간 조회에 실패했습니다. 잠시 후 다시 시도해 주세요."},502);
+      // Report only the failed stage and a safe upstream status; never reveal secrets,
+      // full URLs, upstream bodies, or request headers to the client or logs.
+      const m=/^upstream_http_([45][0-9]{2})$/.exec(String(error?.message||""));
+      const reason=m?"http_"+m[1]:"request_failed";
+      return answer({error:"provider_unavailable",stage,reason,
+        message:"실시간 조회에 실패했습니다. 오류 단계와 코드를 확인해 주세요."},502);
     }
   }
 };
