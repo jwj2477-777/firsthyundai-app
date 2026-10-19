@@ -30,13 +30,16 @@ function makeContext(initialMode){
   window:{FirstHyundaiNative:native},
   alert(){},
  });
- vm.runInContext(prefix+'\nfunction renderNearby(){}\nfunction renderNew(){}\nfunction renderTrades(){}\nfunction renderNews(){}\nfunction renderNotes(){}\nfunction refreshAll(){}',ctx);
+ vm.runInContext(prefix+'\nfunction renderNearby(){}
+function renderComplexes(){}\nfunction renderNew(){}\nfunction renderTrades(){}\nfunction renderNews(){}\nfunction renderNotes(){}\nfunction refreshAll(){}',ctx);
  return {ctx,get};
 }
 const family=makeContext('family');
 assert.equal(vm.runInContext('role',family.ctx),'family');
 assert.equal(vm.runInContext('repository',family.ctx),'jwj2477-777/firsthyundai-app');
-assert.equal(vm.runInContext('activePages().length',family.ctx),5);
+assert.equal(vm.runInContext('activePages().length',family.ctx),6);
+vm.runInContext("switchPage('complexes')",family.ctx);
+assert.equal(vm.runInContext('currentPage',family.ctx),'complexes','family can view public apartment information');
 vm.runInContext("switchPage('settings')",family.ctx);
 assert.equal(vm.runInContext('currentPage',family.ctx),'nearby','settings should not open in family mode');
 vm.runInContext("switchPage('security')",family.ctx);
@@ -44,14 +47,14 @@ assert.equal(vm.runInContext('currentPage',family.ctx),'nearby','security settin
 vm.runInContext("switchPage('notes')",family.ctx);
 assert.equal(vm.runInContext('currentPage',family.ctx),'nearby','notes should be admin only');
 vm.runInContext("window.onRoleChanged('admin')",family.ctx);
-assert.equal(vm.runInContext('activePages().length',family.ctx),8);
+assert.equal(vm.runInContext('activePages().length',family.ctx),9);
 vm.runInContext("switchPage('settings')",family.ctx);
 assert.equal(vm.runInContext('currentPage',family.ctx),'settings','admin may view settings');
 vm.runInContext("window.onRoleChanged('family')",family.ctx);
 assert.equal(vm.runInContext('repository',family.ctx),'jwj2477-777/firsthyundai-app');
-assert.equal(vm.runInContext('activePages().length',family.ctx),5);
+assert.equal(vm.runInContext('activePages().length',family.ctx),6);
 assert.equal(vm.runInContext('currentPage',family.ctx),'nearby');
 const admin=makeContext('admin');
 assert.equal(vm.runInContext('role',admin.ctx),'admin','admin device remembers its mode');
-assert.equal(vm.runInContext('activePages().length',admin.ctx),8);
+assert.equal(vm.runInContext('activePages().length',admin.ctx),9);
 console.log('Role test passed: family default repository, admin confirmation state, restricted menus');
