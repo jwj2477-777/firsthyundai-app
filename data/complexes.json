@@ -2,7 +2,7 @@
   "schema_version": 1,
   "state": "verified_partial",
   "updated_at": "2026-10-19",
-  "note": "퍼스트파크 13블럭의 추가 단지정보는 사용자가 제공한 네이버페이 부동산 공개 표기를 근거로 기록했습니다. 다른 단지의 세대수·난방·평형 등 기존 출처 기초정보는 유지했고 추가 필드는 독립 검증 전까지 등록하지 않았습니다. 학교 배정·학교 상세는 정확한 학구 출처 없이는 공란입니다. 고객 개인정보·네이버 이미지 복제 금지.",
+  "note": "관심 13개 단지의 기본정보를 공개 출처로 보강. 사용승인일·동수·주차·층수·주소·시공사·용적률·건폐율·EV 충전시설·관리사무소 번호 포함. 주차대수·난방·층수 일부 출처 불일치에 대해 단지별 detail_note 및 대체값 기록. KB부동산의 주차 수치는 기준 표시값으로 채택, K-apt 출처와 차이 발생 시 안내. 전기차 충전기 수는 국토교통부 공동주택 단지 기본정보 2026-09-09 공개자료 기준. 사용자 제공 F13값 우선 유지. 학군은 입력하지 않았음.",
   "records": [
     {
       "id": "f13",
@@ -38,7 +38,9 @@
       "ev_chargers": 14,
       "management_phone": "032-834-8996",
       "detail_source": "네이버페이 부동산 단지정보 (사용자 제공 내용)",
-      "schools": []
+      "schools": [],
+      "detail_checked_at": "2026-10-19",
+      "detail_note": "사용자가 네이버페이 부동산의 F13 단지 상세정보를 직접 제공한 값입니다. 전기차 충전대수 등 변동 가능한 시설 정보는 최신 현황 확인 권장"
     },
     {
       "id": "f14",
@@ -63,7 +65,23 @@
         "131A",
         "144"
       ],
-      "schools": []
+      "schools": [],
+      "buildings": 5,
+      "approved_date": "2017-11-17",
+      "parking_total": 1229,
+      "floors": "35~42층",
+      "floor_area_ratio": 317,
+      "building_coverage_ratio": 15,
+      "address": "인천광역시 연수구 컨벤시아대로252번길 50",
+      "builder": "주식회사 포스코건설",
+      "management_phone": "032-834-8974",
+      "ev_chargers": 34,
+      "kapt_code": "A10026681",
+      "parking_alt_total": 1224,
+      "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
+      "detail_source_url": "https://apt.hilite.co.kr/apt/A10026681/",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": "주차대수 출처 불일치: KB부동산 1229대, K-apt 기반 공개자료 1224대. 앱 표시값은 KB부동산 기준이며 최신 주차 현황은 관리사무소 확인 필요"
     },
     {
       "id": "f15",
@@ -88,7 +106,22 @@
         "131A",
         "144"
       ],
-      "schools": []
+      "schools": [],
+      "buildings": 5,
+      "approved_date": "2017-11-17",
+      "parking_total": 1233,
+      "floors": "34~43층",
+      "floor_area_ratio": 316,
+      "building_coverage_ratio": 14,
+      "address": "인천광역시 연수구 컨벤시아대로252번길 30",
+      "builder": "주식회사 포스코건설",
+      "management_phone": "032-831-1526",
+      "ev_chargers": 25,
+      "kapt_code": "A10026679",
+      "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
+      "detail_source_url": "https://apt.hilite.co.kr/apt/A10026679/",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": null
     },
     {
       "id": "m21",
@@ -111,7 +144,23 @@
         "184",
         "245"
       ],
-      "schools": []
+      "schools": [],
+      "buildings": 6,
+      "approved_date": "2015-07-29",
+      "parking_total": 1113,
+      "floors": "25~32층",
+      "floor_area_ratio": 211,
+      "building_coverage_ratio": 13,
+      "address": "인천광역시 연수구 컨벤시아대로274번길 55",
+      "builder": "(주)포스코건설",
+      "management_phone": "032-831-8417",
+      "ev_chargers": 10,
+      "kapt_code": "A10027925",
+      "parking_alt_total": 1106,
+      "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
+      "detail_source_url": "https://apt.hilite.co.kr/apt/A10027925/",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": "주차대수 출처 불일치: KB부동산 1113대, K-apt 기반 공개자료 1106대. 앱 표시값은 KB부동산 기준이며 최신 주차 현황은 관리사무소 확인 필요"
     },
     {
       "id": "m22",
@@ -134,7 +183,22 @@
         "184",
         "245"
       ],
-      "schools": []
+      "schools": [],
+      "buildings": 6,
+      "approved_date": "2015-07-29",
+      "parking_total": 1137,
+      "floors": "26~32층",
+      "floor_area_ratio": 212,
+      "building_coverage_ratio": 13,
+      "address": "인천광역시 연수구 컨벤시아대로274번길 35",
+      "builder": "(주)포스코건설",
+      "management_phone": "032-831-8125",
+      "ev_chargers": 27,
+      "kapt_code": "A10027929",
+      "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
+      "detail_source_url": "https://apt.hilite.co.kr/apt/A10027929/",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": null
     },
     {
       "id": "m23",
@@ -158,7 +222,23 @@
         "182",
         "244"
       ],
-      "schools": []
+      "schools": [],
+      "buildings": 5,
+      "approved_date": "2015-07-29",
+      "parking_total": 780,
+      "floors": "29~34층",
+      "floor_area_ratio": 213,
+      "building_coverage_ratio": 13,
+      "address": "인천광역시 연수구 컨벤시아대로274번길 15",
+      "builder": "(주)포스코건설",
+      "management_phone": "032-831-8407",
+      "ev_chargers": 12,
+      "kapt_code": "A10027930",
+      "parking_alt_total": 767,
+      "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
+      "detail_source_url": "https://apt.hilite.co.kr/apt/A10027930/",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": "주차대수 출처 불일치: KB부동산 780대, K-apt 기반 공개자료 767대. 앱 표시값은 KB부동산 기준이며 최신 주차 현황은 관리사무소 확인 필요 / 난방방식 출처 불일치: KB부동산은 지역난방, K-apt 기반 정보는 중앙난방으로 표시. 확인 전까지 난방방식 미확정 처리"
     },
     {
       "id": "avenue",
@@ -182,7 +262,22 @@
         "129",
         "146"
       ],
-      "schools": []
+      "schools": [],
+      "buildings": 4,
+      "approved_date": "2018-11-22",
+      "parking_total": 944,
+      "floors": "38~46층",
+      "floor_area_ratio": 313,
+      "building_coverage_ratio": 15,
+      "address": "인천광역시 연수구 컨벤시아대로252번길 10",
+      "builder": "(주)포스코건설",
+      "management_phone": "032-858-9056",
+      "ev_chargers": 22,
+      "kapt_code": "A10025853",
+      "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
+      "detail_source_url": "https://apt.hilite.co.kr/apt/A10025853/",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": null
     },
     {
       "id": "centennial",
@@ -194,11 +289,26 @@
       "heating": "지역난방",
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": "https://avo-kado.co.kr/main/actual-price/A10023207?area=41&type=SALE",
+      "source_url": "https://realty.daangn.com/complexes/13596133",
       "last_verified": "2026-10-19",
       "supply_type_labels": [],
       "secondary_source_url": "https://realty.daangn.com/complexes/13596133",
-      "schools": []
+      "schools": [],
+      "buildings": 4,
+      "approved_date": "2023-04-10",
+      "parking_total": 483,
+      "floors": "최고 39층",
+      "floor_area_ratio": 252,
+      "building_coverage_ratio": 18,
+      "address": "인천광역시 연수구 컨벤시아대로274번길 62",
+      "builder": "(주)포스코이앤씨",
+      "management_phone": "032-834-5008",
+      "ev_chargers": 25,
+      "kapt_code": "A10023207",
+      "detail_source": "당근부동산 단지정보 및 2026-09-09 K-apt 단지 원자료(동수·충전시설) + 공개 관리사무소 전화",
+      "detail_source_url": "https://apt.hilite.co.kr/apt/A10023207/",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": null
     },
     {
       "id": "prime20",
@@ -221,7 +331,22 @@
         "143A",
         "150"
       ],
-      "schools": []
+      "schools": [],
+      "buildings": 5,
+      "approved_date": "2022-07-29",
+      "parking_total": 1067,
+      "floors": "29~37층",
+      "floor_area_ratio": 209,
+      "building_coverage_ratio": 11,
+      "address": "인천광역시 연수구 인천타워대로231번길 97",
+      "builder": "(주)포스코건설",
+      "management_phone": "032-831-2268",
+      "ev_chargers": 22,
+      "kapt_code": "A10023693",
+      "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
+      "detail_source_url": "https://apt.hilite.co.kr/apt/A10023693/",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": null
     },
     {
       "id": "prime25",
@@ -242,7 +367,22 @@
         "177A",
         "241"
       ],
-      "schools": []
+      "schools": [],
+      "buildings": 4,
+      "approved_date": "2021-10-29",
+      "parking_total": 322,
+      "floors": "16~19층",
+      "floor_area_ratio": 159,
+      "building_coverage_ratio": 16,
+      "address": "인천광역시 연수구 인천타워대로231번길 117",
+      "builder": "(주)포스코건설",
+      "management_phone": "032-833-9930",
+      "ev_chargers": 7,
+      "kapt_code": "A10024083",
+      "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
+      "detail_source_url": "https://apt.hilite.co.kr/apt/A10024083/",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": null
     },
     {
       "id": "skcentral",
@@ -260,7 +400,22 @@
         "109A",
         "109B"
       ],
-      "schools": []
+      "schools": [],
+      "buildings": 3,
+      "approved_date": "2020-10-15",
+      "parking_total": 400,
+      "floors": "33~36층",
+      "floor_area_ratio": 349,
+      "building_coverage_ratio": 45,
+      "address": "인천광역시 연수구 하모니로188번길 17",
+      "builder": "에스케이건설(주)",
+      "management_phone": "032-859-1030",
+      "ev_chargers": 34,
+      "kapt_code": "A10024573",
+      "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
+      "detail_source_url": "https://apt.hilite.co.kr/apt/A10024573/",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": null
     },
     {
       "id": "artwin",
@@ -291,7 +446,23 @@
         "300A",
         "302B"
       ],
-      "schools": []
+      "schools": [],
+      "buildings": 2,
+      "approved_date": "2015-08-27",
+      "parking_total": 1463,
+      "floors": "최고 60층",
+      "floor_area_ratio": 849,
+      "building_coverage_ratio": 51,
+      "address": "인천광역시 연수구 인천타워대로 253-25",
+      "builder": "(주)대우건설",
+      "management_phone": "032-832-0030",
+      "ev_chargers": 28,
+      "kapt_code": "A10027898",
+      "parking_alt_total": 1399,
+      "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
+      "detail_source_url": "https://apt.hilite.co.kr/apt/A10027898/",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": "주차대수 출처 불일치: KB부동산 1463대, K-apt 기반 공개자료 1399대. 앱 표시값은 KB부동산 기준이며 최신 주차 현황은 관리사무소 확인 필요"
     },
     {
       "id": "central3",
@@ -318,7 +489,23 @@
         "269",
         "277"
       ],
-      "schools": []
+      "schools": [],
+      "buildings": 2,
+      "approved_date": "2022-12-30",
+      "parking_total": 575,
+      "floors": "38~40층",
+      "floor_area_ratio": 363,
+      "building_coverage_ratio": 41,
+      "address": "인천광역시 연수구 인천타워대로180번길 11",
+      "builder": "(주)포스코건설",
+      "management_phone": "032-831-2206",
+      "ev_chargers": 29,
+      "kapt_code": "A10023434",
+      "floors_alt": "최고 39층",
+      "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
+      "detail_source_url": "https://apt.hilite.co.kr/apt/A10023434/",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": "층수 출처 불일치: KB부동산 38~40층, K-apt 기반 정보 최고 39층. 상세 층수 범위는 검증 필요"
     }
   ]
 }
