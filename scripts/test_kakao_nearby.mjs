@@ -23,7 +23,10 @@ const env={KAKAO_REST_API_KEY:"fake-secret-do-not-publish",NEARBY_RATE_LIMITER:{
 const hit=(path)=>handler.fetch(new Request("https://firsthyundai-nearby.demo.workers.dev"+path),env);
 try{
   assert.equal((await hit("/nearby?complex=f13&category=bad")).status,400);
+  assert.equal((await hit("/nearby/f13/bad")).status,400);
   assert.equal((await hit("/nearby?complex=hidden&category=HP8")).status,404);
+  assert.equal((await hit("/nearby/hidden/HP8")).status,404);
+  assert.equal((await hit("/nearby/f13/HP8")).status,200);
   const r=await hit("/nearby?complex=f13&category=HP8");
   assert.equal(r.status,200);
   const obj=await r.json();
