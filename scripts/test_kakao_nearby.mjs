@@ -46,7 +46,14 @@ try{
   assert.equal(failed.status,502);
   const diagnostic=await failed.json();
   assert.equal(diagnostic.stage,"kakao_address");
-  assert.equal(diagnostic.reason,"request_failed");
+  assert.equal(diagnostic.reason,"network_error");
   assert(!JSON.stringify(diagnostic).includes(env.KAKAO_REST_API_KEY));
+  globalThis.fetch=async()=>new Response("",{status:403});
+  const forbidden=await (await hit("/nearby/f13/HP8")).json();
+  assert.equal(forbidden.stage,"kakao_address");
+  assert.equal(forbidden.reason,"http_403");
+  globalThis.fetch=async()=>new Response("",{status:302,headers:{Location:"https://example.com/"}});
+  const redirected=await (await hit("/nearby/f13/HP8")).json();
+  assert.equal(redirected.reason,"redirect_302");
   console.log("Kakao live nearby: embedded public addresses, no-cache, secret isolation, mobile route and failure diagnostics passed.");
 }finally{globalThis.fetch=oldFetch;}
