@@ -201,7 +201,7 @@ def normalize_subscriptions(rows,kind):
         address=str(item.get('HSSPLY_ADRES') or '').strip()
         # Incheon-wide: use authoritative supply address, never just a project
         # name containing '인천' or an untrusted administrative label.
-        if not (name and re.match(r'^인천(?:광역시|시)?\\s',address)):continue
+        if not (name and re.match(r'^인천(?:광역시|시)?\s',address)):continue
         notice=subscription_date(item.get('RCRIT_PBLANC_DE'))
         if not notice:continue
         house_no=str(item.get('HOUSE_MANAGE_NO') or '').strip()
