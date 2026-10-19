@@ -1000,7 +1000,7 @@ const knownCatalogIds=new Set(['f13','f14','f15','m21','m22','m23','avenue','cen
 window.firstHyundaiDraftCount=()=>Object.keys(catalogDrafts).filter(x=>knownCatalogIds.has(x)).length;
 window.firstHyundaiDraftOverlay=(published,mode)=>{
  for(const p of published){
-  if(p&&typeof p.id==='string'&&(/^(?:trade-[0-9a-f]{8}|kapt-a[0-9]{8})$/.test(p.id)))knownCatalogIds.add(p.id);
+  if(p&&typeof p.id==='string'&&(/^(?:trade-[0-9a-f]{8}|kapt-a[0-9]{8}|verified-extra-[0-9]{2})$/.test(p.id)))knownCatalogIds.add(p.id);
  }
  return mode==='admin'?published.map(p=>{
   const changed=knownCatalogIds.has(p.id)&&catalogDrafts[p.id];
@@ -1159,6 +1159,11 @@ function resetComplexDraft(){
 function createCatalogExport(){
  if(role!=='admin')return null;
  const records=catalogRows().filter(p=>knownCatalogIds.has(p.id));
+ // Preserve authoritative K-apt management aggregates in backups. These are
+ // intentionally hidden in the UI so their combined household counts are not
+ // mistaken for another independent apartment complex.
+ const aggregates=(remote.complexes?.records||[]).filter(p=>p.aggregate_only);
+ const allExport=records.concat(aggregates.filter(p=>!records.some(v=>v.id===p.id)));
  return {
   schema_version:1,state:'verified_partial',updated_at:kstDateOffset(0),
   note:'관리자가 직접 확인한 공개용 단지정보입니다. 개인정보·계약서·비밀번호 저장 금지. 출처와 검증일 필수.',
@@ -1175,7 +1180,9 @@ function createCatalogExport(){
    schools:Array.isArray(p.schools)?p.schools:[],detail_source:p.detail_source??null,
    kapt_code:p.kapt_code??null,parking_alt_total:p.parking_alt_total??null,floors_alt:p.floors_alt??null,
    detail_note:p.detail_note??null,detail_source_url:p.detail_source_url??null,
-   detail_checked_at:p.detail_checked_at??null
+   detail_checked_at:p.detail_checked_at??null,aggregate_only:p.aggregate_only===true,
+   catalog_source:p.catalog_source??null,lot_address:p.lot_address??null,
+   parent_catalog_id:p.parent_catalog_id??null
   }))
  };
 }
