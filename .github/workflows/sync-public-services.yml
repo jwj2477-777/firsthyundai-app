@@ -7,16 +7,18 @@ on:
         required: true
         default: schools
         type: choice
-        options: [schools, offices, subscriptions, all]
+        options: [schools, offices, subscriptions, buildings, maintenance, complexinfo, all]
   push:
     branches: [main]
     paths:
       - 'scripts/collect_public_services.py'
+      - 'scripts/collect_registry_maintenance.py'
       - 'tests/test_public_services.py'
       - '.github/workflows/sync-public-services.yml'
   schedule:
     - cron: '32 21 2 * *' # monthly school update
     - cron: '12 23 * * *' # daily Applyhome update, 08:12 KST
+    - cron: '15 21 15 * *' # monthly approved registry / fee items, 06:15 KST
 permissions:
   contents: write
 concurrency:
@@ -25,7 +27,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,11 +45,13 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ]; then
             if [ "${{ github.event.schedule }}" = "32 21 2 * *" ]; then
               python scripts/collect_public_services.py --mode schools
+            elif [ "${{ github.event.schedule }}" = "15 21 15 * *" ]; then
+              python scripts/collect_public_services.py --mode complexinfo
             else
               python scripts/collect_public_services.py --mode subscriptions
             fi
           elif [ "${{ github.event_name }}" = "push" ]; then
-            python scripts/collect_public_services.py --mode subscriptions
+            python scripts/collect_public_services.py --mode complexinfo
           else
             python scripts/collect_public_services.py --mode "${{ inputs.mode }}"
           fi
