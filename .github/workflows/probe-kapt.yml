@@ -15,31 +15,27 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Compare authorized trade API with newly approved K-apt APIs without disclosing secret
+      - name: Validate real K-apt codes and one complete official profile
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
         run: |
           python - <<'PY'
-          import os, concurrent.futures, urllib.request, urllib.error
-          from urllib.parse import urlencode, unquote
-          key=os.environ.get('DATA_GO_KR_SERVICE_KEY','').strip()
-          if not key: raise RuntimeError('No existing public-data key configured')
-          key=unquote(key)
-          tests=[
-           ('existing_trade','https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev',{'LAWD_CD':'28185','DEAL_YMD':'202608','numOfRows':1,'pageNo':1}),
-           ('approved_apt_list','https://apis.data.go.kr/1613000/AptListService4/getSigunguAptList4',{'sigunguCode':'28185','numOfRows':1,'pageNo':1,'_type':'json'}),
-           ('approved_provincial_list','https://apis.data.go.kr/1613000/AptListService4/getSidoAptList4',{'sidoCode':'28','numOfRows':1,'pageNo':1,'_type':'json'})]
-          def check(row):
-           label,url,params=row
-           req=urllib.request.Request(url+'?'+urlencode({'serviceKey':key,**params}),headers={'User-Agent':'FirstHyundai-Kapt-Probe/1.0'})
-           try:
-            with urllib.request.urlopen(req,timeout=13) as res:
-             payload=res.read(2000)
-             return label,'http',res.status,'bytes',len(payload),'type',res.headers.get('Content-Type','unknown')[:80]
-           except urllib.error.HTTPError as ex:
-            return label,'HTTP',ex.code,'message redacted'
-           except Exception as ex:
-            return label,type(ex).__name__,str(ex)[:140]
-          with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
-           for result in pool.map(check,tests): print(result,flush=True)
+          import os
+          from scripts import collect_complexes as k
+          key=os.environ.get('DATA_GO_KR_SERVICE_KEY','')
+          response=k.call_api(k.LIST_URL,{'sigunguCode':'28185','pageNo':1,'numOfRows':10,'_type':'json'},key)
+          env=response.get('response',response)
+          print('K-apt list resultCode:',env.get('header',{}).get('resultCode','missing'),flush=True)
+          rows,total=k.unpack(response)
+          print('Decoded K-apt listing count:',len(rows),'declared total:',total,flush=True)
+          if not rows: raise RuntimeError('K-apt listing contained no apartment records')
+          print('Public listing keys:',sorted(rows[0].keys()),flush=True)
+          code=next((str(row.get('kaptCode','')) for row in rows if str(row.get('kaptCode','')).startswith('A')),None)
+          if not code: raise RuntimeError('K-apt list item lacks official complex code')
+          basic=k.base_item(key,code)
+          if not basic: raise RuntimeError('Basic info service returned no apartment')
+          print('Public basic keys:',sorted(basic.keys()),flush=True)
+          detail=k.detail_item(key,code)
+          print('Public detail keys:',sorted(detail.keys()),flush=True)
+          print('K-apt LIST+BASIC+DETAIL genuinely decoded successfully')
           PY
