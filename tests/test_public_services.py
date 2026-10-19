@@ -30,7 +30,8 @@ def office_xml():
 
 def subscription_payload(rows,total=None,page=1):
  return json.dumps({'page':page,'perPage':100,'currentCount':len(rows),
-  'totalCount':len(rows) if total is None else total,'data':rows},ensure_ascii=False).encode()
+  'matchCount':len(rows) if total is None else total,
+  'totalCount':10000,'data':rows},ensure_ascii=False).encode()
 
 def subscription_example(**kw):
  row={'HOUSE_MANAGE_NO':'2026000777','PBLANC_NO':'2026102001',
