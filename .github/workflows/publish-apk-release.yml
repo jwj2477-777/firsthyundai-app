@@ -1,4 +1,4 @@
-name: Publish FirstHyundai v1.7.0 Download
+name: Publish FirstHyundai v1.8.0 Download
 on:
   push:
     branches: [main]
@@ -18,20 +18,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh run download 39252561100 --repo "$GITHUB_REPOSITORY" --name FirstHyundai-Free-Auto-APK --dir artifact
+          gh run download 39257076813 --repo "$GITHUB_REPOSITORY" --name FirstHyundai-Free-Auto-APK --dir artifact
           test -s artifact/app-debug.apk
-          cp artifact/app-debug.apk FirstHyundai-v1.7.0.apk
-          unzip -t FirstHyundai-v1.7.0.apk | grep 'No errors detected'
-          sha256sum FirstHyundai-v1.7.0.apk
+          cp artifact/app-debug.apk FirstHyundai-v1.8.0.apk
+          unzip -t FirstHyundai-v1.8.0.apk | grep 'No errors detected'
+          sha256sum FirstHyundai-v1.8.0.apk
       - name: Publish publicly downloadable release APK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view v1.7.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload v1.7.0 FirstHyundai-v1.7.0.apk --repo "$GITHUB_REPOSITORY" --clobber
+          if gh release view v1.8.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v1.8.0 FirstHyundai-v1.8.0.apk --repo "$GITHUB_REPOSITORY" --clobber
           else
-            gh release create v1.7.0 FirstHyundai-v1.7.0.apk \
+            gh release create v1.8.0 FirstHyundai-v1.8.0.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.7.0' \
-              --notes '송도 K-apt 공식 API 77개 단지정보 반영(기존 13개+신규 64개). GitHub Actions에서 테스트·빌드된 디버그 서명 APK입니다. 기존 앱 메모를 백업한 뒤 설치하세요.'
+              --title '퍼스트현대 v1.8.0' \
+              --notes '부모님용 3대 메뉴, 13개 즐겨찾기 완전 분리, 큰 실거래 선택 버튼, 매매 파랑·전세 초록·월세 주황 및 계약해제 빨간색. 송도 공식 77개 단지정보 유지. GitHub Actions에서 테스트·빌드된 디버그 서명 APK입니다. 기존 앱 메모를 백업한 뒤 설치하세요.'
           fi
