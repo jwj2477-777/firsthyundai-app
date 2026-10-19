@@ -28,6 +28,10 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Validate in-app JavaScript syntax
+        run: |
+          python3 -c "from pathlib import Path; x=Path('app/src/main/assets/index.html').read_text(encoding='utf-8'); Path('/tmp/firsthyundai-ui.js').write_text(x.split('<script>',1)[1].split('</script>',1)[0],encoding='utf-8')"
+          node --check /tmp/firsthyundai-ui.js
       - name: Generate family access verifier (private Secret)
         env:
           FIRSTHYUNDAI_ACCESS_CODE: ${{ secrets.FIRSTHYUNDAI_ACCESS_CODE }}
