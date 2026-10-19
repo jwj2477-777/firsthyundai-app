@@ -22,6 +22,7 @@ jobs:
           python-version: '3.11'
       - name: Verify public K-apt parsing and provenance
         run: python -m unittest discover -s tests -v
+      # Rerun after K-apt V5 decimal household parsing was corrected.
       - name: Collect only Songdo-dong K-apt apartments
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
