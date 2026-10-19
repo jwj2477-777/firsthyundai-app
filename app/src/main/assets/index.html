@@ -435,8 +435,8 @@ body.apartmentSheetActive{overflow:hidden}
 'use strict';
 const NOTE_KEY='firsthyundai-local-v04', REPO_KEY='firsthyundai-public-repo';
 const DEFAULT_REPOSITORY='jwj2477-777/firsthyundai-app';
-const PRIVATE_PAGES=new Set(['settings','notes','security']);
-const PAGES=[['overview','전체 브리핑'],['nearby','★ 주변단지'],['complexes','단지정보'],['new','새소식'],['trades','실거래가'],['news','뉴스 브리핑'],['notes','내 자료'],['settings','설정'],['security','보안 관리']];
+const PRIVATE_PAGES=new Set(['settings','notes','security','apiGuide']);
+const PAGES=[['overview','전체 브리핑'],['nearby','★ 주변단지'],['complexes','단지정보'],['new','새소식'],['trades','실거래가'],['news','뉴스 브리핑'],['notes','내 자료'],['apiGuide','API 신청'],['settings','설정'],['security','보안 관리']];
 const $=id=>document.getElementById(id);
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeLink=url=>/^https:\/\/[a-z0-9.-]+(?:[:][0-9]+)?(?:[/?#]|$)/i.test(String(url||''))?String(url):'';
