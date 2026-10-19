@@ -36,7 +36,11 @@ def probe(label,path,args):
         print('RESULT_CODE',str(h.get('resultCode',''))[:15],flush=True)
     rows,total=unpack(obj)
     print('RESULT_ROWS',len(rows),'TOTAL',total,flush=True)
-    if rows:print('FIELD_NAMES',sorted(rows[0].keys())[:90],flush=True)
+    if rows:
+      print('FIELD_NAMES',sorted(rows[0].keys())[:90],flush=True)
+      if label.startswith('maintenance'):
+        print('PAY_EXAMPLE',str(rows[0].get('pay',''))[:30],flush=True)
+        print('NAME_MATCH',str(rows[0].get('kaptName',''))[:50],flush=True)
     return rows[0] if rows else None
   except Exception:
     print('UNEXPECTED_RESPONSE_FORMAT',flush=True)
@@ -47,12 +51,20 @@ sample=probe('kapt-basic','AptBasisInfoServiceV5/getAphusBassInfoV5',
 for date in ('202608','2026-08'):
   probe('maintenance-labor-'+date,'AptCmnuseManageCostServiceV3/getHsmpLaborCostInfoV3',
    {'kaptCode':'A10020270','searchDate':date,'dataType':'JSON'})
+for endpoint in ('getHsmpGuardCostInfoV3','getHsmpCleaningCostInfoV3'):
+  probe('maintenance-'+endpoint,'AptCmnuseManageCostServiceV3/'+endpoint,
+    {'kaptCode':'A10020270','searchDate':'202608','dataType':'JSON'})
 if isinstance(sample,dict):
   address=str(sample.get('kaptAddr') or '')
+  print('KAPT_PUBLIC_LOT',address[:90],flush=True)
   match=re.search(r'송도동\s+(\d+)(?:-(\d+))?',address)
   print('BUILDING_LOT_IDENTIFIED',bool(match),flush=True)
   if match and str(sample.get('bjdCode') or '')=='2818510600':
     probe('building-recap','BldRgstHubService/getBrRecapTitleInfo',
+     {'sigunguCd':'28185','bjdongCd':'10600','platGbCd':'0',
+      'bun':match.group(1).zfill(4),'ji':(match.group(2) or '0').zfill(4),
+      'numOfRows':10,'pageNo':1,'_type':'json'})
+    probe('building-title','BldRgstHubService/getBrTitleInfo',
      {'sigunguCd':'28185','bjdongCd':'10600','platGbCd':'0',
       'bun':match.group(1).zfill(4),'ji':(match.group(2) or '0').zfill(4),
       'numOfRows':10,'pageNo':1,'_type':'json'})
