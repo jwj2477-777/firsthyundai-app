@@ -36,7 +36,7 @@ jobs:
       - name: Run collector unit tests
         run: python -m unittest discover -s tests -v
       - name: Collect RSS and create topic briefs
-        if: ${{ github.event_name == 'workflow_dispatch' && (inputs.mode == 'all' || inputs.mode == 'news') || github.event.schedule == '17 */3 * * *' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && (inputs.mode == 'all' || inputs.mode == 'news') || github.event.schedule == '17 */3 * * *' || github.event_name == 'push' }}
         run: python scripts/collect_news.py
       - name: Collect official apartment transactions
         if: ${{ github.event_name == 'workflow_dispatch' && (inputs.mode == 'all' || inputs.mode == 'trades') || github.event.schedule == '41 19 * * *' || github.event_name == 'push' }}
