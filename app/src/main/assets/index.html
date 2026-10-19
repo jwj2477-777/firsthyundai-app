@@ -266,6 +266,7 @@ window.onRoleChanged=function(next){
   $('repo').value=repository;
   if($('noteDialog').open)$('noteDialog').close();
    if($('complexEditor').open)$('complexEditor').close();
+   $('complexAdmin').classList.toggle('hidden',true);
  }else{
   repository=localStorage.getItem(REPO_KEY)||DEFAULT_REPOSITORY;
   $('repo').value=repository;
