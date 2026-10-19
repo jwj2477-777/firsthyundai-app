@@ -10,6 +10,7 @@ on:
       - 'scripts/test_family_mode.js'
       - 'scripts/test_complexes.js'
       - 'scripts/test_catalog_editor.js'
+      - 'scripts/test_complex_discovery.js'
       - 'build.gradle'
       - 'settings.gradle'
       - 'gradle.properties'
@@ -42,6 +43,7 @@ jobs:
           node scripts/test_admin_guards.js
           node scripts/test_complexes.js
           node scripts/test_catalog_editor.js
+          node scripts/test_complex_discovery.js
       - name: Test password policy generation (disposable code)
         run: python3 scripts/test_family_policy.py
       - name: Test independent administrator policy
