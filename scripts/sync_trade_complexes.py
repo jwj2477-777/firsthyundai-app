@@ -77,10 +77,22 @@ def normalized(s):
     return re.sub(r'[^0-9A-Z가-힣]','',
       unicodedata.normalize('NFKC',str(s or '')).upper())
 
-def trade_id(name):
+def lot_key(value):
+    """Compare only official Songdo land-lot coordinates, never brand-like names."""
+    value=unicodedata.normalize('NFKC',str(value or '')).strip()
+    # K-apt: 인천광역시 연수구 송도동 123-4 ...
+    m=re.search(r'송도동\s*(?:산\s*)?(\d+)(?:\s*-\s*(\d+))?',value)
+    if not m and re.fullmatch(r'\d+(?:\s*-\s*\d+)?',value):
+        m=re.fullmatch(r'(\d+)(?:\s*-\s*(\d+))?',value)
+    if not m:return ''
+    return str(int(m.group(1)))+('-'+str(int(m.group(2))) if m.group(2) else '')
+
+def trade_id(name, lot=''):
     h=2166136261
-    # Browser uses UTF-16 code units for JavaScript charCodeAt.
-    by=normalized(name).encode('utf-16-le')
+    # App-compatible hash for name-only legacy records; use lot when present
+    # to guarantee independent identities for same-brand, same-name buildings.
+    key=normalized(name)+(('LOT'+lot) if lot else '')
+    by=key.encode('utf-16-le')
     for i in range(0,len(by),2):
         n=by[i]+(by[i+1]<<8)
         h=((h^n)*16777619)&0xffffffff
@@ -92,70 +104,88 @@ def build(catalog, trades):
     if trades.get('state') in ('not_started',None) or not isinstance(trades.get('records'),list) or not trades['records']:
         raise ValueError('Official Songdo transaction snapshot unavailable; refuse publication')
     by_id={r['id']:r for r in existing}
-    fixed_aliases={normalized(alias):dest for alias,dest in ALIASES.items()}
     for dest in ALIASES.values():
         if dest not in by_id:raise ValueError('Missing alias target '+dest)
-    # Map all existing labels and aliases first, even if an alias was introduced earlier.
-    by_alias={}
-    for row in existing:
-        for name in [row['label'],*(row.get('aliases') or [])]:
-            alias=normalized(name)
-            if alias:
-                if alias in by_alias and by_alias[alias]!=row['id']:
-                    raise ValueError('Conflicting aliases among two recorded complexes: '+name)
-                by_alias[alias]=row['id']
+    lot_targets=collections.defaultdict(list)
+    for estate in existing:
+        loc=lot_key(estate.get('lot_address')) or lot_key(estate.get('lot_number'))
+        if loc and estate.get('catalog_source')!='trades':
+            lot_targets[loc].append(estate)
+    by_name=collections.defaultdict(set)
+    for estate in existing:
+        for label in [estate['label'],*(estate.get('aliases') or [])]:
+            key=normalized(label)
+            if key:by_name[key].add(estate['id'])
     groups=collections.defaultdict(list)
     for row in trades['records']:
-        if isinstance(row,dict) and str(row.get('building','')).strip():
-            groups[normalized(row['building'])].append(row)
-    appended,linked=0,0
+        if not isinstance(row,dict) or not str(row.get('building','')).strip():continue
+        name=normalized(row['building'])
+        lot=lot_key(row.get('lot_number'))
+        groups[(name,lot)].append(row)
+    added=linked=uncertain=0
     date=trades.get('checked_at','')[:10]
     if not re.fullmatch(r'\d{4}-\d{2}-\d{2}',date):
         date=datetime.now(KST).strftime('%Y-%m-%d')
-    for key,records in sorted(groups.items()):
+    for (key,lot),records in sorted(groups.items()):
         label=str(records[0]['building']).strip()
-        if key in fixed_aliases:
-            target=by_id[fixed_aliases[key]]
-            if key not in by_alias:
-                if len(target.get('aliases') or [])>=10:raise ValueError('Too many aliases for '+target['id'])
-                target['aliases'].append(label)
-                by_alias[key]=target['id']
-                linked+=1
+        existing_ids=by_name.get(key,set())
+        # Legacy exact matching allowed only where address is not contradictory.
+        exact=[by_id[i] for i in existing_ids if i in by_id and
+               (not lot or not (lot_key(by_id[i].get('lot_address')) or lot_key(by_id[i].get('lot_number')))
+                or lot == (lot_key(by_id[i].get('lot_address')) or lot_key(by_id[i].get('lot_number'))))]
+        if len(exact)==1 and (not lot or not (lot_key(exact[0].get('lot_address')) or lot_key(exact[0].get('lot_number'))) or
+                              (lot_key(exact[0].get('lot_address')) or lot_key(exact[0].get('lot_number')))==lot):
             continue
-        if key in by_alias:continue
-        record_id=trade_id(label)
+        if lot and label not in SUBCOMPLEX:
+            candidates=lot_targets.get(lot,[])
+            # A lot is stronger than a name only if there is exactly one
+            # K-apt/validated owner and no registered independent sub-complex.
+            if len(candidates)==1:
+                target=candidates[0]
+                # Do not conflate sub-complex and aggregate estate.
+                if key not in by_name and len(target.get('aliases') or [])<10:
+                    target.setdefault('aliases',[]).append(label)
+                    by_name[key].add(target['id'])
+                    linked+=1
+                continue
+        # A visually similar name WITHOUT same verifiable address is not merged.
+        # Unlocated historical trades also stay unverified, not a false alias.
+        record_id=trade_id(label,lot)
         if record_id in by_id:
-            # Only reuse when a JS-generated transaction ID agrees with its label.
-            if normalized(by_id[record_id]['label'])!=key:raise ValueError('Transaction id collision '+label)
+            old=by_id[record_id]
+            if normalized(old['label'])!=key and normalized(old['label'])!=normalized(label+' (지번 '+lot+')'):
+                raise ValueError('Trade catalog ID collision '+label)
             continue
+        if len(exact)>1 and not lot:uncertain+=1
         years=sorted({str(r.get('building_year','')).strip() for r in records
                       if re.fullmatch(r'\d{4}',str(r.get('building_year','')).strip())})
+        text=label+((' (지번 '+lot+')') if lot and any(x.get('catalog_source')=='trades' and
+                      normalized(x['label'])==key for x in existing) else '')
         item={
-            'id':record_id,'label':label,'aliases':[label],
-            'catalog_source':'trades',
+            'id':record_id,'label':text,'aliases':[label],
+            'catalog_source':'trades','lot_number':lot or None,
             'households':None,'buildings':None,'approved_date':None,
             'heating':None,'parking_total':None,'ev_chargers':None,
             'management_phone':None,'builder':None,'floors':None,
             'floor_area_ratio':None,'building_coverage_ratio':None,
             'area_types_m2':[],'supply_type_labels':[],'floorplans':[],
-            'schools':[],
-            'source_url':'https://rt.molit.go.kr/',
-            'detail_source':'국토교통부 송도동 아파트 실거래명 (건축년도는 별도 확인)',
-            'last_verified':date,
-            'observed_trade_count':len(records),
+            'schools':[],'source_url':'https://rt.molit.go.kr/',
+            'detail_source':'국토교통부 송도동 아파트 실거래 기록 (지번과 명칭으로 조회)',
+            'last_verified':date,'observed_trade_count':len(records),
             'observed_building_year':years[0] if len(years)==1 else None,
-            'detail_note':'국토부 실거래에 등장한 단지명입니다. K-apt 세대수·동수·준공일 등 단지 기본정보는 확인 전입니다.'
+            'detail_note':('송도동 지번 '+lot+'의 실제 거래명입니다. 기본정보는 출처 확인 전입니다.'
+                           if lot else '송도동 거래명은 확인됐지만 실거래 원본의 지번정보가 없어 다른 단지인지 확인 전입니다.'),
         }
         if label in SUBCOMPLEX:
             parent=SUBCOMPLEX[label]
-            if parent not in by_id:raise ValueError('Missing aggregated parent '+parent)
+            if parent not in by_id:raise ValueError('Missing parent '+parent)
             item['parent_catalog_id']=parent
-            item['detail_note']+=' K-apt에는 상위 묶음 단지로 등록되어 있으므로 총세대수 등을 이 구분 단지에 그대로 적용하지 않습니다.'
+            item['detail_note']+=' K-apt는 여러 블럭을 묶은 관리단지이므로 부모 단지의 세대수를 복사하지 않습니다.'
         existing.append(item)
         by_id[record_id]=item
-        by_alias[key]=record_id
-        appended+=1
-    return catalog,appended,linked
+        by_name[key].add(record_id)
+        added+=1
+    return catalog,added,linked
 
 def main():
     catalog=json.loads(CATALOG.read_text(encoding='utf8'))
