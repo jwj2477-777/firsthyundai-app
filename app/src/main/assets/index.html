@@ -7,7 +7,28 @@
 :root{color-scheme:light;--navy:#173b60;--blue:#2566a2;--light:#edf3f7;--slate:#647587;--border:#dfe8ef;--ink:#142c41;--orange:#d77828}
 *{box-sizing:border-box}body{margin:0;background:#f3f6f8;color:var(--ink);font-family:system-ui,-apple-system,'Noto Sans KR',sans-serif;font-size:15px}
 header{background:linear-gradient(130deg,#12375b,#226398);padding:24px 18px 21px;color:white}header h1{font-size:25px;letter-spacing:-.8px;margin:0}header p{color:#d0e3f4;font-size:13px;line-height:1.6;margin:7px 0 0}.eyebrow{letter-spacing:1.6px;font-weight:750;color:#add6f7;font-size:10px;margin-bottom:6px}
-main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;border:1px solid #eeddb2;background:#fff9eb;border-radius:13px;font-size:13px;color:#745521;line-height:1.7;margin-bottom:12px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 0 14px;scrollbar-width:none}.tabs button{padding:10px 13px;border:1px solid #cbddea;background:white;border-radius:10px;font-size:13px;font-weight:650;color:#42617a;white-space:nowrap}.tabs button.active{background:var(--navy);color:white;border-color:var(--navy)}
+main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;border:1px solid #eeddb2;background:#fff9eb;border-radius:13px;font-size:13px;color:#745521;line-height:1.7;margin-bottom:12px}.tabs{display:grid;gap:9px;margin:3px 0 12px}
+.primaryNav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.primaryNav button{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;min-width:0;min-height:80px;padding:10px 5px;border:1px solid #c9dce9;border-radius:14px;background:white;color:#315b7b;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 2px 7px #183b6010}
+.primaryNav button .navIcon{font-size:24px;line-height:1.1}
+.primaryNav button.active{background:#173b60;color:white;border-color:#173b60;box-shadow:0 3px 12px #173b6029}
+.secondaryNav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.secondaryNav.single{grid-template-columns:1fr}
+.secondaryNav button{min-height:47px;border:1px solid #cadce8;border-radius:10px;padding:8px 5px;color:#325a79;background:#f8fbfd;font-size:12px;font-weight:750;cursor:pointer}
+.secondaryNav button.active{background:#e1effb;color:#194b78;border-color:#8db8d9}
+.utilityNav{display:flex;align-items:start;gap:9px;flex-wrap:wrap}
+.utilityNav>button,.adminQuick summary{border:1px solid #d4e1ea;background:white;border-radius:9px;color:#466880;padding:9px 11px;font-size:12px;font-weight:700;cursor:pointer}
+.utilityNav>button.active{background:#e7f1f8;border-color:#9fc3df;color:#194d75}
+.adminQuick{position:relative;flex:1;min-width:145px}
+.adminQuick summary{display:block;text-align:center;list-style:none}
+.adminQuick summary::-webkit-details-marker{display:none}
+.adminQuickLinks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px;border:1px solid #d5e3ee;background:white;border-radius:10px;margin-top:5px}
+.adminQuickLinks button{min-height:46px;border:1px solid #d7e5ef;border-radius:9px;background:#f4f8fc;color:#315a79;font-size:12px;font-weight:700}
+.noticeCompact{border:1px solid #e5e3d9;border-radius:11px;background:#fffdf7;margin-bottom:10px;padding:7px 11px;font-size:12px;color:#6a6a5d}
+.noticeCompact summary{cursor:pointer;font-weight:650;list-style:none}
+.noticeCompact summary::-webkit-details-marker{display:none}
+.noticeCompact p{margin:8px 0;line-height:1.65}
+@media(max-width:370px){.primaryNav button{font-size:13px;min-height:74px}.secondaryNav button{font-size:11px;padding:7px 3px}.primaryNav button .navIcon{font-size:22px}}
 .panel{background:white;border:1px solid var(--border);padding:17px;border-radius:16px;margin:12px 0;box-shadow:0 2px 15px #173b6008}.sectionTitle{display:flex;justify-content:space-between;align-items:start;gap:12px;margin:5px 0 12px}.sectionTitle h2{font-size:19px;margin:0}.tiny{color:var(--slate);font-size:12px;line-height:1.6}.muted{color:var(--slate)}.row{display:flex;gap:8px;align-items:center;justify-content:space-between}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.metric{border-radius:13px;background:#eaf3fa;padding:14px}.metric strong{font-size:25px;display:block;margin-top:3px}.metric small{font-size:12px;color:#557590}.pill{display:inline-block;padding:4px 7px;background:#e7f0f9;border-radius:6px;font-size:11px;color:#1c5684;font-weight:700}.pill.orange{background:#fff1db;color:#945814}.pill.red{background:#fdecea;color:#ab3434}.pill.gray{background:#edf0f3;color:#566575}.btn{display:inline-flex;align-items:center;justify-content:center;border:0;background:var(--blue);color:white;padding:11px 15px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer}.btn.alt{background:#e9f1f8;color:#185483}.btn.danger{background:#a33d3d}.btn:disabled{opacity:.45}input,select,textarea{font:inherit;border:1px solid #cbd8e4;border-radius:9px;padding:11px;color:var(--ink);background:white;min-width:0;width:100%}input:focus,select:focus,textarea:focus{outline:2px solid #a2cee9}textarea{min-height:100px;resize:vertical}.inputLabel{font-size:13px;font-weight:700;margin:12px 0 5px;display:block}.controls{display:flex;gap:9px;margin:10px 0;align-items:center}.controls>*{flex:1}.controls button{flex:0 auto}.item{padding:15px 0;border-top:1px solid #e8edf1}.item:first-child{border-top:0}.item h3{font-size:16px;margin:8px 0;line-height:1.5;letter-spacing:-.2px}.item p{font-size:13px;line-height:1.8;margin:8px 0}.item .meta{font-size:12px;color:var(--slate);line-height:1.8;overflow-wrap:anywhere}.money{color:#15507b;font-weight:800;font-size:18px;margin:7px 0}.submoney{font-size:13px;color:var(--slate)}a{color:#20629c;text-decoration:none;overflow-wrap:anywhere}a:hover{text-decoration:underline}.tagbox{display:flex;flex-wrap:wrap;gap:5px}.empty{text-align:center;color:#6b7d8b;font-size:13px;padding:35px 10px;line-height:1.8}.details{margin-top:8px;background:#f7fafc;padding:10px;border-radius:9px}.details summary{cursor:pointer;font-size:13px;font-weight:700;color:#2b5d87}.sources{list-style:none;padding:0;margin:7px 0}.sources li{padding:7px 0;border-bottom:1px solid #e4ecf1;font-size:13px;line-height:1.6}.sources li:last-child{border:0}.foot{font-size:12px;text-align:center;color:#7e8fa0;padding:20px 0}.flash{margin:10px 0;border-radius:10px;background:#eaf6ee;color:#376345;padding:12px;font-size:13px;line-height:1.6}.flash.bad{background:#fff1ed;color:#91492c}dialog{width:95%;max-width:650px;border:0;border-radius:17px;max-height:90vh;overflow:auto;padding:19px}dialog::backdrop{background:#0b1e2eaa}.hidden{display:none!important}.noteBox{white-space:pre-wrap;line-height:1.7;font-size:13px}.smaller{font-size:12px}.inlineAction{font-size:13px;margin:8px 8px 0 0}.inlineAction.danger{color:#a64141}
 .modeBar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;padding:10px 12px;border:1px solid #d5e3ee;background:#fff;border-radius:12px}
 .modeBar small{font-weight:700;color:#4c6b83}
@@ -72,11 +93,11 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 </style>
 </head>
 <body>
-<header><div class="eyebrow">FIRST HYUNDAI · SONGDO</div><h1>퍼스트현대</h1><p>송도 부동산 실무 정보센터 · 가족용 안드로이드 앱</p></header>
+<header><div class="eyebrow">FIRST HYUNDAI · SONGDO</div><h1>퍼스트현대</h1><p>실거래 · 아파트정보 · 뉴스 한눈에 조회</p></header>
 <main>
-<div class="notice" id="globalNotice">실거래가와 뉴스는 공공·언론 자료를 자동 정리한 참고정보입니다. 정확한 거래 조건, 계약·해제 여부, 사업 확정 및 법령 시행일은 원문을 확인하세요. 가족 개인 메모는 기기에만 저장됩니다.</div>
+<details class="noticeCompact" id="globalNotice"><summary>ⓘ 자료 이용 안내 · 눌러서 보기</summary><p>실거래가와 뉴스는 공공·언론 자료를 자동 정리한 참고정보입니다. 정확한 거래 조건, 계약·해제 여부, 사업 확정 및 법령 시행일은 원문을 확인하세요. 가족 개인 메모는 기기에만 저장됩니다.</p></details>
 <div id="modeBar" class="modeBar modeFamily"><small id="roleLabel">가족 조회 모드 · 설정 보호</small><button id="roleButton" type="button" class="btn alt" onclick="toggleAdminMode()">관리자 전환</button></div>
-<div class="tabs" role="tablist" id="nav"></div>
+<nav class="tabs" id="nav" aria-label="업무 주요 메뉴"></nav>
 <div id="overview" class="page">
   <div class="sectionTitle"><h2>오늘의 업무 브리핑</h2><button class="btn alt" onclick="refreshAll()">새로고침</button></div>
   <div class="grid">
@@ -86,22 +107,20 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
    <div class="metric"><small>오늘 신규 공개 확인</small><strong id="newDeals">—</strong><small>최초 발견일 기준</small></div>
    <div class="metric"><small>뉴스 묶음</small><strong id="newsGroups">—</strong><small>최근 기사 제목</small></div>
   </div>
-  <div class="panel"><button class="btn nearbyTotal" type="button" onclick="switchPage('nearby')"><span>★ 사무실 주변 12개 단지 실거래 바로보기</span><span>→</span></button><p class="tiny">퍼스트파크·마스터뷰 등 자주 중개하는 단지만 모았습니다.</p><button class="btn alt" type="button" onclick="switchPage('complexes')">단지별 세대수·평형·난방 정보 →</button></div>
+  <div class="panel"><button class="btn nearbyTotal" type="button" onclick="switchPage('nearby')"><span>★ 관심 13개 단지 실거래 바로보기</span><span>→</span></button><p class="tiny">프라임뷰 20블럭과 25블럭은 별개 단지로 표시합니다.</p><button class="btn alt" type="button" onclick="switchPage('complexes')">송도 전체 아파트 기본정보 →</button></div>
   <div class="panel"><div class="sectionTitle"><h2>수집 상태</h2></div><div id="overviewStatus" class="tiny">연결 정보가 없습니다.</div></div>
-  <div class="panel"><h2>사용 순서</h2><p class="noteBox">① 연결 설정 없이 주변 12개 단지와 새소식을 바로 확인하세요.
-② ‘실거래가’와 ‘뉴스 브리핑’에서 최신 공개 자료를 확인하세요.
-③ 관리자 모드에서는 설정과 개인 메모를 관리할 수 있습니다.</p></div>
+  <div class="panel"><p class="tiny">상단의 실거래·아파트정보·뉴스 버튼으로 바로 이동할 수 있습니다. 관리자용 자료·설정·보안은 '관리자 도구'에서 확인하세요.</p></div>
 </div>
 <div id="nearby" class="page hidden">
- <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2><p class="tiny">송도 3공구 퍼스트파크 15블럭 사무실 중심 · 자주 중개하는 12개 단지</p></div><button class="btn alt" onclick="refreshOne('trades')">갱신</button></div>
+ <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2><p class="tiny">송도 3공구 퍼스트파크 15블럭 사무실 중심 · 자주 중개하는 13개 단지</p></div><button class="btn alt" onclick="refreshOne('trades')">갱신</button></div>
  <div class="panel">
-  <h3 style="margin:0 0 8px">즐겨찾기 12개 단지</h3>
-  <p class="tiny">단지를 누르면 아래에서 해당 단지의 매매·전세·월세 거래만 확인할 수 있습니다. 프라임뷰는 20·25블럭을 합쳐 표시합니다.</p>
-  <button id="nearbyAll" class="btn alt nearbyTotal" type="button" onclick="chooseNearby('all')"><span>★ 주변 12개 단지 전체 보기</span><strong id="nearbyAllCount">—</strong></button>
+  <h3 style="margin:0 0 8px">즐겨찾기 13개 단지</h3>
+  <p class="tiny">단지를 누르면 아래에서 해당 단지의 매매·전세·월세 거래만 확인할 수 있습니다. 프라임뷰 20블럭과 25블럭은 각각 선택할 수 있습니다.</p>
+  <button id="nearbyAll" class="btn alt nearbyTotal" type="button" onclick="chooseNearby('all')"><span>★ 관심 13개 단지 전체 보기</span><strong id="nearbyAllCount">—</strong></button>
   <div id="nearbyCards" class="nearbyGrid"></div>
  </div>
  <div class="panel" id="nearbyDetails">
-  <div class="sectionTitle"><div><h2 id="nearbyTitle">주변 12개 단지 실거래</h2><p class="tiny" id="nearbyMeta">국토교통부 실거래가 자료를 불러오는 중입니다.</p></div></div>
+  <div class="sectionTitle"><div><h2 id="nearbyTitle">관심 13개 단지 실거래</h2><p class="tiny" id="nearbyMeta">국토교통부 실거래가 자료를 불러오는 중입니다.</p></div></div>
   <label class="inputLabel" for="nearbyType">실거래 유형</label>
   <select id="nearbyType" onchange="renderNearbyDetails(true)"><option value="">매매·전세·월세 전체</option><option>매매</option><option>전세</option><option>월세</option></select>
   <div id="nearbyStats" class="nearbyStats"></div>
@@ -177,7 +196,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
  <div class="panel">
   <label class="inputLabel" for="newDate">신규 공개 확인일 (한국시간)</label><select id="newDate" onchange="renderNew()"></select>
   <div class="controls"><select id="newType" aria-label="실거래 유형" onchange="renderNew()"><option value="">매매·전세·월세 전체</option><option>매매</option><option>전세</option><option>월세</option></select><input id="newAptFilter" placeholder="단지명 검색" aria-label="단지명 검색" oninput="renderNew()"></div>
-  <select id="newFavoriteFilter" aria-label="주변단지 한정" onchange="renderNew()"><option value="">송도동 전체 단지</option><option value="favorites">★ 주변 12개 단지만</option></select>
+  <select id="newFavoriteFilter" aria-label="주변단지 한정" onchange="renderNew()"><option value="">송도동 전체 단지</option><option value="favorites">★ 관심 13개 단지만</option></select>
   <div id="newCounts" class="newCounts"></div>
   <p class="tiny" id="newStatus">일별 수집 결과를 불러오는 중입니다.</p>
   <div id="newContent"><div class="empty">설정에서 공개 GitHub 저장소를 연결하면 날짜별 새 거래가 표시됩니다.</div></div>
@@ -256,7 +275,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
   <p class="tiny">두 비밀번호의 원문은 GitHub 비공개 Secret에만 존재하고, 공개 저장소에는 각 비밀번호의 PBKDF2 검증 정보만 게시됩니다. 공개 검증 정보는 오프라인 추측 공격 대상이므로 특히 관리자 비밀번호는 16자 이상 무작위 문자열을 권장합니다.</p>
  </div>
 </div>
-<footer class="foot">퍼스트현대 v1.6 · 단지정보 4탭 · 간편 실거래 · 관리자 편집</footer>
+<footer class="foot">퍼스트현대 v1.8 · 실거래 / 아파트정보 / 뉴스 · 관심 13개 단지</footer>
 </main>
 <dialog id="noteDialog"><h2 id="noteDialogTitle">내 자료 등록</h2>
 <form id="noteForm">
@@ -322,11 +341,39 @@ window.onRoleChanged=function(next){
  switchPage(role==='admin'?'overview':'nearby');
  refreshAll();
 };
+const NAV_CATEGORIES=[
+ {id:'trades',label:'실거래',icon:'↗',main:'nearby',
+  children:[['nearby','★ 관심 13단지'],['trades','전체 거래'],['new','새 거래']]},
+ {id:'complexes',label:'아파트정보',icon:'⌂',main:'complexes',
+  children:[['complexes','송도 단지 검색']]},
+ {id:'news',label:'뉴스',icon:'▤',main:'news',
+  children:[['news','부동산·송도 뉴스']]}
+];
+function navGroupForPage(id){
+ return NAV_CATEGORIES.find(g=>g.children.some(([page])=>page===id))||null;
+}
+function renderMainNavigation(id){
+ const chosen=navGroupForPage(id);
+ const primary='<div class="primaryNav">'+NAV_CATEGORIES.map(g=>
+  '<button type="button" class="'+(chosen?.id===g.id?'active':'')+
+  '" onclick="switchPage(\''+g.main+'\')" aria-current="'+(chosen?.id===g.id?'page':'false')+'">'+
+  '<span class="navIcon" aria-hidden="true">'+g.icon+'</span><span>'+g.label+'</span></button>').join('')+'</div>';
+ const secondary=chosen?'<div class="secondaryNav'+(chosen.children.length===1?' single':'')+'">'+
+  chosen.children.map(([page,label])=>'<button type="button" class="'+(id===page?'active':'')+
+  '" onclick="switchPage(\''+page+'\')" aria-current="'+(id===page?'page':'false')+'">'+label+'</button>').join('')+
+  '</div>':'';
+ const admin=role==='admin'?'<details class="adminQuick"><summary>관리자 도구 ▾</summary>'+
+  '<div class="adminQuickLinks">'+[['notes','내 자료'],['settings','설정'],['security','보안']].map(([page,label])=>
+  '<button type="button" onclick="switchPage(\''+page+'\')">'+label+'</button>').join('')+'</div></details>':'';
+ const tools='<div class="utilityNav"><button class="'+(id==='overview'?'active':'')+
+  '" type="button" onclick="switchPage(\'overview\')">▦ 오늘 요약</button>'+admin+'</div>';
+ $('nav').innerHTML=primary+secondary+tools;
+}
 function switchPage(id){
  if(!activePages().some(([key])=>key===id))id='nearby';
  currentPage=id;
  PAGES.forEach(p=>$(p[0]).classList.toggle('hidden',p[0]!==id));
- $('nav').innerHTML=activePages().map(([key,label])=>`<button class="${id===key?'active':''}" onclick="switchPage('${key}')">${label}</button>`).join('');
+ renderMainNavigation(id);
  if(id==='nearby')renderNearby();
  if(id==='complexes')renderComplexes();
  if(id==='new')renderNew();
@@ -353,7 +400,8 @@ const FAVORITE_APTS=[
  {id:'m23', label:'마스터뷰 23블럭', group:'마스터뷰', names:['송도더샵마스터뷰23-1BL','송도더샵마스터뷰23BL']},
  {id:'avenue', label:'파크애비뉴', group:'주변 핵심단지', names:['송도더샵파크애비뉴']},
  {id:'centennial', label:'센터니얼', group:'주변 핵심단지', names:['더샵송도센터니얼']},
- {id:'prime', label:'프라임뷰 (20·25블럭)', group:'주변 핵심단지', names:['더샵송도프라임뷰20BL','더샵송도프라임뷰25BL']},
+ {id:'prime20', label:'프라임뷰 20블럭', group:'프라임뷰', names:['더샵송도프라임뷰20BL']},
+ {id:'prime25', label:'프라임뷰 25블럭', group:'프라임뷰', names:['더샵송도프라임뷰25BL']},
  {id:'skcentral', label:'SK뷰센트럴', group:'주변 핵심단지', names:['송도SK뷰센트럴']},
  {id:'artwin', label:'아트윈푸르지오', group:'주변 핵심단지', names:['송도아트윈푸르지오']},
  {id:'central3', label:'센트럴파크 3차', group:'주변 핵심단지', names:['더샵송도센트럴파크Ⅲ','더샵송도센트럴파크III','더샵송도센트럴파크3차']}
@@ -366,13 +414,7 @@ function favoriteIdForBuilding(name){return FAVORITE_MATCH.get(normalizeAptName(
 /* APARTMENT_CATALOG_V16: deduplicated, source-backed public facts and quick tabs. */
 let complexSelected='f15', complexDisplayLimit=48, complexDetailTab='basic', complexDealType='';
 function baseComplexes(){
- return FAVORITE_APTS.flatMap(g=>{
-  if(g.id==='prime')return [
-   {id:'prime20',label:'프라임뷰 20블럭',aliases:[g.names[0]]},
-   {id:'prime25',label:'프라임뷰 25블럭',aliases:[g.names[1]]}
-  ];
-  return [{id:g.id,label:g.label,aliases:g.names}];
- });
+ return FAVORITE_APTS.map(g=>({id:g.id,label:g.label,aliases:g.names}));
 }
 function catalogRows(){
  const base=baseComplexes().map(x=>({...x,households:null,heating:null,area_types_m2:[],floorplans:[],source_url:null,last_verified:null}));
@@ -573,7 +615,7 @@ function renderNearby(){
  $('nearbyAll').classList.toggle('selected',nearbySelected==='all');
  $('nearbyCards').innerHTML=FAVORITE_APTS.map((g,i)=>{
   const matches=grouped[g.id], latest=matches.reduce((a,x)=>!a||x.contract_date>a.contract_date?x:a,null);
-  const part=g.id==='prime'?'20·25블럭 통합':g.group;
+  const part=g.group;
   const count=hasData?number(matches.length)+'건':'—';
   const latestText=latest?'최근 계약 '+latest.contract_date:'거래 수집 대기';
   return '<button type="button" class="nearbyCard'+(nearbySelected===g.id?' selected':'')+
@@ -594,7 +636,7 @@ function renderNearbyDetails(resetLimit){
  const allTypes={매매:0,전세:0,월세:0};
  for(let row of rows)if(Object.prototype.hasOwnProperty.call(allTypes,row.type))allTypes[row.type]++;
  const total=rows.length;
- $('nearbyTitle').textContent=g?g.label+' 실거래':'★ 주변 12개 단지 실거래';
+ $('nearbyTitle').textContent=g?g.label+' 실거래':'★ 관심 13개 단지 실거래';
  $('nearbyMeta').textContent=remote.trades?
   '계약일 최신순 · 최종 수집 '+prettyTime(remote.trades.checked_at):
   '데이터 연결 대기 · 설정에서 GitHub 저장소를 연결하세요.';
