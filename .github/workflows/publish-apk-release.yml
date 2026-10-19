@@ -1,4 +1,4 @@
-name: Publish FirstHyundai v1.9.1 Download
+name: Publish FirstHyundai v1.9.2 Download
 on:
   push:
     branches: [main]
@@ -18,20 +18,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh run download 39263624338 --repo "$GITHUB_REPOSITORY" --name FirstHyundai-Free-Auto-APK --dir artifact
+          gh run download 39265487934 --repo "$GITHUB_REPOSITORY" --name FirstHyundai-Free-Auto-APK --dir artifact
           test -s artifact/app-debug.apk
-          cp artifact/app-debug.apk FirstHyundai-v1.9.1.apk
-          unzip -t FirstHyundai-v1.9.1.apk | grep 'No errors detected'
-          sha256sum FirstHyundai-v1.9.1.apk
+          cp artifact/app-debug.apk FirstHyundai-v1.9.2.apk
+          unzip -t FirstHyundai-v1.9.2.apk | grep 'No errors detected'
+          sha256sum FirstHyundai-v1.9.2.apk
       - name: Publish publicly downloadable release APK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view v1.9.1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload v1.9.1 FirstHyundai-v1.9.1.apk --repo "$GITHUB_REPOSITORY" --clobber
+          if gh release view v1.9.2 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v1.9.2 FirstHyundai-v1.9.2.apk --repo "$GITHUB_REPOSITORY" --clobber
           else
-            gh release create v1.9.1 FirstHyundai-v1.9.1.apk \
+            gh release create v1.9.2 FirstHyundai-v1.9.2.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.9.1' \
-              --notes '네이버페이 부동산 화면 5장 대조. 엑스포10·아리스타 주소, 이안송도 주차257·관리전화, 월드메르디앙 4개동·주차145 보강. 가족용 기본정보에서 용적률·건폐율 제거. 기존 93개 개별 단지 유지. GitHub Actions에서 테스트·빌드된 디버그 서명 APK입니다. 기존 앱 메모를 백업한 뒤 설치하세요.'
+              --title '퍼스트현대 v1.9.2' \
+              --notes '센트럴파크푸르지오를 기존 K-apt 데이터에 연결해 관심 14개 단지로 확대. 프라임뷰20·25 및 더샵센트럴파크3차는 각각 독립 유지. FHD FIRST 앱 아이콘의 Android 안전영역 잘림 수정. 송도 전체 93개 개별 아파트 유지. GitHub Actions에서 테스트·빌드된 디버그 서명 APK입니다. 기존 앱 메모를 백업한 뒤 설치하세요.'
           fi
