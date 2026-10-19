@@ -15,7 +15,7 @@ from urllib.error import HTTPError,URLError
 from urllib.parse import urlencode,unquote,urlparse
 from urllib.request import urlopen,Request
 from xml.etree import ElementTree as ET
-from collect_registry_maintenance import collect_registry,collect_maintenance
+from collect_registry_maintenance import collect_registry,collect_maintenance,resolve_missing_kapt_codes
 
 ROOT=Path(__file__).resolve().parents[1]
 TARGET=ROOT/'data'/'public_services.json'
@@ -298,6 +298,8 @@ def main():
         if key:
             catalog=json.loads((ROOT/'data'/'complexes.json').read_text(encoding='utf8'))
             complexes=catalog.get('records',[])
+            try:complexes=resolve_missing_kapt_codes(complexes,key)
+            except RuntimeError as e:print('기존 단지 K-apt 코드 매핑 보류 · 기존 단지코드 사용:',str(e)[:90])
             if args.mode in ('buildings','complexinfo','all'):
                 try:
                     registry=collect_registry(complexes,key)
