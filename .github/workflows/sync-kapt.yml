@@ -1,0 +1,47 @@
+name: Sync Songdo K-apt Apartments (requires separate API approvals)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: firsthyundai-kapt-catalog
+  cancel-in-progress: false
+jobs:
+  sync-kapt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify public K-apt parsing and provenance
+        run: python -m unittest discover -s tests -v
+      - name: Collect only Songdo-dong K-apt apartments
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+        run: |
+          python scripts/collect_complexes.py
+          node scripts/test_complexes.js
+          node scripts/test_complex_facts.js
+      - name: Commit verified catalog safely
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/complexes.json
+          if git diff --cached --quiet; then
+            echo 'No changes to catalog'
+            exit 0
+          fi
+          git commit -m 'data: sync official K-apt Songdo apartment catalog'
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            sleep 3
+          done
+          echo 'Could not publish apartment JSON'; exit 1
