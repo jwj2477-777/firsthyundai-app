@@ -42,7 +42,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && (inputs.mode == 'all' || inputs.mode == 'trades') || github.event.schedule == '41 19 * * *' || github.event_name == 'push' }}
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
-        run: python scripts/collect_trades.py --months ${{ github.event_name == 'push' && '1' || '12' }}
+        run: python scripts/collect_trades.py --months 12
       - name: Publish refreshed JSON only
         run: |
           git config user.name 'github-actions[bot]'
