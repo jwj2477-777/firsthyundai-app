@@ -176,10 +176,11 @@ def is_songdo(x):
 
 
 def to_positive_int(value, *, zero=False):
-    try:
-        num = int(str(value).replace(",", "").strip())
-    except (ValueError, TypeError):
+    # K-apt V5 may encode integral counts as 1114.0 or "1114.0".
+    raw = cleaned(value).replace(",", "")
+    if not re.fullmatch(r"[0-9]+(?:\\.0+)?", raw):
         return None
+    num = int(raw.split(".", 1)[0])
     return num if (0 <= num <= 100000 if zero else 1 <= num <= 100000) else None
 
 
@@ -205,7 +206,14 @@ def apt_profile(basic, detail, checked_at):
     name = cleaned(basic.get("kaptName"))
     if not re.fullmatch(r"A\d{8}", code) or not name or not is_songdo(basic):
         return None
-    hh = to_positive_int(basic.get("kaptdaCnt") or basic.get("hoCnt"))
+    # hoCnt reports total households; kaptdaCnt is another count which may differ.
+    # Use the total from hoCnt first and retain a mismatch note when necessary.
+    total_hh = to_positive_int(basic.get("hoCnt"))
+    alternate_hh = to_positive_int(basic.get("kaptdaCnt"))
+    hh = total_hh or alternate_hh
+    hh_note = ("K-apt 공개 세대수 항목 차이: hoCnt " + str(total_hh) + "세대, kaptdaCnt " +
+               str(alternate_hh) + "세대. 총세대수는 hoCnt 기준."
+               if total_hh and alternate_hh and total_hh != alternate_hh else None)
     building = to_positive_int(basic.get("kaptDongCnt"))
     address = cleaned(basic.get("doroJuso"))
     if not hh or not building or not address or "연수구" not in address:
@@ -247,6 +255,7 @@ def apt_profile(basic, detail, checked_at):
         "floorplans": [], "area_types_m2": [], "supply_type_labels": [],
         "source_url": "https://www.k-apt.go.kr/",
         "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
+        "detail_note": hh_note,
         "detail_source_url": "https://www.k-apt.go.kr/",
         "last_verified": checked_at, "detail_checked_at": checked_at,
         "schools": [],
