@@ -41,6 +41,22 @@ jobs:
           gradle-version: '8.9'
       - name: Test K-apt API parsing, authorization and Songdo-only source matching
         run: python -m unittest discover -s tests -v
+      - name: Validate published Songdo K-apt catalog and source identities
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('data/complexes.json').read_text(encoding='utf-8'))
+          rows=data['records']
+          assert len(rows)>=13
+          ids=[row['id'] for row in rows]
+          assert len(ids)==len(set(ids)), 'Duplicated catalog identifiers'
+          curated=[x for x in rows if x.get('catalog_source')!='kapt']
+          official=[x for x in rows if x.get('catalog_source')=='kapt']
+          assert len(curated)==13, 'All original thirteen verified estates must survive'
+          assert all(str(x.get('kapt_code','')).startswith('A') and x.get('households',0)>0 for x in official)
+          print('Verified published apartment data:',len(rows),'total,',len(official),'additional K-apt registered complexes')
+          PY
       - name: Validate in-app JavaScript syntax
         run: |
           python3 -c "from pathlib import Path; x=Path('app/src/main/assets/index.html').read_text(encoding='utf-8'); Path('/tmp/firsthyundai-ui.js').write_text(x.split('<script>',1)[1].split('</script>',1)[0],encoding='utf-8')"
