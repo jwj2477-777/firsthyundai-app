@@ -12,7 +12,7 @@ from datetime import datetime,timedelta,timezone
 import json,os,re,sys
 from pathlib import Path
 from urllib.error import HTTPError,URLError
-from urllib.parse import urlencode,unquote
+from urllib.parse import urlencode,unquote,urlparse
 from urllib.request import urlopen,Request
 from xml.etree import ElementTree as ET
 
@@ -140,11 +140,127 @@ def collect_offices(key,opener=None,months=6):
        note='연수구 송도동의 오피스텔 전월세, 국토부 신고·확정일자 자료. 아파트와 별개. 개인정보 및 호수 없음.',
        months=months,records=allrows[:10000])
 
-def update_snapshot(path,school=None,office=None):
+
+# 한국부동산원 청약홈 분양정보 OpenAPI. Uses the SAME approved data.go.kr key
+# as the trade collectors, but separate API approval is required.
+# Never publish the service key or unverified partial responses.
+APPLYHOME_BASE='https://api.odcloud.kr/api/ApplyhomeInfoDetailSvc/v1/'
+APPLYHOME_SOURCE='https://www.data.go.kr/data/15098547/openapi.do'
+APPLYHOME_SERVICES=(
+    ('getAPTLttotPblancDetail','아파트'),
+    ('getRemndrLttotPblancDetail','무순위·잔여세대'),
+    ('getUrbtyOfctlLttotPblancDetail','오피스텔·도시형 등'),
+)
+
+def subscription_date(value):
+    raw=str(value or '').strip()
+    if not raw:return ''
+    s=raw.replace('.','-').replace('/','-').rstrip('-')
+    if re.fullmatch(r'\d{8}',s):s=s[:4]+'-'+s[4:6]+'-'+s[6:]
+    try:
+        d=datetime.strptime(s,'%Y-%m-%d')
+        return d.strftime('%Y-%m-%d') if 2000<=d.year<=2100 else ''
+    except ValueError:return ''
+
+def official_notice_link(value):
+    s=str(value or '').strip()
+    if not 1<=len(s)<=500:return ''
+    try:
+        u=urlparse(s)
+        host=(u.hostname or '').lower()
+        if u.scheme!='https' or u.username or u.password:return ''
+        if host not in ('www.applyhome.co.kr','applyhome.co.kr','www.applyhome.kr','applyhome.kr'):
+            return ''
+        return s
+    except ValueError:return ''
+
+def subscription_rows(payload):
+    try:
+        obj=json.loads(payload.decode('utf-8-sig') if isinstance(payload,bytes) else payload)
+    except (UnicodeDecodeError,ValueError,TypeError):
+        raise RuntimeError('청약홈 API 응답 JSON 형식 오류') from None
+    if not isinstance(obj,dict) or not isinstance(obj.get('data'),list):
+        raise RuntimeError('청약홈 API 미승인 또는 예상하지 못한 응답 형식')
+    try:
+        count=int(obj['totalCount'])
+        page=int(obj['page'])
+    except (KeyError,ValueError,TypeError):
+        raise RuntimeError('청약홈 API 페이지 정보 누락') from None
+    if count<0 or count>100000 or page<1:
+        raise RuntimeError('청약홈 API 전체 건수 비정상')
+    return obj['data'],count,page
+
+def normalize_subscriptions(rows,kind):
+    out=[]
+    for item in rows:
+        if not isinstance(item,dict):continue
+        name=str(item.get('HOUSE_NM') or '').strip()
+        address=str(item.get('HSSPLY_ADRES') or '').strip()
+        # Strict geographic scope: never report another city's Songdo-named project.
+        if not (name and '연수구' in address and
+                ('송도' in address or '송도' in name)):continue
+        notice=subscription_date(item.get('RCRIT_PBLANC_DE'))
+        if not notice:continue
+        house_no=str(item.get('HOUSE_MANAGE_NO') or '').strip()
+        notice_no=str(item.get('PBLANC_NO') or '').strip()
+        if not (re.fullmatch(r'[0-9]{1,30}',house_no) and
+                re.fullmatch(r'[0-9A-Za-z_-]{1,40}',notice_no)):continue
+        start=subscription_date(item.get('SUBSCRPT_RCEPT_BGNDE') or
+              item.get('GNRL_RCEPT_BGNDE') or item.get('SPSPLY_RCEPT_BGNDE'))
+        end=subscription_date(item.get('SUBSCRPT_RCEPT_ENDDE') or
+              item.get('GNRL_RCEPT_ENDDE') or item.get('SPSPLY_RCEPT_ENDDE'))
+        # Never mistake missing dates for a scheduled application period.
+        if start and end and start>end:start=end=''
+        supply=as_int(item.get('TOT_SUPLY_HSHLDCO'))
+        if supply is not None and supply>100000:supply=None
+        out.append(dict(kind=kind,house_manage_no=house_no,notice_no=notice_no,
+            name=name[:120],address=address[:220],notice_date=notice,
+            apply_start=start,apply_end=end,
+            announcement_date=subscription_date(item.get('PRZWNER_PRESNATN_DE')),
+            move_in=str(item.get('MVN_PREARNGE_YM') or '').strip()[:20],
+            households=supply,notice_url=official_notice_link(item.get('PBLANC_URL'))))
+    return out
+
+def collect_subscriptions(key,opener=None,today=None,days_back=420):
+    if not key:raise RuntimeError('GitHub secret DATA_GO_KR_SERVICE_KEY 미설정')
+    if not 30<=days_back<=730:raise ValueError('청약홈 기간 30~730일 필요')
+    key=unquote(key.strip())
+    now=today or datetime.now(KST).date()
+    if isinstance(now,datetime):now=now.date()
+    start=(now-timedelta(days=days_back)).isoformat()
+    end=(now+timedelta(days=60)).isoformat()
+    all_rows={}
+    # 3 official endpoints; every page must be fetched before publishing data.
+    for endpoint,kind in APPLYHOME_SERVICES:
+        for page in range(1,31):
+            args={
+                'page':page,'perPage':100,'returnType':'JSON',
+                'cond[SUBSCRPT_AREA_CODE_NM::EQ]':'인천',
+                'cond[RCRIT_PBLANC_DE::GTE]':start,
+                'cond[RCRIT_PBLANC_DE::LTE]':end,
+                'serviceKey':key
+            }
+            raw=retrieve(APPLYHOME_BASE+endpoint,args,opener)
+            rows,total,pageno=subscription_rows(raw)
+            if pageno!=page or len(rows)>100:
+                raise RuntimeError('청약홈 API 페이지 일치 검증 실패')
+            for row in normalize_subscriptions(rows,kind):
+                unique=(kind,row['house_manage_no'],row['notice_no'])
+                all_rows[unique]=row
+            if page*100>=total:break
+            if not rows:raise RuntimeError('청약홈 API 중간 페이지 누락')
+        else:raise RuntimeError('청약홈 API 페이지 최대치 초과, 부분결과 게시 금지')
+    records=sorted(all_rows.values(),key=lambda r:(r['notice_date'],r['name']),reverse=True)
+    return dict(state='verified',updated_at=fresh_date(),source_url=APPLYHOME_SOURCE,
+        note='한국부동산원 청약홈 공식 모집공고일 기준, 인천 연수구 송도 소재 확인 공고. 접수일이 없으면 일정 미확인. 결과가 없어도 전체 분양공고 부재를 뜻하지 않음.',
+        window_start=start,window_end=end,records=records)
+
+def update_snapshot(path,school=None,office=None,subscriptions=None):
     current=json.loads(path.read_text(encoding='utf-8'))
     if current.get('schema_version')!=1:raise RuntimeError('Snapshot schema mismatch')
     if school is not None:current['schools']=school
     if office is not None:current['office_rents']=office
+    if subscriptions is not None:current['subscriptions']=subscriptions
     current['updated_at']=fresh_date()
     temp=path.with_suffix('.json.tmp')
     temp.write_text(json.dumps(current,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
@@ -152,11 +268,11 @@ def update_snapshot(path,school=None,office=None):
 
 def main():
     a=argparse.ArgumentParser()
-    a.add_argument('--mode',choices=['schools','offices','all'],default='all')
+    a.add_argument('--mode',choices=['schools','offices','subscriptions','all'],default='all')
     a.add_argument('--months',type=int,default=6)
     args=a.parse_args()
     if not 1<=args.months<=12:raise ValueError('months must be 1..12')
-    school=office=None
+    school=office=subscriptions=None
     if args.mode in ('schools','all') and os.environ.get('NEIS_EDU_KEY'):
         school=collect_schools(os.environ['NEIS_EDU_KEY'])
         print('NEIS 송도 학교 기본정보',len(school['records']),'곳')
@@ -166,10 +282,15 @@ def main():
         office=collect_offices(os.environ['DATA_GO_KR_SERVICE_KEY'],months=args.months)
         print('송도 오피스텔 전월세',len(office['records']),'건')
     elif args.mode in ('offices','all'):print('오피스텔 API 인증키 미설정: 기존 상태 유지')
-    if school is None and office is None:
+    if args.mode in ('subscriptions','all') and os.environ.get('DATA_GO_KR_SERVICE_KEY'):
+        subscriptions=collect_subscriptions(os.environ['DATA_GO_KR_SERVICE_KEY'])
+        print('청약홈 송도 분양공고',len(subscriptions['records']),'건')
+    elif args.mode in ('subscriptions','all'):
+        print('청약홈 API 인증키 미설정: 기존 상태 유지')
+    if school is None and office is None and subscriptions is None:
         print('실행 가능한 신규 서비스 없음: 파일 변경 안 함')
         return
-    update_snapshot(TARGET,school,office)
+    update_snapshot(TARGET,school,office,subscriptions)
     print('기존 미승인 서비스·검증값 보존; 새 인증키는 출력하지 않음')
 
 if __name__=='__main__':
