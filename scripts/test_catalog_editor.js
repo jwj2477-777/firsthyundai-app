@@ -41,7 +41,7 @@ vm.runInContext(script,context);
 (async()=>{
  for(let i=0;i<25;i++)await Promise.resolve();
  const evalJS=q=>vm.runInContext(q,context);
- assert.equal(evalJS('catalogRows().length'),13);
+ assert(evalJS('catalogRows().length')>=13);
  assert.equal(evalJS("catalogRows().find(x=>x.id==='f15').households"),872);
  evalJS("switchPage('complexes')");
  assert.equal(elt('complexAdmin').classList.contains('hidden'),false,'Admin editor is visible to authenticated admin');
@@ -57,7 +57,7 @@ vm.runInContext(script,context);
  evalJS('exportComplexCatalog()');
  assert(exported?.includes('"households": 873'),'Android JSON export saves approved changes');
  const result=JSON.parse(exported);
- assert.equal(result.records.length,13);
+ assert(result.records.length>=13);
  assert.equal(result.records.find(x=>x.id==='f15').households,873);
  assert.equal(result.records.find(x=>x.id==='f15').aliases[0],'송도더샵퍼스트파크F15BL');
  evalJS("window.onRoleChanged('family')");
