@@ -1,6 +1,60 @@
-# 퍼스트현대 무료 자동 수집 안드로이드 앱 v1.10.1
+# 퍼스트현대 무료 자동 수집 안드로이드 앱 v1.11.0
 
 > **중요:** 현재 제공 파일은 Android APK *빌드 가능 소스*입니다. 실거래 API 키·GitHub 저장소 연결·자동 실행은 각자 계정에서 설정해야 합니다. 이 작업 환경에서는 실제 APK 컴파일과 실휴대폰 설치 검증을 아직 수행하지 못했습니다. 데이터 파일에는 허위 샘플 거래/뉴스를 넣지 않았습니다.
+
+## v1.11 — 신규 공식 공공데이터 API 신청·연동 기반
+
+**승인 전 데이터를 임의로 입력하지 않습니다.** 데이터 통합 스냅샷 `data/public_services.json` 에서는
+`state=awaiting_approval` / `state=awaiting_key` 와 실제 `state=verified` 를 엄격히 구분합니다.
+승인 전에는 부모님 화면에 '연동 대기'와 공식 출처를 표시합니다.
+
+### API 활용신청 체크리스트
+
+1. [국토부 건축HUB 건축물대장정보 서비스](https://www.data.go.kr/data/15134735/openapi.do): 개발계정 활용신청.
+   전유면적과 건축물 용도 확인에 사용. **동·호수 정보 등 개인정보성 결합 정보는 공개 GitHub에 저장하지 마세요.**
+2. [국토부 공동주택관리비(공용관리비)정보제공서비스](https://www.data.go.kr/data/15057937/openapi.do):
+   개발계정 활용신청. K-apt 코드별 관리비 통계에 이용(개별 세대 청구액이 아님).
+3. [국토부 오피스텔 전월세 실거래가 자료](https://www.data.go.kr/data/15126475/openapi.do):
+   개발계정 활용신청. 이미 사용 중인 `DATA_GO_KR_SERVICE_KEY` 인증키로 해당 서비스 **추가 활용승인이 필요**.
+4. [한국부동산원 청약홈 분양정보 조회](https://www.data.go.kr/data/15098547/openapi.do):
+   개발계정 활용신청. API 게이트웨이/서비스키 활성 상태는 별도로 확인.
+5. [나이스 교육정보 개방 포털](https://open.neis.go.kr/portal/guide/apiGuidePage.do):
+   로그인 → 활용가이드 → **인증키 신청**. 발급받은 키는 GitHub Actions `NEIS_EDU_KEY`에 등록.
+6. [주소기반산업지원서비스](https://business.juso.go.kr/):
+   API 신청 → **도로명주소 검색 API** 신청(해당 서비스 승인키는 `JUSO_CONFIRM_KEY`로 보관할 예정).
+7. [학구도 공공데이터 목록](https://schoolzone.emac.kr/publicData/publicDataList.do):
+   공식 2026-09-20 초등 통학구역·중학교 학구/학교군 자료(SHP 및 연계 CSV) 다운로드.
+   **나이스 학교 기본정보만으로 아파트의 배정학교를 계산하거나 단정하지 않습니다.**
+   좌표·경계 교차 검증, 학교군 예외 및 교육청 고시 확인 후 배정 표시.
+
+공공데이터포털 활용목적 예시:
+`부동산 중개업무용 인천 송도 아파트·오피스텔 건축물, 관리비, 실거래, 학교, 도로명주소 및 청약 분양정보 공공데이터 조회 앱 개발`
+
+### 비밀키 등록 방법 (채팅으로 인증키 전송 금지)
+
+본인 계정에서 [GitHub Actions secrets](https://github.com/jwj2477-777/firsthyundai-app/settings/secrets/actions)
+→ **New repository secret** → 이름 `NEIS_EDU_KEY` → 키 값 저장.
+기존 `DATA_GO_KR_SERVICE_KEY`를 덮어쓰지 말고, 4종 국토부·청약홈 API에 **서비스별 승인**을 추가합니다.
+주소 API는 별도 승인키이므로 사용자가 신청 완료를 알려주면 `JUSO_CONFIRM_KEY`를 등록해 연계합니다.
+일부 인증키는 포털별로 사용제한이 있어 공개 소스/앱 APK/평문 JSON 안에 절대 넣지 않습니다.
+
+### 구현 현황과 사용 위치
+
+- **아파트 상세 → 학교·학군**: 학교 기본정보 나이스 API 수집기 구현, GitHub 비밀키 등록 전 `awaiting_key`.
+  학교 이름·주소는 지역 참고용이고 배정 확인은 공식 학구도 링크 제공.
+- **아파트 상세 → 건축·관리비**: 건축HUB·K-apt 관리비·도로명주소에 대한 확인 및 연동 상태, 공식 신청 링크.
+  활용승인 후 API 응답 구조/주소 식별자를 실측 검증한 다음 금액·면적을 게시. **현재 자동 수치 수집은 미완료.**
+- **실거래 → 오피스텔 전월세**: 아파트와 섞지 않는 독립 필터/거래 목록.
+  기술문서에 따른 국토부 `RTMSDataSvcOffiRent` XML 수집기 구현.
+  별도 활용승인 후 워크플로우를 수동 실행해 검증 필요.
+- **뉴스 → 청약·분양**: 청약홈 연동 대기 표시와 공식 API 신청 링크.
+  API 승인 및 실제 수집기는 미연결이며, 공고정보를 임의로 만들지 않음.
+- 비밀키를 사용하는 갱신 작업은 `.github/workflows/sync-public-services.yml`.
+  GitHub Actions → **Sync Optional Public Services (requires approvals)** → Run workflow에서
+  `schools`, `offices`, `all` 중 **실제로 승인된 서비스**만 선택.
+  학교 기본정보는 인증키 설정 후 매월 정기 점검. 미승인 서비스 상태나 기존 실거래 자료는 보존.
+- 자동 검증: `tests/test_public_services.py`, `scripts/test_public_hub.js`.
+  실제 API 인증/비밀키 없이도 학교 배정 오표시, 다른 동 오피스텔 혼입, 미승인 자료의 '0원' 표시를 방지.
 
 ## v1.10.1 — 갱신 확인 개선·상단 FHD 로고·화면 안내 정리
 
