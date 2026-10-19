@@ -206,7 +206,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
  <div class="sectionTitle"><div><h2>송도동 아파트 실거래가</h2><p class="tiny" id="tradesMeta">국토교통부 공개 API 연동 대기</p></div><button class="btn alt" onclick="refreshOne('trades')">갱신</button></div>
  <div class="panel"><div id="tradeFocusBanner"></div><div class="controls"><input id="aptFilter" placeholder="아파트 단지명 검색" oninput="renderTrades()" aria-label="아파트 단지명"></div>
   <div class="controls"><select id="typeFilter" onchange="renderTrades()"><option value="">매매·전세·월세 전체</option><option>매매</option><option>전세</option><option>월세</option></select><select id="statusFilter" onchange="renderTrades()"><option value="">해제 포함 전체</option><option value="notcancel">해제 제외</option><option value="cancel">해제 거래만</option></select></div>
-  <select id="tradesFavoriteFilter" aria-label="주변단지 한정" onchange="renderTrades()"><option value="">송도동 전체 단지</option><option value="favorites">★ 주변 12개 단지만</option></select>
+  <select id="tradesFavoriteFilter" aria-label="주변단지 한정" onchange="renderTrades()"><option value="">송도동 전체 단지</option><option value="favorites">★ 관심 13개 단지만</option></select>
   <div id="tradesContent"><div class="empty">데이터 저장소를 연결한 후 표시됩니다.</div></div>
   <div class="tiny">금액 단위: 만 원. 보증금과 월세는 별도 표시합니다. 실거래는 신고 이후 반영되므로 실제 계약일보다 늦게 게시될 수 있습니다. 동일 조건의 별도 계약도 각각 표시할 수 있습니다.</div>
  </div>
@@ -659,7 +659,7 @@ function renderNearbyDetails(resetLimit){
     '<span class="pill">'+escapeHtml(x.type)+'</span>'+
     '<span class="pill '+(x.status==='해제'?'red':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+
     '</div><h3>'+escapeHtml(name)+'</h3>'+
-    (g?.id==='prime'?'<p class="tiny">'+escapeHtml(x.building)+'</p>':'')+
+    ''+
     '<div class="money">'+escapeHtml(value)+'</div>'+
     '<div class="meta">계약일 '+escapeHtml(x.contract_date)+
     ' · 전용 '+escapeHtml(x.area_m2)+'㎡ · '+escapeHtml(x.floor||'층 정보 없음')+'층</div>'+
