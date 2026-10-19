@@ -1,6 +1,8 @@
 name: Build Android APK
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
   push:
     branches: [main]
     paths:
@@ -35,6 +37,7 @@ jobs:
           node scripts/test_nearby.js
           node scripts/test_family_mode.js
           node scripts/test_admin_guards.js
+          node scripts/test_complexes.js
       - name: Test password policy generation (disposable code)
         run: python3 scripts/test_family_policy.py
       - name: Test independent administrator policy
