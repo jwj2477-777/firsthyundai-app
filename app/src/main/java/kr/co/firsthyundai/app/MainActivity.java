@@ -1,6 +1,15 @@
 package kr.co.firsthyundai.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.SharedPreferences;
+import android.text.InputType;
+import android.widget.EditText;
+import java.util.Arrays;
+import java.util.Properties;
+import java.security.MessageDigest;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,6 +36,8 @@ public class MainActivity extends Activity {
     private WebView web;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private String pendingBackup = "";
+    private static final String MODE_PREFS = "firsthyundai-device-mode";
+    private static final String ADMIN_TRIES = "firsthyundai-admin-attempts";
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +65,100 @@ public class MainActivity extends Activity {
         web.loadUrl("file:///android_asset/index.html");
     }
 
+    private boolean isAdminDeviceMode() {
+        return getSharedPreferences(MODE_PREFS, MODE_PRIVATE).getBoolean("admin_mode", false);
+    }
+
+    private void changeRole(boolean admin) {
+        getSharedPreferences(MODE_PREFS, MODE_PRIVATE).edit()
+                .putBoolean("admin_mode", admin).apply();
+        // Script only receives a role label; no password travels to JavaScript.
+        web.evaluateJavascript("window.onRoleChanged(" +
+                (admin ? "'admin'" : "'family'") + ")", null);
+    }
+
+    private static byte[] decodeHex(String value) {
+        if (value == null || value.length() % 2 != 0) throw new IllegalArgumentException();
+        byte[] bytes = new byte[value.length() / 2];
+        for (int i = 0; i < bytes.length; i++) {
+            int a = Character.digit(value.charAt(2 * i), 16);
+            int b = Character.digit(value.charAt(2 * i + 1), 16);
+            if (a < 0 || b < 0) throw new IllegalArgumentException();
+            bytes[i] = (byte) ((a << 4) | b);
+        }
+        return bytes;
+    }
+
+    private boolean matchesFamilyCode(char[] candidate) {
+        try (InputStream stream = getAssets().open("access-verifier.properties")) {
+            Properties p = new Properties();
+            p.load(stream);
+            int count = Integer.parseInt(p.getProperty("iterations", "0"));
+            if (count < 100000 || count > 1000000) return false;
+            byte[] salt = decodeHex(p.getProperty("salt", ""));
+            byte[] expected = decodeHex(p.getProperty("verifier", ""));
+            if (salt.length < 16 || expected.length != 32) return false;
+            PBEKeySpec spec = new PBEKeySpec(candidate, salt, count, 256);
+            try {
+                byte[] derived = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+                        .generateSecret(spec).getEncoded();
+                boolean ok = MessageDigest.isEqual(expected, derived);
+                Arrays.fill(derived, (byte) 0);
+                return ok;
+            } finally {
+                spec.clearPassword();
+            }
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    private void showAdminCodeDialog() {
+        if (isAdminDeviceMode()) return;
+        SharedPreferences tries = getSharedPreferences(ADMIN_TRIES, MODE_PRIVATE);
+        long now = System.currentTimeMillis();
+        long lockedUntil = tries.getLong("locked_until", 0L);
+        if (now < lockedUntil) {
+            new AlertDialog.Builder(this)
+                    .setMessage("여러 번 틀렸습니다. 잠시 후 다시 시도해 주세요.")
+                    .setPositiveButton("확인", null).show();
+            return;
+        }
+        final EditText field = new EditText(this);
+        field.setSingleLine(true);
+        field.setHint("기존 가족 보안코드 입력");
+        field.setPadding(32, 24, 32, 24);
+        field.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        new AlertDialog.Builder(this)
+                .setTitle("관리자 모드")
+                .setMessage("이번 1차 버전은 기존 가족 보안코드로 관리자 화면에 진입합니다. 별도 관리자 비밀번호는 다음 단계에서 추가할 예정입니다.")
+                .setView(field)
+                .setNegativeButton("취소", null)
+                .setPositiveButton("확인", (dialog, which) -> {
+                    char[] candidate = field.getText().toString().trim().toCharArray();
+                    field.setText("");
+                    boolean ok = candidate.length > 0 && matchesFamilyCode(candidate);
+                    Arrays.fill(candidate, (char) 0);
+                    if (ok) {
+                        tries.edit().clear().apply();
+                        changeRole(true);
+                    } else {
+                        int attempt = tries.getInt("attempts", 0) + 1;
+                        if (attempt >= 5) {
+                            tries.edit().putInt("attempts", 0)
+                                    .putLong("locked_until", System.currentTimeMillis() + 60000).apply();
+                        } else {
+                            tries.edit().putInt("attempts", attempt).apply();
+                        }
+                        new AlertDialog.Builder(this)
+                                .setMessage(attempt >= 5 ?
+                                        "5회 실패해 1분 동안 관리자 전환이 제한됩니다." :
+                                        "보안코드가 일치하지 않습니다.")
+                                .setPositiveButton("확인", null).show();
+                    }
+                }).show();
+    }
+
     private boolean routeExternal(String url) {
         if ("file:///android_asset/index.html".equals(url)) return false;
         Uri uri = Uri.parse(url);
@@ -69,6 +174,15 @@ public class MainActivity extends Activity {
     }
 
     public final class Bridge {
+        @JavascriptInterface public String getMode() {
+            return isAdminDeviceMode() ? "admin" : "family";
+        }
+        @JavascriptInterface public void requestAdminAccess() {
+            runOnUiThread(() -> showAdminCodeDialog());
+        }
+        @JavascriptInterface public void switchToFamilyMode() {
+            runOnUiThread(() -> changeRole(false));
+        }
         @JavascriptInterface public void fetch(String repository, String filename, String requestId) {
             // Public data ONLY. Never inject API tokens / family records into remote requests.
             if (repository==null || !repository.matches("[A-Za-z0-9_.-]{1,60}/[A-Za-z0-9_.-]{1,100}") ||
