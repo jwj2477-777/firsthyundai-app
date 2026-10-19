@@ -141,20 +141,20 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
    <div class="metric"><small>오늘 신규 공개 확인</small><strong id="newDeals">—</strong><small>최초 발견일 기준</small></div>
    <div class="metric"><small>뉴스 묶음</small><strong id="newsGroups">—</strong><small>최근 기사 제목</small></div>
   </div>
-  <div class="panel"><button class="btn nearbyTotal" type="button" onclick="switchPage('nearby')"><span>★ 관심 13개 단지 실거래 바로보기</span><span>→</span></button><p class="tiny">프라임뷰 20블럭과 25블럭은 별개 단지로 표시합니다.</p><button class="btn alt" type="button" onclick="switchPage('complexes')">송도 전체 아파트 기본정보 →</button></div>
+  <div class="panel"><button class="btn nearbyTotal" type="button" onclick="switchPage('nearby')"><span>★ 관심 14개 단지 실거래 바로보기</span><span>→</span></button><p class="tiny">프라임뷰 20블럭과 25블럭은 별개 단지로 표시합니다.</p><button class="btn alt" type="button" onclick="switchPage('complexes')">송도 전체 아파트 기본정보 →</button></div>
   <div class="panel"><div class="sectionTitle"><h2>수집 상태</h2></div><div id="overviewStatus" class="tiny">연결 정보가 없습니다.</div></div>
   <div class="panel"><p class="tiny">상단의 실거래·아파트정보·뉴스 버튼으로 바로 이동할 수 있습니다. 관리자용 자료·설정·보안은 '관리자 도구'에서 확인하세요.</p></div>
 </div>
 <div id="nearby" class="page hidden">
- <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2><p class="tiny">송도 3공구 퍼스트파크 15블럭 사무실 중심 · 자주 중개하는 13개 단지</p></div><button class="btn alt" onclick="refreshOne('trades')">갱신</button></div>
+ <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2><p class="tiny">송도 3공구 퍼스트파크 15블럭 사무실 중심 · 자주 중개하는 14개 단지</p></div><button class="btn alt" onclick="refreshOne('trades')">갱신</button></div>
  <div class="panel">
-  <h3 style="margin:0 0 8px">즐겨찾기 13개 단지</h3>
+  <h3 style="margin:0 0 8px">즐겨찾기 14개 단지</h3>
   <p class="tiny">단지를 누르면 아래에서 해당 단지의 매매·전세·월세 거래만 확인할 수 있습니다. 프라임뷰 20블럭과 25블럭은 각각 선택할 수 있습니다.</p>
-  <button id="nearbyAll" class="btn alt nearbyTotal" type="button" onclick="chooseNearby('all')"><span>★ 관심 13개 단지 전체 보기</span><strong id="nearbyAllCount">—</strong></button>
+  <button id="nearbyAll" class="btn alt nearbyTotal" type="button" onclick="chooseNearby('all')"><span>★ 관심 14개 단지 전체 보기</span><strong id="nearbyAllCount">—</strong></button>
   <div id="nearbyCards" class="nearbyGrid"></div>
  </div>
  <div class="panel" id="nearbyDetails">
-  <div class="sectionTitle"><div><h2 id="nearbyTitle">관심 13개 단지 실거래</h2><p class="tiny" id="nearbyMeta">국토교통부 실거래가 자료를 불러오는 중입니다.</p></div></div>
+  <div class="sectionTitle"><div><h2 id="nearbyTitle">관심 14개 단지 실거래</h2><p class="tiny" id="nearbyMeta">국토교통부 실거래가 자료를 불러오는 중입니다.</p></div></div>
   <p class="tiny" style="margin-bottom:4px">거래 유형</p>
   <div class="tradeTypeBar" id="nearbyTypeBar" aria-label="관심단지 거래유형">
     <button type="button" onclick="setNearbyType('')">전체</button>
@@ -240,7 +240,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
  <div class="panel">
   <label class="inputLabel" for="newDate">신규 공개 확인일 (한국시간)</label><select id="newDate" onchange="renderNew()"></select>
   <div class="controls"><select id="newType" aria-label="실거래 유형" onchange="renderNew()"><option value="">매매·전세·월세 전체</option><option>매매</option><option>전세</option><option>월세</option></select><input id="newAptFilter" placeholder="단지명 검색" aria-label="단지명 검색" oninput="renderNew()"></div>
-  <select id="newFavoriteFilter" aria-label="주변단지 한정" onchange="renderNew()"><option value="">송도동 전체 단지</option><option value="favorites">★ 관심 13개 단지만</option></select>
+  <select id="newFavoriteFilter" aria-label="주변단지 한정" onchange="renderNew()"><option value="">송도동 전체 단지</option><option value="favorites">★ 관심 14개 단지만</option></select>
   <div id="newCounts" class="newCounts"></div>
   <p class="tiny" id="newStatus">일별 수집 결과를 불러오는 중입니다.</p>
   <div id="newContent"><div class="empty">설정에서 공개 GitHub 저장소를 연결하면 날짜별 새 거래가 표시됩니다.</div></div>
@@ -252,7 +252,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
   <p class="tiny">원하는 보기 방식을 먼저 선택하세요. 복잡한 조건 없이 계약일 최신순으로 바로 볼 수 있습니다.</p>
   <div class="tradeStarter" aria-label="실거래 보기 방식">
     <button id="tradeModeLatest" type="button" onclick="openTradeLatest()"><span class="starterIcon">◷</span>전체 최신순</button>
-    <button id="tradeModeFavorites" type="button" onclick="switchPage('nearby')"><span class="starterIcon">★</span>관심 13개</button>
+    <button id="tradeModeFavorites" type="button" onclick="switchPage('nearby')"><span class="starterIcon">★</span>관심 14개</button>
     <button id="tradeModeSearch" type="button" onclick="startTradeSearch()"><span class="starterIcon">⌕</span>아파트 선택</button>
   </div>
   <div id="tradeFocusBanner"></div>
@@ -278,7 +278,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
     <label class="inputLabel" for="statusFilter">해제 거래 표시</label>
     <select id="statusFilter" onchange="renderTrades()"><option value="">해제 포함 전체</option><option value="notcancel">해제 제외</option><option value="cancel">해제 거래만</option></select>
     <select class="hidden" id="typeFilter" aria-label="거래유형 내부 필터"><option value="">전체</option><option>매매</option><option>전세</option><option>월세</option></select>
-    <select class="hidden" id="tradesFavoriteFilter" aria-label="관심단지 내부 필터"><option value="">송도동 전체 단지</option><option value="favorites">★ 관심 13개 단지만</option></select>
+    <select class="hidden" id="tradesFavoriteFilter" aria-label="관심단지 내부 필터"><option value="">송도동 전체 단지</option><option value="favorites">★ 관심 14개 단지만</option></select>
   </details>
   <div id="tradesContent"><div class="empty">최신 실거래 자료를 불러오고 있습니다.</div></div>
   <div class="tiny">금액 단위: 만 원. 보증금과 월세는 별도 표시합니다. 실거래는 신고 이후 반영되므로 실제 계약일보다 늦게 게시될 수 있습니다. 동일 조건의 별도 계약도 각각 표시할 수 있습니다.</div>
@@ -348,7 +348,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
   <p class="tiny">두 비밀번호의 원문은 GitHub 비공개 Secret에만 존재하고, 공개 저장소에는 각 비밀번호의 PBKDF2 검증 정보만 게시됩니다. 공개 검증 정보는 오프라인 추측 공격 대상이므로 특히 관리자 비밀번호는 16자 이상 무작위 문자열을 권장합니다.</p>
  </div>
 </div>
-<footer class="foot">퍼스트현대 v1.8 · 실거래 / 아파트정보 / 뉴스 · 관심 13개 단지</footer>
+<footer class="foot">퍼스트현대 v1.9.2 · 실거래 / 아파트정보 / 뉴스 · 관심 14개 단지</footer>
 </main>
 <dialog id="noteDialog"><h2 id="noteDialogTitle">내 자료 등록</h2>
 <form id="noteForm">
@@ -416,7 +416,7 @@ window.onRoleChanged=function(next){
 };
 const NAV_CATEGORIES=[
  {id:'trades',label:'실거래',icon:'↗',main:'trades',
-  children:[['trades','전체 최신순'],['nearby','★ 관심 13개'],['new','새로 확인']]},
+  children:[['trades','전체 최신순'],['nearby','★ 관심 14개'],['new','새로 확인']]},
  {id:'complexes',label:'아파트정보',icon:'⌂',main:'complexes',
   children:[['complexes','송도 단지 검색']]},
  {id:'news',label:'뉴스',icon:'▤',main:'news',
@@ -477,7 +477,8 @@ const FAVORITE_APTS=[
  {id:'prime25', label:'프라임뷰 25블럭', group:'프라임뷰', names:['더샵송도프라임뷰25BL']},
  {id:'skcentral', label:'SK뷰센트럴', group:'주변 핵심단지', names:['송도SK뷰센트럴']},
  {id:'artwin', label:'아트윈푸르지오', group:'주변 핵심단지', names:['송도아트윈푸르지오']},
- {id:'central3', label:'센트럴파크 3차', group:'주변 핵심단지', names:['더샵송도센트럴파크Ⅲ','더샵송도센트럴파크III','더샵송도센트럴파크3차']}
+ {id:'central3', label:'센트럴파크 3차', group:'주변 핵심단지', names:['더샵송도센트럴파크Ⅲ','더샵송도센트럴파크III','더샵송도센트럴파크3차']},
+ {id:'kapt-a10027887', label:'센트럴파크푸르지오', group:'센트럴파크', names:['송도센트럴파크푸르지오','송도센트럴파크 푸르지오','센트럴파크푸르지오','송도센트럴파크푸르지오(주상복합)']}
 ];
 function normalizeAptName(name){return String(name||'').normalize('NFKC').toUpperCase().replace(/[^0-9A-Z가-힣]/g,'');}
 const FAVORITE_MATCH=new Map(FAVORITE_APTS.flatMap(g=>g.names.map(name=>[normalizeAptName(name),g.id])));
@@ -796,7 +797,7 @@ function renderNearbyDetails(resetLimit){
  const allTypes={매매:0,전세:0,월세:0};
  for(let row of rows)if(Object.prototype.hasOwnProperty.call(allTypes,row.type))allTypes[row.type]++;
  const total=rows.length;
- $('nearbyTitle').textContent=g?g.label+' 실거래':'★ 관심 13개 단지 실거래';
+ $('nearbyTitle').textContent=g?g.label+' 실거래':'★ 관심 14개 단지 실거래';
  $('nearbyMeta').textContent=remote.trades?
   '계약일 최신순 · 최종 수집 '+prettyTime(remote.trades.checked_at):
   '데이터 연결 대기 · 설정에서 GitHub 저장소를 연결하세요.';
