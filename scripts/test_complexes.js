@@ -28,7 +28,7 @@ function element(id) {
  if(!elements.has(id)) {
   const classes=new Set(id==='complexAdmin'?['hidden']:[]);
   elements.set(id,{
-   value:'',innerHTML:'',textContent:'',open:false,
+   value:'',innerHTML:'',textContent:'',open:false,options:[{}],
    classList:{toggle(c,force){if(force)classes.add(c);else classes.delete(c);},remove(c){classes.delete(c);},contains(c){return classes.has(c);}},
    scrollIntoView(){},reset(){},showModal(){},close(){},elements:{}
   });
