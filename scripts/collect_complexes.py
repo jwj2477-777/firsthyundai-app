@@ -349,6 +349,15 @@ def main():
             for field in ("aggregate_only","detail_note","naver_complex_url"):
                 if field in prior:
                     r[field] = prior[field]
+            # An exact apartment screenshot is stronger than a stale K-apt record:
+            # do not silently erase manually cross-checked facts on the next sync.
+            if prior.get("naver_sample_verified"):
+                for field in ("address", "households", "buildings", "approved_date",
+                              "floors", "heating", "heating_detail", "parking_total",
+                              "builder", "management_phone", "detail_source",
+                              "detail_checked_at", "naver_sample_verified"):
+                    if prior.get(field) is not None:
+                        r[field] = prior[field]
     print("송도동 K-apt 본문 확인:", count, "건, 기존 보존:", len(curated),
           "건, 게시 단지:", len(records), "건, 조회실패:", failures)
     if args.dry_run:
