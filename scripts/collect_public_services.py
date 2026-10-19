@@ -182,12 +182,15 @@ def subscription_rows(payload):
     if not isinstance(obj,dict) or not isinstance(obj.get('data'),list):
         raise RuntimeError('청약홈 API 미승인 또는 예상하지 못한 응답 형식')
     try:
-        count=int(obj['totalCount'])
+        # odcloud totalCount is the unfiltered global total; matchCount is the
+        # number matching cond[...] filters and is what pagination must use.
+        global_count=int(obj['totalCount'])
+        count=int(obj.get('matchCount',global_count))
         page=int(obj['page'])
     except (KeyError,ValueError,TypeError):
         raise RuntimeError('청약홈 API 페이지 정보 누락') from None
-    if count<0 or count>100000 or page<1:
-        raise RuntimeError('청약홈 API 전체 건수 비정상')
+    if count<0 or count>global_count or global_count>100000 or page<1:
+        raise RuntimeError('청약홈 API 검색 건수 비정상')
     return obj['data'],count,page
 
 def normalize_subscriptions(rows,kind):
