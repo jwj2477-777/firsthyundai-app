@@ -817,7 +817,7 @@ function openComplexEditor(){
  $('complexEditor').showModal();
 }
 function nullableIntegerInput(id,max,allowZero=false){
- const text=$(id).value.trim();
+ const text=String($(id).value??'').trim();
  if(text==='')return null;
  if(!/^\d+$/.test(text))throw Error('숫자 입력을 확인해 주세요: '+id);
  const value=Number(text);
@@ -825,7 +825,7 @@ function nullableIntegerInput(id,max,allowZero=false){
  return value;
 }
 function nullablePercentage(id,max){
- const text=$(id).value.trim();
+ const text=String($(id).value??'').trim();
  if(!text)return null;
  if(!/^\d{1,4}(?:\.\d{1,2})?$/.test(text)||Number(text)>max)throw Error('비율은 숫자로 입력해 주세요.');
  return Number(text);
