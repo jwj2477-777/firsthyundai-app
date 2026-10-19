@@ -360,5 +360,17 @@ public class MainActivity extends Activity {
         }
     }
     @Override protected void onDestroy(){io.shutdownNow();if(web!=null)web.destroy();super.onDestroy();}
-    @Override public void onBackPressed(){if(web.canGoBack())web.goBack();else super.onBackPressed();}
+    @Override public void onBackPressed() {
+        if(web==null) {super.onBackPressed();return;}
+        // Close the native-feeling apartment detail screen before leaving the app.
+        // evaluateJavascript is asynchronous; do not navigate the WebView until
+        // its return value confirms that JavaScript did not handle Back.
+        web.evaluateJavascript(
+                "Boolean(window.firstHyundaiGoBack && window.firstHyundaiGoBack())",
+                result -> {
+                    if("true".equals(result))return;
+                    if(web.canGoBack())web.goBack();
+                    else MainActivity.super.onBackPressed();
+                });
+    }
 }

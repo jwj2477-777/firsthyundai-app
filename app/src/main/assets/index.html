@@ -114,6 +114,28 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 .complexSchoolRow a{display:inline-block;margin-top:8px;font-size:13px;font-weight:750}
 .complexTabBar button{min-height:49px;border:1px solid #c3d6e5;border-radius:10px;background:#f3f8fc;color:#1b527e;font-size:14px;font-weight:750;padding:10px;cursor:pointer}
 .complexTabBar button.active{background:#1f5d94;border-color:#1f5d94;color:#fff}
+
+/* Independent apartment detail pages; background list retains search and scroll. */
+body.apartmentSheetActive{overflow:hidden}
+.apartmentSheet.panel{position:fixed;z-index:150;inset:0;margin:0;width:100%;height:100%;height:100dvh;max-width:none;
+ border:0;border-radius:0;box-shadow:-10px 0 35px #183b6033;background:#fff;
+ padding:0 16px 30px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+ visibility:hidden;pointer-events:none;opacity:0;transform:translate3d(25px,0,0);
+ transition:transform 240ms cubic-bezier(.2,.8,.2,1),opacity 200ms ease,visibility 0s linear 250ms}
+.apartmentSheet.panel.detailOpen{visibility:visible;pointer-events:auto;opacity:1;transform:translate3d(0,0,0);
+ transition:transform 240ms cubic-bezier(.2,.8,.2,1),opacity 200ms ease,visibility 0s}
+.detailSheetTop{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:10px;min-height:64px;
+ padding:9px 0;background:#fff;border-bottom:1px solid #e0e9ef;margin-bottom:15px}
+.detailSheetTop strong{font-size:16px;line-height:1.35;min-width:0;overflow-wrap:anywhere}
+.detailBackButton{flex:0 0 auto;display:flex;align-items:center;gap:3px;min-height:48px;padding:5px 12px 5px 7px;
+ border:1px solid #d4e3ed;background:#f1f7fb;border-radius:10px;color:#1b5788;font-size:14px;font-weight:800;cursor:pointer}
+.detailBackButton span:first-child{font-size:29px;line-height:24px}
+.detailSwitchButton{width:100%;min-height:51px;display:block;text-align:left;padding:12px;border:1px solid #bdd9e8;
+ border-radius:11px;background:#edf7fc;color:#174b78;font-size:14px;font-weight:800;margin-bottom:16px}
+.apartmentSheet .complexTabBar{margin-top:12px}
+.apartmentSheet .complexTabBar button{min-height:50px}
+@media(min-width:700px){.apartmentSheet.panel{width:min(700px,100vw);left:50%;right:auto;transform:translate3d(calc(-50% + 25px),0,0)}.apartmentSheet.panel.detailOpen{transform:translate3d(-50%,0,0)}}
+@media(prefers-reduced-motion:reduce){.apartmentSheet.panel,.apartmentSheet.panel.detailOpen{transition:none;transform:none}}
 .complexTap{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:55px;width:100%;border:1px solid #d5e3ec;background:#f8fbfd;border-radius:11px;padding:12px 14px;text-align:left;font:inherit;cursor:pointer;color:#163d61}
 .complexTap strong{font-size:14px}
 .complexTap .sub{font-size:11px;color:#64809a}
@@ -149,11 +171,13 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
  <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2><p class="tiny">송도 3공구 퍼스트파크 15블럭 사무실 중심 · 자주 중개하는 14개 단지</p></div><button class="btn alt" onclick="refreshOne('trades')">갱신</button></div>
  <div class="panel">
   <h3 style="margin:0 0 8px">즐겨찾기 14개 단지</h3>
-  <p class="tiny">단지를 누르면 아래에서 해당 단지의 매매·전세·월세 거래만 확인할 수 있습니다. 프라임뷰 20블럭과 25블럭은 각각 선택할 수 있습니다.</p>
+  <p class="tiny">단지를 누르면 별도 상세 화면이 부드럽게 열립니다. 프라임뷰 20·25블럭도 따로 확인할 수 있습니다.</p>
   <button id="nearbyAll" class="btn alt nearbyTotal" type="button" onclick="chooseNearby('all')"><span>★ 관심 14개 단지 전체 보기</span><strong id="nearbyAllCount">—</strong></button>
   <div id="nearbyCards" class="nearbyGrid"></div>
  </div>
- <div class="panel" id="nearbyDetails">
+ <section class="panel apartmentSheet" id="nearbyDetails" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="nearbySheetTitle">
+  <div class="detailSheetTop"><button class="detailBackButton" type="button" onclick="closeApartmentSheet()" aria-label="관심 아파트 목록으로 돌아가기"><span aria-hidden="true">‹</span><span>목록</span></button><strong id="nearbySheetTitle">관심 아파트 실거래</strong></div>
+  <button class="detailSwitchButton" id="nearbyBasicButton" type="button" onclick="openFavoriteBasicInfo()">⌂ 이 아파트 기본정보 보기 ›</button>
   <div class="sectionTitle"><div><h2 id="nearbyTitle">관심 14개 단지 실거래</h2><p class="tiny" id="nearbyMeta">국토교통부 실거래가 자료를 불러오는 중입니다.</p></div></div>
   <p class="tiny" style="margin-bottom:4px">거래 유형</p>
   <div class="tradeTypeBar" id="nearbyTypeBar" aria-label="관심단지 거래유형">
@@ -170,22 +194,25 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
   <div id="nearbyStats" class="nearbyStats"></div>
   <div id="nearbyTrades"><div class="empty">데이터를 불러오면 거래가 표시됩니다.</div></div>
   <button id="nearbyMore" class="btn alt hidden" type="button" onclick="showMoreNearby()">거래 더 보기</button>
-  <button class="btn alt" type="button" onclick="document.getElementById('nearbyCards').scrollIntoView({behavior:'smooth',block:'start'})">↑ 다른 주변단지 선택</button>
+  <button class="btn alt" type="button" onclick="closeApartmentSheet()">← 다른 관심 아파트 선택</button>
   <p class="tiny">계약일 기준 정렬 · 신고 지연·정정·해제 가능 · 국토교통부 아파트 매매·전월세 공개 자료</p>
- </div>
+ </section>
 </div>
 
 <div id="complexes" class="page hidden">
- <div class="sectionTitle"><div><h2>단지정보 · 송도 아파트</h2><p class="tiny">관심 단지 13곳 + 공공 실거래에서 발견된 송도 아파트 자동 목록</p></div><button class="btn alt" type="button" onclick="refreshOne('complexes')">갱신</button></div>
- <div class="complexIntro">단지를 선택한 후 <b>기본정보·평형·실거래·자료</b> 버튼으로 필요한 내용만 빠르게 확인하세요. 전체 목록은 최근 실거래에 등장한 단지를 포함하며, 거래가 없던 단지는 빠질 수 있습니다.</div>
+ <div class="sectionTitle"><div><h2>단지정보 · 송도 아파트</h2><p class="tiny">관심 단지 14곳 + 송도 아파트 정보 조회</p></div><button class="btn alt" type="button" onclick="refreshOne('complexes')">갱신</button></div>
+ <div class="complexIntro">아파트를 누르면 <b>상세 화면</b>이 부드럽게 열립니다. 뒤로 가면 원래 목록 위치가 유지됩니다.</div>
  <div class="panel">
   <label class="inputLabel" for="complexSearch">아파트명 검색</label>
   <input id="complexSearch" type="search" placeholder="단지 검색: 더샵, 롯데캐슬, 힐스테이트 등" oninput="resetComplexLimit();renderComplexes()" aria-label="단지정보 아파트명 검색">
-   <div class="complexTools"><div><label class="inputLabel" for="complexScope">표시 범위</label><select id="complexScope" onchange="resetComplexLimit();renderComplexes()"><option value="all">전체 송도 실거래 단지</option><option value="favorites">관심 단지 13곳만</option></select></div></div>
+   <div class="complexTools"><div><label class="inputLabel" for="complexScope">표시 범위</label><select id="complexScope" onchange="resetComplexLimit();renderComplexes()"><option value="all">전체 송도 실거래 단지</option><option value="favorites">관심 단지 14곳만</option></select></div></div>
   <p class="tiny" id="complexMeta">기본 단지 목록을 준비했습니다.</p>
   <div class="nearbyGrid" id="complexCards"></div><button type="button" id="complexShowMore" class="btn alt hidden" onclick="showMoreComplexes()">단지 더 보기</button>
  </div>
- <div class="panel" id="complexDetails"><div class="empty">단지 선택 후 기본정보와 평형·실거래를 확인할 수 있습니다.</div></div>
+ <section class="panel apartmentSheet" id="complexSheet" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="complexSheetTitle">
+  <div class="detailSheetTop"><button class="detailBackButton" type="button" onclick="closeApartmentSheet()" aria-label="아파트정보 목록으로 돌아가기"><span aria-hidden="true">‹</span><span>목록</span></button><strong id="complexSheetTitle">아파트 상세정보</strong></div>
+  <div id="complexDetails"><div class="empty">아파트정보를 불러오고 있습니다.</div></div>
+ </section>
  <div class="panel hidden" id="complexAdmin">
   <h3 style="margin-top:0">관리자 · 단지정보 편집</h3>
   <p class="tiny">관리자용 임시 수정은 가족에게 보이지 않습니다. 전체 JSON을 내보내 GitHub에 게시하면 가족 기기에 반영됩니다.</p>
@@ -348,7 +375,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
   <p class="tiny">두 비밀번호의 원문은 GitHub 비공개 Secret에만 존재하고, 공개 저장소에는 각 비밀번호의 PBKDF2 검증 정보만 게시됩니다. 공개 검증 정보는 오프라인 추측 공격 대상이므로 특히 관리자 비밀번호는 16자 이상 무작위 문자열을 권장합니다.</p>
  </div>
 </div>
-<footer class="foot">퍼스트현대 v1.9.2 · 실거래 / 아파트정보 / 뉴스 · 관심 14개 단지</footer>
+<footer class="foot">퍼스트현대 v1.10 · 실거래 / 아파트정보 / 뉴스 · 관심 14개 단지</footer>
 </main>
 <dialog id="noteDialog"><h2 id="noteDialogTitle">내 자료 등록</h2>
 <form id="noteForm">
@@ -442,7 +469,48 @@ function renderMainNavigation(id){
   '" type="button" onclick="switchPage(\'overview\')">▦ 오늘 요약</button>'+admin+'</div>';
  $('nav').innerHTML=primary+secondary+tools;
 }
+// A detail sheet is its own full-screen view; the scrollable list stays intact.
+let activeApartmentSheet=null, apartmentReturnFocus=null;
+function openApartmentSheet(id){
+ if(!['complexSheet','nearbyDetails'].includes(id))return false;
+ if(activeApartmentSheet && activeApartmentSheet!==id)closeApartmentSheet(false);
+ if(!activeApartmentSheet)apartmentReturnFocus=document.activeElement||null;
+ const el=$(id);
+ activeApartmentSheet=id;
+ el.classList.toggle('detailOpen',true);
+ if(el.setAttribute)el.setAttribute('aria-hidden','false');
+ if(document.body?.classList)document.body.classList.add('apartmentSheetActive');
+ el.scrollTop=0;
+ if(el.querySelector){
+  const back=el.querySelector('.detailBackButton');
+  if(back?.focus)back.focus({preventScroll:true});
+ }
+ return true;
+}
+function closeApartmentSheet(restoreFocus=true){
+ if(!activeApartmentSheet)return false;
+ const el=$(activeApartmentSheet);
+ el.classList.remove('detailOpen');
+ if(el.setAttribute)el.setAttribute('aria-hidden','true');
+ activeApartmentSheet=null;
+ if(document.body?.classList)document.body.classList.remove('apartmentSheetActive');
+ if(restoreFocus&&apartmentReturnFocus?.focus)apartmentReturnFocus.focus({preventScroll:true});
+ apartmentReturnFocus=null;
+ return true;
+}
+window.firstHyundaiGoBack=function(){
+ return closeApartmentSheet();
+};
+function openFavoriteBasicInfo(){
+ const id=nearbySelected;
+ if(id==='all'||!catalogRows().some(x=>x.id===id))return;
+ $('complexSearch').value='';
+ $('complexScope').value='all';
+ switchPage('complexes');
+ selectComplex(id);
+}
 function switchPage(id){
+ closeApartmentSheet(false);
  if(!activePages().some(([key])=>key===id))id='nearby';
  currentPage=id;
  PAGES.forEach(p=>$(p[0]).classList.toggle('hidden',p[0]!==id));
@@ -555,6 +623,7 @@ function setComplexDetailTab(tab){
  if(!['basic','types','schools','deals','sources'].includes(tab))return;
  complexDetailTab=tab;
  renderComplexes();
+ if(activeApartmentSheet==='complexSheet')$('complexSheet').scrollTop=0;
 }
 function setComplexDealType(type){
  if(!['','매매','전세','월세'].includes(type))return;
@@ -745,7 +814,19 @@ function clearTradeFocus(){
  renderTrades();
 }
 let tradeFocus=null;
-function selectComplex(id){if(!catalogRows().some(x=>x.id===id))return;complexSelected=id;complexDetailTab='basic';complexDealType='';renderComplexes();$('complexDetails').scrollIntoView({behavior:'smooth',block:'start'});}
+function selectComplex(id){
+ const match=catalogRows().find(x=>x.id===id);
+ if(!match)return;
+ complexSelected=id;complexDetailTab='basic';complexDealType='';
+ renderComplexes();
+ // Favorites can launch from a previous search/scope without losing the target.
+ if(complexSelected!==id){
+  $('complexSearch').value='';$('complexScope').value='all';complexSelected=id;
+  renderComplexes();
+ }
+ $('complexSheetTitle').textContent=match.label;
+ openApartmentSheet('complexSheet');
+}
 /* APARTMENT_CATALOG_V16_END */
 
 let nearbySelected='all', nearbyLimit=40;
@@ -755,8 +836,10 @@ function chooseNearby(id){
  $('nearbyAreaSelect').value='';
  nearbyLimit=40;
  renderNearby();
- const detail=$('nearbyDetails');
- if(detail&&id!=='all')detail.scrollIntoView({behavior:'smooth',block:'start'});
+ const g=FAVORITE_APTS.find(x=>x.id===id);
+ $('nearbySheetTitle').textContent=g?g.label:'관심 14개 단지 전체 실거래';
+ $('nearbyBasicButton').classList.toggle('hidden',id==='all');
+ openApartmentSheet('nearbyDetails');
 }
 function showMoreNearby(){nearbyLimit+=40;renderNearbyDetails(false);}
 function nearbyAllRows(){
