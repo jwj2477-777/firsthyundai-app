@@ -1098,7 +1098,7 @@ function updateTradeAreaOptions(){
   .filter(x=>x.building===selected).map(x=>areaKey(x.area_m2)).filter(Boolean))]
   .sort((a,b)=>Number(a)-Number(b));
  input.innerHTML='<option value="">모든 전용면적 보기</option>'+values.map(v=>
-  '<option value="'+v+'">전용 '+v+'㎡ (약 '+Math.round(Number(v)/3.305785)+'평)</option>').join('');
+  '<option value="'+v+'">'+escapeHtml(displayExclusiveArea(v,catalogForTradeName(selected)))+'</option>').join('');
  input.value=values.includes(selectedTradeArea)?selectedTradeArea:'';
 }
 function chooseTradeBuilding(){
@@ -1124,7 +1124,7 @@ function updateNearbyAreas(g,rows){
  const previous=input.value;
  const values=[...new Set(rows.map(x=>areaKey(x.area_m2)).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
  input.innerHTML='<option value="">모든 전용면적 보기</option>'+values.map(v=>
-  '<option value="'+v+'">전용 '+v+'㎡ (약 '+Math.round(Number(v)/3.305785)+'평)</option>').join('');
+  '<option value="'+v+'">'+escapeHtml(displayExclusiveArea(v,catalogRows().find(p=>p.id===g?.id)))+'</option>').join('');
  input.value=values.includes(previous)?previous:'';
 }
 function showComplexTrades(id,area,type){
@@ -1235,7 +1235,7 @@ function renderNearbyDetails(resetLimit){
     ''+
     '<div class="money">'+escapeHtml(value)+'</div>'+
     '<div class="meta">계약일 '+escapeHtml(x.contract_date)+
-    ' · 전용 '+escapeHtml(x.area_m2)+'㎡ · '+escapeHtml(x.floor||'층 정보 없음')+'층</div>'+
+    ' · '+escapeHtml(displayExclusiveArea(x.area_m2,catalogForTradeName(x.building)))+' · '+escapeHtml(x.floor||'층 정보 없음')+'층</div>'+
     (x.status==='해제'?'<p class="tiny">해제 사유일: '+escapeHtml(x.cancel_date_raw||'정보 없음')+'</p>':'')+
     '</article>';
   }).join('') :
@@ -1300,8 +1300,8 @@ function renderTrades(){
    return '<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+dealBadge(x.type)+
     '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span></div>'+
     '<h3>'+escapeHtml(x.building)+'</h3><div class="money">'+escapeHtml(val)+'</div>'+
-    '<div class="meta">계약일 '+escapeHtml(x.contract_date)+' · 전용 '+escapeHtml(x.area_m2)+
-    '㎡ · '+escapeHtml(x.floor||'층 정보 없음')+'층</div>'+
+    '<div class="meta">계약일 '+escapeHtml(x.contract_date)+' · '+escapeHtml(displayExclusiveArea(x.area_m2,catalogForTradeName(x.building)))+
+    ' · '+escapeHtml(x.floor||'층 정보 없음')+'층</div>'+
     (x.status==='해제'?'<p class="pill red">계약 해제일: '+escapeHtml(x.cancel_date_raw||'정보 미제공')+'</p>':'')+
     '<p class="meta">출처: 국토교통부 · 조회 계약연월 '+escapeHtml(x.source_month)+'</p></article>';
   }).join(''):'<div class="empty">선택한 조건에 해당하는 실거래가 없습니다. 다른 유형이나 아파트를 선택해 주세요.</div>');
@@ -1492,7 +1492,7 @@ function renderNew(){
     '<div class="money">'+escapeHtml(value)+'</div>'+
     '<div class="meta"><b>신규 공개 확인 '+escapeHtml(x.first_seen_date)+'</b>'+
     ' · 실제 계약일 '+escapeHtml(x.contract_date)+
-    ' · 전용 '+escapeHtml(x.area_m2)+'㎡ · '+escapeHtml(x.floor||'정보 없음')+'층</div>'+
+    ' · '+escapeHtml(displayExclusiveArea(x.area_m2,catalogForTradeName(x.building)))+' · '+escapeHtml(x.floor||'정보 없음')+'층</div>'+
     '<p class="tiny">출처: 국토교통부 아파트 실거래가 API</p></article>';
   }).join('');
 }
