@@ -37,6 +37,12 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 .complexLinks a{display:inline-block;padding:9px 11px;background:#eaf3fa;border-radius:9px;color:#245a92;font-size:13px;overflow-wrap:anywhere}
 .complexMeta{color:#647587;font-size:12px;line-height:1.6}
 @media(max-width:380px){.complexFacts{grid-template-columns:1fr}}
+.complexTypeList{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.complexTypeList span{font-size:12px;padding:7px 9px;border-radius:7px;background:#edf5fb;color:#285980}
+.editorActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+#complexEditor{border:1px solid #cadde8;border-radius:15px;max-width:min(580px,94vw);width:94vw;max-height:85vh;overflow-y:auto;padding:20px}
+#complexEditor input,#complexEditor textarea{margin-bottom:9px}
+#complexEditor textarea{min-height:65px}
 </style>
 </head>
 <body>
@@ -91,11 +97,33 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
  </div>
  <div class="panel" id="complexDetails"><div class="empty">단지를 선택하면 세대수·전용면적·난방·평면도와 실거래 참고정보가 표시됩니다.</div></div>
  <div class="panel hidden" id="complexAdmin">
-  <h3 style="margin-top:0">관리자 · 단지정보 관리</h3>
-  <p class="tiny">현재 버전은 검증되지 않은 숫자가 자동 게시되는 것을 막기 위해 공개 JSON 파일을 수동 편집합니다. GitHub에서 <b>data/complexes.json</b>을 수정·커밋하면 가족 휴대폰에서도 갱신 시 같은 정보를 볼 수 있습니다. 주민·고객 개인정보는 입력하지 마세요.</p>
-  <a class="btn alt" href="https://github.com/jwj2477-777/firsthyundai-app/blob/main/data/complexes.json">단지정보 원본 열기 ↗</a>
+  <h3 style="margin-top:0">관리자 · 단지정보 편집</h3>
+  <p class="tiny">이 휴대폰에서 단지별 자료를 임시 수정할 수 있습니다. <b>임시 저장만으로 부모님 휴대폰에는 반영되지 않습니다.</b> JSON으로 내보낸 뒤 GitHub 공개 저장소에 적용해 주세요.</p>
+  <p id="catalogDraftNotice" class="tiny">미게시 수정: 0개 단지</p>
+  <div class="editorActions">
+   <button class="btn" type="button" onclick="openComplexEditor()">선택 단지 수정</button>
+   <button class="btn alt" type="button" onclick="exportComplexCatalog()">전체 단지정보 JSON 내보내기</button>
+   <a class="btn alt" href="https://github.com/jwj2477-777/firsthyundai-app/edit/main/data/complexes.json">GitHub 원본 수정 ↗</a>
+  </div>
+  <p class="tiny">고객 이름·연락처·매물 메모·비밀번호는 공개 단지정보 JSON에 입력하지 마세요.</p>
  </div>
 </div>
+<dialog id="complexEditor">
+<h2 id="complexEditTitle">단지정보 수정</h2>
+<p class="tiny">이 휴대폰의 관리자용 임시 저장입니다. JSON을 GitHub에 반영해야 가족이 볼 수 있습니다.</p>
+<form id="complexForm">
+<label class="inputLabel" for="complexHouseholds">세대수</label><input id="complexHouseholds" type="number" min="1" max="99999" step="1">
+<label class="inputLabel" for="complexHeating">난방방식</label><input id="complexHeating" maxlength="60" placeholder="예: 지역난방">
+<label class="inputLabel" for="complexSupplyTypes">공급면적 타입(㎡, A/B 구분)</label><textarea id="complexSupplyTypes" placeholder="87B, 88A, 117A, 117B"></textarea>
+<label class="inputLabel" for="complexAreaTypes">확인된 전용면적(㎡)</label><textarea id="complexAreaTypes" placeholder="59.98, 84.9, 101.52"></textarea>
+<label class="inputLabel" for="complexFloorplans">평면도 링크(한 줄에 타입 | HTTPS주소)</label><textarea id="complexFloorplans" placeholder="84A | https://example.com/plan"></textarea>
+<label class="inputLabel" for="complexSource">출처 링크(HTTPS)</label><input id="complexSource" type="url" maxlength="500">
+<label class="inputLabel" for="complexVerified">검증일</label><input id="complexVerified" type="date">
+<div class="editorActions">
+<button class="btn" type="submit">이 기기에 임시 저장</button>
+<button class="btn alt" type="button" onclick="resetComplexDraft()">수정 버리기</button>
+<button class="btn alt" type="button" onclick="document.getElementById('complexEditor').close()">닫기</button>
+</div></form></dialog>
 <div id="new" class="page hidden">
  <div class="sectionTitle"><div><h2>새소식 · 신규 공개 실거래</h2><p class="tiny" id="newMeta">송도동 아파트 매매·전세·월세 · 일자별 공개 확인</p></div><button class="btn alt" onclick="refreshOne('new_trades')">갱신</button></div>
  <div class="notice">계약일이 아니라 <b>이전 수집에 없었고 새로 확인된 날짜</b>로 묶습니다. 국토부 API에 정확한 공개일이 없으므로 실제 공개일과 차이가 날 수 있고 정정 거래도 신규로 분류될 수 있습니다. 기록은 기능 활성화 이후부터 쌓입니다.</div>
@@ -181,7 +209,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
   <p class="tiny">두 비밀번호의 원문은 GitHub 비공개 Secret에만 존재하고, 공개 저장소에는 각 비밀번호의 PBKDF2 검증 정보만 게시됩니다. 공개 검증 정보는 오프라인 추측 공격 대상이므로 특히 관리자 비밀번호는 16자 이상 무작위 문자열을 권장합니다.</p>
  </div>
 </div>
-<footer class="foot">퍼스트현대 v1.2 · 가족 자동 로그인 · 별도 관리자 비밀번호 · 주변 12개 단지</footer>
+<footer class="foot">퍼스트현대 v1.4 · 관리자 단지정보 편집 · 가족 조회 모드</footer>
 </main>
 <dialog id="noteDialog"><h2 id="noteDialogTitle">내 자료 등록</h2>
 <form id="noteForm">
@@ -237,6 +265,7 @@ window.onRoleChanged=function(next){
   repository=DEFAULT_REPOSITORY;
   $('repo').value=repository;
   if($('noteDialog').open)$('noteDialog').close();
+   if($('complexEditor').open)$('complexEditor').close();
  }else{
   repository=localStorage.getItem(REPO_KEY)||DEFAULT_REPOSITORY;
   $('repo').value=repository;
@@ -307,7 +336,7 @@ function catalogRows(){
   if(map.has(row.id))map.set(row.id,{...map.get(row.id),...row,aliases:map.get(row.id).aliases});
   else map.set(row.id,row);
  }
- return [...map.values()];
+ return window.firstHyundaiDraftOverlay?window.firstHyundaiDraftOverlay([...map.values()],role):[...map.values()];
 }
 function complexObservedAreas(apt){
  const names=new Set((Array.isArray(apt.aliases)?apt.aliases:[]).map(normalizeAptName));
@@ -330,6 +359,8 @@ function renderComplexes(){
   const areas=(Array.isArray(p.area_types_m2)?p.area_types_m2:[]).map(Number).filter(v=>Number.isFinite(v)&&v>0&&v<1000).sort((a,b)=>a-b);
   const observed=complexObservedAreas(p), hasTradeData=remote.trades&&remote.trades.state!=='not_started';
   const areaText=areas.length?areas.map(v=>number(v)+'㎡').join(' · '):'확인 전';
+  const types=(Array.isArray(p.supply_type_labels)?p.supply_type_labels:[]).filter(v=>typeof v==='string'&&/^[0-9]{2,3}(?:\\.[0-9]{1,2})?[A-Za-z-]{0,4}$/.test(v)).slice(0,45);
+  const supplyText=types.length?types.map(v=>'<span>'+escapeHtml(v)+'㎡ (약 '+Math.round(parseFloat(v)/3.305785)+'평)</span>').join(''):'<span class="tiny">등록된 공급면적 타입 없음</span>';
   const observedText=!hasTradeData?'실거래 수집 대기':observed.length?observed.map(v=>number(v)+'㎡').join(' · '):'관측된 거래 없음';
   const householdText=Number.isInteger(p.households)&&p.households>0&&p.households<100000?number(p.households)+'세대':'확인 전';
   const heatingText=typeof p.heating==='string'&&p.heating.trim()?p.heating:'확인 전';
@@ -343,7 +374,7 @@ function renderComplexes(){
     '<div class="complexFact"><small>난방방식</small><strong>'+escapeHtml(heatingText)+'</strong></div>'+
     '<div class="complexFact"><small>확인된 전용면적 유형</small><strong>'+escapeHtml(areaText)+'</strong></div>'+
     '<div class="complexFact"><small>공개 실거래에 관측된 전용면적</small><strong>'+escapeHtml(observedText)+'</strong></div>'+
-   '</div><h3>평면도</h3><div class="complexLinks">'+floorplanLinks+'</div>'+
+   '</div><h3>공급면적 타입</h3><p class="tiny">공급면적 ㎡는 반올림된 타입 표시이며 평 환산은 약값입니다. 동일 면적의 A/B타입은 별도 표기합니다.</p><div class="complexTypeList">'+supplyText+'</div><h3>평면도</h3><div class="complexLinks">'+floorplanLinks+'</div>'+
    '<p class="complexMeta">정보 검증일: '+escapeHtml(p.last_verified||'확인 전')+
    (source?' · <a href="'+escapeHtml(source)+'">자료 출처 확인 ↗</a>':' · 근거 링크 등록 전')+'</p>'+
    '<p class="tiny">관측 면적은 국토교통부 거래 자료에서 추출한 값으로, 해당 단지의 전체 평형 구성이나 공급면적·평면도를 뜻하지 않습니다.</p>'+
@@ -351,6 +382,7 @@ function renderComplexes(){
     '<button type="button" class="btn alt" onclick="showComplexNearbyTrades(\''+p.id+'\')">이 단지 주변단지 실거래 보기 →</button>':'');
  }
  $('complexAdmin').classList.toggle('hidden',role!=='admin');
+ if(role==='admin'&&window.firstHyundaiDraftCount)$('catalogDraftNotice').textContent='이 기기의 미게시 수정: '+number(window.firstHyundaiDraftCount())+'개 단지 · 공개 전에는 가족에게 표시되지 않습니다.';
 }
 function selectComplex(id){if(!catalogRows().some(x=>x.id===id))return;complexSelected=id;renderComplexes();$('complexDetails').scrollIntoView({behavior:'smooth',block:'start'});}
 function showComplexNearbyTrades(id){
@@ -543,4 +575,4 @@ function renderNew(){
 }
 
 updateRoleBar();switchPage(role==='admin'?'overview':'nearby');refreshAll();
-</script></body></html>
+</script><script src="catalog-editor.js"></script></body></html>
