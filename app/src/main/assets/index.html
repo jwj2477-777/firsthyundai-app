@@ -713,7 +713,7 @@ function verifiedSupplyPairs(apt){
  const labels=new Set(Array.isArray(apt?.supply_type_labels)?apt.supply_type_labels:[]);
  return (Array.isArray(apt?.area_type_pairs)?apt.area_type_pairs:[]).filter(x=>
   x&&typeof x.supply_label==='string'&&labels.has(x.supply_label)&&
-  /^[0-9]{2,3}(?:\.[0-9]{1,2})?[A-Za-z-]{0,4}$/.test(x.supply_label)&&
+  /^[0-9]{2,3}(?:\.[0-9]{1,2})?[A-Za-z0-9-]{0,8}$/.test(x.supply_label)&&
   Number.isFinite(x.exclusive_m2)&&Number.isFinite(x.supply_m2)&&
   x.exclusive_m2>0&&x.supply_m2>x.exclusive_m2&&
   x.supply_m2/x.exclusive_m2<2.5&&Math.abs(parseFloat(x.supply_label)-x.supply_m2)<2&&
@@ -762,7 +762,8 @@ function displaySupplyType(apt,label){
   return '전용 '+number(match.exclusive_m2)+'㎡ (약 '+py+'평형) · 공급 '+label+'㎡';
  }
  const sqm=parseFloat(label),py=supplyPyeong(sqm);
- return '공급 '+label+'㎡'+(py?' (약 '+py+'평형)':'')+' · 전용면적 미확인';
+ // A supply TYPE CODE is not a precise square-meter measurement.
+ return '공급 '+label+'타입'+(py?' (약 '+py+'평형)':'')+' · 전용㎡ 대응 확인 중';
 }
 function displayComplexValue(v,suffix=''){
  return v===null||v===undefined||v===''?'확인 전':String(v)+suffix;
@@ -908,7 +909,7 @@ function renderComplexes(){
     (ev!==null&&p.kapt_code?' · 전기차 충전 수치는 2026-09-09 K-apt 공개자료 기준':'')+'</p>'+
    (p.detail_note?'<details class="details"><summary>자료 차이·확인사항 보기</summary><p class="complexSectionNote">'+escapeHtml(p.detail_note)+'</p></details>':'');
   const types=(Array.isArray(p.supply_type_labels)?p.supply_type_labels:[]).filter(v=>
-   typeof v==='string'&&/^[0-9]{2,3}(?:\.[0-9]{1,2})?[A-Za-z-]{0,4}$/.test(v)).slice(0,45);
+   typeof v==='string'&&/^[0-9]{2,3}(?:\.[0-9]{1,2})?[A-Za-z0-9-]{0,8}$/.test(v)).slice(0,45);
   const verified=verifiedSupplyPairs(p);
   const exclusiveAreas=[...new Set([
    ...(Array.isArray(p.area_types_m2)?p.area_types_m2:[]),
@@ -923,10 +924,12 @@ function renderComplexes(){
   }).join('')+'</div>':
    '<div class="empty">공식 실거래에서 관측된 전용면적이 아직 없습니다. 공급타입 자료를 확인해 주세요.</div>';
   const partialSupplies=types.filter(x=>!verifiedLabels.has(x));
-  const supplyOnly=partialSupplies.length?'<details class="details"><summary>전용면적 미대조 공급타입 '+partialSupplies.length+'개 보기</summary>'+
+  // Expand unpaired source-backed supply types immediately for previously blank complexes.
+  const supplyOnly=partialSupplies.length?'<details class="details"'+(!verified.length?' open':'')+'><summary>공급평형 '+partialSupplies.length+'타입 · 전용면적 연결 전</summary>'+
    '<div class="complexTypeList">'+partialSupplies.map(x=>'<span>'+escapeHtml(displaySupplyType(p,x))+'</span>').join('')+'</div></details>':'';
   const sourcePairs=[...new Set(verified.map(x=>x.source_url).filter(Boolean))];
-  const typeSources=sourcePairs.slice(0,4).map((url,i)=>sourceLink(url,'공급·전용 대응자료 '+(i+1))).join('');
+  const typeSources=sourcePairs.slice(0,4).map((url,i)=>sourceLink(url,'공급·전용 대응자료 '+(i+1))).join('')+
+   (types.length&&p.supply_type_source_url?sourceLink(p.supply_type_source_url,'공급타입 출처 · KB부동산'):'');
   const planning=Array.isArray(p.exclusive_plan_labels)?p.exclusive_plan_labels.filter(x=>/^[0-9]{2,3}[A-Z]{0,2}$/.test(x)).slice(0,30):[];
   const planningView=planning.length?'<details class="details"><summary>분양 당시 전용 타입 '+planning.length+'종 보기</summary>'+
    '<div class="complexTypeList">'+planning.map(x=>'<span>전용 '+escapeHtml(x)+'형 · 공급평형 미대조</span>').join('')+'</div>'+
@@ -936,7 +939,7 @@ function renderComplexes(){
   const sourceLookup='https://search.naver.com/search.naver?query='+encodeURIComponent('네이버페이 부동산 '+p.label+' 타입 공급면적 전용면적');
   const areaView='<p class="tiny">면적 수치는 전용㎡, 약 ○평형은 확인된 공급면적 기준입니다. <strong>전용㎡를 나누어 평형으로 계산하지 않습니다.</strong></p>'+
    '<p class="tiny">전용면적 '+exclusiveAreas.length+'종 · '+(count?'실거래 관측 '+count+' · ':'')+
-   '공급·전용 대응 검증 '+verified.length+'타입</p>'+areaTypes+supplyOnly+planningView+
+   '공급·전용 대응 검증 '+verified.length+'타입 · 공급면적 타입 '+types.length+'개</p>'+areaTypes+supplyOnly+planningView+
    '<p class="tiny">실거래 관측 유형은 단지의 전체 법정 타입을 보장하지 않습니다. 공급평형은 확인된 타입에만 표시합니다.</p>'+
    typeSources+(verified.length<exclusiveAreas.length?sourceLink(sourceLookup,'미확인 공급평형 원본 찾아보기'):'');
   const stats=complexAreaStats(p),active=complexDealType;
@@ -1589,7 +1592,7 @@ function parseAreaTypes(input){
 function parseSupplyTypes(input){
  const values=input.trim()?input.split(/[,\n]+/).map(v=>v.trim()).filter(Boolean):[];
  if(values.length>45)throw Error('공급면적 타입은 최대 45개까지 입력할 수 있습니다.');
- if(values.some(v=>!/^[0-9]{2,3}(?:\.[0-9]{1,2})?[A-Za-z-]{0,4}$/.test(v)))throw Error('공급면적은 117A, 131B 같은 타입명으로 입력하세요.');
+ if(values.some(v=>!/^[0-9]{2,3}(?:\.[0-9]{1,2})?[A-Za-z0-9-]{0,8}$/.test(v)))throw Error('공급면적은 117A, 131B 같은 타입명으로 입력하세요.');
  return [...new Set(values)];
 }
 function parseFloorplanUrls(input){
@@ -1731,6 +1734,9 @@ function createCatalogExport(){
   records:records.map(p=>({
    id:p.id,label:p.label,aliases:p.aliases,households:p.households??null,heating:p.heating??null,
    supply_type_labels:Array.isArray(p.supply_type_labels)?p.supply_type_labels:[],
+   supply_type_source_url:safeLink(p.supply_type_source_url)||null,
+   supply_type_source_status:p.supply_type_source_status??null,
+   supply_type_checked_at:p.supply_type_checked_at??null,
    area_type_pairs:verifiedSupplyPairs(p).map(x=>({exclusive_m2:x.exclusive_m2,supply_m2:x.supply_m2,
     supply_label:x.supply_label,market_pyeong:x.market_pyeong??null,source_url:safeLink(x.source_url)||null})),
    area_types_m2:Array.isArray(p.area_types_m2)?p.area_types_m2:[],
