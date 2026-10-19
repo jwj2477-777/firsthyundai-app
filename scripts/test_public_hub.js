@@ -30,7 +30,7 @@ assert(missing.includes('자료 미제공은 0원 또는 0건이 아니며'), 'M
 assert(run('renderSchoolPublicInfo()').includes('배정학교가 아닙니다'));
 assert(run('renderSchoolPublicInfo()').includes('schoolzone.emac.kr'));
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('활용승인'));
-run('renderPublicSubscriptions()');assert(nodes.publicSubscriptions.innerHTML.includes('활용승인'));
+run('renderPublicSubscriptions()');assert(nodes.publicSubscriptions.innerHTML.includes('첫 수집 대기'));
 const sample={
  schools:{state:'verified',records:[{name:'송도초등학교',level:'초등학교',address:'인천광역시 연수구 송도교육로 1'}]},
  office_rents:{state:'verified',records:[{building:'송도 오피스텔',type:'전세',deposit_10k:20000,monthly_10k:0,area_m2:42,contract_date:'2026-10-03'}]},
@@ -41,6 +41,14 @@ const schools=run('renderSchoolPublicInfo()');
 assert(schools.includes('송도초등학교')&&!schools.includes('배정학교 확인'));
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('송도 오피스텔'));
 run('renderPublicSubscriptions()');assert(nodes.publicSubscriptions.innerHTML.includes('활용승인'));
+run("publicServices.subscriptions={state:'verified',updated_at:'2026-10-20T09:30:00+0900',window_start:'2025-09-01',records:[{kind:'아파트',name:'송도 새아파트',address:'인천 연수구 송도동',notice_date:'2026-10-19',apply_start:'2026-10-23',apply_end:'2026-10-25',households:123,notice_url:'https://www.applyhome.co.kr/ai/aia/test.do'}]}");
+run('renderPublicSubscriptions()');
+assert(nodes.publicSubscriptions.innerHTML.includes('송도 새아파트'));
+assert(nodes.publicSubscriptions.innerHTML.includes('청약홈 공고 원문'));
+assert(nodes.publicSubscriptions.innerHTML.includes('공급 123세대'));
+run("publicServices.subscriptions.records[0].notice_url='https://evil.example/'");
+run('renderPublicSubscriptions()');
+assert(!nodes.publicSubscriptions.innerHTML.includes('https://evil.example/'));
 const native=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/MainActivity.java'),'utf8');
 assert(native.includes('"public_services.json".equals(filename)'));
 const snapshot=JSON.parse(fs.readFileSync(path.join(root,'data/public_services.json'),'utf8'));
