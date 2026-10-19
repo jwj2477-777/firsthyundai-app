@@ -240,7 +240,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void fetch(String repository, String filename, String requestId) {
             // Public data ONLY. Never inject API tokens / family records into remote requests.
             if (repository==null || !repository.matches("[A-Za-z0-9_.-]{1,60}/[A-Za-z0-9_.-]{1,100}") ||
-                    !("trades.json".equals(filename) || "new_trades.json".equals(filename) || "news.json".equals(filename) || "complexes.json".equals(filename) || "public_services.json".equals(filename))) {
+                    !("trades.json".equals(filename) || "new_trades.json".equals(filename) || "news.json".equals(filename) || "complexes.json".equals(filename) || "public_services.json".equals(filename) || "nearby_config.json".equals(filename))) {
                 deliverFeed(requestId, false, "저장소 주소 또는 파일명이 올바르지 않습니다.", null);
                 return;
             }
@@ -276,6 +276,45 @@ public class MainActivity extends Activity {
                 } catch(Exception e) {
                     deliverFeed(requestId,false,e.getMessage()==null?"네트워크 연결 실패":e.getMessage(),null);
                 } finally {if(conn!=null)conn.disconnect();}
+            });
+        }
+        @JavascriptInterface public void fetchNearby(String workerUrl, String complexId, String category, String requestId) {
+            // Server-side Kakao API proxy only. Kakao REST key never enters Android.
+            if(workerUrl==null || !workerUrl.matches(
+                    "https://firsthyundai-nearby\\.[A-Za-z0-9-]{1,63}\\.workers\\.dev") ||
+                    complexId==null || !complexId.matches("[A-Za-z0-9_-]{1,64}") ||
+                    category==null || !category.matches("(SC4|PS3|HP8|PM9|MT1|CS2|SW8|BK9|CE7|AC5)")) {
+                deliverFeed(requestId,false,"주변시설 서비스 주소 또는 요청 형식이 잘못되었습니다.",null);
+                return;
+            }
+            io.execute(() -> {
+                HttpURLConnection conn=null;
+                try {
+                    String address=workerUrl+"/nearby?complex="+complexId+"&category="+category;
+                    conn=(HttpURLConnection)new URL(address).openConnection();
+                    conn.setUseCaches(false);
+                    conn.setConnectTimeout(12000);
+                    conn.setReadTimeout(16000);
+                    conn.setInstanceFollowRedirects(false);
+                    conn.setRequestProperty("Accept","application/json");
+                    conn.setRequestProperty("Cache-Control","no-store");
+                    int status=conn.getResponseCode();
+                    if(status!=200)throw new Exception(status==429?"잠시 후 다시 조회해 주세요.":"주변시설 조회 오류 HTTP "+status);
+                    ByteArrayOutputStream out=new ByteArrayOutputStream();
+                    try(InputStream in=conn.getInputStream()) {
+                        byte[] buffer=new byte[4096]; int n;
+                        while((n=in.read(buffer))!=-1) {
+                            out.write(buffer,0,n);
+                            if(out.size()>50000)throw new Exception("주변시설 응답 크기 초과");
+                        }
+                    }
+                    JSONObject payload=new JSONObject(out.toString("UTF-8"));
+                    if(payload.optInt("schema_version")!=1)
+                        throw new Exception("주변시설 자료 형식 오류");
+                    deliverFeed(requestId,true,"",payload);
+                }catch(Exception e){
+                    deliverFeed(requestId,false,e.getMessage()==null?"주변시설 서버 연결 실패":e.getMessage(),null);
+                }finally{if(conn!=null)conn.disconnect();}
             });
         }
         @JavascriptInterface public void saveBackup(String json) {
