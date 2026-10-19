@@ -469,7 +469,48 @@ function renderMainNavigation(id){
   '" type="button" onclick="switchPage(\'overview\')">▦ 오늘 요약</button>'+admin+'</div>';
  $('nav').innerHTML=primary+secondary+tools;
 }
+// A detail sheet is its own full-screen view; the scrollable list stays intact.
+let activeApartmentSheet=null, apartmentReturnFocus=null;
+function openApartmentSheet(id){
+ if(!['complexSheet','nearbyDetails'].includes(id))return false;
+ if(activeApartmentSheet && activeApartmentSheet!==id)closeApartmentSheet(false);
+ if(!activeApartmentSheet)apartmentReturnFocus=document.activeElement||null;
+ const el=$(id);
+ activeApartmentSheet=id;
+ el.classList.add('detailOpen');
+ if(el.setAttribute)el.setAttribute('aria-hidden','false');
+ if(document.body?.classList)document.body.classList.add('apartmentSheetActive');
+ el.scrollTop=0;
+ if(el.querySelector){
+  const back=el.querySelector('.detailBackButton');
+  if(back?.focus)back.focus({preventScroll:true});
+ }
+ return true;
+}
+function closeApartmentSheet(restoreFocus=true){
+ if(!activeApartmentSheet)return false;
+ const el=$(activeApartmentSheet);
+ el.classList.remove('detailOpen');
+ if(el.setAttribute)el.setAttribute('aria-hidden','true');
+ activeApartmentSheet=null;
+ if(document.body?.classList)document.body.classList.remove('apartmentSheetActive');
+ if(restoreFocus&&apartmentReturnFocus?.focus)apartmentReturnFocus.focus({preventScroll:true});
+ apartmentReturnFocus=null;
+ return true;
+}
+window.firstHyundaiGoBack=function(){
+ return closeApartmentSheet();
+};
+function openFavoriteBasicInfo(){
+ const id=nearbySelected;
+ if(id==='all'||!catalogRows().some(x=>x.id===id))return;
+ $('complexSearch').value='';
+ $('complexScope').value='all';
+ switchPage('complexes');
+ selectComplex(id);
+}
 function switchPage(id){
+ closeApartmentSheet(false);
  if(!activePages().some(([key])=>key===id))id='nearby';
  currentPage=id;
  PAGES.forEach(p=>$(p[0]).classList.toggle('hidden',p[0]!==id));
@@ -582,6 +623,7 @@ function setComplexDetailTab(tab){
  if(!['basic','types','schools','deals','sources'].includes(tab))return;
  complexDetailTab=tab;
  renderComplexes();
+ if(activeApartmentSheet==='complexSheet')$('complexSheet').scrollTop=0;
 }
 function setComplexDealType(type){
  if(!['','매매','전세','월세'].includes(type))return;
@@ -772,18 +814,34 @@ function clearTradeFocus(){
  renderTrades();
 }
 let tradeFocus=null;
-function selectComplex(id){if(!catalogRows().some(x=>x.id===id))return;complexSelected=id;complexDetailTab='basic';complexDealType='';renderComplexes();$('complexDetails').scrollIntoView({behavior:'smooth',block:'start'});}
+function selectComplex(id){
+ const match=catalogRows().find(x=>x.id===id);
+ if(!match)return;
+ complexSelected=id;complexDetailTab='basic';complexDealType='';
+ renderComplexes();
+ // Favorites can launch from a previous search/scope without losing the target.
+ if(complexSelected!==id){
+  $('complexSearch').value='';$('complexScope').value='all';complexSelected=id;
+  renderComplexes();
+ }
+ $('complexSheetTitle').textContent=match.label;
+ openApartmentSheet('complexSheet');
+}
 /* APARTMENT_CATALOG_V16_END */
 
 let nearbySelected='all', nearbyLimit=40;
 function chooseNearby(id){
  if(id!=='all'&&!FAVORITE_APTS.some(x=>x.id===id))return;
+ if(id==='all')closeApartmentSheet();
  nearbySelected=id;
  $('nearbyAreaSelect').value='';
  nearbyLimit=40;
  renderNearby();
- const detail=$('nearbyDetails');
- if(detail&&id!=='all')detail.scrollIntoView({behavior:'smooth',block:'start'});
+ if(id!=='all'){
+  const g=FAVORITE_APTS.find(x=>x.id===id);
+  $('nearbySheetTitle').textContent=g?g.label:'관심 아파트 실거래';
+  openApartmentSheet('nearbyDetails');
+ }
 }
 function showMoreNearby(){nearbyLimit+=40;renderNearbyDetails(false);}
 function nearbyAllRows(){
