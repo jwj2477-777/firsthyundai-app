@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import datetime, timezone, timedelta
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
-from collect_trades import parse_response, normalize, recent_months, unique_ids, normalized_service_key
+from collect_trades import parse_response, normalize, recent_months, unique_ids, normalized_service_key, newly_detected
 from collect_news import parse_rss, deduplicate, make_briefs, rss_link
 
 class TradeTests(unittest.TestCase):
@@ -19,6 +19,21 @@ class TradeTests(unittest.TestCase):
         b=b'''<response><header><resultCode>00</resultCode><resultMsg>NORMAL SERVICE.</resultMsg></header><body><items><item><abc>aaa</abc></item></items><totalCount>1</totalCount></body></response>'''
         rows,total=parse_response(b)
         self.assertEqual(total,1);self.assertEqual(rows[0]['abc'],'aaa')
+    def test_newly_observed_not_contract_day(self):
+        row = {
+            'contract_date':'2026-09-20', 'building':'송도테스트',
+            'area_m2':84.96, 'floor':'15', 'type':'매매',
+            'amount_10k':65000, 'deposit_10k':0, 'monthly_10k':0,
+            'status':'신고'
+        }
+        # 해제 정보가 수정되어도 '새 공개 거래'로 다시 분류하지 않음.
+        changed = {**row, 'status':'해제', 'cancel_date_raw':'20261019'}
+        self.assertEqual(newly_detected([row], [changed]), [])
+        self.assertEqual(newly_detected([row], [row,changed]), [changed])
+        self.assertEqual(newly_detected([row], [row]), [])
+        # 계약일이 과거이더라도 이전 관측에 없으면 신규로 판단.
+        self.assertEqual(newly_detected([], [row]), [row])
+
     def test_molit_success_code_000(self):
         payload=b'<response><header><resultCode>000</resultCode><resultMsg>NORMAL SERVICE.</resultMsg></header><body><items/><totalCount>0</totalCount></body></response>'
         rows,total=parse_response(payload)
