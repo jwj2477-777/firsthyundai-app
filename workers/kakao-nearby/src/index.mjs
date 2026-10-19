@@ -46,7 +46,7 @@ export default {
       return answer({error:"invalid_parameters"},400);
     if(!env.KAKAO_REST_API_KEY||!env.NEARBY_RATE_LIMITER)
       return answer({error:"not_configured"},503);
-    // Small global ceiling to protect limited free API quota even if endpoint is discovered.
+    // Conservative per-Cloudflare-location limiter; keep paid usage disabled and monitor quota.
     const quota=await env.NEARBY_RATE_LIMITER.limit({key:"firsthyundai-live-lookup"});
     if(!quota.success)return answer({error:"rate_limited",message:"조회가 많아 잠시 후 다시 시도해 주세요."},429);
     try {
