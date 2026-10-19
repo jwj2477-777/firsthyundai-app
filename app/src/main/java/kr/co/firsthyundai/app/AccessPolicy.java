@@ -101,6 +101,12 @@ final class AccessPolicy {
         try{return parse(text);}catch(Exception ignored){return null;}
     }
 
+    static boolean shouldRecheck(Context ctx) {
+        long last=prefs(ctx).getLong("last_online_check",0L);
+        long now=System.currentTimeMillis();
+        return last<=0 || now<last || now-last>120_000L;
+    }
+
     static int currentVersion(Context ctx) {
         Policy p=cached(ctx);
         return p == null ? 0 : p.version;
