@@ -139,7 +139,7 @@ let currentPage='nearby', remote={trades:null,new_trades:null,news:null}, issues
 const NATIVE=window.FirstHyundaiNative;
 let role=NATIVE?.getMode?.()==='admin'?'admin':'family';
 let repository=role==='admin'?(localStorage.getItem(REPO_KEY)||DEFAULT_REPOSITORY):DEFAULT_REPOSITORY;
-if(!/^[A-Za-z0-9_.-]{1,60}\\/[A-Za-z0-9_.-]{1,100}$/.test(repository))repository=DEFAULT_REPOSITORY;
+if(!/^[A-Za-z0-9_.-]{1,60}\/[A-Za-z0-9_.-]{1,100}$/.test(repository))repository=DEFAULT_REPOSITORY;
 try{notes=JSON.parse(localStorage.getItem(NOTE_KEY)||'[]');if(!Array.isArray(notes))notes=[];}catch(e){notes=[];}
 $('repo').value=repository;
 
