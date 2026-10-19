@@ -327,6 +327,20 @@ def collect(existing, key, *, session=None, wait=0.1, max_count=MAX_SONGDO):
     return merged, len(rows), failures
 
 
+# Enriched area facts come from reviewed public listings and official trade reports,
+# not the broad K-apt basics feed. A refresh of K-apt facts MUST preserve them.
+AREA_ENRICHMENT_FIELDS=(
+    "area_types_m2", "area_types_source", "area_types_observation_count",
+    "supply_type_labels", "area_type_pairs",
+    "exclusive_plan_labels", "exclusive_plan_source_url", "exclusive_plan_note",
+)
+def preserve_area_enrichment(current,prior):
+    for field in AREA_ENRICHMENT_FIELDS:
+        if field in prior:
+            current[field]=prior[field]
+    return current
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--key", default=os.environ.get("DATA_GO_KR_SERVICE_KEY", ""))
@@ -343,6 +357,7 @@ def main():
     for r in records:
         prior = previous_kapt.get(r.get("kapt_code"))
         if prior and r.get("catalog_source")=="kapt":
+            preserve_area_enrichment(r,prior)
             # Preserve the explicitly audited trade aliases, not arbitrary fuzzy labels.
             known = [r["label"],*(prior.get("aliases") or [])]
             r["aliases"] = list(dict.fromkeys(known))[:10]
