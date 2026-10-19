@@ -22,8 +22,8 @@ from xml.etree import ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 TARGET = ROOT / "data" / "complexes.json"
 LIST_URL = "https://apis.data.go.kr/1613000/AptListService4/getSigunguAptList4"
-BASIC_URL = "https://apis.data.go.kr/1613000/AptBasisInfoServiceV4/getAphusBassInfoV4"
-DETAIL_URL = "https://apis.data.go.kr/1613000/AptBasisInfoServiceV4/getAphusDtlInfoV4"
+BASIC_URL = "https://apis.data.go.kr/1613000/AptBasisInfoServiceV5/getAphusBassInfoV5"
+DETAIL_URL = "https://apis.data.go.kr/1613000/AptBasisInfoServiceV5/getAphusDtlInfoV5"
 SONGDO_CODE = "2818510600"
 KST = timezone(timedelta(hours=9))
 BAD_CODES = {"03", "04", "05", "10", "11", "12", "20", "21", "22", "30", "31", "32", "99"}
@@ -155,13 +155,13 @@ def list_complexes(key, *, session=None, wait=0.1):
 
 
 def base_item(key, code, *, session=None):
-    result = call_api(BASIC_URL, {"kaptCode": code, "_type": "json"}, key, session=session)
+    result = call_api(BASIC_URL, {"kaptCode": code, "dataType": "JSON"}, key, session=session)
     rows, _ = unpack(result)
     return rows[0] if rows else None
 
 
 def detail_item(key, code, *, session=None):
-    result = call_api(DETAIL_URL, {"kaptCode": code, "_type": "json"}, key, session=session)
+    result = call_api(DETAIL_URL, {"kaptCode": code, "dataType": "JSON"}, key, session=session)
     rows, _ = unpack(result)
     return rows[0] if rows else {}
 
@@ -214,6 +214,13 @@ def apt_profile(basic, detail, checked_at):
     heater = cleaned(basic.get("codeHeatNm"))
     if heater not in ("지역난방", "개별난방", "중앙난방"):
         heater = None
+    # K-apt top-floor is confirmed; the basement count is NOT the lowest residential floor.
+    top_floor = to_positive_int(basic.get("kaptTopFloor"))
+    floors = "최고 " + str(top_floor) + "층" if top_floor else None
+    # Charging units exist in official K-apt V5 detailed information.
+    ev_ground = to_positive_int(detail.get("groundElChargerCnt"), zero=True)
+    ev_underground = to_positive_int(detail.get("undergroundElChargerCnt"), zero=True)
+    ev_chargers = ev_ground + ev_underground if ev_ground is not None and ev_underground is not None else None
     # K-apt detailed API parking field. Never substitute other metrics.
     pc_up = to_positive_int(detail.get("kaptdPcnt"), zero=True)
     pc_down = to_positive_int(detail.get("kaptdPcntu"), zero=True)
@@ -235,7 +242,8 @@ def apt_profile(basic, detail, checked_at):
         "address": address,
         "builder": cleaned(basic.get("kaptBcompany")) or None,
         "management_phone": valid_phone(basic.get("kaptTel")),
-        "parking_total": park_total,
+        "parking_total": park_total, "floors": floors,
+        "ev_chargers": ev_chargers,
         "floorplans": [], "area_types_m2": [], "supply_type_labels": [],
         "source_url": "https://www.k-apt.go.kr/",
         "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -324,7 +332,7 @@ def main():
     data["updated_at"] = datetime.now(KST).strftime("%Y-%m-%d")
     data["state"] = "verified_partial"
     data["note"] = ("공공데이터포털 K-apt 공식 API로 송도동 공동주택 기초정보를 수집했습니다. "
-                    "기존 13개 수동검증 단지는 보존. 최고층, 용적률, EV 충전기, 공급타입은 "
+                    "기존 13개 수동검증 단지는 보존. 용적률, 건폐율, 공급타입은 "
                     "해당 공공 API에서 검증하지 못했으므로 임의 기입하지 않았습니다. "
                     "등록 단지 전체가 송도 아파트의 완전한 목록이라는 뜻은 아닙니다.")
     tmp = TARGET.with_suffix(".json.tmp")
