@@ -586,8 +586,9 @@ function renderComplexes(){
   const hh=Number.isInteger(p.households)&&p.households>0?p.households:null;
   const rate=parking!==null&&hh?String(Math.round(parking/hh*100)/100)+'대':'확인 전';
   const tile=(name,v)=>'<div class="complexFact"><small>'+escapeHtml(name)+'</small><strong>'+escapeHtml(v)+'</strong></div>';
-  const optional=[['도로명주소',p.address],['시공사',p.builder],['용적률',p.floor_area_ratio===undefined?null:p.floor_area_ratio,' %'],
-   ['건폐율',p.building_coverage_ratio===undefined?null:p.building_coverage_ratio,' %']];
+  // Keep floor-area/building coverage ratios in source data for provenance,
+  // but do not put nonessential planning metrics on the family-facing basic card.
+  const optional=[['도로명주소',p.address],['시공사',p.builder]];
   const extra=optional.filter(([name,value])=>value!==null&&value!==undefined&&value!=='').map(([name,value,unit])=>
    tile(name,displayComplexValue(value,unit||''))).join('');
   const ev=Number.isInteger(p.ev_chargers)&&p.ev_chargers>=0?p.ev_chargers:null;
