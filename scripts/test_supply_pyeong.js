@@ -9,7 +9,7 @@ const observed=rows.filter(p=>Array.isArray(p.area_types_m2)&&p.area_types_m2.le
 const paired=rows.filter(p=>Array.isArray(p.area_type_pairs)&&p.area_type_pairs.length);
 assert.equal(rows.length,93,'All 93 standalone Songdo apartment profiles must survive');
 assert.equal(observed.length,93,'A source-backed exclusive area type list must exist for every listed complex');
-assert(paired.length>=11,'Retain 11 apartment-source private/supply area paired profiles');
+assert(paired.length>=12,'Retain twelve apartment-source private/supply paired profiles');
 let count=0;
 for(const apt of rows){
  assert(apt.area_types_source?.includes('실거래'),apt.id+' exclusive type source needed');
@@ -24,7 +24,10 @@ for(const apt of rows){
   count++;
  }
 }
-assert(count>=66,'Expected 66 area labels with verified pairings');
+assert(count>=67,'Expected 67 area labels with verified pairings');
+const centennial=rows.find(p=>p.id==='centennial');
+assert.equal(centennial.exclusive_plan_labels.length,7);
+assert(centennial.exclusive_plan_source_url.startsWith('https://'));
 const html=fs.readFileSync(path.join(root,'app/src/main/assets/index.html'),'utf8');
 const script=html.split('<script>',2)[1].split('</script>',1)[0];
 new vm.Script(script);
