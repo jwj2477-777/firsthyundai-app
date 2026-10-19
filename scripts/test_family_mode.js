@@ -30,8 +30,7 @@ function makeContext(initialMode){
   window:{FirstHyundaiNative:native},
   alert(){},
  });
- vm.runInContext(prefix+'\nfunction renderNearby(){}
-function renderComplexes(){}\nfunction renderNew(){}\nfunction renderTrades(){}\nfunction renderNews(){}\nfunction renderNotes(){}\nfunction refreshAll(){}',ctx);
+ vm.runInContext(prefix+'\nfunction renderNearby(){}\nfunction renderComplexes(){}\nfunction renderNew(){}\nfunction renderTrades(){}\nfunction renderNews(){}\nfunction renderNotes(){}\nfunction refreshAll(){}',ctx);
  return {ctx,get};
 }
 const family=makeContext('family');
