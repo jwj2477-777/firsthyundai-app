@@ -1,0 +1,43 @@
+name: Publish Family Access Code Policy
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rotate-family-code.yml'
+permissions:
+  contents: write
+concurrency:
+  group: family-code-policy
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Refresh remote policy from private Secret
+        env:
+          FIRSTHYUNDAI_ACCESS_CODE: ${{ secrets.FIRSTHYUNDAI_ACCESS_CODE }}
+        run: python scripts/publish_family_policy.py
+      - name: Commit policy (without secret)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/access_policy.json
+          if git diff --cached --quiet; then
+            echo "Policy unchanged."
+            exit 0
+          fi
+          git commit -m "security: publish updated family policy"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 3
+          done
+          echo "Failed to publish family policy"
+          exit 1
