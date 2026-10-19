@@ -261,7 +261,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
     <select id="tradeBuildingSelect" onchange="chooseTradeBuilding()" aria-label="실거래 아파트 선택"><option value="">아파트를 선택하세요</option></select>
     <div id="tradeAreaPanel" class="hidden">
       <label class="inputLabel" for="tradeAreaSelect">평형 선택 (선택사항)</label>
-      <select id="tradeAreaSelect" onchange="renderTrades()" aria-label="실거래 전용면적 선택"><option value="">모든 전용면적 보기</option></select>
+      <select id="tradeAreaSelect" onchange="setTradeArea()" aria-label="실거래 전용면적 선택"><option value="">모든 전용면적 보기</option></select>
     </div>
   </div>
   <p class="tiny" style="margin:12px 0 4px">거래 유형</p>
@@ -727,7 +727,7 @@ function showComplexTrades(id,area,type){
  if(!p||!Number.isFinite(area)||area<=0||!['','매매','전세','월세'].includes(type))return;
  tradeFocus={id:p.id,area,type};tradeMode='focused';selectedTradeBuilding='';selectedTradeArea='';
  $('aptFilter').value='';
- $('typeFilter').value='';
+ $('typeFilter').value=type;
  $('statusFilter').value='';
  $('tradesFavoriteFilter').value='';
  switchPage('trades');
@@ -826,18 +826,67 @@ function renderNearbyDetails(resetLimit){
 }
 
 function renderOverview(){let list=remote.trades?.records||[];$('totalDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.length):'—';$('saleDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.filter(x=>x.type==='매매').length):'—';$('rentDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.filter(x=>x.type==='전세'||x.type==='월세').length):'—';$('newsGroups').textContent=remote.news&&remote.news.state!=='not_started'?number(remote.news.briefs?.length):'—';$('newDeals').textContent=remote.new_trades&&remote.new_trades.state!=='not_started'?number((remote.new_trades.records||[]).filter(x=>x.first_seen_date===new Date(Date.now()+9*3600000).toISOString().slice(0,10)).length):'—';$('overviewStatus').innerHTML=`<div>${escapeHtml(textState(remote.trades,'실거래가'))}</div><div>${escapeHtml(textState(remote.news,'뉴스'))}</div>${issues.trades?`<div class="flash bad">실거래가 연결 오류: ${escapeHtml(issues.trades)}</div>`:''}${issues.news?`<div class="flash bad">뉴스 연결 오류: ${escapeHtml(issues.news)}</div>`:''}`;}
-function renderTrades(){let payload=remote.trades;if(!payload){$('tradesContent').innerHTML='<div class="empty">‘설정’에서 공개 GitHub 저장소를 연결하세요.</div>';return;}
-$('tradesMeta').textContent=`${payload.area||'송도동'} · 최종 수집 ${prettyTime(payload.checked_at)} · ${payload.state==='partial'?'일부 수집 실패':'공개 데이터'}`;
-if(payload.state==='not_started'){$('tradesContent').innerHTML='<div class="empty">아직 첫 실거래가 수집을 실행하지 않았습니다.<br>GitHub Actions에서 Update Public Data 실행이 필요합니다.</div>';return;}
-let q=$('aptFilter').value.trim().toLowerCase(),type=$('typeFilter').value,s=$('statusFilter').value, favoriteOnly=$('tradesFavoriteFilter').value==='favorites';
-const focused=tradeFocus&&catalogRows().find(x=>x.id===tradeFocus.id);
+function renderTrades(){
+ const payload=remote.trades;
+ $('tradeModeLatest').classList.toggle('active',tradeMode==='latest');
+ $('tradeModeFavorites').classList.toggle('active',false);
+ $('tradeModeSearch').classList.toggle('active',tradeMode==='search');
+ $('tradeSearchPanel').classList.toggle('hidden',tradeMode!=='search');
+ renderTypeButtons('tradeTypeBar',$('typeFilter').value);
+ if(tradeMode==='search'){
+  if(payload && $('tradeBuildingSelect').options.length<=1)populateTradeBuildings();
+  updateTradeAreaOptions();
+ }
+ if(!payload){
+  $('tradeFocusBanner').innerHTML='';
+  $('tradesContent').innerHTML='<div class="empty">공개 실거래 자료를 불러오고 있습니다. 연결이 안 되면 관리자에게 문의하세요.</div>';
+  return;
+ }
+ $('tradesMeta').textContent=(payload.area||'송도동')+' · 마지막 수집 '+prettyTime(payload.checked_at)+
+  (payload.state==='partial'?' · 일부 수집 실패':'');
+ if(payload.state==='not_started'){
+  $('tradesContent').innerHTML='<div class="empty">첫 실거래 수집을 기다리고 있습니다.</div>';return;
+ }
+ const q=$('aptFilter').value.trim().toLowerCase();
+ const type=$('typeFilter').value,s=$('statusFilter').value;
+ const favoriteOnly=$('tradesFavoriteFilter').value==='favorites';
+ const focused=tradeFocus&&catalogRows().find(x=>x.id===tradeFocus.id);
  $('tradeFocusBanner').innerHTML=focused?
- '<div class="tradeFocusBanner"><b>'+escapeHtml(focused.label)+'</b> · 전용 '+number(tradeFocus.area)+'㎡ · '+escapeHtml(tradeFocus.type||'전체 거래')+
- ' <button class="btn alt" type="button" onclick="clearTradeFocus()">단지·면적 필터 해제</button></div>':'';
- let records=(payload.records||[]).filter(x=>(!focused||(focused.aliases||[]).some(name=>normalizeAptName(name)===normalizeAptName(x.building))&&
- (!tradeFocus.area||Math.round(Number(x.area_m2)*100)/100===tradeFocus.area)&&(!tradeFocus.type||x.type===tradeFocus.type))&&(!favoriteOnly||favoriteIdForBuilding(x.building))&&(!type||x.type===type)&&(!q||(x.building||'').toLowerCase().includes(q))&&(s==='cancel'?x.status==='해제':s==='notcancel'?x.status!=='해제':true));
-$('tradesContent').innerHTML=`<p class="tiny">검색 결과 <b>${number(records.length)}건</b> · 최대 70건 표시 ${payload.state==='partial'?'<span class="pill orange">일부 수집 실패: 최신성 주의</span>':''}</p>`+(records.length?records.slice(0,70).map(x=>{let val=x.type==='매매'?value10k(x.amount_10k):x.type==='전세'?`보증금 ${value10k(x.deposit_10k)}`:`보증금 ${value10k(x.deposit_10k)} / 월세 ${value10k(x.monthly_10k)}`;
-return `<article class="item"><div class="tagbox"><span class="pill">${escapeHtml(x.type)}</span><span class="pill ${x.status==='해제'?'red':'gray'}">${escapeHtml(x.status)}</span></div><h3>${escapeHtml(x.building)}</h3><div class="money">${escapeHtml(val)}</div><div class="meta">계약일 ${escapeHtml(x.contract_date)} · 전용 ${escapeHtml(x.area_m2)}㎡ · ${escapeHtml(x.floor||'층 정보 없음')}층</div>${x.status==='해제'?`<p class="pill red">해제 사유 발생일: ${escapeHtml(x.cancel_date_raw||'정보 미제공')}</p>`:''}<p class="meta">출처: 국토교통부 · 조회 기준 계약연월 ${escapeHtml(x.source_month)}</p></article>`;}).join(''):'<div class="empty">조건에 맞는 거래 내역이 없습니다.<br>수집 실패 또는 해당 기간 내 거래 없음일 수 있습니다.</div>');}
+  '<div class="tradeFocusBanner"><b>'+escapeHtml(focused.label)+'</b>'+
+  (tradeFocus.area?' · 전용 '+number(tradeFocus.area)+'㎡':'')+
+  ' · '+escapeHtml(type||tradeFocus.type||'전체 거래')+
+  ' <button class="btn alt" type="button" onclick="clearTradeFocus()">전체 최신순으로 돌아가기</button></div>':'';
+ let records=(payload.records||[]).filter(x=>
+  (!focused||(
+   (focused.aliases||[]).some(name=>normalizeAptName(name)===normalizeAptName(x.building))||
+   normalizeAptName(focused.label)===normalizeAptName(x.building)
+  ))&&
+  (!tradeFocus?.area||areaKey(x.area_m2)===areaKey(tradeFocus.area))&&
+  (!tradeFocus?.type||x.type===tradeFocus.type)&&
+  (!favoriteOnly||favoriteIdForBuilding(x.building))&&
+  (!type||x.type===type)&&
+  (!q||String(x.building||'').toLowerCase().includes(q))&&
+  (tradeMode!=='search'||!selectedTradeBuilding||x.building===selectedTradeBuilding)&&
+  (tradeMode!=='search'||!selectedTradeArea||areaKey(x.area_m2)===selectedTradeArea)&&
+  (s==='cancel'?x.status==='해제':s==='notcancel'?x.status!=='해제':true));
+ records.sort((a,b)=>(b.contract_date||'').localeCompare(a.contract_date||''));
+ const rows=records.slice(0,70);
+ $('tradesContent').innerHTML=
+  '<p class="tiny">검색 결과 <b>'+number(records.length)+'건</b> · '+number(rows.length)+'건 표시'+
+  (payload.state==='partial'?' <span class="pill orange">일부 수집 실패: 최신성 주의</span>':'')+'</p>'+
+  (rows.length?rows.map(x=>{
+   const val=x.type==='매매'?value10k(x.amount_10k):
+    x.type==='전세'?'보증금 '+value10k(x.deposit_10k):
+    '보증금 '+value10k(x.deposit_10k)+' / 월세 '+value10k(x.monthly_10k);
+   return '<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+dealBadge(x.type)+
+    '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span></div>'+
+    '<h3>'+escapeHtml(x.building)+'</h3><div class="money">'+escapeHtml(val)+'</div>'+
+    '<div class="meta">계약일 '+escapeHtml(x.contract_date)+' · 전용 '+escapeHtml(x.area_m2)+
+    '㎡ · '+escapeHtml(x.floor||'층 정보 없음')+'층</div>'+
+    (x.status==='해제'?'<p class="pill red">계약 해제일: '+escapeHtml(x.cancel_date_raw||'정보 미제공')+'</p>':'')+
+    '<p class="meta">출처: 국토교통부 · 조회 계약연월 '+escapeHtml(x.source_month)+'</p></article>';
+  }).join(''):'<div class="empty">선택한 조건에 해당하는 실거래가 없습니다. 다른 유형이나 아파트를 선택해 주세요.</div>');
+}
 function renderNews(){let payload=remote.news;if(!payload){$('newsContent').innerHTML='<div class="empty">‘설정’에서 공개 GitHub 저장소를 연결하세요.</div>';return;}
 $('newsMeta').textContent=`마지막 수집 ${prettyTime(payload.checked_at)} · 생성형 AI 아님 / 공식 확인 필요`;
 if(payload.state==='not_started'){$('newsContent').innerHTML='<div class="empty">아직 첫 뉴스 수집을 실행하지 않았습니다.</div>';return;}
