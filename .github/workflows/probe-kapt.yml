@@ -15,41 +15,25 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Diagnose official basic and detail parameter errors safely
+      - name: Confirm current K-apt V5 basic and detail responses
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
         run: |
           python - <<'PY'
-          import os,urllib.request,urllib.error,json,re,concurrent.futures
-          from urllib.parse import urlencode,unquote
+          import os
           from scripts import collect_complexes as k
-          key=unquote(os.environ['DATA_GO_KR_SERVICE_KEY'].strip())
-          items,total=k.unpack(k.call_api(k.LIST_URL,{'sigunguCode':'28185','numOfRows':5,'pageNo':1,'_type':'json'},key))
-          code=items[0].get('kaptCode')
-          print('K-apt list: OK; code format valid',bool(re.fullmatch(r'A[0-9]{8}',str(code))),flush=True)
-          targets=[
-           ('basic_json',k.BASIC_URL,{'kaptCode':code,'_type':'json'}),
-           ('basic_default',k.BASIC_URL,{'kaptCode':code}),
-           ('detail_json',k.DETAIL_URL,{'kaptCode':code,'_type':'json'}),
-           ('detail_default',k.DETAIL_URL,{'kaptCode':code})
-          ]
-          def go(t):
-           label,url,params=t
-           q=url+'?'+urlencode({'serviceKey':key,**params})
-           request=urllib.request.Request(q,headers={'User-Agent':'FirstHyundai-Diagnostics/1.0'})
-           try:
-            with urllib.request.urlopen(request,timeout=12) as r:
-             payload=r.read(10000);status=r.status;ctype=r.headers.get('Content-Type','')
-           except urllib.error.HTTPError as e:
-            payload=e.read(3000);status=e.code;ctype=e.headers.get('Content-Type','')
-           except Exception as e:
-            return (label,'network',type(e).__name__)
-           text=payload.decode('utf-8','replace')
-           reason=';'.join(token for token in ['INVALID_REQUEST_PARAMETER_ERROR','SERVICE_ACCESS_DENIED_ERROR',
-            'SERVICE_KEY_IS_NOT_REGISTERED_ERROR','NO_OPENAPI_SERVICE_ERROR','PERMISSION_DENIED','SERVICE_KEY_IS_NULL',
-            'SERVICE_ACCESS_DENIED','Bad Request'] if token in text)
-           m=re.search(r'(?:resultCode|returnReasonCode)[^0-9]{1,12}([0-9]{1,3})',text)
-           return (label,'status',status,'body_len',len(payload),'code',m.group(1) if m else 'unknown','known_reason',reason or 'not_recognized','content_type',ctype[:60])
-          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
-           for v in pool.map(go,targets):print(v,flush=True)
+          key=os.environ.get('DATA_GO_KR_SERVICE_KEY')
+          listing=k.call_api(k.LIST_URL,{'sigunguCode':'28185','numOfRows':10,'pageNo':1,'_type':'json'},key)
+          rows,total=k.unpack(listing)
+          if not rows: raise RuntimeError('No K-apt list rows')
+          code=rows[0]['kaptCode']
+          print('K-apt list verified:',len(rows),'rows of',total,flush=True)
+          for typ,old_url in [('basic',k.BASIC_URL),('detail',k.DETAIL_URL)]:
+              url=old_url.replace('V4','V5')
+              obj=k.call_api(url,{'kaptCode':code,'dataType':'JSON'},key)
+              header=obj.get('response',obj).get('header',{})
+              items,count=k.unpack(obj)
+              print(typ,'V5 resultCode',header.get('resultCode'),'items',len(items),'keys',sorted(items[0]) if items else [],flush=True)
+              if not items: raise RuntimeError(typ+' V5 API has no result')
+          print('AUTHENTICATED K-apt LIST+BASIC+DETAIL V5 OK',flush=True)
           PY
