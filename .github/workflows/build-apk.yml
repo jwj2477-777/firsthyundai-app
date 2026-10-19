@@ -34,10 +34,8 @@ jobs:
           node --check /tmp/firsthyundai-ui.js
           node scripts/test_nearby.js
           node scripts/test_family_mode.js
-      - name: Generate family access verifier (private Secret)
-        env:
-          FIRSTHYUNDAI_ACCESS_CODE: ${{ secrets.FIRSTHYUNDAI_ACCESS_CODE }}
-        run: python3 scripts/generate_app_lock.py
+      - name: Test password policy generation (disposable code)
+        run: python3 scripts/test_family_policy.py
       - name: Generate FHD office launcher icon
         run: python3 scripts/generate_launcher_icon.py
       - name: Build APK
