@@ -15,8 +15,8 @@ assert.ok(start >= 0 && end > start, 'Missing favorite mapping');
 const source = html.slice(start, end + endMarker.length);
 const result = vm.runInNewContext(source + '\n({groups:FAVORITE_APTS, lookup:favoriteIdForBuilding})');
 const {groups, lookup} = result;
-assert.equal(groups.length, 13, 'Prime View 20 and 25 must be independent favorite groups');
-assert.equal(new Set(groups.map(g => g.id)).size, 13, 'Favorite IDs must be distinct');
+assert.equal(groups.length, 14, 'Prime View 20 and 25 must be independent favorite groups');
+assert.equal(new Set(groups.map(g => g.id)).size, 14, 'Favorite IDs must be distinct');
 
 const expected = [
  ['f13','송도더샵퍼스트파크F13-1BL'],
@@ -31,13 +31,16 @@ const expected = [
  ['prime25','더샵송도프라임뷰25BL'],
  ['skcentral','송도SK뷰센트럴'],
  ['artwin','송도아트윈푸르지오'],
- ['central3','더샵송도센트럴파크Ⅲ']
+ ['central3','더샵송도센트럴파크Ⅲ'],
+ ['kapt-a10027887','송도센트럴파크푸르지오']
 ];
 for(const [id,name] of expected){
  assert.equal(lookup(name), id, 'Official building missing: '+name);
 }
 assert.equal(lookup('송도SKVIEW'), '', 'Do not combine different SK VIEW apartment');
 assert.equal(lookup('더샵센트럴파크2'), '', 'Do not combine central park 2 and 3');
+assert.equal(lookup('더샵송도센트럴파크Ⅲ'),'central3','Central Park 3 must remain distinct from Prugio');
+assert.equal(lookup('송도센트럴파크 푸르지오'),'kapt-a10027887');
 assert.equal(lookup('송도더샵센트럴시티'), '', 'Do not conflate nearby buildings');
 
 const data = JSON.parse(fs.readFileSync(path.join(root,'data/trades.json'),'utf8'));
@@ -50,6 +53,6 @@ for(const row of data.records || []){
   matchCount++;
  }
 }
-assert.equal(matched.size, 13, 'All 13 favorite apartments need matching real transactions');
+assert(matched.size>=13 && matched.size<=14, 'Original 13 favorites must retain matching trade names; newer favorites may lack recent transactions');
 assert.ok(matchCount > 100, 'Most likely official name mapping or source JSON regression');
 console.log('Favorite mapping tests passed: '+groups.length+' groups, '+matchCount+' matching real transactions');
