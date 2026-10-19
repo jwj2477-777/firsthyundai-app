@@ -68,7 +68,7 @@ vm.runInContext(javascript+'\n globalThis.__test={catalogRows,complexAreaStats,r
  assert(!element('nav').innerHTML.includes('보안 관리'), 'Family navigation hides admin tabs');
  switchPage('complexes');
  assert.equal(element('complexAdmin').classList.contains('hidden'),true,'Admin editor must be hidden in family mode');
- assert(element('complexDetails').innerHTML.includes('확인 전'));
+ assert(element('complexDetails').innerHTML.includes('872세대'),'Verified F15 household data must render');
  const prime20=catalogRows().find(x=>x.id==='prime20');
  assert.equal(complexAreaStats(prime20).map(x=>x.area).join(','),'84.95','Observed areas are sourced from matching trades only');
  element('complexSearch').value='프라임뷰';
