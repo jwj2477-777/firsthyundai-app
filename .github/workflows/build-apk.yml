@@ -37,6 +37,8 @@ jobs:
         env:
           FIRSTHYUNDAI_ACCESS_CODE: ${{ secrets.FIRSTHYUNDAI_ACCESS_CODE }}
         run: python3 scripts/generate_app_lock.py
+      - name: Generate FHD office launcher icon
+        run: python3 scripts/generate_launcher_icon.py
       - name: Build APK
         run: gradle --no-daemon assembleDebug
       - uses: actions/upload-artifact@v4
