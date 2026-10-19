@@ -15,28 +15,32 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Verify K-apt list, basic, detail API using existing protected secret
-        env:
-          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+      - name: Diagnose upstream public-data network without transmitting service key
         run: |
           python - <<'PY'
-          import os
-          from scripts import collect_complexes as k
-          token = os.environ.get('DATA_GO_KR_SERVICE_KEY')
-          if not token:
-              raise RuntimeError('GitHub secret DATA_GO_KR_SERVICE_KEY absent. Set secret without exposing value.')
-          print('Existing public-data secret: present (value intentionally hidden)')
-          res = k.call_api(k.LIST_URL, {'sigunguCode':'28185','pageNo':1,'numOfRows':30,'_type':'json'}, token)
-          entries,count = k.unpack(res)
-          print('List service: response rows',len(entries),'declared total',count)
-          if not entries: raise RuntimeError('Listing returned no rows; check service name and parameters')
-          print('List response keys:', sorted(entries[0].keys()))
-          code = next((str(row.get('kaptCode','')) for row in entries if str(row.get('kaptCode','')).startswith('A')), None)
-          if not code: raise RuntimeError('List lacks kaptCode; map correct response names')
-          b = k.base_item(token, code)
-          if not b: raise RuntimeError('Basic API returned no apartment details')
-          print('Basic service: success for test code', code,'keys:',sorted(b.keys()))
-          d = k.detail_item(token, code)
-          print('Detail service: success; keys:',sorted(d.keys()))
-          print('K-apt two-service access probe: success')
+          import socket, urllib.request, urllib.error, concurrent.futures
+          host='apis.data.go.kr'
+          try:
+              addrs={i[4][0] for i in socket.getaddrinfo(host,443)}
+              print('Gateway DNS:',len(addrs),'IP(s)')
+          except Exception as exc:
+              print('Gateway DNS error:',type(exc).__name__)
+          paths=[
+            'https://apis.data.go.kr/1613000/AptListService4/getSigunguAptList4',
+            'https://apis.data.go.kr/1613000/AptListService4/getSidoAptList4',
+            'http://apis.data.go.kr/1613000/AptListService4/getSigunguAptList4',
+            'https://www.data.go.kr/data/15057332/openapi.do'
+          ]
+          def check(url):
+              try:
+                  req=urllib.request.Request(url,headers={'User-Agent':'FirstHyundai-Diagnostics/1.0'})
+                  with urllib.request.urlopen(req,timeout=9) as r:
+                      return (url.split('/')[0]+'//'+url.split('/')[2],r.status,len(r.read(512)),'OK')
+              except urllib.error.HTTPError as e:
+                  return (url.split('/')[0]+'//'+url.split('/')[2],e.code,'http-error','reachable')
+              except Exception as e:
+                  return (url.split('/')[0]+'//'+url.split('/')[2],type(e).__name__,str(e)[:100],'failed')
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+              for url,x in zip(paths,pool.map(check,paths)):
+                  print(url.split('/')[-1],x)
           PY
