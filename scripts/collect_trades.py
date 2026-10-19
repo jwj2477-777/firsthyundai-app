@@ -10,7 +10,7 @@ from pathlib import Path
 import re
 import sys
 import time
-from urllib.parse import urlencode
+from urllib.parse import urlencode, unquote
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 from xml.etree import ElementTree as ET
@@ -68,17 +68,24 @@ def parse_response(xml_bytes):
     root = ET.fromstring(xml_bytes)
     code = clean(root.findtext('.//resultCode'))
     if code and code != '00':
-        msg = clean(root.findtext('.//resultMsg'))
-        raise RuntimeError(f'공공데이터 API 오류 {code}: {msg}')
+        # 공개 로그에는 응답 코드만 남김 (서버 메시지 등에 토큰이 섞일 가능성 차단).
+        safe_code = code if re.fullmatch(r'[0-9A-Z_]{1,48}', code) else 'UNKNOWN'
+        raise RuntimeError(f'API XML resultCode={safe_code}')
     count = int(root.findtext('.//totalCount') or '0')
     items = [{child.tag: (child.text or '').strip() for child in item} for item in root.findall('.//items/item')]
     return items, count
 
 
+def normalized_service_key(key):
+    """Encoding 키(%2B 등)와 Decoding 키를 모두 받아 URL에는 정확히 한 번만 인코딩."""
+    key = key.strip()
+    return unquote(key) if re.search(r'%[0-9a-fA-F]{2}', key) else key
+
+
 def fetch_month(session, category, month, api_key, *, page_size=1000, max_pages=30, pause=0.15):
     result = []
     for page in range(1, max_pages+1):
-        query = urlencode({'serviceKey':api_key, 'LAWD_CD':DISTRICT_CODE,
+        query = urlencode({'serviceKey':normalized_service_key(api_key), 'LAWD_CD':DISTRICT_CODE,
                            'DEAL_YMD':month, 'pageNo':page, 'numOfRows':page_size})
         req = Request(ENDPOINTS[category]+'?'+query, headers={'User-Agent':'FirstHyundai-Research/1.0'})
         # 테스트에서 요청을 주입할 수 있도록 별도 함수 사용
@@ -218,9 +225,11 @@ def update(*, months=12, key=None, request=http_request, now=None):
                 successes += 1
                 print(f'{bucket}: {len(normalized)}건 (연수구 전체 조회 {len(raw)}건)')
             except Exception as exc:
-                label = str(exc) if isinstance(exc, RuntimeError) and str(exc).startswith('API HTTP ') else type(exc).__name__
+                label = str(exc) if isinstance(exc, RuntimeError) and str(exc).startswith(('API HTTP ', 'API XML ')) else type(exc).__name__
                 print(f'[WARN] {bucket} 수집 실패: {label}', file=sys.stderr)
                 failures.append(f'{bucket}: {label}')
+                if 'SERVICE_KEY_IS_NOT_REGISTERED_ERROR' in label:
+                    raise RuntimeError('API 인증키 등록 오류: Encoding/Decoding 형식을 자동 보정했으므로 공공데이터포털 승인 상태와 GitHub Secret 원본을 확인하세요.') from None
     if successes == 0:
         raise RuntimeError('모든 API 요청 실패: 기존 자료를 덮어쓰지 않습니다.')
     # 현재 범위 외 이전 월은 삭제 (계속 무한히 쌓이지 않도록)
