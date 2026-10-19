@@ -7,7 +7,7 @@
 - 별도 Cloudflare Worker `firsthyundai-nearby` 소스 및 GitHub 수동 배포 워크플로
 - Worker의 Kakao API 비공개 호출, 주소 → 좌표 → 카테고리 검색, 직선거리/원문 링크 출력
 - 조회 결과 서버 저장·GitHub 공개 JSON 복제 없음, `Cache-Control: no-store` 적용
-- 요청은 고정 송도 아파트 ID, 열 가지 카테고리, 반경 1.5km, 상위 열 곳으로 제한. 20회/분 전역 rate limit
+- 요청은 고정 송도 아파트 ID, 열 가지 카테고리, 반경 1.5km, 상위 열 곳으로 제한. 20회/분 Cloudflare 처리 위치별 rate limit
 
 ## 다음 준비: Cloudflare Workers 무료 계정
 
@@ -33,7 +33,7 @@
 - 실시간 API 응답: `https://firsthyundai-nearby.<서브도메인>.workers.dev/nearby?complex=f13&category=HP8`.
 - 정상 응답은 `schema_version=1`, `source=Kakao Local`, `places` 배열을 포함합니다.
 - 0개 결과는 해당 **반경·카테고리 요청에서 결과가 없었다**는 뜻일 뿐 병원이 없다는 확정 의미가 아닙니다.
-- `429`: 20회/분 요청 제한. `503`: API key 또는 Rate Limiter 설정 누락. `502`: 외부 카카오 호출 실패. `422`: 해당 단지 주소 좌표 검증 실패.
+- `429`: 처리 위치별 20회/분 요청 제한. `503`: API key 또는 Rate Limiter 설정 누락. `502`: 외부 카카오 호출 실패. `422`: 해당 단지 주소 좌표 검증 실패.
 - 배정학교 정보는 카카오 학교 검색 결과로 자동 판정하지 않습니다.
 - `distance_m`는 **직선거리**이며 도보/운전 이동시간이 아닙니다.
 
@@ -41,7 +41,7 @@
 
 - 카카오맵 무료 쿼터는 개발자 계정에서 첫 번째로 활성화한 앱에만 제공합니다. 무료 쿼터 적용 앱 배지 확인: https://developers.kakao.com/docs/ko/kakaomap/common
 - Cloudflare Workers Free는 일일 사용량 제한이 있습니다. 유료 전환 전에는 Cloudflare/카카오 사용량·계정 정책을 확인하세요.
-- 중계 URL은 공개될 수 있습니다. Worker는 제한된 단지/시설 카테고리만 제공하고 전역 rate limiting을 적용하지만, 완전한 사설 인증망은 아닙니다. 사용량이 늘면 Cloudflare Access 또는 강한 서버 인증과 감사를 추가하세요.
+- 중계 URL은 공개될 수 있습니다. Worker는 제한된 단지/시설 카테고리만 제공하고 처리 위치별 rate limiting을 적용하지만, 완전한 사설 인증망은 아닙니다. 사용량이 늘면 Cloudflare Access 또는 강한 서버 인증과 감사를 추가하세요.
 - GitHub Actions 및 Cloudflare의 비밀 변수는 공개 소스에 삽입하지 않습니다.
 - API 장소 결과를 GitHub `data/`에 올리거나 재가공 DB로 장기 보관하지 않습니다.
 - Cloudflare Worker 코드는 `workers/kakao-nearby/src/index.mjs`, 설정은 `workers/kakao-nearby/wrangler.toml`.
