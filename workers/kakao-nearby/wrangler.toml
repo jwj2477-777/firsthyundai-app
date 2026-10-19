@@ -1,0 +1,12 @@
+name = "firsthyundai-nearby"
+main = "src/index.mjs"
+compatibility_date = "2026-10-20"
+workers_dev = true
+
+# 20 lookups per minute globally. Change only after reviewing live usage.
+[[ratelimits]]
+name = "NEARBY_RATE_LIMITER"
+namespace_id = "872014"
+  [ratelimits.simple]
+  limit = 20
+  period = 60
