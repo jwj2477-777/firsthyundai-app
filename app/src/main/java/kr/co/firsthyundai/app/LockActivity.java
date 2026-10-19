@@ -27,43 +27,17 @@ import javax.crypto.spec.PBEKeySpec;
  * Prevents casual opening of an APK but is not a remotely revocable license.
  */
 public class LockActivity extends Activity {
-    private byte[] salt;
-    private byte[] verifier;
-    private int iterations;
+    private AccessPolicy.Policy currentPolicy;
     private EditText codeField;
     private TextView status;
+    private Button unlockButton;
+    private Button retryButton;
     private static final String PREFS = "firsthyundai_access_attempts";
 
     private int dp(int v) { return (int) (getResources().getDisplayMetrics().density * v + 0.5f); }
 
-    private static byte[] fromHex(String value) {
-        if (value == null || value.length() % 2 != 0) throw new IllegalArgumentException();
-        byte[] bytes = new byte[value.length() / 2];
-        for (int i = 0; i < bytes.length; i++) {
-            int hi = Character.digit(value.charAt(2 * i), 16);
-            int lo = Character.digit(value.charAt(2 * i + 1), 16);
-            if (hi < 0 || lo < 0) throw new IllegalArgumentException();
-            bytes[i] = (byte) ((hi << 4) | lo);
-        }
-        return bytes;
-    }
-
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
-
-        try (InputStream stream = getAssets().open("access-verifier.properties")) {
-            Properties info = new Properties();
-            info.load(stream);
-            iterations = Integer.parseInt(info.getProperty("iterations", ""));
-            salt = fromHex(info.getProperty("salt", ""));
-            verifier = fromHex(info.getProperty("verifier", ""));
-            if (iterations < 100000 || iterations > 1000000 || salt.length < 16 || verifier.length != 32) {
-                throw new IllegalArgumentException("검증 데이터 형식 오류");
-            }
-        } catch (Exception e) {
-            showError("보안 설정이 포함되지 않은 APK입니다. 관리자에게 새 APK를 요청하세요.");
-            return;
-        }
 
         ScrollView scroll = new ScrollView(this);
         scroll.setFillViewport(true);
@@ -100,6 +74,7 @@ public class LockActivity extends Activity {
         root.addView(codeField, inputParams);
 
         Button unlock = new Button(this);
+        unlockButton = unlock;
         unlock.setAllCaps(false);
         unlock.setText("인증하고 앱 열기");
         LinearLayout.LayoutParams buttonParams =
@@ -114,32 +89,69 @@ public class LockActivity extends Activity {
         status.setPadding(0, dp(14), 0, 0);
         root.addView(status);
 
+        retryButton = new Button(this);
+        retryButton.setAllCaps(false);
+        retryButton.setText("연결 다시 확인");
+        retryButton.setVisibility(android.view.View.GONE);
+        root.addView(retryButton);
+
         TextView foot = new TextView(this);
-        foot.setText("보안코드는 APK에 그대로 저장되지 않습니다.\n"
-                + "앱 설치 자체나 공개된 GitHub 자료 접근을 막는 기능은 아닙니다.");
+        foot.setText("처음 한 번 인증하면 이후에는 자동으로 열립니다.\n"
+                + "관리자가 보안코드를 변경하면 다시 인증해야 합니다.\n"
+                + "보안 확인에 인터넷이 필요하며 최근 확인한 정책은 24시간 동안 오프라인 이용 가능합니다.");
         foot.setTextSize(12);
         foot.setGravity(Gravity.CENTER);
         foot.setTextColor(Color.rgb(99, 115, 129));
         foot.setPadding(0, dp(32), 0, 0);
         root.addView(foot);
 
+        codeField.setEnabled(false);
+        unlock.setEnabled(false);
+        status.setText("최신 가족 보안 정책을 확인하는 중...");
         unlock.setOnClickListener(v -> unlock());
+        retryButton.setOnClickListener(v -> loadLatestPolicy());
         setContentView(scroll);
+        loadLatestPolicy();
     }
 
-    private boolean matches(char[] provided) {
-        PBEKeySpec spec = new PBEKeySpec(provided, salt, iterations, 256);
-        try {
-            byte[] derived = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-                    .generateSecret(spec).getEncoded();
-            boolean valid = MessageDigest.isEqual(verifier, derived);
-            Arrays.fill(derived, (byte) 0);
-            return valid;
-        } catch (Exception ignored) {
-            return false;
-        } finally {
-            spec.clearPassword();
-        }
+    private void openMain() {
+        if(isFinishing() || isDestroyed()) return;
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
+    }
+
+    private void loadLatestPolicy() {
+        currentPolicy = null;
+        codeField.setEnabled(false);
+        unlockButton.setEnabled(false);
+        retryButton.setVisibility(android.view.View.GONE);
+        status.setText("온라인 보안 정책 확인 중...");
+        new Thread(() -> {
+            try {
+                AccessPolicy.Result result = AccessPolicy.resolve(this);
+                runOnUiThread(() -> {
+                    if(isFinishing() || isDestroyed())return;
+                    currentPolicy = result.policy;
+                    if(AccessPolicy.authorized(this,result.policy)){
+                        openMain();
+                        return;
+                    }
+                    codeField.setEnabled(true);
+                    unlockButton.setEnabled(true);
+                    status.setText(result.changed
+                        ? "보안코드가 변경되었습니다. 새 보안코드를 다시 입력해 주세요."
+                        : result.online ? "처음 한 번만 가족 보안코드를 입력해 주세요."
+                        : "오프라인: 최근 확인한 인증정보로 입력할 수 있습니다.");
+                });
+            } catch (Exception error) {
+                runOnUiThread(() -> {
+                    if(isFinishing() || isDestroyed())return;
+                    status.setText(error.getMessage()==null
+                            ? "보안 정책 확인 실패":error.getMessage());
+                    retryButton.setVisibility(android.view.View.VISIBLE);
+                });
+            }
+        }, "family-policy-load").start();
     }
 
     private void unlock() {
@@ -154,13 +166,13 @@ public class LockActivity extends Activity {
 
         char[] input = codeField.getText().toString().trim().toCharArray();
         codeField.setText("");
-        boolean good = input.length > 0 && matches(input);
+        boolean good = currentPolicy != null && AccessPolicy.matches(currentPolicy,input);
         Arrays.fill(input, (char) 0);
 
         if (good) {
+            AccessPolicy.authorize(this,currentPolicy);
             prefs.edit().clear().apply();
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
+            openMain();
         } else {
             int attempts = prefs.getInt("attempts", 0) + 1;
             if (attempts >= 5) {
@@ -174,11 +186,4 @@ public class LockActivity extends Activity {
         }
     }
 
-    private void showError(String text) {
-        TextView error = new TextView(this);
-        error.setPadding(dp(24), dp(48), dp(24), dp(24));
-        error.setTextSize(17);
-        error.setText(text);
-        setContentView(error);
-    }
 }
