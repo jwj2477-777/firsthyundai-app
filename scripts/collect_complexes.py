@@ -178,7 +178,7 @@ def is_songdo(x):
 def to_positive_int(value, *, zero=False):
     # K-apt V5 may encode integral counts as 1114.0 or "1114.0".
     raw = cleaned(value).replace(",", "")
-    if not re.fullmatch(r"[0-9]+(?:\\.0+)?", raw):
+    if not re.fullmatch(r"[0-9]+(?:\.0+)?", raw):
         return None
     num = int(raw.split(".", 1)[0])
     return num if (0 <= num <= 100000 if zero else 1 <= num <= 100000) else None
