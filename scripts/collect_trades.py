@@ -146,6 +146,8 @@ def normalize(row, category, month):
         'area_m2': area,
         'floor': floor,
         'building_year': get(row, '건축년도', 'buildYear'),
+        'lot_number': get(row, '지번', 'jibun'),
+        'apt_seq': get(row, '아파트일련번호', 'aptSeq'),
         'source_month': month,
         'source': '국토교통부 실거래가 공개 API',
     }
