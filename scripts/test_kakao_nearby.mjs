@@ -36,9 +36,17 @@ try{
   assert.equal(r.headers.get("Cache-Control"),"no-store, max-age=0");
   assert(!JSON.stringify(obj).includes(env.KAKAO_REST_API_KEY));
   assert(calls.some(x=>x.auth==="KakaoAK "+env.KAKAO_REST_API_KEY));
+  assert(!calls.some(x=>x.url.includes("complexes.json")), "Worker must not depend on live GitHub catalog fetch");
   assert.equal((await handler.fetch(new Request("https://firsthyundai-nearby.demo.workers.dev/nearby?complex=f13&category=HP8"),
     {...env,NEARBY_RATE_LIMITER:{limit:async()=>({success:false})}})).status,429);
   assert.equal((await handler.fetch(new Request("https://firsthyundai-nearby.demo.workers.dev/nearby?complex=f13&category=HP8"),
     {...env,KAKAO_REST_API_KEY:""})).status,503);
-  console.log("Kakao live nearby: categories, no-cache, secret isolation, whitelist and global quota passed.");
+  globalThis.fetch=async()=>{throw new Error("network unavailable");};
+  const failed=await hit("/nearby/f13/HP8");
+  assert.equal(failed.status,502);
+  const diagnostic=await failed.json();
+  assert.equal(diagnostic.stage,"kakao_address");
+  assert.equal(diagnostic.reason,"request_failed");
+  assert(!JSON.stringify(diagnostic).includes(env.KAKAO_REST_API_KEY));
+  console.log("Kakao live nearby: embedded public addresses, no-cache, secret isolation, mobile route and failure diagnostics passed.");
 }finally{globalThis.fetch=oldFetch;}
