@@ -11,6 +11,7 @@ import re
 import sys
 import time
 from urllib.parse import urlencode
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 from xml.etree import ElementTree as ET
 
@@ -93,11 +94,25 @@ def fetch_month(session, category, month, api_key, *, page_size=1000, max_pages=
 
 
 def http_request(req):
-    with urlopen(req, timeout=40) as r:
-        data = r.read(10_000_001)
-        if len(data) > 10_000_000:
-            raise RuntimeError('API 응답 용량 상한 초과')
-        return data
+    try:
+        with urlopen(req, timeout=40) as r:
+            data = r.read(10_000_001)
+            if len(data) > 10_000_000:
+                raise RuntimeError('API 응답 용량 상한 초과')
+            return data
+    except HTTPError as exc:
+        # 인증키 및 요청 URL을 공개 GitHub Actions 로그에 출력하지 않음.
+        response = exc.read(8192).decode('utf-8', errors='replace')
+        known_codes = (
+            'SERVICE_ACCESS_DENIED_ERROR', 'SERVICE_KEY_IS_NOT_REGISTERED_ERROR',
+            'SERVICE_KEY_IS_NULL', 'PERMISSION_DENIED', 'BLACKLIST_IP_ACCESS_ERROR',
+            'LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR',
+            'LIMITED_NUMBER_OF_SERVICE_REQUESTS_PER_SECOND_EXCEEDS_ERROR',
+            'DEADLINE_HAS_EXPIRED_ERROR', 'INVALID_REQUEST_PARAMETER_ERROR',
+            'NO_OPENAPI_SERVICE_ERROR', 'HTTP_ERROR',
+        )
+        reason = next((code for code in known_codes if code in response), '상세 코드 확인 불가')
+        raise RuntimeError(f'API HTTP {exc.code} ({reason})') from None
 
 
 def normalize(row, category, month):
@@ -203,7 +218,7 @@ def update(*, months=12, key=None, request=http_request, now=None):
                 successes += 1
                 print(f'{bucket}: {len(normalized)}건 (연수구 전체 조회 {len(raw)}건)')
             except Exception as exc:
-                label = f'{type(exc).__name__} (HTTP {exc.code})' if hasattr(exc, 'code') else type(exc).__name__
+                label = str(exc) if isinstance(exc, RuntimeError) and str(exc).startswith('API HTTP ') else type(exc).__name__
                 print(f'[WARN] {bucket} 수집 실패: {label}', file=sys.stderr)
                 failures.append(f'{bucket}: {label}')
     if successes == 0:
