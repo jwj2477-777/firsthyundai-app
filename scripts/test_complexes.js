@@ -75,7 +75,8 @@ vm.runInContext(javascript+'\n globalThis.__test={catalogRows,complexObservedAre
  context.__test.renderComplexes();
  assert.equal((element('complexCards').innerHTML.match(/class="nearbyCard/g)||[]).length,2,'Prime 20 and 25 appear as two distinct complexes');
  selectComplex('prime25');
+ vm.runInContext("setComplexDetailTab('deals')",context);
  assert(element('complexDetails').innerHTML.includes('101.5㎡'));
  assert(!element('complexDetails').innerHTML.includes('84.95㎡'),'Prime 20 area must not leak into prime 25');
- console.log('Apartment catalog v1.3 checks passed');
+ console.log('Apartment catalog v1.6 checks passed');
 })().catch(e=>{console.error(e);process.exitCode=1;});
