@@ -43,6 +43,16 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 #complexEditor{border:1px solid #cadde8;border-radius:15px;max-width:min(580px,94vw);width:94vw;max-height:85vh;overflow-y:auto;padding:20px}
 #complexEditor input,#complexEditor textarea{margin-bottom:9px}
 #complexEditor textarea{min-height:65px}
+.complexAreaCard{border:1px solid #d6e1e8;border-radius:10px;padding:11px;margin:8px 0}
+.complexAreaCard h4{margin:0 0 6px;font-size:14px}
+.complexAreaCard .tiny{line-height:1.7}
+.complexAreaButtons{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.complexAreaButtons button{border:1px solid #aac8de;border-radius:7px;padding:8px;background:#f0f7fa;color:#144769;font-size:12px;cursor:pointer}
+.complexTools{display:flex;flex-wrap:wrap;align-items:end;gap:10px}
+.complexTools select{max-width:220px}
+.complexLinksExternal{display:flex;flex-wrap:wrap;gap:9px;margin:10px 0}
+.complexLinksExternal a{font-size:13px}
+.tradeFocusBanner{background:#eff7fc;border:1px solid #cbdde9;border-radius:10px;padding:12px;margin:9px 0}
 </style>
 </head>
 <body>
@@ -87,13 +97,14 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 </div>
 
 <div id="complexes" class="page hidden">
- <div class="sectionTitle"><div><h2>단지정보 · 송도 아파트</h2><p class="tiny">주변 12개 즐겨찾기 그룹에서 시작하는 아파트 정보 도감 · 프라임뷰는 20·25블럭 별도</p></div><button class="btn alt" type="button" onclick="refreshOne('complexes')">갱신</button></div>
- <div class="complexIntro">세대수·난방·평면도는 출처가 확인된 정보만 표시합니다. 미확인 항목은 <b>확인 전</b>으로 남겨둡니다. 실거래가에 등장한 전용면적은 아래에 별도로 구분해서 보여드립니다.</div>
+ <div class="sectionTitle"><div><h2>단지정보 · 송도 아파트</h2><p class="tiny">관심 단지 13곳 + 공공 실거래에서 발견된 송도 아파트 자동 목록</p></div><button class="btn alt" type="button" onclick="refreshOne('complexes')">갱신</button></div>
+ <div class="complexIntro">국토교통부 송도동 실거래 수집자료에서 아파트명과 거래된 전용면적을 자동 추출합니다. <b>수집기간에 거래가 없는 단지는 자동 목록에 없을 수 있습니다.</b> 세대수·난방·학군·평면도는 확인된 출처만 표시합니다. 네이버페이 부동산 원본으로도 연결합니다.</div>
  <div class="panel">
   <label class="inputLabel" for="complexSearch">아파트명 검색</label>
-  <input id="complexSearch" type="search" placeholder="퍼스트파크, 마스터뷰, 프라임뷰 등" oninput="renderComplexes()" aria-label="단지정보 아파트명 검색">
+  <input id="complexSearch" type="search" placeholder="단지 검색: 더샵, 롯데캐슬, 힐스테이트 등" oninput="resetComplexLimit();renderComplexes()" aria-label="단지정보 아파트명 검색">
+   <div class="complexTools"><div><label class="inputLabel" for="complexScope">표시 범위</label><select id="complexScope" onchange="resetComplexLimit();renderComplexes()"><option value="all">전체 송도 실거래 단지</option><option value="favorites">관심 단지 13곳만</option></select></div></div>
   <p class="tiny" id="complexMeta">기본 단지 목록을 준비했습니다.</p>
-  <div class="nearbyGrid" id="complexCards"></div>
+  <div class="nearbyGrid" id="complexCards"></div><button type="button" id="complexShowMore" class="btn alt hidden" onclick="showMoreComplexes()">단지 더 보기</button>
  </div>
  <div class="panel" id="complexDetails"><div class="empty">단지를 선택하면 세대수·전용면적·난방·평면도와 실거래 참고정보가 표시됩니다.</div></div>
  <div class="panel hidden" id="complexAdmin">
@@ -138,7 +149,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 </div>
 <div id="trades" class="page hidden">
  <div class="sectionTitle"><div><h2>송도동 아파트 실거래가</h2><p class="tiny" id="tradesMeta">국토교통부 공개 API 연동 대기</p></div><button class="btn alt" onclick="refreshOne('trades')">갱신</button></div>
- <div class="panel"><div class="controls"><input id="aptFilter" placeholder="아파트 단지명 검색" oninput="renderTrades()" aria-label="아파트 단지명"></div>
+ <div class="panel"><div id="tradeFocusBanner"></div><div class="controls"><input id="aptFilter" placeholder="아파트 단지명 검색" oninput="renderTrades()" aria-label="아파트 단지명"></div>
   <div class="controls"><select id="typeFilter" onchange="renderTrades()"><option value="">매매·전세·월세 전체</option><option>매매</option><option>전세</option><option>월세</option></select><select id="statusFilter" onchange="renderTrades()"><option value="">해제 포함 전체</option><option value="notcancel">해제 제외</option><option value="cancel">해제 거래만</option></select></div>
   <select id="tradesFavoriteFilter" aria-label="주변단지 한정" onchange="renderTrades()"><option value="">송도동 전체 단지</option><option value="favorites">★ 주변 12개 단지만</option></select>
   <div id="tradesContent"><div class="empty">데이터 저장소를 연결한 후 표시됩니다.</div></div>
@@ -209,7 +220,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
   <p class="tiny">두 비밀번호의 원문은 GitHub 비공개 Secret에만 존재하고, 공개 저장소에는 각 비밀번호의 PBKDF2 검증 정보만 게시됩니다. 공개 검증 정보는 오프라인 추측 공격 대상이므로 특히 관리자 비밀번호는 16자 이상 무작위 문자열을 권장합니다.</p>
  </div>
 </div>
-<footer class="foot">퍼스트현대 v1.4 · 관리자 단지정보 편집 · 가족 조회 모드</footer>
+<footer class="foot">퍼스트현대 v1.5 · 송도 아파트 자동 목록 · 면적별 거래 · 관리자 편집</footer>
 </main>
 <dialog id="noteDialog"><h2 id="noteDialogTitle">내 자료 등록</h2>
 <form id="noteForm">
@@ -317,7 +328,7 @@ function favoriteIdForBuilding(name){return FAVORITE_MATCH.get(normalizeAptName(
 /* FAVORITES_MAPPING_END */
 
 /* APARTMENT_CATALOG_V13: public, fact-safe reference data. */
-let complexSelected='f15';
+let complexSelected='f15', complexDisplayLimit=48;
 function baseComplexes(){
  return FAVORITE_APTS.flatMap(g=>{
   if(g.id==='prime')return [
@@ -333,58 +344,135 @@ function catalogRows(){
  for(const row of remote.complexes?.records||[]){
   if(!row||typeof row.id!=='string'||!/^[a-z0-9-]{1,32}$/.test(row.id)||
      typeof row.label!=='string'||row.label.length>80||!Array.isArray(row.aliases)||row.aliases.length>10)continue;
-  // Preserve the canonical official-name mapping of the 12 existing nearby favorites.
+  // Canonical aliases remain anchored to validated favorite labels.
   if(map.has(row.id))map.set(row.id,{...map.get(row.id),...row,aliases:map.get(row.id).aliases});
   else map.set(row.id,row);
  }
- return window.firstHyundaiDraftOverlay?window.firstHyundaiDraftOverlay([...map.values()],role):[...map.values()];
+ const known=new Set([...map.values()].flatMap(x=>(x.aliases||[]).map(normalizeAptName)));
+ const observedNames=new Map();
+ for(const deal of remote.trades?.records||[]){
+  const name=String(deal.building||'').trim(),norm=normalizeAptName(name);
+  if(!name||name.length>100||!norm||known.has(norm))continue;
+  if(!observedNames.has(norm))observedNames.set(norm,name);
+ }
+ const sorted=[...observedNames.entries()].sort((a,b)=>a[0].localeCompare(b[0],'ko'));
+ for(const [norm,name] of sorted){
+  // 32-bit FNV-1a of NFKC building name gives stable id as catalogs grow.
+  let hash=2166136261;
+  for(const c of norm)hash=Math.imul(hash^c.charCodeAt(0),16777619)>>>0;
+  const id='trade-'+hash.toString(16).padStart(8,'0');
+  if(map.has(id))continue;
+  map.set(id,{id,label:name,aliases:[name],households:null,heating:null,area_types_m2:[],
+   supply_type_labels:[],floorplans:[],source_url:null,last_verified:null,catalog_source:'trades'});
+ }
+ const all=[...map.values()];
+ return window.firstHyundaiDraftOverlay?window.firstHyundaiDraftOverlay(all,role):all;
 }
+function resetComplexLimit(){complexDisplayLimit=48;}
+function showMoreComplexes(){complexDisplayLimit+=48;renderComplexes();}
 function complexObservedAreas(apt){
  const names=new Set((Array.isArray(apt.aliases)?apt.aliases:[]).map(normalizeAptName));
  const list=(remote.trades?.records||[]).filter(x=>names.has(normalizeAptName(x.building)));
  return [...new Set(list.map(x=>Math.round(Number(x.area_m2)*100)/100).filter(x=>Number.isFinite(x)&&x>0&&x<1000))].sort((a,b)=>a-b);
 }
+function complexTradeRows(apt){
+ const names=new Set((Array.isArray(apt.aliases)?apt.aliases:[]).map(normalizeAptName));
+ return (remote.trades?.records||[]).filter(x=>names.has(normalizeAptName(x.building)));
+}
+function complexAreaStats(apt){
+ const groups=new Map();
+ for(const row of complexTradeRows(apt)){
+  const raw=Number(row.area_m2);
+  if(!Number.isFinite(raw)||raw<=0||raw>=1000)continue;
+  const area=Math.round(raw*100)/100;
+  let g=groups.get(area);
+  if(!g){g={area,total:0,sale:0,lease:0,monthly:0,last:''};groups.set(area,g);}
+  g.total++;
+  if(row.type==='매매')g.sale++;
+  if(row.type==='전세')g.lease++;
+  if(row.type==='월세')g.monthly++;
+  if(row.contract_date>g.last)g.last=row.contract_date;
+ }
+ return [...groups.values()].sort((a,b)=>a.area-b.area);
+}
 function renderComplexes(){
- const all=catalogRows(), q=($('complexSearch').value||'').trim().normalize('NFKC').toLowerCase();
- const visible=all.filter(x=>!q||([x.label,...(Array.isArray(x.aliases)?x.aliases:[])].join(' ').normalize('NFKC').toLowerCase().includes(q)));
- $('complexMeta').textContent=(remote.complexes?'공개 단지정보 '+all.length+'곳 · 최종 수정 '+(remote.complexes.updated_at||'미기록'):'기본 단지 목록 표시 · 상세정보 동기화 대기')+
-  (issues.complexes?' · 불러오기 오류: '+issues.complexes:'')+' · 검색 결과 '+visible.length+'곳';
- $('complexCards').innerHTML=visible.length?visible.map(x=>
-  '<button type="button" class="nearbyCard'+(x.id===complexSelected?' selected':'')+'" onclick="selectComplex(\''+x.id+'\')" aria-pressed="'+(x.id===complexSelected?'true':'false')+'">'+
-  '<span class="star">⌂ 단지정보</span><strong>'+escapeHtml(x.label)+'</strong>'+
+ const all=catalogRows(),q=($('complexSearch').value||'').trim().normalize('NFKC').toLowerCase();
+ const onlyFavorites=$('complexScope').value==='favorites';
+ const favoriteIds=new Set(baseComplexes().map(x=>x.id));
+ const visible=all.filter(x=>(!onlyFavorites||favoriteIds.has(x.id))&&
+  (!q||[x.label,...(Array.isArray(x.aliases)?x.aliases:[])].join(' ').normalize('NFKC').toLowerCase().includes(q)));
+ $('complexMeta').textContent=(remote.complexes?'공개 검증자료 '+(remote.complexes.records||[]).length+'곳':'검증자료 수신 대기')+
+  ' · 목록 '+all.length+'곳 (실거래 자동 발견 포함) · 검색 '+visible.length+'곳'+(issues.trades?' · 실거래 수신 실패: '+issues.trades:'');
+ const shown=visible.slice(0,complexDisplayLimit);
+ $('complexCards').innerHTML=shown.length?shown.map(x=>
+  '<button type="button" class="nearbyCard'+(x.id===complexSelected?' selected':'')+'" onclick="selectComplex(\\''+x.id+'\\')" aria-pressed="'+(x.id===complexSelected?'true':'false')+'">'+
+  '<span class="star">'+(x.catalog_source==='trades'?'거래 확인 단지':'⌂ 기본정보 등록')+'</span><strong>'+escapeHtml(x.label)+'</strong>'+
   '<small>'+((Number.isInteger(x.households)&&x.households>0)?number(x.households)+'세대':'세대수 확인 전')+'</small></button>'
- ).join(''):'<div class="empty">검색에 맞는 단지가 없습니다.</div>';
+ ).join(''):'<div class="empty">검색 결과가 없습니다. 공개 거래가 없는 단지는 전체 목록에 없을 수 있습니다.</div>';
+ $('complexShowMore').classList.toggle('hidden',shown.length>=visible.length);
+ $('complexShowMore').textContent='단지 더 보기 ('+number(visible.length-shown.length)+'곳 남음)';
  const p=visible.find(x=>x.id===complexSelected)||visible[0];
  if(!p){$('complexDetails').innerHTML='<div class="empty">다른 검색어를 입력해 주세요.</div>';}
  else {
+  complexSelected=p.id;
   const areas=(Array.isArray(p.area_types_m2)?p.area_types_m2:[]).map(Number).filter(v=>Number.isFinite(v)&&v>0&&v<1000).sort((a,b)=>a-b);
-  const observed=complexObservedAreas(p), hasTradeData=remote.trades&&remote.trades.state!=='not_started';
+  const observed=complexObservedAreas(p),stats=complexAreaStats(p);
+  const hasTradeData=remote.trades&&remote.trades.state!=='not_started';
   const areaText=areas.length?areas.map(v=>number(v)+'㎡').join(' · '):'확인 전';
   const types=(Array.isArray(p.supply_type_labels)?p.supply_type_labels:[]).filter(v=>typeof v==='string'&&/^[0-9]{2,3}(?:\\.[0-9]{1,2})?[A-Za-z-]{0,4}$/.test(v)).slice(0,45);
   const supplyText=types.length?types.map(v=>'<span>'+escapeHtml(v)+'㎡ (약 '+Math.round(parseFloat(v)/3.305785)+'평)</span>').join(''):'<span class="tiny">등록된 공급면적 타입 없음</span>';
-  const observedText=!hasTradeData?'실거래 수집 대기':observed.length?observed.map(v=>number(v)+'㎡').join(' · '):'관측된 거래 없음';
+  const observedText=!hasTradeData?'실거래 수집 대기':observed.length?observed.map(v=>number(v)+'㎡').join(' · '):'최근 수집 거래 없음';
   const householdText=Number.isInteger(p.households)&&p.households>0&&p.households<100000?number(p.households)+'세대':'확인 전';
   const heatingText=typeof p.heating==='string'&&p.heating.trim()?p.heating:'확인 전';
   const source=safeLink(p.source_url);
   const floorplans=(Array.isArray(p.floorplans)?p.floorplans:[]).filter(v=>v&&safeLink(v.url)).slice(0,30);
-  const floorplanLinks=floorplans.length?floorplans.map(v=>'<a href="'+escapeHtml(safeLink(v.url))+'">'+escapeHtml(v.label||'평면도 자료')+' ↗</a>').join(''):'<span class="tiny">검증된 평면도 링크가 아직 없습니다.</span>';
+  const floorplanLinks=floorplans.length?floorplans.map(v=>'<a href="'+escapeHtml(safeLink(v.url))+'">'+escapeHtml(v.label||'평면도 자료')+' ↗</a>').join(''):'<span class="tiny">검증된 평면도 링크가 아직 없습니다. 외부 원본 페이지에서 확인해 주세요.</span>';
+  const naverSearch='https://search.naver.com/search.naver?query='+encodeURIComponent('네이버페이 부동산 '+p.label+' 송도 아파트 단지정보');
+  const statsHtml=stats.length?stats.slice(0,35).map(g=>
+    '<div class="complexAreaCard"><h4>전용 '+number(g.area)+'㎡ (약 '+Math.round(g.area/3.305785)+'평)</h4>'+
+    '<p class="tiny">공개 거래 '+number(g.total)+'건 · 매매 '+number(g.sale)+' · 전세 '+number(g.lease)+' · 월세 '+number(g.monthly)+
+    ' · 최근 계약 '+escapeHtml(g.last||'미기록')+'</p>'+
+    '<div class="complexAreaButtons"><button onclick="showComplexTrades(\\''+p.id+'\\','+g.area+',\\'\\')">전체 거래</button>'+
+    '<button onclick="showComplexTrades(\\''+p.id+'\\','+g.area+',\\'매매\\')">매매</button>'+
+    '<button onclick="showComplexTrades(\\''+p.id+'\\','+g.area+',\\'전세\\')">전세</button>'+
+    '<button onclick="showComplexTrades(\\''+p.id+'\\','+g.area+',\\'월세\\')">월세</button></div></div>'
+  ).join(''):'<p class="tiny">최근 수집 기간에 확인된 거래가 없습니다.</p>';
   $('complexDetails').innerHTML=
    '<h3 class="complexDetailTitle">'+escapeHtml(p.label)+'</h3>'+
+   (p.catalog_source==='trades'?'<p class="tiny">국토교통부 실거래에서 자동 발견된 단지입니다. 기본정보와 배정학교는 확인 전입니다.</p>':'')+
    '<div class="complexFacts">'+
-    '<div class="complexFact"><small>세대수</small><strong>'+escapeHtml(householdText)+'</strong></div>'+
-    '<div class="complexFact"><small>난방방식</small><strong>'+escapeHtml(heatingText)+'</strong></div>'+
-    '<div class="complexFact"><small>확인된 전용면적 유형</small><strong>'+escapeHtml(areaText)+'</strong></div>'+
-    '<div class="complexFact"><small>공개 실거래에 관측된 전용면적</small><strong>'+escapeHtml(observedText)+'</strong></div>'+
-   '</div><h3>공급면적 타입</h3><p class="tiny">공급면적 ㎡는 반올림된 타입 표시이며 평 환산은 약값입니다. 동일 면적의 A/B타입은 별도 표기합니다.</p><div class="complexTypeList">'+supplyText+'</div><h3>평면도</h3><div class="complexLinks">'+floorplanLinks+'</div>'+
-   '<p class="complexMeta">정보 검증일: '+escapeHtml(p.last_verified||'확인 전')+
-   (source?' · <a href="'+escapeHtml(source)+'">자료 출처 확인 ↗</a>':' · 근거 링크 등록 전')+'</p>'+
-   '<p class="tiny">관측 면적은 국토교통부 거래 자료에서 추출한 값으로, 해당 단지의 전체 평형 구성이나 공급면적·평면도를 뜻하지 않습니다.</p>'+
-   (FAVORITE_APTS.some(g=>g.id===p.id||g.id==='prime'&&p.id.startsWith('prime'))?
-    '<button type="button" class="btn alt" onclick="showComplexNearbyTrades(\''+p.id+'\')">이 단지 주변단지 실거래 보기 →</button>':'');
+   '<div class="complexFact"><small>세대수</small><strong>'+escapeHtml(householdText)+'</strong></div>'+
+   '<div class="complexFact"><small>난방방식</small><strong>'+escapeHtml(heatingText)+'</strong></div>'+
+   '<div class="complexFact"><small>확인된 전용면적 유형</small><strong>'+escapeHtml(areaText)+'</strong></div>'+
+   '<div class="complexFact"><small>실거래 관측 전용면적</small><strong>'+escapeHtml(observedText)+'</strong></div></div>'+
+   '<h3>공급면적 타입</h3><p class="tiny">공급 ㎡는 반올림된 타입 표기이며 평 환산은 약값입니다. A/B 타입을 별도로 표기합니다.</p>'+
+   '<div class="complexTypeList">'+supplyText+'</div>'+
+   '<h3>전용면적별 실거래 조회</h3><p class="tiny">아래 숫자는 현재 수집한 거래 기록 기준으로, 해당 면적 전체 세대수나 실시간 매물가격이 아닙니다.</p>'+
+   statsHtml+
+   '<h3>평면도·단지 상세 원본</h3><div class="complexLinks">'+floorplanLinks+'</div>'+
+   '<div class="complexLinksExternal"><a href="'+escapeHtml(naverSearch)+'">네이버페이 부동산에서 단지 찾기 ↗</a>'+
+   (source?'<a href="'+escapeHtml(source)+'">검증자료 원문 보기 ↗</a>':'')+'</div>'+
+   '<p class="complexMeta">기본정보 검증일: '+escapeHtml(p.last_verified||'확인 전')+'</p>'+
+   '<p class="tiny">네이버 원본 검색 링크는 별도 사이트를 열며 네이버 자료를 앱 서버에 복사하지 않습니다. 검색결과에서 해당 블럭을 다시 확인하세요. 학군은 실제 배정구역 검증 전까지 표시하지 않습니다.</p>';
  }
  $('complexAdmin').classList.toggle('hidden',role!=='admin');
  if(role==='admin'&&window.firstHyundaiDraftCount)$('catalogDraftNotice').textContent='이 기기의 미게시 수정: '+number(window.firstHyundaiDraftCount())+'개 단지 · 공개 전에는 가족에게 표시되지 않습니다.';
 }
+function showComplexTrades(id,area,type){
+ const p=catalogRows().find(x=>x.id===id);
+ if(!p||!Number.isFinite(area)||area<=0||!['','매매','전세','월세'].includes(type))return;
+ tradeFocus={id:p.id,area,type};
+ $('aptFilter').value='';
+ $('typeFilter').value='';
+ $('statusFilter').value='';
+ $('tradesFavoriteFilter').value='';
+ switchPage('trades');
+}
+function clearTradeFocus(){
+ tradeFocus=null;
+ renderTrades();
+}
+let tradeFocus=null;
 function selectComplex(id){if(!catalogRows().some(x=>x.id===id))return;complexSelected=id;renderComplexes();$('complexDetails').scrollIntoView({behavior:'smooth',block:'start'});}
 function showComplexNearbyTrades(id){
  const favoriteId=id==='prime20'||id==='prime25'?'prime':id;
@@ -479,7 +567,12 @@ function renderTrades(){let payload=remote.trades;if(!payload){$('tradesContent'
 $('tradesMeta').textContent=`${payload.area||'송도동'} · 최종 수집 ${prettyTime(payload.checked_at)} · ${payload.state==='partial'?'일부 수집 실패':'공개 데이터'}`;
 if(payload.state==='not_started'){$('tradesContent').innerHTML='<div class="empty">아직 첫 실거래가 수집을 실행하지 않았습니다.<br>GitHub Actions에서 Update Public Data 실행이 필요합니다.</div>';return;}
 let q=$('aptFilter').value.trim().toLowerCase(),type=$('typeFilter').value,s=$('statusFilter').value, favoriteOnly=$('tradesFavoriteFilter').value==='favorites';
-let records=(payload.records||[]).filter(x=>(!favoriteOnly||favoriteIdForBuilding(x.building))&&(!type||x.type===type)&&(!q||(x.building||'').toLowerCase().includes(q))&&(s==='cancel'?x.status==='해제':s==='notcancel'?x.status!=='해제':true));
+const focused=tradeFocus&&catalogRows().find(x=>x.id===tradeFocus.id);
+ $('tradeFocusBanner').innerHTML=focused?
+ '<div class="tradeFocusBanner"><b>'+escapeHtml(focused.label)+'</b> · 전용 '+number(tradeFocus.area)+'㎡ · '+escapeHtml(tradeFocus.type||'전체 거래')+
+ ' <button class="btn alt" type="button" onclick="clearTradeFocus()">단지·면적 필터 해제</button></div>':'';
+ let records=(payload.records||[]).filter(x=>(!focused||(focused.aliases||[]).some(name=>normalizeAptName(name)===normalizeAptName(x.building))&&
+ (!tradeFocus.area||Math.round(Number(x.area_m2)*100)/100===tradeFocus.area)&&(!tradeFocus.type||x.type===tradeFocus.type))&&(!favoriteOnly||favoriteIdForBuilding(x.building))&&(!type||x.type===type)&&(!q||(x.building||'').toLowerCase().includes(q))&&(s==='cancel'?x.status==='해제':s==='notcancel'?x.status!=='해제':true));
 $('tradesContent').innerHTML=`<p class="tiny">검색 결과 <b>${number(records.length)}건</b> · 최대 70건 표시 ${payload.state==='partial'?'<span class="pill orange">일부 수집 실패: 최신성 주의</span>':''}</p>`+(records.length?records.slice(0,70).map(x=>{let val=x.type==='매매'?value10k(x.amount_10k):x.type==='전세'?`보증금 ${value10k(x.deposit_10k)}`:`보증금 ${value10k(x.deposit_10k)} / 월세 ${value10k(x.monthly_10k)}`;
 return `<article class="item"><div class="tagbox"><span class="pill">${escapeHtml(x.type)}</span><span class="pill ${x.status==='해제'?'red':'gray'}">${escapeHtml(x.status)}</span></div><h3>${escapeHtml(x.building)}</h3><div class="money">${escapeHtml(val)}</div><div class="meta">계약일 ${escapeHtml(x.contract_date)} · 전용 ${escapeHtml(x.area_m2)}㎡ · ${escapeHtml(x.floor||'층 정보 없음')}층</div>${x.status==='해제'?`<p class="pill red">해제 사유 발생일: ${escapeHtml(x.cancel_date_raw||'정보 미제공')}</p>`:''}<p class="meta">출처: 국토교통부 · 조회 기준 계약연월 ${escapeHtml(x.source_month)}</p></article>`;}).join(''):'<div class="empty">조건에 맞는 거래 내역이 없습니다.<br>수집 실패 또는 해당 기간 내 거래 없음일 수 있습니다.</div>');}
 function renderNews(){let payload=remote.news;if(!payload){$('newsContent').innerHTML='<div class="empty">‘설정’에서 공개 GitHub 저장소를 연결하세요.</div>';return;}
