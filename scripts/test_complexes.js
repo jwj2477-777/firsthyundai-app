@@ -60,22 +60,23 @@ const context={
  alert:()=>{},confirm:()=>true,console,URL,Blob,
 };
 vm.createContext(context);
-vm.runInContext(javascript+'\n globalThis.__test={catalogRows,complexObservedAreas,renderComplexes,selectComplex,switchPage,showComplexNearbyTrades};',context);
+vm.runInContext(javascript+'\n globalThis.__test={catalogRows,complexAreaStats,renderComplexes,selectComplex,switchPage};',context);
 (async()=>{
  await new Promise(r=>setImmediate(r));
- const {catalogRows,complexObservedAreas,switchPage,selectComplex}=context.__test;
+ const {catalogRows,complexAreaStats,switchPage,selectComplex}=context.__test;
  assert.equal(catalogRows().length,13);
  assert(!element('nav').innerHTML.includes('보안 관리'), 'Family navigation hides admin tabs');
  switchPage('complexes');
  assert.equal(element('complexAdmin').classList.contains('hidden'),true,'Admin editor must be hidden in family mode');
  assert(element('complexDetails').innerHTML.includes('확인 전'));
  const prime20=catalogRows().find(x=>x.id==='prime20');
- assert.equal(complexObservedAreas(prime20).join(','),'84.95','Observed areas are sourced from matching trades only');
+ assert.equal(complexAreaStats(prime20).map(x=>x.area).join(','),'84.95','Observed areas are sourced from matching trades only');
  element('complexSearch').value='프라임뷰';
  context.__test.renderComplexes();
  assert.equal((element('complexCards').innerHTML.match(/class="nearbyCard/g)||[]).length,2,'Prime 20 and 25 appear as two distinct complexes');
  selectComplex('prime25');
+ vm.runInContext("setComplexDetailTab('deals')",context);
  assert(element('complexDetails').innerHTML.includes('101.5㎡'));
  assert(!element('complexDetails').innerHTML.includes('84.95㎡'),'Prime 20 area must not leak into prime 25');
- console.log('Apartment catalog v1.3 checks passed');
+ console.log('Apartment catalog v1.6 checks passed');
 })().catch(e=>{console.error(e);process.exitCode=1;});
