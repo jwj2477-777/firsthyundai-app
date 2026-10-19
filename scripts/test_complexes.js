@@ -16,7 +16,11 @@ assert.equal(catalog.records.find(x=>x.id==='m23').heating,'지역난방');
 for (const row of catalog.records) {
  assert.match(row.id,/^[a-z0-9-]{1,32}$/);
  assert(row.aliases.length>0);
- assert(Number.isInteger(row.households) && row.households > 0,'Households must be verified positive integers');
+ if(row.catalog_source==='trades'){
+  assert.equal(row.households,null,'Trade-only estate household counts must remain unknown');
+  assert(/^https:\/\//.test(row.source_url));
+  assert(/국토교통부/.test(row.detail_source),'Transaction-only estates must state evidence');
+ }else assert(Number.isInteger(row.households) && row.households > 0,'Households must be verified positive integers');
  assert(row.source_url.startsWith('https://'),'Each household count must have a cited HTTPS source');
  assert.equal(row.last_verified,'2026-10-19');
  assert(row.heating===null || ['지역난방','개별난방','중앙난방'].includes(row.heating),'Heating values must be declared and source backed');
