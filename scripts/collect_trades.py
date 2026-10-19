@@ -20,7 +20,7 @@ OUTPUT = ROOT / 'data' / 'trades.json'
 KST = timezone(timedelta(hours=9))
 DISTRICT_CODE = '28185'  # 인천광역시 연수구 (송도동은 이 법정동 권역에 속함)
 ENDPOINTS = {
-    '매매': 'https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev',
+    '매매': 'https://apis.data.go.kr/1613000/RTMSDataSvcAptTrade/getRTMSDataSvcAptTrade',
     '임대': 'https://apis.data.go.kr/1613000/RTMSDataSvcAptRent/getRTMSDataSvcAptRent',
 }
 
