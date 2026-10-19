@@ -64,8 +64,13 @@ function answer(body,status=200) {
   return new Response(JSON.stringify(body),{status,headers:HEADERS});
 }
 async function readJson(url,init) {
-  const response=await fetch(url,{...init,redirect:"error",cache:"no-store",
-    signal:AbortSignal.timeout(9000)});
+  // Cloudflare may reject an outbound subrequest before an HTTP response is made.
+  // Use a simple standard fetch; authorization-header requests bypass edge caching.
+  // Reject redirects explicitly instead of letting auth credentials follow them.
+  const response=await fetch(url,{...init,redirect:"manual",
+    signal:AbortSignal.timeout(12000)});
+  if(response.status>=300&&response.status<400)
+    throw Error("upstream_redirect_"+response.status);
   if(!response.ok)throw Error("upstream_http_"+response.status);
   const body=await response.text();
   if(body.length>400000)throw Error("upstream_size_limit");
@@ -133,8 +138,17 @@ export default {
     } catch(error) {
       // Report only the failed stage and a safe upstream status; never reveal secrets,
       // full URLs, upstream bodies, or request headers to the client or logs.
-      const m=/^upstream_http_([45][0-9]{2})$/.exec(String(error?.message||""));
-      const reason=m?"http_"+m[1]:"request_failed";
+      const message=String(error?.message||"").toLowerCase();
+      const http=/^upstream_http_([1-5][0-9]{2})$/.exec(message);
+      const redirect=/^upstream_redirect_([3][0-9]{2})$/.exec(message);
+      const reason=http?"http_"+http[1]:redirect?"redirect_"+redirect[1]:
+        error?.name==="TimeoutError"?"timeout":
+        /tls|ssl|certificate/.test(message)?"tls_error":
+        /dns|resolve|name lookup/.test(message)?"dns_error":
+        /redirect/.test(message)?"redirect_error":
+        /unsupported|invalid option|not implemented/.test(message)?"unsupported_fetch_option":
+        /connect|network|proxy|fetch failed/.test(message)?"network_error":
+        error?.name==="TypeError"?"fetch_type_error":"request_failed";
       return answer({error:"provider_unavailable",stage,reason,
         message:"실시간 조회에 실패했습니다. 오류 단계와 코드를 확인해 주세요."},502);
     }
