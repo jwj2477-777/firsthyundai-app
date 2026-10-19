@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.text.InputType;
 import android.widget.EditText;
+import android.widget.Toast;
 import java.util.Arrays;
 import java.util.Properties;
 import java.security.MessageDigest;
@@ -36,8 +37,11 @@ public class MainActivity extends Activity {
     private WebView web;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private String pendingBackup = "";
-    private static final String MODE_PREFS = "firsthyundai-device-mode";
     private static final String ADMIN_TRIES = "firsthyundai-admin-attempts";
+    // Administrator privilege is deliberately session-only; legacy saved
+    // admin_mode=true from v1.1 must not bypass independent verification.
+    private volatile String adminSessionIdentity = "";
+    private volatile boolean adminCheckInProgress = false;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,23 +70,37 @@ public class MainActivity extends Activity {
     }
 
     private boolean isAdminDeviceMode() {
-        return getSharedPreferences(MODE_PREFS, MODE_PRIVATE).getBoolean("admin_mode", false);
+        return adminSessionIdentity != null && !adminSessionIdentity.isEmpty();
     }
 
     private void changeRole(boolean admin) {
-        getSharedPreferences(MODE_PREFS, MODE_PRIVATE).edit()
-                .putBoolean("admin_mode", admin).apply();
-        // Script only receives a role label; no password travels to JavaScript.
+        if(!admin) adminSessionIdentity = "";
+        // Never persist the admin session in SharedPreferences.
+        // Script receives no credential or verifier.
         web.evaluateJavascript("window.onRoleChanged(" +
                 (admin ? "'admin'" : "'family'") + ")", null);
     }
 
-    private boolean matchesFamilyCode(char[] candidate) {
-        return AccessPolicy.matches(AccessPolicy.cached(this), candidate);
-    }
-
     @Override protected void onResume() {
         super.onResume();
+        final String activeAdmin=adminSessionIdentity;
+        if(activeAdmin!=null && !activeAdmin.isEmpty()) {
+            io.execute(()->{
+                boolean match=false;
+                try {
+                    match=activeAdmin.equals(AdminPolicy.fetch(MainActivity.this).identity);
+                }catch(Exception ignored) {
+                    // Administrator mode requires an online, current policy.
+                }
+                if(!match)runOnUiThread(()->{
+                    if(isFinishing()||isDestroyed())return;
+                    if(activeAdmin.equals(adminSessionIdentity)){
+                        changeRole(false);
+                        Toast.makeText(this,"관리자 정책을 확인할 수 없어 가족 모드로 전환했습니다.",Toast.LENGTH_LONG).show();
+                    }
+                });
+            });
+        }
         // When resuming from a long background pause, verify that the manager
         // has not rotated the shared family code. Also applies to admin devices.
         if (AccessPolicy.shouldRecheck(this)) {
@@ -104,48 +122,83 @@ public class MainActivity extends Activity {
     }
 
     private void showAdminCodeDialog() {
-        if (isAdminDeviceMode()) return;
-        SharedPreferences tries = getSharedPreferences(ADMIN_TRIES, MODE_PRIVATE);
-        long now = System.currentTimeMillis();
-        long lockedUntil = tries.getLong("locked_until", 0L);
-        if (now < lockedUntil) {
+        if(isAdminDeviceMode() || adminCheckInProgress)return;
+        SharedPreferences tries=getSharedPreferences(ADMIN_TRIES,MODE_PRIVATE);
+        long now=System.currentTimeMillis();
+        if(now<tries.getLong("locked_until",0L)) {
             new AlertDialog.Builder(this)
-                    .setMessage("여러 번 틀렸습니다. 잠시 후 다시 시도해 주세요.")
-                    .setPositiveButton("확인", null).show();
+                    .setMessage("관리자 비밀번호를 여러 번 틀렸습니다. 1분 후 다시 시도해 주세요.")
+                    .setPositiveButton("확인",null).show();
             return;
         }
-        final EditText field = new EditText(this);
+
+        EditText field=new EditText(this);
         field.setSingleLine(true);
-        field.setHint("기존 가족 보안코드 입력");
-        field.setPadding(32, 24, 32, 24);
+        field.setHint("관리자 전용 비밀번호");
         field.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        field.setPadding(32,24,32,24);
         new AlertDialog.Builder(this)
-                .setTitle("관리자 모드")
-                .setMessage("현재 가족 보안코드로 관리자 화면에 진입합니다. 별도 관리자 전용 암호는 추후 지원할 예정입니다.")
+                .setTitle("관리자 전환")
+                .setMessage("가족 로그인 코드와는 다른 관리자 전용 비밀번호를 입력하세요. 이 비밀번호가 등록되지 않았다면 GitHub 비공개 Secret을 먼저 설정해야 합니다.")
                 .setView(field)
-                .setNegativeButton("취소", null)
-                .setPositiveButton("확인", (dialog, which) -> {
-                    char[] candidate = field.getText().toString().trim().toCharArray();
+                .setNegativeButton("취소",null)
+                .setPositiveButton("확인",(dialog,which)->{
+                    if(adminCheckInProgress)return;
+                    char[] code=field.getText().toString().trim().toCharArray();
                     field.setText("");
-                    boolean ok = candidate.length > 0 && matchesFamilyCode(candidate);
-                    Arrays.fill(candidate, (char) 0);
-                    if (ok) {
-                        tries.edit().clear().apply();
-                        changeRole(true);
-                    } else {
-                        int attempt = tries.getInt("attempts", 0) + 1;
-                        if (attempt >= 5) {
-                            tries.edit().putInt("attempts", 0)
-                                    .putLong("locked_until", System.currentTimeMillis() + 60000).apply();
-                        } else {
-                            tries.edit().putInt("attempts", attempt).apply();
-                        }
-                        new AlertDialog.Builder(this)
-                                .setMessage(attempt >= 5 ?
-                                        "5회 실패해 1분 동안 관리자 전환이 제한됩니다." :
-                                        "보안코드가 일치하지 않습니다.")
-                                .setPositiveButton("확인", null).show();
+                    if(code.length==0) {
+                        Arrays.fill(code,(char)0);
+                        return;
                     }
+                    adminCheckInProgress=true;
+                    AlertDialog waiting=new AlertDialog.Builder(this)
+                            .setMessage("관리자 비밀번호를 온라인으로 확인하고 있습니다...")
+                            .setCancelable(false).create();
+                    waiting.show();
+                    io.execute(()->{
+                        boolean valid=false;
+                        String error="";
+                        String identity="";
+                        try {
+                            AdminPolicy.Data policy=AdminPolicy.fetch(MainActivity.this);
+                            valid=AdminPolicy.matches(policy,code);
+                            identity=policy.identity;
+                        }catch(Exception e){
+                            error=e.getMessage()==null?"관리자 보안 정책을 확인할 수 없습니다.":e.getMessage();
+                        }finally {
+                            Arrays.fill(code,(char)0);
+                        }
+                        final boolean success=valid;
+                        final String errorMessage=error;
+                        final String verifiedIdentity=identity;
+                        runOnUiThread(()->{
+                            waiting.dismiss();
+                            adminCheckInProgress=false;
+                            if(isFinishing()||isDestroyed())return;
+                            if(success){
+                                tries.edit().clear().apply();
+                                adminSessionIdentity=verifiedIdentity;
+                                changeRole(true);
+                            }else {
+                                String message;
+                                if(!errorMessage.isEmpty()) {
+                                    message=errorMessage;
+                                }else {
+                                    int attempts=tries.getInt("attempts",0)+1;
+                                    if(attempts>=5) {
+                                        tries.edit().putInt("attempts",0)
+                                                .putLong("locked_until",System.currentTimeMillis()+60000L).apply();
+                                        message="관리자 비밀번호가 5회 틀렸습니다. 1분 동안 잠깁니다.";
+                                    }else {
+                                        tries.edit().putInt("attempts",attempts).apply();
+                                        message="관리자 비밀번호가 올바르지 않습니다. ("+attempts+"/5)";
+                                    }
+                                }
+                                new AlertDialog.Builder(this).setMessage(message)
+                                        .setPositiveButton("확인",null).show();
+                            }
+                        });
+                    });
                 }).show();
     }
 
@@ -210,7 +263,7 @@ public class MainActivity extends Activity {
             });
         }
         @JavascriptInterface public void saveBackup(String json) {
-            if(json==null || json.length()>2_000_000)return;
+            if(!isAdminDeviceMode() || json==null || json.length()>2_000_000)return;
             pendingBackup=json;
             runOnUiThread(() -> {
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -221,6 +274,7 @@ public class MainActivity extends Activity {
             });
         }
         @JavascriptInterface public void openBackup() {
+            if(!isAdminDeviceMode())return;
             runOnUiThread(() -> {
                 Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.setType("application/json");
