@@ -155,7 +155,7 @@ public class LockActivity extends Activity {
         char[] input = codeField.getText().toString().trim().toCharArray();
         codeField.setText("");
         boolean good = input.length > 0 && matches(input);
-        Arrays.fill(input, '\\0');
+        Arrays.fill(input, (char) 0);
 
         if (good) {
             prefs.edit().clear().apply();
