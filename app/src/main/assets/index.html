@@ -908,7 +908,8 @@ function renderComplexes(){
   const verified=verifiedSupplyPairs(p);
   const exclusiveAreas=[...new Set([
    ...(Array.isArray(p.area_types_m2)?p.area_types_m2:[]),
-   ...verified.map(x=>x.exclusive_m2)
+   ...verified.map(x=>x.exclusive_m2),
+   ...complexAreaStats(p).map(x=>x.area)
   ].filter(x=>Number.isFinite(x)&&x>0&&x<1000).map(x=>Math.round(x*100)/100))].sort((a,b)=>a-b);
   const verifiedLabels=new Set(verified.map(x=>x.supply_label));
   const areaTypes=exclusiveAreas.length?'<div class="complexTypeList">'+exclusiveAreas.slice(0,55).map(v=>{
