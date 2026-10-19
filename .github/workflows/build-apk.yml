@@ -21,6 +21,8 @@ on:
       - 'scripts/test_apartment_detail_navigation.js'
       - 'scripts/test_refresh_feedback.js'
       - 'scripts/test_public_hub.js'
+      - 'scripts/test_kakao_nearby.mjs'
+      - 'data/nearby_config.json'
       - 'scripts/collect_public_services.py'
       - 'tests/test_public_services.py'
       - 'data/public_services.json'
@@ -80,6 +82,7 @@ jobs:
           node scripts/test_apartment_detail_navigation.js
           node scripts/test_refresh_feedback.js
           node scripts/test_public_hub.js
+          node scripts/test_kakao_nearby.mjs
           node scripts/test_family_mode.js
           node scripts/test_admin_guards.js
           node scripts/test_complexes.js
