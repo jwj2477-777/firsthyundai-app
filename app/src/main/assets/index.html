@@ -879,17 +879,23 @@ function renderSchoolPublicInfo(){
  sourceLink(PUBLIC_SRC.school,'나이스 학교정보')+'</div>';
 }
 function renderPublicComplexInfo(p){
- const items=[['건축물대장','건축물 용도·전유부 정보','building_registry',PUBLIC_SRC.registry],
-              ['공동주택 관리비','단지 월별 관리비 통계','maintenance',PUBLIC_SRC.fee],
-              ['도로명·지번주소','단지명보다 주소 우선 대조','addresses',PUBLIC_SRC.address]];
- return '<div class="apiInfoCards">'+items.map(([name,description,key,link])=>{
+ const items=[
+  ['건축물대장','건축물 용도·전유부 정보','building_registry'],
+  ['공동주택 관리비','단지 월별 관리비 통계','maintenance'],
+  ['도로명·지번주소','단지 주소 확인','addresses']
+ ];
+ return '<div class="apiInfoCards">'+items.map(([name,description,key])=>{
   const records=verifiedRecords(key);
   const found=records?.find(x=>x.complex_id===p.id);
+  const address=key==='addresses'&&typeof p.address==='string'?p.address.trim():'';
+  const summary=found&&typeof found.summary==='string'?found.summary.trim():'';
+  const detail=summary?'<p>'+escapeHtml(summary)+'</p>':
+   address?'<p>'+escapeHtml(address)+'</p>':
+   '<p class="tiny">아직 검증된 단지별 조회 자료가 없습니다. 공식 자료 연동 후 표시됩니다.</p>';
+  const lookup=address?sourceLink('https://map.kakao.com/?q='+encodeURIComponent(address),'카카오맵에서 주소 확인'):'';
   return '<article><strong>'+escapeHtml(name)+'</strong><p>'+escapeHtml(description)+'</p>'+
-   (found&&typeof found.summary==='string'?'<p>'+escapeHtml(found.summary)+'</p>':
-   '<p class="tiny">공식 서비스 활용승인·개별 단지 검증 후 상세 수치를 표시합니다.</p>')+
-   sourceLink(link,'공식 자료·신청')+'</article>';
- }).join('')+'</div><p class="complexSectionNote">정보 미제공은 0원 또는 0건이 아닙니다. 관리비는 개별 세대의 실제 청구액과 다릅니다.</p>';
+   detail+(key==='addresses'?lookup:'')+'</article>';
+ }).join('')+'</div><p class="complexSectionNote">건축물대장·관리비는 검증된 자료만 표시합니다. 자료 미제공은 0원 또는 0건이 아니며, 관리비는 개별 세대의 실제 청구액과 다릅니다.</p>';
 }
 function renderOfficeRentals(){
  const el=$('officeRentContent');if(!el)return;
