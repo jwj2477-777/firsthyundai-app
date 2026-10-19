@@ -209,6 +209,12 @@ public class MainActivity extends Activity {
         Uri uri = Uri.parse(url);
         if ("https".equalsIgnoreCase(uri.getScheme())) {
             try { startActivity(new Intent(Intent.ACTION_VIEW, uri)); } catch (Exception ignored) {}
+        } else if ("tel".equalsIgnoreCase(uri.getScheme())) {
+            String number=uri.getSchemeSpecificPart();
+            // Public apartment management-office number only; open dial pad, never call automatically.
+            if(number!=null && number.matches("[+0-9-]{7,22}")) {
+                try { startActivity(new Intent(Intent.ACTION_DIAL, uri)); } catch (Exception ignored) {}
+            }
         }
         // allow no navigation to untrusted content inside JavascriptInterface-bearing WebView
         return true;
