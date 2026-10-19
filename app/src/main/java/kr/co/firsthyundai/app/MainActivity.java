@@ -167,6 +167,9 @@ public class MainActivity extends Activity {
         @JavascriptInterface public String getMode() {
             return isAdminDeviceMode() ? "admin" : "family";
         }
+        @JavascriptInterface public int getPolicyVersion() {
+            return AccessPolicy.currentVersion(MainActivity.this);
+        }
         @JavascriptInterface public void requestAdminAccess() {
             runOnUiThread(() -> showAdminCodeDialog());
         }
