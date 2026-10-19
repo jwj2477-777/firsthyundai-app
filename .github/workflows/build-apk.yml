@@ -34,8 +34,11 @@ jobs:
           node --check /tmp/firsthyundai-ui.js
           node scripts/test_nearby.js
           node scripts/test_family_mode.js
+          node scripts/test_admin_guards.js
       - name: Test password policy generation (disposable code)
         run: python3 scripts/test_family_policy.py
+      - name: Test independent administrator policy
+        run: python3 scripts/test_admin_policy.py
       - name: Generate FHD office launcher icon
         run: python3 scripts/generate_launcher_icon.py
       - name: Build APK
