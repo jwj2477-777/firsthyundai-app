@@ -7,9 +7,16 @@ on:
         required: true
         default: schools
         type: choice
-        options: [schools, offices, all]
+        options: [schools, offices, subscriptions, all]
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/collect_public_services.py'
+      - 'tests/test_public_services.py'
+      - '.github/workflows/sync-public-services.yml'
   schedule:
-    - cron: '32 21 2 * *'
+    - cron: '32 21 2 * *' # monthly school update
+    - cron: '12 23 * * *' # daily Applyhome update, 08:12 KST
 permissions:
   contents: write
 concurrency:
@@ -34,7 +41,13 @@ jobs:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            python scripts/collect_public_services.py --mode schools
+            if [ "${{ github.event.schedule }}" = "32 21 2 * *" ]; then
+              python scripts/collect_public_services.py --mode schools
+            else
+              python scripts/collect_public_services.py --mode subscriptions
+            fi
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            python scripts/collect_public_services.py --mode subscriptions
           else
             python scripts/collect_public_services.py --mode "${{ inputs.mode }}"
           fi
