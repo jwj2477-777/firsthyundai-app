@@ -332,7 +332,18 @@ def main():
         raise PublicApiError("공개 단지 JSON 스키마가 잘못되었습니다")
     old = data["records"]
     curated = [r for r in old if r.get("catalog_source") != "kapt"]
+    prior_kapt = {r.get("kapt_code"): r for r in old if r.get("catalog_source") == "kapt" and r.get("kapt_code")}
     records, count, failures = collect(curated, args.key)
+    # Preserve transaction-name crosswalk aliases and verified annotations on refresh.
+    for r in records:
+        old_row = prior_kapt.get(r.get("kapt_code"))
+        if not old_row or r.get("catalog_source") != "kapt":
+            continue
+        saved_aliases = [x for x in (old_row.get("aliases") or []) if isinstance(x,str) and x.strip()]
+        r["aliases"] = list(dict.fromkeys([r["label"], *saved_aliases]))[:10]
+        for field in ("naver_complex_url", "detail_note", "parent_catalog_id"):
+            if old_row.get(field) is not None and not r.get(field):
+                r[field] = old_row[field]
     print("송도동 K-apt 본문 확인:", count, "건, 기존 보존:", len(curated),
           "건, 게시 단지:", len(records), "건, 조회실패:", failures)
     if args.dry_run:
