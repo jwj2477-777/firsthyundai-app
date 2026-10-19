@@ -25,6 +25,13 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 .apiSmallCard{margin-top:16px}.apiSmallCard h3{font-size:16px;margin:0 0 12px}
 .apiNotice{padding:12px;background:#f3f8fc;border:1px solid #d6e5ed;border-radius:10px;font-size:13px;line-height:1.6;color:#48687e}
 .apiSourceLink{display:inline-block;margin:9px 0;color:#205e93;font-size:13px;font-weight:750}
+.nearbyFacilityButtons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0}
+.nearbyFacilityButtons button{border:1px solid #d2e1ec;border-radius:10px;padding:11px 5px;background:#fff;color:#1a4265;font-weight:700;font-size:13px}
+.nearbyFacilityButtons button.active{background:#173b60;color:white;border-color:#173b60}
+.nearbyFacilityItem{padding:13px 11px;border:1px solid #dce6ef;border-radius:11px;background:#fff;margin:8px 0}
+.nearbyFacilityItem strong{display:block;font-size:14px}
+.nearbyFacilityItem span{display:block;font-size:12px;color:#5a7485;line-height:1.5;margin:5px 0}
+.nearbyFacilityItem a{display:inline-block;font-size:13px;color:#205e93;font-weight:700}
 .apiInfoCards{display:grid;gap:9px}.apiInfoCards article{padding:13px;background:#fcfeff;border:1px solid #dce7ef;border-radius:10px}
 .apiInfoCards article strong{display:block;margin-bottom:6px}.apiInfoCards article p{font-size:12px;line-height:1.6}
 .apiSchools{display:grid;gap:7px}.apiSchools>div{border:1px solid #dce7ef;padding:10px;border-radius:10px}
@@ -662,10 +669,90 @@ function displayComplexValue(v,suffix=''){
  return v===null||v===undefined||v===''?'확인 전':String(v)+suffix;
 }
 function setComplexDetailTab(tab){
- if(!['basic','types','schools','deals','public','sources'].includes(tab))return;
+ if(!['basic','types','schools','deals','public','nearby','sources'].includes(tab))return;
  complexDetailTab=tab;
  renderComplexes();
  if(activeApartmentSheet==='complexSheet')$('complexSheet').scrollTop=0;
+}
+// Kakao Local places are requested live and NEVER saved to GitHub or localStorage.
+const KAKAO_FACILITIES=[['HP8','병원','병원'],['PM9','약국','약국'],['SC4','학교','학교'],['PS3','어린이집','어린이집'],['MT1','대형마트','대형마트'],['CS2','편의점','편의점'],['SW8','지하철역','지하철역'],['BK9','은행','은행'],['CE7','카페','카페'],['AC5','학원','학원']];
+let nearbyConfig=null,nearbyCategory='HP8',nearbyLiveResult=null,nearbyLoading=false,nearbyError='',nearbySerial=0;
+function validNearbyWorker(url){
+ return typeof url==='string'&&/^https:\/\/firsthyundai-nearby\.[a-z0-9-]{1,63}\.workers\.dev$/i.test(url);
+}
+async function refreshNearbyConfig(){
+ try {
+  const cfg=await fetchRemote('nearby_config');
+  if(cfg?.schema_version===1&&['awaiting_backend','ready'].includes(cfg.state))nearbyConfig=cfg;
+ }catch(e){/* show external Kakao Map links, do not misrepresent live API status */}
+ if(currentPage==='complexes'&&complexDetailTab==='nearby')renderComplexes();
+}
+function kakaoFacilitySearch(p,term){
+ const query=(p.address||'인천 연수구 송도동')+' '+term;
+ return 'https://map.kakao.com/?q='+encodeURIComponent(query);
+}
+function renderNearbyComplexInfo(p){
+ const ready=nearbyConfig?.state==='ready'&&validNearbyWorker(nearbyConfig.backend_url);
+ const selection=KAKAO_FACILITIES.find(x=>x[0]===nearbyCategory)||KAKAO_FACILITIES[0];
+ const buttons='<div class="nearbyFacilityButtons">'+KAKAO_FACILITIES.map(([code,label])=>
+  '<button type="button" class="'+(nearbyCategory===code?'active':'')+
+  '" onclick="setNearbyFacilityCategory(\''+code+'\')" aria-pressed="'+(nearbyCategory===code?'true':'false')+'">'+label+'</button>').join('')+'</div>';
+ const url=kakaoFacilitySearch(p,selection[2]);
+ let status=ready?
+   '<button type="button" class="btn" onclick="requestLiveNearby()" '+(nearbyLoading?'disabled':'')+'>'+
+   (nearbyLoading?'조회 중…':'선택한 시설 실시간 조회')+'</button>':
+   '<div class="apiNotice">카카오 실시간 API 연동 서버 설정 전입니다. 지금은 아래 카카오맵 검색을 사용할 수 있습니다.</div>';
+ const items=nearbyLiveResult?.complex_id===p.id&&nearbyLiveResult.category===nearbyCategory?
+   (nearbyLiveResult.places.length?nearbyLiveResult.places.map(place=>
+    '<article class="nearbyFacilityItem"><strong>'+escapeHtml(place.name)+'</strong>'+
+    '<span>직선거리 '+(Number.isFinite(place.distance_m)?number(place.distance_m)+'m':'확인 전')+
+    ' · '+escapeHtml(place.address||'주소 확인 전')+'</span>'+
+    (safeLink(place.url)?'<a href="'+escapeHtml(safeLink(place.url))+'">카카오맵 상세 보기 ↗</a>':'')+
+    '</article>').join(''):'<div class="empty">반경 1.5km 내 검색 결과가 없습니다.</div>'):'';
+ return '<h3>주변 생활시설</h3>'+
+  '<p class="complexSectionNote">공식 카카오맵 자료를 실시간 조회합니다. 거리는 직선거리이며 도보·차량 이동거리가 아닙니다.</p>'+
+  buttons+status+
+  (nearbyError?'<p class="apiNotice">'+escapeHtml(nearbyError)+'</p>':'')+
+  items+
+  '<p><a class="apiSourceLink" href="'+escapeHtml(url)+'">카카오맵에서 '+escapeHtml(selection[1])+' 검색 ↗</a></p>'+
+  '<p class="tiny">출처: 카카오맵 · 장소 결과는 서버 또는 앱에 별도로 저장하지 않습니다. 영업시간과 정확한 위치는 원본에서 확인하세요.</p>';
+}
+function setNearbyFacilityCategory(category){
+ if(!KAKAO_FACILITIES.some(x=>x[0]===category))return;
+ nearbyCategory=category;nearbyError='';
+ nearbyLiveResult=null;nearbySerial++;
+ nearbyLoading=false;
+ renderComplexes();
+}
+async function requestLiveNearby(){
+ const p=catalogRows().find(x=>x.id===complexSelected);
+ if(!p||nearbyLoading||nearbyConfig?.state!=='ready'||!validNearbyWorker(nearbyConfig.backend_url))return;
+ const category=nearbyCategory,run=++nearbySerial;
+ nearbyLoading=true;nearbyError='';nearbyLiveResult=null;
+ renderComplexes();
+ try{
+  let payload;
+  const base=nearbyConfig.backend_url;
+  if(window.FirstHyundaiNative?.fetchNearby){
+   payload=await new Promise((resolve,reject)=>{
+    const id=String(++serial);
+    pending[id]={resolve,reject};
+    window.FirstHyundaiNative.fetchNearby(base,p.id,category,id);
+   });
+  }else{
+   const response=await fetch(base+'/nearby?complex='+encodeURIComponent(p.id)+'&category='+category,{cache:'no-store'});
+   if(!response.ok)throw Error(response.status===429?'조회 요청이 많아 잠시 후 다시 시도해 주세요.':'HTTP '+response.status);
+   payload=await response.json();
+  }
+  if(payload?.schema_version!==1||payload.complex_id!==p.id||payload.category!==category||!Array.isArray(payload.places))
+   throw Error('주변시설 응답 형식이 올바르지 않습니다.');
+  const safePlaces=payload.places.slice(0,10).filter(x=>x&&typeof x.name==='string'&&x.name.length<=90&&
+    typeof x.url==='string'&&/^https:\/\/place\.map\.kakao\.com\/[0-9]+$/.test(x.url))
+   .map(x=>({name:x.name,address:String(x.address||'').slice(0,160),url:x.url,
+    distance_m:Number.isFinite(x.distance_m)&&x.distance_m>=0?x.distance_m:null}));
+  if(run===nearbySerial)nearbyLiveResult={complex_id:p.id,category,places:safePlaces};
+ }catch(e){if(run===nearbySerial)nearbyError='실시간 조회 실패: '+(e.message||'연결을 확인해 주세요.');}
+ finally{if(run===nearbySerial){nearbyLoading=false;renderComplexes();}}
 }
 function setComplexDealType(type){
  if(!['','매매','전세','월세'].includes(type))return;
@@ -755,10 +842,10 @@ function renderComplexes(){
     '<strong>'+escapeHtml(x.name)+'</strong>'+
     (safeLink(x.source_url)?'<a href="'+escapeHtml(safeLink(x.source_url))+'">근거 확인 ↗</a>':'')+'</div>').join('')+'</div>':
     '<div class="empty">이 단지의 배정학교는 아직 검증되지 않았습니다.</div>';
-  const tabs=[['basic','기본정보'],['types','평형·타입'],['schools','학교·학군'],['deals','실거래'],['public','건축·관리비'],['sources','평면도·원문']]
+  const tabs=[['basic','기본정보'],['types','평형·타입'],['schools','학교·학군'],['deals','실거래'],['public','건축·관리비'],['nearby','주변시설'],['sources','평면도·원문']]
    .map(([id,label])=>'<button type="button" class="'+(id===complexDetailTab?'active':'')+
     '" onclick="setComplexDetailTab(\''+id+'\')" aria-pressed="'+(id===complexDetailTab?'true':'false')+'">'+label+'</button>').join('');
-  const tabBody=complexDetailTab==='types'?areaView:complexDetailTab==='schools'?schoolView+renderSchoolPublicInfo():complexDetailTab==='deals'?deals:complexDetailTab==='public'?renderPublicComplexInfo(p):complexDetailTab==='sources'?doc:basic;
+  const tabBody=complexDetailTab==='types'?areaView:complexDetailTab==='schools'?schoolView+renderSchoolPublicInfo():complexDetailTab==='deals'?deals:complexDetailTab==='public'?renderPublicComplexInfo(p):complexDetailTab==='nearby'?renderNearbyComplexInfo(p):complexDetailTab==='sources'?doc:basic;
   $('complexDetails').innerHTML='<h3 class="complexDetailTitle">'+escapeHtml(p.label)+'</h3>'+
    (p.address?'<p class="complexDetailAddress">⌖ '+escapeHtml(p.address)+'</p>':'')+
    '<div class="complexTabBar">'+tabs+'</div>'+tabBody;
@@ -928,7 +1015,7 @@ let tradeFocus=null;
 function selectComplex(id){
  const match=catalogRows().find(x=>x.id===id);
  if(!match)return;
- complexSelected=id;complexDetailTab='basic';complexDealType='';
+ complexSelected=id;complexDetailTab='basic';complexDealType='';nearbyLiveResult=null;nearbyError='';nearbySerial++;nearbyLoading=false;
  renderComplexes();
  // Favorites can launch from a previous search/scope without losing the target.
  if(complexSelected!==id){
@@ -1212,7 +1299,7 @@ async function refreshAll(manual=false){
  }
  return all;
 }
-function saveRepo(){if(role!=='admin')return;let text=$('repo').value.trim();if(!/^[A-Za-z0-9_.-]{1,60}\/[A-Za-z0-9_.-]{1,100}$/.test(text)){alert('GitHub아이디/저장소이름 형식으로 입력하세요. 예: hong/firsthyundai-app');return;}repository=text;localStorage.setItem(REPO_KEY,text);$('settingStatus').classList.remove('hidden');$('settingStatus').textContent='저장되었습니다. 온라인 데이터를 불러옵니다.';refreshAll();refreshPublicServices();}
+function saveRepo(){if(role!=='admin')return;let text=$('repo').value.trim();if(!/^[A-Za-z0-9_.-]{1,60}\/[A-Za-z0-9_.-]{1,100}$/.test(text)){alert('GitHub아이디/저장소이름 형식으로 입력하세요. 예: hong/firsthyundai-app');return;}repository=text;localStorage.setItem(REPO_KEY,text);$('settingStatus').classList.remove('hidden');$('settingStatus').textContent='저장되었습니다. 온라인 데이터를 불러옵니다.';refreshAll();refreshPublicServices();refreshNearbyConfig();}
 
 function kstDateOffset(daysAgo){
  const date=new Date(Date.now()+9*3600000);
@@ -1280,7 +1367,7 @@ function renderNew(){
   }).join('');
 }
 
-updateRoleBar();switchPage(role==='admin'?'overview':'nearby');refreshAll();refreshPublicServices();
+updateRoleBar();switchPage(role==='admin'?'overview':'nearby');refreshAll();refreshPublicServices();refreshNearbyConfig();
 
 // FirstHyundai v1.4 - Admin-only draft editor for PUBLIC apartment reference data.
 'use strict';
