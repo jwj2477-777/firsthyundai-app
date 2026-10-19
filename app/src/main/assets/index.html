@@ -749,7 +749,7 @@ const knownCatalogIds=new Set(['f13','f14','f15','m21','m22','m23','avenue','cen
 window.firstHyundaiDraftCount=()=>Object.keys(catalogDrafts).filter(x=>knownCatalogIds.has(x)).length;
 window.firstHyundaiDraftOverlay=(published,mode)=>{
  for(const p of published){
-  if(p&&typeof p.id==='string'&&/^trade-[0-9a-f]{8}$/.test(p.id))knownCatalogIds.add(p.id);
+  if(p&&typeof p.id==='string'&&(/^(?:trade-[0-9a-f]{8}|kapt-a[0-9]{8})$/.test(p.id)))knownCatalogIds.add(p.id);
  }
  return mode==='admin'?published.map(p=>{
   const changed=knownCatalogIds.has(p.id)&&catalogDrafts[p.id];
