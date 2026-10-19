@@ -65,6 +65,6 @@ vm.runInContext(script,context);
  assert.equal(elt('complexAdmin').classList.contains('hidden'),true);
  assert(!elt('nav').innerHTML.includes('보안 관리'));
  exported=null;evalJS('exportComplexCatalog()');assert.equal(exported,null,'Family cannot export catalog');
- assert(alerts.some(x=>x.includes('임시 저장')));
+ assert(storage.has('firsthyundai-catalog-drafts-v14'),'Local draft persisted for admin before GitHub publication');
  console.log('Catalog editor v1.4 passed: JSON export, admin draft visibility, public family isolation, URL validation');
 })().catch(e=>{console.error(e);process.exitCode=1;});
