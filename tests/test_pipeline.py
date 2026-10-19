@@ -19,6 +19,12 @@ class TradeTests(unittest.TestCase):
         b=b'''<response><header><resultCode>00</resultCode><resultMsg>NORMAL SERVICE.</resultMsg></header><body><items><item><abc>aaa</abc></item></items><totalCount>1</totalCount></body></response>'''
         rows,total=parse_response(b)
         self.assertEqual(total,1);self.assertEqual(rows[0]['abc'],'aaa')
+    def test_molit_success_code_000(self):
+        payload=b'<response><header><resultCode>000</resultCode><resultMsg>NORMAL SERVICE.</resultMsg></header><body><items/><totalCount>0</totalCount></body></response>'
+        rows,total=parse_response(payload)
+        self.assertEqual(total,0)
+        self.assertEqual(rows,[])
+
     def test_error_xml(self):
         with self.assertRaises(RuntimeError):
             parse_response(b'<response><header><resultCode>30</resultCode><resultMsg>INVALID KEY</resultMsg></header></response>')
