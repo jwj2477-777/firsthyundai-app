@@ -477,7 +477,7 @@ function openApartmentSheet(id){
  if(!activeApartmentSheet)apartmentReturnFocus=document.activeElement||null;
  const el=$(id);
  activeApartmentSheet=id;
- el.classList.add('detailOpen');
+ el.classList.toggle('detailOpen',true);
  if(el.setAttribute)el.setAttribute('aria-hidden','false');
  if(document.body?.classList)document.body.classList.add('apartmentSheetActive');
  el.scrollTop=0;
