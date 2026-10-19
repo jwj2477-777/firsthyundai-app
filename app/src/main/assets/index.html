@@ -405,7 +405,7 @@ function renderComplexes(){
   ' · 목록 '+all.length+'곳 (실거래 자동 발견 포함) · 검색 '+visible.length+'곳'+(issues.trades?' · 실거래 수신 실패: '+issues.trades:'');
  const shown=visible.slice(0,complexDisplayLimit);
  $('complexCards').innerHTML=shown.length?shown.map(x=>
-  '<button type="button" class="nearbyCard'+(x.id===complexSelected?' selected':'')+'" onclick="selectComplex(\\''+x.id+'\\')" aria-pressed="'+(x.id===complexSelected?'true':'false')+'">'+
+  '<button type="button" class="nearbyCard'+(x.id===complexSelected?' selected':'')+'" onclick="selectComplex(\''+x.id+'\')" aria-pressed="'+(x.id===complexSelected?'true':'false')+'">'+
   '<span class="star">'+(x.catalog_source==='trades'?'거래 확인 단지':'⌂ 기본정보 등록')+'</span><strong>'+escapeHtml(x.label)+'</strong>'+
   '<small>'+((Number.isInteger(x.households)&&x.households>0)?number(x.households)+'세대':'세대수 확인 전')+'</small></button>'
  ).join(''):'<div class="empty">검색 결과가 없습니다. 공개 거래가 없는 단지는 전체 목록에 없을 수 있습니다.</div>';
@@ -419,7 +419,7 @@ function renderComplexes(){
   const observed=complexObservedAreas(p),stats=complexAreaStats(p);
   const hasTradeData=remote.trades&&remote.trades.state!=='not_started';
   const areaText=areas.length?areas.map(v=>number(v)+'㎡').join(' · '):'확인 전';
-  const types=(Array.isArray(p.supply_type_labels)?p.supply_type_labels:[]).filter(v=>typeof v==='string'&&/^[0-9]{2,3}(?:\\.[0-9]{1,2})?[A-Za-z-]{0,4}$/.test(v)).slice(0,45);
+  const types=(Array.isArray(p.supply_type_labels)?p.supply_type_labels:[]).filter(v=>typeof v==='string'&&/^[0-9]{2,3}(?:\.[0-9]{1,2})?[A-Za-z-]{0,4}$/.test(v)).slice(0,45);
   const supplyText=types.length?types.map(v=>'<span>'+escapeHtml(v)+'㎡ (약 '+Math.round(parseFloat(v)/3.305785)+'평)</span>').join(''):'<span class="tiny">등록된 공급면적 타입 없음</span>';
   const observedText=!hasTradeData?'실거래 수집 대기':observed.length?observed.map(v=>number(v)+'㎡').join(' · '):'최근 수집 거래 없음';
   const householdText=Number.isInteger(p.households)&&p.households>0&&p.households<100000?number(p.households)+'세대':'확인 전';
@@ -432,10 +432,10 @@ function renderComplexes(){
     '<div class="complexAreaCard"><h4>전용 '+number(g.area)+'㎡ (약 '+Math.round(g.area/3.305785)+'평)</h4>'+
     '<p class="tiny">공개 거래 '+number(g.total)+'건 · 매매 '+number(g.sale)+' · 전세 '+number(g.lease)+' · 월세 '+number(g.monthly)+
     ' · 최근 계약 '+escapeHtml(g.last||'미기록')+'</p>'+
-    '<div class="complexAreaButtons"><button onclick="showComplexTrades(\\''+p.id+'\\','+g.area+',\\'\\')">전체 거래</button>'+
-    '<button onclick="showComplexTrades(\\''+p.id+'\\','+g.area+',\\'매매\\')">매매</button>'+
-    '<button onclick="showComplexTrades(\\''+p.id+'\\','+g.area+',\\'전세\\')">전세</button>'+
-    '<button onclick="showComplexTrades(\\''+p.id+'\\','+g.area+',\\'월세\\')">월세</button></div></div>'
+    '<div class="complexAreaButtons"><button onclick="showComplexTrades(\''+p.id+'\','+g.area+',\'\')">전체 거래</button>'+
+    '<button onclick="showComplexTrades(\''+p.id+'\','+g.area+',\'매매\')">매매</button>'+
+    '<button onclick="showComplexTrades(\''+p.id+'\','+g.area+',\'전세\')">전세</button>'+
+    '<button onclick="showComplexTrades(\''+p.id+'\','+g.area+',\'월세\')">월세</button></div></div>'
   ).join(''):'<p class="tiny">최근 수집 기간에 확인된 거래가 없습니다.</p>';
   $('complexDetails').innerHTML=
    '<h3 class="complexDetailTitle">'+escapeHtml(p.label)+'</h3>'+
