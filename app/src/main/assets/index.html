@@ -8,6 +8,19 @@
 *{box-sizing:border-box}body{margin:0;background:#f3f6f8;color:var(--ink);font-family:system-ui,-apple-system,'Noto Sans KR',sans-serif;font-size:15px}
 header{background:linear-gradient(130deg,#12375b,#226398);padding:24px 18px 21px;color:white}header h1{font-size:25px;letter-spacing:-.8px;margin:0}header p{color:#d0e3f4;font-size:13px;line-height:1.6;margin:7px 0 0}.eyebrow{letter-spacing:1.6px;font-weight:750;color:#add6f7;font-size:10px;margin-bottom:6px}
 main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;border:1px solid #eeddb2;background:#fff9eb;border-radius:13px;font-size:13px;color:#745521;line-height:1.7;margin-bottom:12px}.tabs{display:grid;gap:9px;margin:3px 0 12px}
+/* FHD FIRST uses the same crisp vector as the Android launcher. */
+.brandHeader{display:flex;align-items:center;gap:12px;min-height:58px}
+.officeMark{display:flex;align-items:center;justify-content:center;flex:0 0 57px;width:57px;height:57px;
+ border-radius:15px;background:#eef6fc;border:1px solid #b7d8ed;box-shadow:0 2px 8px #08264130}
+.officeMarkSvg{width:52px;height:52px;display:block}
+.brandHeaderText{min-width:0}.brandHeaderText .eyebrow{margin:0 0 4px}
+.brandHeaderText h1{font-size:24px;line-height:1.2}
+.refreshAction[disabled]{opacity:.58;cursor:wait}
+.refreshFeedback{display:flex;align-items:center;min-height:44px;padding:10px 13px;margin:8px 0 11px;
+ border-radius:11px;background:#eaf3fb;border:1px solid #bdd7e9;color:#17476b;font-size:13px;font-weight:650;line-height:1.55}
+.refreshFeedback.success{background:#eaf7ef;border-color:#aed7bd;color:#1b6540}
+.refreshFeedback.warning{background:#fff3e8;border-color:#eec7b0;color:#905024}
+.refreshFeedback.error{background:#fff0ec;border-color:#edc2b9;color:#9e332f}
 .primaryNav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
 .primaryNav button{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;min-width:0;min-height:80px;padding:10px 5px;border:1px solid #c9dce9;border-radius:14px;background:white;color:#315b7b;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 2px 7px #183b6010}
 .primaryNav button .navIcon{font-size:24px;line-height:1.1}
@@ -149,13 +162,14 @@ body.apartmentSheetActive{overflow:hidden}
 </style>
 </head>
 <body>
-<header><div class="eyebrow">FIRST HYUNDAI · SONGDO</div><h1>퍼스트현대</h1><p>실거래 · 아파트정보 · 뉴스 한눈에 조회</p></header>
+<header><div class="brandHeader"><span class="officeMark"><svg class="officeMarkSvg" viewBox="0 0 512 512" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><path fill="#FF0000" d="M256,2 C396,2 510,116 510,256 C510,396 396,510 256,510 C116,510 2,396 2,256 C2,116 116,2 256,2 Z"/><path fill="#FFFFFF" fill-rule="evenodd" d="M244,23 L243,24 L232,24 L218,26 L192,32 L157,45 L143,52 L122,65 L104,79 L86,96 L72,112 L59,130 L46,152 L35,177 L28,199 L24,218 L23,232 L22,233 L22,247 L21,248 L21,265 L22,266 L22,281 L26,306 L32,328 L39,346 L49,366 L67,393 L88,417 L103,431 L130,451 L140,457 L168,470 L187,476 L212,481 L232,482 L233,483 L257,483 L258,482 L279,481 L301,477 L316,473 L346,462 L371,449 L391,436 L416,416 L434,398 L447,382 L459,364 L475,331 L481,313 L487,284 L488,239 L487,238 L485,216 L480,195 L470,167 L459,145 L437,112 L427,100 L407,80 L378,58 L368,52 L336,37 L321,32 L288,25 L269,24 L268,23Z M196,393 L211,393 L212,394 L212,450 L211,451 L196,451 L195,450 L195,394Z M188,393 L189,394 L189,404 L187,406 L186,405 L184,406 L180,405 L176,406 L165,405 L164,406 L163,405 L163,416 L184,416 L185,417 L185,428 L184,429 L163,429 L163,450 L162,451 L147,451 L146,450 L146,394 L147,393Z M319,392 L364,392 L365,393 L365,404 L363,406 L348,406 L348,450 L347,451 L332,451 L331,450 L331,406 L319,406 L317,404 L317,394Z M221,392 L249,392 L257,394 L264,400 L266,404 L265,417 L258,424 L255,425 L263,433 L270,450 L269,451 L252,451 L246,436 L242,430 L236,430 L236,450 L235,451 L220,451 L219,450 L219,394Z M236,404 L236,418 L244,418 L248,416 L249,414 L248,406 L243,404Z M310,393 L312,395 L312,399 L309,407 L304,405 L291,405 L289,407 L289,410 L292,413 L303,418 L312,425 L315,431 L315,436 L312,443 L305,449 L296,452 L282,452 L274,450 L272,448 L272,442 L274,436 L283,439 L293,439 L297,436 L297,434 L294,431 L280,424 L274,418 L272,413 L273,402 L278,396 L286,392 L299,391Z M68,132 L86,109 L107,88 L126,73 L147,60 L166,51 L182,45 L208,38 L242,33 L271,33 L272,34 L289,35 L305,38 L330,45 L354,55 L367,62 L388,76 L399,85 L424,110 L433,121 L452,150 L463,172 L472,197 L477,218 L479,231 L479,241 L480,242 L479,282 L476,299 L469,323 L462,340 L452,359 L435,383 L71,383 L59,366 L44,336 L34,304 L30,278 L30,236 L33,215 L37,198 L44,177 L51,161Z M311,168 L311,372 L372,372 L385,367 L394,359 L399,351 L401,344 L401,258 L400,253 L395,241 L389,234Z M343,237 L355,244 L365,254 L369,263 L369,338 L363,345 L355,348 L343,348 L342,347 L342,238Z M195,168 L149,205 L119,227 L119,372 L150,372 L150,316 L192,293 L192,259 L152,281 L150,279 L150,269 L151,268 L151,242 L195,210Z M264,128 L265,238 L263,240 L244,240 L243,239 L243,129 L239,131 L210,155 L210,372 L243,372 L243,274 L244,273 L264,273 L265,274 L265,372 L296,372 L296,155Z M444,237 L368,169 L368,77 L347,77 L343,83 L336,89 L329,93 L319,96 L319,108 L320,109 L319,110 L320,111 L342,111 L343,112 L343,145 L341,146 L254,71 L127,177 L57,233 L93,233 L254,102 L409,237Z"/></svg></span><div class="brandHeaderText"><div class="eyebrow">FIRST HYUNDAI · SONGDO</div><h1>퍼스트현대</h1></div></div></header>
 <main>
-<details class="noticeCompact" id="globalNotice"><summary>ⓘ 자료 이용 안내 · 눌러서 보기</summary><p>실거래가와 뉴스는 공공·언론 자료를 자동 정리한 참고정보입니다. 정확한 거래 조건, 계약·해제 여부, 사업 확정 및 법령 시행일은 원문을 확인하세요. 가족 개인 메모는 기기에만 저장됩니다.</p></details>
+
 <div id="modeBar" class="modeBar modeFamily"><small id="roleLabel">가족 조회 모드 · 설정 보호</small><button id="roleButton" type="button" class="btn alt" onclick="toggleAdminMode()">관리자 전환</button></div>
 <nav class="tabs" id="nav" aria-label="업무 주요 메뉴"></nav>
+<div id="refreshFeedback" class="refreshFeedback hidden" role="status" aria-live="polite"></div>
 <div id="overview" class="page">
-  <div class="sectionTitle"><h2>오늘의 업무 브리핑</h2><button class="btn alt" onclick="refreshAll()">새로고침</button></div>
+  <div class="sectionTitle"><h2>오늘의 업무 브리핑</h2><button class="btn alt refreshAction" type="button" onclick="refreshAll(true)">새로고침</button></div>
   <div class="grid">
    <div class="metric"><small>송도동 실거래 누적</small><strong id="totalDeals">—</strong><small>최근 최대 12개월</small></div>
    <div class="metric"><small>매매 건수</small><strong id="saleDeals">—</strong><small>신고+해제 표시</small></div>
@@ -163,15 +177,15 @@ body.apartmentSheetActive{overflow:hidden}
    <div class="metric"><small>오늘 신규 공개 확인</small><strong id="newDeals">—</strong><small>최초 발견일 기준</small></div>
    <div class="metric"><small>뉴스 묶음</small><strong id="newsGroups">—</strong><small>최근 기사 제목</small></div>
   </div>
-  <div class="panel"><button class="btn nearbyTotal" type="button" onclick="switchPage('nearby')"><span>★ 관심 14개 단지 실거래 바로보기</span><span>→</span></button><p class="tiny">프라임뷰 20블럭과 25블럭은 별개 단지로 표시합니다.</p><button class="btn alt" type="button" onclick="switchPage('complexes')">송도 전체 아파트 기본정보 →</button></div>
+  <div class="panel"><button class="btn nearbyTotal" type="button" onclick="switchPage('nearby')"><span>★ 관심 14개 단지 실거래 바로보기</span><span>→</span></button><button class="btn alt" type="button" onclick="switchPage('complexes')">송도 전체 아파트 기본정보 →</button></div>
   <div class="panel"><div class="sectionTitle"><h2>수집 상태</h2></div><div id="overviewStatus" class="tiny">연결 정보가 없습니다.</div></div>
-  <div class="panel"><p class="tiny">상단의 실거래·아파트정보·뉴스 버튼으로 바로 이동할 수 있습니다. 관리자용 자료·설정·보안은 '관리자 도구'에서 확인하세요.</p></div>
+  
 </div>
 <div id="nearby" class="page hidden">
- <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2><p class="tiny">송도 3공구 퍼스트파크 15블럭 사무실 중심 · 자주 중개하는 14개 단지</p></div><button class="btn alt" onclick="refreshOne('trades')">갱신</button></div>
+ <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2><p class="tiny">송도 3공구 퍼스트파크 15블럭 사무실 중심 · 자주 중개하는 14개 단지</p></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
  <div class="panel">
   <h3 style="margin:0 0 8px">즐겨찾기 14개 단지</h3>
-  <p class="tiny">단지를 누르면 별도 상세 화면이 부드럽게 열립니다. 프라임뷰 20·25블럭도 따로 확인할 수 있습니다.</p>
+  
   <button id="nearbyAll" class="btn alt nearbyTotal" type="button" onclick="chooseNearby('all')"><span>★ 관심 14개 단지 전체 보기</span><strong id="nearbyAllCount">—</strong></button>
   <div id="nearbyCards" class="nearbyGrid"></div>
  </div>
@@ -200,8 +214,8 @@ body.apartmentSheetActive{overflow:hidden}
 </div>
 
 <div id="complexes" class="page hidden">
- <div class="sectionTitle"><div><h2>단지정보 · 송도 아파트</h2><p class="tiny">관심 단지 14곳 + 송도 아파트 정보 조회</p></div><button class="btn alt" type="button" onclick="refreshOne('complexes')">갱신</button></div>
- <div class="complexIntro">아파트를 누르면 <b>상세 화면</b>이 부드럽게 열립니다. 뒤로 가면 원래 목록 위치가 유지됩니다.</div>
+ <div class="sectionTitle"><div><h2>단지정보 · 송도 아파트</h2><p class="tiny">관심 단지 14곳 + 송도 아파트 정보 조회</p></div><button class="btn alt refreshAction" type="button" data-refresh="complexes" onclick="refreshOne('complexes',true)">갱신</button></div>
+ 
  <div class="panel">
   <label class="inputLabel" for="complexSearch">아파트명 검색</label>
   <input id="complexSearch" type="search" placeholder="단지 검색: 더샵, 롯데캐슬, 힐스테이트 등" oninput="resetComplexLimit();renderComplexes()" aria-label="단지정보 아파트명 검색">
@@ -262,7 +276,7 @@ body.apartmentSheetActive{overflow:hidden}
 <button class="btn alt" type="button" onclick="document.getElementById('complexEditor').close()">닫기</button>
 </div></form></dialog>
 <div id="new" class="page hidden">
- <div class="sectionTitle"><div><h2>새소식 · 신규 공개 실거래</h2><p class="tiny" id="newMeta">송도동 아파트 매매·전세·월세 · 일자별 공개 확인</p></div><button class="btn alt" onclick="refreshOne('new_trades')">갱신</button></div>
+ <div class="sectionTitle"><div><h2>새소식 · 신규 공개 실거래</h2><p class="tiny" id="newMeta">송도동 아파트 매매·전세·월세 · 일자별 공개 확인</p></div><button class="btn alt refreshAction" type="button" data-refresh="new_trades" onclick="refreshOne('new_trades',true)">갱신</button></div>
  <div class="notice">계약일이 아니라 <b>이전 수집에 없었고 새로 확인된 날짜</b>로 묶습니다. 국토부 API에 정확한 공개일이 없으므로 실제 공개일과 차이가 날 수 있고 정정 거래도 신규로 분류될 수 있습니다. 기록은 기능 활성화 이후부터 쌓입니다.</div>
  <div class="panel">
   <label class="inputLabel" for="newDate">신규 공개 확인일 (한국시간)</label><select id="newDate" onchange="renderNew()"></select>
@@ -274,9 +288,9 @@ body.apartmentSheetActive{overflow:hidden}
  </div>
 </div>
 <div id="trades" class="page hidden">
- <div class="sectionTitle"><div><h2>송도동 아파트 실거래가</h2><p class="tiny" id="tradesMeta">국토교통부 공개 API 연동 대기</p></div><button class="btn alt" onclick="refreshOne('trades')">갱신</button></div>
+ <div class="sectionTitle"><div><h2>송도동 아파트 실거래가</h2><p class="tiny" id="tradesMeta">국토교통부 공개 API 연동 대기</p></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
  <div class="panel">
-  <p class="tiny">원하는 보기 방식을 먼저 선택하세요. 복잡한 조건 없이 계약일 최신순으로 바로 볼 수 있습니다.</p>
+  
   <div class="tradeStarter" aria-label="실거래 보기 방식">
     <button id="tradeModeLatest" type="button" onclick="openTradeLatest()"><span class="starterIcon">◷</span>전체 최신순</button>
     <button id="tradeModeFavorites" type="button" onclick="switchPage('nearby')"><span class="starterIcon">★</span>관심 14개</button>
@@ -312,7 +326,7 @@ body.apartmentSheetActive{overflow:hidden}
  </div>
 </div>
 <div id="news" class="page hidden">
- <div class="sectionTitle"><div><h2>송도·부동산 뉴스 브리핑</h2><p class="tiny" id="newsMeta">무료 자연어 처리 기반 기사 묶음</p></div><button class="btn alt" onclick="refreshOne('news')">갱신</button></div>
+ <div class="sectionTitle"><div><h2>송도·부동산 뉴스 브리핑</h2><p class="tiny" id="newsMeta">무료 자연어 처리 기반 기사 묶음</p></div><button class="btn alt refreshAction" type="button" data-refresh="news" onclick="refreshOne('news',true)">갱신</button></div>
  <div class="notice">이 브리핑은 기사 <b>제목</b> 유사도를 이용한 자동 묶음입니다. 생성형 AI 요약이나 공식 사실검증이 아닙니다. 세금·대출·개발일정은 공식 원문 확인 후 안내하세요.</div>
  <div class="panel"><select id="newsCategory" onchange="renderNews()"><option value="">모든 주제</option><option>개발·교통</option><option>분양·입주</option><option>세금·대출</option><option>정책·규제</option></select><div id="newsContent"><div class="empty">데이터 저장소를 연결한 후 표시됩니다.</div></div></div>
 </div>
@@ -674,7 +688,7 @@ function renderComplexes(){
    tile('관리사무소',phone||'확인 전')+
    '</div>'+
    (phone?'<a class="complexCallButton" href="tel:'+escapeHtml(phone.replace(/-/g,''))+'">☎ 관리사무소 전화 걸기</a>':'')+
-   (extra?'<details class="details"><summary>주소·시공사·용적률 등 더 보기</summary><div class="complexFacts">'+extra+'</div></details>':'')+
+   (extra?'<details class="details"><summary>주소·시공사 보기</summary><div class="complexFacts">'+extra+'</div></details>':'')+
    '<p class="complexMeta">자료 확인일 '+escapeHtml(p.detail_checked_at||p.last_verified||'확인 전')+
     (ev!==null&&p.kapt_code?' · 전기차 충전 수치는 2026-09-09 K-apt 공개자료 기준':'')+'</p>'+
    (p.detail_note?'<details class="details"><summary>자료 차이·확인사항 보기</summary><p class="complexSectionNote">'+escapeHtml(p.detail_note)+'</p></details>':'');
