@@ -5,7 +5,7 @@ from datetime import datetime, timezone, timedelta
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 from collect_trades import parse_response, normalize, recent_months, unique_ids, normalized_service_key, newly_detected
-from collect_news import parse_rss, deduplicate, make_briefs, rss_link
+from collect_news import parse_rss, deduplicate, make_briefs, rss_link, relevant_news_title
 
 class TradeTests(unittest.TestCase):
     def test_service_key_normalization(self):
@@ -60,6 +60,15 @@ class TradeTests(unittest.TestCase):
         rows=unique_ids([normalize(base,'매매','202610'),normalize(base,'매매','202610')]);self.assertNotEqual(rows[0]['id'],rows[1]['id'])
 
 class NewsTests(unittest.TestCase):
+    def test_local_news_relevance(self):
+        self.assertTrue(relevant_news_title('송도 GTX-B 역사 착공 추진', '개발·교통'))
+        self.assertTrue(relevant_news_title('연수구 송도 아파트 분양', '분양·입주'))
+        self.assertFalse(relevant_news_title('강원 망상지구 개발계획 변경', '개발·교통'))
+        self.assertFalse(relevant_news_title('카지노 주택 게임 이벤트', '정책·규제'))
+        self.assertFalse(relevant_news_title('토토 대출 빠른가입 안내', '세금·대출'))
+        self.assertTrue(relevant_news_title('주담대 변동금리 6% 돌파', '세금·대출'))
+        self.assertTrue(relevant_news_title('국토부 주택 공급정책 발표', '정책·규제'))
+
     def test_feed_query(self):self.assertIn('news.google.com/rss/search',rss_link('송도 GTX-B'))
     def test_parse_and_group(self):
         payload='''<rss><channel><item><title>송도 개발 진행 - 테스트뉴스</title><link>https://news.google.com/rss/articles/test</link><pubDate>Mon, 19 Oct 2026 00:00:00 GMT</pubDate><source>테스트뉴스</source></item></channel></rss>'''.encode()
