@@ -53,4 +53,16 @@ jobs:
             exit 0
           fi
           git commit -m 'data: refresh public Songdo briefing snapshots'
-          git push
+          # 변경 사항 수집 도중 저장소 코드가 갱신될 수 있으므로
+          # 원격 브랜치로 재정렬해 데이터 커밋을 안전하게 업로드.
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Remote changed; retrying publish (${attempt}/3)"
+            sleep 3
+          done
+          echo 'Publishing refreshed data failed after retries.'
+          exit 1
