@@ -77,39 +77,29 @@ public class MainActivity extends Activity {
                 (admin ? "'admin'" : "'family'") + ")", null);
     }
 
-    private static byte[] decodeHex(String value) {
-        if (value == null || value.length() % 2 != 0) throw new IllegalArgumentException();
-        byte[] bytes = new byte[value.length() / 2];
-        for (int i = 0; i < bytes.length; i++) {
-            int a = Character.digit(value.charAt(2 * i), 16);
-            int b = Character.digit(value.charAt(2 * i + 1), 16);
-            if (a < 0 || b < 0) throw new IllegalArgumentException();
-            bytes[i] = (byte) ((a << 4) | b);
-        }
-        return bytes;
+    private boolean matchesFamilyCode(char[] candidate) {
+        return AccessPolicy.matches(AccessPolicy.cached(this), candidate);
     }
 
-    private boolean matchesFamilyCode(char[] candidate) {
-        try (InputStream stream = getAssets().open("access-verifier.properties")) {
-            Properties p = new Properties();
-            p.load(stream);
-            int count = Integer.parseInt(p.getProperty("iterations", "0"));
-            if (count < 100000 || count > 1000000) return false;
-            byte[] salt = decodeHex(p.getProperty("salt", ""));
-            byte[] expected = decodeHex(p.getProperty("verifier", ""));
-            if (salt.length < 16 || expected.length != 32) return false;
-            PBEKeySpec spec = new PBEKeySpec(candidate, salt, count, 256);
-            try {
-                byte[] derived = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-                        .generateSecret(spec).getEncoded();
-                boolean ok = MessageDigest.isEqual(expected, derived);
-                Arrays.fill(derived, (byte) 0);
-                return ok;
-            } finally {
-                spec.clearPassword();
-            }
-        } catch (Exception ignored) {
-            return false;
+    @Override protected void onResume() {
+        super.onResume();
+        // When resuming from a long background pause, verify that the manager
+        // has not rotated the shared family code. Also applies to admin devices.
+        if (AccessPolicy.shouldRecheck(this)) {
+            io.execute(() -> {
+                boolean allowed;
+                try {
+                    AccessPolicy.Result latest=AccessPolicy.resolve(this);
+                    allowed=AccessPolicy.authorized(this,latest.policy);
+                }catch(Exception ignored) {
+                    allowed=false;
+                }
+                if(!allowed) runOnUiThread(() -> {
+                    if(isFinishing()||isDestroyed())return;
+                    startActivity(new Intent(this,LockActivity.class));
+                    finish();
+                });
+            });
         }
     }
 
@@ -131,7 +121,7 @@ public class MainActivity extends Activity {
         field.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         new AlertDialog.Builder(this)
                 .setTitle("관리자 모드")
-                .setMessage("이번 1차 버전은 기존 가족 보안코드로 관리자 화면에 진입합니다. 별도 관리자 비밀번호는 다음 단계에서 추가할 예정입니다.")
+                .setMessage("현재 가족 보안코드로 관리자 화면에 진입합니다. 별도 관리자 전용 암호는 추후 지원할 예정입니다.")
                 .setView(field)
                 .setNegativeButton("취소", null)
                 .setPositiveButton("확인", (dialog, which) -> {
