@@ -1140,8 +1140,8 @@ async function refreshOne(filename,manual=false){
   if(manual)showRefreshFeedback('연결된 저장소가 없습니다.','error');
   return {ok:false,error:issues[filename],filename};
  }
- if(refreshRunning[filename]&&manual){
-  showRefreshFeedback('이미 게시자료를 확인 중입니다.','info');
+ if(refreshRunning[filename]){
+  if(manual)showRefreshFeedback('이미 게시자료를 확인 중입니다. 잠시 후 다시 확인해 주세요.','info');
   return {ok:false,pending:true,filename};
  }
  const seq=(refreshGeneration[filename]||0)+1;
@@ -1162,10 +1162,10 @@ async function refreshOne(filename,manual=false){
   if(seq!==refreshGeneration[filename])return {ok:false,superseded:true,filename};
   const changed=JSON.stringify(remote[filename])!==JSON.stringify(fresh);
   remote[filename]=fresh;
-  result={ok:true,changed,filename,published:publishedAt(fresh)};
+  result={ok:true,changed,filename,published:publishedAt(fresh),checked:new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})};
   if(manual)showRefreshFeedback(
    (changed?'새로 게시된 자료를 반영했습니다.':'현재 게시된 자료와 동일합니다.')+
-   ' · 마지막 수집: '+result.published+
+   ' · 서버 확인: '+result.checked+' · 자료 수집: '+result.published+
    ' · 버튼은 서버 자료 재확인이며 새 수집은 정기 실행됩니다.',
    changed?'success':'warning');
  }catch(e){
@@ -1196,14 +1196,16 @@ async function refreshAll(manual=false){
  if(manual)showRefreshFeedback('실거래·뉴스·단지정보 게시자료를 확인 중입니다…');
  const all=await Promise.all(['trades','new_trades','news','complexes'].map(x=>refreshOne(x,false)));
  if(manual){
-  const failed=all.filter(x=>!x.ok);
+  const failed=all.filter(x=>!x.ok&&!x.pending);
+  const pending=all.filter(x=>x.pending);
   const changed=all.filter(x=>x.ok&&x.changed);
   const latest=all.find(x=>x.filename==='trades'&&x.ok);
-  showRefreshFeedback(failed.length?
+  showRefreshFeedback(pending.length?
+   pending.length+'개 자료는 이미 확인 중입니다. 중복 요청하지 않았습니다.':failed.length?
    (4-failed.length)+'개 자료 확인, '+failed.length+'개 확인 실패 · 기존 자료를 유지합니다.':
    changed.length?'새 게시자료 '+changed.length+'개 반영 완료 · 실거래 마지막 수집: '+(latest?.published||'확인 전'):
    '모든 게시자료를 확인했습니다. 새로 게시된 자료는 없습니다. · 실거래 마지막 수집: '+(latest?.published||'확인 전'),
-   failed.length?'error':changed.length?'success':'warning');
+   failed.length?'error':pending.length?'info':changed.length?'success':'warning');
  }
  return all;
 }
