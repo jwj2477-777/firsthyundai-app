@@ -18,6 +18,24 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 .tradeTypeBar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:12px 0}
 .tradeTypeBar button{min-height:51px;border:1px solid #cbdde8;background:#f8fbfd;color:#2c536f;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer}
 .tradeTypeBar button.active{background:#236297;color:#fff;border-color:#236297}
+.tradeTypeBar button.active.sale{background:#225f9a;border-color:#225f9a}
+.tradeTypeBar button.active.lease{background:#157655;border-color:#157655}
+.tradeTypeBar button.active.monthly{background:#9d590e;border-color:#9d590e}
+.dealRow{background:#fff;border:1px solid #e4e9ed;border-left-width:5px;border-radius:11px;padding:13px 14px;margin:10px 0;box-shadow:0 1px 5px #183b6010}
+.dealRow.sale{border-left-color:#2563a4;background:#f5f9ff}
+.dealRow.lease{border-left-color:#168361;background:#f4fcf8}
+.dealRow.monthly{border-left-color:#ca791b;background:#fffbf3}
+.dealRow .dealBadge{display:inline-flex;align-items:center;justify-content:center;min-width:49px;min-height:29px;padding:4px 9px;border-radius:7px;font-size:13px;font-weight:900;letter-spacing:.2px}
+.dealBadge.sale{background:#dbeafe;color:#164d87}
+.dealBadge.lease{background:#d9f3e5;color:#116647}
+.dealBadge.monthly{background:#ffebce;color:#854700}
+.dealRow.sale .money{color:#205c99}
+.dealRow.lease .money{color:#147252}
+.dealRow.monthly .money{color:#945314}
+.dealRow.cancelled{outline:1px dashed #c47777}
+.dealRow.cancelled .dealCancelLabel{background:#fce4e4;color:#9e2727;font-weight:900}
+.tradeLegend{display:flex;gap:7px;flex-wrap:wrap;font-size:12px;align-items:center;margin:0 0 10px}
+.tradeLegend .dealBadge{font-size:12px}
 .tradeSearchOptions{border:1px solid #d5e6f0;background:#f7fbff;border-radius:11px;padding:12px;margin:8px 0 11px}
 .tradeSearchOptions select{min-height:51px;margin-bottom:8px;font-size:15px}
 .tradeAdvanced{border:1px solid #e0e8ed;border-radius:11px;padding:9px 12px;margin:8px 0}
@@ -630,10 +648,84 @@ function renderComplexes(){
  $('complexAdmin').classList.toggle('hidden',role!=='admin');
  if(role==='admin'&&window.firstHyundaiDraftCount)$('catalogDraftNotice').textContent='이 기기의 미게시 수정: '+number(window.firstHyundaiDraftCount())+'개 단지';
 }
+function tradeClass(type){return type==='매매'?'sale':type==='전세'?'lease':type==='월세'?'monthly':'';}
+function dealBadge(type){return '<span class="dealBadge '+tradeClass(type)+'">'+escapeHtml(type||'기타')+'</span>';}
+function dealArticleClass(row,extra=''){return 'dealRow '+tradeClass(row.type)+(row.status==='해제'?' cancelled':'')+(extra?' '+extra:'');}
+function renderTypeButtons(id,type){
+ const el=$(id);if(!el)return;
+ const buttons=el.querySelectorAll?Array.from(el.querySelectorAll('button')):[];
+ buttons.forEach((button,index)=>{
+  const t=['','매매','전세','월세'][index],active=t===type;
+  button.className=(active?'active ':'')+tradeClass(t);
+  if(button.setAttribute)button.setAttribute('aria-pressed',active?'true':'false');
+ });
+}
+function areaKey(val){const n=Number(val);return Number.isFinite(n)&&n>0?String(Math.round(n*100)/100):'';}
+let tradeMode='latest',selectedTradeBuilding='',selectedTradeArea='';
+function openTradeLatest(){
+ tradeMode='latest';selectedTradeBuilding='';selectedTradeArea='';tradeFocus=null;
+ $('aptFilter').value='';$('typeFilter').value='';$('statusFilter').value='';
+ $('tradesFavoriteFilter').value='';
+ switchPage('trades');
+}
+function startTradeSearch(){
+ tradeMode='search';tradeFocus=null;
+ $('aptFilter').value='';$('tradesFavoriteFilter').value='';
+ selectedTradeBuilding='';selectedTradeArea='';
+ switchPage('trades');
+}
+function populateTradeBuildings(){
+ const input=$('tradeBuildingSelect');
+ const names=[...new Set((remote.trades?.records||[]).map(r=>String(r.building||'').trim()).filter(Boolean))]
+  .sort((a,b)=>a.localeCompare(b,'ko'));
+ const previous=selectedTradeBuilding;
+ input.innerHTML='<option value="">아파트를 선택하세요</option>'+names.map(name=>
+  '<option value="'+escapeHtml(name)+'">'+escapeHtml(name)+'</option>').join('');
+ input.value=names.includes(previous)?previous:'';
+ if(!input.value){selectedTradeBuilding='';selectedTradeArea='';}
+}
+function updateTradeAreaOptions(){
+ const panel=$('tradeAreaPanel'),input=$('tradeAreaSelect');
+ const selected=selectedTradeBuilding;
+ panel.classList.toggle('hidden',!selected);
+ if(!selected){input.innerHTML='<option value="">모든 전용면적 보기</option>';return;}
+ const values=[...new Set((remote.trades?.records||[])
+  .filter(x=>x.building===selected).map(x=>areaKey(x.area_m2)).filter(Boolean))]
+  .sort((a,b)=>Number(a)-Number(b));
+ input.innerHTML='<option value="">모든 전용면적 보기</option>'+values.map(v=>
+  '<option value="'+v+'">전용 '+v+'㎡ (약 '+Math.round(Number(v)/3.305785)+'평)</option>').join('');
+ input.value=values.includes(selectedTradeArea)?selectedTradeArea:'';
+}
+function chooseTradeBuilding(){
+ selectedTradeBuilding=$('tradeBuildingSelect').value;
+ selectedTradeArea='';updateTradeAreaOptions();renderTrades();
+}
+function setTradeArea(){selectedTradeArea=$('tradeAreaSelect').value;renderTrades();}
+function setTradeType(type){
+ if(!['','매매','전세','월세'].includes(type))return;
+ $('typeFilter').value=type;
+ if(tradeFocus)tradeFocus.type=type;
+ renderTrades();
+}
+function setNearbyType(type){
+ if(!['','매매','전세','월세'].includes(type))return;
+ $('nearbyType').value=type;
+ renderNearbyDetails(true);
+}
+function updateNearbyAreas(g,rows){
+ const panel=$('nearbyAreaPanel'),input=$('nearbyAreaSelect');
+ panel.classList.toggle('hidden',!g);
+ if(!g){input.value='';return;}
+ const previous=input.value;
+ const values=[...new Set(rows.map(x=>areaKey(x.area_m2)).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
+ input.innerHTML='<option value="">모든 전용면적 보기</option>'+values.map(v=>
+  '<option value="'+v+'">전용 '+v+'㎡ (약 '+Math.round(Number(v)/3.305785)+'평)</option>').join('');
+ input.value=values.includes(previous)?previous:'';
+}
 function showComplexTrades(id,area,type){
  const p=catalogRows().find(x=>x.id===id);
  if(!p||!Number.isFinite(area)||area<=0||!['','매매','전세','월세'].includes(type))return;
- tradeFocus={id:p.id,area,type};
+ tradeFocus={id:p.id,area,type};tradeMode='focused';selectedTradeBuilding='';selectedTradeArea='';
  $('aptFilter').value='';
  $('typeFilter').value='';
  $('statusFilter').value='';
@@ -641,7 +733,7 @@ function showComplexTrades(id,area,type){
  switchPage('trades');
 }
 function clearTradeFocus(){
- tradeFocus=null;
+ tradeFocus=null;tradeMode='latest';$('typeFilter').value='';
  renderTrades();
 }
 let tradeFocus=null;
@@ -652,6 +744,7 @@ let nearbySelected='all', nearbyLimit=40;
 function chooseNearby(id){
  if(id!=='all'&&!FAVORITE_APTS.some(x=>x.id===id))return;
  nearbySelected=id;
+ $('nearbyAreaSelect').value='';
  nearbyLimit=40;
  renderNearby();
  const detail=$('nearbyDetails');
@@ -689,7 +782,10 @@ function renderNearbyDetails(resetLimit){
  const all=nearbyAllRows();
  const g=FAVORITE_APTS.find(x=>x.id===nearbySelected);
  let rows=g?all.filter(x=>favoriteIdForBuilding(x.building)===g.id):all;
+ updateNearbyAreas(g,rows);
  const type=$('nearbyType').value;
+ const chosenArea=g?$('nearbyAreaSelect').value:'';
+ renderTypeButtons('nearbyTypeBar',type);
  const allTypes={매매:0,전세:0,월세:0};
  for(let row of rows)if(Object.prototype.hasOwnProperty.call(allTypes,row.type))allTypes[row.type]++;
  const total=rows.length;
@@ -702,6 +798,7 @@ function renderNearbyDetails(resetLimit){
   '<span class="pill">전세 '+number(allTypes.전세)+'건</span>'+
   '<span class="pill">월세 '+number(allTypes.월세)+'건</span>';
  if(type)rows=rows.filter(x=>x.type===type);
+ if(chosenArea)rows=rows.filter(x=>areaKey(x.area_m2)===chosenArea);
  // 거래 스냅샷은 이미 계약일 역순이지만 화면에서도 다시 확인하여 정렬합니다.
  rows=rows.slice().sort((a,b)=>(b.contract_date||'').localeCompare(a.contract_date||''));
  const shown=rows.slice(0,nearbyLimit);
@@ -712,9 +809,9 @@ function renderNearbyDetails(resetLimit){
       x.type==='전세'?'보증금 '+value10k(x.deposit_10k):
       '보증금 '+value10k(x.deposit_10k)+' / 월세 '+value10k(x.monthly_10k);
    const name=FAVORITE_APTS.find(z=>z.id===favoriteIdForBuilding(x.building))?.label||x.building;
-   return '<article class="item"><div class="tagbox">'+
-    '<span class="pill">'+escapeHtml(x.type)+'</span>'+
-    '<span class="pill '+(x.status==='해제'?'red':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+
+   return '<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+
+    dealBadge(x.type)+
+    '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+
     '</div><h3>'+escapeHtml(name)+'</h3>'+
     ''+
     '<div class="money">'+escapeHtml(value)+'</div>'+
@@ -822,9 +919,9 @@ function renderNew(){
    const value=x.type==='매매'?value10k(x.amount_10k):
       x.type==='전세'?'보증금 '+value10k(x.deposit_10k):
       '보증금 '+value10k(x.deposit_10k)+' / 월세 '+value10k(x.monthly_10k);
-   return '<article class="item newTop"><div class="tagbox">'+
-    '<span class="pill">'+escapeHtml(x.type)+'</span>'+
-    '<span class="pill '+(x.status==='해제'?'red':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+
+   return '<article class="'+dealArticleClass(x,'newTop')+'"><div class="tagbox">'+
+    dealBadge(x.type)+
+    '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+
     '</div><h3>'+escapeHtml(x.building)+'</h3>'+
     '<div class="money">'+escapeHtml(value)+'</div>'+
     '<div class="meta"><b>신규 공개 확인 '+escapeHtml(x.first_seen_date)+'</b>'+
