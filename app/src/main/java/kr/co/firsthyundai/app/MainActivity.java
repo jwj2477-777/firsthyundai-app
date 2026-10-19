@@ -33,10 +33,12 @@ import java.util.concurrent.Executors;
 public class MainActivity extends Activity {
     private static final int SAVE_BACKUP = 1021;
     private static final int OPEN_BACKUP = 1022;
+    private static final int SAVE_CATALOG = 1023;
     private static final int LIMIT = 8 * 1024 * 1024;
     private WebView web;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private String pendingBackup = "";
+    private String pendingCatalog = "";
     private static final String ADMIN_TRIES = "firsthyundai-admin-attempts";
     // Administrator privilege is deliberately session-only; legacy saved
     // admin_mode=true from v1.1 must not bypass independent verification.
@@ -232,7 +234,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void fetch(String repository, String filename, String requestId) {
             // Public data ONLY. Never inject API tokens / family records into remote requests.
             if (repository==null || !repository.matches("[A-Za-z0-9_.-]{1,60}/[A-Za-z0-9_.-]{1,100}") ||
-                    !("trades.json".equals(filename) || "new_trades.json".equals(filename) || "news.json".equals(filename))) {
+                    !("trades.json".equals(filename) || "new_trades.json".equals(filename) || "news.json".equals(filename) || "complexes.json".equals(filename))) {
                 deliverFeed(requestId, false, "저장소 주소 또는 파일명이 올바르지 않습니다.", null);
                 return;
             }
@@ -273,6 +275,25 @@ public class MainActivity extends Activity {
                 startActivityForResult(intent,SAVE_BACKUP);
             });
         }
+
+        @JavascriptInterface public void saveCatalog(String json) {
+            // Only an authenticated administrator can export public catalog data.
+            // No GitHub write token, personal notes or passwords are included.
+            if(!isAdminDeviceMode() || json==null || json.length()>1_000_000)return;
+            try {
+                JSONObject source=new JSONObject(json);
+                if(source.optInt("schema_version",-1)!=1 || source.optJSONArray("records")==null ||
+                    source.getJSONArray("records").length()>500) return;
+            } catch(Exception e) {return;}
+            runOnUiThread(() -> {
+                pendingCatalog=json;
+                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                intent.setType("application/json");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.putExtra(Intent.EXTRA_TITLE,"complexes.json");
+                startActivityForResult(intent,SAVE_CATALOG);
+            });
+        }
         @JavascriptInterface public void openBackup() {
             if(!isAdminDeviceMode())return;
             runOnUiThread(() -> {
@@ -307,6 +328,18 @@ public class MainActivity extends Activity {
                     os.write(backup.getBytes(StandardCharsets.UTF_8));
                     JSONObject o=new JSONObject();o.put("ok",true);deliver("onBackupSaved",o);
                 } catch(Exception e) {try {JSONObject o=new JSONObject();o.put("ok",false);deliver("onBackupSaved",o);}catch(Exception ignored){}}
+            });
+        } else if(request==SAVE_CATALOG) {
+            String catalog=pendingCatalog;pendingCatalog="";
+            io.execute(() -> {
+                try(OutputStream os=getContentResolver().openOutputStream(uri)) {
+                    if(os==null)throw new Exception("파일 저장 실패");
+                    os.write(catalog.getBytes(StandardCharsets.UTF_8));
+                    JSONObject o=new JSONObject();o.put("ok",true);deliver("onCatalogSaved",o);
+                } catch(Exception e) {
+                    try {JSONObject o=new JSONObject();o.put("ok",false);deliver("onCatalogSaved",o);}
+                    catch(Exception ignored){}
+                }
             });
         } else if(request==OPEN_BACKUP) {
             io.execute(() -> {
