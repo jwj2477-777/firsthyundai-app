@@ -1,0 +1,21 @@
+// Static regression checks to prevent returning to the v1.1 family-code admin bypass.
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const main=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/MainActivity.java'),'utf8');
+const policy=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/AdminPolicy.java'),'utf8');
+const ui=fs.readFileSync(path.join(root,'app/src/main/assets/index.html'),'utf8');
+assert.ok(main.includes('AdminPolicy.fetch(MainActivity.this)'),'must use separate admin policy');
+assert.ok(main.includes('AdminPolicy.matches(policy,code)'),'must check separate admin credential');
+assert.ok(!main.includes('matchesFamilyCode('),'family code cannot unlock admin mode');
+assert.ok(!main.includes('getBoolean("admin_mode"'),'legacy administrator privilege must not survive update');
+assert.ok(main.includes('private volatile String adminSessionIdentity = "";'),'admin access is session only');
+assert.ok(main.includes('if(!isAdminDeviceMode() || json==null'),'backups admin-only');
+assert.ok(main.includes('if(!isAdminDeviceMode())return;'),'open backups admin-only');
+assert.ok(ui.includes('FIRSTHYUNDAI_ADMIN_CODE'),'admin security tab should provide private secret name');
+assert.ok(ui.includes('rotate-admin-code.yml'),'administrator rotation workflow linked');
+assert.ok(ui.includes("const PRIVATE_PAGES=new Set(['settings','notes','security'])"),'family UI must hide admin settings');
+assert.ok(policy.includes('AdminPolicy') && policy.includes('PBKDF2WithHmacSHA256'),'password should not be stored in plain text');
+console.log('Administrator guard tests passed: separate secret, fail closed, no v1.1 admin-mode bypass');
