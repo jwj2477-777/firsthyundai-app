@@ -67,7 +67,7 @@ def recent_months(n=12, today=None):
 def parse_response(xml_bytes):
     root = ET.fromstring(xml_bytes)
     code = clean(root.findtext('.//resultCode'))
-    if code and code != '00':
+    if code and code not in ('00', '000'):
         # 공개 로그에는 응답 코드만 남김 (서버 메시지 등에 토큰이 섞일 가능성 차단).
         safe_code = code if re.fullmatch(r'[0-9A-Z_]{1,48}', code) else 'UNKNOWN'
         raise RuntimeError(f'API XML resultCode={safe_code}')
@@ -215,8 +215,11 @@ def update(*, months=12, key=None, request=http_request, now=None):
             snapshots[f'{month}:{category}'].append(record)
     failures = []
     successes = 0
+    unavailable_categories = set()
     for month in recent_months(months, today=now):
         for category in ('매매','임대'):
+            if category in unavailable_categories:
+                continue
             bucket = f'{month}:{category}'
             try:
                 raw = fetch_month(request, category, month, key)
@@ -228,8 +231,11 @@ def update(*, months=12, key=None, request=http_request, now=None):
                 label = str(exc) if isinstance(exc, RuntimeError) and str(exc).startswith(('API HTTP ', 'API XML ')) else type(exc).__name__
                 print(f'[WARN] {bucket} 수집 실패: {label}', file=sys.stderr)
                 failures.append(f'{bucket}: {label}')
-                if 'SERVICE_KEY_IS_NOT_REGISTERED_ERROR' in label:
-                    raise RuntimeError('API 인증키 등록 오류: Encoding/Decoding 형식을 자동 보정했으므로 공공데이터포털 승인 상태와 GitHub Secret 원본을 확인하세요.') from None
+                if ('SERVICE_KEY_IS_NOT_REGISTERED_ERROR' in label or
+                    'SERVICE_ACCESS_DENIED_ERROR' in label or
+                    'PERMISSION_DENIED' in label):
+                    unavailable_categories.add(category)
+                    print(f'[WARN] {category} API 권한 오류: 나머지 월의 해당 종류 호출을 중단합니다', file=sys.stderr)
     if successes == 0:
         raise RuntimeError('모든 API 요청 실패: 기존 자료를 덮어쓰지 않습니다.')
     # 현재 범위 외 이전 월은 삭제 (계속 무한히 쌓이지 않도록)
@@ -244,7 +250,7 @@ def update(*, months=12, key=None, request=http_request, now=None):
         'source_links': ['https://www.data.go.kr/data/15126469/openapi.do',
                          'https://www.data.go.kr/data/15126474/openapi.do'],
         'checked_at': now.isoformat(timespec='seconds'),
-        'last_success_at': now.isoformat(timespec='seconds') if not failures else old.get('last_success_at'),
+        'last_success_at': now.isoformat(timespec='seconds'),
         'state': 'ok' if not failures and not missing else 'partial',
         'errors': failures[:30], 'missing_buckets':missing,
         'count':len(all_records), 'records':all_records,
