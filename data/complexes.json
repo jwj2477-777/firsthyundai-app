@@ -2,7 +2,7 @@
   "schema_version": 1,
   "state": "verified_partial",
   "updated_at": "2026-10-19",
-  "note": "공공데이터포털 K-apt 공식 API로 송도동 공동주택 기초정보를 수집했습니다. 기존 13개 수동검증 단지는 보존. 용적률, 건폐율, 공급타입은 해당 공공 API에서 검증하지 못했으므로 임의 기입하지 않았습니다. 등록 단지 전체가 송도 아파트의 완전한 목록이라는 뜻은 아닙니다.",
+  "note": "기존 K-apt 등록단지 및 13개 관심단지를 보존하고 실거래에 등장한 이름 중 검증된 기존 아파트 표기들을 aliases로 연결. K-apt에서 누락되거나 여러 단지로 합산된 공동주택 중 별도 주소·세대수가 확인되는 12개 단지를 독립 등록. 송도더샵엑스포 합계 1,337세대는 검색 중복 방지용 관리항목으로만 유지. EV·관리사무소 등 미확인 정보는 비워둠.",
   "records": [
     {
       "id": "f13",
@@ -637,7 +637,8 @@
       "id": "kapt-a10020712",
       "label": "더샵송도아크베이아파트",
       "aliases": [
-        "더샵송도아크베이아파트"
+        "더샵송도아크베이아파트",
+        "더샵송도아크베이"
       ],
       "kapt_code": "A10020712",
       "catalog_source": "kapt",
@@ -666,7 +667,8 @@
       "id": "kapt-a10020744",
       "label": "송도럭스오션SK뷰",
       "aliases": [
-        "송도럭스오션SK뷰"
+        "송도럭스오션SK뷰",
+        "송도LuxeOceanSKVIEW"
       ],
       "kapt_code": "A10020744",
       "catalog_source": "kapt",
@@ -724,7 +726,8 @@
       "id": "kapt-a10022353",
       "label": "송도 하늘채아이비원",
       "aliases": [
-        "송도 하늘채아이비원"
+        "송도 하늘채아이비원",
+        "송도아이비원"
       ],
       "kapt_code": "A10022353",
       "catalog_source": "kapt",
@@ -753,7 +756,8 @@
       "id": "kapt-a10022395",
       "label": "송도이안아파트",
       "aliases": [
-        "송도이안아파트"
+        "송도이안아파트",
+        "송도이안"
       ],
       "kapt_code": "A10022395",
       "catalog_source": "kapt",
@@ -898,7 +902,8 @@
       "id": "kapt-a10023361",
       "label": "호반써밋송도아파트",
       "aliases": [
-        "호반써밋송도아파트"
+        "호반써밋송도아파트",
+        "호반써밋송도"
       ],
       "kapt_code": "A10023361",
       "catalog_source": "kapt",
@@ -927,7 +932,8 @@
       "id": "kapt-a10024710",
       "label": "송도랜드마크시티센트럴더샵아파트",
       "aliases": [
-        "송도랜드마크시티센트럴더샵아파트"
+        "송도랜드마크시티센트럴더샵아파트",
+        "랜드마크시티센트럴더샵"
       ],
       "kapt_code": "A10024710",
       "catalog_source": "kapt",
@@ -1043,7 +1049,8 @@
       "id": "kapt-a10025399",
       "label": "송도 SK VIEW 아파트",
       "aliases": [
-        "송도 SK VIEW 아파트"
+        "송도 SK VIEW 아파트",
+        "송도SKVIEW"
       ],
       "kapt_code": "A10025399",
       "catalog_source": "kapt",
@@ -1072,7 +1079,8 @@
       "id": "kapt-a10025443",
       "label": "힐스테이트 레이크송도",
       "aliases": [
-        "힐스테이트 레이크송도"
+        "힐스테이트 레이크송도",
+        "힐스테이트레이크송도1차"
       ],
       "kapt_code": "A10025443",
       "catalog_source": "kapt",
@@ -1101,7 +1109,8 @@
       "id": "kapt-a10025745",
       "label": "송도 아메리칸타운아이파크아파트",
       "aliases": [
-        "송도 아메리칸타운아이파크아파트"
+        "송도 아메리칸타운아이파크아파트",
+        "송도아메리칸타운아이파크"
       ],
       "kapt_code": "A10025745",
       "catalog_source": "kapt",
@@ -1130,7 +1139,8 @@
       "id": "kapt-a10025886",
       "label": "e편한세상송도아파트",
       "aliases": [
-        "e편한세상송도아파트"
+        "e편한세상송도아파트",
+        "e편한세상송도"
       ],
       "kapt_code": "A10025886",
       "catalog_source": "kapt",
@@ -1159,7 +1169,8 @@
       "id": "kapt-a10026038",
       "label": "송도더샵센트럴시티아파트",
       "aliases": [
-        "송도더샵센트럴시티아파트"
+        "송도더샵센트럴시티아파트",
+        "송도더샵센트럴시티"
       ],
       "kapt_code": "A10026038",
       "catalog_source": "kapt",
@@ -1217,7 +1228,8 @@
       "id": "kapt-a10027171",
       "label": "베르디움더퍼스트아파트",
       "aliases": [
-        "베르디움더퍼스트아파트"
+        "베르디움더퍼스트아파트",
+        "베르디움더퍼스트"
       ],
       "kapt_code": "A10027171",
       "catalog_source": "kapt",
@@ -1246,7 +1258,8 @@
       "id": "kapt-a10027367",
       "label": "송도에듀포레 푸르지오아파트",
       "aliases": [
-        "송도에듀포레 푸르지오아파트"
+        "송도에듀포레 푸르지오아파트",
+        "송도에듀포레푸르지오"
       ],
       "kapt_code": "A10027367",
       "catalog_source": "kapt",
@@ -1275,7 +1288,8 @@
       "id": "kapt-a10027653",
       "label": "롯데캐슬캠퍼스타운아파트",
       "aliases": [
-        "롯데캐슬캠퍼스타운아파트"
+        "롯데캐슬캠퍼스타운아파트",
+        "롯데캐슬캠퍼스타운"
       ],
       "kapt_code": "A10027653",
       "catalog_source": "kapt",
@@ -1304,7 +1318,8 @@
       "id": "kapt-a10027884",
       "label": "송도더샵그린워크3차 D17-1BL",
       "aliases": [
-        "송도더샵그린워크3차 D17-1BL"
+        "송도더샵그린워크3차 D17-1BL",
+        "송도더샵그린워크3차(17-1블럭)"
       ],
       "kapt_code": "A10027884",
       "catalog_source": "kapt",
@@ -1362,7 +1377,8 @@
       "id": "kapt-a10027888",
       "label": "송도 더샵 그린워크3차 18-1BL",
       "aliases": [
-        "송도 더샵 그린워크3차 18-1BL"
+        "송도 더샵 그린워크3차 18-1BL",
+        "송도더샵그린워크3차(18-1블럭)"
       ],
       "kapt_code": "A10027888",
       "catalog_source": "kapt",
@@ -1420,7 +1436,8 @@
       "id": "kapt-a40673101",
       "label": "송도 풍림6단지",
       "aliases": [
-        "송도 풍림6단지"
+        "송도 풍림6단지",
+        "송도풍림아이원6단지"
       ],
       "kapt_code": "A40673101",
       "catalog_source": "kapt",
@@ -1449,7 +1466,8 @@
       "id": "kapt-a40673412",
       "label": "송도 풍림아이원1단지아파트",
       "aliases": [
-        "송도 풍림아이원1단지아파트"
+        "송도 풍림아이원1단지아파트",
+        "송도풍림아이원1단지"
       ],
       "kapt_code": "A40673412",
       "catalog_source": "kapt",
@@ -1478,7 +1496,8 @@
       "id": "kapt-a40673510",
       "label": "송도 풍림아이원2단지아파트",
       "aliases": [
-        "송도 풍림아이원2단지아파트"
+        "송도 풍림아이원2단지아파트",
+        "송도풍림아이원2단지"
       ],
       "kapt_code": "A40673510",
       "catalog_source": "kapt",
@@ -1507,7 +1526,8 @@
       "id": "kapt-a40673603",
       "label": "송도풍림아이원3단지아파트",
       "aliases": [
-        "송도풍림아이원3단지아파트"
+        "송도풍림아이원3단지아파트",
+        "송도풍림아이원3단지"
       ],
       "kapt_code": "A40673603",
       "catalog_source": "kapt",
@@ -1555,11 +1575,12 @@
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
-      "detail_note": null,
+      "detail_note": "K-apt 관리단지 합계 1,337세대(더샵엑스포 6단지 356 + 9단지 520 + 10단지 461). 개별 단지정보는 각각 조회하세요.",
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "aggregate_only": true
     },
     {
       "id": "kapt-a40673902",
@@ -1768,7 +1789,8 @@
       "id": "kapt-a40673910",
       "label": "더샵센트럴파크2단지",
       "aliases": [
-        "더샵센트럴파크2단지"
+        "더샵센트럴파크2단지",
+        "더샵센트럴파크2"
       ],
       "kapt_code": "A40673910",
       "catalog_source": "kapt",
@@ -1797,7 +1819,8 @@
       "id": "kapt-a40673911",
       "label": "송도더샵하버뷰14단지",
       "aliases": [
-        "송도더샵하버뷰14단지"
+        "송도더샵하버뷰14단지",
+        "송도더샵하버뷰(D14)"
       ],
       "kapt_code": "A40673911",
       "catalog_source": "kapt",
@@ -1826,7 +1849,8 @@
       "id": "kapt-a40673912",
       "label": "송도더샵하버뷰13단지",
       "aliases": [
-        "송도더샵하버뷰13단지"
+        "송도더샵하버뷰13단지",
+        "송도더샵하버뷰(D13)"
       ],
       "kapt_code": "A40673912",
       "catalog_source": "kapt",
@@ -1855,7 +1879,8 @@
       "id": "kapt-a40673913",
       "label": "송도더샵하버뷰2",
       "aliases": [
-        "송도더샵하버뷰2"
+        "송도더샵하버뷰2",
+        "송도더샵하버뷰(D15)"
       ],
       "kapt_code": "A40673913",
       "catalog_source": "kapt",
@@ -1942,7 +1967,8 @@
       "id": "kapt-a40673916",
       "label": "송도해모로월드뷰",
       "aliases": [
-        "송도해모로월드뷰"
+        "송도해모로월드뷰",
+        "해모로월드뷰"
       ],
       "kapt_code": "A40673916",
       "catalog_source": "kapt",
@@ -1971,7 +1997,8 @@
       "id": "kapt-a40673917",
       "label": "송도롯데캐슬",
       "aliases": [
-        "송도롯데캐슬"
+        "송도롯데캐슬",
+        "롯데캐슬"
       ],
       "kapt_code": "A40673917",
       "catalog_source": "kapt",
@@ -2000,7 +2027,8 @@
       "id": "kapt-a40673918",
       "label": "송도더프라우3단지",
       "aliases": [
-        "송도더프라우3단지"
+        "송도더프라우3단지",
+        "송도코오롱더프라우3단지"
       ],
       "kapt_code": "A40673918",
       "catalog_source": "kapt",
@@ -2058,7 +2086,8 @@
       "id": "kapt-a40673921",
       "label": "송도글로벌캠퍼스푸르지오",
       "aliases": [
-        "송도글로벌캠퍼스푸르지오"
+        "송도글로벌캠퍼스푸르지오",
+        "글로벌캠퍼스푸르지오"
       ],
       "kapt_code": "A40673921",
       "catalog_source": "kapt",
@@ -2087,7 +2116,8 @@
       "id": "kapt-a40673922",
       "label": "송도더샵그린스퀘어",
       "aliases": [
-        "송도더샵그린스퀘어"
+        "송도더샵그린스퀘어",
+        "더샵그린스퀘어"
       ],
       "kapt_code": "A40673922",
       "catalog_source": "kapt",
@@ -2116,7 +2146,8 @@
       "id": "kapt-a40673923",
       "label": "송도더샵그린워크1차",
       "aliases": [
-        "송도더샵그린워크1차"
+        "송도더샵그린워크1차",
+        "더샵그린워크1차"
       ],
       "kapt_code": "A40673923",
       "catalog_source": "kapt",
@@ -2174,7 +2205,8 @@
       "id": "kapt-a40684004",
       "label": "송도 금호어울림 아파트",
       "aliases": [
-        "송도 금호어울림 아파트"
+        "송도 금호어울림 아파트",
+        "송도금호어울림"
       ],
       "kapt_code": "A40684004",
       "catalog_source": "kapt",
@@ -2232,7 +2264,8 @@
       "id": "kapt-a40684007",
       "label": "송도 성지리벨루스아파트",
       "aliases": [
-        "송도 성지리벨루스아파트"
+        "송도 성지리벨루스아파트",
+        "성지리벨루스"
       ],
       "kapt_code": "A40684007",
       "catalog_source": "kapt",
@@ -2261,7 +2294,8 @@
       "id": "kapt-a40684008",
       "label": "송도해모로아파트",
       "aliases": [
-        "송도해모로아파트"
+        "송도해모로아파트",
+        "송도한진해모로"
       ],
       "kapt_code": "A40684008",
       "catalog_source": "kapt",
@@ -2290,7 +2324,8 @@
       "id": "kapt-a40684009",
       "label": "송도웰카운티2단지 아파트",
       "aliases": [
-        "송도웰카운티2단지 아파트"
+        "송도웰카운티2단지 아파트",
+        "송도웰카운티2단지"
       ],
       "kapt_code": "A40684009",
       "catalog_source": "kapt",
@@ -2319,7 +2354,8 @@
       "id": "kapt-a40684011",
       "label": "송도 웰카운티1단지아파트",
       "aliases": [
-        "송도 웰카운티1단지아파트"
+        "송도 웰카운티1단지아파트",
+        "송도웰카운티1단지"
       ],
       "kapt_code": "A40684011",
       "catalog_source": "kapt",
@@ -2348,7 +2384,8 @@
       "id": "kapt-a40684013",
       "label": "송도더샵퍼스트월드",
       "aliases": [
-        "송도더샵퍼스트월드"
+        "송도더샵퍼스트월드",
+        "더샵퍼스트월드"
       ],
       "kapt_code": "A40684013",
       "catalog_source": "kapt",
@@ -2372,6 +2409,365 @@
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
       "schools": []
+    },
+    {
+      "id": "verified-extra-01",
+      "label": "더샵엑스포6단지",
+      "aliases": [
+        "더샵엑스포6단지"
+      ],
+      "catalog_source": "reference_verified",
+      "households": 356,
+      "buildings": 6,
+      "approved_date": "2009-09-30",
+      "floors": "14~15층",
+      "heating": "지역난방",
+      "parking_total": 630,
+      "ev_chargers": 49,
+      "floor_area_ratio": 162,
+      "building_coverage_ratio": 17,
+      "builder": "(주)포스코건설",
+      "management_phone": "032-833-0812",
+      "address": "인천광역시 연수구 컨벤시아대로42번길 96",
+      "lot_address": "인천광역시 연수구 송도동 15-2",
+      "area_types_m2": [],
+      "supply_type_labels": [],
+      "floorplans": [],
+      "schools": [],
+      "source_url": "https://kbland.kr/se/c/24540",
+      "last_verified": "2026-10-19",
+      "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
+      "detail_checked_at": "2026-10-19",
+      "parent_catalog_id": "kapt-a40673901",
+      "detail_note": "K-apt는 6·9·10단지의 합계 1,337세대로 표시합니다. 이 값은 개별 단지의 세대수가 아니며, 본 단지는 단지별 공개자료 수치입니다."
+    },
+    {
+      "id": "verified-extra-02",
+      "label": "더샵엑스포9단지",
+      "aliases": [
+        "더샵엑스포9단지"
+      ],
+      "catalog_source": "reference_verified",
+      "households": 520,
+      "buildings": 6,
+      "approved_date": "2009-09-30",
+      "floors": "19~27층",
+      "heating": "지역난방",
+      "parking_total": 905,
+      "ev_chargers": null,
+      "floor_area_ratio": 226,
+      "building_coverage_ratio": 17,
+      "builder": "(주)포스코건설",
+      "management_phone": null,
+      "address": "인천광역시 연수구 컨벤시아대로42번길 77",
+      "lot_address": "인천광역시 연수구 송도동 16-6",
+      "area_types_m2": [],
+      "supply_type_labels": [],
+      "floorplans": [],
+      "schools": [],
+      "source_url": "https://www.kbland.kr/se/c/24836",
+      "last_verified": "2026-10-19",
+      "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
+      "detail_checked_at": "2026-10-19",
+      "parent_catalog_id": "kapt-a40673901",
+      "detail_note": "K-apt는 6·9·10단지의 합계 1,337세대로 표시합니다. 이 값은 개별 단지의 세대수가 아니며, 본 단지는 단지별 공개자료 수치입니다."
+    },
+    {
+      "id": "verified-extra-03",
+      "label": "더샵엑스포10단지",
+      "aliases": [
+        "더샵엑스포10단지"
+      ],
+      "catalog_source": "reference_verified",
+      "households": 461,
+      "buildings": 6,
+      "approved_date": "2009-09-30",
+      "floors": "15~27층",
+      "heating": "지역난방",
+      "parking_total": 808,
+      "ev_chargers": null,
+      "floor_area_ratio": 205,
+      "building_coverage_ratio": 16,
+      "builder": "(주)포스코건설",
+      "management_phone": null,
+      "address": null,
+      "lot_address": "인천광역시 연수구 송도동 16-4",
+      "area_types_m2": [],
+      "supply_type_labels": [],
+      "floorplans": [],
+      "schools": [],
+      "source_url": "https://kbland.kr/se/c/24833",
+      "last_verified": "2026-10-19",
+      "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
+      "detail_checked_at": "2026-10-19",
+      "parent_catalog_id": "kapt-a40673901",
+      "detail_note": "K-apt는 6·9·10단지의 합계 1,337세대로 표시합니다. 이 값은 개별 단지의 세대수가 아니며, 본 단지는 단지별 공개자료 수치입니다."
+    },
+    {
+      "id": "verified-extra-04",
+      "label": "송도센트럴파크리버리치",
+      "aliases": [
+        "송도센트럴파크리버리치"
+      ],
+      "catalog_source": "reference_verified",
+      "households": 96,
+      "buildings": 3,
+      "approved_date": "2023-10-19",
+      "floors": "10층",
+      "heating": "지역난방",
+      "parking_total": 124,
+      "ev_chargers": null,
+      "floor_area_ratio": 269,
+      "building_coverage_ratio": 49,
+      "builder": "(주)창보종합건설",
+      "management_phone": null,
+      "address": "인천광역시 연수구 해돋이로171번길 11",
+      "lot_address": "인천광역시 연수구 송도동 22-12",
+      "area_types_m2": [],
+      "supply_type_labels": [],
+      "floorplans": [],
+      "schools": [],
+      "source_url": "https://realty.daangn.com/complexes/13596014",
+      "last_verified": "2026-10-19",
+      "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": "주차대수 출처차이: 당근부동산 124대 / 다른 공개 출처 123대. 당근 자료를 우선 표시, 관리사무소 확인 권장."
+    },
+    {
+      "id": "verified-extra-05",
+      "label": "송도대경스위트리아파크뷰",
+      "aliases": [
+        "송도대경스위트리아파크뷰"
+      ],
+      "catalog_source": "reference_verified",
+      "households": 64,
+      "buildings": 1,
+      "approved_date": "2021-11-22",
+      "floors": "10층",
+      "heating": "지역난방",
+      "parking_total": 73,
+      "ev_chargers": null,
+      "floor_area_ratio": 279,
+      "building_coverage_ratio": 48,
+      "builder": "대경종합건설(주)",
+      "management_phone": null,
+      "address": "인천광역시 연수구 해돋이로 160-7",
+      "lot_address": "인천광역시 연수구 송도동 21-34",
+      "area_types_m2": [],
+      "supply_type_labels": [],
+      "floorplans": [],
+      "schools": [],
+      "source_url": "https://kbland.kr/se/c/429928",
+      "last_verified": "2026-10-19",
+      "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
+      "detail_checked_at": "2026-10-19"
+    },
+    {
+      "id": "verified-extra-06",
+      "label": "송도아리스타프라임아파트",
+      "aliases": [
+        "송도아리스타프라임아파트"
+      ],
+      "catalog_source": "reference_verified",
+      "households": 90,
+      "buildings": 1,
+      "approved_date": "2023-02-24",
+      "floors": "9~10층",
+      "heating": "지역난방",
+      "parking_total": 85,
+      "ev_chargers": null,
+      "floor_area_ratio": 278,
+      "building_coverage_ratio": 47,
+      "builder": "대양종합건설(주)",
+      "management_phone": null,
+      "address": null,
+      "lot_address": "인천광역시 연수구 송도동 22-6",
+      "area_types_m2": [],
+      "supply_type_labels": [],
+      "floorplans": [],
+      "schools": [],
+      "source_url": "https://kbland.kr/se/c/380453",
+      "last_verified": "2026-10-19",
+      "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
+      "detail_checked_at": "2026-10-19"
+    },
+    {
+      "id": "verified-extra-07",
+      "label": "월드메르디앙송도",
+      "aliases": [
+        "월드메르디앙송도"
+      ],
+      "catalog_source": "reference_verified",
+      "households": 128,
+      "buildings": 1,
+      "approved_date": null,
+      "floors": "10층",
+      "heating": null,
+      "parking_total": 259,
+      "ev_chargers": null,
+      "floor_area_ratio": 280,
+      "building_coverage_ratio": 50,
+      "builder": null,
+      "management_phone": null,
+      "address": "인천광역시 연수구 신송로 165-17",
+      "lot_address": "인천광역시 연수구 송도동 21-16",
+      "area_types_m2": [],
+      "supply_type_labels": [],
+      "floorplans": [],
+      "schools": [],
+      "source_url": "https://kbland.kr/se/c/1072436",
+      "last_verified": "2026-10-19",
+      "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": "사용승인일은 월 단위(2023년 8월)로만 교차 확인되어 정확한 일자를 표시하지 않습니다."
+    },
+    {
+      "id": "verified-extra-08",
+      "label": "위드프리상뜨",
+      "aliases": [
+        "위드프리상뜨"
+      ],
+      "catalog_source": "reference_verified",
+      "households": 42,
+      "buildings": 1,
+      "approved_date": "2006-02-10",
+      "floors": "17층",
+      "heating": "지역난방",
+      "parking_total": 115,
+      "ev_chargers": null,
+      "floor_area_ratio": 278,
+      "building_coverage_ratio": 46,
+      "builder": "위드종합건설(주)",
+      "management_phone": null,
+      "address": "인천광역시 연수구 신송로118번길 9",
+      "lot_address": "인천광역시 연수구 송도동 2-5",
+      "area_types_m2": [],
+      "supply_type_labels": [],
+      "floorplans": [],
+      "schools": [],
+      "source_url": "https://kbland.kr/se/c/15893",
+      "last_verified": "2026-10-19",
+      "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": "같은 주소에 공동주택 42세대와 별도 오피스텔 24세대가 존재합니다. 이 항목은 주상복합 내 공동주택 42세대만 의미합니다."
+    },
+    {
+      "id": "verified-extra-09",
+      "label": "송도코오롱더프라우1단지",
+      "aliases": [
+        "송도코오롱더프라우1단지"
+      ],
+      "catalog_source": "reference_verified",
+      "households": 120,
+      "buildings": 2,
+      "approved_date": "2009-07-24",
+      "floors": "19~20층",
+      "heating": "지역난방",
+      "parking_total": 347,
+      "ev_chargers": null,
+      "floor_area_ratio": 327,
+      "building_coverage_ratio": 29,
+      "builder": "코오롱건설(주)",
+      "management_phone": null,
+      "address": "인천광역시 연수구 컨벤시아대로42번길 8",
+      "lot_address": "인천광역시 연수구 송도동 15-12",
+      "area_types_m2": [],
+      "supply_type_labels": [],
+      "floorplans": [],
+      "schools": [],
+      "source_url": "https://kbland.kr/se/c/20019",
+      "last_verified": "2026-10-19",
+      "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": "해당 건물에는 공동주택과 별도 오피스텔이 혼재합니다. 표시된 세대수·주차대수는 주상복합 공동주택 기준이며 오피스텔 수치를 합산하지 않습니다."
+    },
+    {
+      "id": "verified-extra-10",
+      "label": "송도코오롱더프라우2단지",
+      "aliases": [
+        "송도코오롱더프라우2단지"
+      ],
+      "catalog_source": "reference_verified",
+      "households": 104,
+      "buildings": 2,
+      "approved_date": "2009-07-24",
+      "floors": "16~18층",
+      "heating": "지역난방",
+      "parking_total": 312,
+      "ev_chargers": null,
+      "floor_area_ratio": 327,
+      "building_coverage_ratio": 29,
+      "builder": "코오롱건설(주)",
+      "management_phone": null,
+      "address": "인천광역시 연수구 컨벤시아대로42번길 12",
+      "lot_address": "인천광역시 연수구 송도동 15-11",
+      "area_types_m2": [],
+      "supply_type_labels": [],
+      "floorplans": [],
+      "schools": [],
+      "source_url": "https://kbland.kr/se/c/20003",
+      "last_verified": "2026-10-19",
+      "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
+      "detail_checked_at": "2026-10-19",
+      "detail_note": "해당 건물에는 공동주택과 별도 오피스텔이 혼재합니다. 표시된 세대수·주차대수는 주상복합 공동주택 기준이며 오피스텔 수치를 합산하지 않습니다."
+    },
+    {
+      "id": "verified-extra-11",
+      "label": "송도푸르지오월드마크2단지",
+      "aliases": [
+        "송도푸르지오월드마크2단지"
+      ],
+      "catalog_source": "reference_verified",
+      "households": 97,
+      "buildings": 2,
+      "approved_date": "2010-11-19",
+      "floors": "17~19층",
+      "heating": "지역난방",
+      "parking_total": 337,
+      "ev_chargers": null,
+      "floor_area_ratio": 327,
+      "building_coverage_ratio": 49,
+      "builder": "(주)대우건설",
+      "management_phone": null,
+      "address": "인천광역시 연수구 컨벤시아대로 60",
+      "lot_address": "인천광역시 연수구 송도동 20-23",
+      "area_types_m2": [],
+      "supply_type_labels": [],
+      "floorplans": [],
+      "schools": [],
+      "source_url": "https://kbland.kr/se/c/21999",
+      "last_verified": "2026-10-19",
+      "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
+      "detail_checked_at": "2026-10-19"
+    },
+    {
+      "id": "verified-extra-12",
+      "label": "송도푸르지오월드마크7단지",
+      "aliases": [
+        "송도푸르지오월드마크7단지"
+      ],
+      "catalog_source": "reference_verified",
+      "households": 95,
+      "buildings": 2,
+      "approved_date": "2010-11-19",
+      "floors": "19층",
+      "heating": "지역난방",
+      "parking_total": 324,
+      "ev_chargers": null,
+      "floor_area_ratio": 327,
+      "building_coverage_ratio": 48,
+      "builder": "(주)대우건설",
+      "management_phone": null,
+      "address": "인천광역시 연수구 컨벤시아대로 116",
+      "lot_address": "인천광역시 연수구 송도동 22-21",
+      "area_types_m2": [],
+      "supply_type_labels": [],
+      "floorplans": [],
+      "schools": [],
+      "source_url": "https://kbland.kr/se/c/22000",
+      "last_verified": "2026-10-19",
+      "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
+      "detail_checked_at": "2026-10-19"
     }
   ]
 }
