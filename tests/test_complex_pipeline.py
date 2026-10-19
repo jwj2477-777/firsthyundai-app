@@ -16,7 +16,7 @@ def record(code, name, district="송도동", bjd=c.SONGDO_CODE):
         "kaptAddr": f"인천광역시 연수구 {district} 123-4",
         "doroJuso": "인천광역시 연수구 아트센터대로 100",
         "kaptdaCnt": "850", "kaptDongCnt": "8",
-        "kaptUsedate": "20180123", "codeHeatNm": "지역난방",
+        "kaptUsedate": "20180123", "codeHeatNm": "지역난방", "kaptTopFloor": "37",
         "kaptBcompany": "테스트건설", "kaptTel": "0328314567",
     }
 
@@ -36,12 +36,14 @@ class KaptTest(unittest.TestCase):
         s = record("A10012345", "송도 테스트")
         self.assertTrue(c.is_songdo(s))
         self.assertFalse(c.is_songdo(record("A10098765", "옆동네", "동춘동", "2818510500")))
-        p = c.apt_profile(s, {"kaptdPcnt": 150, "kaptdPcntu": 900}, "2026-10-19")
+        p = c.apt_profile(s, {"kaptdPcnt": 150, "kaptdPcntu": 900, "groundElChargerCnt": 5, "undergroundElChargerCnt": 8}, "2026-10-19")
         self.assertEqual(p["households"], 850)
         self.assertEqual(p["parking_total"], 1050)
+        self.assertEqual(p["ev_chargers"], 13)
+        self.assertEqual(p["floors"], "최고 37층")
         self.assertEqual(p["approved_date"], "2018-01-23")
         self.assertEqual(p["management_phone"], "032-831-4567")
-        self.assertIsNone(p.get("ev_chargers"))
+        self.assertIsNone(p.get("floor_area_ratio"))
         self.assertFalse(p["supply_type_labels"])
         self.assertEqual(p["catalog_source"], "kapt")
         self.assertIsNone(c.apt_profile(record("A10012345", "outside", "동춘동", "2818510500"), {}, "2026-10-19"))
