@@ -4,10 +4,15 @@ from pathlib import Path
 from datetime import datetime, timezone, timedelta
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
-from collect_trades import parse_response, normalize, recent_months, unique_ids
+from collect_trades import parse_response, normalize, recent_months, unique_ids, normalized_service_key
 from collect_news import parse_rss, deduplicate, make_briefs, rss_link
 
 class TradeTests(unittest.TestCase):
+    def test_service_key_normalization(self):
+        self.assertEqual(normalized_service_key('a%2Bb%2Fc%3D'), 'a+b/c=')
+        self.assertEqual(normalized_service_key('a+b/c='), 'a+b/c=')
+        self.assertEqual(normalized_service_key('  a%2Bb%2Fc%3D  '), 'a+b/c=')
+
     def test_month_rollover(self):
         self.assertEqual(list(recent_months(3,datetime(2026,1,15,tzinfo=timezone.utc))),['202601','202512','202511'])
     def test_molit_xml(self):
