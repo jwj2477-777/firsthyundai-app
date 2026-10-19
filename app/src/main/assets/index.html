@@ -1195,7 +1195,7 @@ async function refreshAll(manual=false){
  }
  return all;
 }
-function saveRepo(){if(role!=='admin')return;let text=$('repo').value.trim();if(!/^[A-Za-z0-9_.-]{1,60}\/[A-Za-z0-9_.-]{1,100}$/.test(text)){alert('GitHub아이디/저장소이름 형식으로 입력하세요. 예: hong/firsthyundai-app');return;}repository=text;localStorage.setItem(REPO_KEY,text);$('settingStatus').classList.remove('hidden');$('settingStatus').textContent='저장되었습니다. 온라인 데이터를 불러옵니다.';refreshAll();}
+function saveRepo(){if(role!=='admin')return;let text=$('repo').value.trim();if(!/^[A-Za-z0-9_.-]{1,60}\/[A-Za-z0-9_.-]{1,100}$/.test(text)){alert('GitHub아이디/저장소이름 형식으로 입력하세요. 예: hong/firsthyundai-app');return;}repository=text;localStorage.setItem(REPO_KEY,text);$('settingStatus').classList.remove('hidden');$('settingStatus').textContent='저장되었습니다. 온라인 데이터를 불러옵니다.';refreshAll();refreshPublicServices();}
 
 function kstDateOffset(daysAgo){
  const date=new Date(Date.now()+9*3600000);
@@ -1263,7 +1263,7 @@ function renderNew(){
   }).join('');
 }
 
-updateRoleBar();switchPage(role==='admin'?'overview':'nearby');refreshAll();
+updateRoleBar();switchPage(role==='admin'?'overview':'nearby');refreshAll();refreshPublicServices();
 
 // FirstHyundai v1.4 - Admin-only draft editor for PUBLIC apartment reference data.
 'use strict';
