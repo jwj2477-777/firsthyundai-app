@@ -1,0 +1,56 @@
+name: Sync Optional Public Services (requires approvals)
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Select approved service only'
+        required: true
+        default: schools
+        type: choice
+        options: [schools, offices, all]
+  schedule:
+    - cron: '32 21 2 * *'
+permissions:
+  contents: write
+concurrency:
+  group: firsthyundai-extra-public
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate provider parse and no-fake-data safeguards
+        run: python -m unittest discover -s tests -v
+      - name: Collect only approved official services
+        env:
+          NEIS_EDU_KEY: ${{ secrets.NEIS_EDU_KEY }}
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            python scripts/collect_public_services.py --mode schools
+          else
+            python scripts/collect_public_services.py --mode "${{ inputs.mode }}"
+          fi
+      - name: Commit only verified public snapshots
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/public_services.json
+          if git diff --staged --quiet; then
+            echo 'No approved source or unchanged data'; exit 0
+          fi
+          git commit -m 'data: update verified official optional public data'
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 3
+          done
+          exit 1

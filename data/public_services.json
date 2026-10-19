@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "state": "awaiting_approval",
+  "updated_at": "2026-10-19",
+  "note": "신청·인증 전에는 빈 배열을 실제 조회 0건으로 해석하지 않습니다. 학구도와 가까운 학교를 배정학교로 자동 판단하지 않습니다. 키는 GitHub Secrets에만 보관.",
+  "schools": {
+    "state": "awaiting_key",
+    "updated_at": null,
+    "records": [],
+    "source_url": "https://open.neis.go.kr/portal/data/service/selectServicePage.do?infId=OPEN17020190531110010104913&infSeq=2"
+  },
+  "school_zones": {
+    "state": "published_download_available",
+    "updated_at": "2026-09-20",
+    "records": [],
+    "source_url": "https://schoolzone.emac.kr/publicData/publicDataList.do",
+    "note": "초등 통학구역·중학교 학교군 SHP는 공식 자료 다운로드 후 단지 주소 좌표와 교차 검증 필요. 현재 자동 배정 판정 기능 없음."
+  },
+  "building_registry": {
+    "state": "awaiting_approval",
+    "updated_at": null,
+    "records": [],
+    "source_url": "https://www.data.go.kr/data/15134735/openapi.do"
+  },
+  "maintenance": {
+    "state": "awaiting_approval",
+    "updated_at": null,
+    "records": [],
+    "source_url": "https://www.data.go.kr/data/15057937/openapi.do"
+  },
+  "addresses": {
+    "state": "awaiting_key",
+    "updated_at": null,
+    "records": [],
+    "source_url": "https://business.juso.go.kr/"
+  },
+  "office_rents": {
+    "state": "awaiting_approval",
+    "updated_at": null,
+    "records": [],
+    "source_url": "https://www.data.go.kr/data/15126475/openapi.do"
+  },
+  "subscriptions": {
+    "state": "awaiting_approval",
+    "updated_at": null,
+    "records": [],
+    "source_url": "https://www.data.go.kr/data/15098547/openapi.do"
+  }
+}

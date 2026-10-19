@@ -240,7 +240,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void fetch(String repository, String filename, String requestId) {
             // Public data ONLY. Never inject API tokens / family records into remote requests.
             if (repository==null || !repository.matches("[A-Za-z0-9_.-]{1,60}/[A-Za-z0-9_.-]{1,100}") ||
-                    !("trades.json".equals(filename) || "new_trades.json".equals(filename) || "news.json".equals(filename) || "complexes.json".equals(filename))) {
+                    !("trades.json".equals(filename) || "new_trades.json".equals(filename) || "news.json".equals(filename) || "complexes.json".equals(filename) || "public_services.json".equals(filename))) {
                 deliverFeed(requestId, false, "저장소 주소 또는 파일명이 올바르지 않습니다.", null);
                 return;
             }

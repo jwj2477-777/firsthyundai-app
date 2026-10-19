@@ -21,6 +21,13 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 .refreshFeedback.success{background:#eaf7ef;border-color:#aed7bd;color:#1b6540}
 .refreshFeedback.warning{background:#fff3e8;border-color:#eec7b0;color:#905024}
 .refreshFeedback.error{background:#fff0ec;border-color:#edc2b9;color:#9e332f}
+
+.apiSmallCard{margin-top:16px}.apiSmallCard h3{font-size:16px;margin:0 0 12px}
+.apiNotice{padding:12px;background:#f3f8fc;border:1px solid #d6e5ed;border-radius:10px;font-size:13px;line-height:1.6;color:#48687e}
+.apiSourceLink{display:inline-block;margin:9px 0;color:#205e93;font-size:13px;font-weight:750}
+.apiInfoCards{display:grid;gap:9px}.apiInfoCards article{padding:13px;background:#fcfeff;border:1px solid #dce7ef;border-radius:10px}
+.apiInfoCards article strong{display:block;margin-bottom:6px}.apiInfoCards article p{font-size:12px;line-height:1.6}
+.apiSchools{display:grid;gap:7px}.apiSchools>div{border:1px solid #dce7ef;padding:10px;border-radius:10px}
 .primaryNav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
 .primaryNav button{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;min-width:0;min-height:80px;padding:10px 5px;border:1px solid #c9dce9;border-radius:14px;background:white;color:#315b7b;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 2px 7px #183b6010}
 .primaryNav button .navIcon{font-size:24px;line-height:1.1}
@@ -323,11 +330,17 @@ body.apartmentSheetActive{overflow:hidden}
   </details>
   <div id="tradesContent"><div class="empty">최신 실거래 자료를 불러오고 있습니다.</div></div>
   <div class="tiny">금액 단위: 만 원. 보증금과 월세는 별도 표시합니다. 실거래는 신고 이후 반영되므로 실제 계약일보다 늦게 게시될 수 있습니다. 동일 조건의 별도 계약도 각각 표시할 수 있습니다.</div>
+  </div>
+  <div class="panel apiSmallCard" id="officetelPanel"><h3>오피스텔 전월세</h3>
+  <div class="controls"><input id="officeNameSearch" aria-label="오피스텔 검색" placeholder="오피스텔명" oninput="renderOfficeRentals()">
+  <select id="officeTypeSearch" aria-label="오피스텔 계약유형" onchange="renderOfficeRentals()"><option value="">전세·월세 전체</option><option value="전세">전세</option><option value="월세">월세</option></select></div>
+  <div id="officeRentContent">공식 API 활용신청 후 이용 가능합니다.</div>
  </div>
 </div>
 <div id="news" class="page hidden">
  <div class="sectionTitle"><div><h2>송도·부동산 뉴스 브리핑</h2><p class="tiny" id="newsMeta">무료 자연어 처리 기반 기사 묶음</p></div><button class="btn alt refreshAction" type="button" data-refresh="news" onclick="refreshOne('news',true)">갱신</button></div>
  <div class="notice">이 브리핑은 기사 <b>제목</b> 유사도를 이용한 자동 묶음입니다. 생성형 AI 요약이나 공식 사실검증이 아닙니다. 세금·대출·개발일정은 공식 원문 확인 후 안내하세요.</div>
+ <div class="panel apiSmallCard"><h3>청약·분양</h3><div id="publicSubscriptions">청약홈 공식 API 연동 대기</div></div>
  <div class="panel"><select id="newsCategory" onchange="renderNews()"><option value="">모든 주제</option><option>개발·교통</option><option>분양·입주</option><option>세금·대출</option><option>정책·규제</option></select><div id="newsContent"><div class="empty">데이터 저장소를 연결한 후 표시됩니다.</div></div></div>
 </div>
 <div id="notes" class="page hidden">
@@ -532,8 +545,8 @@ function switchPage(id){
  if(id==='nearby')renderNearby();
  if(id==='complexes')renderComplexes();
  if(id==='new')renderNew();
- if(id==='trades')renderTrades();
- if(id==='news')renderNews();
+ if(id==='trades'){renderTrades();renderOfficeRentals();}
+ if(id==='news'){renderNews();renderPublicSubscriptions();}
  if(id==='notes'&&role==='admin')renderNotes();
  if(id==='security'&&role==='admin'){
   const v=window.FirstHyundaiNative?.getPolicyVersion?.()||0;
@@ -634,7 +647,7 @@ function displayComplexValue(v,suffix=''){
  return v===null||v===undefined||v===''?'확인 전':String(v)+suffix;
 }
 function setComplexDetailTab(tab){
- if(!['basic','types','schools','deals','sources'].includes(tab))return;
+ if(!['basic','types','schools','deals','public','sources'].includes(tab))return;
  complexDetailTab=tab;
  renderComplexes();
  if(activeApartmentSheet==='complexSheet')$('complexSheet').scrollTop=0;
@@ -726,18 +739,87 @@ function renderComplexes(){
     '<div class="complexSchoolRow"><span>'+escapeHtml(x.level)+' · '+(x.classification==='assigned'?'배정학교 확인':'인근 참고학교 (배정 미확인)')+'</span>'+
     '<strong>'+escapeHtml(x.name)+'</strong>'+
     (safeLink(x.source_url)?'<a href="'+escapeHtml(safeLink(x.source_url))+'">근거 확인 ↗</a>':'')+'</div>').join('')+'</div>':
-    '<div class="empty">이 단지의 배정학교는 아직 검증되지 않았습니다.</div>'+
-    '<p class="complexSectionNote">학교와의 거리만으로 배정학교를 판단하지 않습니다. 확인된 학구 자료나 학교 안내 자료로 보강하겠습니다.</p>';
-  const tabs=[['basic','기본정보'],['types','평형·타입'],['schools','학교·학군'],['deals','실거래'],['sources','평면도·원문']]
+    '<div class="empty">이 단지의 배정학교는 아직 검증되지 않았습니다.</div>';
+  const tabs=[['basic','기본정보'],['types','평형·타입'],['schools','학교·학군'],['deals','실거래'],['public','건축·관리비'],['sources','평면도·원문']]
    .map(([id,label])=>'<button type="button" class="'+(id===complexDetailTab?'active':'')+
     '" onclick="setComplexDetailTab(\''+id+'\')" aria-pressed="'+(id===complexDetailTab?'true':'false')+'">'+label+'</button>').join('');
-  const tabBody=complexDetailTab==='types'?areaView:complexDetailTab==='schools'?schoolView:complexDetailTab==='deals'?deals:complexDetailTab==='sources'?doc:basic;
+  const tabBody=complexDetailTab==='types'?areaView:complexDetailTab==='schools'?schoolView+renderSchoolPublicInfo():complexDetailTab==='deals'?deals:complexDetailTab==='public'?renderPublicComplexInfo(p):complexDetailTab==='sources'?doc:basic;
   $('complexDetails').innerHTML='<h3 class="complexDetailTitle">'+escapeHtml(p.label)+'</h3>'+
    (p.address?'<p class="complexDetailAddress">⌖ '+escapeHtml(p.address)+'</p>':'')+
    '<div class="complexTabBar">'+tabs+'</div>'+tabBody;
  }
  $('complexAdmin').classList.toggle('hidden',role!=='admin');
  if(role==='admin'&&window.firstHyundaiDraftCount)$('catalogDraftNotice').textContent='이 기기의 미게시 수정: '+number(window.firstHyundaiDraftCount())+'개 단지';
+}
+// Source-backed optional integrations. Never treat an unapproved service as 0 records.
+let publicServices=null;
+const PUBLIC_SRC={
+ school:'https://open.neis.go.kr/portal/data/service/selectServicePage.do?infId=OPEN17020190531110010104913&infSeq=2',
+ zone:'https://schoolzone.emac.kr/',
+ registry:'https://www.data.go.kr/data/15134735/openapi.do',
+ fee:'https://www.data.go.kr/data/15057937/openapi.do',
+ address:'https://business.juso.go.kr/',
+ office:'https://www.data.go.kr/data/15126475/openapi.do',
+ subscription:'https://www.data.go.kr/data/15098547/openapi.do'};
+function sourceLink(url,label){const u=safeLink(url);return u?'<a class="apiSourceLink" href="'+escapeHtml(u)+'" target="_blank" rel="noopener noreferrer">'+escapeHtml(label)+' ↗</a>':'';}
+function verifiedRecords(key){
+ const p=publicServices?.[key];
+ return p?.state==='verified'&&Array.isArray(p.records)?p.records:null;
+}
+function renderSchoolPublicInfo(){
+ const schools=verifiedRecords('schools');
+ let details=schools===null?'<div class="apiNotice">나이스 인증키 등록 후 송도 학교 기본정보를 자동 조회합니다.</div>':
+ schools.length?'<div class="apiSchools">'+schools.slice(0,35).map(x=>'<div><strong>'+escapeHtml(x.level)+' · '+escapeHtml(x.name)+'</strong>'+
+ '<span class="tiny">'+escapeHtml(x.address)+'</span></div>').join('')+'</div>':
+ '<div class="apiNotice">현재 확인된 송도 학교 기본정보가 없습니다.</div>';
+ return '<div class="apiSmallCard"><h3>송도 학교 기본정보</h3><p class="complexSectionNote">이 목록은 배정학교가 아닙니다. 통학구역은 교육청 공식 학구도로 확인하세요.</p>'+
+ details+sourceLink(PUBLIC_SRC.zone,'공식 학구도에서 해당 주소 검색')+
+ sourceLink(PUBLIC_SRC.school,'나이스 학교정보')+'</div>';
+}
+function renderPublicComplexInfo(p){
+ const items=[['건축물대장','건축물 용도·전유부 정보','building_registry',PUBLIC_SRC.registry],
+              ['공동주택 관리비','단지 월별 관리비 통계','maintenance',PUBLIC_SRC.fee],
+              ['도로명·지번주소','단지명보다 주소 우선 대조','addresses',PUBLIC_SRC.address]];
+ return '<div class="apiInfoCards">'+items.map(([name,description,key,link])=>{
+  const records=verifiedRecords(key);
+  const found=records?.find(x=>x.complex_id===p.id);
+  return '<article><strong>'+escapeHtml(name)+'</strong><p>'+escapeHtml(description)+'</p>'+
+   (found&&typeof found.summary==='string'?'<p>'+escapeHtml(found.summary)+'</p>':
+   '<p class="tiny">공식 서비스 활용승인·개별 단지 검증 후 상세 수치를 표시합니다.</p>')+
+   sourceLink(link,'공식 자료·신청')+'</article>';
+ }).join('')+'</div><p class="complexSectionNote">정보 미제공은 0원 또는 0건이 아닙니다. 관리비는 개별 세대의 실제 청구액과 다릅니다.</p>';
+}
+function renderOfficeRentals(){
+ const el=$('officeRentContent');if(!el)return;
+ const records=verifiedRecords('office_rents');
+ if(!records){el.innerHTML='<div class="apiNotice">국토교통부 오피스텔 전월세 API 활용승인 후 자동 수집됩니다.</div>'+sourceLink(PUBLIC_SRC.office,'신청 페이지');return;}
+ const q=($('officeNameSearch').value||'').trim().toLowerCase(),type=$('officeTypeSearch').value;
+ const visible=records.filter(x=>(!type||x.type===type)&&(!q||String(x.building||'').toLowerCase().includes(q)));
+ el.innerHTML='<p class="tiny">송도 오피스텔 전월세 '+number(visible.length)+'건 · 아파트 거래와 별도</p>'+
+ (visible.length?visible.slice(0,40).map(x=>'<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+dealBadge(x.type)+
+ '</div><h3>'+escapeHtml(x.building)+'</h3><div class="money">보증금 '+escapeHtml(value10k(x.deposit_10k))+
+ (x.type==='월세'?' / 월세 '+escapeHtml(value10k(x.monthly_10k)):'')+'</div>'+
+ '<div class="meta">계약 '+escapeHtml(x.contract_date)+' · 전용 '+escapeHtml(x.area_m2)+'㎡</div></article>').join(''):
+ '<div class="empty">해당 조건의 오피스텔 거래가 없습니다.</div>');
+}
+function renderPublicSubscriptions(){
+ const el=$('publicSubscriptions');if(!el)return;
+ const records=verifiedRecords('subscriptions');
+ if(!records){el.innerHTML='<div class="apiNotice">청약홈 API 활용승인 후 송도 분양공고를 조회할 수 있습니다.</div>'+
+ sourceLink(PUBLIC_SRC.subscription,'분양정보 API 신청');return;}
+ el.innerHTML=records.length?records.slice(0,20).map(x=>'<article class="item"><strong>'+escapeHtml(x.name||'분양공고')+
+ '</strong><p class="tiny">'+escapeHtml(x.address||'')+'</p></article>').join(''):
+ '<div class="apiNotice">현재 확인된 송도 분양공고가 없습니다.</div>';
+}
+async function refreshPublicServices(manual=false){
+ try{
+  const doc=await fetchRemote('public_services');
+  if(doc?.schema_version!==1||!doc.schools||!doc.office_rents)throw Error('자료 형식 오류');
+  publicServices=doc;
+  if(manual)showRefreshFeedback('공공정보 게시자료를 확인했습니다. 미승인 서비스는 연동 대기로 표시합니다.','success');
+ }catch(e){if(manual)showRefreshFeedback('공공정보 요청 실패 · 이전 정보 유지','error');}
+ renderOfficeRentals();renderPublicSubscriptions();
+ if(currentPage==='complexes')renderComplexes();
 }
 function tradeClass(type){return type==='매매'?'sale':type==='전세'?'lease':type==='월세'?'monthly':'';}
 function dealBadge(type){return '<span class="dealBadge '+tradeClass(type)+'">'+escapeHtml(type||'기타')+'</span>';}
@@ -1113,7 +1195,7 @@ async function refreshAll(manual=false){
  }
  return all;
 }
-function saveRepo(){if(role!=='admin')return;let text=$('repo').value.trim();if(!/^[A-Za-z0-9_.-]{1,60}\/[A-Za-z0-9_.-]{1,100}$/.test(text)){alert('GitHub아이디/저장소이름 형식으로 입력하세요. 예: hong/firsthyundai-app');return;}repository=text;localStorage.setItem(REPO_KEY,text);$('settingStatus').classList.remove('hidden');$('settingStatus').textContent='저장되었습니다. 온라인 데이터를 불러옵니다.';refreshAll();}
+function saveRepo(){if(role!=='admin')return;let text=$('repo').value.trim();if(!/^[A-Za-z0-9_.-]{1,60}\/[A-Za-z0-9_.-]{1,100}$/.test(text)){alert('GitHub아이디/저장소이름 형식으로 입력하세요. 예: hong/firsthyundai-app');return;}repository=text;localStorage.setItem(REPO_KEY,text);$('settingStatus').classList.remove('hidden');$('settingStatus').textContent='저장되었습니다. 온라인 데이터를 불러옵니다.';refreshAll();refreshPublicServices();}
 
 function kstDateOffset(daysAgo){
  const date=new Date(Date.now()+9*3600000);
@@ -1181,7 +1263,7 @@ function renderNew(){
   }).join('');
 }
 
-updateRoleBar();switchPage(role==='admin'?'overview':'nearby');refreshAll();
+updateRoleBar();switchPage(role==='admin'?'overview':'nearby');refreshAll();refreshPublicServices();
 
 // FirstHyundai v1.4 - Admin-only draft editor for PUBLIC apartment reference data.
 'use strict';

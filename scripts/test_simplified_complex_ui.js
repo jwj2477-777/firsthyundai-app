@@ -46,7 +46,7 @@ vm.runInContext(js,ctx);
  assert(!basic.includes('실거래 관측 전용면적'));
  assert(!basic.includes('확인된 전용면적 유형'));
  assert(!basic.includes('전용면적별 실거래 조회'),'Basic tab must not repeat per-area trades');
- assert((basic.match(/setComplexDetailTab\(/g)||[]).length===5,'Five accessible tap targets');
+ assert((basic.match(/setComplexDetailTab\(/g)||[]).length===6,'Six accessible tap targets including public building and fees');
  ev("setComplexDetailTab('schools')");
  assert(el('complexDetails').innerHTML.includes('배정학교는 아직 검증되지 않았습니다'));
  ev('openComplexEditor()');
