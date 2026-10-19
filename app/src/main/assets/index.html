@@ -43,11 +43,6 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 #complexEditor{border:1px solid #cadde8;border-radius:15px;max-width:min(580px,94vw);width:94vw;max-height:85vh;overflow-y:auto;padding:20px}
 #complexEditor input,#complexEditor textarea{margin-bottom:9px}
 #complexEditor textarea{min-height:65px}
-.complexAreaCard{border:1px solid #d6e1e8;border-radius:10px;padding:11px;margin:8px 0}
-.complexAreaCard h4{margin:0 0 6px;font-size:14px}
-.complexAreaCard .tiny{line-height:1.7}
-.complexAreaButtons{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.complexAreaButtons button{border:1px solid #aac8de;border-radius:7px;padding:8px;background:#f0f7fa;color:#144769;font-size:12px;cursor:pointer}
 .complexTools{display:flex;flex-wrap:wrap;align-items:end;gap:10px}
 .complexTools select{max-width:220px}
 .complexLinksExternal{display:flex;flex-wrap:wrap;gap:9px;margin:10px 0}
@@ -368,7 +363,7 @@ const FAVORITE_MATCH=new Map(FAVORITE_APTS.flatMap(g=>g.names.map(name=>[normali
 function favoriteIdForBuilding(name){return FAVORITE_MATCH.get(normalizeAptName(name))||'';}
 /* FAVORITES_MAPPING_END */
 
-/* APARTMENT_CATALOG_V13: public, fact-safe reference data. */
+/* APARTMENT_CATALOG_V16: deduplicated, source-backed public facts and quick tabs. */
 let complexSelected='f15', complexDisplayLimit=48, complexDetailTab='basic', complexDealType='';
 function baseComplexes(){
  return FAVORITE_APTS.flatMap(g=>{
@@ -411,11 +406,6 @@ function catalogRows(){
 }
 function resetComplexLimit(){complexDisplayLimit=48;}
 function showMoreComplexes(){complexDisplayLimit+=48;renderComplexes();}
-function complexObservedAreas(apt){
- const names=new Set((Array.isArray(apt.aliases)?apt.aliases:[]).map(normalizeAptName));
- const list=(remote.trades?.records||[]).filter(x=>names.has(normalizeAptName(x.building)));
- return [...new Set(list.map(x=>Math.round(Number(x.area_m2)*100)/100).filter(x=>Number.isFinite(x)&&x>0&&x<1000))].sort((a,b)=>a-b);
-}
 function complexTradeRows(apt){
  const names=new Set((Array.isArray(apt.aliases)?apt.aliases:[]).map(normalizeAptName));
  return (remote.trades?.records||[]).filter(x=>names.has(normalizeAptName(x.building)));
@@ -484,7 +474,7 @@ function renderComplexes(){
    tile('세대수',hh===null?'확인 전':number(hh)+'세대')+
    tile('동수',displayComplexValue(p.buildings,'개동'))+
    tile('사용승인일',displayComplexValue(p.approved_date))+
-   tile('최고층',displayComplexValue(floors))+
+   tile('층수 범위',displayComplexValue(floors))+
    tile('난방',displayComplexValue(p.heating_detail||p.heating))+
    tile('주차',parking===null?'확인 전':number(parking)+'대 (세대당 '+rate+')')+
    tile('전기차 충전',ev===null?'확인 전':number(ev)+'대')+
@@ -554,13 +544,7 @@ function clearTradeFocus(){
 }
 let tradeFocus=null;
 function selectComplex(id){if(!catalogRows().some(x=>x.id===id))return;complexSelected=id;complexDetailTab='basic';complexDealType='';renderComplexes();$('complexDetails').scrollIntoView({behavior:'smooth',block:'start'});}
-function showComplexNearbyTrades(id){
- const favoriteId=id==='prime20'||id==='prime25'?'prime':id;
- if(!FAVORITE_APTS.some(x=>x.id===favoriteId))return;
- nearbySelected=favoriteId;nearbyLimit=40;switchPage('nearby');
- $('nearbyDetails').scrollIntoView({behavior:'smooth',block:'start'});
-}
-/* APARTMENT_CATALOG_V13_END */
+/* APARTMENT_CATALOG_V16_END */
 
 let nearbySelected='all', nearbyLimit=40;
 function chooseNearby(id){
