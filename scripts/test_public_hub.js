@@ -14,7 +14,7 @@ const ctx=vm.createContext({
  escapeHtml:v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),
  $:id=>(nodes[id]??={innerHTML:'',value:''}),
  number:n=>String(n),prettyTime:v=>v,
- value10k:n=>String(n)+'만원',
+ value10k:n=>String(n)+'만원', URL,
  dealArticleClass:v=>'dealRow',dealBadge:v=>v.type,fetchRemote:async()=>{throw Error('missing optional')},
  currentPage:'nearby',renderComplexes(){},showRefreshFeedback(){},console
 });
