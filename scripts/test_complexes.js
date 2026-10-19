@@ -11,12 +11,17 @@ assert.equal(catalog.records.length, 13, '12 nearby favorites should include spl
 assert.equal(new Set(catalog.records.map(x => x.id)).size, 13);
 assert(catalog.records.some(x=>x.id==='prime20'));
 assert(catalog.records.some(x=>x.id==='prime25'));
+assert.equal(catalog.records.find(x=>x.id==='f14').households,869);
+assert.equal(catalog.records.find(x=>x.id==='m23').heating,null);
 for (const row of catalog.records) {
  assert.match(row.id,/^[a-z0-9-]{1,32}$/);
  assert(row.aliases.length>0);
- assert.equal(row.households,null,'No fabricated household count');
- assert.equal(row.heating,null,'No fabricated heating system');
- assert.deepEqual(row.floorplans,[], 'No unverified floorplan link');
+ assert(Number.isInteger(row.households) && row.households > 0,'Households must be verified positive integers');
+ assert(row.source_url.startsWith('https://'),'Each household count must have a cited HTTPS source');
+ assert.equal(row.last_verified,'2026-10-19');
+ assert(row.heating===null || row.heating==='지역난방','Conflicting heating information remains unverified');
+ assert(Array.isArray(row.supply_type_labels));
+ assert.deepEqual(row.floorplans,[], 'Do not claim an unverified image is a floorplan');
 }
 const html = fs.readFileSync(path.join(root, 'app/src/main/assets/index.html'), 'utf8');
 assert(html.includes('id="complexes"'));
