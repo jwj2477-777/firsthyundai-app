@@ -1,0 +1,21 @@
+name: Probe approved building and maintenance API fields (no secrets logged)
+on:
+  push:
+    branches: [main]
+    paths: ['scripts/probe_registry_maintenance.py','.github/workflows/probe-registry-fees.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Probe public official API shapes only
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+        run: python scripts/probe_registry_maintenance.py
