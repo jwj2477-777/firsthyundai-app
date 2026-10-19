@@ -492,14 +492,20 @@ function baseComplexes(){
 function catalogRows(){
  const base=baseComplexes().map(x=>({...x,households:null,heating:null,area_types_m2:[],floorplans:[],source_url:null,last_verified:null}));
  const map=new Map(base.map(x=>[x.id,x]));
+ const groupAliases=new Set();
  for(const row of remote.complexes?.records||[]){
   if(!row||typeof row.id!=='string'||!/^[a-z0-9-]{1,32}$/.test(row.id)||
      typeof row.label!=='string'||row.label.length>80||!Array.isArray(row.aliases)||row.aliases.length>10)continue;
-  // Canonical aliases remain anchored to validated favorite labels.
+  // Combined management complexes are not an additional individual apartment.
+  // Keep their names reserved so a transaction label does not recreate a blank duplicate.
+  if(row.aggregate_only){
+   [row.label,...row.aliases].forEach(v=>groupAliases.add(normalizeAptName(v)));
+   continue;
+  }
   if(map.has(row.id))map.set(row.id,{...map.get(row.id),...row,aliases:map.get(row.id).aliases});
   else map.set(row.id,row);
  }
- const known=new Set([...map.values()].flatMap(x=>(x.aliases||[]).map(normalizeAptName)));
+ const known=new Set([...map.values()].flatMap(x=>(x.aliases||[]).map(normalizeAptName)).concat([...groupAliases]));
  const observedNames=new Map();
  for(const deal of remote.trades?.records||[]){
   const name=String(deal.building||'').trim(),norm=normalizeAptName(name);
