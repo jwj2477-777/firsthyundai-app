@@ -53,7 +53,8 @@ def upsert_complex_targets(catalog,basic):
     # A K-apt catalog row always wins. For manually verified apartment entries,
     # allow a *unique exact* road-address match only.
     matches=[p for p in catalog if not p.get('aggregate_only') and
-        p.get('kapt_code')==code and p.get('id')]
+        p.get('kapt_code')==code and p.get('id') and
+        address_key(p.get('address'))==road]
     if matches:return matches[:1]
     matches=[p for p in catalog if not p.get('aggregate_only') and
         p.get('id') and not p.get('kapt_code') and address_key(p.get('address'))==road]
