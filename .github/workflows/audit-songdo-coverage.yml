@@ -14,4 +14,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Compare distinct Songdo trade buildings against K-apt catalog
-        run: python scripts/audit_songdo_coverage.py
+        run: |
+          python scripts/audit_songdo_coverage.py
+          python - <<'PY'
+          import json,collections
+          c=json.load(open('data/complexes.json'))['records']
+          t=json.load(open('data/trades.json'))['records']
+          names=collections.Counter(x.get('building','') for x in t if x.get('building'))
+          print('Trade distinct',len(names),'catalog',len(c))
+          for key in ('lot_number','jibun','apt_seq','address'):
+              print(key,'present in',sum(bool(x.get(key)) for x in t),'trade records')
+          PY
