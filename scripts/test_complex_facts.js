@@ -3,8 +3,9 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..');
 const obj=JSON.parse(fs.readFileSync(path.join(root,'data/complexes.json'),'utf8'));
-assert.equal(obj.records.length,13);
-const rows=obj.records;
+assert(obj.records.length>=13);
+const rows=obj.records.filter(x=>x.catalog_source!=='kapt');
+assert.equal(rows.length,13,'All thirteen manually checked profiles must remain');
 assert.equal(new Set(rows.map(x=>x.id)).size,13);
 const required=['households','buildings','approved_date','parking_total','floors','floor_area_ratio',
  'building_coverage_ratio','address','builder','management_phone','ev_chargers','source_url'];
@@ -31,7 +32,8 @@ for(const row of rows){
 const p13=rows.find(x=>x.id==='f13'),m23=rows.find(x=>x.id==='m23'),c3=rows.find(x=>x.id==='central3');
 assert.equal(p13.ev_chargers,14,'Preserve 13BL EV figure directly supplied by user');
 assert.equal(p13.management_phone,'032-834-8996');
-assert.equal(m23.heating,null,'Conflicting 23BL heating must remain unset');
+assert.equal(m23.heating,'지역난방','User supplied Naver screenshot confirms displayed heating as regional');
+assert.equal(m23.heating_detail,'지역난방 / 열병합');
 assert(m23.detail_note.includes('중앙난방') && m23.detail_note.includes('지역난방'));
 assert(c3.detail_note.includes('층수 출처 불일치'));
 assert.equal(rows.filter(x=>x.parking_alt_total!=null).length,4,'Four parking counts need manual K-apt reconciliation');

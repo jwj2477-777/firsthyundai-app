@@ -7,19 +7,19 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const catalog = JSON.parse(fs.readFileSync(path.join(root, 'data/complexes.json'), 'utf8'));
 assert.equal(catalog.schema_version, 1);
-assert.equal(catalog.records.length, 13, '12 nearby favorites should include split prime 20/25');
-assert.equal(new Set(catalog.records.map(x => x.id)).size, 13);
+assert(catalog.records.length >= 13, 'Core thirteen complexes must remain after K-apt expansion');
+assert.equal(new Set(catalog.records.map(x => x.id)).size, catalog.records.length);
 assert(catalog.records.some(x=>x.id==='prime20'));
 assert(catalog.records.some(x=>x.id==='prime25'));
 assert.equal(catalog.records.find(x=>x.id==='f14').households,869);
-assert.equal(catalog.records.find(x=>x.id==='m23').heating,null);
+assert.equal(catalog.records.find(x=>x.id==='m23').heating,'지역난방');
 for (const row of catalog.records) {
  assert.match(row.id,/^[a-z0-9-]{1,32}$/);
  assert(row.aliases.length>0);
  assert(Number.isInteger(row.households) && row.households > 0,'Households must be verified positive integers');
  assert(row.source_url.startsWith('https://'),'Each household count must have a cited HTTPS source');
  assert.equal(row.last_verified,'2026-10-19');
- assert(row.heating===null || row.heating==='지역난방','Conflicting heating information remains unverified');
+ assert(row.heating===null || ['지역난방','개별난방','중앙난방'].includes(row.heating),'Heating values must be declared and source backed');
  assert(Array.isArray(row.supply_type_labels));
  assert.deepEqual(row.floorplans,[], 'Do not claim an unverified image is a floorplan');
 }
@@ -64,7 +64,7 @@ vm.runInContext(javascript+'\n globalThis.__test={catalogRows,complexAreaStats,r
 (async()=>{
  await new Promise(r=>setImmediate(r));
  const {catalogRows,complexAreaStats,switchPage,selectComplex}=context.__test;
- assert.equal(catalogRows().length,13);
+ assert(catalogRows().length>=13);
  assert(!element('nav').innerHTML.includes('보안 관리'), 'Family navigation hides admin tabs');
  switchPage('complexes');
  assert.equal(element('complexAdmin').classList.contains('hidden'),true,'Admin editor must be hidden in family mode');
