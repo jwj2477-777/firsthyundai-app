@@ -109,7 +109,35 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 휴대폰에만 남는 것: 직접 입력한 가족 업무 메모
 올리면 안 되는 것: 고객 성명·연락처·계약서·개인정보·API 인증키</p></div>
 </div>
-<footer class="foot">퍼스트현대 v1.0 · 관리자/가족 화면 분리 · 주변 12개 단지 · FHD 공식 아이콘</footer>
+<div id="security" class="page hidden">
+ <div class="sectionTitle"><div><h2>관리자 · 가족 보안코드 관리</h2><p class="tiny">GitHub 계정 소유자만 변경할 수 있습니다.</p></div></div>
+ <div class="panel">
+  <h3 style="margin-top:0">보안코드 변경</h3>
+  <p class="tiny">한 번 인증한 휴대폰은 평소 자동으로 열리고, 관리자가 코드를 바꾸면 새 코드를 다시 입력합니다.</p>
+  <div class="notice">이 앱이나 공개 GitHub 파일에 보안코드를 입력하지 마세요. 실제 변경은 GitHub 비공개 Secret에서 진행합니다. 영문·숫자·기호 12자 이상의 추측하기 어려운 코드를 권장합니다.</div>
+  <div class="item">
+   <h3>① 새로운 가족 코드 등록</h3>
+   <p class="tiny">GitHub에 로그인해 <b>FIRSTHYUNDAI_ACCESS_CODE</b> Secret을 편집하고 새 보안코드를 저장하세요.</p>
+   <a class="btn" href="https://github.com/jwj2477-777/firsthyundai-app/settings/secrets/actions">GitHub 보안코드 설정 열기 ↗</a>
+  </div>
+  <div class="item">
+   <h3>② 가족 휴대폰에 변경 적용</h3>
+   <p class="tiny">아래 링크에서 <b>Run workflow → Run workflow</b>를 누르면 기존 APK를 다시 설치하지 않고도 새 코드로 인증 상태가 바뀝니다.</p>
+   <a class="btn" href="https://github.com/jwj2477-777/firsthyundai-app/actions/workflows/rotate-family-code.yml">새 보안코드 적용하기 ↗</a>
+  </div>
+  <div class="item">
+   <h3>③ 다음 실행 때 새 코드 인증</h3>
+   <p class="tiny">각 휴대폰이 온라인 정책을 확인할 때 코드 변경을 감지합니다. 오프라인은 최근 확인 정책으로 최대 24시간 이용 가능합니다.</p>
+   <p class="tiny" id="securityVersion">이 휴대폰의 인증정책을 확인하는 중입니다.</p>
+  </div>
+ </div>
+ <div class="panel">
+  <h3>보안 한계</h3>
+  <p class="tiny">가족 코드와 관리자 전환 코드가 현재 동일하므로 독립 관리자 권한으로 강제 분리한 것은 아닙니다. 별도 관리자 암호와 특정 휴대폰 원격 차단은 추후 개발해야 합니다.</p>
+  <p class="tiny">공개 저장소에는 비밀번호 원문 대신 PBKDF2 검증정보가 게시되며 오프라인 암호 추측 공격에 노출될 수 있으므로 긴 암호를 사용하세요. 원격 재인증은 v1.1 이상에서만 지원됩니다.</p>
+ </div>
+</div>
+<footer class="foot">퍼스트현대 v1.1 · 첫 인증 후 자동 접속 · 변경 시 재인증 · 가족 모드</footer>
 </main>
 <dialog id="noteDialog"><h2 id="noteDialogTitle">내 자료 등록</h2>
 <form id="noteForm">
@@ -130,8 +158,8 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 'use strict';
 const NOTE_KEY='firsthyundai-local-v04', REPO_KEY='firsthyundai-public-repo';
 const DEFAULT_REPOSITORY='jwj2477-777/firsthyundai-app';
-const PRIVATE_PAGES=new Set(['settings','notes']);
-const PAGES=[['overview','전체 브리핑'],['nearby','★ 주변단지'],['new','새소식'],['trades','실거래가'],['news','뉴스 브리핑'],['notes','내 자료'],['settings','설정']];
+const PRIVATE_PAGES=new Set(['settings','notes','security']);
+const PAGES=[['overview','전체 브리핑'],['nearby','★ 주변단지'],['new','새소식'],['trades','실거래가'],['news','뉴스 브리핑'],['notes','내 자료'],['settings','설정'],['security','보안 관리']];
 const $=id=>document.getElementById(id);
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeLink=url=>/^https:\/\/[a-z0-9.-]+(?:[:][0-9]+)?(?:[/?#]|$)/i.test(String(url||''))?String(url):'';
@@ -183,6 +211,10 @@ function switchPage(id){
  if(id==='trades')renderTrades();
  if(id==='news')renderNews();
  if(id==='notes'&&role==='admin')renderNotes();
+ if(id==='security'&&role==='admin'){
+  const v=window.FirstHyundaiNative?.getPolicyVersion?.()||0;
+  $('securityVersion').textContent='이 휴대폰의 보안 정책 버전: '+(v?v:'확인 전');
+ }
 }
 function prettyTime(s){if(!s)return '아직 수집 전';try{return new Date(s).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour12:false});}catch{return s;}}
 function number(n){return Number(n||0).toLocaleString('ko-KR');}
