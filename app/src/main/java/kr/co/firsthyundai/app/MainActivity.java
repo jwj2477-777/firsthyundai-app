@@ -123,112 +123,85 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void adminMessage(String message) {
-        new AlertDialog.Builder(this).setTitle("관리자 보안")
-                .setMessage(message).setPositiveButton("확인",null).show();
-    }
-
     private void showAdminCodeDialog() {
-        if (isAdminDeviceMode()) return;
+        if(isAdminDeviceMode() || adminCheckInProgress)return;
         SharedPreferences tries=getSharedPreferences(ADMIN_TRIES,MODE_PRIVATE);
-        if(System.currentTimeMillis()<tries.getLong("locked_until",0L)){
-            adminMessage("5회 실패로 잠시 제한되었습니다. 1분 후 다시 시도해 주세요.");
+        long now=System.currentTimeMillis();
+        if(now<tries.getLong("locked_until",0L)) {
+            new AlertDialog.Builder(this)
+                    .setMessage("관리자 비밀번호를 여러 번 틀렸습니다. 1분 후 다시 시도해 주세요.")
+                    .setPositiveButton("확인",null).show();
             return;
         }
-        boolean setup=!AdminPin.configured(this);
+
         EditText field=new EditText(this);
         field.setSingleLine(true);
-        field.setHint(setup?"기존 가족 보안코드":"관리자 전용 비밀번호");
+        field.setHint("관리자 전용 비밀번호");
         field.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         field.setPadding(32,24,32,24);
         new AlertDialog.Builder(this)
-            .setTitle(setup?"관리자 최초 등록":"관리자 전환")
-            .setMessage(setup?"이 휴대폰에 관리자 전용 비밀번호를 처음 등록합니다. 먼저 가족 보안코드를 확인하세요."
-                :"관리자 전용 비밀번호를 입력하세요.")
-            .setView(field)
-            .setNegativeButton("취소",null)
-            .setPositiveButton("확인",(dialog,which)->{
-                char[] input=field.getText().toString().toCharArray();
-                field.setText("");
-                boolean ok=setup?matchesFamilyCode(input):AdminPin.matches(this,input);
-                Arrays.fill(input,(char)0);
-                if(ok){
-                    tries.edit().clear().apply();
-                    if(setup)showAdminSetupDialog();
-                    else changeRole(true);
-                }else{
-                    int attempt=tries.getInt("attempts",0)+1;
-                    if(attempt>=5)tries.edit().putInt("attempts",0)
-                            .putLong("locked_until",System.currentTimeMillis()+60000L).apply();
-                    else tries.edit().putInt("attempts",attempt).apply();
-                    adminMessage(attempt>=5?"5회 실패했습니다. 1분 동안 관리자 전환이 제한됩니다."
-                            :"비밀번호가 일치하지 않습니다. ("+attempt+"/5)");
-                }
-            }).show();
-    }
-
-    private void showAdminSetupDialog() {
-        final android.widget.LinearLayout layout=new android.widget.LinearLayout(this);
-        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
-        layout.setPadding(30,10,30,0);
-        EditText first=new EditText(this);
-        first.setSingleLine(true);
-        first.setHint("새 관리자 비밀번호 (8~64자)");
-        first.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        EditText confirm=new EditText(this);
-        confirm.setSingleLine(true);
-        confirm.setHint("새 관리자 비밀번호 다시 입력");
-        confirm.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        layout.addView(first);layout.addView(confirm);
-        new AlertDialog.Builder(this)
-            .setTitle("관리자 전용 비밀번호 만들기")
-            .setMessage("가족 코드와 다른 영문·숫자·기호 8~64자의 비밀번호를 설정하세요. 이 비밀번호는 이 휴대폰에만 저장됩니다.")
-            .setView(layout)
-            .setNegativeButton("취소",null)
-            .setPositiveButton("등록",(dialog,which)->{
-                char[] a=first.getText().toString().toCharArray();
-                char[] b=confirm.getText().toString().toCharArray();
-                first.setText("");confirm.setText("");
-                boolean valid=AdminPin.validFormat(a) && Arrays.equals(a,b)
-                        && !matchesFamilyCode(a);
-                if(valid)valid=AdminPin.set(this,a);
-                Arrays.fill(a,(char)0);Arrays.fill(b,(char)0);
-                if(valid){
-                    changeRole(true);
-                    adminMessage("관리자 비밀번호가 이 휴대폰에 등록되었습니다. 다음 관리자 전환부터 가족 코드 대신 새 관리자 비밀번호를 입력하세요.");
-                }else adminMessage("등록 실패: 영문·숫자·기호 8~64자, 재입력 일치, 가족 코드와 다른 비밀번호가 필요합니다. 다시 관리자 전환을 눌러주세요.");
-            }).show();
-    }
-
-    private void showChangeAdminPinDialog() {
-        if(!isAdminDeviceMode()||!AdminPin.configured(this))return;
-        final android.widget.LinearLayout layout=new android.widget.LinearLayout(this);
-        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
-        layout.setPadding(30,10,30,0);
-        EditText old=new EditText(this),fresh=new EditText(this),confirm=new EditText(this);
-        for(EditText f:new EditText[]{old,fresh,confirm}){
-            f.setSingleLine(true);
-            f.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            layout.addView(f);
-        }
-        old.setHint("현재 관리자 비밀번호");
-        fresh.setHint("새 관리자 비밀번호 (8~64자)");
-        confirm.setHint("새 비밀번호 다시 입력");
-        new AlertDialog.Builder(this)
-            .setTitle("이 휴대폰의 관리자 비밀번호 변경")
-            .setView(layout)
-            .setNegativeButton("취소",null)
-            .setPositiveButton("변경",(dialog,which)->{
-                char[] a=old.getText().toString().toCharArray();
-                char[] b=fresh.getText().toString().toCharArray();
-                char[] c=confirm.getText().toString().toCharArray();
-                old.setText("");fresh.setText("");confirm.setText("");
-                boolean ok=AdminPin.matches(this,a)&&AdminPin.validFormat(b)
-                        && Arrays.equals(b,c)&&!matchesFamilyCode(b);
-                if(ok)ok=AdminPin.set(this,b);
-                Arrays.fill(a,(char)0);Arrays.fill(b,(char)0);Arrays.fill(c,(char)0);
-                adminMessage(ok?"관리자 전용 비밀번호를 변경했습니다.":"변경하지 못했습니다. 현재 비밀번호와 새 비밀번호를 확인하세요.");
-            }).show();
+                .setTitle("관리자 전환")
+                .setMessage("가족 로그인 코드와는 다른 관리자 전용 비밀번호를 입력하세요. 이 비밀번호가 등록되지 않았다면 GitHub 비공개 Secret을 먼저 설정해야 합니다.")
+                .setView(field)
+                .setNegativeButton("취소",null)
+                .setPositiveButton("확인",(dialog,which)->{
+                    if(adminCheckInProgress)return;
+                    char[] code=field.getText().toString().trim().toCharArray();
+                    field.setText("");
+                    if(code.length==0) {
+                        Arrays.fill(code,(char)0);
+                        return;
+                    }
+                    adminCheckInProgress=true;
+                    AlertDialog waiting=new AlertDialog.Builder(this)
+                            .setMessage("관리자 비밀번호를 온라인으로 확인하고 있습니다...")
+                            .setCancelable(false).create();
+                    waiting.show();
+                    io.execute(()->{
+                        boolean valid=false;
+                        String error="";
+                        String identity="";
+                        try {
+                            AdminPolicy.Data policy=AdminPolicy.fetch(MainActivity.this);
+                            valid=AdminPolicy.matches(policy,code);
+                            identity=policy.identity;
+                        }catch(Exception e){
+                            error=e.getMessage()==null?"관리자 보안 정책을 확인할 수 없습니다.":e.getMessage();
+                        }finally {
+                            Arrays.fill(code,(char)0);
+                        }
+                        final boolean success=valid;
+                        final String errorMessage=error;
+                        final String verifiedIdentity=identity;
+                        runOnUiThread(()->{
+                            waiting.dismiss();
+                            adminCheckInProgress=false;
+                            if(isFinishing()||isDestroyed())return;
+                            if(success){
+                                tries.edit().clear().apply();
+                                adminSessionIdentity=verifiedIdentity;
+                                changeRole(true);
+                            }else {
+                                String message;
+                                if(!errorMessage.isEmpty()) {
+                                    message=errorMessage;
+                                }else {
+                                    int attempts=tries.getInt("attempts",0)+1;
+                                    if(attempts>=5) {
+                                        tries.edit().putInt("attempts",0)
+                                                .putLong("locked_until",System.currentTimeMillis()+60000L).apply();
+                                        message="관리자 비밀번호가 5회 틀렸습니다. 1분 동안 잠깁니다.";
+                                    }else {
+                                        tries.edit().putInt("attempts",attempts).apply();
+                                        message="관리자 비밀번호가 올바르지 않습니다. ("+attempts+"/5)";
+                                    }
+                                }
+                                new AlertDialog.Builder(this).setMessage(message)
+                                        .setPositiveButton("확인",null).show();
+                            }
+                        });
+                    });
+                }).show();
     }
 
     private boolean routeExternal(String url) {
@@ -263,9 +236,6 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public void switchToFamilyMode() {
             runOnUiThread(() -> changeRole(false));
-        }
-        @JavascriptInterface public void changeAdminPassword() {
-            runOnUiThread(() -> showChangeAdminPinDialog());
         }
         @JavascriptInterface public void fetch(String repository, String filename, String requestId) {
             // Public data ONLY. Never inject API tokens / family records into remote requests.
