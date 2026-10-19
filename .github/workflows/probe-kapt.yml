@@ -1,0 +1,42 @@
+name: Probe approved K-apt API (safe one-time check)
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/probe-kapt.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-access:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify K-apt list, basic, detail API using existing protected secret
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+        run: |
+          python - <<'PY'
+          import os
+          from scripts import collect_complexes as k
+          token = os.environ.get('DATA_GO_KR_SERVICE_KEY')
+          if not token:
+              raise RuntimeError('GitHub secret DATA_GO_KR_SERVICE_KEY absent. Set secret without exposing value.')
+          print('Existing public-data secret: present (value intentionally hidden)')
+          res = k.call_api(k.LIST_URL, {'sigunguCode':'28185','pageNo':1,'numOfRows':30,'_type':'json'}, token)
+          entries,count = k.unpack(res)
+          print('List service: response rows',len(entries),'declared total',count)
+          if not entries: raise RuntimeError('Listing returned no rows; check service name and parameters')
+          print('List response keys:', sorted(entries[0].keys()))
+          code = next((str(row.get('kaptCode','')) for row in entries if str(row.get('kaptCode','')).startswith('A')), None)
+          if not code: raise RuntimeError('List lacks kaptCode; map correct response names')
+          b = k.base_item(token, code)
+          if not b: raise RuntimeError('Basic API returned no apartment details')
+          print('Basic service: success for test code', code,'keys:',sorted(b.keys()))
+          d = k.detail_item(token, code)
+          print('Detail service: success; keys:',sorted(d.keys()))
+          print('K-apt two-service access probe: success')
+          PY
