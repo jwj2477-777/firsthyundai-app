@@ -248,12 +248,20 @@ public class MainActivity extends Activity {
                 HttpURLConnection conn = null;
                 try {
                     // branch fixed to main; HTTPS host fixed to raw.githubusercontent.com
-                    String address = "https://raw.githubusercontent.com/"+repository+"/main/data/"+filename;
+                    // Raw GitHub files and cellular proxies may cache old snapshots.
+                    // Always ask the origin for the current published JSON, not
+                    // a local/WebView/CDN-cached version of the previous request.
+                    String address = "https://raw.githubusercontent.com/"+repository+"/main/data/"+filename
+                            +"?refresh="+System.currentTimeMillis()+"-"+requestId;
                     conn=(HttpURLConnection)new URL(address).openConnection();
+                    conn.setUseCaches(false);
+                    conn.setDefaultUseCaches(false);
                     conn.setConnectTimeout(15000);
                     conn.setReadTimeout(20000);
                     conn.setInstanceFollowRedirects(false);
                     conn.setRequestProperty("Accept", "application/json");
+                    conn.setRequestProperty("Cache-Control", "no-cache, no-store, max-age=0");
+                    conn.setRequestProperty("Pragma", "no-cache");
                     if (conn.getResponseCode()!=200) throw new Exception("HTTP "+conn.getResponseCode()+" (공개 저장소의 main/data 파일 확인)");
                     ByteArrayOutputStream out=new ByteArrayOutputStream();
                     try(InputStream in=conn.getInputStream()) {
