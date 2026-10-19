@@ -9,7 +9,8 @@ const observed=rows.filter(p=>Array.isArray(p.area_types_m2)&&p.area_types_m2.le
 const paired=rows.filter(p=>Array.isArray(p.area_type_pairs)&&p.area_type_pairs.length);
 assert(rows.length>=93,'All original 93 standalone Songdo apartment profiles must survive');
 assert(observed.length>=93,'Source-backed exclusive types must survive for the original 93 profiles');
-assert(paired.length>=12,'Retain twelve apartment-source private/supply paired profiles');
+assert(paired.length>=20,'At least twenty source-matched exclusive/supply apartment profiles must survive');
+assert(rows.filter(p=>p.supply_type_labels?.length).length>=49,'Retain at least 49 verified supply-type inventories');
 let count=0;
 for(const apt of observed){
  assert(apt.area_types_source?.includes('실거래'),apt.id+' exclusive type source needed');
@@ -24,7 +25,7 @@ for(const apt of observed){
   count++;
  }
 }
-assert(count>=67,'Expected 67 area labels with verified pairings');
+assert(count>=136,'Expected at least 136 source-verified exclusive/supply pairings');
 const centennial=rows.find(p=>p.id==='centennial');
 assert.equal(centennial.exclusive_plan_labels.length,7);
 assert(centennial.exclusive_plan_source_url.startsWith('https://'));
@@ -33,6 +34,7 @@ const script=html.split('<script>',2)[1].split('</script>',1)[0];
 new vm.Script(script);
 assert(script.includes('const exclusiveAreas='),'Every apartment needs visible exclusive-size options');
 assert(script.includes('공급평형 확인 중'),'Unknown supply types must never be faked');
+assert(script.includes('공급평형 '+"'"+"), 'Unmatched KB supply types are visible in the UI');
 assert(script.includes('실거래 관측'),'Users must understand observed trade sizes are not complete legal types');
 assert(!script.includes('Math.round(g.area/3.305785)'),'Exclusive-to-pyeong shortcut forbidden');
 const normalization=script.slice(script.indexOf('function normalizeAptName('),script.indexOf('const FAVORITE_MATCH='));
@@ -45,10 +47,20 @@ for(const id of ['f13','f14','f15','skcentral','artwin','central3']){
 vm.createContext(env);
 vm.runInContext(normalization+funcs,env);
 function get(expr){return vm.runInContext(expr,env);}
+env.kb_skview=rows.find(x=>x.id==='kapt-a10025399');
+env.kb_greenwalk=rows.find(x=>x.id==='kapt-a10027884');
+env.kb_lake3=rows.find(x=>x.id==='kapt-a10022954');
+env.kb_worldmark=rows.find(x=>x.id==='kapt-a10020270');
 assert.equal(get("displayExclusiveArea(84.9,apt_f13)"),'전용 84.9㎡ (약 35평형)');
 assert.equal(get("displayExclusiveArea(84.9,apt_f14)"),'전용 84.9㎡ (약 35평형)');
 assert.equal(get("displayExclusiveArea(84.9,apt_f15)"),'전용 84.9㎡ (약 35평형)');
 assert.equal(get("displayExclusiveArea(84.65,apt_skcentral)"),'전용 84.65㎡ (약 33평형)');
+assert.equal(get("displayExclusiveArea(84.65,kb_skview)"),'전용 84.65㎡ (약 34평형)');
+assert.equal(get("displayExclusiveArea(84.73,kb_greenwalk)"),'전용 84.73㎡ (약 34평형)');
+assert.equal(get("displayExclusiveArea(84.57,kb_lake3)"),'전용 84.57㎡');
+assert.equal(get("displaySupplyType(kb_worldmark,'233PH-A')"),'공급 233PH-A타입 (약 70평형) · 전용㎡ 대응 확인 중');
+assert.equal(get("displaySupplyType(kb_lake3,'112D0')"),'공급 112D0타입 (약 34평형) · 전용㎡ 대응 확인 중');
+
 assert.equal(get("displayExclusiveArea(84.98,apt_artwin)"),'전용 84.98㎡ (약 36평형)');
 assert.equal(get("displayExclusiveArea(80.05,apt_central3)"),'전용 80.05㎡ (약 33평형)');
 assert.equal(get("displaySupplyType(apt_central3,'111')"),'전용 80.05㎡ (약 33평형) · 공급 111㎡');
