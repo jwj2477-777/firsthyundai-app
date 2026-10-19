@@ -199,9 +199,9 @@ def normalize_subscriptions(rows,kind):
         if not isinstance(item,dict):continue
         name=str(item.get('HOUSE_NM') or '').strip()
         address=str(item.get('HSSPLY_ADRES') or '').strip()
-        # Strict geographic scope: never report another city's Songdo-named project.
-        if not (name and '연수구' in address and
-                ('송도' in address or '송도' in name)):continue
+        # Incheon-wide: use authoritative supply address, never just a project
+        # name containing '인천' or an untrusted administrative label.
+        if not (name and re.match(r'^인천(?:광역시|시)?\\s',address)):continue
         notice=subscription_date(item.get('RCRIT_PBLANC_DE'))
         if not notice:continue
         house_no=str(item.get('HOUSE_MANAGE_NO') or '').strip()
@@ -255,7 +255,7 @@ def collect_subscriptions(key,opener=None,today=None,days_back=420):
         else:raise RuntimeError('청약홈 API 페이지 최대치 초과, 부분결과 게시 금지')
     records=sorted(all_rows.values(),key=lambda r:(r['notice_date'],r['name']),reverse=True)
     return dict(state='verified',updated_at=fresh_date(),source_url=APPLYHOME_SOURCE,
-        note='한국부동산원 청약홈 공식 모집공고일 기준, 인천 연수구 송도 소재 확인 공고. 접수일이 없으면 일정 미확인. 결과가 없어도 전체 분양공고 부재를 뜻하지 않음.',
+        note='한국부동산원 청약홈 공식 모집공고일 기준 인천광역시 전체 소재 공고. 접수일 미기재는 별도 확인 필요. 접수 마감 공고도 지난 공고 탭에서 조회 가능.',
         window_start=start,window_end=end,records=records)
 
 def update_snapshot(path,school=None,office=None,subscriptions=None):
@@ -287,7 +287,7 @@ def main():
     elif args.mode in ('offices','all'):print('오피스텔 API 인증키 미설정: 기존 상태 유지')
     if args.mode in ('subscriptions','all') and os.environ.get('DATA_GO_KR_SERVICE_KEY'):
         subscriptions=collect_subscriptions(os.environ['DATA_GO_KR_SERVICE_KEY'])
-        print('청약홈 송도 분양공고',len(subscriptions['records']),'건')
+        print('청약홈 인천 분양공고',len(subscriptions['records']),'건')
     elif args.mode in ('subscriptions','all'):
         print('청약홈 API 인증키 미설정: 기존 상태 유지')
     if school is None and office is None and subscriptions is None:
