@@ -1015,8 +1015,104 @@ window.onFirstHyundaiResult=result=>{let p=pending[result.requestId];if(!p)retur
 function fetchRemote(filename){let target=`https://raw.githubusercontent.com/${repository}/main/data/${filename}.json`;
 if(window.FirstHyundaiNative){return new Promise((resolve,reject)=>{let id=String(++serial);pending[id]={resolve,reject};window.FirstHyundaiNative.fetch(repository,filename+'.json',id);});}
 return fetch(target+'?t='+Date.now(),{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json();});}
-async function refreshOne(filename){if(!repository){issues[filename]='저장소를 먼저 설정하세요.';renderOverview();return;}issues[filename]='';try{let fresh=await fetchRemote(filename);if(!fresh||typeof fresh!=='object'||fresh.schema_version!==1)throw Error('JSON 데이터 형식이 맞지 않습니다');if((filename==='trades'||filename==='new_trades')&&!Array.isArray(fresh.records))throw Error('거래 목록이 없습니다');if(filename==='news'&&!Array.isArray(fresh.briefs))throw Error('브리핑 목록이 없습니다');if(filename==='complexes'&&(!Array.isArray(fresh.records)||fresh.records.length>500))throw Error('단지정보 목록 형식이 맞지 않습니다');remote[filename]=fresh;}catch(e){issues[filename]=e.message||String(e);}renderOverview();if(filename==='trades'){renderTrades();renderNearby();renderComplexes();}else if(filename==='new_trades')renderNew();else if(filename==='complexes')renderComplexes();else renderNews();}
-async function refreshAll(){if(!repository){issues={trades:'저장소 미설정',new_trades:'저장소 미설정',news:'저장소 미설정',complexes:'저장소 미설정'};renderOverview();return;}await Promise.all([refreshOne('trades'),refreshOne('new_trades'),refreshOne('news'),refreshOne('complexes')]);}
+// Refresh means download the most recently *published* GitHub snapshot.
+// Government open-data/RSS collection happens separately in scheduled workflows.
+const refreshRunning=Object.create(null),refreshGeneration=Object.create(null);
+let refreshFeedbackSerial=0;
+function setRefreshBusy(filename,busy){
+ if(!document.querySelectorAll)return;
+ const buttons=document.querySelectorAll('[data-refresh="'+filename+'"]');
+ for(const button of buttons)button.disabled=!!busy;
+}
+function showRefreshFeedback(message,tone='info'){
+ const el=$('refreshFeedback');
+ if(!el)return;
+ const serial=++refreshFeedbackSerial;
+ el.textContent=message;
+ el.className='refreshFeedback'+(tone==='success'?' success':tone==='warning'?' warning':tone==='error'?' error':'');
+ // Remains readable on older WebViews/tests without timer support.
+ if(typeof setTimeout==='function')setTimeout(()=>{
+  if(serial===refreshFeedbackSerial)el.classList.add('hidden');
+ },6200);
+}
+function publishedAt(payload){
+ const raw=payload?.checked_at||payload?.updated_at||payload?.last_verified||'';
+ return raw?prettyTime(raw):'수집 시각 미표시';
+}
+async function refreshOne(filename,manual=false){
+ if(!repository){
+  issues[filename]='저장소를 먼저 설정하세요.';
+  renderOverview();
+  if(manual)showRefreshFeedback('연결된 저장소가 없습니다.','error');
+  return {ok:false,error:issues[filename],filename};
+ }
+ if(refreshRunning[filename]&&manual){
+  showRefreshFeedback('이미 게시자료를 확인 중입니다.','info');
+  return {ok:false,pending:true,filename};
+ }
+ const seq=(refreshGeneration[filename]||0)+1;
+ refreshGeneration[filename]=seq;
+ refreshRunning[filename]=true;
+ if(manual){
+  setRefreshBusy(filename,true);
+  showRefreshFeedback('GitHub에 게시된 최신 '+({trades:'실거래',new_trades:'새 거래',complexes:'아파트정보',news:'뉴스'}[filename]||'')+' 자료를 확인하고 있습니다…');
+ }
+ issues[filename]='';
+ let result;
+ try{
+  const fresh=await fetchRemote(filename);
+  if(!fresh||typeof fresh!=='object'||fresh.schema_version!==1)throw Error('JSON 데이터 형식이 맞지 않습니다');
+  if((filename==='trades'||filename==='new_trades')&&!Array.isArray(fresh.records))throw Error('거래 목록이 없습니다');
+  if(filename==='news'&&!Array.isArray(fresh.briefs))throw Error('브리핑 목록이 없습니다');
+  if(filename==='complexes'&&(!Array.isArray(fresh.records)||fresh.records.length>500))throw Error('단지정보 목록 형식이 맞지 않습니다');
+  if(seq!==refreshGeneration[filename])return {ok:false,superseded:true,filename};
+  const changed=JSON.stringify(remote[filename])!==JSON.stringify(fresh);
+  remote[filename]=fresh;
+  result={ok:true,changed,filename,published:publishedAt(fresh)};
+  if(manual)showRefreshFeedback(
+   (changed?'새로 게시된 자료를 반영했습니다.':'현재 게시된 자료와 동일합니다.')+
+   ' · 마지막 수집: '+result.published+
+   ' · 버튼은 서버 자료 재확인이며 새 수집은 정기 실행됩니다.',
+   changed?'success':'warning');
+ }catch(e){
+  if(seq!==refreshGeneration[filename])return {ok:false,superseded:true,filename};
+  issues[filename]=e.message||String(e);
+  result={ok:false,error:issues[filename],filename};
+  if(manual)showRefreshFeedback('자료 확인 실패: '+result.error+' · 기존 화면 자료는 유지합니다.','error');
+ }finally{
+  if(seq===refreshGeneration[filename]){
+   refreshRunning[filename]=false;
+   if(manual)setRefreshBusy(filename,false);
+  }
+ }
+ renderOverview();
+ if(filename==='trades'){renderTrades();renderNearby();renderComplexes();}
+ else if(filename==='new_trades')renderNew();
+ else if(filename==='complexes')renderComplexes();
+ else renderNews();
+ return result;
+}
+async function refreshAll(manual=false){
+ if(!repository){
+  issues={trades:'저장소 미설정',new_trades:'저장소 미설정',news:'저장소 미설정',complexes:'저장소 미설정'};
+  renderOverview();
+  if(manual)showRefreshFeedback('연결된 저장소가 없습니다.','error');
+  return;
+ }
+ if(manual)showRefreshFeedback('실거래·뉴스·단지정보 게시자료를 확인 중입니다…');
+ const all=await Promise.all(['trades','new_trades','news','complexes'].map(x=>refreshOne(x,false)));
+ if(manual){
+  const failed=all.filter(x=>!x.ok);
+  const changed=all.filter(x=>x.ok&&x.changed);
+  const latest=all.find(x=>x.filename==='trades'&&x.ok);
+  showRefreshFeedback(failed.length?
+   (4-failed.length)+'개 자료 확인, '+failed.length+'개 확인 실패 · 기존 자료를 유지합니다.':
+   changed.length?'새 게시자료 '+changed.length+'개 반영 완료 · 실거래 마지막 수집: '+(latest?.published||'확인 전'):
+   '모든 게시자료를 확인했습니다. 새로 게시된 자료는 없습니다. · 실거래 마지막 수집: '+(latest?.published||'확인 전'),
+   failed.length?'error':changed.length?'success':'warning');
+ }
+ return all;
+}
 function saveRepo(){if(role!=='admin')return;let text=$('repo').value.trim();if(!/^[A-Za-z0-9_.-]{1,60}\/[A-Za-z0-9_.-]{1,100}$/.test(text)){alert('GitHub아이디/저장소이름 형식으로 입력하세요. 예: hong/firsthyundai-app');return;}repository=text;localStorage.setItem(REPO_KEY,text);$('settingStatus').classList.remove('hidden');$('settingStatus').textContent='저장되었습니다. 온라인 데이터를 불러옵니다.';refreshAll();}
 
 function kstDateOffset(daysAgo){
