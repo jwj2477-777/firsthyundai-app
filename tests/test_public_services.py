@@ -91,7 +91,7 @@ class PublicDataTests(unittest.TestCase):
    self.assertEqual(after['office_rents']['state'],'awaiting_approval')
    self.assertEqual(len(after['schools']['records']),2)
 
- def test_applyhome_songdo_official_filter_and_schedule(self):
+ def test_applyhome_incheon_official_filter_and_schedule(self):
   calls=[]
   def fetch(req):
    u=urlsplit(req.full_url)
@@ -105,7 +105,9 @@ class PublicDataTests(unittest.TestCase):
     subscription_example(HOUSE_MANAGE_NO='2026000999',HSSPLY_ADRES='인천광역시 남동구 구월동')])
   result=p.collect_subscriptions('fake-key',opener=fetch,today=p.datetime(2026,10,20).date())
   self.assertEqual(result['state'],'verified')
-  self.assertEqual(len(result['records']),3)
+  self.assertEqual(len(result['records']),6)
+  self.assertTrue(any('남동구' in v['address'] for v in result['records']))
+  self.assertFalse(any('서울' in v['address'] for v in result['records']))
   self.assertEqual(len(calls),3)
   self.assertEqual(result['records'][0]['apply_start'],'2026-10-22')
   self.assertEqual(result['records'][0]['households'],250)
