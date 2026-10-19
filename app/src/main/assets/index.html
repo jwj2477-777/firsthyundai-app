@@ -110,9 +110,25 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 올리면 안 되는 것: 고객 성명·연락처·계약서·개인정보·API 인증키</p></div>
 </div>
 <div id="security" class="page hidden">
- <div class="sectionTitle"><div><h2>관리자 · 가족 보안코드 관리</h2><p class="tiny">GitHub 계정 소유자만 변경할 수 있습니다.</p></div></div>
+ <div class="sectionTitle"><div><h2>관리자 · 비밀번호 관리</h2><p class="tiny">가족용과 관리자용 비밀번호는 서로 독립적입니다.</p></div></div>
  <div class="panel">
-  <h3 style="margin-top:0">보안코드 변경</h3>
+  <h3 style="margin-top:0">관리자 전용 비밀번호</h3>
+  <p class="tiny">관리자 화면에 들어갈 때는 <b>가족 로그인 코드가 아닌 별도의 관리자 비밀번호</b>를 확인합니다. 관리자 모드는 앱을 종료하면 자동으로 해제됩니다.</p>
+  <div class="notice">관리자 비밀번호는 공개 GitHub 파일이나 앱에 직접 입력해 저장하지 않습니다. GitHub 로그인 후 비공개 Secret에서만 변경하세요. 가족 코드와 <b>다른</b> 길고 무작위한 12~64자 비밀번호가 필요합니다. 16자 이상 권장합니다.</div>
+  <div class="item">
+   <h3>① 관리자 비밀번호 등록·변경</h3>
+   <p class="tiny">GitHub → Settings → Secrets and variables → Actions에서 <b>FIRSTHYUNDAI_ADMIN_CODE</b>를 새로 추가하거나 편집합니다.</p>
+   <a class="btn" href="https://github.com/jwj2477-777/firsthyundai-app/settings/secrets/actions">관리자 비밀번호 설정 열기 ↗</a>
+  </div>
+  <div class="item">
+   <h3>② 관리자 정책 적용</h3>
+   <p class="tiny"><b>Publish Administrator Access Policy</b>에서 Run workflow를 실행합니다. 완료된 뒤 새 관리자 비밀번호로 로그인할 수 있습니다.</p>
+   <a class="btn" href="https://github.com/jwj2477-777/firsthyundai-app/actions/workflows/rotate-admin-code.yml">관리자 비밀번호 적용하기 ↗</a>
+  </div>
+  <p class="tiny">관리자 비밀번호를 변경하면 이미 열려 있던 관리자 화면은 다음 온라인 확인 시 가족 모드로 돌아갑니다. 온라인 보안 정책이 없으면 관리자 전환을 허용하지 않습니다.</p>
+ </div>
+ <div class="panel">
+  <h3 style="margin-top:0">가족용 보안코드 변경</h3>
   <p class="tiny">한 번 인증한 휴대폰은 평소 자동으로 열리고, 관리자가 코드를 바꾸면 새 코드를 다시 입력합니다.</p>
   <div class="notice">이 앱이나 공개 GitHub 파일에 보안코드를 입력하지 마세요. 실제 변경은 GitHub 비공개 Secret에서 진행합니다. 영문·숫자·기호 12자 이상의 추측하기 어려운 코드를 권장합니다.</div>
   <div class="item">
@@ -133,11 +149,11 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
  </div>
  <div class="panel">
   <h3>보안 한계</h3>
-  <p class="tiny">가족 코드와 관리자 전환 코드가 현재 동일하므로 독립 관리자 권한으로 강제 분리한 것은 아닙니다. 별도 관리자 암호와 특정 휴대폰 원격 차단은 추후 개발해야 합니다.</p>
-  <p class="tiny">공개 저장소에는 비밀번호 원문 대신 PBKDF2 검증정보가 게시되며 오프라인 암호 추측 공격에 노출될 수 있으므로 긴 암호를 사용하세요. 원격 재인증은 v1.1 이상에서만 지원됩니다.</p>
+  <p class="tiny">가족 코드만 알고 있다면 관리자 모드로 들어갈 수 없게 분리했습니다. 그러나 APK와 검증용 코드가 공개되는 구조여서 서버 기반 계정·기기 인증만큼 강한 복제 방지는 아닙니다. 휴대폰별 원격 차단 기능은 아직 없습니다.</p>
+  <p class="tiny">두 비밀번호의 원문은 GitHub 비공개 Secret에만 존재하고, 공개 저장소에는 각 비밀번호의 PBKDF2 검증 정보만 게시됩니다. 공개 검증 정보는 오프라인 추측 공격 대상이므로 특히 관리자 비밀번호는 16자 이상 무작위 문자열을 권장합니다.</p>
  </div>
 </div>
-<footer class="foot">퍼스트현대 v1.1 · 첫 인증 후 자동 접속 · 변경 시 재인증 · 가족 모드</footer>
+<footer class="foot">퍼스트현대 v1.2 · 가족 자동 로그인 · 별도 관리자 비밀번호 · 주변 12개 단지</footer>
 </main>
 <dialog id="noteDialog"><h2 id="noteDialogTitle">내 자료 등록</h2>
 <form id="noteForm">
