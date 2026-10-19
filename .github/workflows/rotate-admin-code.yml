@@ -1,0 +1,39 @@
+name: Publish Administrator Access Policy
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publish-admin-code
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate administrator policy from private code
+        env:
+          FIRSTHYUNDAI_ADMIN_CODE: ${{ secrets.FIRSTHYUNDAI_ADMIN_CODE }}
+          FIRSTHYUNDAI_ACCESS_CODE: ${{ secrets.FIRSTHYUNDAI_ACCESS_CODE }}
+        run: python scripts/publish_admin_policy.py
+      - name: Commit only verifier data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/admin_policy.json
+          if git diff --cached --quiet; then
+            echo "Administrator policy unchanged."
+            exit 0
+          fi
+          git commit -m "security: update administrator verifier"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 3
+          done
+          exit 1
