@@ -70,6 +70,20 @@ class KaptTest(unittest.TestCase):
         self.assertEqual(p["households"], 581)
         self.assertIn("578세대", p["detail_note"])
 
+    def test_kapt_refresh_preserves_verified_supply_area_pairs(self):
+        old={"id":"kapt-a10012345","kapt_code":"A10012345",
+             "supply_type_labels":["117A"],"area_types_m2":[84.9],
+             "area_type_pairs":[{"exclusive_m2":84.9,"supply_m2":117.09,
+                                  "supply_label":"117A","source_url":"https://example.com/"}],
+             "area_types_source":"국토교통부 실거래 관측",
+             "area_types_observation_count":18}
+        refreshed={"id":"kapt-a10012345","kapt_code":"A10012345",
+                   "supply_type_labels":[],"area_types_m2":[]}
+        got=c.preserve_area_enrichment(refreshed,old)
+        for key in c.AREA_ENRICHMENT_FIELDS:
+            if key in old:self.assertEqual(got[key],old[key],key)
+        self.assertIsNot(got["area_type_pairs"],None)
+
     def test_unapproved_api_never_returns_fake_data(self):
         def fake(req):
             args = parse_qs(urlsplit(req.full_url).query)
