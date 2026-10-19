@@ -57,6 +57,8 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 .complexLinks{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .complexLinks a{display:inline-block;padding:9px 11px;background:#eaf3fa;border-radius:9px;color:#245a92;font-size:13px;overflow-wrap:anywhere}
 .complexMeta{color:#647587;font-size:12px;line-height:1.6}
+.complexDetailAddress{margin:-5px 0 12px;font-size:12px;color:#506f84;overflow-wrap:anywhere;line-height:1.6}
+.nearbyCard .complexCardAddress{font-size:11px;color:#5d7787;line-height:1.4;overflow-wrap:anywhere}
 @media(max-width:380px){.complexFacts{grid-template-columns:1fr}}
 .complexTypeList{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
 .complexTypeList span{font-size:12px;padding:7px 9px;border-radius:7px;background:#edf5fb;color:#285980}
@@ -492,6 +494,7 @@ function renderComplexes(){
  $('complexCards').innerHTML=shown.length?shown.map(x=>
   '<button type="button" class="nearbyCard'+(x.id===complexSelected?' selected':'')+'" onclick="selectComplex(\''+x.id+'\')" aria-pressed="'+(x.id===complexSelected?'true':'false')+'">'+
   '<strong>'+escapeHtml(x.label)+'</strong>'+
+  (x.address?'<span class="complexCardAddress">'+escapeHtml(x.address)+'</span>':'')+
   '<small>'+((Number.isInteger(x.households)&&x.households>0)?number(x.households)+'세대':'기초정보 준비 중')+'</small></button>'
  ).join(''):'<div class="empty">검색 결과가 없습니다.</div>';
  $('complexShowMore').classList.toggle('hidden',shown.length>=visible.length);
@@ -568,6 +571,7 @@ function renderComplexes(){
     '" onclick="setComplexDetailTab(\''+id+'\')" aria-pressed="'+(id===complexDetailTab?'true':'false')+'">'+label+'</button>').join('');
   const tabBody=complexDetailTab==='types'?areaView:complexDetailTab==='schools'?schoolView:complexDetailTab==='deals'?deals:complexDetailTab==='sources'?doc:basic;
   $('complexDetails').innerHTML='<h3 class="complexDetailTitle">'+escapeHtml(p.label)+'</h3>'+
+   (p.address?'<p class="complexDetailAddress">⌖ '+escapeHtml(p.address)+'</p>':'')+
    '<div class="complexTabBar">'+tabs+'</div>'+tabBody;
  }
  $('complexAdmin').classList.toggle('hidden',role!=='admin');
