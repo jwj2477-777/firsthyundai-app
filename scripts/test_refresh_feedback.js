@@ -55,7 +55,7 @@ vm.runInContext(js,ctx);
  assert.equal(result.ok,true);
  assert.equal(result.changed,false,'Same published source should be labeled unchanged');
  assert(el('refreshFeedback').textContent.includes('동일'));
- assert(el('refreshFeedback').textContent.includes('마지막 수집'));
+ assert(el('refreshFeedback').textContent.includes('자료 수집:'));
  assert(buttonSets.trades.every(x=>x.disabled===false));
  assert(requests[0].url.includes('trades.json?t='),'Cache buster must be on browser request');
  assert.equal(requests[0].options.cache,'no-store');
