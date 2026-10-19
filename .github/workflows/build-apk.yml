@@ -18,6 +18,7 @@ on:
       - 'scripts/test_naver_basic_facts.js'
       - 'scripts/test_nearby.js'
       - 'scripts/test_mobile_navigation.js'
+      - 'scripts/test_apartment_detail_navigation.js'
       - 'scripts/generate_launcher_icon.py'
       - 'scripts/test_launcher_safezone.py'
       - 'scripts/collect_complexes.py'
@@ -71,6 +72,7 @@ jobs:
           node --check /tmp/firsthyundai-ui.js
           node scripts/test_nearby.js
           node scripts/test_mobile_navigation.js
+          node scripts/test_apartment_detail_navigation.js
           node scripts/test_family_mode.js
           node scripts/test_admin_guards.js
           node scripts/test_complexes.js
