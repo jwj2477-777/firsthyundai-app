@@ -9,6 +9,11 @@
 header{background:linear-gradient(130deg,#12375b,#226398);padding:24px 18px 21px;color:white}header h1{font-size:25px;letter-spacing:-.8px;margin:0}header p{color:#d0e3f4;font-size:13px;line-height:1.6;margin:7px 0 0}.eyebrow{letter-spacing:1.6px;font-weight:750;color:#add6f7;font-size:10px;margin-bottom:6px}
 main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;border:1px solid #eeddb2;background:#fff9eb;border-radius:13px;font-size:13px;color:#745521;line-height:1.7;margin-bottom:12px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 0 14px;scrollbar-width:none}.tabs button{padding:10px 13px;border:1px solid #cbddea;background:white;border-radius:10px;font-size:13px;font-weight:650;color:#42617a;white-space:nowrap}.tabs button.active{background:var(--navy);color:white;border-color:var(--navy)}
 .panel{background:white;border:1px solid var(--border);padding:17px;border-radius:16px;margin:12px 0;box-shadow:0 2px 15px #173b6008}.sectionTitle{display:flex;justify-content:space-between;align-items:start;gap:12px;margin:5px 0 12px}.sectionTitle h2{font-size:19px;margin:0}.tiny{color:var(--slate);font-size:12px;line-height:1.6}.muted{color:var(--slate)}.row{display:flex;gap:8px;align-items:center;justify-content:space-between}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.metric{border-radius:13px;background:#eaf3fa;padding:14px}.metric strong{font-size:25px;display:block;margin-top:3px}.metric small{font-size:12px;color:#557590}.pill{display:inline-block;padding:4px 7px;background:#e7f0f9;border-radius:6px;font-size:11px;color:#1c5684;font-weight:700}.pill.orange{background:#fff1db;color:#945814}.pill.red{background:#fdecea;color:#ab3434}.pill.gray{background:#edf0f3;color:#566575}.btn{display:inline-flex;align-items:center;justify-content:center;border:0;background:var(--blue);color:white;padding:11px 15px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer}.btn.alt{background:#e9f1f8;color:#185483}.btn.danger{background:#a33d3d}.btn:disabled{opacity:.45}input,select,textarea{font:inherit;border:1px solid #cbd8e4;border-radius:9px;padding:11px;color:var(--ink);background:white;min-width:0;width:100%}input:focus,select:focus,textarea:focus{outline:2px solid #a2cee9}textarea{min-height:100px;resize:vertical}.inputLabel{font-size:13px;font-weight:700;margin:12px 0 5px;display:block}.controls{display:flex;gap:9px;margin:10px 0;align-items:center}.controls>*{flex:1}.controls button{flex:0 auto}.item{padding:15px 0;border-top:1px solid #e8edf1}.item:first-child{border-top:0}.item h3{font-size:16px;margin:8px 0;line-height:1.5;letter-spacing:-.2px}.item p{font-size:13px;line-height:1.8;margin:8px 0}.item .meta{font-size:12px;color:var(--slate);line-height:1.8;overflow-wrap:anywhere}.money{color:#15507b;font-weight:800;font-size:18px;margin:7px 0}.submoney{font-size:13px;color:var(--slate)}a{color:#20629c;text-decoration:none;overflow-wrap:anywhere}a:hover{text-decoration:underline}.tagbox{display:flex;flex-wrap:wrap;gap:5px}.empty{text-align:center;color:#6b7d8b;font-size:13px;padding:35px 10px;line-height:1.8}.details{margin-top:8px;background:#f7fafc;padding:10px;border-radius:9px}.details summary{cursor:pointer;font-size:13px;font-weight:700;color:#2b5d87}.sources{list-style:none;padding:0;margin:7px 0}.sources li{padding:7px 0;border-bottom:1px solid #e4ecf1;font-size:13px;line-height:1.6}.sources li:last-child{border:0}.foot{font-size:12px;text-align:center;color:#7e8fa0;padding:20px 0}.flash{margin:10px 0;border-radius:10px;background:#eaf6ee;color:#376345;padding:12px;font-size:13px;line-height:1.6}.flash.bad{background:#fff1ed;color:#91492c}dialog{width:95%;max-width:650px;border:0;border-radius:17px;max-height:90vh;overflow:auto;padding:19px}dialog::backdrop{background:#0b1e2eaa}.hidden{display:none!important}.noteBox{white-space:pre-wrap;line-height:1.7;font-size:13px}.smaller{font-size:12px}.inlineAction{font-size:13px;margin:8px 8px 0 0}.inlineAction.danger{color:#a64141}
+.modeBar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;padding:10px 12px;border:1px solid #d5e3ee;background:#fff;border-radius:12px}
+.modeBar small{font-weight:700;color:#4c6b83}
+.modeBar .btn{padding:8px 10px;font-size:12px}
+.modeFamily{background:#f5fafc}
+.modeAdmin{background:#eff5ff;border-color:#b9d2e8}
 .nearbyGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
 .nearbyCard{border:1px solid #d5e4ee;background:#f8fbfd;border-radius:13px;padding:12px 10px;text-align:left;cursor:pointer;min-height:102px;color:var(--ink);width:100%;font:inherit;display:flex;flex-direction:column;gap:7px}
 .nearbyCard strong{font-size:13px;line-height:1.45}
@@ -27,6 +32,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 <header><div class="eyebrow">FIRST HYUNDAI · SONGDO</div><h1>퍼스트현대</h1><p>송도 부동산 실무 정보센터 · 가족용 안드로이드 앱</p></header>
 <main>
 <div class="notice" id="globalNotice">실거래가와 뉴스는 공공·언론 자료를 자동 정리한 참고정보입니다. 정확한 거래 조건, 계약·해제 여부, 사업 확정 및 법령 시행일은 원문을 확인하세요. 가족 개인 메모는 기기에만 저장됩니다.</div>
+<div id="modeBar" class="modeBar modeFamily"><small id="roleLabel">가족 조회 모드 · 설정 보호</small><button id="roleButton" type="button" class="btn alt" onclick="toggleAdminMode()">관리자 전환</button></div>
 <div class="tabs" role="tablist" id="nav"></div>
 <div id="overview" class="page">
   <div class="sectionTitle"><h2>오늘의 업무 브리핑</h2><button class="btn alt" onclick="refreshAll()">새로고침</button></div>
@@ -39,9 +45,9 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
   </div>
   <div class="panel"><button class="btn nearbyTotal" type="button" onclick="switchPage('nearby')"><span>★ 사무실 주변 12개 단지 실거래 바로보기</span><span>→</span></button><p class="tiny">퍼스트파크·마스터뷰 등 자주 중개하는 단지만 모았습니다.</p></div>
   <div class="panel"><div class="sectionTitle"><h2>수집 상태</h2></div><div id="overviewStatus" class="tiny">연결 정보가 없습니다.</div></div>
-  <div class="panel"><h2>사용 순서</h2><p class="noteBox">① 먼저 ‘설정’에서 GitHub 저장소 주소를 입력하세요.
-② ‘실거래가’와 ‘뉴스 브리핑’을 열어 최신 결과를 확인하세요.
-③ 공식 확인을 거친 중개 메모는 ‘내 자료’에 기록하세요.</p></div>
+  <div class="panel"><h2>사용 순서</h2><p class="noteBox">① 연결 설정 없이 주변 12개 단지와 새소식을 바로 확인하세요.
+② ‘실거래가’와 ‘뉴스 브리핑’에서 최신 공개 자료를 확인하세요.
+③ 관리자 모드에서는 설정과 개인 메모를 관리할 수 있습니다.</p></div>
 </div>
 <div id="nearby" class="page hidden">
  <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2><p class="tiny">송도 3공구 퍼스트파크 15블럭 사무실 중심 · 자주 중개하는 12개 단지</p></div><button class="btn alt" onclick="refreshOne('trades')">갱신</button></div>
@@ -94,7 +100,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
  <div class="panel"><h2>백업과 복원</h2><p class="tiny">앱 삭제 또는 휴대폰 초기화 전에 내보내기 기능으로 별도 저장하세요. JSON 백업은 암호화되지 않으므로 고객 개인정보를 기록하지 마세요.</p><div class="controls"><button class="btn alt" onclick="exportNotes()">자료 백업</button><button class="btn alt" onclick="importNotes()">백업 복원</button></div><input id="browserFile" type="file" accept="application/json,.json" class="hidden" onchange="readBrowserBackup(event)"></div>
 </div>
 <div id="settings" class="page hidden">
- <div class="sectionTitle"><h2>무료 자동 업데이트 연결</h2></div>
+ <div class="sectionTitle"><h2>관리자 전용 · 데이터 연결 설정</h2></div>
  <div class="panel"><label class="inputLabel" for="repo">공개 GitHub 저장소 주소</label><input id="repo" placeholder="예: myusername/firsthyundai-app" autocapitalize="none" spellcheck="false" autocomplete="off"><p class="tiny">주소 형식은 <b>GitHub아이디/저장소이름</b>입니다. GitHub에서 만든 공개 저장소의 main 브랜치에 data 폴더가 있어야 합니다.</p><button class="btn" onclick="saveRepo()">저장하고 불러오기</button><button class="btn alt" onclick="refreshAll()">다시 연결</button><div id="settingStatus" class="flash hidden"></div></div>
  <div class="panel"><h2>자동 갱신 주기</h2><p class="noteBox">실거래가: GitHub 예약 실행으로 하루 한 번 수집
 뉴스: GitHub 예약 실행으로 3시간마다 수집
@@ -103,7 +109,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 휴대폰에만 남는 것: 직접 입력한 가족 업무 메모
 올리면 안 되는 것: 고객 성명·연락처·계약서·개인정보·API 인증키</p></div>
 </div>
-<footer class="foot">퍼스트현대 v0.9 · 사무실 공식 로고 + 주변단지 즐겨찾기 + 가족 보안코드</footer>
+<footer class="foot">퍼스트현대 v1.0 · 관리자/가족 화면 분리 · 주변 12개 단지 · FHD 공식 아이콘</footer>
 </main>
 <dialog id="noteDialog"><h2 id="noteDialogTitle">내 자료 등록</h2>
 <form id="noteForm">
@@ -123,15 +129,61 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 <script>
 'use strict';
 const NOTE_KEY='firsthyundai-local-v04', REPO_KEY='firsthyundai-public-repo';
+const DEFAULT_REPOSITORY='jwj2477-777/firsthyundai-app';
+const PRIVATE_PAGES=new Set(['settings','notes']);
 const PAGES=[['overview','전체 브리핑'],['nearby','★ 주변단지'],['new','새소식'],['trades','실거래가'],['news','뉴스 브리핑'],['notes','내 자료'],['settings','설정']];
 const $=id=>document.getElementById(id);
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeLink=url=>/^https:\/\/[a-z0-9.-]+(?:[:][0-9]+)?(?:[/?#]|$)/i.test(String(url||''))?String(url):'';
-let currentPage='overview', remote={trades:null,new_trades:null,news:null}, issues={trades:'',new_trades:'',news:''}, notes=[], editing=null;
-let repository=localStorage.getItem(REPO_KEY)||'';
+let currentPage='nearby', remote={trades:null,new_trades:null,news:null}, issues={trades:'',new_trades:'',news:''}, notes=[], editing=null;
+const NATIVE=window.FirstHyundaiNative;
+let role=NATIVE?.getMode?.()==='admin'?'admin':'family';
+let repository=role==='admin'?(localStorage.getItem(REPO_KEY)||DEFAULT_REPOSITORY):DEFAULT_REPOSITORY;
+if(!/^[A-Za-z0-9_.-]{1,60}\\/[A-Za-z0-9_.-]{1,100}$/.test(repository))repository=DEFAULT_REPOSITORY;
 try{notes=JSON.parse(localStorage.getItem(NOTE_KEY)||'[]');if(!Array.isArray(notes))notes=[];}catch(e){notes=[];}
 $('repo').value=repository;
-function switchPage(id){currentPage=id;PAGES.forEach(p=>$(p[0]).classList.toggle('hidden',p[0]!==id));$('nav').innerHTML=PAGES.map(([key,label])=>`<button class="${id===key?'active':''}" onclick="switchPage('${key}')">${label}</button>`).join('');if(id==='nearby')renderNearby();if(id==='new')renderNew();if(id==='trades')renderTrades();if(id==='news')renderNews();if(id==='notes')renderNotes();}
+
+function activePages(){
+ return role==='admin'?PAGES:PAGES.filter(([id])=>!PRIVATE_PAGES.has(id));
+}
+function updateRoleBar(){
+ $('roleLabel').textContent=role==='admin'?'관리자 모드 · 설정·내 자료 사용 가능':'가족 조회 모드 · 설정 보호';
+ $('roleButton').textContent=role==='admin'?'가족 모드로 전환':'관리자 전환';
+ $('modeBar').className='modeBar '+(role==='admin'?'modeAdmin':'modeFamily');
+}
+function toggleAdminMode(){
+ if(role==='admin'){
+  if(NATIVE?.switchToFamilyMode)NATIVE.switchToFamilyMode();
+  else window.onRoleChanged('family');
+ }else if(NATIVE?.requestAdminAccess)NATIVE.requestAdminAccess();
+ else alert('관리자 전환은 안드로이드 앱에서만 지원됩니다.');
+}
+window.onRoleChanged=function(next){
+ if(next!=='admin'&&next!=='family')return;
+ role=next;
+ if(role==='family'){
+  repository=DEFAULT_REPOSITORY;
+  $('repo').value=repository;
+  if($('noteDialog').open)$('noteDialog').close();
+ }else{
+  repository=localStorage.getItem(REPO_KEY)||DEFAULT_REPOSITORY;
+  $('repo').value=repository;
+ }
+ updateRoleBar();
+ switchPage(role==='admin'?'overview':'nearby');
+ refreshAll();
+};
+function switchPage(id){
+ if(!activePages().some(([key])=>key===id))id='nearby';
+ currentPage=id;
+ PAGES.forEach(p=>$(p[0]).classList.toggle('hidden',p[0]!==id));
+ $('nav').innerHTML=activePages().map(([key,label])=>`<button class="${id===key?'active':''}" onclick="switchPage('${key}')">${label}</button>`).join('');
+ if(id==='nearby')renderNearby();
+ if(id==='new')renderNew();
+ if(id==='trades')renderTrades();
+ if(id==='news')renderNews();
+ if(id==='notes'&&role==='admin')renderNotes();
+}
 function prettyTime(s){if(!s)return '아직 수집 전';try{return new Date(s).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour12:false});}catch{return s;}}
 function number(n){return Number(n||0).toLocaleString('ko-KR');}
 function value10k(n){let x=Number(n||0);if(x>=10000){let e=Math.floor(x/10000),r=x%10000;return `${number(e)}억${r?' '+number(r)+'만':''}`;}return number(x)+'만';}
@@ -270,7 +322,7 @@ if(window.FirstHyundaiNative){return new Promise((resolve,reject)=>{let id=Strin
 return fetch(target+'?t='+Date.now(),{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json();});}
 async function refreshOne(filename){if(!repository){issues[filename]='저장소를 먼저 설정하세요.';renderOverview();return;}issues[filename]='';try{let fresh=await fetchRemote(filename);if(!fresh||typeof fresh!=='object'||fresh.schema_version!==1)throw Error('JSON 데이터 형식이 맞지 않습니다');if((filename==='trades'||filename==='new_trades')&&!Array.isArray(fresh.records))throw Error('거래 목록이 없습니다');if(filename==='news'&&!Array.isArray(fresh.briefs))throw Error('브리핑 목록이 없습니다');remote[filename]=fresh;}catch(e){issues[filename]=e.message||String(e);}renderOverview();if(filename==='trades'){renderTrades();renderNearby();}else if(filename==='new_trades')renderNew();else renderNews();}
 async function refreshAll(){if(!repository){issues={trades:'저장소 미설정',new_trades:'저장소 미설정',news:'저장소 미설정'};renderOverview();return;}await Promise.all([refreshOne('trades'),refreshOne('new_trades'),refreshOne('news')]);}
-function saveRepo(){let text=$('repo').value.trim();if(!/^[A-Za-z0-9_.-]{1,60}\/[A-Za-z0-9_.-]{1,100}$/.test(text)){alert('GitHub아이디/저장소이름 형식으로 입력하세요. 예: hong/firsthyundai-app');return;}repository=text;localStorage.setItem(REPO_KEY,text);$('settingStatus').classList.remove('hidden');$('settingStatus').textContent='저장되었습니다. 온라인 데이터를 불러옵니다.';refreshAll();}
+function saveRepo(){if(role!=='admin')return;let text=$('repo').value.trim();if(!/^[A-Za-z0-9_.-]{1,60}\/[A-Za-z0-9_.-]{1,100}$/.test(text)){alert('GitHub아이디/저장소이름 형식으로 입력하세요. 예: hong/firsthyundai-app');return;}repository=text;localStorage.setItem(REPO_KEY,text);$('settingStatus').classList.remove('hidden');$('settingStatus').textContent='저장되었습니다. 온라인 데이터를 불러옵니다.';refreshAll();}
 
 function kstDateOffset(daysAgo){
  const date=new Date(Date.now()+9*3600000);
@@ -338,5 +390,5 @@ function renderNew(){
   }).join('');
 }
 
-switchPage('overview');if(repository)refreshAll();else renderOverview();
+updateRoleBar();switchPage(role==='admin'?'overview':'nearby');refreshAll();
 </script></body></html>
