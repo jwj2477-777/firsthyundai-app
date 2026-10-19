@@ -14,6 +14,7 @@ on:
       - 'scripts/test_complex_discovery.js'
       - 'scripts/test_simplified_complex_ui.js'
       - 'scripts/test_complex_facts.js'
+      - 'scripts/test_supply_pyeong.js'
       - 'scripts/test_extended_complex_catalog.js'
       - 'scripts/test_naver_basic_facts.js'
       - 'scripts/test_nearby.js'
@@ -90,6 +91,7 @@ jobs:
           node scripts/test_complex_discovery.js
           node scripts/test_simplified_complex_ui.js
           node scripts/test_complex_facts.js
+          node scripts/test_supply_pyeong.js
           node scripts/test_extended_complex_catalog.js
           node scripts/test_naver_basic_facts.js
       - name: Test password policy generation (disposable code)
