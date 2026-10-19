@@ -103,7 +103,7 @@ export default {
     if(!quota.success)return answer({error:"rate_limited",message:"조회가 많아 잠시 후 다시 시도해 주세요."},429);
     let stage="address_lookup";
     try {
-      const address=COMPLEX_ADDRESSES[id]||"";
+      const address=Object.hasOwn(COMPLEX_ADDRESSES,id)?COMPLEX_ADDRESSES[id]:"";
       if(!address)return answer({error:"address_unavailable"},404);
       const headers={"Authorization":"KakaoAK "+env.KAKAO_REST_API_KEY,"Accept":"application/json"};
       const addrUrl=new URL(KAKAO+"search/address.json");
