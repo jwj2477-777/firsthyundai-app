@@ -58,6 +58,18 @@ class KaptTest(unittest.TestCase):
         self.assertEqual(len(c.join_curated(old, [k])), 2)
         self.assertEqual(c.join_curated(old, [k])[0]["heating"], "지역난방")
 
+    def test_integral_decimal_counts_and_total_household_precedence(self):
+        self.assertEqual(c.to_positive_int("1114.0"), 1114)
+        self.assertEqual(c.to_positive_int(1114.0), 1114)
+        self.assertIsNone(c.to_positive_int("1114.5"))
+        self.assertIsNone(c.to_positive_int("unknown"))
+        row = record("A10012345", "송도 신축 테스트")
+        row["hoCnt"] = "581"
+        row["kaptdaCnt"] = 578.0
+        p = c.apt_profile(row, {}, "2026-10-19")
+        self.assertEqual(p["households"], 581)
+        self.assertIn("578세대", p["detail_note"])
+
     def test_unapproved_api_never_returns_fake_data(self):
         def fake(req):
             args = parse_qs(urlsplit(req.full_url).query)
