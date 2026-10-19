@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#173b60"><title>퍼스트현대 | 송도 정보센터</title>
+<style>
+:root{color-scheme:light;--navy:#173b60;--blue:#2566a2;--light:#edf3f7;--slate:#647587;--border:#dfe8ef;--ink:#142c41;--orange:#d77828}
+*{box-sizing:border-box}body{margin:0;background:#f3f6f8;color:var(--ink);font-family:system-ui,-apple-system,'Noto Sans KR',sans-serif;font-size:15px}
+header{background:linear-gradient(130deg,#12375b,#226398);padding:24px 18px 21px;color:white}header h1{font-size:25px;letter-spacing:-.8px;margin:0}header p{color:#d0e3f4;font-size:13px;line-height:1.6;margin:7px 0 0}.eyebrow{letter-spacing:1.6px;font-weight:750;color:#add6f7;font-size:10px;margin-bottom:6px}
+main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;border:1px solid #eeddb2;background:#fff9eb;border-radius:13px;font-size:13px;color:#745521;line-height:1.7;margin-bottom:12px}.tabs{display:flex;gap:8px;overflow-x:auto;padding:3px 0 14px;scrollbar-width:none}.tabs button{padding:10px 13px;border:1px solid #cbddea;background:white;border-radius:10px;font-size:13px;font-weight:650;color:#42617a;white-space:nowrap}.tabs button.active{background:var(--navy);color:white;border-color:var(--navy)}
+.panel{background:white;border:1px solid var(--border);padding:17px;border-radius:16px;margin:12px 0;box-shadow:0 2px 15px #173b6008}.sectionTitle{display:flex;justify-content:space-between;align-items:start;gap:12px;margin:5px 0 12px}.sectionTitle h2{font-size:19px;margin:0}.tiny{color:var(--slate);font-size:12px;line-height:1.6}.muted{color:var(--slate)}.row{display:flex;gap:8px;align-items:center;justify-content:space-between}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.metric{border-radius:13px;background:#eaf3fa;padding:14px}.metric strong{font-size:25px;display:block;margin-top:3px}.metric small{font-size:12px;color:#557590}.pill{display:inline-block;padding:4px 7px;background:#e7f0f9;border-radius:6px;font-size:11px;color:#1c5684;font-weight:700}.pill.orange{background:#fff1db;color:#945814}.pill.red{background:#fdecea;color:#ab3434}.pill.gray{background:#edf0f3;color:#566575}.btn{display:inline-flex;align-items:center;justify-content:center;border:0;background:var(--blue);color:white;padding:11px 15px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer}.btn.alt{background:#e9f1f8;color:#185483}.btn.danger{background:#a33d3d}.btn:disabled{opacity:.45}input,select,textarea{font:inherit;border:1px solid #cbd8e4;border-radius:9px;padding:11px;color:var(--ink);background:white;min-width:0;width:100%}input:focus,select:focus,textarea:focus{outline:2px solid #a2cee9}textarea{min-height:100px;resize:vertical}.inputLabel{font-size:13px;font-weight:700;margin:12px 0 5px;display:block}.controls{display:flex;gap:9px;margin:10px 0;align-items:center}.controls>*{flex:1}.controls button{flex:0 auto}.item{padding:15px 0;border-top:1px solid #e8edf1}.item:first-child{border-top:0}.item h3{font-size:16px;margin:8px 0;line-height:1.5;letter-spacing:-.2px}.item p{font-size:13px;line-height:1.8;margin:8px 0}.item .meta{font-size:12px;color:var(--slate);line-height:1.8;overflow-wrap:anywhere}.money{color:#15507b;font-weight:800;font-size:18px;margin:7px 0}.submoney{font-size:13px;color:var(--slate)}a{color:#20629c;text-decoration:none;overflow-wrap:anywhere}a:hover{text-decoration:underline}.tagbox{display:flex;flex-wrap:wrap;gap:5px}.empty{text-align:center;color:#6b7d8b;font-size:13px;padding:35px 10px;line-height:1.8}.details{margin-top:8px;background:#f7fafc;padding:10px;border-radius:9px}.details summary{cursor:pointer;font-size:13px;font-weight:700;color:#2b5d87}.sources{list-style:none;padding:0;margin:7px 0}.sources li{padding:7px 0;border-bottom:1px solid #e4ecf1;font-size:13px;line-height:1.6}.sources li:last-child{border:0}.foot{font-size:12px;text-align:center;color:#7e8fa0;padding:20px 0}.flash{margin:10px 0;border-radius:10px;background:#eaf6ee;color:#376345;padding:12px;font-size:13px;line-height:1.6}.flash.bad{background:#fff1ed;color:#91492c}dialog{width:95%;max-width:650px;border:0;border-radius:17px;max-height:90vh;overflow:auto;padding:19px}dialog::backdrop{background:#0b1e2eaa}.hidden{display:none!important}.noteBox{white-space:pre-wrap;line-height:1.7;font-size:13px}.smaller{font-size:12px}.inlineAction{font-size:13px;margin:8px 8px 0 0}.inlineAction.danger{color:#a64141}
+@media(min-width:600px){main{padding:22px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}header{padding:29px calc((100% - 960px)/2)}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">FIRST HYUNDAI · SONGDO</div><h1>퍼스트현대</h1><p>송도 부동산 실무 정보센터 · 가족용 안드로이드 앱</p></header>
+<main>
+<div class="notice" id="globalNotice">실거래가와 뉴스는 공공·언론 자료를 자동 정리한 참고정보입니다. 정확한 거래 조건, 계약·해제 여부, 사업 확정 및 법령 시행일은 원문을 확인하세요. 가족 개인 메모는 기기에만 저장됩니다.</div>
+<div class="tabs" role="tablist" id="nav"></div>
+<div id="overview" class="page">
+  <div class="sectionTitle"><h2>오늘의 업무 브리핑</h2><button class="btn alt" onclick="refreshAll()">새로고침</button></div>
+  <div class="grid">
+   <div class="metric"><small>송도동 실거래 누적</small><strong id="totalDeals">—</strong><small>최근 최대 12개월</small></div>
+   <div class="metric"><small>매매 건수</small><strong id="saleDeals">—</strong><small>신고+해제 표시</small></div>
+   <div class="metric"><small>전·월세 건수</small><strong id="rentDeals">—</strong><small>공개된 계약</small></div>
+   <div class="metric"><small>뉴스 묶음</small><strong id="newsGroups">—</strong><small>최근 기사 제목</small></div>
+  </div>
+  <div class="panel"><div class="sectionTitle"><h2>수집 상태</h2></div><div id="overviewStatus" class="tiny">연결 정보가 없습니다.</div></div>
+  <div class="panel"><h2>사용 순서</h2><p class="noteBox">① 먼저 ‘설정’에서 GitHub 저장소 주소를 입력하세요.
+② ‘실거래가’와 ‘뉴스 브리핑’을 열어 최신 결과를 확인하세요.
+③ 공식 확인을 거친 중개 메모는 ‘내 자료’에 기록하세요.</p></div>
+</div>
+<div id="trades" class="page hidden">
+ <div class="sectionTitle"><div><h2>송도동 아파트 실거래가</h2><p class="tiny" id="tradesMeta">국토교통부 공개 API 연동 대기</p></div><button class="btn alt" onclick="refreshOne('trades')">갱신</button></div>
+ <div class="panel"><div class="controls"><input id="aptFilter" placeholder="아파트 단지명 검색" oninput="renderTrades()" aria-label="아파트 단지명"></div>
+  <div class="controls"><select id="typeFilter" onchange="renderTrades()"><option value="">매매·전세·월세 전체</option><option>매매</option><option>전세</option><option>월세</option></select><select id="statusFilter" onchange="renderTrades()"><option value="">해제 포함 전체</option><option value="notcancel">해제 제외</option><option value="cancel">해제 거래만</option></select></div>
+  <div id="tradesContent"><div class="empty">데이터 저장소를 연결한 후 표시됩니다.</div></div>
+  <div class="tiny">금액 단위: 만 원. 보증금과 월세는 별도 표시합니다. 실거래는 신고 이후 반영되므로 실제 계약일보다 늦게 게시될 수 있습니다. 동일 조건의 별도 계약도 각각 표시할 수 있습니다.</div>
+ </div>
+</div>
+<div id="news" class="page hidden">
+ <div class="sectionTitle"><div><h2>송도·부동산 뉴스 브리핑</h2><p class="tiny" id="newsMeta">무료 자연어 처리 기반 기사 묶음</p></div><button class="btn alt" onclick="refreshOne('news')">갱신</button></div>
+ <div class="notice">이 브리핑은 기사 <b>제목</b> 유사도를 이용한 자동 묶음입니다. 생성형 AI 요약이나 공식 사실검증이 아닙니다. 세금·대출·개발일정은 공식 원문 확인 후 안내하세요.</div>
+ <div class="panel"><select id="newsCategory" onchange="renderNews()"><option value="">모든 주제</option><option>개발·교통</option><option>분양·입주</option><option>세금·대출</option><option>정책·규제</option></select><div id="newsContent"><div class="empty">데이터 저장소를 연결한 후 표시됩니다.</div></div></div>
+</div>
+<div id="notes" class="page hidden">
+ <div class="sectionTitle"><div><h2>내 자료</h2><p class="tiny">이 휴대폰에만 저장 · 세 가족 사이 자동 공유 안 됨</p></div><button class="btn" onclick="openNote()">+ 등록</button></div>
+ <div class="panel"><input id="noteSearch" placeholder="단지·개발사업·고객 설명 메모 검색" oninput="renderNotes()"><div id="notesContent"></div></div>
+ <div class="panel"><h2>백업과 복원</h2><p class="tiny">앱 삭제 또는 휴대폰 초기화 전에 내보내기 기능으로 별도 저장하세요. JSON 백업은 암호화되지 않으므로 고객 개인정보를 기록하지 마세요.</p><div class="controls"><button class="btn alt" onclick="exportNotes()">자료 백업</button><button class="btn alt" onclick="importNotes()">백업 복원</button></div><input id="browserFile" type="file" accept="application/json,.json" class="hidden" onchange="readBrowserBackup(event)"></div>
+</div>
+<div id="settings" class="page hidden">
+ <div class="sectionTitle"><h2>무료 자동 업데이트 연결</h2></div>
+ <div class="panel"><label class="inputLabel" for="repo">공개 GitHub 저장소 주소</label><input id="repo" placeholder="예: myusername/firsthyundai-app" autocapitalize="none" spellcheck="false" autocomplete="off"><p class="tiny">주소 형식은 <b>GitHub아이디/저장소이름</b>입니다. GitHub에서 만든 공개 저장소의 main 브랜치에 data 폴더가 있어야 합니다.</p><button class="btn" onclick="saveRepo()">저장하고 불러오기</button><button class="btn alt" onclick="refreshAll()">다시 연결</button><div id="settingStatus" class="flash hidden"></div></div>
+ <div class="panel"><h2>자동 갱신 주기</h2><p class="noteBox">실거래가: GitHub 예약 실행으로 하루 한 번 수집
+뉴스: GitHub 예약 실행으로 3시간마다 수집
+앱 화면: 실행 및 수동 새로고침 시 최신 스냅샷 요청</p><p class="tiny">GitHub Actions의 예약 실행은 지연되거나 누락될 수 있습니다. 여기 보이는 확인 시각이 오래되면 자동 수집 상태를 확인하세요.</p></div>
+ <div class="panel"><h2>공개 데이터와 개인정보</h2><p class="noteBox">인터넷에 올리는 것: 국토교통부 공개 거래, 뉴스 제목·출처 링크
+휴대폰에만 남는 것: 직접 입력한 가족 업무 메모
+올리면 안 되는 것: 고객 성명·연락처·계약서·개인정보·API 인증키</p></div>
+</div>
+<footer class="foot">퍼스트현대 v0.5 · 공공데이터 자동 조회 + 무료 NLP 뉴스 브리핑</footer>
+</main>
+<dialog id="noteDialog"><h2 id="noteDialogTitle">내 자료 등록</h2>
+<form id="noteForm">
+<label class="inputLabel">분류</label><select name="category"><option>송도 가이드</option><option>단지·실거래</option><option>개발·교통</option><option>분양·입주</option><option>세금·대출</option><option>정책·규제</option><option>중개실무</option></select>
+<label class="inputLabel">제목</label><input name="title" required maxlength="150">
+<label class="inputLabel">키워드</label><input name="keyword">
+<label class="inputLabel">상태</label><select name="status"><option>검증 대기</option><option>공식 확인</option><option>공식 계획</option><option>언론 보도</option><option>현장 확인</option></select>
+<label class="inputLabel">30초 설명 / 요약</label><textarea name="summary"></textarea>
+<label class="inputLabel">세부내용</label><textarea name="facts"></textarea>
+<label class="inputLabel">실거래 메모 (유형)</label><select name="deal"><option value="">해당 없음</option><option>매매</option><option>전세</option><option>월세</option></select>
+<label class="inputLabel">금액 메모</label><input name="price">
+<label class="inputLabel">평면도 링크</label><input name="plan" type="url">
+<label class="inputLabel">원문 링크</label><input name="source" type="url">
+<label class="inputLabel">직접 확인한 날짜</label><input name="verified" type="date">
+<div style="margin-top:16px"><button type="submit" class="btn">저장</button> <button type="button" class="btn alt" onclick="document.getElementById('noteDialog').close()">취소</button></div>
+</form></dialog>
+<script>
+'use strict';
+const NOTE_KEY='firsthyundai-local-v04', REPO_KEY='firsthyundai-public-repo';
+const PAGES=[['overview','전체 브리핑'],['trades','실거래가'],['news','뉴스 브리핑'],['notes','내 자료'],['settings','설정']];
+const $=id=>document.getElementById(id);
+const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeLink=url=>/^https:\/\/[a-z0-9.-]+(?:[:][0-9]+)?(?:[/?#]|$)/i.test(String(url||''))?String(url):'';
+let currentPage='overview', remote={trades:null,news:null}, issues={trades:'',news:''}, notes=[], editing=null;
+let repository=localStorage.getItem(REPO_KEY)||'';
+try{notes=JSON.parse(localStorage.getItem(NOTE_KEY)||'[]');if(!Array.isArray(notes))notes=[];}catch(e){notes=[];}
+$('repo').value=repository;
+function switchPage(id){currentPage=id;PAGES.forEach(p=>$(p[0]).classList.toggle('hidden',p[0]!==id));$('nav').innerHTML=PAGES.map(([key,label])=>`<button class="${id===key?'active':''}" onclick="switchPage('${key}')">${label}</button>`).join('');if(id==='trades')renderTrades();if(id==='news')renderNews();if(id==='notes')renderNotes();}
+function prettyTime(s){if(!s)return '아직 수집 전';try{return new Date(s).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour12:false});}catch{return s;}}
+function number(n){return Number(n||0).toLocaleString('ko-KR');}
+function value10k(n){let x=Number(n||0);if(x>=10000){let e=Math.floor(x/10000),r=x%10000;return `${number(e)}억${r?' '+number(r)+'만':''}`;}return number(x)+'만';}
+function textState(object,name){if(!object)return `${name}: 아직 데이터를 읽지 못했습니다.`;let status=object.state==='ok'?'정상':object.state==='partial'?'부분 오류':object.state==='not_started'?'첫 수집 전':'상태 확인 필요';return `${name}: ${status} · 확인 ${prettyTime(object.checked_at)}`;}
+function renderOverview(){let list=remote.trades?.records||[];$('totalDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.length):'—';$('saleDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.filter(x=>x.type==='매매').length):'—';$('rentDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.filter(x=>x.type==='전세'||x.type==='월세').length):'—';$('newsGroups').textContent=remote.news&&remote.news.state!=='not_started'?number(remote.news.briefs?.length):'—';$('overviewStatus').innerHTML=`<div>${escapeHtml(textState(remote.trades,'실거래가'))}</div><div>${escapeHtml(textState(remote.news,'뉴스'))}</div>${issues.trades?`<div class="flash bad">실거래가 연결 오류: ${escapeHtml(issues.trades)}</div>`:''}${issues.news?`<div class="flash bad">뉴스 연결 오류: ${escapeHtml(issues.news)}</div>`:''}`;}
+function renderTrades(){let payload=remote.trades;if(!payload){$('tradesContent').innerHTML='<div class="empty">‘설정’에서 공개 GitHub 저장소를 연결하세요.</div>';return;}
+$('tradesMeta').textContent=`${payload.area||'송도동'} · 최종 수집 ${prettyTime(payload.checked_at)} · ${payload.state==='partial'?'일부 수집 실패':'공개 데이터'}`;
+if(payload.state==='not_started'){$('tradesContent').innerHTML='<div class="empty">아직 첫 실거래가 수집을 실행하지 않았습니다.<br>GitHub Actions에서 Update Public Data 실행이 필요합니다.</div>';return;}
+let q=$('aptFilter').value.trim().toLowerCase(),type=$('typeFilter').value,s=$('statusFilter').value;
+let records=(payload.records||[]).filter(x=>(!type||x.type===type)&&(!q||(x.building||'').toLowerCase().includes(q))&&(s==='cancel'?x.status==='해제':s==='notcancel'?x.status!=='해제':true));
+$('tradesContent').innerHTML=`<p class="tiny">검색 결과 <b>${number(records.length)}건</b> · 최대 70건 표시 ${payload.state==='partial'?'<span class="pill orange">일부 수집 실패: 최신성 주의</span>':''}</p>`+(records.length?records.slice(0,70).map(x=>{let val=x.type==='매매'?value10k(x.amount_10k):x.type==='전세'?`보증금 ${value10k(x.deposit_10k)}`:`보증금 ${value10k(x.deposit_10k)} / 월세 ${value10k(x.monthly_10k)}`;
+return `<article class="item"><div class="tagbox"><span class="pill">${escapeHtml(x.type)}</span><span class="pill ${x.status==='해제'?'red':'gray'}">${escapeHtml(x.status)}</span></div><h3>${escapeHtml(x.building)}</h3><div class="money">${escapeHtml(val)}</div><div class="meta">계약일 ${escapeHtml(x.contract_date)} · 전용 ${escapeHtml(x.area_m2)}㎡ · ${escapeHtml(x.floor||'층 정보 없음')}층</div>${x.status==='해제'?`<p class="pill red">해제 사유 발생일: ${escapeHtml(x.cancel_date_raw||'정보 미제공')}</p>`:''}<p class="meta">출처: 국토교통부 · 조회 기준 계약연월 ${escapeHtml(x.source_month)}</p></article>`;}).join(''):'<div class="empty">조건에 맞는 거래 내역이 없습니다.<br>수집 실패 또는 해당 기간 내 거래 없음일 수 있습니다.</div>');}
+function renderNews(){let payload=remote.news;if(!payload){$('newsContent').innerHTML='<div class="empty">‘설정’에서 공개 GitHub 저장소를 연결하세요.</div>';return;}
+$('newsMeta').textContent=`마지막 수집 ${prettyTime(payload.checked_at)} · 생성형 AI 아님 / 공식 확인 필요`;
+if(payload.state==='not_started'){$('newsContent').innerHTML='<div class="empty">아직 첫 뉴스 수집을 실행하지 않았습니다.</div>';return;}
+let cat=$('newsCategory').value;let filtered=(payload.briefs||[]).filter(x=>!cat||x.category===cat);
+$('newsContent').innerHTML=`<p class="tiny">뉴스 묶음 ${filtered.length}개 ${payload.state==='partial'?'· 일부 RSS 요청 실패':''}</p>`+(filtered.length?filtered.slice(0,55).map(x=>{
+let sources=(x.sources||[]).map(s=>{let safe=safeLink(s.link);return `<li>${safe?`<a href="${escapeHtml(safe)}">${escapeHtml(s.title)}</a>`:escapeHtml(s.title)}<div class="tiny">${escapeHtml(s.publisher)} · ${escapeHtml(prettyTime(s.published_at))}</div></li>`;}).join('');return `<article class="item"><div class="tagbox"><span class="pill">${escapeHtml(x.category)}</span><span class="pill orange">기사 자동 분류 · 미검증</span></div><h3>${escapeHtml(x.title)}</h3><p>${escapeHtml(x.summary)}</p><div class="meta">최근 보도: ${escapeHtml(prettyTime(x.last_published_at))} · ${escapeHtml(x.article_count)}건</div><details class="details"><summary>관련 기사 원문 ${escapeHtml(x.sources?.length||0)}건 보기</summary><ul class="sources">${sources}</ul></details></article>`;}).join(''):'<div class="empty">해당 조건의 최신 뉴스가 없습니다.</div>');}
+function persistNotes(){localStorage.setItem(NOTE_KEY,JSON.stringify(notes));}
+function renderNotes(){let q=$('noteSearch').value.trim().toLowerCase();let rows=notes.filter(x=>JSON.stringify(x).toLowerCase().includes(q));$('notesContent').innerHTML=rows.length?rows.map(x=>{let src=safeLink(x.source),plan=safeLink(x.plan);return `<article class="item"><div class="tagbox"><span class="pill">${escapeHtml(x.category)}</span><span class="pill orange">${escapeHtml(x.status||'검증 대기')}</span></div><h3>${escapeHtml(x.title)}</h3><p class="noteBox">${escapeHtml(x.summary||'')}</p>${x.facts?`<p class="noteBox tiny">${escapeHtml(x.facts)}</p>`:''}${x.deal?`<p class="tiny">${escapeHtml(x.deal)} ${escapeHtml(x.price||'')}</p>`:''}<div class="tiny">직접 확인일: ${escapeHtml(x.verified||'미입력')}</div>${src?`<p><a href="${escapeHtml(src)}">원문 링크</a></p>`:''}${plan?`<p><a href="${escapeHtml(plan)}">평면도 링크</a></p>`:''}<button class="btn alt inlineAction" onclick="openNote('${escapeHtml(x.id)}')">수정</button><button class="btn danger inlineAction" onclick="removeNote('${escapeHtml(x.id)}')">삭제</button></article>`;}).join(''):'<div class="empty">저장한 개인 메모가 없습니다.</div>';}
+const noteFields=['category','title','keyword','status','summary','facts','deal','price','plan','source','verified'];
+function openNote(id){editing=id||null;let note=notes.find(x=>x.id===id);$('noteForm').reset();if(note)for(let key of noteFields)$('noteForm').elements[key].value=note[key]||'';$('noteDialogTitle').textContent=note?'내 자료 수정':'내 자료 등록';$('noteDialog').showModal();}
+$('noteForm').onsubmit=event=>{event.preventDefault();let note={};for(let key of noteFields)note[key]=$('noteForm').elements[key].value.trim();note.id=editing||String(Date.now())+'-'+Math.floor(Math.random()*100000);note.updated=new Date().toISOString();if(editing)notes=notes.map(x=>x.id===editing?note:x);else notes.unshift(note);persistNotes();$('noteDialog').close();renderNotes();};
+function removeNote(id){if(confirm('메모를 삭제하시겠습니까?')){notes=notes.filter(x=>x.id!==id);persistNotes();renderNotes();}}
+function exportNotes(){let content=JSON.stringify({format:'firsthyundai-v04',records:notes},null,2);if(window.FirstHyundaiNative){window.FirstHyundaiNative.saveBackup(content);return;}let blob=new Blob([content],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='firsthyundai-notes-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+function importNotes(){if(window.FirstHyundaiNative)window.FirstHyundaiNative.openBackup();else $('browserFile').click();}
+function restoreNotes(content){try{let parsed=JSON.parse(content);if(parsed.format!=='firsthyundai-v04'||!Array.isArray(parsed.records)||parsed.records.length>5000)throw Error('올바르지 않은 백업 형식');if(!confirm('기기 내 메모를 백업 내용으로 모두 교체하시겠습니까?'))return;notes=parsed.records.filter(x=>x&&typeof x==='object'&&typeof x.id==='string');persistNotes();renderNotes();alert('메모 복원 완료');}catch(e){alert('백업 복원 실패: '+e.message);}}
+async function readBrowserBackup(e){let file=e.target.files?.[0];if(!file)return;restoreNotes(await file.text());e.target.value='';}
+window.onBackupOpened=r=>{if(r.ok)restoreNotes(r.json);else alert('백업 읽기 실패: '+(r.error||''));};
+window.onBackupSaved=r=>alert(r.ok?'메모 백업 저장 완료':'백업 파일 저장 실패');
+let pending={};let serial=0;
+window.onFirstHyundaiResult=result=>{let p=pending[result.requestId];if(!p)return;delete pending[result.requestId];if(result.ok)p.resolve(result.payload);else p.reject(new Error(result.error||'알 수 없는 오류'));};
+function fetchRemote(filename){let target=`https://raw.githubusercontent.com/${repository}/main/data/${filename}.json`;
+if(window.FirstHyundaiNative){return new Promise((resolve,reject)=>{let id=String(++serial);pending[id]={resolve,reject};window.FirstHyundaiNative.fetch(repository,filename+'.json',id);});}
+return fetch(target+'?t='+Date.now(),{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json();});}
+async function refreshOne(filename){if(!repository){issues[filename]='저장소를 먼저 설정하세요.';renderOverview();return;}issues[filename]='';try{let fresh=await fetchRemote(filename);if(!fresh||typeof fresh!=='object'||fresh.schema_version!==1)throw Error('JSON 데이터 형식이 맞지 않습니다');if(filename==='trades'&&!Array.isArray(fresh.records))throw Error('거래 목록이 없습니다');if(filename==='news'&&!Array.isArray(fresh.briefs))throw Error('브리핑 목록이 없습니다');remote[filename]=fresh;}catch(e){issues[filename]=e.message||String(e);}renderOverview();if(filename==='trades')renderTrades();else renderNews();}
+async function refreshAll(){if(!repository){issues={trades:'저장소 미설정',news:'저장소 미설정'};renderOverview();return;}await Promise.all([refreshOne('trades'),refreshOne('news')]);}
+function saveRepo(){let text=$('repo').value.trim();if(!/^[A-Za-z0-9_.-]{1,60}\/[A-Za-z0-9_.-]{1,100}$/.test(text)){alert('GitHub아이디/저장소이름 형식으로 입력하세요. 예: hong/firsthyundai-app');return;}repository=text;localStorage.setItem(REPO_KEY,text);$('settingStatus').classList.remove('hidden');$('settingStatus').textContent='저장되었습니다. 온라인 데이터를 불러옵니다.';refreshAll();}
+switchPage('overview');if(repository)refreshAll();else renderOverview();
+</script></body></html>
