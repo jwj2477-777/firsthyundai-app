@@ -46,7 +46,7 @@ assert.equal(vm.runInContext('currentPage',family.ctx),'nearby','security settin
 vm.runInContext("switchPage('notes')",family.ctx);
 assert.equal(vm.runInContext('currentPage',family.ctx),'nearby','notes should be admin only');
 vm.runInContext("window.onRoleChanged('admin')",family.ctx);
-assert.equal(vm.runInContext('activePages().length',family.ctx),9);
+assert.equal(vm.runInContext('activePages().length',family.ctx),10);
 vm.runInContext("switchPage('settings')",family.ctx);
 assert.equal(vm.runInContext('currentPage',family.ctx),'settings','admin may view settings');
 vm.runInContext("window.onRoleChanged('family')",family.ctx);
@@ -55,5 +55,5 @@ assert.equal(vm.runInContext('activePages().length',family.ctx),6);
 assert.equal(vm.runInContext('currentPage',family.ctx),'nearby');
 const admin=makeContext('admin');
 assert.equal(vm.runInContext('role',admin.ctx),'admin','admin device remembers its mode');
-assert.equal(vm.runInContext('activePages().length',admin.ctx),9);
+assert.equal(vm.runInContext('activePages().length',admin.ctx),10);
 console.log('Role test passed: family default repository, admin confirmation state, restricted menus');
