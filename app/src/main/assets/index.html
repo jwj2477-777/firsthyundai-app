@@ -923,11 +923,18 @@ function renderComplexes(){
    '<div class="complexTypeList">'+partialSupplies.map(x=>'<span>'+escapeHtml(displaySupplyType(p,x))+'</span>').join('')+'</div></details>':'';
   const sourcePairs=[...new Set(verified.map(x=>x.source_url).filter(Boolean))];
   const typeSources=sourcePairs.slice(0,4).map((url,i)=>sourceLink(url,'공급·전용 대응자료 '+(i+1))).join('');
+  const planning=Array.isArray(p.exclusive_plan_labels)?p.exclusive_plan_labels.filter(x=>/^[0-9]{2,3}[A-Z]{0,2}$/.test(x)).slice(0,30):[];
+  const planningView=planning.length?'<details class="details"><summary>분양 당시 전용 타입 '+planning.length+'종 보기</summary>'+
+   '<div class="complexTypeList">'+planning.map(x=>'<span>전용 '+escapeHtml(x)+'형 · 공급평형 미대조</span>').join('')+'</div>'+
+   '<p class="tiny">타입명은 실제 면적 소수점 및 공급평형에 아직 연결되지 않았습니다.</p>'+
+   sourceLink(p.exclusive_plan_source_url,'전용 타입 구분 출처')+'</details>':'';
   const count=Number.isSafeInteger(p.area_types_observation_count)?number(p.area_types_observation_count)+'건':'';
+  const sourceLookup='https://search.naver.com/search.naver?query='+encodeURIComponent('네이버페이 부동산 '+p.label+' 타입 공급면적 전용면적');
   const areaView='<p class="tiny">면적 수치는 전용㎡, 약 ○평형은 확인된 공급면적 기준입니다. <strong>전용㎡를 나누어 평형으로 계산하지 않습니다.</strong></p>'+
    '<p class="tiny">전용면적 '+exclusiveAreas.length+'종 · '+(count?'실거래 관측 '+count+' · ':'')+
-   '공급·전용 대응 검증 '+verified.length+'타입</p>'+areaTypes+supplyOnly+
-   '<p class="tiny">실거래 관측 유형은 단지의 전체 법정 타입을 보장하지 않습니다. 공급평형은 확인된 타입에만 표시합니다.</p>'+typeSources;
+   '공급·전용 대응 검증 '+verified.length+'타입</p>'+areaTypes+supplyOnly+planningView+
+   '<p class="tiny">실거래 관측 유형은 단지의 전체 법정 타입을 보장하지 않습니다. 공급평형은 확인된 타입에만 표시합니다.</p>'+
+   typeSources+(verified.length<exclusiveAreas.length?sourceLink(sourceLookup,'미확인 공급평형 원본 찾아보기'):'');
   const stats=complexAreaStats(p),active=complexDealType;
   const dealButtons=[['','전체'],['매매','매매'],['전세','전세'],['월세','월세']]
    .map(([v,label])=>'<button type="button" class="'+(active===v?'active':'')+'" onclick="setComplexDealType(\''+v+'\')">'+label+'</button>').join('');
@@ -1725,6 +1732,9 @@ function createCatalogExport(){
    area_types_m2:Array.isArray(p.area_types_m2)?p.area_types_m2:[],
    area_types_source:p.area_types_source??null,
    area_types_observation_count:p.area_types_observation_count??null,
+   exclusive_plan_labels:Array.isArray(p.exclusive_plan_labels)?p.exclusive_plan_labels:[],
+   exclusive_plan_source_url:safeLink(p.exclusive_plan_source_url)||null,
+   exclusive_plan_note:p.exclusive_plan_note??null,
    floorplans:Array.isArray(p.floorplans)?p.floorplans:[],
    source_url:p.source_url??null,last_verified:p.last_verified??null,naver_complex_url:p.naver_complex_url??null,
    buildings:p.buildings??null,approved_date:p.approved_date??null,parking_total:p.parking_total??null,
