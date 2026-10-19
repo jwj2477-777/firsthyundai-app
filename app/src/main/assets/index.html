@@ -444,13 +444,14 @@ function renderComplexes(){
  const onlyFavorites=$('complexScope').value==='favorites',favoriteIds=new Set(baseComplexes().map(x=>x.id));
  const visible=all.filter(x=>(!onlyFavorites||favoriteIds.has(x.id))&&
   (!q||[x.label,...(Array.isArray(x.aliases)?x.aliases:[])].join(' ').normalize('NFKC').toLowerCase().includes(q)));
- $('complexMeta').textContent='조회 '+visible.length+'곳 · 등록된 단지 기본정보 '+(remote.complexes?.records||[]).length+'곳'+
+ $('complexMeta').textContent='조회 '+visible.length+'곳 · 공식·검증 단지 '+all.filter(x=>x.catalog_source!=='trades').length+
+  '곳 · 추가 실거래 구분 '+all.filter(x=>x.catalog_source==='trades').length+'곳'+
   (issues.trades?' · 실거래 갱신 오류':'')+(issues.complexes?' · 단지정보 갱신 오류':'');
  const shown=visible.slice(0,complexDisplayLimit);
  $('complexCards').innerHTML=shown.length?shown.map(x=>
   '<button type="button" class="nearbyCard'+(x.id===complexSelected?' selected':'')+'" onclick="selectComplex(\''+x.id+'\')" aria-pressed="'+(x.id===complexSelected?'true':'false')+'">'+
   '<strong>'+escapeHtml(x.label)+'</strong>'+
-  '<small>'+((Number.isInteger(x.households)&&x.households>0)?number(x.households)+'세대':'기초정보 준비 중')+'</small></button>'
+  '<small>'+(x.catalog_source==='trades'?'실거래 확인 · 기본정보 조사 중':(Number.isInteger(x.households)&&x.households>0)?number(x.households)+'세대':'기초정보 준비 중')+'</small></button>'
  ).join(''):'<div class="empty">검색 결과가 없습니다.</div>';
  $('complexShowMore').classList.toggle('hidden',shown.length>=visible.length);
  $('complexShowMore').textContent='단지 더 보기 ('+number(visible.length-shown.length)+'곳)';
@@ -470,7 +471,11 @@ function renderComplexes(){
    tile(name,displayComplexValue(value,unit||''))).join('');
   const ev=Number.isInteger(p.ev_chargers)&&p.ev_chargers>=0?p.ev_chargers:null;
   const phone=typeof p.management_phone==='string'&&/^(?:0[0-9]{1,2}-?[0-9]{3,4}-?[0-9]{4})$/.test(p.management_phone)?p.management_phone:'';
-  const basic='<div class="complexFacts">'+
+  const traceYear=p.catalog_source==='trades'&&/^\d{4}$/.test(String(p.observed_building_year||''))?
+   tile('실거래상 건축년도',String(p.observed_building_year)+'년 (사용승인일 아님)'):'';
+  const basic=(p.catalog_source==='trades'?
+   '<p class="complexSectionNote">국토부 아파트 실거래에 등장한 이름입니다. K-apt 상세 기본정보를 아직 확인하지 못했습니다.</p>':'')+
+   '<div class="complexFacts">'+
    tile('세대수',hh===null?'확인 전':number(hh)+'세대')+
    tile('동수',displayComplexValue(p.buildings,'개동'))+
    tile('사용승인일',displayComplexValue(p.approved_date))+
@@ -479,12 +484,13 @@ function renderComplexes(){
    tile('주차',parking===null?'확인 전':number(parking)+'대 (세대당 '+rate+')')+
    tile('전기차 충전',ev===null?'확인 전':number(ev)+'대')+
    tile('관리사무소',phone||'확인 전')+
+   traceYear+
    '</div>'+
    (phone?'<a class="complexCallButton" href="tel:'+escapeHtml(phone.replace(/-/g,''))+'">☎ 관리사무소 전화 걸기</a>':'')+
    (extra?'<details class="details"><summary>주소·시공사·용적률 등 더 보기</summary><div class="complexFacts">'+extra+'</div></details>':'')+
    '<p class="complexMeta">자료 확인일 '+escapeHtml(p.detail_checked_at||p.last_verified||'확인 전')+
     (ev!==null&&p.kapt_code?' · 전기차 충전 수치는 2026-09-09 K-apt 공개자료 기준':'')+'</p>'+
-   (p.detail_note?'<details class="details"><summary>자료 차이·확인사항 보기</summary><p class="complexSectionNote">'+escapeHtml(p.detail_note)+'</p></details>':'');
+   (p.detail_note?'<details class="details"><summary>'+(p.catalog_source==='trades'?'기본정보 수집 상태':'자료 차이·확인사항 보기')+'</summary><p class="complexSectionNote">'+escapeHtml(p.detail_note)+'</p></details>':'');
   const types=(Array.isArray(p.supply_type_labels)?p.supply_type_labels:[]).filter(v=>
    typeof v==='string'&&/^[0-9]{2,3}(?:\.[0-9]{1,2})?[A-Za-z-]{0,4}$/.test(v)).slice(0,45);
   const typesView=types.length?'<div class="complexTypeList">'+types.map(v=>'<span>'+escapeHtml(v)+'㎡ (약 '+Math.round(parseFloat(v)/3.305785)+'평)</span>').join('')+'</div>':
