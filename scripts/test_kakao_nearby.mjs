@@ -1,0 +1,41 @@
+// Offline integration regression for a private, no-cache Kakao Local proxy.
+import assert from "node:assert/strict";
+import handler from "../workers/kakao-nearby/src/index.mjs";
+import {readFileSync} from "node:fs";
+
+const src=readFileSync(new URL("../app/src/main/assets/index.html",import.meta.url),"utf8");
+assert.match(src,/\['nearby','주변시설'\]/);
+assert.match(src,/refreshNearbyConfig\(\)/);
+assert.match(src,/window\.FirstHyundaiNative\.fetchNearby/);
+assert.match(src,/카카오맵에서/);
+assert.doesNotMatch(src,/localStorage\.setItem\(['"]kakao/i);
+let calls=[];
+const oldFetch=globalThis.fetch;
+globalThis.fetch=async (request,options={})=>{
+  const url=String(request);calls.push({url,auth:options.headers?.Authorization||""});
+  const data=url.includes("complexes.json")?
+    {schema_version:1,records:[{id:"f13",label:"퍼스트파크 F13",address:"인천광역시 연수구 컨벤시아대로252번길 70"},{id:"hidden",aggregate_only:true,address:"인천광역시 연수구 송도동"}]}:
+    url.includes("/search/address.json")?{documents:[{x:"126.647",y:"37.389"}]}:
+    url.includes("/search/category.json")?{documents:[{place_name:"테스트병원",distance:"330",road_address_name:"인천 연수구 테스트로",place_url:"http://place.map.kakao.com/16618597"}]}:{};
+  return new Response(JSON.stringify(data),{status:200,headers:{"Content-Type":"application/json"}});
+};
+const env={KAKAO_REST_API_KEY:"fake-secret-do-not-publish",NEARBY_RATE_LIMITER:{limit:async()=>({success:true})}};
+const hit=(path)=>handler.fetch(new Request("https://firsthyundai-nearby.demo.workers.dev"+path),env);
+try{
+  assert.equal((await hit("/nearby?complex=f13&category=bad")).status,400);
+  assert.equal((await hit("/nearby?complex=hidden&category=HP8")).status,404);
+  const r=await hit("/nearby?complex=f13&category=HP8");
+  assert.equal(r.status,200);
+  const obj=await r.json();
+  assert.equal(obj.places[0].name,"테스트병원");
+  assert.equal(obj.places[0].distance_m,330);
+  assert.match(obj.places[0].url,/^https:\/\/place\.map\.kakao\.com\//);
+  assert.equal(r.headers.get("Cache-Control"),"no-store, max-age=0");
+  assert(!JSON.stringify(obj).includes(env.KAKAO_REST_API_KEY));
+  assert(calls.some(x=>x.auth==="KakaoAK "+env.KAKAO_REST_API_KEY));
+  assert.equal((await handler.fetch(new Request("https://firsthyundai-nearby.demo.workers.dev/nearby?complex=f13&category=HP8"),
+    {...env,NEARBY_RATE_LIMITER:{limit:async()=>({success:false})}})).status,429);
+  assert.equal((await handler.fetch(new Request("https://firsthyundai-nearby.demo.workers.dev/nearby?complex=f13&category=HP8"),
+    {...env,KAKAO_REST_API_KEY:""})).status,503);
+  console.log("Kakao live nearby: categories, no-cache, secret isolation, whitelist and global quota passed.");
+}finally{globalThis.fetch=oldFetch;}
