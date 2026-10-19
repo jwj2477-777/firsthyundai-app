@@ -11,6 +11,20 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 .primaryNav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
 .primaryNav button{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;min-width:0;min-height:80px;padding:10px 5px;border:1px solid #c9dce9;border-radius:14px;background:white;color:#315b7b;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 2px 7px #183b6010}
 .primaryNav button .navIcon{font-size:24px;line-height:1.1}
+.tradeStarter{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 16px}
+.tradeStarter button{min-height:66px;border:1px solid #bad4e6;background:#f0f7fc;color:#254e73;border-radius:12px;font-size:14px;font-weight:800;padding:9px 5px;cursor:pointer}
+.tradeStarter button.active{background:#194e7c;color:#fff;border-color:#194e7c}
+.tradeStarter button .starterIcon{display:block;font-size:21px;margin-bottom:3px}
+.tradeTypeBar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:12px 0}
+.tradeTypeBar button{min-height:51px;border:1px solid #cbdde8;background:#f8fbfd;color:#2c536f;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer}
+.tradeTypeBar button.active{background:#236297;color:#fff;border-color:#236297}
+.tradeSearchOptions{border:1px solid #d5e6f0;background:#f7fbff;border-radius:11px;padding:12px;margin:8px 0 11px}
+.tradeSearchOptions select{min-height:51px;margin-bottom:8px;font-size:15px}
+.tradeAdvanced{border:1px solid #e0e8ed;border-radius:11px;padding:9px 12px;margin:8px 0}
+.tradeAdvanced summary{list-style:none;cursor:pointer;color:#456b89;font-size:13px;font-weight:700}
+.tradeAdvanced summary::-webkit-details-marker{display:none}
+.tradeAdvanced .controls{margin:8px 0}
+@media(max-width:370px){.tradeStarter button{font-size:12px}.tradeTypeBar button{font-size:13px}}
 .primaryNav button.active{background:#173b60;color:white;border-color:#173b60;box-shadow:0 3px 12px #173b6029}
 .secondaryNav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
 .secondaryNav.single{grid-template-columns:1fr}
@@ -123,8 +137,18 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
  </div>
  <div class="panel" id="nearbyDetails">
   <div class="sectionTitle"><div><h2 id="nearbyTitle">관심 13개 단지 실거래</h2><p class="tiny" id="nearbyMeta">국토교통부 실거래가 자료를 불러오는 중입니다.</p></div></div>
-  <label class="inputLabel" for="nearbyType">실거래 유형</label>
-  <select id="nearbyType" onchange="renderNearbyDetails(true)"><option value="">매매·전세·월세 전체</option><option>매매</option><option>전세</option><option>월세</option></select>
+  <p class="tiny" style="margin-bottom:4px">거래 유형</p>
+  <div class="tradeTypeBar" id="nearbyTypeBar" aria-label="관심단지 거래유형">
+    <button type="button" onclick="setNearbyType('')">전체</button>
+    <button type="button" onclick="setNearbyType('매매')">매매</button>
+    <button type="button" onclick="setNearbyType('전세')">전세</button>
+    <button type="button" onclick="setNearbyType('월세')">월세</button>
+  </div>
+  <select id="nearbyType" class="hidden" aria-label="관심단지 내부 거래유형"><option value="">전체</option><option>매매</option><option>전세</option><option>월세</option></select>
+  <div id="nearbyAreaPanel" class="hidden">
+    <label class="inputLabel" for="nearbyAreaSelect">평형 선택 (선택사항)</label>
+    <select id="nearbyAreaSelect" onchange="renderNearbyDetails(true)" aria-label="관심단지 전용면적"><option value="">모든 전용면적 보기</option></select>
+  </div>
   <div id="nearbyStats" class="nearbyStats"></div>
   <div id="nearbyTrades"><div class="empty">데이터를 불러오면 거래가 표시됩니다.</div></div>
   <button id="nearbyMore" class="btn alt hidden" type="button" onclick="showMoreNearby()">거래 더 보기</button>
@@ -206,10 +230,39 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 </div>
 <div id="trades" class="page hidden">
  <div class="sectionTitle"><div><h2>송도동 아파트 실거래가</h2><p class="tiny" id="tradesMeta">국토교통부 공개 API 연동 대기</p></div><button class="btn alt" onclick="refreshOne('trades')">갱신</button></div>
- <div class="panel"><div id="tradeFocusBanner"></div><div class="controls"><input id="aptFilter" placeholder="아파트 단지명 검색" oninput="renderTrades()" aria-label="아파트 단지명"></div>
-  <div class="controls"><select id="typeFilter" onchange="renderTrades()"><option value="">매매·전세·월세 전체</option><option>매매</option><option>전세</option><option>월세</option></select><select id="statusFilter" onchange="renderTrades()"><option value="">해제 포함 전체</option><option value="notcancel">해제 제외</option><option value="cancel">해제 거래만</option></select></div>
-  <select id="tradesFavoriteFilter" aria-label="주변단지 한정" onchange="renderTrades()"><option value="">송도동 전체 단지</option><option value="favorites">★ 관심 13개 단지만</option></select>
-  <div id="tradesContent"><div class="empty">데이터 저장소를 연결한 후 표시됩니다.</div></div>
+ <div class="panel">
+  <p class="tiny">원하는 보기 방식을 먼저 선택하세요. 복잡한 조건 없이 계약일 최신순으로 바로 볼 수 있습니다.</p>
+  <div class="tradeStarter" aria-label="실거래 보기 방식">
+    <button id="tradeModeLatest" type="button" onclick="openTradeLatest()"><span class="starterIcon">◷</span>전체 최신순</button>
+    <button id="tradeModeFavorites" type="button" onclick="switchPage('nearby')"><span class="starterIcon">★</span>관심 13개</button>
+    <button id="tradeModeSearch" type="button" onclick="startTradeSearch()"><span class="starterIcon">⌕</span>아파트 선택</button>
+  </div>
+  <div id="tradeFocusBanner"></div>
+  <div id="tradeSearchPanel" class="tradeSearchOptions hidden">
+    <label class="inputLabel" for="tradeBuildingSelect">어느 아파트를 보시겠어요?</label>
+    <select id="tradeBuildingSelect" onchange="chooseTradeBuilding()" aria-label="실거래 아파트 선택"><option value="">아파트를 선택하세요</option></select>
+    <div id="tradeAreaPanel" class="hidden">
+      <label class="inputLabel" for="tradeAreaSelect">평형 선택 (선택사항)</label>
+      <select id="tradeAreaSelect" onchange="renderTrades()" aria-label="실거래 전용면적 선택"><option value="">모든 전용면적 보기</option></select>
+    </div>
+  </div>
+  <p class="tiny" style="margin:12px 0 4px">거래 유형</p>
+  <div id="tradeTypeBar" class="tradeTypeBar" aria-label="거래유형">
+    <button type="button" onclick="setTradeType('')">전체</button>
+    <button type="button" onclick="setTradeType('매매')">매매</button>
+    <button type="button" onclick="setTradeType('전세')">전세</button>
+    <button type="button" onclick="setTradeType('월세')">월세</button>
+  </div>
+  <details class="tradeAdvanced" id="tradeAdvanced">
+    <summary>＋ 상세 검색 조건 (필요할 때만)</summary>
+    <label class="inputLabel" for="aptFilter">아파트 이름 직접 검색</label>
+    <input id="aptFilter" placeholder="아파트 이름 입력" oninput="renderTrades()" aria-label="아파트 단지명">
+    <label class="inputLabel" for="statusFilter">해제 거래 표시</label>
+    <select id="statusFilter" onchange="renderTrades()"><option value="">해제 포함 전체</option><option value="notcancel">해제 제외</option><option value="cancel">해제 거래만</option></select>
+    <select class="hidden" id="typeFilter" aria-label="거래유형 내부 필터"><option value="">전체</option><option>매매</option><option>전세</option><option>월세</option></select>
+    <select class="hidden" id="tradesFavoriteFilter" aria-label="관심단지 내부 필터"><option value="">송도동 전체 단지</option><option value="favorites">★ 관심 13개 단지만</option></select>
+  </details>
+  <div id="tradesContent"><div class="empty">최신 실거래 자료를 불러오고 있습니다.</div></div>
   <div class="tiny">금액 단위: 만 원. 보증금과 월세는 별도 표시합니다. 실거래는 신고 이후 반영되므로 실제 계약일보다 늦게 게시될 수 있습니다. 동일 조건의 별도 계약도 각각 표시할 수 있습니다.</div>
  </div>
 </div>
@@ -344,8 +397,8 @@ window.onRoleChanged=function(next){
  refreshAll();
 };
 const NAV_CATEGORIES=[
- {id:'trades',label:'실거래',icon:'↗',main:'nearby',
-  children:[['nearby','★ 관심 13단지'],['trades','전체 거래'],['new','새 거래']]},
+ {id:'trades',label:'실거래',icon:'↗',main:'trades',
+  children:[['trades','전체 최신순'],['nearby','★ 관심 13개'],['new','새로 확인']]},
  {id:'complexes',label:'아파트정보',icon:'⌂',main:'complexes',
   children:[['complexes','송도 단지 검색']]},
  {id:'news',label:'뉴스',icon:'▤',main:'news',
@@ -358,11 +411,11 @@ function renderMainNavigation(id){
  const chosen=navGroupForPage(id);
  const primary='<div class="primaryNav">'+NAV_CATEGORIES.map(g=>
   '<button type="button" class="'+(chosen?.id===g.id?'active':'')+
-  '" onclick="switchPage(\''+g.main+'\')" aria-current="'+(chosen?.id===g.id?'page':'false')+'">'+
+  '" onclick="'+(g.id==='trades'?'openTradeLatest()':"switchPage('"+g.main+"')")+'" aria-current="'+(chosen?.id===g.id?'page':'false')+'">'+
   '<span class="navIcon" aria-hidden="true">'+g.icon+'</span><span>'+g.label+'</span></button>').join('')+'</div>';
  const secondary=chosen?'<div class="secondaryNav'+(chosen.children.length===1?' single':'')+'">'+
   chosen.children.map(([page,label])=>'<button type="button" class="'+(id===page?'active':'')+
-  '" onclick="switchPage(\''+page+'\')" aria-current="'+(id===page?'page':'false')+'">'+label+'</button>').join('')+
+  '" onclick="'+(page==='trades'?'openTradeLatest()':"switchPage('"+page+"')")+'" aria-current="'+(id===page?'page':'false')+'">'+label+'</button>').join('')+
   '</div>':'';
  const admin=role==='admin'?'<details class="adminQuick"><summary>관리자 도구 ▾</summary>'+
   '<div class="adminQuickLinks">'+[['notes','내 자료'],['settings','설정'],['security','보안']].map(([page,label])=>
