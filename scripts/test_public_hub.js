@@ -22,7 +22,7 @@ vm.runInContext(snippet,ctx);
 const run=q=>vm.runInContext(q,ctx);
 const missing=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13'})");
 assert(missing.includes('활용승인')&&missing.includes('건축물대장')&&missing.includes('공동주택 관리비'));
-assert(!missing.includes('0원'), 'No fake fee amount');
+assert(missing.includes('0원 또는 0건이 아닙니다'), 'Missing fee is clearly labeled unknown, not zero');
 assert(run('renderSchoolPublicInfo()').includes('배정학교가 아닙니다'));
 assert(run('renderSchoolPublicInfo()').includes('schoolzone.emac.kr'));
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('활용승인'));
