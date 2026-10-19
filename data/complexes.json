@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "state": "catalog_ready",
+  "state": "verified_partial",
   "updated_at": "2026-10-19",
-  "note": "단지 이름/실거래가 매칭용 식별자만 등록했습니다. 세대수·난방·평형·평면도 등 미확인 정보는 공란이며 사실로 취급하지 않습니다.",
+  "note": "13개 단지 세대수는 단지별 부동산 플랫폼에서 확인한 값입니다. 난방은 12개 확인, 마스터뷰 23BL은 출처별 상충으로 보류했습니다. 공급 타입은 표기용 대략 ㎡이며 A/B 등 구분합니다. 평면도 링크와 전용면적 구성은 미검증 상태입니다. 공개 저장소에 개인정보를 넣지 마세요.",
   "records": [
     {
       "id": "f13",
@@ -11,12 +11,21 @@
         "송도더샵퍼스트파크F13-1BL",
         "송도더샵퍼스트파크F13BL"
       ],
-      "households": null,
-      "heating": null,
+      "households": 856,
+      "heating": "지역난방",
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": null,
-      "last_verified": null
+      "source_url": "https://kbland.kr/se/c/29994",
+      "last_verified": "2026-10-19",
+      "supply_type_labels": [
+        "98B",
+        "99A",
+        "117A",
+        "117B",
+        "129B",
+        "131A",
+        "145"
+      ]
     },
     {
       "id": "f14",
@@ -24,12 +33,23 @@
       "aliases": [
         "송도더샵퍼스트파크F14BL"
       ],
-      "households": null,
-      "heating": null,
+      "households": 869,
+      "heating": "지역난방",
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": null,
-      "last_verified": null
+      "source_url": "https://kbland.kr/se/c/29997",
+      "last_verified": "2026-10-19",
+      "supply_type_labels": [
+        "87B",
+        "88A",
+        "98B",
+        "99A",
+        "117A",
+        "117B",
+        "129B",
+        "131A",
+        "144"
+      ]
     },
     {
       "id": "f15",
@@ -37,12 +57,23 @@
       "aliases": [
         "송도더샵퍼스트파크F15BL"
       ],
-      "households": null,
-      "heating": null,
+      "households": 872,
+      "heating": "지역난방",
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": null,
-      "last_verified": null
+      "source_url": "https://kbland.kr/se/c/29996",
+      "last_verified": "2026-10-19",
+      "supply_type_labels": [
+        "87B",
+        "88A",
+        "98B",
+        "99A",
+        "117A",
+        "117B",
+        "129B",
+        "131A",
+        "144"
+      ]
     },
     {
       "id": "m21",
@@ -50,12 +81,21 @@
       "aliases": [
         "송도더샵마스터뷰21BL"
       ],
-      "households": null,
-      "heating": null,
+      "households": 692,
+      "heating": "지역난방",
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": null,
-      "last_verified": null
+      "source_url": "https://kbland.kr/se/c/27165",
+      "last_verified": "2026-10-19",
+      "supply_type_labels": [
+        "96",
+        "113B",
+        "114A",
+        "115C",
+        "157",
+        "184",
+        "245"
+      ]
     },
     {
       "id": "m22",
@@ -63,12 +103,21 @@
       "aliases": [
         "송도더샵마스터뷰22BL"
       ],
-      "households": null,
-      "heating": null,
+      "households": 691,
+      "heating": "지역난방",
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": null,
-      "last_verified": null
+      "source_url": "https://kbland.kr/se/c/27166",
+      "last_verified": "2026-10-19",
+      "supply_type_labels": [
+        "96",
+        "113B",
+        "114A",
+        "115C",
+        "157",
+        "184",
+        "245"
+      ]
     },
     {
       "id": "m23",
@@ -77,12 +126,21 @@
         "송도더샵마스터뷰23-1BL",
         "송도더샵마스터뷰23BL"
       ],
-      "households": null,
+      "households": 478,
       "heating": null,
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": null,
-      "last_verified": null
+      "source_url": "https://kbland.kr/se/c/27168",
+      "last_verified": "2026-10-19",
+      "supply_type_labels": [
+        "96",
+        "114B",
+        "114A",
+        "115C",
+        "157",
+        "182",
+        "244"
+      ]
     },
     {
       "id": "avenue",
@@ -90,12 +148,22 @@
       "aliases": [
         "송도더샵파크애비뉴"
       ],
-      "households": null,
-      "heating": null,
+      "households": 668,
+      "heating": "지역난방",
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": null,
-      "last_verified": null
+      "source_url": "https://kbland.kr/se/c/432132",
+      "last_verified": "2026-10-19",
+      "supply_type_labels": [
+        "91B",
+        "91A",
+        "101",
+        "118B",
+        "118C",
+        "118A",
+        "129",
+        "146"
+      ]
     },
     {
       "id": "centennial",
@@ -103,12 +171,13 @@
       "aliases": [
         "더샵송도센터니얼"
       ],
-      "households": null,
-      "heating": null,
+      "households": 342,
+      "heating": "지역난방",
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": null,
-      "last_verified": null
+      "source_url": "https://realty.daangn.com/complexes/13596133",
+      "last_verified": "2026-10-19",
+      "supply_type_labels": []
     },
     {
       "id": "prime20",
@@ -116,12 +185,21 @@
       "aliases": [
         "더샵송도프라임뷰20BL"
       ],
-      "households": null,
-      "heating": null,
+      "households": 662,
+      "heating": "지역난방",
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": null,
-      "last_verified": null
+      "source_url": "https://kbland.kr/se/c/46842",
+      "last_verified": "2026-10-19",
+      "supply_type_labels": [
+        "97",
+        "114B",
+        "117C",
+        "118A",
+        "141B",
+        "143A",
+        "150"
+      ]
     },
     {
       "id": "prime25",
@@ -129,12 +207,19 @@
       "aliases": [
         "더샵송도프라임뷰25BL"
       ],
-      "households": null,
-      "heating": null,
+      "households": 164,
+      "heating": "지역난방",
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": null,
-      "last_verified": null
+      "source_url": "https://kbland.kr/se/c/46843",
+      "last_verified": "2026-10-19",
+      "supply_type_labels": [
+        "135C",
+        "154",
+        "177B",
+        "177A",
+        "241"
+      ]
     },
     {
       "id": "skcentral",
@@ -142,12 +227,16 @@
       "aliases": [
         "송도SK뷰센트럴"
       ],
-      "households": null,
-      "heating": null,
+      "households": 299,
+      "heating": "지역난방",
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": null,
-      "last_verified": null
+      "source_url": "https://kbland.kr/se/c/39286",
+      "last_verified": "2026-10-19",
+      "supply_type_labels": [
+        "109A",
+        "109B"
+      ]
     },
     {
       "id": "artwin",
@@ -155,12 +244,29 @@
       "aliases": [
         "송도아트윈푸르지오"
       ],
-      "households": null,
-      "heating": null,
+      "households": 999,
+      "heating": "지역난방",
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": null,
-      "last_verified": null
+      "source_url": "https://kbland.kr/se/c/26158",
+      "last_verified": "2026-10-19",
+      "supply_type_labels": [
+        "120B",
+        "120B-H",
+        "120B-S",
+        "121A-H",
+        "121A",
+        "121A-S",
+        "152",
+        "152H",
+        "163",
+        "163S",
+        "163H",
+        "184",
+        "195",
+        "300A",
+        "302B"
+      ]
     },
     {
       "id": "central3",
@@ -170,12 +276,23 @@
         "더샵송도센트럴파크III",
         "더샵송도센트럴파크3차"
       ],
-      "households": null,
-      "heating": null,
+      "households": 351,
+      "heating": "지역난방",
       "area_types_m2": [],
       "floorplans": [],
-      "source_url": null,
-      "last_verified": null
+      "source_url": "https://kbland.kr/se/c/46841",
+      "last_verified": "2026-10-19",
+      "supply_type_labels": [
+        "111",
+        "140",
+        "152",
+        "164B",
+        "164A",
+        "234",
+        "238",
+        "269",
+        "277"
+      ]
     }
   ]
 }
