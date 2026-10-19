@@ -1,0 +1,37 @@
+name: Publish FirstHyundai v1.6.1 Download
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-apk-release.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    if: github.repository == 'jwj2477-777/firsthyundai-app'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Retrieve already-tested successful Android APK artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 39246157767 --repo "$GITHUB_REPOSITORY" --name FirstHyundai-Free-Auto-APK --dir artifact
+          test -s artifact/app-debug.apk
+          cp artifact/app-debug.apk FirstHyundai-v1.6.1.apk
+          unzip -t FirstHyundai-v1.6.1.apk | grep 'No errors detected'
+          sha256sum FirstHyundai-v1.6.1.apk
+      - name: Publish publicly downloadable release APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v1.6.1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v1.6.1 FirstHyundai-v1.6.1.apk --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v1.6.1 FirstHyundai-v1.6.1.apk \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title '퍼스트현대 v1.6.1' \
+              --notes '송도 관심 13개 아파트 기본정보 반영. GitHub Actions에서 테스트·빌드된 디버그 서명 APK입니다. 기존 앱 메모를 백업한 뒤 설치하세요.'
+          fi
