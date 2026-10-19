@@ -13,6 +13,8 @@ on:
       - 'scripts/test_complex_discovery.js'
       - 'scripts/test_simplified_complex_ui.js'
       - 'scripts/test_complex_facts.js'
+      - 'scripts/collect_complexes.py'
+      - 'tests/test_complex_pipeline.py'
       - 'build.gradle'
       - 'settings.gradle'
       - 'gradle.properties'
@@ -36,6 +38,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Test K-apt API parsing, authorization and Songdo-only source matching
+        run: python -m unittest discover -s tests -v
       - name: Validate in-app JavaScript syntax
         run: |
           python3 -c "from pathlib import Path; x=Path('app/src/main/assets/index.html').read_text(encoding='utf-8'); Path('/tmp/firsthyundai-ui.js').write_text(x.split('<script>',1)[1].split('</script>',1)[0],encoding='utf-8')"
