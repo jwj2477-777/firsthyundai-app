@@ -11,6 +11,7 @@ on:
       - 'scripts/test_complexes.js'
       - 'scripts/test_catalog_editor.js'
       - 'scripts/test_complex_discovery.js'
+      - 'scripts/test_simplified_complex_ui.js'
       - 'build.gradle'
       - 'settings.gradle'
       - 'gradle.properties'
@@ -44,6 +45,7 @@ jobs:
           node scripts/test_complexes.js
           node scripts/test_catalog_editor.js
           node scripts/test_complex_discovery.js
+          node scripts/test_simplified_complex_ui.js
       - name: Test password policy generation (disposable code)
         run: python3 scripts/test_family_policy.py
       - name: Test independent administrator policy
