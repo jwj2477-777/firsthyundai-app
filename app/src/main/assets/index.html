@@ -220,6 +220,18 @@ body.apartmentSheetActive{overflow:hidden}
  </section>
 </div>
 
+<div id="apiGuide" class="page hidden">
+ <div class="sectionTitle"><h2>공공데이터 연동 안내</h2></div>
+ <div class="panel">
+ <p>신청할 공공데이터를 확인할 수 있습니다. 인증키는 앱에 입력하거나 공유하지 마시고 GitHub 저장소의 Actions secrets에 등록하세요.</p>
+ <h3>건축물대장</h3><p>동별 층수·용도·전유면적 확인</p><p><a href="https://www.data.go.kr/data/15134735/openapi.do">활용신청 페이지 열기 ↗</a></p>
+ <h3>공동주택 관리비</h3><p>단지별 월별 관리비 비교</p><p><a href="https://www.data.go.kr/data/15057937/openapi.do">활용신청 페이지 열기 ↗</a></p>
+ <h3>나이스 학교정보</h3><p>학교 기본정보 확인. 실제 배정학구는 학구도 공식자료와 별도로 대조합니다.</p><p><a href="https://open.neis.go.kr/portal/guide/apiGuidePage.do">인증키 발급 안내 ↗</a></p>
+ <h3>도로명주소 검색</h3><p>도로명·지번주소 표준화 및 단지명 중복 방지</p><p><a href="https://business.juso.go.kr/addrlink/openApi/apiExprn.do">주소 API 안내 ↗</a></p>
+ <h3>학구도 공간정보</h3><p>초등학교 통학구역 및 중학교 학교군은 공식 지도자료 다운로드 후 주소·좌표로 검증합니다.</p><p><a href="https://schoolzone.emac.kr/">학구도 안내 ↗</a></p>
+ <p class="tiny">현재 이 화면은 신청·설정 안내입니다. 승인 전 데이터는 표시하지 않으며, API 연결이 완료되면 해당 단지의 기본정보·학교·관리비 영역에 자동 반영하도록 확장합니다.</p>
+ </div>
+</div>
 <div id="complexes" class="page hidden">
  <div class="sectionTitle"><div><h2>단지정보 · 송도 아파트</h2><p class="tiny">관심 단지 14곳 + 송도 아파트 정보 조회</p></div><button class="btn alt refreshAction" type="button" data-refresh="complexes" onclick="refreshOne('complexes',true)">갱신</button></div>
  
@@ -423,8 +435,8 @@ body.apartmentSheetActive{overflow:hidden}
 'use strict';
 const NOTE_KEY='firsthyundai-local-v04', REPO_KEY='firsthyundai-public-repo';
 const DEFAULT_REPOSITORY='jwj2477-777/firsthyundai-app';
-const PRIVATE_PAGES=new Set(['settings','notes','security']);
-const PAGES=[['overview','전체 브리핑'],['nearby','★ 주변단지'],['complexes','단지정보'],['new','새소식'],['trades','실거래가'],['news','뉴스 브리핑'],['notes','내 자료'],['settings','설정'],['security','보안 관리']];
+const PRIVATE_PAGES=new Set(['settings','notes','security','apiGuide']);
+const PAGES=[['overview','전체 브리핑'],['nearby','★ 주변단지'],['complexes','단지정보'],['new','새소식'],['trades','실거래가'],['news','뉴스 브리핑'],['notes','내 자료'],['apiGuide','API 신청'],['settings','설정'],['security','보안 관리']];
 const $=id=>document.getElementById(id);
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeLink=url=>/^https:\/\/[a-z0-9.-]+(?:[:][0-9]+)?(?:[/?#]|$)/i.test(String(url||''))?String(url):'';
