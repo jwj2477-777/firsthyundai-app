@@ -34,7 +34,7 @@ class TestGeminiNews(unittest.TestCase):
             calls.append(("gemini",title))
             return "이 정책이 논의되고 있다는 점과 실제 시행되지 않았다는 점을 구분했습니다."
         done=enrich(original,before,"SECRET",fake_read,fake_generate,max_calls=1)
-        self.assertEqual(done["ai_summary_stats"],{"created":1,"reused":1,"awaiting_body":1})
+        self.assertEqual(done["ai_summary_stats"],{"created":1,"reused":1,"article_fetches":1,"awaiting_body":1})
         self.assertEqual(done["briefs"][0]["summary"],before["briefs"][0]["summary"])
         self.assertEqual(done["briefs"][1]["summary_method"],"gemini_article")
         self.assertEqual(done["briefs"][2]["summary_method"],"headline_only")
