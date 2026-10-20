@@ -172,7 +172,8 @@ function recognize(raw){
  });
  if(!val('property')&&buildings.length){
   const first=buildings[0],second=buildings[1];
-  if(first.score>=78&&(!second||first.score-second.score>=15)){
+  const blockSpecific=!!block&&buildings.filter(x=>new RegExp('(?:^|[^0-9])'+block[1]+'\\s*(?:블럭|블록|bl\\b|block\\b)','i').test(x.row.label)).length===1;
+  if((first.score>=78&&(!second||first.score-second.score>=15))||(blockSpecific&&first.score>=66&&new RegExp('(?:^|[^0-9])'+block[1]+'\\s*(?:블럭|블록|bl\\b|block\\b)','i').test(first.row.label))){
    smart.select(first.row.id);
    found.push({id:'property',value:first.row.label,source:'단지 카탈로그'});
   }else if(first.score>=66){
