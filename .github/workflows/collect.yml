@@ -6,7 +6,9 @@ on:
       - 'scripts/collect_trades.py'
       - 'scripts/collect_news.py'
       - 'scripts/summarize_news.py'
+      - 'scripts/openai_news.py'
       - 'tests/test_news_gemini.py'
+      - 'tests/test_openai_news.py'
       - 'tests/test_pipeline.py'
       - '.github/workflows/collect.yml'
   workflow_dispatch:
@@ -53,6 +55,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && (inputs.mode == 'all' || inputs.mode == 'news') || github.event.schedule == '17 */3 * * *' || github.event_name == 'push' }}
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python scripts/summarize_news.py --previous /tmp/firsthyundai-previous-news.json
       - name: Collect official apartment transactions
         if: ${{ github.event_name == 'workflow_dispatch' && (inputs.mode == 'all' || inputs.mode == 'trades') || github.event.schedule == '41 19 * * *' }}
