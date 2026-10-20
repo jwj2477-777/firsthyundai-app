@@ -81,13 +81,87 @@ class Paragraphs(HTMLParser):
         if tag in ("script","style","noscript","nav","footer","aside","form") and self.skip:
             self.skip-=1
 
+class NewsContainer(HTMLParser):
+    """Read news body containers that use div/br rather than paragraphs."""
+    MARKER = re.compile(
+        r"(article[_-]?body|article[_-]?content|article[_-]?view|"
+        r"newsct_article|article_txt|news_body|articlebody|dic_area)", re.I
+    )
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.depth=0
+        self.ignored=0
+        self.parts=[]
+    def handle_starttag(self,tag,attrs):
+        attrs=dict(attrs)
+        if tag in ("script","style","noscript","nav","footer","aside"):
+            self.ignored+=1
+        if tag in ("div","section") and self.depth:
+            self.depth+=1
+        elif not self.depth and tag in ("div","section","main"):
+            marker=" ".join((attrs.get("id",""),attrs.get("class","")))
+            if self.MARKER.search(marker):
+                self.depth=1
+        if self.depth and tag in ("p","br","h2","h3"):
+            self.parts.append("\n")
+    def handle_data(self,data):
+        if self.depth and not self.ignored:
+            self.parts.append(data)
+    def handle_endtag(self,tag):
+        if tag in ("script","style","noscript","nav","footer","aside") and self.ignored:
+            self.ignored-=1
+        if self.depth and tag in ("div","section","main"):
+            self.depth-=1
+    def readable_text(self):
+        result=re.sub(r"[ \t]+"," ","".join(self.parts))
+        result=re.sub(r"\n[ \t]*\n+", "\n",result)
+        return result.strip()[:6000]
+
+
+def jsonld_article_body(html):
+    """Use publishers' NewsArticle JSON-LD articleBody if provided."""
+    for match in re.finditer(
+            r"<script\b[^>]*type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
+            html[:500_000],re.I|re.S):
+        try:
+            obj=json.loads(match.group(1))
+        except (ValueError,TypeError):
+            continue
+        queue=[obj]
+        limit=0
+        while queue and limit<40:
+            limit+=1
+            item=queue.pop(0)
+            if isinstance(item,list):
+                queue.extend(item[:20])
+            elif isinstance(item,dict):
+                body=item.get("articleBody","")
+                kind=item.get("@type","")
+                type_names=[str(k).lower() for k in kind] if isinstance(kind,list) else [str(kind).lower()]
+                if (isinstance(body,str) and
+                        any("article" in x for x in type_names)):
+                    body=re.sub(r"\s+"," ",body).strip()
+                    if len(body)>=260:
+                        return body[:6000]
+                queue.extend(v for k,v in item.items() if k in ("@graph","mainEntity","mainEntityOfPage") and isinstance(v,(list,dict)))
+    return ""
+
+
 def article_text(html,final_url):
     if (urlsplit(final_url).hostname or "").lower().endswith("google.com"):
         return ""
+    structured=jsonld_article_body(html)
+    if structured:
+        return structured
     parser=Paragraphs()
     parser.feed(html[:500_000])
     parts=parser.article_text or parser.other_text
     text="\n".join(dict.fromkeys(parts))[:6000]
+    if len(text)>=260:
+        return text
+    body=NewsContainer()
+    body.feed(html[:500_000])
+    text=body.readable_text()
     return text if len(text)>=260 else ""
 
 def read_article(url,opener=None):
