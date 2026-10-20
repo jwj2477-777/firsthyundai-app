@@ -150,6 +150,9 @@ def enrich(current,previous,key,read=read_article,generate=summarize,max_calls=M
             reused+=1
             continue
         if not key or created>=max_calls:
+            brief["summary"]="기사 본문을 아직 확인하지 못했습니다. 관련 기사 원문에서 확인해 주세요."
+            brief["summary_method"]="headline_only"
+            brief["verification"]="기사 제목 수집 · 본문 미확인"
             continue
         for src in brief.get("sources",[])[:2]:
             body=read(src.get("link",""))
@@ -163,6 +166,10 @@ def enrich(current,previous,key,read=read_article,generate=summarize,max_calls=M
                 brief["verification"]="Gemini 기사 본문 요약 · 사실 미검증"
                 created+=1
                 break
+        if brief.get("summary_method")!="gemini_article":
+            brief["summary"]="기사 본문을 아직 확인하지 못했습니다. 관련 기사 원문에서 확인해 주세요."
+            brief["summary_method"]="headline_only"
+            brief["verification"]="기사 제목 수집 · 본문 미확인"
     current["ai_summary_stats"]={"created":created,"reused":reused,
         "awaiting_body":sum(b.get("summary_method")!="gemini_article" for b in current["briefs"])}
     current["brief_method"]="RSS 제목 군집 · Gemini 기사 본문 요약(본문 확보 시에만)"
