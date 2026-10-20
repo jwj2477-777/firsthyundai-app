@@ -57,6 +57,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 .dealBadge.lease{background:#d9f3e5;color:#116647}
 .dealBadge.monthly{background:#ffebce;color:#854700}
 .pill.contractNew{background:#dceeff;color:#195d91}.pill.contractRenew{background:#f0e5fb;color:#66389a}.pill.contractUnknown{background:#edf0f3;color:#596879}
+.pill.dealBrokerage{background:#e2f0ff;color:#234e83}.pill.dealDirect{background:#f6e8da;color:#80501c}
 .dealRow.sale .money{color:#205c99}
 .dealRow.lease .money{color:#147252}
 .dealRow.monthly .money{color:#945314}
@@ -1019,6 +1020,15 @@ function leaseContractBadge(row){
  const color=label==='신규계약'?'contractNew':label==='갱신계약'?'contractRenew':'contractUnknown';
  return '<span class="pill '+color+'">'+label+'</span>';
 }
+function dealingModeBadge(row){
+ // 국토부 매매 API에서 검증된 '거래유형' 필드만 표기합니다.
+ // 전세·월세 API는 중개/직거래 정보를 제공하지 않으므로 추측하거나 혼합하지 않습니다.
+ if(!row||row.type!=='매매')return '';
+ const raw=String(row.dealing_type??'').trim().replace(/\s+/g,'');
+ const label=raw==='중개거래'?'중개거래':raw==='직거래'?'직거래':'';
+ if(!label)return '';
+ return '<span class="pill '+(label==='중개거래'?'dealBrokerage':'dealDirect')+'">'+label+'</span>';
+}
 function dealArticleClass(row,extra=''){return 'dealRow '+tradeClass(row.type)+(row.status==='해제'?' cancelled':'')+(extra?' '+extra:'');}
 function renderTypeButtons(id,type){
  const el=$(id);if(!el)return;
@@ -1193,7 +1203,7 @@ function renderNearbyDetails(resetLimit){
       '보증금 '+value10k(x.deposit_10k)+' / 월세 '+value10k(x.monthly_10k);
    const name=FAVORITE_APTS.find(z=>z.id===favoriteIdForBuilding(x.building))?.label||x.building;
    return '<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+
-    dealBadge(x.type)+leaseContractBadge(x)+
+    dealBadge(x.type)+leaseContractBadge(x)+dealingModeBadge(x)+
     '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+
     '</div><h3>'+escapeHtml(name)+'</h3>'+
     ''+
@@ -1261,13 +1271,13 @@ function renderTrades(){
    const val=x.type==='매매'?value10k(x.amount_10k):
     x.type==='전세'?'보증금 '+value10k(x.deposit_10k):
     '보증금 '+value10k(x.deposit_10k)+' / 월세 '+value10k(x.monthly_10k);
-   return '<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+dealBadge(x.type)+leaseContractBadge(x)+
+   return '<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+dealBadge(x.type)+leaseContractBadge(x)+dealingModeBadge(x)+
     '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span></div>'+
     '<h3>'+escapeHtml(x.building)+'</h3><div class="money">'+escapeHtml(val)+'</div>'+
     '<div class="meta">계약일 '+escapeHtml(x.contract_date)+' · 전용 '+escapeHtml(x.area_m2)+
     '㎡ · '+escapeHtml(x.floor||'층 정보 없음')+'층</div>'+
     (x.status==='해제'?'<p class="pill red">계약 해제일: '+escapeHtml(x.cancel_date_raw||'정보 미제공')+'</p>':'')+
-    '<p class="meta">출처: 국토교통부 · 조회 계약연월 '+escapeHtml(x.source_month)+'</p></article>';
+    '</article>';
   }).join(''):'<div class="empty">선택한 조건에 해당하는 실거래가 없습니다. 다른 유형이나 아파트를 선택해 주세요.</div>');
 }
 function renderNews(){let payload=remote.news;if(!payload){$('newsContent').innerHTML='<div class="empty">‘설정’에서 공개 GitHub 저장소를 연결하세요.</div>';return;}
@@ -1450,14 +1460,14 @@ function renderNew(){
       x.type==='전세'?'보증금 '+value10k(x.deposit_10k):
       '보증금 '+value10k(x.deposit_10k)+' / 월세 '+value10k(x.monthly_10k);
    return '<article class="'+dealArticleClass(x,'newTop')+'"><div class="tagbox">'+
-    dealBadge(x.type)+leaseContractBadge(x)+
+    dealBadge(x.type)+leaseContractBadge(x)+dealingModeBadge(x)+
     '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+
     '</div><h3>'+escapeHtml(x.building)+'</h3>'+
     '<div class="money">'+escapeHtml(value)+'</div>'+
     '<div class="meta"><b>신규 공개 확인 '+escapeHtml(x.first_seen_date)+'</b>'+
     ' · 실제 계약일 '+escapeHtml(x.contract_date)+
     ' · 전용 '+escapeHtml(x.area_m2)+'㎡ · '+escapeHtml(x.floor||'정보 없음')+'층</div>'+
-    '<p class="tiny">출처: 국토교통부 아파트 실거래가 API</p></article>';
+    '</article>';
   }).join('');
 }
 
