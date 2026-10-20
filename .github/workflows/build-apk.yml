@@ -110,19 +110,19 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v1.12.5 APK from the stable official-API branch
+      - name: Publish v1.12.6 APK from the stable official-API branch
         if: github.ref == 'refs/heads/feature/official-apis-stable-continuation' && github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view v1.12.5 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo 'v1.12.5 release already exists; leaving the immutable APK untouched'
+          if gh release view v1.12.6 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'v1.12.6 release already exists; leaving the immutable APK untouched'
             exit 0
           fi
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.5.apk
-          unzip -t FirstHyundai-v1.12.5.apk | grep 'No errors detected'
-          sha256sum FirstHyundai-v1.12.5.apk
-          gh release create v1.12.5 FirstHyundai-v1.12.5.apk \
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.6.apk
+          unzip -t FirstHyundai-v1.12.6.apk | grep 'No errors detected'
+          sha256sum FirstHyundai-v1.12.6.apk
+          gh release create v1.12.6 FirstHyundai-v1.12.6.apk \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title '퍼스트현대 v1.12.5 (Gemini 기사요약 연동)' \
-            --notes '퍼스트현대 v1.12.4 안정 버전을 기준으로 뉴스 카드의 중복 안내문을 제거하고 Gemini가 기사 본문을 확보해 요약한 경우에만 2~3문장으로 표시합니다. 기사 본문을 확인할 수 없는 경우 요약하지 않고 원문 보기 안내를 표시합니다. Gemini API 키는 GitHub Actions Secret GEMINI_API_KEY에만 등록하며 앱에 저장하지 않습니다. 모델 gemini-3.5-flash-lite, 실행당 신규 요약 최대 8건, 원문 조회 상한 18회. 키가 없을 때 요약 서비스는 자동 비활성화됩니다. 기존 안정 버전 기능과 평형 정보는 보존됩니다. 업데이트 전 개인 메모를 백업하세요.'
+            --title '퍼스트현대 v1.12.6 (간결한 AI 뉴스 핵심 요약)' \
+            --notes '기존 v1.12.5 안정버전 기준. 뉴스 요약을 1문장 35~95자 가량의 핵심 키워드·증감/추진/지연 방향·중요 수치 중심으로 단축합니다. 기사 본문 확보 및 Gemini 요약을 여러 건 일괄 처리해 뉴스 묶음을 가능한 한 많이 요약합니다(실행당 최대 80건, 실제 기사 확보 및 API 용량에 따름). 뉴스 탭에는 AI 핵심 요약 건수와 짧은 문장만 보여주고 반복적인 본문 확인 안내문은 제거합니다. 접근이 막힌 기사는 요약하지 않고 원문 링크를 유지합니다. API 키는 GitHub Secrets에만 저장하며 다른 기존 기능과 평형정보는 유지합니다. 설치 전 메모를 백업하세요.'
