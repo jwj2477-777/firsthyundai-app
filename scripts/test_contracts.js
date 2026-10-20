@@ -1,0 +1,66 @@
+// Contract notice composer regression suite. No internet/Android required.
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const vm=require('node:vm');
+const root=path.resolve(__dirname,'..');
+const source=fs.readFileSync(path.join(root,'app/src/main/assets/contracts.js'),'utf8');
+const html=fs.readFileSync(path.join(root,'app/src/main/assets/index.html'),'utf8');
+new vm.Script(source);
+assert(html.includes('id="contracts"'));
+assert(html.includes('contracts.js')&&html.includes('contracts.css'));
+assert(html.includes("['contracts','계약문자 작성']"));
+assert(html.includes('FirstHyundaiContracts.fromSelectedComplex()'));
+assert(!/\b(localStorage|fetch|XMLHttpRequest)\b/.test(source),'Contract letters must not go to public data storage');
+const elements=new Map();
+function el(id){
+ if(!elements.has(id)){
+  elements.set(id,{value:'',textContent:'',className:'',focus(){},select(){}});
+ }
+ return elements.get(id);
+}
+const ctx=vm.createContext({window:{},document:{getElementById:el},alert(){},confirm(){return true},Date,Number,String,console,navigator:{}});
+vm.runInContext(source,ctx);
+const api=ctx.window.FirstHyundaiContracts;
+const {contractValue,normalizeDate,collect}=api._test;
+assert.equal(contractValue('3억9천만원'),39000);
+assert.equal(contractValue('3억 9000만원'),39000);
+assert.equal(contractValue('39,000만원'),39000);
+assert.equal(contractValue('500만원'),500);
+assert.equal(contractValue('3억 9천 5백만원'),39500);
+assert.equal(contractValue('입력오류'),null);
+assert.equal(normalizeDate('2026년 12월 30일'),'2026-12-30');
+assert.equal(normalizeDate('2026.02.31'),'');
+el('ct_dealType').value='전세';
+el('ct_property').value='파크애비뉴 / 인천 연수구 송도동 103';
+el('ct_unit').value='1601동 1702호';
+el('ct_price').value='39000';
+el('ct_contractDeposit').value='3900';
+el('ct_advance').value='500';
+el('ct_balanceDate').value='2026-12-30';
+el('ct_leaseDuration').value='2년';
+el('ct_bank').value='테스트은행';
+el('ct_account').value='123-45';
+el('ct_accountHolder').value='홍길동';
+el('ct_terms').value='현 상태로 인도한다.\n권리관계 변경이 없어야 한다.';
+assert.equal(collect().errors.length,0,JSON.stringify(collect().errors));
+api.makePreview();
+assert(el('ct_preview').value.includes('▶ 약정 계약금 : 3,900만원'));
+assert(el('ct_preview').value.includes('▶ 이번 선송금 예정액 : 500만원'));
+assert(el('ct_preview').value.includes('▶ 남은 계약금 : 3,400만원'));
+assert(el('ct_preview').value.includes('▶ 최종 잔금 : 35,100만원'));
+assert(el('ct_preview').value.includes('1. 현 상태로 인도한다.'));
+assert(!el('ct_preview').value.includes('계약금 포기'));
+el('ct_advance').value='5000';
+assert(collect().errors.some(x=>x.includes('초과')));
+el('ct_advance').value='500';
+api.reset();
+el('ct_rough').value='소재지: 파크애비뉴\n동호수: 1601동 1702호\n전세보증금: 3억9천만원\n계약금: 3900만원\n이번 송금액: 500만원\n잔금일: 2026.12.30\n특약사항:\n1. 현 상태 인도';
+api.extractNotes();
+assert.equal(el('ct_price').value,'39000');
+assert.equal(el('ct_contractDeposit').value,'3900');
+assert.equal(el('ct_advance').value,'500');
+assert.equal(el('ct_balanceDate').value,'2026-12-30');
+assert(el('ct_terms').value.includes('현 상태 인도'));
+console.log('Contract composer: parsing, validation, sample amounts, preview and private data regression passed');
