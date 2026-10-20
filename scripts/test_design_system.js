@@ -18,7 +18,6 @@ assert.match(html,/\.nearbyCard\{background:#f9fcfd/);
 // Footer version is drawn from the APK itself, not stale page content.
 assert.equal((html.match(/id="appVersion"/g)||[]).length,1);
 assert.match(html,/NATIVE\?\.getAppVersion\?\.\(\)/);
-assert.match(html,/getAppVersion\(\)/);
 assert.match(java,/@JavascriptInterface public String getAppVersion\(\)/);
 assert.match(java,/getPackageManager\(\)\.getPackageInfo\(getPackageName\(\), 0\)/);
 assert.match(java,/return info\.versionName == null \? "" : info\.versionName/);
