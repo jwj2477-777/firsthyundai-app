@@ -282,6 +282,17 @@ input:focus,select:focus,textarea:focus{outline:2px solid #a0cbdc;outline-offset
 }
 @media(prefers-reduced-motion:reduce){.primaryNav button,.btn,.nearbyCard{transition:none}}
 
+\n/* Verified supply↔exclusive matching: lightweight cards, one row per verified subtype. */
+.complexPairList{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,225px),1fr));gap:10px;margin:12px 0}
+.complexTypeCard{background:#f7fbfd;border:1px solid #dce9ef;border-radius:15px;padding:13px;min-width:0}
+.complexTypeTop{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:9px}
+.complexTypeTop strong{font-size:16px;color:#235b76;letter-spacing:-.3px}
+.complexTypeTop span{font-size:12px;color:#688292;font-weight:650}
+.complexTypeValues{display:grid;grid-template-columns:1fr 1fr;gap:9px;color:#69818f;font-size:11px;line-height:1.55}
+.complexTypeValues span{min-width:0;white-space:nowrap}
+.complexTypeValues b{font-size:13px;color:#26495a;font-weight:800;display:block;white-space:normal;overflow-wrap:anywhere}
+.complexTypeRooms{color:#718a96;font-size:11px;margin-top:8px}
+.complexTypeSource{font-size:11px;color:#27698b;font-weight:690;display:inline-block;margin-top:9px}
 </style>
 </head>
 <body>
@@ -955,11 +966,30 @@ function renderComplexes(){
    '<p class="complexMeta">자료 확인일 '+escapeHtml(p.detail_checked_at||p.last_verified||'확인 전')+
     (ev!==null&&p.kapt_code?' · 전기차 충전 수치는 2026-09-09 K-apt 공개자료 기준':'')+'</p>'+
    (p.detail_note?'<details class="details"><summary>자료 차이·확인사항 보기</summary><p class="complexSectionNote">'+escapeHtml(p.detail_note)+'</p></details>':'');
+  // A/B/C are independent supply types. Never display exclusive m² as extra supply types.
+  // A paired row is displayed only if BOTH exact source values are present and plausible.
+  const pairs=(Array.isArray(p.area_type_pairs)?p.area_type_pairs:[])
+   .filter(v=>v&&Number.isFinite(v.supply_m2)&&Number.isFinite(v.exclusive_m2)&&
+      v.supply_m2>=v.exclusive_m2&&v.exclusive_m2>=15&&v.supply_m2<=500&&
+      typeof v.supply_label==='string'&&/^[0-9]{2,3}(?:\\.[0-9]{1,2})?[A-Za-z0-9-]{0,5}$/.test(v.supply_label)&&
+      !!safeLink(v.source_url||p.area_type_pairs_source))
+   .filter((v,i,all)=>all.findIndex(t=>t.supply_label===v.supply_label&&
+     Math.abs(t.exclusive_m2-v.exclusive_m2)<0.01&&Math.abs(t.supply_m2-v.supply_m2)<0.01)===i)
+   .sort((a,b)=>a.supply_m2-b.supply_m2).slice(0,50);
   const types=(Array.isArray(p.supply_type_labels)?p.supply_type_labels:[]).filter(v=>
-   typeof v==='string'&&/^[0-9]{2,3}(?:\.[0-9]{1,2})?[A-Za-z-]{0,4}$/.test(v)).slice(0,45);
-  const typesView=types.length?'<div class="complexTypeList">'+types.map(v=>'<span>'+escapeHtml(v)+'㎡ (약 '+Math.round(parseFloat(v)/3.305785)+'평)</span>').join('')+'</div>':
-   '<div class="empty">아직 확인된 공급면적 타입이 없습니다. 원본 단지정보를 참고해 주세요.</div>';
-  const areaView='<p class="tiny">공급면적 기준이며 A/B 등 구조별 타입은 별도로 표시합니다. 평은 참고용 약값입니다.</p>'+typesView;
+   typeof v==='string'&&/^[0-9]{2,3}(?:\\.[0-9]{1,2})?[A-Za-z0-9-]{0,5}$/.test(v)).slice(0,45);
+  const typesView=pairs.length?'<div class="complexPairList">'+pairs.map(t=>
+    '<div class="complexTypeCard"><div class="complexTypeTop"><strong>'+escapeHtml(t.supply_label)+'㎡</strong>'+
+    '<span>약 '+Math.round(t.supply_m2/3.305785)+'평</span></div>'+
+    '<div class="complexTypeValues"><span>공급 <b>'+escapeHtml(number(t.supply_m2))+'㎡</b></span>'+
+    '<span>전용 <b>'+escapeHtml(number(t.exclusive_m2))+'㎡</b></span></div>'+
+    ((Number.isInteger(t.rooms)&&Number.isInteger(t.baths))?
+     '<div class="complexTypeRooms">방 '+t.rooms+' · 욕실 '+t.baths+'</div>':'')+
+    '<a class="complexTypeSource" href="'+escapeHtml(safeLink(t.source_url||p.area_type_pairs_source))+'">면적 출처 보기 ›</a></div>').join('')+'</div>':
+    types.length?'<div class="complexTypeList">'+types.map(v=>'<span>'+escapeHtml(v)+'㎡ (약 '+Math.round(parseFloat(v)/3.305785)+'평)</span>').join('')+'</div>':
+    '<div class="empty">검증된 공급·전용면적 매칭을 아직 확보하지 못했습니다.</div>';
+  const areaView='<p class="tiny">'+(pairs.length?'실제 단지 자료에서 공급·전용면적을 함께 확인한 타입 '+pairs.length+'개입니다. 같은 전용면적이라도 A/B 등 공급타입은 구분합니다.':
+   '공급면적 기준입니다. 평형은 공급면적 ÷ 3.305785의 반올림 값이며, 매칭이 검증되지 않은 타입은 전용면적을 추정해 표시하지 않습니다.')+'</p>'+typesView;
   const stats=complexAreaStats(p),active=complexDealType;
   const dealButtons=[['','전체'],['매매','매매'],['전세','전세'],['월세','월세']]
    .map(([v,label])=>'<button type="button" class="'+(active===v?'active':'')+'" onclick="setComplexDealType(\''+v+'\')">'+label+'</button>').join('');
