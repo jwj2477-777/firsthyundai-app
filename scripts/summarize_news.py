@@ -161,7 +161,7 @@ def compact_summary(sentences):
     if isinstance(sentences,str):
         # Preserve existing JSON-string output as well as the preferred list form.
         source=sentences.strip()
-        sentences=source.splitlines() if "\\n" in source else re.split(r"(?<=[.!?])\\s+",source)
+        sentences=source.splitlines() if "\n" in source else re.split(r"(?<=[.!?])\s+",source)
         sentences=[part.strip() for part in sentences if part.strip()]
     if not isinstance(sentences,list) or not 3<=len(sentences)<=4:
         return ""
