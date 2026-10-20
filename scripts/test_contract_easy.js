@@ -77,6 +77,13 @@ assert(app._test.collect().errors.includes('이번 송금액이 계약금보다 
 input('퍼스트파크 15블럭 1501동 1203호 전세 3억9천, 500 먼저 보내 잔금은 12월 말');
 eq('balanceDate','');
 assert(e('ct_languageWarnings').textContent.includes('정확한 날짜'));
+input('집주인 김철수 세입자 이영희 퍼스트파크 15블럭 1501동 1203호 전세 3억9천, 계약금 5%, 선입금 500만원, 잔금 2026.12.30 기간 2년');
+eq('owner','김철수');eq('buyer','이영희');
+eq('contractDeposit','1950');
+assert(e('ct_languageWarnings').textContent.includes('5%'));
+input('퍼스트파크 15블럭 1501동 1203호 전세 3억9천, 계약금 10%, 선입금 500만원 잔금 2026.12.30 기간 2년');
+eq('contractDeposit','3900');
+assert(e('ct_preview').value.includes('▶ 약정 계약금 : 3,900만원'));
 e('ct_rough').value='';
 assert.equal(easy.compose(),false);
 assert(alerts.some(a=>a.includes('먼저 메모')));
