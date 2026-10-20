@@ -150,16 +150,13 @@ function makePreview(){
  out.push('','위 조건과 송금 계좌·예금주를 당사자 모두 확인해 주시기 바랍니다.',
  '계약금 일부 송금 및 이후 계약서 작성에 관한 합의 내용을 확인한 후 진행해 주시기 바랍니다.');
  E('ct_preview').value=out.join('\n');
- created=true;approved=d.errors.length===0;
- E('ct_status').className='contractReview '+(approved?'ok':'bad');
- E('ct_status').textContent=approved?'필수 조건 검토 항목이 모두 입력되었습니다. 발송 전에 당사자 합의와 특약 내용을 다시 확인하세요.':
- '⚠ 초안입니다. 발송 전에 다음을 수정해야 합니다: '+d.errors.join(' · ');
+ created=true;
+ approved=false; // Human confirmation is mandatory even for a fully populated template.
  updateSummary();
- // updateSummary invalidates only when created and a preexisting preview; reset state after computing
- approved=d.errors.length===0;
- E('ct_status').className='contractReview '+(approved?'ok':'bad');
- E('ct_status').textContent=approved?'필수 항목 확인 완료. 계약 내용·금액·계좌·특약을 직접 최종 검토하세요.':
- '⚠ 미완성 초안 · 발송 전 보완: '+d.errors.join(' · ');
+ E('ct_status').className='contractReview '+(d.errors.length?'bad':'');
+ E('ct_status').textContent=d.errors.length?
+  '⚠ 미완성 초안 · 발송 전 보완: '+d.errors.join(' · '):
+  '필수 항목이 채워졌습니다. 문자와 계좌를 직접 대조한 뒤 ‘내용 확인 완료’를 눌러 주세요.';
 }
 function edited(){
  approved=false;E('ct_status').className='contractReview bad';
