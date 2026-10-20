@@ -160,7 +160,9 @@ def compact_summary(sentences):
     """Validate 3–4 distinct short, complete sentences; do not clip facts."""
     if isinstance(sentences,str):
         # Preserve existing JSON-string output as well as the preferred list form.
-        sentences=[part.strip() for part in re.split(r"(?<=[.!?])\s+",sentences.strip()) if part.strip()]
+        source=sentences.strip()
+        sentences=source.splitlines() if "\n" in source else re.split(r"(?<=[.!?])\s+",source)
+        sentences=[part.strip() for part in sentences if part.strip()]
     if not isinstance(sentences,list) or not 3<=len(sentences)<=4:
         return ""
     parts=[]
@@ -168,10 +170,9 @@ def compact_summary(sentences):
         if not isinstance(part,str):
             return ""
         part=re.sub(r"\s+"," ",part).strip().strip('"')
-        if (not 10<=len(part)<=85 or not part.endswith((".","!","?"))
-                or "<" in part or ">" in part):
+        if (not 10<=len(part)<=85 or "<" in part or ">" in part):
             return ""
-        parts.append(part)
+        parts.append(part if part.endswith((".","!","?")) else part+".")
     if len({re.sub(r"\s+","",x) for x in parts})!=len(parts):
         return ""
     summary="\n".join(parts)
@@ -194,7 +195,7 @@ def summarize_batch(items, key, opener=None):
     if not source_items:
         return {}
     guide = (
-        "기사 원문을 보고, 확인된 핵심 사실만 한국어 3~4개 짧은 문장으로 요약하세요. "
+         "기사 원문에서 확인된 핵심 사실을 3문장으로 나눠 간결하게 정리하세요. 필요하면 4문장까지 가능합니다. "
         "각 문장은 10~85자이고 마침표로 끝나야 합니다. 전체는 약 90~230자를 권장합니다. "
         '반드시 JSON 객체 {"items":[{"id":"기사ID","sentences":["문장1.","문장2.","문장3."]}]} 형식으로 답하세요. '
         "첫 문장에는 가장 중요한 발표·사건·변화 방향을 쓰세요. "
@@ -240,6 +241,8 @@ def summarize_batch(items, key, opener=None):
                 short = compact_summary(entry.get("sentences", entry.get("summary")))
                 if short:
                     output[str(entry["id"])] = short
+            print("Gemini batch accepted:", len(output),"/",len(entries),
+                  "response_shape:",type(data).__name__)
             return output
         except HTTPError as e:
             print("Gemini summary HTTP status:", e.code)
@@ -248,6 +251,9 @@ def summarize_batch(items, key, opener=None):
             sleep(7 * (attempt + 1))
         except (OSError, ValueError, TypeError, IndexError, KeyError) as e:
             print("Gemini summary response issue:", type(e).__name__)
+            if isinstance(e, ValueError) and attempt < 2:
+                sleep(2)
+                continue
             return {}
     return {}
 
