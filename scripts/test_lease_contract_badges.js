@@ -29,4 +29,22 @@ assert.equal((html.match(/dealBadge\(x\.type\)\+leaseContractBadge\(x\)/g)||[]).
  'new contract badge must render in nearby, general trade, and new-trade screens');
 const collector=fs.readFileSync(path.join(__dirname,'collect_trades.py'),'utf8');
 assert.match(collector,/'contract_type_raw': get\(row, '계약구분', 'contractType'\)/);
-console.log('전월세 신규/갱신/미기재 표기 및 세 거래 화면 테스트 통과');
+const modeHelper=html.match(/function dealingModeBadge\(row\)\{[\s\S]*?\n\}/)?.[0];
+assert.ok(modeHelper,'dealingModeBadge helper must exist');
+vm.runInContext(modeHelper,context);
+const modeBadge=context.dealingModeBadge;
+assert.match(modeBadge({type:'매매',dealing_type:'중개거래'}),/dealBrokerage.*중개거래/);
+assert.match(modeBadge({type:'매매',dealing_type:'직거래'}),/dealDirect.*직거래/);
+assert.match(modeBadge({type:'매매',dealing_type:' 중개 거래 '}),/중개거래/);
+for(const unknown of ['',null,'-','<img src=x onerror=alert(1)>']){
+ assert.equal(modeBadge({type:'매매',dealing_type:unknown}),'','unverified sale transaction mode must remain hidden');
+}
+assert.equal(modeBadge({type:'전세',dealing_type:'중개거래'}),'');
+assert.equal(modeBadge({type:'월세',dealing_type:'직거래'}),'');
+assert.equal(modeBadge(null),'');
+assert.equal((html.match(/dealBadge\(x\.type\)\+leaseContractBadge\(x\)\+dealingModeBadge\(x\)/g)||[]).length,3,
+ 'mode badge must appear in nearby, main trades, and new trade cards');
+assert.doesNotMatch(html,/조회 계약연월|출처: 국토교통부 아파트 실거래가 API/,
+ 'duplicated card source and queried year-month footer should be removed');
+assert.match(collector,/'dealing_type': get\(row, '거래유형', 'dealingGbn'\)/);
+console.log('전월세 계약구분·매매 중개/직거래 배지 및 불필요한 카드 출처 삭제 테스트 통과');
