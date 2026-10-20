@@ -7,10 +7,9 @@ const data=JSON.parse(fs.readFileSync(path.join(root,'data/complexes.json'),'utf
 const all=data.records, visible=all.filter(r=>!r.aggregate_only);
 assert.equal(all.length,95);
 assert.equal(visible.length,93);
-assert.equal(visible.filter(r=>r.area_type_pairs?.length).length,89);
-assert.equal(visible.filter(r=>!r.area_type_pairs?.length).length,4);
-assert.deepEqual(visible.filter(r=>!r.area_type_pairs?.length).map(r=>r.id).sort(),
- ['verified-extra-13','verified-extra-14','verified-extra-15','verified-extra-16']);
+assert.equal(visible.filter(r=>r.area_type_pairs?.length).length,93);
+assert.equal(visible.filter(r=>!r.area_type_pairs?.length).length,0);
+assert.deepEqual(visible.filter(r=>!r.area_type_pairs?.length).map(r=>r.id).sort(), []);
 const expected={
  'centennial':5,'kapt-a10020272':6,'kapt-a10024710':4,'kapt-a10025745':10,
  'kapt-a10027888':7,'kapt-a40673510':2,'kapt-a40673912':14,
