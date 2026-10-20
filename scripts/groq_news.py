@@ -12,12 +12,12 @@ from urllib.request import Request, urlopen
 MODEL = "openai/gpt-oss-120b"  # Open-weights model hosted by Groq, NOT paid OpenAI API
 API_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"
 MAX_FALLBACK_BRIEFS = 18
-MAX_REVIEW_BRIEFS = 2
-BATCH_SIZE = 3
+MAX_REVIEW_BRIEFS = 1
+BATCH_SIZE = 2
 GROQ_BLOCKED = "FIRSTHYUNDAI_GROQ_BLOCKED"
 
 
-def _response_json(prompt, key, opener=None, max_tokens=1600):
+def _response_json(prompt, key, opener=None, max_tokens=1250):
     if not key or os.environ.get(GROQ_BLOCKED):
         return {}
     opener = opener or urlopen
@@ -64,7 +64,7 @@ def generate_fallback(items, key, request=_response_json):
     from summarize_news import compact_summary
     payload = [{"id": str(x["id"]), "title": str(x["title"])[:150],
                 "publisher": str(x.get("publisher", ""))[:60],
-                "body": str(x["body"])[:2600]}
+                "body": str(x["body"])[:2200]}
                for x in items[:BATCH_SIZE] if len(x.get("body", "")) >= 260]
     if not payload:
         return {}
