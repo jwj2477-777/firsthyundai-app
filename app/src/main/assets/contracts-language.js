@@ -203,6 +203,7 @@ function recognize(raw){
  const deposit=explicitTotal||ordinaryDeposit;
  if(deposit?.amount!=null)apply('contractDeposit',deposit.amount,found);
  let advance=amountAfter(s,['선입금','선송금','선금','일부\\s*계약금','이번\\s*송금액','이번\\s*입금','가계약금','먼저\\s*보낼','일단\\s*보낼','우선\\s*보낼']);
+ if(!advance)advance=amountAfter(s,['먼저','우선','일단']);
  if(!advance)advance=amountBefore(s,['먼저\\s*보내','먼저\\s*입금','먼저\\s*송금','먼저','선입금','송금해','입금해','보내고']);
  if(!advance){
   // "보증금 ... 오백 먼저" -- prefixed Korean currency.
