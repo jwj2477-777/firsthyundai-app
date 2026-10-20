@@ -164,7 +164,12 @@ function recognize(raw){
  const found=[],review=[];
  const deal=/월세|반전세|반 전세|월차임/.test(s)?'월세':/매매|매도|매수|팔기로|사기로/.test(s)?'매매':/전세|임차|임대/.test(s)?'전세':null;
  if(deal&&(!val('price')||!val('unit'))&&E('dealType')){E('dealType').value=deal;found.push({id:'dealType',value:deal,source:'문맥'});}
- const buildings=apartmentCandidates(s);
+ const block=s.match(/(?:^|[^0-9])(\d{1,2})\s*(?:블럭|블록|bl\b|block\b)/i);
+ const buildings=apartmentCandidates(s).filter(x=>{
+  if(!block)return true;
+  const rowBlock=x.row.label.match(/(\d{1,2})\s*(?:블럭|블록|bl\b|block\b)/i);
+  return !rowBlock||rowBlock[1]===block[1];
+ });
  if(!val('property')&&buildings.length){
   const first=buildings[0],second=buildings[1];
   if(first.score>=78&&(!second||first.score-second.score>=15)){
