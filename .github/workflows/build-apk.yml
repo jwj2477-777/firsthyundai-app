@@ -36,7 +36,7 @@ on:
       - 'gradle.properties'
       - '.github/workflows/build-apk.yml'
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -110,3 +110,19 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
+      - name: Publish v1.12.1 APK from the stable lease-contract branch
+        if: github.ref == 'refs/heads/feature/official-apis-stable-continuation' && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v1.12.1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'v1.12.1 release already exists; leaving the immutable APK untouched'
+            exit 0
+          fi
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.1.apk
+          unzip -t FirstHyundai-v1.12.1.apk | grep 'No errors detected'
+          sha256sum FirstHyundai-v1.12.1.apk
+          gh release create v1.12.1 FirstHyundai-v1.12.1.apk \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title '퍼스트현대 v1.12.1 (전월세 신규·갱신계약 표기)' \
+            --notes '기존 Incheon-Official-APIs 안정 소스를 기준으로 전세·월세 실거래, 관심단지, 새소식의 계약구분을 신규계약/갱신계약/미기재로 표시합니다. 국토교통부 원본값이 없는 거래는 추정하지 않습니다. 평형 매칭 실험 기능은 포함되지 않습니다. GitHub Actions에서 테스트·빌드된 디버그 서명 APK입니다. 기존 설치 앱과 서명이 다를 수 있으니 메모를 백업한 뒤 설치하세요.'
