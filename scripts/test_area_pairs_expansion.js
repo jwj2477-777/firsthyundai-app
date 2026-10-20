@@ -19,8 +19,8 @@ assert.equal(rows.length,95,'Never remove existing curated Songdo complexes');
 const present=rows.filter(x=>!x.aggregate_only);
 assert.equal(present.length,93);
 const paired=present.filter(x=>Array.isArray(x.area_type_pairs)&&x.area_type_pairs.length);
-assert.equal(paired.length,51);
-assert.equal(present.length-paired.length,42);
+assert.ok(paired.length>=51,'Preserve first 51 matched complexes after catalog expansion');
+assert.ok(present.length-paired.length<=42,'Never regress the first 51 verified profiles');
 let newPairs=0;
 for(const id of audited){
  const p=rows.find(v=>v.id===id);
@@ -51,4 +51,4 @@ assert.match(html,/Math\.round\(t\.supply_m2\/3\.305785\)/);
 assert.match(html,/const pairSources=\[\.\.\.new Set/);
 const pipeline=fs.readFileSync(path.join(root,'scripts/collect_complexes.py'),'utf8');
 assert.match(pipeline,/"area_type_pairs_precision"/,'Refresh must preserve published-value precision metadata');
-console.log('PASS: 26 source-reviewed Songdo complexes, 119 pairs, 51/93 verified types, favorites maintained.');
+console.log('PASS: 26 source-reviewed Songdo complexes, 119 pairs, at least 51/93 verified types, favorites maintained.');
