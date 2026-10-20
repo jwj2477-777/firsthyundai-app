@@ -5,7 +5,7 @@ from datetime import datetime, timezone, timedelta
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 from collect_trades import parse_response, normalize, recent_months, unique_ids, normalized_service_key, newly_detected
-from collect_news import parse_rss, deduplicate, make_briefs, rss_link, relevant_news_title
+from collect_news import parse_rss, deduplicate, make_briefs, rss_link, relevant_news_title, TOPICS, MAX_ITEMS_PER_FEED, MAX_ENTRIES, MAX_BRIEFS, MAX_SOURCES_PER_BRIEF
 
 class TradeTests(unittest.TestCase):
     def test_service_key_normalization(self):
@@ -50,11 +50,63 @@ class TradeTests(unittest.TestCase):
         row=normalize(base,'매매','202610')
         self.assertEqual(row['amount_10k'],90000)
         self.assertEqual(row['contract_date'],'2026-10-15')
+    def test_official_sale_broker_region_korean_and_english(self):
+        core={'법정동':'송도동','아파트':'연습단지','전용면적':'84.99','년':'2026','월':'10','일':'19',
+              '층':'27','거래금액':'100,000','거래유형':'중개거래','중개사소재지':'서울 강남구'}
+        sale=normalize(core,'매매','202610')
+        self.assertEqual(sale['dealing_type'],'중개거래')
+        self.assertEqual(sale['broker_region_raw'],'서울 강남구')
+        core['중개사소재지']='인천 연수구'
+        self.assertEqual(normalize(core,'매매','202610')['broker_region_raw'],'인천 연수구')
+        core.pop('중개사소재지')
+        self.assertEqual(normalize(core,'매매','202610')['broker_region_raw'],'')
+        english={'umdNm':'송도동','aptNm':'연습단지','excluUseAr':'84.99','dealYear':'2026',
+                 'dealMonth':'10','dealDay':'19','floor':'27','dealAmount':'100,000',
+                 'dealingGbn':'중개거래','estateAgentSggNm':'경기 성남시 분당구'}
+        self.assertEqual(normalize(english,'매매','202610')['broker_region_raw'],'경기 성남시 분당구')
+        before=normalize(core,'매매','202610')
+        after=normalize({**core,'중개사소재지':'경기 성남시 분당구'},'매매','202610')
+        self.assertEqual(newly_detected([before],[after]),[])
+
     def test_lease_and_cancel(self):
         b={'법정동':'송도동','아파트':'연습단지','전용면적':'84.99','년':'2026','월':'10','일':'2','층':'21','보증금액':'50,000','월세금액':'0'}
         r=normalize(b,'임대','202610');self.assertEqual(r['type'],'전세');self.assertEqual(r['deposit_10k'],50000)
         b['월세금액']='140';r=normalize(b,'임대','202610');self.assertEqual(r['type'],'월세')
         b['거래금액']='100,000';b['해제여부']='O';r=normalize(b,'매매','202610');self.assertEqual(r['status'],'해제')
+    def test_renewal_fields_korean_and_english_and_missing(self):
+        base = {'법정동': '송도동', '아파트': '연습단지', '전용면적': '84.99',
+                '년': '2026', '월': '10', '일': '3', '층': '12',
+                '보증금액': '41,000', '월세금액': '0', '계약구분': '갱신',
+                '갱신요구권사용': '사용', '계약기간': '26.11~28.11',
+                '종전계약보증금': '39,000', '종전계약월세': '0'}
+        renewal = normalize(base, '임대', '202610')
+        self.assertEqual(renewal['contract_type_raw'], '갱신')
+        self.assertEqual(renewal['renewal_raw'], '사용')
+        self.assertEqual(renewal['contract_term_raw'], '26.11~28.11')
+        self.assertEqual(renewal['previous_deposit_raw'], '39,000')
+        self.assertEqual(renewal['previous_monthly_raw'], '0')
+        # 공식 API 영문 태그도 동일하게 유지
+        english = {'umdNm': '송도동', 'aptNm': '연습단지',
+                   'excluUseAr': '84.99', 'dealYear': '2026',
+                   'dealMonth': '10', 'dealDay': '3', 'floor': '12',
+                   'deposit': '2,000', 'monthlyRent': '90',
+                   'contractType': '갱신', 'useRRRight': '미사용',
+                   'contractTerm': '26.10~28.10', 'preDeposit': '1,000',
+                   'preMonthlyRent': '75'}
+        monthly = normalize(english, '임대', '202610')
+        self.assertEqual(monthly['type'], '월세')
+        self.assertEqual(monthly['previous_deposit_raw'], '1,000')
+        self.assertEqual(monthly['previous_monthly_raw'], '75')
+        self.assertEqual(monthly['renewal_raw'], '미사용')
+        # 응답에 종전금액이 없으면 0이라고 기록하지 않음
+        base.pop('종전계약보증금')
+        base.pop('종전계약월세')
+        missing = normalize(base, '임대', '202610')
+        self.assertEqual(missing['previous_deposit_raw'], '')
+        self.assertEqual(missing['previous_monthly_raw'], '')
+        # 새로운 원본 설명이 추가돼도 신규 공개 거래로 다시 분류하지 않음
+        self.assertEqual(newly_detected([missing], [renewal]), [])
+
     def test_separate_identical_deals(self):
         base={'법정동':'송도동','아파트':'연습단지','전용면적':'84','년':'2026','월':'10','일':'1','거래금액':'90,000'}
         rows=unique_ids([normalize(base,'매매','202610'),normalize(base,'매매','202610')]);self.assertNotEqual(rows[0]['id'],rows[1]['id'])
@@ -68,6 +120,35 @@ class NewsTests(unittest.TestCase):
         self.assertFalse(relevant_news_title('토토 대출 빠른가입 안내', '세금·대출'))
         self.assertTrue(relevant_news_title('주담대 변동금리 6% 돌파', '세금·대출'))
         self.assertTrue(relevant_news_title('국토부 주택 공급정책 발표', '정책·규제'))
+
+    def test_all_incheon_songdo_news_scope(self):
+        self.assertIn('송도 종합',TOPICS)
+        self.assertGreaterEqual(len(TOPICS['송도 종합']),8)
+        for headline in (
+            '인천 송도 국제학교 학생 과학대회 수상',
+            '송도국제도시에서 대규모 음악 축제 개최',
+            '송도 공원에서 주민 참여 환경정화 활동 진행',
+            '인천 송도 지역 기업 신제품 발표',
+            '인천 송도에서 발생한 교통사고 경찰 조사',
+            '송도에서 불법 도박장 운영 일당 검거',
+        ):
+            self.assertTrue(relevant_news_title(headline,'송도 종합'),headline)
+        for headline in (
+            '부산 송도해수욕장 여름 축제',
+            '포항 송도에 문화센터 새로 개관',
+            '인천 청라 주민 문화 축제',
+            '서울 강남 주택 가격 상승',
+            '송도 카지노 입장 이벤트 무료 쿠폰',
+        ):
+            self.assertFalse(relevant_news_title(headline,'송도 종합'),headline)
+        # 전국 부동산 정책 뉴스는 여전히 수집
+        self.assertTrue(relevant_news_title('정부가 부동산 양도세 개편 방안 발표','정책·규제'))
+
+    def test_expanded_news_limits(self):
+        self.assertEqual(MAX_ITEMS_PER_FEED,90)
+        self.assertEqual(MAX_ENTRIES,300)
+        self.assertEqual(MAX_BRIEFS,180)
+        self.assertEqual(MAX_SOURCES_PER_BRIEF,10)
 
     def test_feed_query(self):self.assertIn('news.google.com/rss/search',rss_link('송도 GTX-B'))
     def test_parse_and_group(self):

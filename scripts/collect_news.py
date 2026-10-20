@@ -23,13 +23,26 @@ TOPICS = {
   '분양·입주': ['송도 분양 입주','인천 연수구 아파트 청약'],
   '세금·대출': ['부동산 취득세 양도소득세','주택담보대출 DSR 정책'],
   '정책·규제': ['국토교통부 주택 정책','인천 부동산 규제'],
+  # 부동산 외의 문화·학교·생활·기업·사건사고도 모두 지역 뉴스로 수집.
+  # 이 범주는 기존 전문 분류 뒤에서 처리되어 이미 분류된 중복 기사를 빼앗지 않음.
+  '송도 종합': [
+    '인천 송도', '"송도국제도시"', '인천 송도동', '인천 연수구 송도',
+    '인천 송도 문화 축제', '인천 송도 학교 교육',
+    '인천 송도 주민 생활', '인천 송도 기업 바이오',
+    '인천 송도 사건 사고', '인천 송도 관광 행사',
+  ],
 }
-MAX_ITEMS_PER_FEED = 45
-MAX_ENTRIES = 160
+MAX_ITEMS_PER_FEED = 90
+MAX_ENTRIES = 300
+MAX_BRIEFS = 180
+MAX_SOURCES_PER_BRIEF = 10
 
 # 지역 기사에는 송도와 직접 연결되는 지명/교통 키워드가 반드시 있어야 함.
 # 전국 부동산 정책은 송도 언급이 없어도 실무에 유효할 수 있음.
 LOCAL_NEWS = re.compile(r'송도|연수구|인천대입구|GTX[ ]*[-–]?[ ]*B|워터프런트', re.I)
+INCHEON_SONGDO = re.compile(r'송도(?:국제도시|동)?', re.I)
+OTHER_SONGDO = re.compile(r'부산(?:시)?\s*송도|포항(?:시)?\s*송도|송도해수욕장|송도구름산책로|부산\s*서구\s*송도',re.I)
+CRIME_REPORT = re.compile(r'검거|적발|단속|수사|체포|경찰|기소',re.I)
 HOUSING_NEWS = re.compile(
     r'주택|아파트|부동산|전세|월세|임대|분양|청약|입주|주담대|'
     r'주택담보|대출|DSR|LTV|DTI|취득세|양도세|종부세|보유세|'
@@ -44,6 +57,14 @@ SPAM_NEWS = re.compile(
 
 
 def relevant_news_title(title, category):
+    if category == '송도 종합':
+        if not INCHEON_SONGDO.search(title):
+            return False
+        # 부산·포항의 송도와 관광지 기사는 인천이 함께 명시된 경우에만 허용.
+        if OTHER_SONGDO.search(title) and not ('인천' in title or '연수구' in title):
+            return False
+        # 실제 송도 도박 범죄 보도와 홍보성 도박 스팸을 구별.
+        return not SPAM_NEWS.search(title) or bool(CRIME_REPORT.search(title))
     if SPAM_NEWS.search(title):
         return False
     if category in ('개발·교통', '분양·입주'):
@@ -156,10 +177,10 @@ def make_briefs(news):
                 'article_count':len(articles),'publisher_count':len(publishers),
                 'last_published_at':representative['published_at'],
                 'sources':[{'title':a['title'],'publisher':a['publisher'],
-                            'published_at':a['published_at'],'link':a['link']} for a in articles[:8]],
+                            'published_at':a['published_at'],'link':a['link']} for a in articles[:MAX_SOURCES_PER_BRIEF]],
             })
     groups.sort(key=lambda x:(x['last_published_at'],x['article_count']), reverse=True)
-    return groups[:90]
+    return groups[:MAX_BRIEFS]
 
 
 def update(*, request=http_request, now=None):
