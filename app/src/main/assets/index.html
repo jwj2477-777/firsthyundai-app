@@ -389,24 +389,28 @@ body.apartmentSheetActive{overflow:hidden}
  <div class="contractHero"><h2>✎ 계약문자 작성</h2><p>계약금 일부를 먼저 송금하는 거래에서 당사자에게 안내할 문자를 작성합니다. 금액은 모두 <b>만원 단위</b>로 입력하고, 마지막에 내용을 직접 확인하세요.</p></div>
  <div class="panel">
   <h3 class="contractSection">메모로 빠르게 시작</h3>
-  <p class="contractHint">음성 메모나 문자 초안을 붙여 넣을 수 있습니다. '보증금: 39000만원', '계약금: 3900만원', '이번 송금액: 500만원'처럼 항목을 적으면 자동 인식합니다. 인식하지 못한 내용은 원문에 남아 있습니다.</p>
+  <p class="contractHint">예: “퍼스트파크 15블럭 1501동 1203호 전세 3억9천, 먼저 500 보내고 잔금은 12월30일.”처럼 자유롭게 말하거나 적어 보세요. 일부 표현과 숫자는 확인이 필요합니다.</p>
   <label class="inputLabel" for="ct_rough">현장 메모 / 음성 인식 결과</label>
   <textarea id="ct_rough" maxlength="12000" placeholder="소재지: 퍼스트파크 15블럭&#10;동호수: 1501동 1203호&#10;전세보증금: 3억 9000만원&#10;계약금: 3900만원&#10;이번 송금액: 500만원&#10;잔금일: 2026-12-30"></textarea>
   <div class="contractActions"><button type="button" class="btn alt" onclick="FirstHyundaiContracts.extractNotes()">메모에서 항목 찾기</button><button type="button" class="btn alt" onclick="FirstHyundaiContracts.voice()">🎙 음성입력</button></div>
-  <p class="contractHint">항목 인식은 기기 내 규칙으로 처리합니다. 자유로운 문장을 완벽하게 해석하는 AI 기능은 아니므로 인식 결과를 확인해 주세요.</p>
+  <p class="contractHint">기기 내 표현 인식·단지명 오타 후보 추천을 사용합니다. 고객 정보가 외부 AI로 전송되지는 않습니다. 애매한 단지명은 주소 후보를 직접 선택해야 합니다.</p>
  </div>
  <div class="panel">
   <h3 class="contractSection">1. 거래 대상과 금액</h3>
-  <div id="contractForm" oninput="FirstHyundaiContracts.updateSummary()" onchange="FirstHyundaiContracts.updateSummary()">
+  <div id="contractForm" oninput="FirstHyundaiSmart.changed(event);FirstHyundaiContracts.updateSummary()" onchange="FirstHyundaiSmart.changed(event);FirstHyundaiContracts.updateSummary()">
    <div class="contractFieldGrid">
     <div><label class="inputLabel" for="ct_dealType">계약 유형</label><select id="ct_dealType"><option>전세</option><option>매매</option><option>월세</option></select></div>
     <div><label class="inputLabel" for="ct_unit">동 · 호수</label><input id="ct_unit" maxlength="100" placeholder="1501동 1203호"></div>
-    <div class="wide"><label class="inputLabel" for="ct_property">소재지 · 단지명</label><input id="ct_property" maxlength="220" placeholder="인천 연수구 송도동 ○○ / ○○아파트"></div>
+    <div class="wide"><label class="inputLabel" for="ct_property">아파트명 또는 단지명</label><input id="ct_property" maxlength="220" placeholder="퍼스트파크 15블럭, 퍼스트팍 15블럭 등" autocomplete="off" spellcheck="false">
+ <div id="ct_suggestions" class="contractSuggestions"></div><div id="ct_autoStatus" class="contractReview" role="status" aria-live="polite">단지명을 적으면 송도 아파트 주소를 자동으로 찾습니다.</div>
+ </div>
+ <div class="wide"><label class="inputLabel" for="ct_address">소재지 주소 · 단지 선택 시 자동 입력</label><input id="ct_address" maxlength="230" placeholder="선택한 단지의 도로명주소가 자동 입력됩니다"></div>
     <div><label class="inputLabel" for="ct_owner">매도인 / 임대인 (선택)</label><input id="ct_owner" maxlength="100" autocomplete="off"></div>
     <div><label class="inputLabel" for="ct_buyer">매수인 / 임차인 (선택)</label><input id="ct_buyer" maxlength="100" autocomplete="off"></div>
     <div><label class="inputLabel" for="ct_price">매매대금 / 보증금 (만원)</label><input id="ct_price" inputmode="decimal" placeholder="39000"></div>
-    <div><label class="inputLabel" for="ct_monthlyRent">월세 (만원 · 월세만)</label><input id="ct_monthlyRent" inputmode="decimal" placeholder="120"></div>
-    <div><label class="inputLabel" for="ct_contractDeposit">약정 계약금 총액 (만원)</label><input id="ct_contractDeposit" inputmode="decimal" placeholder="3900"></div>
+    <div class="contractMonthlyRow hidden"><label class="inputLabel" for="ct_monthlyRent">월세 (만원 · 월세만)</label><input id="ct_monthlyRent" inputmode="decimal" placeholder="120"></div>
+    <div><label class="inputLabel" for="ct_contractDeposit">약정 계약금 총액 (만원)</label><input id="ct_contractDeposit" inputmode="decimal" placeholder="미입력 시 총액의 10%"></div>
+ <div class="wide contractAutoRow"><label><input id="ct_autoDeposit" type="checkbox" checked> 계약금 미입력 시 총액의 10% 자동 제안</label><div id="ct_depositHelp" class="contractHint">계약금이 비어 있으면 10%를 제안합니다. 실제 합의 금액을 우선합니다.</div></div>
     <div><label class="inputLabel" for="ct_advance">이번에 먼저 보낼 금액 (만원)</label><input id="ct_advance" inputmode="decimal" placeholder="500"></div>
     <div><label class="inputLabel" for="ct_interim">중도금 (만원 · 없으면 빈칸)</label><input id="ct_interim" inputmode="decimal" placeholder="0"></div>
    </div>
@@ -1849,4 +1853,4 @@ function exportComplexCatalog(){
 }
 window.onCatalogSaved=r=>alert(r.ok?'단지정보 JSON을 저장했습니다. GitHub에 올려야 가족에게 반영됩니다.':'단지정보 파일 저장 실패');
 
-</script><script src="contracts.js"></script></body></html>
+</script><script src="contracts.js"></script><script src="contracts-smart.js"></script></body></html>
