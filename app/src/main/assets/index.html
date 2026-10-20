@@ -378,7 +378,7 @@ body.apartmentSheetActive{overflow:hidden}
  </div>
  <section id="newsArticlesPane" role="tabpanel" aria-labelledby="newsTabArticles">
   <div class="sectionTitle"><div><h3>송도·부동산 뉴스 브리핑</h3><p class="tiny" id="newsMeta">무료 자연어 처리 기반 기사 묶음</p></div><button class="btn alt refreshAction" type="button" data-refresh="news" onclick="refreshOne('news',true)">갱신</button></div>
-  <div class="notice">이 브리핑은 기사 <b>제목</b> 유사도를 이용한 자동 묶음입니다. 생성형 AI 요약이나 공식 사실검증이 아닙니다. 세금·대출·개발일정은 공식 원문 확인 후 안내하세요.</div>
+  <div class="notice">뉴스는 제목 유사도로 묶고, 기사 본문이 확보되면 Gemini·Groq AI로 핵심을 요약합니다. AI 요약은 공식 검증 자료가 아니므로 세금·대출·개발일정은 원문과 공식 발표를 확인하세요.</div>
   <div class="panel"><select id="newsCategory" onchange="newsDisplayLimit=45;renderNews()"><option value="">모든 주제</option><option>개발·교통</option><option>분양·입주</option><option>세금·대출</option><option>정책·규제</option><option>송도 종합</option></select><div id="newsContent"><div class="empty">데이터 저장소를 연결한 후 표시됩니다.</div></div></div>
  </section>
  <section id="newsSubscriptionsPane" class="hidden" role="tabpanel" aria-labelledby="newsTabSubscriptions">
@@ -1328,11 +1328,11 @@ function renderNews(){let payload=remote.news;if(!payload){$('newsContent').inne
 $('newsMeta').textContent=`마지막 수집 ${prettyTime(payload.checked_at)} · AI 핵심 요약 · 상세 내용은 원문 확인`;
 if(payload.state==='not_started'){$('newsContent').innerHTML='<div class="empty">아직 첫 뉴스 수집을 실행하지 않았습니다.</div>';return;}
 let cat=$('newsCategory').value;let filtered=(payload.briefs||[]).filter(x=>!cat||x.category===cat);
-let summarized=filtered.filter(x=>['gemini_article','openai_article'].includes(x.summary_method)&&x.summary).length;
+let summarized=filtered.filter(x=>['gemini_article','groq_article','openai_article'].includes(x.summary_method)&&x.summary).length;
 let header='<p class="tiny">뉴스 묶음 '+filtered.length+'개 · AI 요약 '+summarized+'개'+(payload.state==='partial'?' · 일부 RSS 요청 실패':'')+'</p>';
 let cards=filtered.slice(0,newsDisplayLimit).map(x=>{
  let sources=(x.sources||[]).map(t=>{let safe=safeLink(t.link);return '<li>'+(safe?'<a href="'+escapeHtml(safe)+'">'+escapeHtml(t.title)+'</a>':escapeHtml(t.title))+'<div class="tiny">'+escapeHtml(t.publisher)+' · '+escapeHtml(prettyTime(t.published_at))+'</div></li>';}).join('');
- let done=['gemini_article','openai_article'].includes(x.summary_method)&&!!x.summary;
+ let done=['gemini_article','groq_article','openai_article'].includes(x.summary_method)&&!!x.summary;
  let points=done?String(x.summary).split(/\r?\n/).map(t=>t.trim()).filter(Boolean):[];
  let summaryHtml=done?'<div class="newsSummaryBox" aria-label="AI 핵심 요약"><div class="newsSummaryHeading">AI 핵심 요약</div><ol class="newsSummarySentences">'+points.map((p,i)=>'<li><span class="newsSummaryCount">'+(i+1)+'</span><span>'+escapeHtml(p)+'</span></li>').join('')+'</ol></div>':'';
  return '<article class="item"><div class="tagbox"><span class="pill">'+escapeHtml(x.category)+'</span>'+(done?'<span class="pill">AI 요약 완료</span>':'')+'</div><h3>'+escapeHtml(x.title)+'</h3>'+summaryHtml+'<div class="meta">최근 보도: '+escapeHtml(prettyTime(x.last_published_at))+' · '+escapeHtml(x.article_count)+'건</div><details class="details"><summary>관련 기사 원문 '+escapeHtml(x.sources?.length||0)+'건 보기</summary><ul class="sources">'+sources+'</ul></details></article>';
