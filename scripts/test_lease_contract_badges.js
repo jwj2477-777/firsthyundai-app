@@ -86,4 +86,25 @@ assert.equal((html.match(/leaseRenewalDetails\(x\)/g)||[]).length,3,
  'render renewal details below main information in three trade screens');
 assert.match(collector,/'previous_deposit_raw': get\(row, '종전계약보증금', 'preDeposit'\)/);
 assert.match(collector,/'previous_monthly_raw': get\(row, '종전계약월세', 'preMonthlyRent'\)/);
-console.log('전월세 갱신권·계약기간·종전금액 3개 화면 및 매매 중개/직거래 테스트 통과');
+const locationHelper=html.match(/function saleBrokerLocation\(row\)\{[\s\S]*?\n\}/)?.[0];
+assert.ok(locationHelper,'sale brokerage location helper must exist');
+vm.runInContext(locationHelper,context);
+const brokerLocation=context.saleBrokerLocation;
+assert.match(brokerLocation({type:'매매',dealing_type:'중개거래',broker_region_raw:'인천 연수구'}),/중개사 소재지 · 인천 연수구/);
+assert.match(brokerLocation({type:'매매',dealing_type:'중개거래',broker_region_raw:'서울 강남구'}),/중개사 소재지 · 서울 강남구/);
+assert.match(brokerLocation({type:'매매',dealing_type:'중개거래',broker_region_raw:'인천 연수구, 경기 성남시'}),/인천 연수구, 경기 성남시/);
+assert.match(brokerLocation({type:'매매',dealing_type:'중개거래',broker_region_raw:'<img src=x onerror=alert(1)>'}),/&lt;img/);
+assert.doesNotMatch(brokerLocation({type:'매매',dealing_type:'중개거래',broker_region_raw:'<img src=x onerror=alert(1)>'}),/<img/);
+for(const mode of ['직거래','','미기재']){
+ assert.equal(brokerLocation({type:'매매',dealing_type:mode,broker_region_raw:'인천 연수구'}),'');
+}
+for(const type of ['전세','월세']){
+ assert.equal(brokerLocation({type,dealing_type:'중개거래',broker_region_raw:'인천 연수구'}),'');
+}
+for(const value of ['',null,'-','미기재']){
+ assert.equal(brokerLocation({type:'매매',dealing_type:'중개거래',broker_region_raw:value}),'');
+}
+assert.equal((html.match(/saleBrokerLocation\(x\)\+leaseRenewalDetails\(x\)/g)||[]).length,3,
+ 'broker region below sale basics in all three transaction views');
+assert.match(collector,/'broker_region_raw': get\(row, '중개사소재지', 'estateAgentSggNm'\)/);
+console.log('매매 중개사 소재지(타지역 포함) 및 전월세 갱신정보 UI 테스트 통과');
