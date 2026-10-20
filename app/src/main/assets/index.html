@@ -1333,7 +1333,7 @@ let header='<p class="tiny">뉴스 묶음 '+filtered.length+'개 · AI 요약 '+
 let cards=filtered.slice(0,newsDisplayLimit).map(x=>{
  let sources=(x.sources||[]).map(t=>{let safe=safeLink(t.link);return '<li>'+(safe?'<a href="'+escapeHtml(safe)+'">'+escapeHtml(t.title)+'</a>':escapeHtml(t.title))+'<div class="tiny">'+escapeHtml(t.publisher)+' · '+escapeHtml(prettyTime(t.published_at))+'</div></li>';}).join('');
  let done=x.summary_method==='gemini_article'&&!!x.summary;
- let points=done?String(x.summary).split(/\\r?\\n/).map(t=>t.trim()).filter(Boolean):[];
+ let points=done?String(x.summary).split(/\r?\n/).map(t=>t.trim()).filter(Boolean):[];
  let summaryHtml=done?'<div class="newsSummaryBox" aria-label="AI 핵심 요약"><div class="newsSummaryHeading">AI 핵심 요약</div><ol class="newsSummarySentences">'+points.map((p,i)=>'<li><span class="newsSummaryCount">'+(i+1)+'</span><span>'+escapeHtml(p)+'</span></li>').join('')+'</ol></div>':'';
  return '<article class="item"><div class="tagbox"><span class="pill">'+escapeHtml(x.category)+'</span>'+(done?'<span class="pill">AI 요약 완료</span>':'')+'</div><h3>'+escapeHtml(x.title)+'</h3>'+summaryHtml+'<div class="meta">최근 보도: '+escapeHtml(prettyTime(x.last_published_at))+' · '+escapeHtml(x.article_count)+'건</div><details class="details"><summary>관련 기사 원문 '+escapeHtml(x.sources?.length||0)+'건 보기</summary><ul class="sources">'+sources+'</ul></details></article>';
  }).join('');
