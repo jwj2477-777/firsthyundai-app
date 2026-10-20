@@ -36,6 +36,7 @@ def _response_json(prompt, key, opener=None, max_tokens=1600):
     }, ensure_ascii=False).encode("utf-8"), headers={
         "Authorization": "Bearer " + key,
         "Content-Type": "application/json",
+        "User-Agent": "FirstHyundai-GroqClient/1.0 (python-news-collector)",
     }, method="POST")
     try:
         with opener(request, timeout=40) as resp:
