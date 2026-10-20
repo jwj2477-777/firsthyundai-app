@@ -62,26 +62,58 @@ jobs:
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
         run: python scripts/collect_trades.py --months 12
-      - name: Publish refreshed JSON only
+      - name: Publish refreshed JSON without conflicting rebases
         run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/news.json data/trades.json data/new_trades.json
-          if git diff --staged --quiet; then
+          set -e
+          mapfile -t changed < <(git diff --name-only -- data/news.json data/trades.json data/new_trades.json)
+          if [ "${#changed[@]}" -eq 0 ]; then
             echo 'No data updates.'
             exit 0
           fi
-          git commit -m 'data: refresh public Songdo briefing snapshots'
-          # 변경 사항 수집 도중 저장소 코드가 갱신될 수 있으므로
-          # 원격 브랜치로 재정렬해 데이터 커밋을 안전하게 업로드.
-          for attempt in 1 2 3; do
+          stage_dir=$(mktemp -d)
+          for file in "${changed[@]}"; do
+            mkdir -p "$stage_dir/$(dirname "$file")"
+            cp "$file" "$stage_dir/$file"
+          done
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          # Preserve newly generated files across main branch updates.
+          # Rebase would conflict when another collector has updated the same JSON.
+          for attempt in 1 2 3 4; do
             git fetch origin main
-            git rebase origin/main
-            if git push origin HEAD:main; then
+            git reset --hard origin/main
+            for file in "${changed[@]}"; do
+              if [ "$file" = 'data/news.json' ]; then
+                if python3 - "$file" "$stage_dir/$file" <<'PY'
+          import json,sys
+          from datetime import datetime
+          try:
+              old=json.load(open(sys.argv[1],encoding='utf-8'))['checked_at']
+              new=json.load(open(sys.argv[2],encoding='utf-8'))['checked_at']
+              older=datetime.fromisoformat(old)>=datetime.fromisoformat(new)
+          except (ValueError,KeyError,FileNotFoundError,TypeError):
+              older=False
+          sys.exit(0 if older else 1)
+          PY
+                then
+                  echo 'Remote news snapshot is newer; preserving its data.'
+                  continue
+                fi
+              fi
+              cp "$stage_dir/$file" "$file"
+            done
+            git add -- data/news.json data/trades.json data/new_trades.json
+            if git diff --staged --quiet; then
+              echo 'No newer data to publish.'
               exit 0
             fi
-            echo "Remote changed; retrying publish (${attempt}/3)"
+            git commit -m 'data: refresh public Songdo briefing snapshots'
+            if git push origin HEAD:main; then
+              echo 'Published refreshed snapshots successfully.'
+              exit 0
+            fi
+            echo "Remote changed; retrying publish ($attempt/4)"
             sleep 3
           done
-          echo 'Publishing refreshed data failed after retries.'
+          echo 'Failed to publish data after four conflict-safe attempts.'
           exit 1
