@@ -33,3 +33,22 @@ jobs:
               v=Wiz();v.feed(html)
               print("Wiz payload lengths:",v.found[:4])
           PY
+      - name: Try pinned Google News article URL decoder
+        env:
+          NEWS_LINK: ${{ github.event.repository.html_url }}
+        run: |
+          printf 'gnews-decoder==0.1.1 --hash=sha256:2d591a6bbb70eade4d1e6da3bc6660294ef6d394119f26283df1d1d7df97796c\n' > /tmp/gnews-hashes.txt
+          python3 -m pip install --no-deps --only-binary=:all: --require-hashes -r /tmp/gnews-hashes.txt
+          python3 - <<'PY'
+          import os
+          from urllib.parse import urlsplit
+          from gnews_decoder import decode_many
+          url="https://news.google.com/rss/articles/CBMiYkFVX3lxTE1MNEdUc3VXNkcxU0FFQ1BlSHA5Z0MzNHNDbFdJRkpZV3prOG1HNVNHYmM2QXllcHdoQUxqeEdXeVRTSUxCQ3pITW5RdVRDbDRKUlVvVU5MU0Rucm1GZ0dvaDFB?oc=5"
+          try:
+              result=decode_many([url],timeout=12,concurrency=1)
+              decoded=result.get(url)
+              print("Decoder final host:",urlsplit(decoded or "").hostname if decoded else "none")
+              print("Decoding worked:",bool(decoded and urlsplit(decoded).hostname!="news.google.com"))
+          except Exception as exc:
+              print("Decoder exception:",type(exc).__name__)
+          PY
