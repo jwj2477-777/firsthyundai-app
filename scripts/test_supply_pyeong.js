@@ -77,9 +77,13 @@ assert.equal(get("displayExclusiveArea(84.98,apt_artwin)"),'전용 84.98㎡ (약
 assert.equal(get("displayExclusiveArea(80.05,apt_central3)"),'전용 80.05㎡ (약 33평형)');
 assert.equal(get("displaySupplyType(apt_central3,'111')"),'전용 80.05㎡ (약 33평형) · 공급 111㎡');
 assert.equal(get("displaySupplyType(apt_artwin,'152')"),'전용 106.78㎡ (약 45평형) · 공급 152㎡');
-const pOther=rows.find(x=>x.id==='kapt-a10020272'); // Worldmark 8 has no verified pairs yet
+const worldmark8=rows.find(x=>x.id==='kapt-a10020272');
+env.worldmark8=worldmark8;
+assert.equal(get("canonicalAreaTypes(worldmark8).length"),6,'Worldmark 8 must retain six separately sourced apartment types only');
+assert.equal(get("canonicalAreaTypes(worldmark8).find(x=>x.supply_label==='152A').supply_m2"),152.723);
+const pOther=rows.find(x=>x.id==='verified-extra-13'); // Hillstate 3: no block-specific paired primary source yet
 env.unknown=pOther;
-assert.equal(get("canonicalAreaTypes(unknown).length"),0,'No fictitious matching from standalone areas');
+assert.equal(get("canonicalAreaTypes(unknown).length"),0,'Do not guess the Hillstate block pairing');
 assert.equal(get("displayExclusiveArea(84.9,unknown)"),'전용 84.9㎡','Never invent supply pyeong for unverified area');
 assert.equal(get("displaySupplyType(apt_artwin,'120B')"),'전용 84.98㎡ (약 36평형) · 공급 120B㎡');
 assert.equal(get("displaySupplyType(apt_skcentral,'109B')"),'전용 84.78㎡ (약 33평형) · 공급 109B㎡');
