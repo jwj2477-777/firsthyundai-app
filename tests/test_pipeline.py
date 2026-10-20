@@ -50,6 +50,24 @@ class TradeTests(unittest.TestCase):
         row=normalize(base,'매매','202610')
         self.assertEqual(row['amount_10k'],90000)
         self.assertEqual(row['contract_date'],'2026-10-15')
+    def test_official_sale_broker_region_korean_and_english(self):
+        core={'법정동':'송도동','아파트':'연습단지','전용면적':'84.99','년':'2026','월':'10','일':'19',
+              '층':'27','거래금액':'100,000','거래유형':'중개거래','중개사소재지':'서울 강남구'}
+        sale=normalize(core,'매매','202610')
+        self.assertEqual(sale['dealing_type'],'중개거래')
+        self.assertEqual(sale['broker_region_raw'],'서울 강남구')
+        core['중개사소재지']='인천 연수구'
+        self.assertEqual(normalize(core,'매매','202610')['broker_region_raw'],'인천 연수구')
+        core.pop('중개사소재지')
+        self.assertEqual(normalize(core,'매매','202610')['broker_region_raw'],'')
+        english={'umdNm':'송도동','aptNm':'연습단지','excluUseAr':'84.99','dealYear':'2026',
+                 'dealMonth':'10','dealDay':'19','floor':'27','dealAmount':'100,000',
+                 'dealingGbn':'중개거래','estateAgentSggNm':'경기 성남시 분당구'}
+        self.assertEqual(normalize(english,'매매','202610')['broker_region_raw'],'경기 성남시 분당구')
+        before=normalize(core,'매매','202610')
+        after=normalize({**core,'중개사소재지':'경기 성남시 분당구'},'매매','202610')
+        self.assertEqual(newly_detected([before],[after]),[])
+
     def test_lease_and_cancel(self):
         b={'법정동':'송도동','아파트':'연습단지','전용면적':'84.99','년':'2026','월':'10','일':'2','층':'21','보증금액':'50,000','월세금액':'0'}
         r=normalize(b,'임대','202610');self.assertEqual(r['type'],'전세');self.assertEqual(r['deposit_10k'],50000)
