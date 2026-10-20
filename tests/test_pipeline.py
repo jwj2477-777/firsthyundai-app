@@ -5,7 +5,7 @@ from datetime import datetime, timezone, timedelta
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 from collect_trades import parse_response, normalize, recent_months, unique_ids, normalized_service_key, newly_detected
-from collect_news import parse_rss, deduplicate, make_briefs, rss_link, relevant_news_title
+from collect_news import parse_rss, deduplicate, make_briefs, rss_link, relevant_news_title, TOPICS, MAX_ITEMS_PER_FEED, MAX_ENTRIES, MAX_BRIEFS, MAX_SOURCES_PER_BRIEF
 
 class TradeTests(unittest.TestCase):
     def test_service_key_normalization(self):
@@ -120,6 +120,35 @@ class NewsTests(unittest.TestCase):
         self.assertFalse(relevant_news_title('토토 대출 빠른가입 안내', '세금·대출'))
         self.assertTrue(relevant_news_title('주담대 변동금리 6% 돌파', '세금·대출'))
         self.assertTrue(relevant_news_title('국토부 주택 공급정책 발표', '정책·규제'))
+
+    def test_all_incheon_songdo_news_scope(self):
+        self.assertIn('송도 종합',TOPICS)
+        self.assertGreaterEqual(len(TOPICS['송도 종합']),8)
+        for headline in (
+            '인천 송도 국제학교 학생 과학대회 수상',
+            '송도국제도시에서 대규모 음악 축제 개최',
+            '송도 공원에서 주민 참여 환경정화 활동 진행',
+            '인천 송도 지역 기업 신제품 발표',
+            '인천 송도에서 발생한 교통사고 경찰 조사',
+            '송도에서 불법 도박장 운영 일당 검거',
+        ):
+            self.assertTrue(relevant_news_title(headline,'송도 종합'),headline)
+        for headline in (
+            '부산 송도해수욕장 여름 축제',
+            '포항 송도에 문화센터 새로 개관',
+            '인천 청라 주민 문화 축제',
+            '서울 강남 주택 가격 상승',
+            '송도 카지노 입장 이벤트 무료 쿠폰',
+        ):
+            self.assertFalse(relevant_news_title(headline,'송도 종합'),headline)
+        # 전국 부동산 정책 뉴스는 여전히 수집
+        self.assertTrue(relevant_news_title('정부가 부동산 양도세 개편 방안 발표','정책·규제'))
+
+    def test_expanded_news_limits(self):
+        self.assertEqual(MAX_ITEMS_PER_FEED,90)
+        self.assertEqual(MAX_ENTRIES,300)
+        self.assertEqual(MAX_BRIEFS,180)
+        self.assertEqual(MAX_SOURCES_PER_BRIEF,10)
 
     def test_feed_query(self):self.assertIn('news.google.com/rss/search',rss_link('송도 GTX-B'))
     def test_parse_and_group(self):
