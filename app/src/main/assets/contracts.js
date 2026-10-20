@@ -201,6 +201,18 @@ function fromSelectedComplex(){
   updateSummary();
  }catch(e){switchPage('contracts');}
 }
+function clearForNewMemo(){
+ const memo=field('rough');
+ FIELDS.forEach(id=>{if(id!=='rough'&&E('ct_'+id))E('ct_'+id).value='';});
+ E('ct_dealType').value='전세';
+ E('ct_preview').value='';
+ E('ct_rough').value=memo;
+ E('ct_status').textContent='메모에서 새 계약조건을 분석합니다.';
+ E('ct_status').className='contractReview';
+ created=false;approved=false;
+ window.FirstHyundaiSmart?.reset();
+ updateSummary();
+}
 function reset(){
  if(!confirm('현재 작성 중인 계약 내용을 모두 지우시겠습니까? 저장된 사본은 없습니다.'))return;
  FIELDS.forEach(id=>{const el=E('ct_'+id);if(el)el.value='';});
@@ -226,6 +238,6 @@ window.FirstHyundaiContracts={
   const r=catalogRows().find(x=>x.id===id);
   if(r){setField('property',r.label,true);setField('address',r.address||'',true);switchPage('contracts');window.FirstHyundaiSmart?.select(r.id);updateSummary();}
  },
- _test:{contractValue,normalizeDate,collect}
+ _test:{contractValue,normalizeDate,collect,clearForNewMemo}
 };
 })();
