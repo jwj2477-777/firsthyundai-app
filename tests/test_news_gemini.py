@@ -1,9 +1,9 @@
 """Offline regression tests for safe, factual Gemini news brief rendering."""
-import sys,unittest
+import sys,unittest,json
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from summarize_news import article_text,enrich,safe_url,summarize,compact_summary,BATCH_SIZE
+from summarize_news import article_text,enrich,safe_url,summarize,compact_summary,summarize_batch,BATCH_SIZE
 
 class TestGeminiNews(unittest.TestCase):
     def test_extract_real_article_paragraphs(self):
@@ -24,9 +24,9 @@ class TestGeminiNews(unittest.TestCase):
             {"id":"2","title":"정책 B","sources":[{"link":"https://news.google.com/b","title":"정책 B","publisher":"B"}]},
             {"id":"3","title":"정책 C","sources":[{"link":"https://news.google.com/c","title":"정책 C","publisher":"C"}]}
         ]}
-        compact="송도 개발계획 조정 — 사업 일정 재검토와 착공 시점 연기."
+        compact="송도 개발계획의 사업 일정을 재검토합니다.\n시공사 선정 절차를 다시 진행하기로 했습니다.\n착공 시점은 추후 발표할 예정입니다."
         before={"briefs":[{"id":"1","title":"정책 A","summary_method":"gemini_article",
-                            "summary":compact,"summary_version":2,
+                            "summary":compact,"summary_version":3,
                             "summary_model":"gemini-3.5-flash-lite"}]}
         calls=[]
         def fake_read(url):
@@ -34,7 +34,7 @@ class TestGeminiNews(unittest.TestCase):
             return "기사에 나온 확인된 정책 사실을 직접 기술합니다. "*15
         def fake_generate(batch,key):
             calls.append(("gemini",len(batch)))
-            return {str(x["id"]):"주택 규제 정책 변경 검토 — 확정 전이며 후속 발표를 기다리는 상황." for x in batch}
+            return {str(x["id"]):"정부가 주택 관련 규제 개편을 검토하고 있습니다.\n해당 규제의 대상과 범위를 관계 기관이 협의하고 있습니다.\n시행 여부는 아직 확정되지 않았습니다." for x in batch}
         done=enrich(original,before,"SECRET",fake_read,fake_generate,max_calls=1,
                     resolve=lambda urls:{u:u for u in urls})
         self.assertEqual(done["ai_summary_stats"]["created"],1)
@@ -42,7 +42,7 @@ class TestGeminiNews(unittest.TestCase):
         self.assertEqual(done["ai_summary_stats"]["awaiting_body"],1)
         self.assertEqual(done["briefs"][0]["summary"],compact)
         self.assertEqual(done["briefs"][1]["summary_method"],"gemini_article")
-        self.assertEqual(done["briefs"][1]["summary_version"],2)
+        self.assertEqual(done["briefs"][1]["summary_version"],3)
         self.assertEqual(done["briefs"][2]["summary_method"],"headline_only")
         self.assertEqual(len([x for x in calls if x[0]=="gemini"]),1)
     def test_many_articles_batched_and_directional(self):
@@ -53,17 +53,43 @@ class TestGeminiNews(unittest.TestCase):
         calls=[]
         def short_batch(batch,key):
             calls.append(len(batch))
-            return {str(b["id"]):"송도 관련 주택 정책 조정 — 공급 확대 논의, 시행 여부는 미확정." for b in batch}
+            return {str(b["id"]):"송도 관련 주택 공급정책의 조정안을 논의하고 있습니다.\n공급 확대 대상 지역은 아직 정해지지 않았습니다.\n개편안 시행 일정도 아직 확정되지 않았습니다." for b in batch}
         result=enrich(data,{},"SECRET",lambda url:"검증된 기사 내용과 언론사 정보를 확보했습니다. "*20,
                       short_batch,resolve=lambda urls:{u:u for u in urls})
         self.assertEqual(result["ai_summary_stats"]["created"],BATCH_SIZE+2)
         self.assertEqual(calls,[BATCH_SIZE,2])
-        self.assertTrue(all(len(x["summary"])<=105 for x in data["briefs"]))
+        self.assertTrue(all(len(x["summary"])<=285 for x in data["briefs"]))
     def test_summary_must_be_short_and_complete(self):
         self.assertEqual(compact_summary("기사의 내용 중 알맞게 확인할 수 있는 핵심 요지입니다."*5),"")
         self.assertEqual(compact_summary("<script>악성</script>"),"")
         self.assertEqual(compact_summary("진행 중"),"")
-        self.assertIn("조정",compact_summary("부동산 공급 정책 조정 — 지방 공급 확대 검토, 시행일은 미정."))
+        example=["정부가 주택 세제 개편안을 발표했습니다.",
+                 "양도세와 종부세를 각각 2%, 3% 인상하는 내용을 제시했습니다.",
+                 "시행 시점은 2034년 3월로 발표됐습니다."]
+        text=compact_summary(example)
+        self.assertEqual(text.count("\n"),2)
+        self.assertIn("2%",text)
+        self.assertEqual(compact_summary(example[:2]),"")
+        self.assertEqual(compact_summary(example+["연관된 논의가 계속되고 있습니다.","추가됐습니다."]),"")
+        self.assertEqual(compact_summary([example[0]]*3),"")
+    def test_api_accepts_object_or_bare_array(self):
+        payload=[{"id":"1","sentences":["공급정책 개편안을 공식 발표했습니다.",
+                 "시행 대상은 국토부 발표자료에 기재됐습니다.","시행일은 아직 결정되지 않았습니다."]}]
+        class Response:
+            def __init__(self,json_data):self.json_data=json_data
+            def __enter__(self):return self
+            def __exit__(self,*args):return False
+            def read(self,size):return json.dumps({"candidates":[{"content":{"parts":[
+                {"text":json.dumps(self.json_data,ensure_ascii=False)}]}}]}).encode()
+        class Opener:
+            def __init__(self,data):self.data=data
+            def open(self,*args,**kwargs):return Response(self.data)
+        articles=[{"id":"1","title":"공급정책","publisher":"테스트뉴스","body":"내용 검증용 본문입니다. "*80}]
+        for response in [payload,{"items":payload}]:
+            result=summarize_batch(articles,"SYNTHETIC",opener=Opener(response))
+            self.assertEqual(result["1"].count("\n"),2)
+            self.assertIn("시행일",result["1"])
+        self.assertEqual(summarize_batch(articles,"SYNTHETIC",opener=Opener([])),{})
 
     def test_url_decoder_failure_stays_safe(self):
         from summarize_news import resolve_rss_links
