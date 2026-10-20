@@ -62,7 +62,8 @@ assert.equal(get("canonicalAreaTypes(apt_f15).find(x=>x.supply_label==='88A').ex
 assert.equal(get("canonicalAreaTypes(apt_f15).find(x=>x.supply_label==='87B').exclusive_m2"),59.98,'KB 87B is exclusive 59.98');
 assert.equal(get("canonicalAreaTypes(apt_f15).find(x=>x.supply_label==='129B').supply_m2"),129.65,'KB exact 129B supply 129.65㎡');
 assert.equal(get("canonicalAreaTypes(apt_f13).length"),7,'F13 seven distinct types');
-assert.equal(get("canonicalAreaTypes(apt_f14).length"),6,'F14 only verified six pairs, no unpaired supply rows');
+assert.equal(get("canonicalAreaTypes(apt_f14).length"),7,'F14 has seven source-matched pairs; no raw supply duplicates');
+assert.equal(get("canonicalAreaTypes(apt_f14).find(x=>x.supply_label==='88A').exclusive_m2"),59.89,'Naver F14 88A is not 59.98');
 
 assert.equal(get("displayExclusiveArea(84.65,apt_skcentral)"),'전용 84.65㎡ (약 33평형)');
 assert.equal(get("displayExclusiveArea(84.65,kb_skview)"),'전용 84.65㎡ (약 34평형)');
