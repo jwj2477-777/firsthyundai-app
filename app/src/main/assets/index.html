@@ -599,7 +599,9 @@ function renderMainNavigation(id){
   '<div class="adminQuickLinks">'+[['notes','내 자료'],['settings','설정'],['security','보안']].map(([page,label])=>
   '<button type="button" onclick="switchPage(\''+page+'\')">'+label+'</button>').join('')+'</div></details>':'';
  const tools='<div class="utilityNav"><button class="'+(id==='overview'?'active':'')+
-  '" type="button" onclick="switchPage(\'overview\')">▦ 오늘 요약</button><button class="'+(id===\'contracts\'?\'active\':\'\')+\'" type="button" onclick="switchPage(\'contracts\')">✎ 계약문자</button>\'+admin+\'</div>\';
+  '" type="button" onclick="switchPage(\'overview\')">▦ 오늘 요약</button>'+
+  '<button class="'+(id==='contracts'?'active':'')+'" type="button" onclick="switchPage(\'contracts\')">✎ 계약문자</button>'+
+  admin+'</div>';
  $('nav').innerHTML=primary+secondary+tools;
 }
 // A detail sheet is its own full-screen view; the scrollable list stays intact.
