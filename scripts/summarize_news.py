@@ -16,7 +16,7 @@ from ipaddress import ip_address
 from pathlib import Path
 from urllib.parse import urlsplit
 from urllib.request import Request, build_opener, HTTPRedirectHandler
-from openai_news import generate_fallback, review_important, MODEL as OPENAI_MODEL, MAX_FALLBACK_BRIEFS, MAX_REVIEW_BRIEFS
+from groq_news import generate_fallback, review_important, MODEL as GROQ_MODEL, MAX_FALLBACK_BRIEFS, MAX_REVIEW_BRIEFS
 
 NEWS=Path(__file__).resolve().parents[1]/"data"/"news.json"
 MODEL="gemini-3.5-flash-lite"
@@ -337,7 +337,7 @@ def summarize_batch(items, key, opener=None):
 
 def enrich(current, previous, key, read=read_article, generate=summarize_batch,
            max_calls=MAX_NEW_SUMMARIES, resolve=resolve_rss_links,
-           openai_key="", fallback=generate_fallback, audit=review_important):
+           groq_key="", fallback=generate_fallback, audit=review_important):
     """Enrich as many visible news groups as can be grounded within bounded work.
 
     Fetch article pages concurrently; Gemini groups five texts per API request.
@@ -349,7 +349,7 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
     cached = {}
     legacy = {}
     for b in previous.get("briefs", []) if isinstance(previous, dict) else []:
-        if b.get("summary_method") not in ("gemini_article", "openai_article") or not b.get("summary"):
+        if b.get("summary_method") not in ("gemini_article", "groq_article", "openai_article") or not b.get("summary"):
             continue
         keypair = (b.get("id"), b.get("title"))
         if b.get("summary_version") == 3 and compact_summary(b["summary"]):
@@ -362,16 +362,17 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
         if previous_brief:
             brief.update({k: previous_brief[k] for k in
                           ("summary", "summary_method", "summary_model",
-                           "summary_source_url", "summary_version", "openai_reviewed")
+                           "summary_source_url", "summary_version", "groq_reviewed")
                           if k in previous_brief})
             brief["verification"] = "기사 본문 기반 AI 요약 · 최종 확인은 원문"
         else:
             pending.append(brief)
+    has_ai_key=bool(key or groq_key)
     # Fair round-robin: try one publisher link for every unsummarized story
     # before spending the lookup budget on alternative links.
     unresolved = []
     seen = set()
-    if key:
+    if has_ai_key:
         for source_index in range(MAX_SOURCES_PER_BRIEF):
             for brief in pending:
                 sources = brief.get("sources", [])
@@ -385,11 +386,11 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
                     break
             if len(unresolved) >= MAX_ARTICLE_FETCHES:
                 break
-    urlmap = resolve(unresolved) if key and unresolved else {}
+    urlmap = resolve(unresolved) if has_ai_key and unresolved else {}
     # Concurrently try multiple real publisher sources. No external article text stored.
     resolved = {original for original in urlmap.values() if original}
     article_bodies = {}
-    if key and resolved:
+    if has_ai_key and resolved:
         with ThreadPoolExecutor(max_workers=14) as pool:
             futures = {pool.submit(read, url):url for url in resolved}
             for task in as_completed(futures):
@@ -463,61 +464,61 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
                     created += 1
             if offset + BATCH_SIZE < len(candidates):
                 sleep(1)
-    # OpenAI is a second-stage fallback, not an extra call for every story.
+    # Groq is a second-stage fallback, not an extra call for every story.
     # Both providers receive only verified article text, never RSS headlines alone.
-    openai_created = 0
-    openai_requests = 0
-    openai_reviewed = 0
+    groq_created = 0
+    groq_requests = 0
+    groq_reviewed = 0
     fallback_items = [
         item for item in candidates
-        if item["brief"].get("summary_method") not in ("gemini_article", "openai_article")
+        if item["brief"].get("summary_method") not in ("gemini_article", "groq_article")
         or not item["brief"].get("summary")
     ][:MAX_FALLBACK_BRIEFS]
-    if openai_key:
-        from openai_news import BATCH_SIZE as OPENAI_BATCH
-        for offset in range(0, len(fallback_items), OPENAI_BATCH):
-            if os.environ.get("FIRSTHYUNDAI_OPENAI_BLOCKED"):
+    if groq_key:
+        from groq_news import BATCH_SIZE as GROQ_BATCH
+        for offset in range(0, len(fallback_items), GROQ_BATCH):
+            if os.environ.get("FIRSTHYUNDAI_GROQ_BLOCKED"):
                 break
-            batch=fallback_items[offset:offset+OPENAI_BATCH]
+            batch=fallback_items[offset:offset+GROQ_BATCH]
             try:
-                generated=fallback(batch,openai_key)
+                generated=fallback(batch,groq_key)
                 if not isinstance(generated,dict):generated={}
             except (OSError,ValueError,TypeError) as exc:
-                print("OpenAI fallback exception:",type(exc).__name__)
+                print("Groq fallback exception:",type(exc).__name__)
                 generated={}
-            openai_requests+=1
+            groq_requests+=1
             for item in batch:
                 summary=compact_summary(generated.get(str(item["id"]), ""))
                 if not summary:
                     continue
                 item["brief"].update({
-                    "summary":summary, "summary_method":"openai_article",
-                    "summary_model":OPENAI_MODEL, "summary_source_url":item["url"],
+                    "summary":summary, "summary_method":"groq_article",
+                    "summary_model":GROQ_MODEL, "summary_source_url":item["url"],
                     "summary_version":3,
-                    "verification":"OpenAI 기사 본문 요약 · 사실 미검증"})
-                openai_created+=1
+                    "verification":"Groq 기사 본문 요약 · 사실 미검증"})
+                groq_created+=1
         # Cost-limited second-opinion reviews only for newly summarized high-impact
         # policy/tax/loan stories with an accessible source body.
         priority=("정책·규제","세금·대출")
         for item in candidates:
-            if openai_reviewed>=MAX_REVIEW_BRIEFS or os.environ.get("FIRSTHYUNDAI_OPENAI_BLOCKED"):
+            if groq_reviewed>=MAX_REVIEW_BRIEFS or os.environ.get("FIRSTHYUNDAI_GROQ_BLOCKED"):
                 break
             brief=item["brief"]
             if brief.get("category") not in priority or brief.get("summary_method")!="gemini_article":
                 continue
-            if brief.get("openai_reviewed"):
+            if brief.get("groq_reviewed"):
                 continue
             review_item={**item,"summary":brief["summary"]}
             try:
-                reviewed=compact_summary(audit(review_item,openai_key))
+                reviewed=compact_summary(audit(review_item,groq_key))
             except (OSError,ValueError,TypeError) as exc:
-                print("OpenAI comparison exception:",type(exc).__name__)
+                print("Groq comparison exception:",type(exc).__name__)
                 reviewed=""
-            openai_requests+=1
-            openai_reviewed+=1
+            groq_requests+=1
+            groq_reviewed+=1
             if reviewed:
                 brief["summary"]=reviewed
-                brief["openai_reviewed"]=True
+                brief["groq_reviewed"]=True
                 brief["verification"]="2개 AI 검토 · 사실 확인은 원문 기준"
     for b in briefs:
         if b.get("summary_version") == 3:
@@ -530,10 +531,10 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
         "source_links_resolved": len(urlmap), "body_readable": len(article_bodies),
         "gemini_requests": requests + retried, "retry_requests": retried,
         "candidate_articles": len(candidates),
-        "openai_created": openai_created, "openai_requests": openai_requests,
-        "openai_reviewed": openai_reviewed,
-        "awaiting_body": sum(b.get("summary_method") not in ("gemini_article","openai_article") for b in briefs)}
-    current["brief_method"] = "기사 본문 확인 Gemini 요약 + OpenAI 보완(짧은 3~4문장)"
+        "groq_created": groq_created, "groq_requests": groq_requests,
+        "groq_reviewed": groq_reviewed,
+        "awaiting_body": sum(b.get("summary_method") not in ("gemini_article","groq_article") for b in briefs)}
+    current["brief_method"] = "기사 본문 확인 Gemini 요약 + Groq 보완(짧은 3~4문장)"
     return current
 
 def main():
@@ -548,7 +549,7 @@ def main():
         except (OSError,ValueError):
             pass
     enriched=enrich(current,previous,os.environ.get("GEMINI_API_KEY","").strip(),
-                    openai_key=os.environ.get("OPENAI_API_KEY","").strip())
+                    groq_key=os.environ.get("GROQ_API_KEY","").strip())
     NEWS.write_text(json.dumps(enriched,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("Gemini summary stats:",enriched["ai_summary_stats"],"key_configured:",bool(os.environ.get("GEMINI_API_KEY")))
 
