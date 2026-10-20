@@ -33,7 +33,12 @@ jobs:
               if data.get("status")!="completed" or not text.strip():
                   raise RuntimeError("No completed text response")
           except HTTPError as e:
-              print("FAIL: OpenAI API returned HTTP",e.code,"(credential not printed)")
+              body=e.read(3000)
+              try:
+                  err=json.loads(body).get("error",{})
+                  print("FAIL: OpenAI API HTTP",e.code,"error_code:",err.get("code","unknown"),"error_type:",err.get("type","unknown"))
+              except (ValueError,TypeError,AttributeError):
+                  print("FAIL: OpenAI API HTTP",e.code,"without error details")
               sys.exit(1)
           except (OSError,ValueError,RuntimeError) as e:
               print("FAIL: OpenAI API connection",type(e).__name__)
