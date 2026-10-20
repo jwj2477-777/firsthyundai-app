@@ -19,8 +19,10 @@ from urllib.request import Request, build_opener, HTTPRedirectHandler
 
 NEWS=Path(__file__).resolve().parents[1]/"data"/"news.json"
 MODEL="gemini-3.5-flash-lite"
-MAX_NEW_SUMMARIES=80
-MAX_ARTICLE_FETCHES=135
+MAX_NEW_SUMMARIES=155
+MAX_ARTICLE_FETCHES=360
+MAX_SOURCES_PER_BRIEF=5
+MAX_EXTRA_RETRIES=18
 BATCH_SIZE=5
 MAX_SUMMARY_CHARS=285
 
@@ -79,13 +81,87 @@ class Paragraphs(HTMLParser):
         if tag in ("script","style","noscript","nav","footer","aside","form") and self.skip:
             self.skip-=1
 
+class NewsContainer(HTMLParser):
+    """Read news body containers that use div/br rather than paragraphs."""
+    MARKER = re.compile(
+        r"(article[_-]?body|article[_-]?content|article[_-]?view|"
+        r"newsct_article|article_txt|news_body|articlebody|dic_area)", re.I
+    )
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.depth=0
+        self.ignored=0
+        self.parts=[]
+    def handle_starttag(self,tag,attrs):
+        attrs=dict(attrs)
+        if tag in ("script","style","noscript","nav","footer","aside"):
+            self.ignored+=1
+        if tag in ("div","section") and self.depth:
+            self.depth+=1
+        elif not self.depth and tag in ("div","section","main"):
+            marker=" ".join((attrs.get("id",""),attrs.get("class","")))
+            if self.MARKER.search(marker):
+                self.depth=1
+        if self.depth and tag in ("p","br","h2","h3"):
+            self.parts.append("\n")
+    def handle_data(self,data):
+        if self.depth and not self.ignored:
+            self.parts.append(data)
+    def handle_endtag(self,tag):
+        if tag in ("script","style","noscript","nav","footer","aside") and self.ignored:
+            self.ignored-=1
+        if self.depth and tag in ("div","section","main"):
+            self.depth-=1
+    def readable_text(self):
+        result=re.sub(r"[ \t]+"," ","".join(self.parts))
+        result=re.sub(r"\n[ \t]*\n+", "\n",result)
+        return result.strip()[:6000]
+
+
+def jsonld_article_body(html):
+    """Use publishers' NewsArticle JSON-LD articleBody if provided."""
+    for match in re.finditer(
+            r"<script\b[^>]*type=['\"]application/ld\+json['\"][^>]*>(.*?)</script>",
+            html[:500_000],re.I|re.S):
+        try:
+            obj=json.loads(match.group(1))
+        except (ValueError,TypeError):
+            continue
+        queue=[obj]
+        limit=0
+        while queue and limit<40:
+            limit+=1
+            item=queue.pop(0)
+            if isinstance(item,list):
+                queue.extend(item[:20])
+            elif isinstance(item,dict):
+                body=item.get("articleBody","")
+                kind=item.get("@type","")
+                type_names=[str(k).lower() for k in kind] if isinstance(kind,list) else [str(kind).lower()]
+                if (isinstance(body,str) and
+                        any("article" in x for x in type_names)):
+                    body=re.sub(r"\s+"," ",body).strip()
+                    if len(body)>=260:
+                        return body[:6000]
+                queue.extend(v for k,v in item.items() if k in ("@graph","mainEntity","mainEntityOfPage") and isinstance(v,(list,dict)))
+    return ""
+
+
 def article_text(html,final_url):
     if (urlsplit(final_url).hostname or "").lower().endswith("google.com"):
         return ""
+    structured=jsonld_article_body(html)
+    if structured:
+        return structured
     parser=Paragraphs()
     parser.feed(html[:500_000])
     parts=parser.article_text or parser.other_text
     text="\n".join(dict.fromkeys(parts))[:6000]
+    if len(text)>=260:
+        return text
+    body=NewsContainer()
+    body.feed(html[:500_000])
+    text=body.readable_text()
     return text if len(text)>=260 else ""
 
 def read_article(url,opener=None):
@@ -278,35 +354,41 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
             cached[keypair] = b
         else:
             legacy[keypair] = b
-    unresolved = []
     pending = []
     for brief in briefs:
-        match = (brief.get("id"), brief.get("title"))
-        previous_brief = cached.get(match)
+        previous_brief = cached.get((brief.get("id"), brief.get("title")))
         if previous_brief:
-            brief.update({k:previous_brief[k] for k in
+            brief.update({k: previous_brief[k] for k in
                           ("summary", "summary_method", "summary_model",
                            "summary_source_url", "summary_version")
                           if k in previous_brief})
             brief["verification"] = "Gemini 기사 본문 요약 · 사실 미검증"
-            continue
-        pending.append(brief)
-        if not key:
-            continue
-        for src in brief.get("sources", [])[:2]:
-            link = src.get("link", "")
-            if link and link not in unresolved:
-                unresolved.append(link)
+        else:
+            pending.append(brief)
+    # Fair round-robin: try one publisher link for every unsummarized story
+    # before spending the lookup budget on alternative links.
+    unresolved = []
+    seen = set()
+    if key:
+        for source_index in range(MAX_SOURCES_PER_BRIEF):
+            for brief in pending:
+                sources = brief.get("sources", [])
+                if len(sources) <= source_index:
+                    continue
+                link = sources[source_index].get("link", "")
+                if link and link not in seen:
+                    unresolved.append(link)
+                    seen.add(link)
+                if len(unresolved) >= MAX_ARTICLE_FETCHES:
+                    break
             if len(unresolved) >= MAX_ARTICLE_FETCHES:
                 break
-        if len(unresolved) >= MAX_ARTICLE_FETCHES:
-            break
     urlmap = resolve(unresolved) if key and unresolved else {}
     # Concurrently try multiple real publisher sources. No external article text stored.
     resolved = {original for original in urlmap.values() if original}
     article_bodies = {}
     if key and resolved:
-        with ThreadPoolExecutor(max_workers=10) as pool:
+        with ThreadPoolExecutor(max_workers=14) as pool:
             futures = {pool.submit(read, url):url for url in resolved}
             for task in as_completed(futures):
                 try:
@@ -321,7 +403,7 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
             break
         sources = b.get("sources", [])
         chosen = None
-        for src in sources[:2]:
+        for src in sources[:MAX_SOURCES_PER_BRIEF]:
             url = urlmap.get(src.get("link", ""), "")
             body = article_bodies.get(url, "")
             if body:
@@ -333,27 +415,52 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
             candidates.append(chosen)
     created = 0
     requests = 0
+    retried = 0
     if key:
+        # Persist successes from each batch. Do not discard an entire batch when
+        # Gemini omits one record; retry missing items individually (budgeted).
         for offset in range(0, len(candidates), BATCH_SIZE):
             batch = candidates[offset:offset+BATCH_SIZE]
             try:
                 result = generate(batch, key)
+                if not isinstance(result, dict):
+                    result = {}
             except (OSError, ValueError, TypeError) as e:
                 print("Gemini batch exception:", type(e).__name__)
                 result = {}
             requests += 1
-            for x in batch:
-                summary = compact_summary(result.get(str(x["id"]), ""))
+            missing = []
+            for item in batch:
+                summary = compact_summary(result.get(str(item["id"]), ""))
+                if not summary:
+                    missing.append(item)
+                    continue
+                item["brief"].update({
+                    "summary": summary, "summary_method": "gemini_article",
+                    "summary_model": MODEL, "summary_source_url": item["url"],
+                    "summary_version": 3,
+                    "verification": "Gemini 기사 본문 요약 · 사실 미검증"})
+                created += 1
+            # Gemini often omits a record in multi-article JSON. Limited
+            # one-item retries recover those without hallucinating headlines.
+            for item in missing:
+                if retried >= MAX_EXTRA_RETRIES:
+                    break
+                retried += 1
+                try:
+                    one = generate([item], key)
+                    summary = compact_summary(one.get(str(item["id"]), "")) if isinstance(one,dict) else ""
+                except (OSError, ValueError, TypeError):
+                    summary = ""
                 if summary:
-                    x["brief"].update({
+                    item["brief"].update({
                         "summary": summary, "summary_method": "gemini_article",
-                        "summary_model": MODEL, "summary_source_url": x["url"],
+                        "summary_model": MODEL, "summary_source_url": item["url"],
                         "summary_version": 3,
                         "verification": "Gemini 기사 본문 요약 · 사실 미검증"})
                     created += 1
-            # Avoid bursting into per-minute API throttling.
-            if offset+BATCH_SIZE < len(candidates):
-                sleep(2)
+            if offset + BATCH_SIZE < len(candidates):
+                sleep(1)
     for b in briefs:
         if b.get("summary_version") == 3:
             continue
@@ -363,7 +470,8 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
     current["ai_summary_stats"] = {
         "created": created, "reused": len(cached), "article_fetches": len(resolved),
         "source_links_resolved": len(urlmap), "body_readable": len(article_bodies),
-        "gemini_requests": requests,
+        "gemini_requests": requests + retried, "retry_requests": retried,
+        "candidate_articles": len(candidates),
         "awaiting_body": sum(b.get("summary_method") != "gemini_article" for b in briefs)}
     current["brief_method"] = "원문 확인 Gemini 핵심 요약(짧은 3~4문장)"
     return current

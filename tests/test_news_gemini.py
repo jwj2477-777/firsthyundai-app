@@ -13,6 +13,37 @@ class TestGeminiNews(unittest.TestCase):
         html="<html><article>"+''.join("<p>공공기관의 실거래 발표 자료 중 제"+str(i)+"분기 데이터를 검토했습니다. 실거래 신고 시점을 기준으로 지역마다 금액과 건수가 다른 것으로 확인했습니다.</p>" for i in range(6))+"</article></html>"
         self.assertIn("제0분기",article_text(html,"https://example.org/a"))
         self.assertEqual(article_text(html,"https://news.google.com/rss/articles/ab"),"")
+    def test_collect_news_div_and_structured_article_text(self):
+        body=("인천 송도의 주민 편의시설에 관한 조사결과가 발표됐습니다. "
+              "시설별 개선 일정과 담당 기관에 대한 구체적인 내용도 공개됐습니다. ")*5
+        div_html="<html><div id='newsct_article'><div>"+body+"</div></div></html>"
+        self.assertIn("인천 송도",article_text(div_html,"https://example.org/news"))
+        ld=json.dumps({"@context":"https://schema.org","@type":"NewsArticle",
+            "articleBody":body},ensure_ascii=False)
+        html="<html><script type='application/ld+json'>"+ld+"</script></html>"
+        self.assertIn("개선 일정",article_text(html,"https://example.org/news"))
+        self.assertEqual(article_text(html,"https://news.google.com/rss/articles/test"),"")
+    def test_alternative_publisher_link_after_two_inaccessible_sources(self):
+        data={"schema_version":1,"briefs":[
+            {"id":str(i),"title":"송도 주제 "+str(i),"sources":[
+                {"link":"https://example.org/"+str(i)+"/"+str(j),
+                 "publisher":"매체","title":"송도 주제 "+str(i)} for j in range(3)]}
+            for i in range(3)]}
+        urls=[]
+        def resolver(sources):
+            urls.extend(sources)
+            return {u:u for u in sources}
+        def read(src):
+            return ("송도 지방정부가 정책 개편을 공식적으로 발표했습니다. "*12
+                    if src.endswith("/2") else "")
+        sentence="송도 지역 교통정책을 새로 발표했습니다.\n노선 운영 계획은 관계 기관과 협의하고 있습니다.\n추가 시행일은 아직 결정되지 않았습니다."
+        def generate(batch,key):
+            return {str(x["id"]):sentence for x in batch}
+        result=enrich(data,{},"SECRET",read,generate,resolve=resolver)
+        self.assertEqual(result["ai_summary_stats"]["created"],3)
+        self.assertEqual(result["ai_summary_stats"]["source_links_resolved"],9)
+        self.assertTrue(any(u.endswith("/2") for u in urls))
+
     def test_refuse_private_and_unsafe_urls_without_dns(self):
         for link in ["http://example.com/a","https://127.0.0.1/a","https://[::1]/",
                      "https://localhost/x","https://x.local/","file:///etc/passwd",
