@@ -332,6 +332,7 @@ def collect(existing, key, *, session=None, wait=0.1, max_count=MAX_SONGDO):
 AREA_ENRICHMENT_FIELDS=(
     "area_types_m2", "area_types_source", "area_types_observation_count",
     "supply_type_labels", "area_type_pairs",
+    "area_type_pairs_source", "area_type_pairs_checked_at",
     "exclusive_plan_labels", "exclusive_plan_source_url", "exclusive_plan_note",
 )
 def preserve_area_enrichment(current,prior):
