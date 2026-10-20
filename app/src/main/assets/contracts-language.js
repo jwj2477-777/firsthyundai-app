@@ -31,8 +31,7 @@ function moneyPart(text){
  const src=String(text||'').replace(/[，,]/g,'').replace(/원정|정\b/g,'').replace(/\s+/g,'').trim();
  if(!src)return null;
  // Recognize explicitly spoken amounts: 삼억구천, 오백만, 3억9천, 3500, 3500만원
- const components=src.match(/(?:\d+(?:\.\d+)?|[일이삼사오육륙칠팔구영공한십백천]+)(?:억|천|백|십|만|원)?/g);
- if(!components||components.join('')!==src)return null;
+ if(!/^[\d.영공일이삼사오육륙칠팔구한십백천억만원]+$/.test(src))return null;
  if(/^[\d.]+원$/.test(src))return Number(src.slice(0,-1))/10000;
  let total=0,rest=src,hasEok=false;
  const eok=rest.match(/^(.+?)억/);
