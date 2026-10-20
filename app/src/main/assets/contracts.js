@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 const E=id=>document.getElementById(id);
-const FIELDS=['dealType','property','unit','owner','buyer','price','monthlyRent','contractDeposit','advance','interim','contractDate','balanceDate','balanceTime','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms','cancellation','brokerFee','rough'];
+const FIELDS=['dealType','property','address','unit','owner','buyer','price','monthlyRent','contractDeposit','advance','interim','contractDate','balanceDate','balanceTime','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms','cancellation','brokerFee','rough'];
 let created=false, approved=false;
 function field(id){return String(E('ct_'+id)?.value||'').trim();}
 function setField(id,value,force){const e=E('ct_'+id);if(e&&(force||!e.value.trim()))e.value=String(value||'');}
@@ -86,7 +86,9 @@ function extractNotes(){
 function collect(){
  const type=field('dealType'),price=amount('price'),deposit=amount('contractDeposit'),advance=amount('advance'),interim=field('interim')?amount('interim'):0;
  const errors=[];
- if(!field('property'))errors.push('소재지/단지명');
+ if(!field('property'))errors.push('단지명');
+ if(!field('address'))errors.push('소재지 도로명주소');
+ if(window.FirstHyundaiSmart?.needsPropertyConfirmation())errors.push('아파트 단지 선택 확인');
  if(!field('unit'))errors.push('동·호수');
  if(price===null||price<=0)errors.push('매매대금 또는 보증금');
  if(deposit===null||deposit<=0)errors.push('약정 계약금');
@@ -112,7 +114,7 @@ function updateSummary(){
   '\n최종 잔금: '+(data.balance===null?'계산 불가':money(data.balance))+
   (data.interim>0?' (중도금 '+money(data.interim)+' 별도)':'');
  if(created&&E('ct_preview').value){
-  approved=false;
+  created=false;approved=false; // Invalidate stale preview after any upstream condition changed.
   E('ct_status').textContent='조건이 변경되었습니다. 새로 초안을 생성하고 다시 검토해 주세요.';
   E('ct_status').className='contractReview bad';
  }
@@ -124,7 +126,8 @@ function makePreview(){
  const paying=d.type==='매매'?'매수인':'임차인';
  const out=['안녕하세요. 퍼스트현대부동산입니다.','',
   '● 아파트 '+d.type+'계약 조건 안내 ●','',
-  '▶ 소재지 : '+(field('property')||'[확인 필요]'),
+  '▶ 아파트 : '+(field('property')||'[확인 필요]'),
+  '▶ 소재지 : '+(field('address')||'[주소 확인 필요]'),
   '▶ 대상물 : '+(field('unit')||'[확인 필요]')];
  if(field('owner'))out.push('▶ '+who+' : '+field('owner'));
  if(field('buyer'))out.push('▶ '+paying+' : '+field('buyer'));
@@ -136,7 +139,7 @@ function makePreview(){
  if(field('contractDate'))out.push('▶ 계약서 작성 예정 : '+field('contractDate'));
  out.push('▶ 약정 계약금 : '+(d.deposit===null?'[확인 필요]':money(d.deposit)));
  out.push('▶ 이번 선송금 예정액 : '+(d.advance===null?'[확인 필요]':money(d.advance)));
- out.push('▶ 남은 계약금 : '+(d.remainder===null?'[확인 필요]':money(d.remainder)));
+ if(d.remainder===null||d.remainder>0)out.push('▶ 남은 계약금 : '+(d.remainder===null?'[확인 필요]':money(d.remainder)));
  if(d.interim>0)out.push('▶ 중도금 : '+money(d.interim));
  out.push('▶ 최종 잔금 : '+(d.balance===null?'[확인 필요]':money(d.balance)));
  out.push('▶ 잔금 지급 예정 : '+(field('balanceDate')?dateLabel(field('balanceDate')):'[확인 필요]')+(field('balanceTime')?' '+field('balanceTime'):''));
@@ -191,9 +194,10 @@ function fromSelectedComplex(){
   const record=catalogRows().find(x=>x.id===complexSelected);
   if(!record)return;
   setField('property',record.label,true);
-  if(record.address)setField('property',record.label+' / '+record.address,true);
+  if(record.address)setField('address',record.address,true);
   switchPage('contracts');
   E('ct_unit').focus();
+  window.FirstHyundaiSmart?.select(record.id);
   updateSummary();
  }catch(e){switchPage('contracts');}
 }
@@ -217,10 +221,10 @@ window.firstHyundaiContractSpeech=function(result){
  }else if(result&&!result.cancelled)alert('음성입력에 실패했습니다. 직접 입력을 이용해 주세요.');
 };
 window.FirstHyundaiContracts={
- onOpen:updateSummary,updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,
+ onOpen(){window.FirstHyundaiSmart?.onOpen();updateSummary();},updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,
  fromComplex(id){
   const r=catalogRows().find(x=>x.id===id);
-  if(r){setField('property',r.label+(r.address?' / '+r.address:''),true);switchPage('contracts');updateSummary();}
+  if(r){setField('property',r.label,true);setField('address',r.address||'',true);switchPage('contracts');window.FirstHyundaiSmart?.select(r.id);updateSummary();}
  },
  _test:{contractValue,normalizeDate,collect}
 };
