@@ -47,4 +47,43 @@ assert.equal((html.match(/dealBadge\(x\.type\)\+leaseContractBadge\(x\)\+dealing
 assert.doesNotMatch(html,/조회 계약연월|출처: 국토교통부 아파트 실거래가 API/,
  'duplicated card source and queried year-month footer should be removed');
 assert.match(collector,/'dealing_type': get\(row, '거래유형', 'dealingGbn'\)/);
-console.log('전월세 계약구분·매매 중개/직거래 배지 및 불필요한 카드 출처 삭제 테스트 통과');
+const renewalHelper=html.match(/function leaseRenewalDetails\(row\)\{[\s\S]*?\n\}/)?.[0];
+assert.ok(renewalHelper,'lease renewal detail helper must exist');
+const helpers=html.match(/function number\(n\)\{[^\n]+\}\nfunction value10k\(n\)\{[^\n]+\}/)?.[0];
+const escapeSource=html.match(/const escapeHtml=v=>[^\n]+;/)?.[0];
+assert.ok(helpers&&escapeSource,'Use same money and escaping logic as actual UI');
+vm.runInContext(escapeSource+'\n'+helpers+'\n'+renewalHelper,context);
+const renewalDetails=context.leaseRenewalDetails;
+const renewal={
+ type:'전세',contract_type_raw:'갱신',renewal_raw:'사용',
+ contract_term_raw:'26.11~28.11',previous_deposit_raw:'39,000',previous_monthly_raw:'0'
+};
+const htmlRenewal=renewalDetails(renewal);
+assert.match(htmlRenewal,/갱신요구권 사용/);
+assert.match(htmlRenewal,/계약기간 26\.11 ~ 28\.11/);
+assert.match(htmlRenewal,/종전금액 보증금 3억 9,000만원/);
+assert.doesNotMatch(htmlRenewal,/월세 0원/,'zero old monthly rent omitted for jeonse');
+const monthlyRenewal=renewalDetails({...renewal,type:'월세',renewal_raw:'미사용',
+ previous_deposit_raw:'2,000',previous_monthly_raw:'90'});
+assert.match(monthlyRenewal,/갱신요구권 미사용/);
+assert.match(monthlyRenewal,/종전금액 보증금 2,000만원 \/ 월세 90만원/);
+assert.match(renewalDetails({...renewal,previous_deposit_raw:'',previous_monthly_raw:'',renewal_raw:''}),
+ /갱신요구권 미기재/);
+assert.match(renewalDetails({...renewal,previous_deposit_raw:'',previous_monthly_raw:''}),
+ /종전금액 미기재/);
+for(const type of ['매매','전세','월세']){
+ if(type==='매매'){
+  assert.equal(renewalDetails({...renewal,type}), '');
+ } else {
+  assert.equal(renewalDetails({...renewal,type,contract_type_raw:'신규'}), '');
+ }
+}
+const xss=renewalDetails({...renewal,renewal_raw:'<img src=x onerror=alert(1)>',
+ contract_term_raw:'<svg onload=alert(1)>',previous_deposit_raw:'<12345>',previous_monthly_raw:''});
+assert.doesNotMatch(xss,/img|svg|onerror|alert/);
+assert.match(xss,/종전금액 미기재/);
+assert.equal((html.match(/leaseRenewalDetails\(x\)/g)||[]).length,3,
+ 'render renewal details below main information in three trade screens');
+assert.match(collector,/'previous_deposit_raw': get\(row, '종전계약보증금', 'preDeposit'\)/);
+assert.match(collector,/'previous_monthly_raw': get\(row, '종전계약월세', 'preMonthlyRent'\)/);
+console.log('전월세 갱신권·계약기간·종전금액 3개 화면 및 매매 중개/직거래 테스트 통과');
