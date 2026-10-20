@@ -56,6 +56,7 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 .dealBadge.sale{background:#dbeafe;color:#164d87}
 .dealBadge.lease{background:#d9f3e5;color:#116647}
 .dealBadge.monthly{background:#ffebce;color:#854700}
+.pill.contractNew{background:#dceeff;color:#195d91}.pill.contractRenew{background:#f0e5fb;color:#66389a}.pill.contractUnknown{background:#edf0f3;color:#596879}
 .dealRow.sale .money{color:#205c99}
 .dealRow.lease .money{color:#147252}
 .dealRow.monthly .money{color:#945314}
@@ -1009,6 +1010,15 @@ async function refreshPublicServices(manual=false){
 }
 function tradeClass(type){return type==='매매'?'sale':type==='전세'?'lease':type==='월세'?'monthly':'';}
 function dealBadge(type){return '<span class="dealBadge '+tradeClass(type)+'">'+escapeHtml(type||'기타')+'</span>';}
+function leaseContractBadge(row){
+ if(!row||!['전세','월세'].includes(row.type))return '';
+ // 국토부 계약구분 원본만 사용합니다. 갱신요구권 미사용을 신규계약으로 추정하지 않습니다.
+ const raw=String(row.contract_type_raw??'').trim().replace(/\s+/g,'');
+ const label=['신규','신규계약'].includes(raw)?'신규계약':
+  ['갱신','갱신계약'].includes(raw)?'갱신계약':'계약구분 미기재';
+ const color=label==='신규계약'?'contractNew':label==='갱신계약'?'contractRenew':'contractUnknown';
+ return '<span class="pill '+color+'">'+label+'</span>';
+}
 function dealArticleClass(row,extra=''){return 'dealRow '+tradeClass(row.type)+(row.status==='해제'?' cancelled':'')+(extra?' '+extra:'');}
 function renderTypeButtons(id,type){
  const el=$(id);if(!el)return;
@@ -1183,7 +1193,7 @@ function renderNearbyDetails(resetLimit){
       '보증금 '+value10k(x.deposit_10k)+' / 월세 '+value10k(x.monthly_10k);
    const name=FAVORITE_APTS.find(z=>z.id===favoriteIdForBuilding(x.building))?.label||x.building;
    return '<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+
-    dealBadge(x.type)+
+    dealBadge(x.type)+leaseContractBadge(x)+
     '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+
     '</div><h3>'+escapeHtml(name)+'</h3>'+
     ''+
@@ -1251,7 +1261,7 @@ function renderTrades(){
    const val=x.type==='매매'?value10k(x.amount_10k):
     x.type==='전세'?'보증금 '+value10k(x.deposit_10k):
     '보증금 '+value10k(x.deposit_10k)+' / 월세 '+value10k(x.monthly_10k);
-   return '<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+dealBadge(x.type)+
+   return '<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+dealBadge(x.type)+leaseContractBadge(x)+
     '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span></div>'+
     '<h3>'+escapeHtml(x.building)+'</h3><div class="money">'+escapeHtml(val)+'</div>'+
     '<div class="meta">계약일 '+escapeHtml(x.contract_date)+' · 전용 '+escapeHtml(x.area_m2)+
@@ -1440,7 +1450,7 @@ function renderNew(){
       x.type==='전세'?'보증금 '+value10k(x.deposit_10k):
       '보증금 '+value10k(x.deposit_10k)+' / 월세 '+value10k(x.monthly_10k);
    return '<article class="'+dealArticleClass(x,'newTop')+'"><div class="tagbox">'+
-    dealBadge(x.type)+
+    dealBadge(x.type)+leaseContractBadge(x)+
     '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+
     '</div><h3>'+escapeHtml(x.building)+'</h3>'+
     '<div class="money">'+escapeHtml(value)+'</div>'+
