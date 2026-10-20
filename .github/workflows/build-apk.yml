@@ -110,19 +110,19 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v1.12.2 APK from the stable official-API branch
+      - name: Publish v1.12.3 APK from the stable official-API branch
         if: github.ref == 'refs/heads/feature/official-apis-stable-continuation' && github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view v1.12.2 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo 'v1.12.2 release already exists; leaving the immutable APK untouched'
+          if gh release view v1.12.3 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'v1.12.3 release already exists; leaving the immutable APK untouched'
             exit 0
           fi
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.2.apk
-          unzip -t FirstHyundai-v1.12.2.apk | grep 'No errors detected'
-          sha256sum FirstHyundai-v1.12.2.apk
-          gh release create v1.12.2 FirstHyundai-v1.12.2.apk \
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.3.apk
+          unzip -t FirstHyundai-v1.12.3.apk | grep 'No errors detected'
+          sha256sum FirstHyundai-v1.12.3.apk
+          gh release create v1.12.3 FirstHyundai-v1.12.3.apk \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title '퍼스트현대 v1.12.2 (거래구분 표시·카드 간소화)' \
-            --notes '기존 Incheon-Official-APIs 안정 소스를 기준으로 전월세 신규·갱신계약 표기를 유지합니다. 매매에서만 국토교통부 원본 거래유형이 확인될 경우 중개거래/직거래 배지를 표시합니다. 전월세에는 중개방식 공개 필드가 없어 추정 표시하지 않습니다. 실거래 카드 하단 중복 출처와 조회 계약연월을 삭제하고 실제 계약일·금액·면적·층수는 유지합니다. 평형 매칭 실험 기능은 포함하지 않았습니다. GitHub Actions 자동 테스트·빌드 APK이며 기존 앱과 서명이 다르면 메모 백업 후 재설치해야 합니다.'
+            --title '퍼스트현대 v1.12.3 (갱신계약 상세정보)' \
+            --notes '퍼스트현대 v1.12.2를 기준으로 갱신계약에만 갱신요구권 사용 여부, 계약기간, 종전 보증금/월세를 카드 아래 작은 보조영역에 표시합니다. 국토부 공식 API의 종전계약보증금(preDeposit)과 종전계약월세(preMonthlyRent)를 새로 수집하며, 없는 정보는 임의로 0원 처리하지 않고 미기재로 표시합니다. 실거래 수집 GitHub main 자동 재수집이 완료된 이후 종전금액이 채워집니다. 평형 매칭 실험 기능은 포함하지 않았습니다. GitHub Actions 테스트·빌드 APK입니다. 개인 메모 백업 후 설치를 권장합니다.'
