@@ -43,6 +43,20 @@ vm.runInContext(js,ctx);
  assert(basic.includes('14대')&&basic.includes('2017-11-17'));
  assert(basic.includes('지역난방 / 열병합'));
  assert(basic.includes('tel:0328348996'));
+ // Every housing type is ONE card regardless of its supply/exclusive area labels.
+ ev("selectComplex('f15')");
+ ev("setComplexDetailTab('types')");
+ const f15Types=el('complexDetails').innerHTML;
+ assert.equal((f15Types.match(/<strong>전용 [0-9.]+㎡ \\(약 [0-9]+평형\\)<\\/strong>/g)||[]).length,9,
+   'F15 must render nine distinct paired housing types, not duplicate raw supply/exclusive lists');
+ assert(f15Types.includes('전용 59.89㎡ (약 27평형)')&&f15Types.includes('88A타입'),
+   'Naver verified 88A has exclusive 59.89');
+ assert(f15Types.includes('전용 59.98㎡ (약 27평형)')&&f15Types.includes('87B타입'),
+   '87B has exclusive 59.98');
+ assert(!f15Types.includes('공급평형 확인 중')&&!f15Types.includes('전용면적 연결 전'));
+ // Go back to F13's basic facts for existing edit / school checks.
+ ev("selectComplex('f13')");
+ ev("setComplexDetailTab('basic')");
  assert(!basic.includes('실거래 관측 전용면적'));
  assert(!basic.includes('확인된 전용면적 유형'));
  assert(!basic.includes('전용면적별 실거래 조회'),'Basic tab must not repeat per-area trades');
