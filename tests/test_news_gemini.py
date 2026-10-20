@@ -53,7 +53,7 @@ class TestGeminiNews(unittest.TestCase):
         calls=[]
         def short_batch(batch,key):
             calls.append(len(batch))
-            return {str(b["id"]):"송도 관련 주택 공급정책의 조정안을 논의하고 있습니다.\\n공급 확대 대상 지역은 아직 정해지지 않았습니다.\\n개편안 시행 일정도 아직 확정되지 않았습니다." for b in batch}
+            return {str(b["id"]):"송도 관련 주택 공급정책의 조정안을 논의하고 있습니다.\n공급 확대 대상 지역은 아직 정해지지 않았습니다.\n개편안 시행 일정도 아직 확정되지 않았습니다." for b in batch}
         result=enrich(data,{},"SECRET",lambda url:"검증된 기사 내용과 언론사 정보를 확보했습니다. "*20,
                       short_batch,resolve=lambda urls:{u:u for u in urls})
         self.assertEqual(result["ai_summary_stats"]["created"],BATCH_SIZE+2)
