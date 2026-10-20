@@ -133,13 +133,43 @@ def summarize(title,publisher,body,key,opener=None):
     except (OSError,ValueError,IndexError,KeyError,TypeError):
         return ""
 
-def enrich(current,previous,key,read=read_article,generate=summarize,max_calls=MAX_NEW_SUMMARIES):
+def resolve_rss_links(urls):
+    """Convert Google News RSS links to original publisher URLs. Optional pinned
+    batch decoder; fail closed if Google's undocumented format changes."""
+    urls=list(dict.fromkeys(u for u in urls if isinstance(u,str)))[:MAX_ARTICLE_FETCHES]
+    direct={u:u for u in urls if urlsplit(u).hostname!="news.google.com" and safe_url(u)}
+    google=[u for u in urls if urlsplit(u).hostname=="news.google.com"]
+    if not google:
+        return direct
+    try:
+        from gnews_decoder import decode_many
+        found=decode_many(google,concurrency=6,timeout=12)
+        for original,decoded in found.items():
+            if decoded and urlsplit(decoded).hostname!="news.google.com" and safe_url(decoded):
+                direct[original]=decoded
+    except (ImportError,OSError,ValueError,TypeError) as error:
+        print("Google News publisher link decoding unavailable:",type(error).__name__)
+    return direct
+
+def enrich(current,previous,key,read=read_article,generate=summarize,
+           max_calls=MAX_NEW_SUMMARIES,resolve=resolve_rss_links):
     if current.get("schema_version")!=1 or not isinstance(current.get("briefs"),list):
         raise ValueError("Unexpected news data")
     cached={}
     for b in previous.get("briefs",[]) if isinstance(previous,dict) else []:
         if b.get("summary_method")=="gemini_article" and b.get("summary"):
             cached[(b.get("id"),b.get("title"))]=b
+    # Only look up a small batch of original article URLs for groups not cached.
+    unresolved=[]
+    if key:
+        for b in current["briefs"]:
+            if (b.get("id"),b.get("title")) in cached:continue
+            for src in b.get("sources",[])[:2]:
+                link=src.get("link","")
+                if link and link not in unresolved:unresolved.append(link)
+                if len(unresolved)>=MAX_ARTICLE_FETCHES:break
+            if len(unresolved)>=MAX_ARTICLE_FETCHES:break
+    publisher_links=resolve(unresolved) if unresolved else {}
     reused=created=attempts=0
     for brief in current["briefs"]:
         previous_brief=cached.get((brief.get("id"),brief.get("title")))
@@ -147,6 +177,8 @@ def enrich(current,previous,key,read=read_article,generate=summarize,max_calls=M
             brief["summary"]=previous_brief["summary"]
             brief["summary_method"]="gemini_article"
             brief["summary_model"]=previous_brief.get("summary_model",MODEL)
+            if previous_brief.get("summary_source_url"):
+                brief["summary_source_url"]=previous_brief["summary_source_url"]
             brief["verification"]="Gemini 기사 본문 요약 · 사실 미검증"
             reused+=1
             continue
@@ -158,8 +190,11 @@ def enrich(current,previous,key,read=read_article,generate=summarize,max_calls=M
         for src in brief.get("sources",[])[:2]:
             if attempts>=MAX_ARTICLE_FETCHES:
                 break
+            original_url=publisher_links.get(src.get("link",""))
+            if not original_url:
+                continue
             attempts+=1
-            body=read(src.get("link",""))
+            body=read(original_url)
             if not body:
                 continue
             result=generate(src.get("title",brief.get("title","")),src.get("publisher",""),body,key)
@@ -167,6 +202,7 @@ def enrich(current,previous,key,read=read_article,generate=summarize,max_calls=M
                 brief["summary"]=result
                 brief["summary_method"]="gemini_article"
                 brief["summary_model"]=MODEL
+                brief["summary_source_url"]=original_url
                 brief["verification"]="Gemini 기사 본문 요약 · 사실 미검증"
                 created+=1
                 break
@@ -175,6 +211,7 @@ def enrich(current,previous,key,read=read_article,generate=summarize,max_calls=M
             brief["summary_method"]="headline_only"
             brief["verification"]="기사 제목 수집 · 본문 미확인"
     current["ai_summary_stats"]={"created":created,"reused":reused,"article_fetches":attempts,
+        "source_links_resolved":len(publisher_links),
         "awaiting_body":sum(b.get("summary_method")!="gemini_article" for b in current["briefs"])}
     current["brief_method"]="RSS 제목 군집 · Gemini 기사 본문 요약(본문 확보 시에만)"
     return current
