@@ -38,11 +38,13 @@ jobs:
               print("SUCCESS: Groq model:",result.get("model","unknown"),"chars:",len(answer or ""))
               if not answer:sys.exit(1)
           except HTTPError as error:
+              raw=error.read(3000)
+              print("FAIL: Groq HTTP",error.code,"content_type:",error.headers.get("Content-Type","unknown"),"server:",error.headers.get("Server","unknown"),"body_type:",("html" if b"<html" in raw.lower() else "json" if raw.lstrip().startswith(b"{") else "other"))
               try:
-                  body=json.loads(error.read(3000)).get("error",{})
-                  print("FAIL: Groq HTTP",error.code,"error_code:",body.get("code","unknown"),"error_type:",body.get("type","unknown"),"message:",str(body.get("message",""))[:180])
+                  body=json.loads(raw).get("error",{})
+                  print("Groq details code:",body.get("code","unknown"),"type:",body.get("type","unknown"),"message:",str(body.get("message",""))[:160])
               except (ValueError,TypeError):
-                  print("FAIL: Groq HTTP",error.code)
+                  print("Groq error is non-JSON; inspect network or account permissions")
               sys.exit(1)
           except (URLError,OSError,KeyError,ValueError,IndexError) as error:
               print("FAIL: Groq response:",type(error).__name__)
