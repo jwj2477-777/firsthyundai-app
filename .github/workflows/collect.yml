@@ -6,7 +6,9 @@ on:
       - 'scripts/collect_trades.py'
       - 'scripts/collect_news.py'
       - 'scripts/summarize_news.py'
+      - 'scripts/groq_news.py'
       - 'tests/test_news_gemini.py'
+      - 'tests/test_groq_news.py'
       - 'tests/test_pipeline.py'
       - '.github/workflows/collect.yml'
   workflow_dispatch:
@@ -49,10 +51,11 @@ jobs:
           echo 'gnews-decoder==0.1.1 --hash=sha256:2d591a6bbb70eade4d1e6da3bc6660294ef6d394119f26283df1d1d7df97796c' > /tmp/firsthyundai-news-deps.txt
           python -m pip install 'requests==2.32.5'
           python -m pip install --no-deps --only-binary=:all: --require-hashes -r /tmp/firsthyundai-news-deps.txt
-      - name: Enrich verified article text with Gemini (optional, capped)
+      - name: Enrich article text with Gemini and free-tier Groq fallback
         if: ${{ github.event_name == 'workflow_dispatch' && (inputs.mode == 'all' || inputs.mode == 'news') || github.event.schedule == '17 */3 * * *' || github.event_name == 'push' }}
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: python scripts/summarize_news.py --previous /tmp/firsthyundai-previous-news.json
       - name: Collect official apartment transactions
         if: ${{ github.event_name == 'workflow_dispatch' && (inputs.mode == 'all' || inputs.mode == 'trades') || github.event.schedule == '41 19 * * *' }}
