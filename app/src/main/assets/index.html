@@ -392,8 +392,8 @@ body.apartmentSheetActive{overflow:hidden}
   <p class="contractHint">예: “퍼스트파크 15블럭 1501동 1203호 전세 3억9천, 먼저 500 보내고 잔금은 12월30일.”처럼 자유롭게 말하거나 적어 보세요. 일부 표현과 숫자는 확인이 필요합니다.</p>
   <label class="inputLabel" for="ct_rough">현장 메모 / 음성 인식 결과</label>
   <textarea id="ct_rough" maxlength="12000" placeholder="소재지: 퍼스트파크 15블럭&#10;동호수: 1501동 1203호&#10;전세보증금: 3억 9000만원&#10;계약금: 3900만원&#10;이번 송금액: 500만원&#10;잔금일: 2026-12-30"></textarea>
-  <div class="contractActions"><button type="button" class="btn alt" onclick="FirstHyundaiContracts.extractNotes()">메모에서 항목 찾기</button><button type="button" class="btn alt" onclick="FirstHyundaiContracts.voice()">🎙 음성입력</button></div>
-  <p class="contractHint">기기 내 표현 인식·단지명 오타 후보 추천을 사용합니다. 고객 정보가 외부 AI로 전송되지는 않습니다. 애매한 단지명은 주소 후보를 직접 선택해야 합니다.</p>
+  <div class="contractActions"><button type="button" class="btn alt" onclick="FirstHyundaiContracts.extractNotes()">대화체 메모 자동 정리</button><button type="button" class="btn alt" onclick="FirstHyundaiContracts.voice()">🎙 음성입력</button></div>
+  <p class="contractHint">금액의 한글 표현(오백·삼억 구천), 구어체 문장, 동·호수, 계약 일정까지 기기 안에서 분석합니다. 인식하지 못한 내용은 그대로 남고, 애매한 값은 확인이 필요합니다.</p><div id="ct_recognized" class="contractReview" role="status" aria-live="polite">어떤 내용을 알아들었는지 여기에 표시합니다.</div><div id="ct_languageWarnings" class="contractReview" role="status" aria-live="polite">자동입력된 계약 조건은 최종 확인이 필요합니다.</div>
  </div>
  <div class="panel">
   <h3 class="contractSection">1. 거래 대상과 금액</h3>
@@ -1853,4 +1853,4 @@ function exportComplexCatalog(){
 }
 window.onCatalogSaved=r=>alert(r.ok?'단지정보 JSON을 저장했습니다. GitHub에 올려야 가족에게 반영됩니다.':'단지정보 파일 저장 실패');
 
-</script><script src="contracts.js"></script><script src="contracts-smart.js"></script></body></html>
+</script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script></body></html>
