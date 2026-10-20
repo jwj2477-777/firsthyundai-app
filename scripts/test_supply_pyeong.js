@@ -69,14 +69,15 @@ assert.equal(get("displayExclusiveArea(84.65,apt_skcentral)"),'전용 84.65㎡ (
 assert.equal(get("displayExclusiveArea(84.65,kb_skview)"),'전용 84.65㎡ (약 34평형)');
 assert.equal(get("displayExclusiveArea(84.73,kb_greenwalk)"),'전용 84.73㎡ (약 34평형)');
 assert.equal(get("displayExclusiveArea(84.57,kb_lake3)"),'전용 84.57㎡');
-assert.equal(get("displaySupplyType(kb_worldmark,'233PH-A')"),'공급 233PH-A타입 (약 70평형) · 전용㎡ 대응 확인 중');
+assert.equal(get("displaySupplyType(kb_worldmark,'233PH-A')"),'전용 191.918㎡ (약 71평형) · 공급 233PH-A㎡',
+ 'Published matched penthouse area must supersede previously unmatched supply-only view');
 assert.equal(get("displaySupplyType(kb_lake3,'112D0')"),'공급 112D0타입 (약 34평형) · 전용㎡ 대응 확인 중');
 
 assert.equal(get("displayExclusiveArea(84.98,apt_artwin)"),'전용 84.98㎡ (약 36평형)');
 assert.equal(get("displayExclusiveArea(80.05,apt_central3)"),'전용 80.05㎡ (약 33평형)');
 assert.equal(get("displaySupplyType(apt_central3,'111')"),'전용 80.05㎡ (약 33평형) · 공급 111㎡');
 assert.equal(get("displaySupplyType(apt_artwin,'152')"),'전용 106.78㎡ (약 45평형) · 공급 152㎡');
-const pOther=rows.find(x=>x.id==='kapt-a10020270');
+const pOther=rows.find(x=>x.id==='kapt-a10020272'); // Worldmark 8 has no verified pairs yet
 env.unknown=pOther;
 assert.equal(get("canonicalAreaTypes(unknown).length"),0,'No fictitious matching from standalone areas');
 assert.equal(get("displayExclusiveArea(84.9,unknown)"),'전용 84.9㎡','Never invent supply pyeong for unverified area');
