@@ -1,0 +1,35 @@
+name: Check Google News Article Resolution
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/check-news-article.yml']
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Diagnose Google News RSS link without third-party credentials
+        env:
+          NEWS_LINK: "https://news.google.com/rss/articles/CBMiYkFVX3lxTE1MNEdUc3VXNkcxU0FFQ1BlSHA5Z0MzNHNDbFdJRkpZV3prOG1HNVNHYmM2QXllcHdoQUxqeEdXeVRTSUxCQ3pITW5RdVRDbDRKUlVvVU5MU0Rucm1GZ0dvaDFB?oc=5"
+        run: |
+          python3 - <<'PY'
+          from urllib.request import Request,urlopen
+          from urllib.parse import urlparse
+          from html.parser import HTMLParser
+          import os
+          req=Request(os.environ["NEWS_LINK"],headers={"User-Agent":"Mozilla/5.0","Accept":"text/html"})
+          with urlopen(req,timeout=20) as r:
+              html=r.read(400000).decode("utf-8",errors="replace")
+              print("Final host:",urlparse(r.url).hostname,"size:",len(html),"status:",r.status)
+              print("Indicators:",{p:(p in html) for p in ['data-p=','data-n-a-sg','data-n-a-ts','garturlreq','batchexecute','<article']})
+              class Wiz(HTMLParser):
+                  found=[]
+                  def handle_starttag(self,tag,attrs):
+                      if tag=="c-wiz":
+                          d=dict(attrs)
+                          if 'data-p' in d:self.found.append(len(d['data-p']))
+              v=Wiz();v.feed(html)
+              print("Wiz payload lengths:",v.found[:4])
+          PY
