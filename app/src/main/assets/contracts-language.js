@@ -190,7 +190,7 @@ function recognize(raw){
  let rentCombo=s.match(/(?:월세|반전세)\s+([일이삼사오육륙칠팔구한십백천\d,.억만원\\s]+?)\s*에\s*([일이삼사오육륙칠팔구한십백천\d,.억만원]+)(?![가-힣\d])/);
  if(!price&&rentCombo)price={amount:moneyPart(rentCombo[1]),raw:rentCombo[1]};
  if(price?.amount!=null)apply('price',price.amount,found);
- const explicitTotal=amountAfter(s,['약정\\s*계약금','총\\s*계약금','전체\\s*계약금']);
+ const explicitTotal=amountAfter(s,['약정\\s*계약금','총\\s*계약금','전체\\s*계약금','계약금\\s*전체는','계약금\\s*전체','계약금\\s*총액']);
  let ordinaryDeposit=amountAfter(s,['계약금']);
  // "계약금 500 먼저" means the advance, not the entire agreed deposit.
  if(ordinaryDeposit&&/^(?:\s|만원|원|정도)*(?:먼저|보내|송금|입금)/.test(s.slice(ordinaryDeposit.end,ordinaryDeposit.end+15)))ordinaryDeposit=null;
