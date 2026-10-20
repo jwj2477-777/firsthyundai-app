@@ -81,9 +81,10 @@ const worldmark8=rows.find(x=>x.id==='kapt-a10020272');
 env.worldmark8=worldmark8;
 assert.equal(get("canonicalAreaTypes(worldmark8).length"),6,'Worldmark 8 must retain six separately sourced apartment types only');
 assert.equal(get("canonicalAreaTypes(worldmark8).find(x=>x.supply_label==='152A').supply_m2"),152.723);
-const pOther=rows.find(x=>x.id==='verified-extra-13'); // Hillstate 3: no block-specific paired primary source yet
+const pOther=rows.find(x=>x.id==='verified-extra-13'); // Hillstate 3: five individually sourced, block-specific pairs; 84.9 remains unknown
 env.unknown=pOther;
-assert.equal(get("canonicalAreaTypes(unknown).length"),0,'Do not guess the Hillstate block pairing');
+assert.equal(get("canonicalAreaTypes(unknown).length"),5,'Keep five individually sourced Hillstate 3 block type pairs');
+assert.equal(get("canonicalAreaTypes(unknown).find(x=>x.supply_label==='154A3').exclusive_m2"),131.365,'Keep Hillstate 3 sourced 154A3 exclusive area');
 assert.equal(get("displayExclusiveArea(84.9,unknown)"),'전용 84.9㎡','Never invent supply pyeong for unverified area');
 assert.equal(get("displaySupplyType(apt_artwin,'120B')"),'전용 84.98㎡ (약 36평형) · 공급 120B㎡');
 assert.equal(get("displaySupplyType(apt_skcentral,'109B')"),'전용 84.78㎡ (약 33평형) · 공급 109B㎡');
