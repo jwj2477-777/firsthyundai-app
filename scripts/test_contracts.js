@@ -53,7 +53,7 @@ assert(el('ct_preview').value.includes('▶ 최종 잔금 : 35,100만원'));
 assert(el('ct_preview').value.includes('1. 현 상태로 인도한다.'));
 assert(!el('ct_preview').value.includes('계약금 포기'));
 el('ct_advance').value='5000';
-assert(collect().errors.some(x=>x.includes('초과')));
+assert(collect().errors.some(x=>x.includes('계약금보다')));
 el('ct_advance').value='500';
 api.reset();
 el('ct_rough').value='소재지: 파크애비뉴\n동호수: 1601동 1702호\n전세보증금: 3억9천만원\n계약금: 3900만원\n이번 송금액: 500만원\n잔금일: 2026.12.30\n특약사항:\n1. 현 상태 인도';
