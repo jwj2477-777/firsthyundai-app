@@ -1,0 +1,61 @@
+name: Check Cloudflare Workers AI (Separate from Kakao)
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/check-cloudflare-ai.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-workers-ai:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check existing Cloudflare token for Workers AI model permission
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_AI_API_TOKEN: ${{ secrets.CLOUDFLARE_AI_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json,os,sys
+          from urllib.request import Request,urlopen
+          from urllib.error import HTTPError
+          account=os.environ.get("CLOUDFLARE_ACCOUNT_ID","").strip()
+          ai_key=os.environ.get("CLOUDFLARE_AI_API_TOKEN","").strip()
+          existing=os.environ.get("CLOUDFLARE_API_TOKEN","").strip()
+          key=ai_key or existing
+          print("Account ID present:",bool(account),"AI dedicated token:",bool(ai_key),
+                "existing deployment token:",bool(existing))
+          if not (account and key):
+              print("Cloudflare AI prerequisites not found")
+              sys.exit(1)
+          url=("https://api.cloudflare.com/client/v4/accounts/"+account+
+               "/ai/run/@cf/meta/llama-3.1-8b-instruct-fp8")
+          req=Request(url,data=json.dumps({"messages":[
+              {"role":"user","content":"한글로 확인 한 단어만 답하세요."}],
+              "max_tokens":48}).encode(),headers={
+              "Authorization":"Bearer "+key,
+              "Content-Type":"application/json",
+              "User-Agent":"FirstHyundai-News-AI/1.0"
+          },method="POST")
+          try:
+              with urlopen(req,timeout=35) as response:
+                  d=json.loads(response.read(30000))
+              result=d.get("result",{}) or {}
+              print("WORKERS AI SUCCESS:",d.get("success"),
+                    "response_len:",len(result.get("response","")))
+              if not d.get("success") or not result.get("response"):
+                  sys.exit(1)
+          except HTTPError as e:
+              try:
+                  details=json.loads(e.read(2500))
+                  codes=[x.get("code") for x in details.get("errors",[]) if isinstance(x,dict)]
+              except (ValueError,TypeError,AttributeError):
+                  codes=[]
+              print("WORKERS AI FAILURE HTTP:",e.code,"error_codes:",codes)
+              sys.exit(1)
+          except (OSError,ValueError,KeyError,TypeError) as e:
+              print("WORKERS AI FAILURE:",type(e).__name__)
+              sys.exit(1)
+          PY
