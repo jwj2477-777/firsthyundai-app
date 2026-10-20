@@ -163,6 +163,7 @@ def normalize(row, category, month):
             'register_date_raw': get(row, '등기일자', 'rgstDate'),
             'building_block': get(row, '동', 'aptDong'),
             'dealing_type': get(row, '거래유형', 'dealingGbn'),
+            'broker_region_raw': get(row, '중개사소재지', 'estateAgentSggNm'),
         })
     else:
         try:
