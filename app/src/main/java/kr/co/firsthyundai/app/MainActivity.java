@@ -12,6 +12,11 @@ import java.security.MessageDigest;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import android.content.Intent;
+import android.content.Context;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.speech.RecognizerIntent;
+import java.util.ArrayList;
 import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.JavascriptInterface;
@@ -34,6 +39,7 @@ public class MainActivity extends Activity {
     private static final int SAVE_BACKUP = 1021;
     private static final int OPEN_BACKUP = 1022;
     private static final int SAVE_CATALOG = 1023;
+    private static final int DICTATE_CONTRACT = 1024;
     private static final int LIMIT = 8 * 1024 * 1024;
     private WebView web;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
@@ -316,6 +322,41 @@ public class MainActivity extends Activity {
                 }finally{if(conn!=null)conn.disconnect();}
             });
         }
+        @JavascriptInterface public void copyContract(String text) {
+            if(text==null || text.isEmpty() || text.length()>20000)return;
+            runOnUiThread(() -> {
+                ClipboardManager clipboard=(ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+                if(clipboard==null)return;
+                clipboard.setPrimaryClip(ClipData.newPlainText("퍼스트현대 계약 안내",text));
+                Toast.makeText(MainActivity.this,"계약문자를 복사했습니다.",Toast.LENGTH_SHORT).show();
+            });
+        }
+        @JavascriptInterface public void shareContract(String text) {
+            if(text==null || text.isEmpty() || text.length()>20000)return;
+            runOnUiThread(() -> {
+                Intent send=new Intent(Intent.ACTION_SEND);
+                send.setType("text/plain");
+                send.putExtra(Intent.EXTRA_TEXT,text);
+                try {
+                    startActivity(Intent.createChooser(send,"계약문자 공유할 앱 선택"));
+                } catch(Exception e) {
+                    Toast.makeText(MainActivity.this,"공유할 앱을 찾지 못했습니다.",Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        @JavascriptInterface public void startContractDictation() {
+            runOnUiThread(() -> {
+                Intent intent=new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,"ko-KR");
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT,"계약 조건 메모를 말해 주세요");
+                try {
+                    startActivityForResult(intent,DICTATE_CONTRACT);
+                } catch(Exception e) {
+                    Toast.makeText(MainActivity.this,"사용 가능한 음성인식 서비스가 없습니다.",Toast.LENGTH_LONG).show();
+                }
+            });
+        }
         @JavascriptInterface public void saveBackup(String json) {
             if(!isAdminDeviceMode() || json==null || json.length()>2_000_000)return;
             pendingBackup=json;
@@ -370,6 +411,18 @@ public class MainActivity extends Activity {
 
     @Override protected void onActivityResult(int request, int result, Intent data) {
         super.onActivityResult(request,result,data);
+        if(request==DICTATE_CONTRACT) {
+            JSONObject response=new JSONObject();
+            try {
+                ArrayList<String> matches=data==null?null:data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                boolean ok=result==RESULT_OK && matches!=null && !matches.isEmpty();
+                response.put("ok",ok);
+                response.put("cancelled",result!=RESULT_OK);
+                response.put("text",ok?matches.get(0):"");
+            }catch(Exception ignored){}
+            deliver("firstHyundaiContractSpeech",response);
+            return;
+        }
         if(result!=RESULT_OK || data==null || data.getData()==null)return;
         Uri uri=data.getData();
         if(request==SAVE_BACKUP) {
