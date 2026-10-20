@@ -200,7 +200,19 @@ function recognize(raw){
  let ordinaryDeposit=amountAfter(s,['계약금']);
  // "계약금 500 먼저" means the advance, not the entire agreed deposit.
  if(ordinaryDeposit&&/^(?:\s|만원|원|정도)*(?:먼저|보내|송금|입금)/.test(s.slice(ordinaryDeposit.end,ordinaryDeposit.end+15)))ordinaryDeposit=null;
- const deposit=explicitTotal||ordinaryDeposit;
+ let deposit=explicitTotal||ordinaryDeposit;
+ // A percentage is not a denomination. "계약금 10%" must never mean 10만원.
+ const percent=s.match(/(?:계약금|약정\s*계약금|전체\s*계약금)\s*(?:은|는|가|을|를|총|전체는|전체)?\s*[:：]?\s*(\d{1,2}(?:\.\d+)?)\s*(?:%|퍼센트|프로)(?![가-힣])/);
+ if(percent){
+  const rate=Number(percent[1]),total=Number(val('price'));
+  if(rate>0&&rate<=100&&total>0){
+   deposit={amount:Math.round(total*rate)/100};
+   review.push('계약금 '+rate+'%를 총 거래금액에 적용했습니다. 실제 합의 금액인지 확인하세요.');
+  }else{
+   deposit=null;
+   review.push('계약금 비율을 확인하지 못했습니다. 계약금 총액을 확인하세요.');
+  }
+ }
  if(deposit?.amount!=null)apply('contractDeposit',deposit.amount,found);
  let advance=amountAfter(s,['선입금','선송금','선금','일부\\s*계약금','이번\\s*송금액','이번\\s*입금','가계약금','먼저\\s*보낼','일단\\s*보낼','우선\\s*보낼']);
  if(!advance)advance=amountAfter(s,['먼저','우선','일단']);
@@ -219,7 +231,7 @@ function recognize(raw){
  }
  for(const [id,terms] of [
   ['balanceDate',['잔금\\s*날','잔금일','잔금\\s*예정일','잔금은','잔금\\s*치르','잔금\\s*처리','잔금']],
-  ['leaseStart',['입주일','입주\\s*날','입주\\s*예정','입주','임대차\\s*시작','임대차\\s*개시']],
+  ['leaseStart',['입주일','입주\\s*날','입주\\s*예정','입주','이사\\s*날','이사일','이사','임대차\\s*시작','임대차\\s*개시']],
   ['leaseEnd',['만기일','종료일','임대차\\s*종료']],
   ['contractDate',['계약서\\s*작성일','본계약\\s*작성일','계약서\\s*쓰','계약서\\s*작성','본계약\\s*날']]
  ]){
@@ -253,6 +265,11 @@ function recognize(raw){
  if(account)apply('account',account[1],found);
  const holder=s.match(/(?:예금주|명의자)\s*[:：]?\s*([가-힣]{2,5})(?=\s|$|[,.;])/);
  if(holder)apply('accountHolder',holder[1],found);
+ // Broker shorthand: "집주인 김철수 / 세입자 이영희".
+ const owner=s.match(/(?:집주인|임대인|매도인)\s*[:：]?\s*([가-힣]{2,4})(?=\s|$|[,.;/])/);
+ const buyer=s.match(/(?:세입자|임차인|매수인)\s*[:：]?\s*([가-힣]{2,4})(?=\s|$|[,.;/])/);
+ if(owner)apply('owner',owner[1],found);
+ if(buyer)apply('buyer',buyer[1],found);
  // Warn on a separately dictated remaining balance that differs from the calculated balance.
  const spokenBalance=amountAfter(s,['최종\\s*잔금','남은\\s*잔금','잔금액','잔금금액']);
  const computed=base._test.collect();
@@ -271,7 +288,7 @@ function report(data){
   const labels={dealType:'거래유형',property:'아파트',unit:'동·호수',price:'총 금액',contractDeposit:'약정 계약금',
    advance:'선송금액',interim:'중도금',monthlyRent:'월세',balanceDate:'잔금일',leaseStart:'입주일',
    leaseEnd:'종료일',contractDate:'본계약일',leaseDuration:'임대차 기간',bank:'은행',account:'계좌번호',
-   accountHolder:'예금주',terms:'특약'};
+   accountHolder:'예금주',owner:'임대인·매도인',buyer:'임차인·매수인',terms:'특약'};
   view.textContent=data.found.length?
    '✓ 자동 인식: '+data.found.map(x=>labels[x.id]||x.id).join(' · '):
    '자동으로 확정할 수 있는 항목을 찾지 못했습니다. 아래 입력란에서 직접 확인해 주세요.';
