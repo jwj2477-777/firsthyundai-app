@@ -287,7 +287,7 @@ function extractNotes(){
  if(!value('property')){
   // Match an apartment phrase anywhere in casual speech. Require a distinct block or unique estate.
   const phrase=memo.split(/(?:보증금|전세가|전세금|매매가|매매대금|계약금|잔금일|월세|특약|계좌)/)[0];
-  const q=phrase.replace(/(?:에\s*있는|아파트|좀|그|우리|말이야|말야|해줘|써줘|전세|매매|계약).*$/,'').trim();
+  const q=phrase.replace(/\d{1,4}\s*동\s*\d{1,4}\s*호.*$/,'').replace(/(?:에\s*있는|아파트|좀|말이야|말야|해줘|써줘|전세|매매|계약).*$/,'').replace(/^(?:저기|그거|그러니까|여기|저|어|그)\s*/,'').trim();
   if(q){const direct=choices(q);if(direct[0]?.score>=78) setCount('property',direct[0].row.label);}
  }
  const unit=label.unit?.match(/(?:\d{1,4}\s*동\s*)?\d{1,4}\s*호/);
