@@ -1,0 +1,50 @@
+name: Verify Groq API Connection
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/check-groq-key.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-key:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check GROQ_API_KEY without revealing token
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import json,os,sys
+          from urllib.request import Request,urlopen
+          from urllib.error import HTTPError,URLError
+          key=os.environ.get("GROQ_API_KEY","").strip()
+          if not key:
+              print("FAIL: GROQ_API_KEY missing in GitHub Secrets")
+              sys.exit(1)
+          data=json.dumps({
+            "model":"openai/gpt-oss-120b",
+            "messages":[{"role":"user","content":"한국어로 확인이라는 한 단어로 답해주세요."}],
+            "max_completion_tokens":100,
+            "temperature":0.1
+          },ensure_ascii=False).encode("utf-8")
+          req=Request("https://api.groq.com/openai/v1/chat/completions",data=data,headers={
+            "Authorization":"Bearer "+key,"Content-Type":"application/json"},method="POST")
+          try:
+              with urlopen(req,timeout=30) as resp:
+                  result=json.loads(resp.read(30000))
+              answer=result["choices"][0]["message"]["content"]
+              print("SUCCESS: Groq model:",result.get("model","unknown"),"chars:",len(answer or ""))
+              if not answer:sys.exit(1)
+          except HTTPError as error:
+              try:
+                  body=json.loads(error.read(3000)).get("error",{})
+                  print("FAIL: Groq HTTP",error.code,"error_code:",body.get("code","unknown"))
+              except (ValueError,TypeError):
+                  print("FAIL: Groq HTTP",error.code)
+              sys.exit(1)
+          except (URLError,OSError,KeyError,ValueError,IndexError) as error:
+              print("FAIL: Groq response:",type(error).__name__)
+              sys.exit(1)
+          PY
