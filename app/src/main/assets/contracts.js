@@ -8,7 +8,7 @@ let created=false, approved=false;
 function field(id){return String(E('ct_'+id)?.value||'').trim();}
 function setField(id,value,force){const e=E('ct_'+id);if(e&&(force||!e.value.trim()))e.value=String(value||'');}
 function contractValue(text){
- const v=String(text||'').replace(/[,，\s]/g,'').replace(/원/g,'');
+ const v=String(text||'').replace(/[,，\s]/g,'').replace(/원/g,'').replace(/(천|백)만$/,'$1');
  if(!v||!/^(?:\d+(?:\.\d+)?(?:억|천|백|만)?)+$/.test(v))return null;
  let amount=0,match;const rx=/(\d+(?:\.\d+)?)(억|천|백|만)?/g;
  while((match=rx.exec(v))!==null){
