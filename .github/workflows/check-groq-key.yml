@@ -29,6 +29,15 @@ jobs:
             "max_completion_tokens":100,
             "temperature":0.1
           },ensure_ascii=False).encode("utf-8")
+          try:
+              check=Request("https://api.groq.com/openai/v1/models",headers={"Authorization":"Bearer "+key})
+              with urlopen(check,timeout=12) as resp:
+                  d=json.loads(resp.read(30000))
+              print("MODEL LIST: success, count:",len(d.get("data",[])))
+          except HTTPError as e:
+              print("MODEL LIST: HTTP",e.code,"type:",e.headers.get("Content-Type","unknown"))
+          except (URLError,ValueError,OSError) as e:
+              print("MODEL LIST: unavailable",type(e).__name__)
           req=Request("https://api.groq.com/openai/v1/chat/completions",data=data,headers={
             "Authorization":"Bearer "+key,"Content-Type":"application/json"},method="POST")
           try:
