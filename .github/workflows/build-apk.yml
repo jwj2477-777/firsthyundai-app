@@ -2,13 +2,14 @@ name: Build Android APK
 on:
   workflow_dispatch:
   pull_request:
-    branches: [main]
+    branches: [main, feature/official-apis-stable-continuation]
   push:
-    branches: [main]
+    branches: [main, feature/official-apis-stable-continuation]
     paths:
       - 'app/**'
       - 'data/complexes.json'
       - 'scripts/test_family_mode.js'
+      - 'scripts/test_lease_contract_badges.js'
       - 'scripts/test_complexes.js'
       - 'scripts/test_catalog_editor.js'
       - 'scripts/test_complex_discovery.js'
@@ -84,6 +85,7 @@ jobs:
           node scripts/test_public_hub.js
           node scripts/test_kakao_nearby.mjs
           node scripts/test_family_mode.js
+          node scripts/test_lease_contract_badges.js
           node scripts/test_admin_guards.js
           node scripts/test_complexes.js
           node scripts/test_catalog_editor.js
