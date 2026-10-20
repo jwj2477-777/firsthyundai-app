@@ -110,19 +110,19 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v1.12.4 APK from the stable official-API branch
+      - name: Publish v1.12.5 APK from the stable official-API branch
         if: github.ref == 'refs/heads/feature/official-apis-stable-continuation' && github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view v1.12.4 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo 'v1.12.4 release already exists; leaving the immutable APK untouched'
+          if gh release view v1.12.5 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'v1.12.5 release already exists; leaving the immutable APK untouched'
             exit 0
           fi
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.4.apk
-          unzip -t FirstHyundai-v1.12.4.apk | grep 'No errors detected'
-          sha256sum FirstHyundai-v1.12.4.apk
-          gh release create v1.12.4 FirstHyundai-v1.12.4.apk \
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.5.apk
+          unzip -t FirstHyundai-v1.12.5.apk | grep 'No errors detected'
+          sha256sum FirstHyundai-v1.12.5.apk
+          gh release create v1.12.5 FirstHyundai-v1.12.5.apk \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title '퍼스트현대 v1.12.4 (매매 중개사 소재지)' \
-            --notes '퍼스트현대 v1.12.3 안정 버전 기반. 국토교통부 매매 실거래가의 중개사소재지(estateAgentSggNm)를 추가 수집하고, 중개거래에 한해 금액과 계약일 아래에 작은 글씨로 소재지(예: 인천 연수구, 서울 강남구)를 표시합니다. 직거래와 전세·월세에는 추정하지 않고, 누락된 소재지는 표시하지 않습니다. 실거래가, 관심 단지, 새소식에 적용하며 기존 갱신계약 상세정보와 앱 기능을 유지합니다. 변경된 서버 데이터는 재수집 후 표시됩니다. 평형 매칭 실험 기능을 포함하지 않았습니다. 기존 앱 메모는 설치 전 백업하세요.'
+            --title '퍼스트현대 v1.12.5 (Gemini 기사요약 연동)' \
+            --notes '퍼스트현대 v1.12.4 안정 버전을 기준으로 뉴스 카드의 중복 안내문을 제거하고 Gemini가 기사 본문을 확보해 요약한 경우에만 2~3문장으로 표시합니다. 기사 본문을 확인할 수 없는 경우 요약하지 않고 원문 보기 안내를 표시합니다. Gemini API 키는 GitHub Actions Secret GEMINI_API_KEY에만 등록하며 앱에 저장하지 않습니다. 모델 gemini-3.5-flash-lite, 실행당 신규 요약 최대 8건, 원문 조회 상한 18회. 키가 없을 때 요약 서비스는 자동 비활성화됩니다. 기존 안정 버전 기능과 평형 정보는 보존됩니다. 업데이트 전 개인 메모를 백업하세요.'
