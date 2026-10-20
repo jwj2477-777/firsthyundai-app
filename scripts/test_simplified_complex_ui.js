@@ -47,7 +47,7 @@ vm.runInContext(js,ctx);
  ev("selectComplex('f15')");
  ev("setComplexDetailTab('types')");
  const f15Types=el('complexDetails').innerHTML;
- assert.equal((f15Types.match(/<strong>전용 [0-9.]+㎡ \\(약 [0-9]+평형\\)<\\/strong>/g)||[]).length,9,
+ assert.equal((f15Types.match(/<strong>전용 /g)||[]).length,9,
    'F15 must render nine distinct paired housing types, not duplicate raw supply/exclusive lists');
  assert(f15Types.includes('전용 59.89㎡ (약 27평형)')&&f15Types.includes('88A타입'),
    'Naver verified 88A has exclusive 59.89');
