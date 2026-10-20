@@ -55,6 +55,40 @@ class TradeTests(unittest.TestCase):
         r=normalize(b,'임대','202610');self.assertEqual(r['type'],'전세');self.assertEqual(r['deposit_10k'],50000)
         b['월세금액']='140';r=normalize(b,'임대','202610');self.assertEqual(r['type'],'월세')
         b['거래금액']='100,000';b['해제여부']='O';r=normalize(b,'매매','202610');self.assertEqual(r['status'],'해제')
+    def test_renewal_fields_korean_and_english_and_missing(self):
+        base = {'법정동': '송도동', '아파트': '연습단지', '전용면적': '84.99',
+                '년': '2026', '월': '10', '일': '3', '층': '12',
+                '보증금액': '41,000', '월세금액': '0', '계약구분': '갱신',
+                '갱신요구권사용': '사용', '계약기간': '26.11~28.11',
+                '종전계약보증금': '39,000', '종전계약월세': '0'}
+        renewal = normalize(base, '임대', '202610')
+        self.assertEqual(renewal['contract_type_raw'], '갱신')
+        self.assertEqual(renewal['renewal_raw'], '사용')
+        self.assertEqual(renewal['contract_term_raw'], '26.11~28.11')
+        self.assertEqual(renewal['previous_deposit_raw'], '39,000')
+        self.assertEqual(renewal['previous_monthly_raw'], '0')
+        # 공식 API 영문 태그도 동일하게 유지
+        english = {'umdNm': '송도동', 'aptNm': '연습단지',
+                   'excluUseAr': '84.99', 'dealYear': '2026',
+                   'dealMonth': '10', 'dealDay': '3', 'floor': '12',
+                   'deposit': '2,000', 'monthlyRent': '90',
+                   'contractType': '갱신', 'useRRRight': '미사용',
+                   'contractTerm': '26.10~28.10', 'preDeposit': '1,000',
+                   'preMonthlyRent': '75'}
+        monthly = normalize(english, '임대', '202610')
+        self.assertEqual(monthly['type'], '월세')
+        self.assertEqual(monthly['previous_deposit_raw'], '1,000')
+        self.assertEqual(monthly['previous_monthly_raw'], '75')
+        self.assertEqual(monthly['renewal_raw'], '미사용')
+        # 응답에 종전금액이 없으면 0이라고 기록하지 않음
+        base.pop('종전계약보증금')
+        base.pop('종전계약월세')
+        missing = normalize(base, '임대', '202610')
+        self.assertEqual(missing['previous_deposit_raw'], '')
+        self.assertEqual(missing['previous_monthly_raw'], '')
+        # 새로운 원본 설명이 추가돼도 신규 공개 거래로 다시 분류하지 않음
+        self.assertEqual(newly_detected([missing], [renewal]), [])
+
     def test_separate_identical_deals(self):
         base={'법정동':'송도동','아파트':'연습단지','전용면적':'84','년':'2026','월':'10','일':'1','거래금액':'90,000'}
         rows=unique_ids([normalize(base,'매매','202610'),normalize(base,'매매','202610')]);self.assertNotEqual(rows[0]['id'],rows[1]['id'])
