@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "state": "verified_partial",
-  "updated_at": "2026-10-19",
-  "note": "기존 K-apt 등록단지 및 13개 관심단지를 보존하고 실거래에 등장한 이름 중 검증된 기존 아파트 표기들을 aliases로 연결. K-apt에서 누락되거나 여러 단지로 합산된 공동주택 중 별도 주소·세대수가 확인되는 12개 단지를 독립 등록. 송도더샵엑스포 합계 1,337세대는 검색 중복 방지용 관리항목으로만 유지. EV·관리사무소 등 미확인 정보는 비워둠. 추가로 인천송도힐스테이트 3·4·5·6단지 및 더퍼스트시티송도, 스위트리아송도 객관적 기본정보를 단지별 공개자료로 등록. K-apt 통합 관리단지 합계는 별도 표시. 2026-10-19 사용자 네이버페이 부동산 화면 5건 대조: 엑스포10, 아리스타프라임 주소, 이안송도 주차·연락처, 월드메르디앙 4개동·주차145 등 보정. 용적률·건폐율은 수집 의무항목이 아니고 가족용 기본화면에서 숨김.",
+  "updated_at": "2026-10-20",
+  "note": "기존 K-apt 등록단지 및 13개 관심단지를 보존하고 실거래에 등장한 이름 중 검증된 기존 아파트 표기들을 aliases로 연결. K-apt에서 누락되거나 여러 단지로 합산된 공동주택 중 별도 주소·세대수가 확인되는 12개 단지를 독립 등록. 송도더샵엑스포 합계 1,337세대는 검색 중복 방지용 관리항목으로만 유지. EV·관리사무소 등 미확인 정보는 비워둠. 추가로 인천송도힐스테이트 3·4·5·6단지 및 더퍼스트시티송도, 스위트리아송도 객관적 기본정보를 단지별 공개자료로 등록. K-apt 통합 관리단지 합계는 별도 표시. 2026-10-19 사용자 네이버페이 부동산 화면 5건 대조: 엑스포10, 아리스타프라임 주소, 이안송도 주차·연락처, 월드메르디앙 4개동·주차145 등 보정. 용적률·건폐율은 수집 의무항목이 아니고 가족용 기본화면에서 숨김. 공급면적 평형 대응표는 단지별 출처에서 공급·전용이 함께 확인된 타입만 기록하며, 실거래 전용㎡는 변환하지 않고 실무 평형만 공급면적에서 계산. 자료 없는 단지는 임의 환산 금지. 전용면적 타입은 국토교통부 실거래 자료에서 단지명 고유일치 및 면적 검증 후 관측된 값입니다. 실거래가 없는 타입은 누락될 수 있고 공급면적 평형은 별도 검증 대응표로만 표시합니다. 단지 자료에 명시된 거래실무 평형 호칭(예: 아트윈 120B=36평형)은 수학적 공급면적 반올림과 다를 수 있으며, 확인된 호칭을 우선 표시합니다.\n2026-10-20: KB부동산 공급·전용 정확한 타입이 함께 제시된 송도 단지 6개에 대응표 추가. 전용면적을 공급평형으로 잘못 계산하지 않음.",
   "records": [
     {
       "id": "f13",
@@ -13,7 +13,15 @@
       ],
       "households": 856,
       "heating": "지역난방",
-      "area_types_m2": [],
+      "area_types_m2": [
+        68.72,
+        68.96,
+        84.9,
+        84.94,
+        95.81,
+        95.87,
+        108.08
+      ],
       "floorplans": [],
       "source_url": "https://kbland.kr/se/c/29994",
       "last_verified": "2026-10-19",
@@ -40,7 +48,55 @@
       "detail_source": "네이버페이 부동산 단지정보 (사용자 제공 내용)",
       "schools": [],
       "detail_checked_at": "2026-10-19",
-      "detail_note": "사용자가 네이버페이 부동산의 F13 단지 상세정보를 직접 제공한 값입니다. 전기차 충전대수 등 변동 가능한 시설 정보는 최신 현황 확인 권장"
+      "detail_note": "사용자가 네이버페이 부동산의 F13 단지 상세정보를 직접 제공한 값입니다. 전기차 충전대수 등 변동 가능한 시설 정보는 최신 현황 확인 권장",
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 68.96,
+          "supply_m2": 98.87,
+          "supply_label": "98B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+        },
+        {
+          "exclusive_m2": 68.72,
+          "supply_m2": 99.09,
+          "supply_label": "99A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+        },
+        {
+          "exclusive_m2": 84.9,
+          "supply_m2": 117.09,
+          "supply_label": "117A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268",
+          "market_pyeong": 35
+        },
+        {
+          "exclusive_m2": 84.94,
+          "supply_m2": 117.12,
+          "supply_label": "117B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268",
+          "market_pyeong": 35
+        },
+        {
+          "exclusive_m2": 95.87,
+          "supply_m2": 129.55,
+          "supply_label": "129B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+        },
+        {
+          "exclusive_m2": 95.81,
+          "supply_m2": 131.17,
+          "supply_label": "131A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+        },
+        {
+          "exclusive_m2": 108.08,
+          "supply_m2": 145.26,
+          "supply_label": "145",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=109268"
+        }
+      ],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 181
     },
     {
       "id": "f14",
@@ -50,7 +106,17 @@
       ],
       "households": 869,
       "heating": "지역난방",
-      "area_types_m2": [],
+      "area_types_m2": [
+        59.89,
+        59.98,
+        68.72,
+        68.96,
+        84.9,
+        84.94,
+        95.81,
+        95.87,
+        108.08
+      ],
       "floorplans": [],
       "source_url": "https://kbland.kr/se/c/29997",
       "last_verified": "2026-10-19",
@@ -83,7 +149,57 @@
       "detail_checked_at": "2026-10-19",
       "detail_note": "주차대수 출처 불일치: KB부동산 1229대, K-apt 기반 공개자료 1224대. 앱 표시값은 KB부동산 기준이며 최신 주차 현황은 관리사무소 확인 필요",
       "heating_detail": "지역난방 / 열병합",
-      "naver_sample_verified": "2026-10-19"
+      "naver_sample_verified": "2026-10-19",
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 59.89,
+          "supply_m2": 88.13,
+          "supply_label": "88A",
+          "source_url": "https://fin.land.naver.com/articles/2530157688"
+        },
+        {
+          "exclusive_m2": 59.98,
+          "supply_m2": 87.97,
+          "supply_label": "87B",
+          "source_url": "https://kbland.kr/se/c/29997"
+        },
+        {
+          "exclusive_m2": 68.72,
+          "supply_m2": 99,
+          "supply_label": "99A",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472"
+        },
+        {
+          "exclusive_m2": 84.9,
+          "supply_m2": 117.08,
+          "supply_label": "117A",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472",
+          "market_pyeong": 35
+        },
+        {
+          "exclusive_m2": 84.94,
+          "supply_m2": 117.12,
+          "supply_label": "117B",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472",
+          "market_pyeong": 35
+        },
+        {
+          "exclusive_m2": 95.81,
+          "supply_m2": 131.4,
+          "supply_label": "131A",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F14BL-28472"
+        },
+        {
+          "exclusive_m2": 108.08,
+          "supply_m2": 144.55,
+          "supply_label": "144",
+          "source_url": "https://fin.land.naver.com/articles/2527574437"
+        }
+      ],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 195,
+      "area_type_pairs_checked_at": "2026-10-20",
+      "area_type_pairs_review_note": "88A=전용59.89㎡/공급88.13㎡ 및 144=전용108.08㎡/공급144.55㎡는 네이버페이 매물로 직접 재검증. 87B는 KB 타입·전용률과 공급최솟값 대조."
     },
     {
       "id": "f15",
@@ -93,7 +209,17 @@
       ],
       "households": 872,
       "heating": "지역난방",
-      "area_types_m2": [],
+      "area_types_m2": [
+        59.89,
+        59.98,
+        68.72,
+        68.96,
+        84.9,
+        84.94,
+        95.81,
+        95.87,
+        108.08
+      ],
       "floorplans": [],
       "source_url": "https://kbland.kr/se/c/29996",
       "last_verified": "2026-10-19",
@@ -125,7 +251,69 @@
       "detail_checked_at": "2026-10-19",
       "detail_note": null,
       "heating_detail": "지역난방 / 열병합",
-      "naver_sample_verified": "2026-10-19"
+      "naver_sample_verified": "2026-10-19",
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 59.89,
+          "supply_m2": 88.08,
+          "supply_label": "88A",
+          "source_url": "https://fin.land.naver.com/articles/2530321262"
+        },
+        {
+          "exclusive_m2": 59.98,
+          "supply_m2": 87.91,
+          "supply_label": "87B",
+          "source_url": "https://kbland.kr/se/c/29996"
+        },
+        {
+          "exclusive_m2": 68.72,
+          "supply_m2": 99.08,
+          "supply_label": "99A",
+          "source_url": "https://fin.land.naver.com/articles/2528747606"
+        },
+        {
+          "exclusive_m2": 68.96,
+          "supply_m2": 98.85,
+          "supply_label": "98B",
+          "source_url": "https://fin.land.naver.com/articles/2531277947"
+        },
+        {
+          "exclusive_m2": 84.9,
+          "supply_m2": 117.1,
+          "supply_label": "117A",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F15BL-28420",
+          "market_pyeong": 35
+        },
+        {
+          "exclusive_m2": 84.94,
+          "supply_m2": 117.12,
+          "supply_label": "117B",
+          "source_url": "https://apt.zaritalk.com/complex/송도동-송도더샵퍼스트파크F15BL-28420",
+          "market_pyeong": 35
+        },
+        {
+          "exclusive_m2": 95.81,
+          "supply_m2": 131.28,
+          "supply_label": "131A",
+          "source_url": "https://fin.land.naver.com/articles/2530143941"
+        },
+        {
+          "exclusive_m2": 95.87,
+          "supply_m2": 129.65,
+          "supply_label": "129B",
+          "source_url": "https://kbland.kr/se/c/29996"
+        },
+        {
+          "exclusive_m2": 108.08,
+          "supply_m2": 144.63,
+          "supply_label": "144",
+          "source_url": "https://fin.land.naver.com/articles/2528250700"
+        }
+      ],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 184,
+      "area_type_pairs_checked_at": "2026-10-20",
+      "area_type_pairs_review_note": "네이버페이 부동산 매물 기본정보 및 KB부동산 평형 상세에서 공급·전용 9개 타입 대조. 전용 59.89㎡는 88A, 전용 59.98㎡는 87B로 구분."
     },
     {
       "id": "m21",
@@ -135,7 +323,14 @@
       ],
       "households": 692,
       "heating": "지역난방",
-      "area_types_m2": [],
+      "area_types_m2": [
+        72.59,
+        84.92,
+        84.94,
+        84.98,
+        125.51,
+        148.72
+      ],
       "floorplans": [],
       "source_url": "https://kbland.kr/se/c/27165",
       "last_verified": "2026-10-19",
@@ -166,7 +361,17 @@
       "detail_checked_at": "2026-10-19",
       "detail_note": "주차대수 출처 불일치: KB부동산 1113대, K-apt 기반 공개자료 1106대. 앱 표시값은 KB부동산 기준이며 최신 주차 현황은 관리사무소 확인 필요",
       "heating_detail": "지역난방 / 열병합",
-      "naver_sample_verified": "2026-10-19"
+      "naver_sample_verified": "2026-10-19",
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 84.92,
+          "supply_m2": 115.16,
+          "supply_label": "115C",
+          "source_url": "https://fin.land.naver.com/articles/2530240144"
+        }
+      ],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 97
     },
     {
       "id": "m22",
@@ -176,7 +381,14 @@
       ],
       "households": 691,
       "heating": "지역난방",
-      "area_types_m2": [],
+      "area_types_m2": [
+        72.59,
+        84.92,
+        84.94,
+        84.98,
+        125.51,
+        148.72
+      ],
       "floorplans": [],
       "source_url": "https://kbland.kr/se/c/27166",
       "last_verified": "2026-10-19",
@@ -206,7 +418,53 @@
       "detail_checked_at": "2026-10-19",
       "detail_note": null,
       "heating_detail": "지역난방 / 열병합",
-      "naver_sample_verified": "2026-10-19"
+      "naver_sample_verified": "2026-10-19",
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 72.59,
+          "supply_m2": 96.83,
+          "supply_label": "96",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        },
+        {
+          "exclusive_m2": 84.94,
+          "supply_m2": 113.91,
+          "supply_label": "113B",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        },
+        {
+          "exclusive_m2": 84.98,
+          "supply_m2": 114.28,
+          "supply_label": "114A",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        },
+        {
+          "exclusive_m2": 84.92,
+          "supply_m2": 115.16,
+          "supply_label": "115C",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        },
+        {
+          "exclusive_m2": 125.51,
+          "supply_m2": 157.32,
+          "supply_label": "157",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        },
+        {
+          "exclusive_m2": 148.72,
+          "supply_m2": 184.2,
+          "supply_label": "184",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        },
+        {
+          "exclusive_m2": 196.04,
+          "supply_m2": 245.33,
+          "supply_label": "245",
+          "source_url": "https://aptgin.com/home/gin02/gin0201/apt/am17769em0"
+        }
+      ],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 81
     },
     {
       "id": "m23",
@@ -217,7 +475,14 @@
       ],
       "households": 478,
       "heating": "지역난방",
-      "area_types_m2": [],
+      "area_types_m2": [
+        72.59,
+        84.92,
+        84.94,
+        84.98,
+        125.51,
+        147.99
+      ],
       "floorplans": [],
       "source_url": "https://kbland.kr/se/c/27168",
       "last_verified": "2026-10-19",
@@ -248,7 +513,18 @@
       "detail_checked_at": "2026-10-19",
       "detail_note": "난방 출처 불일치: 사용자 제공 네이버페이 부동산 단지정보에는 '지역난방 / 열병합', K-apt 기반 과거 자료에는 '중앙난방'으로 표기. 앱에서는 사용자 제공 원본 화면(2026-10-19)을 기준 표시하며 K-apt 표기와의 차이를 보존함. 주차 출처 불일치: 네이버페이 부동산 780대, K-apt 기반 자료 767대.",
       "heating_detail": "지역난방 / 열병합",
-      "naver_sample_verified": "2026-10-19"
+      "naver_sample_verified": "2026-10-19",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 76,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 125.51,
+          "supply_m2": 157.02,
+          "supply_label": "157",
+          "source_url": "https://fin.land.naver.com/articles/2526463087",
+          "market_pyeong": 47
+        }
+      ]
     },
     {
       "id": "avenue",
@@ -258,7 +534,16 @@
       ],
       "households": 668,
       "heating": "지역난방",
-      "area_types_m2": [],
+      "area_types_m2": [
+        59.53,
+        59.94,
+        68.64,
+        84.05,
+        84.4,
+        84.51,
+        95.18,
+        108.39
+      ],
       "floorplans": [],
       "source_url": "https://kbland.kr/se/c/432132",
       "last_verified": "2026-10-19",
@@ -287,7 +572,59 @@
       "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
       "detail_source_url": "https://apt.hilite.co.kr/apt/A10025853/",
       "detail_checked_at": "2026-10-19",
-      "detail_note": null
+      "detail_note": null,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 59.94,
+          "supply_m2": 91.74,
+          "supply_label": "91A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 59.53,
+          "supply_m2": 91.27,
+          "supply_label": "91B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 68.64,
+          "supply_m2": 101.25,
+          "supply_label": "101",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 84.05,
+          "supply_m2": 118.94,
+          "supply_label": "118A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 84.4,
+          "supply_m2": 118.87,
+          "supply_label": "118B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 84.51,
+          "supply_m2": 118.92,
+          "supply_label": "118C",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 95.18,
+          "supply_m2": 129.51,
+          "supply_label": "129",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        },
+        {
+          "exclusive_m2": 108.39,
+          "supply_m2": 146.32,
+          "supply_label": "146",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=144109"
+        }
+      ],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 153
     },
     {
       "id": "centennial",
@@ -297,7 +634,14 @@
       ],
       "households": 342,
       "heating": "지역난방",
-      "area_types_m2": [],
+      "area_types_m2": [
+        75.92,
+        84.92,
+        84.94,
+        84.98,
+        98.92,
+        98.97
+      ],
       "floorplans": [],
       "source_url": "https://realty.daangn.com/complexes/13596133",
       "last_verified": "2026-10-19",
@@ -318,7 +662,20 @@
       "detail_source": "당근부동산 단지정보 및 2026-09-09 K-apt 단지 원자료(동수·충전시설) + 공개 관리사무소 전화",
       "detail_source_url": "https://apt.hilite.co.kr/apt/A10023207/",
       "detail_checked_at": "2026-10-19",
-      "detail_note": null
+      "detail_note": null,
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 28,
+      "exclusive_plan_labels": [
+        "75A",
+        "84A",
+        "84B",
+        "84C",
+        "84D",
+        "98A",
+        "98B"
+      ],
+      "exclusive_plan_source_url": "https://realestate-asset.tistory.com/286",
+      "exclusive_plan_note": "분양 당시 공개자료에서 확인된 전용면적형 구분으로, 공급면적 평형과 직접 대응하지 않습니다."
     },
     {
       "id": "prime20",
@@ -328,7 +685,15 @@
       ],
       "households": 662,
       "heating": "지역난방",
-      "area_types_m2": [],
+      "area_types_m2": [
+        70.92,
+        84.53,
+        84.83,
+        84.97,
+        107.44,
+        107.45,
+        114.26
+      ],
       "floorplans": [],
       "source_url": "https://kbland.kr/se/c/46842",
       "last_verified": "2026-10-19",
@@ -356,7 +721,53 @@
       "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
       "detail_source_url": "https://apt.hilite.co.kr/apt/A10023693/",
       "detail_checked_at": "2026-10-19",
-      "detail_note": null
+      "detail_note": null,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 70.92,
+          "supply_m2": 97.83,
+          "supply_label": "97",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        },
+        {
+          "exclusive_m2": 84.83,
+          "supply_m2": 114.73,
+          "supply_label": "114B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        },
+        {
+          "exclusive_m2": 84.53,
+          "supply_m2": 117.15,
+          "supply_label": "117C",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        },
+        {
+          "exclusive_m2": 84.97,
+          "supply_m2": 118.29,
+          "supply_label": "118A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        },
+        {
+          "exclusive_m2": 107.44,
+          "supply_m2": 141.7,
+          "supply_label": "141B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        },
+        {
+          "exclusive_m2": 107.45,
+          "supply_m2": 143.45,
+          "supply_label": "143A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        },
+        {
+          "exclusive_m2": 114.26,
+          "supply_m2": 150.5,
+          "supply_label": "150",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=127135"
+        }
+      ],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 116
     },
     {
       "id": "prime25",
@@ -366,7 +777,11 @@
       ],
       "households": 164,
       "heating": "지역난방",
-      "area_types_m2": [],
+      "area_types_m2": [
+        107.6,
+        121.18,
+        144.92
+      ],
       "floorplans": [],
       "source_url": "https://kbland.kr/se/c/46843",
       "last_verified": "2026-10-19",
@@ -392,7 +807,35 @@
       "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
       "detail_source_url": "https://apt.hilite.co.kr/apt/A10024083/",
       "detail_checked_at": "2026-10-19",
-      "detail_note": null
+      "detail_note": null,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 107.6,
+          "supply_m2": 135.8,
+          "supply_label": "135C",
+          "source_url": "https://asil.kr/asil/agent/aptprice.jsp?apt=1500070242"
+        },
+        {
+          "exclusive_m2": 121.18,
+          "supply_m2": 154.15,
+          "supply_label": "154",
+          "source_url": "https://asil.kr/asil/agent/aptprice.jsp?apt=1500070242"
+        },
+        {
+          "exclusive_m2": 144.92,
+          "supply_m2": 177.85,
+          "supply_label": "177A",
+          "source_url": "https://asil.kr/asil/agent/aptprice.jsp?apt=1500070242"
+        },
+        {
+          "exclusive_m2": 195.5,
+          "supply_m2": 241.5,
+          "supply_label": "241",
+          "source_url": "https://asil.kr/asil/agent/aptprice.jsp?apt=1500070242"
+        }
+      ],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 23
     },
     {
       "id": "skcentral",
@@ -402,7 +845,10 @@
       ],
       "households": 299,
       "heating": "지역난방",
-      "area_types_m2": [],
+      "area_types_m2": [
+        84.66,
+        84.79
+      ],
       "floorplans": [],
       "source_url": "https://kbland.kr/se/c/39286",
       "last_verified": "2026-10-19",
@@ -425,7 +871,25 @@
       "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
       "detail_source_url": "https://apt.hilite.co.kr/apt/A10024573/",
       "detail_checked_at": "2026-10-19",
-      "detail_note": null
+      "detail_note": null,
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 72,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 84.65,
+          "supply_m2": 109.69,
+          "supply_label": "109A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=118987",
+          "market_pyeong": 33
+        },
+        {
+          "exclusive_m2": 84.78,
+          "supply_m2": 109.7,
+          "supply_label": "109B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=118987",
+          "market_pyeong": 33
+        }
+      ]
     },
     {
       "id": "artwin",
@@ -435,7 +899,14 @@
       ],
       "households": 999,
       "heating": "지역난방",
-      "area_types_m2": [],
+      "area_types_m2": [
+        84.97,
+        84.98,
+        84.99,
+        106.78,
+        114.95,
+        129.83
+      ],
       "floorplans": [],
       "source_url": "https://kbland.kr/se/c/26158",
       "last_verified": "2026-10-19",
@@ -472,7 +943,116 @@
       "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
       "detail_source_url": "https://apt.hilite.co.kr/apt/A10027898/",
       "detail_checked_at": "2026-10-19",
-      "detail_note": "주차대수 출처 불일치: KB부동산 1463대, K-apt 기반 공개자료 1399대. 앱 표시값은 KB부동산 기준이며 최신 주차 현황은 관리사무소 확인 필요"
+      "detail_note": "주차대수 출처 불일치: KB부동산 1463대, K-apt 기반 공개자료 1399대. 앱 표시값은 KB부동산 기준이며 최신 주차 현황은 관리사무소 확인 필요",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 135,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 84.98,
+          "supply_m2": 120.92,
+          "supply_label": "120B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 36
+        },
+        {
+          "exclusive_m2": 84.99,
+          "supply_m2": 120.99,
+          "supply_label": "120B-S",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 36
+        },
+        {
+          "exclusive_m2": 84.98,
+          "supply_m2": 120.93,
+          "supply_label": "120B-H",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 36
+        },
+        {
+          "exclusive_m2": 84.97,
+          "supply_m2": 121.32,
+          "supply_label": "121A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 36
+        },
+        {
+          "exclusive_m2": 84.99,
+          "supply_m2": 121.31,
+          "supply_label": "121A-H",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 36
+        },
+        {
+          "exclusive_m2": 84.97,
+          "supply_m2": 121.32,
+          "supply_label": "121A-S",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 36
+        },
+        {
+          "exclusive_m2": 106.78,
+          "supply_m2": 152.05,
+          "supply_label": "152",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 45
+        },
+        {
+          "exclusive_m2": 106.78,
+          "supply_m2": 152.05,
+          "supply_label": "152H",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 45
+        },
+        {
+          "exclusive_m2": 114.95,
+          "supply_m2": 163.11,
+          "supply_label": "163",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 49
+        },
+        {
+          "exclusive_m2": 114.95,
+          "supply_m2": 163.11,
+          "supply_label": "163S",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 49
+        },
+        {
+          "exclusive_m2": 114.95,
+          "supply_m2": 163.11,
+          "supply_label": "163H",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 49
+        },
+        {
+          "exclusive_m2": 129.83,
+          "supply_m2": 184.96,
+          "supply_label": "184",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 55
+        },
+        {
+          "exclusive_m2": 136.91,
+          "supply_m2": 195.45,
+          "supply_label": "195",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 59
+        },
+        {
+          "exclusive_m2": 210.15,
+          "supply_m2": 300.22,
+          "supply_label": "300A",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 90
+        },
+        {
+          "exclusive_m2": 210.1,
+          "supply_m2": 302.22,
+          "supply_label": "302B",
+          "source_url": "https://www.aldongsan.com/aptview.php?id=104544",
+          "market_pyeong": 91
+        }
+      ]
     },
     {
       "id": "central3",
@@ -484,7 +1064,13 @@
       ],
       "households": 351,
       "heating": "지역난방",
-      "area_types_m2": [],
+      "area_types_m2": [
+        80.05,
+        102.49,
+        110.85,
+        119.28,
+        119.77
+      ],
       "floorplans": [],
       "source_url": "https://kbland.kr/se/c/46841",
       "last_verified": "2026-10-19",
@@ -515,7 +1101,32 @@
       "detail_source": "KB부동산 단지 기본정보 + 2026-09-09 기준 K-apt 공개자료 (전기차 충전 등), 필요시 당근부동산·관리사무소 공개 전화번호 확인",
       "detail_source_url": "https://apt.hilite.co.kr/apt/A10023434/",
       "detail_checked_at": "2026-10-19",
-      "detail_note": "층수 출처 불일치: KB부동산 38~40층, K-apt 기반 정보 최고 39층. 상세 층수 범위는 검증 필요"
+      "detail_note": "층수 출처 불일치: KB부동산 38~40층, K-apt 기반 정보 최고 39층. 상세 층수 범위는 검증 필요",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 45,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 80.05,
+          "supply_m2": 111.44,
+          "supply_label": "111",
+          "source_url": "https://fin.land.naver.com/articles/2527801637",
+          "market_pyeong": 33
+        },
+        {
+          "exclusive_m2": 102.49,
+          "supply_m2": 140.96,
+          "supply_label": "140",
+          "source_url": "https://fin.land.naver.com/articles/2527801637",
+          "market_pyeong": 42
+        },
+        {
+          "exclusive_m2": 110.85,
+          "supply_m2": 152.05,
+          "supply_label": "152",
+          "source_url": "https://fin.land.naver.com/articles/2527801637",
+          "market_pyeong": 46
+        }
+      ]
     },
     {
       "id": "kapt-a10020270",
@@ -536,15 +1147,33 @@
       "floors": "최고 20층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        127.05,
+        137.55,
+        138.27,
+        156.85
+      ],
+      "supply_type_labels": [
+        "154A",
+        "167B",
+        "168C",
+        "190",
+        "233PH-A",
+        "240PH-B",
+        "248PH-C"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 7,
+      "supply_type_source_url": "https://kbland.kr/se/c/21998",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a10020272",
@@ -565,15 +1194,32 @@
       "floors": "최고 20층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        127.05,
+        137.55,
+        138.27,
+        156.85
+      ],
+      "supply_type_labels": [
+        "152A",
+        "165B",
+        "166C",
+        "188D",
+        "237PH-B",
+        "246PH-C"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 12,
+      "supply_type_source_url": "https://kbland.kr/se/c/22001",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a10020527",
@@ -594,15 +1240,35 @@
       "floors": "최고 36층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.96,
+        84.99,
+        99.99,
+        109.99
+      ],
+      "supply_type_labels": [
+        "111A",
+        "111C",
+        "112B",
+        "131A",
+        "131B",
+        "144A0",
+        "144A1",
+        "220P1",
+        "221P0"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 183,
+      "supply_type_source_url": "https://kbland.kr/se/c/490000",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a10020539",
@@ -623,7 +1289,10 @@
       "floors": "최고 1층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        84.87,
+        108.63
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -631,7 +1300,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 149
     },
     {
       "id": "kapt-a10020712",
@@ -653,15 +1324,37 @@
       "floors": "최고 49층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.2,
+        84.81,
+        98.06,
+        112.3,
+        121.06,
+        121.18
+      ],
+      "supply_type_labels": [
+        "113A",
+        "115B",
+        "134",
+        "151",
+        "163A",
+        "165B",
+        "210",
+        "227",
+        "244"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 80,
+      "supply_type_source_url": "https://kbland.kr/se/c/438483",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a10020744",
@@ -683,15 +1376,196 @@
       "floors": "최고 49층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.96,
+        84.97,
+        84.98,
+        84.99,
+        85,
+        88.94,
+        97.84,
+        104.74,
+        130.78,
+        137.61,
+        139.18
+      ],
+      "supply_type_labels": [
+        "114A",
+        "114D",
+        "114C",
+        "114A1",
+        "115B",
+        "115F1",
+        "116E",
+        "116F",
+        "120T",
+        "129T",
+        "131T",
+        "140T",
+        "141T",
+        "173",
+        "183T",
+        "185T",
+        "188T",
+        "191T"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 123,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 84.95,
+          "supply_m2": 114.91,
+          "supply_label": "114A",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 84.96,
+          "supply_m2": 114.24,
+          "supply_label": "114D",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 84.96,
+          "supply_m2": 114.85,
+          "supply_label": "114C",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 84.95,
+          "supply_m2": 114.8,
+          "supply_label": "114A1",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 84.99,
+          "supply_m2": 115.78,
+          "supply_label": "115B",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 84.98,
+          "supply_m2": 115.55,
+          "supply_label": "115F1",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 84.99,
+          "supply_m2": 116.67,
+          "supply_label": "116E",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 84.98,
+          "supply_m2": 116.01,
+          "supply_label": "116F",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 88.94,
+          "supply_m2": 120.02,
+          "supply_label": "120T",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 96.28,
+          "supply_m2": 129.77,
+          "supply_label": "129T",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 97.83,
+          "supply_m2": 131.73,
+          "supply_label": "131T",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 104.73,
+          "supply_m2": 140.44,
+          "supply_label": "140T",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 105.82,
+          "supply_m2": 141.82,
+          "supply_label": "141T",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 130.77,
+          "supply_m2": 173.74,
+          "supply_label": "173",
+          "rooms": 4,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 137.6,
+          "supply_m2": 183.12,
+          "supply_label": "183T",
+          "rooms": 4,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 139.18,
+          "supply_m2": 185.06,
+          "supply_label": "185T",
+          "rooms": 4,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 141.9,
+          "supply_m2": 188.92,
+          "supply_label": "188T",
+          "rooms": 4,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        },
+        {
+          "exclusive_m2": 143.89,
+          "supply_m2": 191.49,
+          "supply_label": "191T",
+          "rooms": 4,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=146782"
+        }
+      ],
+      "area_type_pairs_source": "https://www.aldongsan.com/aptview.php?id=146782",
+      "area_type_pairs_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a10021000",
@@ -712,15 +1586,55 @@
       "floors": "최고 44층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.71,
+        84.93,
+        84.96,
+        85,
+        99.78,
+        99.86,
+        99.87,
+        99.97,
+        107.96,
+        118.99
+      ],
+      "supply_type_labels": [
+        "118A1",
+        "118A2",
+        "118B",
+        "119C",
+        "119D",
+        "136Tb3",
+        "138A",
+        "139B",
+        "140C",
+        "140T1",
+        "141T2",
+        "141T3",
+        "144Tb1",
+        "145Ta3",
+        "146Tb2",
+        "148T1",
+        "149T2",
+        "154Tc1",
+        "155Ta2",
+        "164T3",
+        "189P",
+        "209P",
+        "216P"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 114,
+      "supply_type_source_url": "https://kbland.kr/se/c/435994",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a10022353",
@@ -742,7 +1656,13 @@
       "floors": "최고 10층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        32.46,
+        32.75,
+        59.02,
+        59.32,
+        59.49
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -750,7 +1670,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 73
     },
     {
       "id": "kapt-a10022395",
@@ -772,8 +1694,12 @@
       "floors": "19~20층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        131.76
+      ],
+      "supply_type_labels": [
+        "156"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API + 2026-10-19 사용자 제공 네이버페이 부동산 단지정보 원본 화면",
       "detail_note": "사용자 제공 네이버페이 부동산 '이안송도(주상복합)' 원본 화면 기준 아파트 108세대, 257대 주차, 관리사무소 032-203-8900. 기존 K-apt 시공사 표기가 상이함: K-apt 원본 '(주)대우자동차판매건설(현 : 대우산업개발)' / 네이버 원본 '대우자동차판매(주)'. 앱은 네이버 표기 채택, 출처 차이 기록.",
@@ -782,7 +1708,21 @@
       "detail_checked_at": "2026-10-19",
       "schools": [],
       "naver_sample_verified": "2026-10-19",
-      "heating_detail": "지역난방 / 열병합"
+      "heating_detail": "지역난방 / 열병합",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 10,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 131.76,
+          "supply_m2": 156.812,
+          "supply_label": "156",
+          "rooms": 4,
+          "baths": 2,
+          "source_url": "https://aptgin.com/home/popup/pp_danji/apt/am12832em0"
+        }
+      ],
+      "area_type_pairs_source": "https://aptgin.com/home/popup/pp_danji/apt/am12832em0",
+      "area_type_pairs_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a10022494",
@@ -803,15 +1743,35 @@
       "floors": null,
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.88,
+        84.9,
+        102.89,
+        120.28
+      ],
+      "supply_type_labels": [
+        "114B",
+        "115A",
+        "139A",
+        "162A",
+        "214A",
+        "217B",
+        "217C",
+        "237A",
+        "238B"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 204,
+      "supply_type_source_url": "https://kbland.kr/se/c/48793",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a10022498",
@@ -832,15 +1792,57 @@
       "floors": "최고 42층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.87,
+        84.91,
+        84.92,
+        84.93,
+        84.97,
+        84.99,
+        98.81,
+        98.9,
+        98.95,
+        99,
+        110.92,
+        132.93,
+        162.93
+      ],
+      "supply_type_labels": [
+        "111A",
+        "111B",
+        "112E",
+        "113C",
+        "113D",
+        "113G",
+        "114F",
+        "130A",
+        "130B",
+        "130C",
+        "131D",
+        "146",
+        "173",
+        "183T",
+        "188T1",
+        "188T2",
+        "194P",
+        "201P",
+        "215T",
+        "228T",
+        "263T",
+        "272P"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 191,
+      "supply_type_source_url": "https://kbland.kr/se/c/345478",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a10022954",
@@ -861,15 +1863,42 @@
       "floors": "최고 49층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.06,
+        84.54,
+        84.57,
+        84.82,
+        84.88,
+        84.95,
+        99.1,
+        99.89,
+        155.79
+      ],
+      "supply_type_labels": [
+        "112D0",
+        "112D1",
+        "112E",
+        "113F",
+        "114A",
+        "114B",
+        "114C",
+        "131B",
+        "134A0",
+        "134A1",
+        "210"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 157,
+      "supply_type_source_url": "https://kbland.kr/se/c/49807",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a10022964",
@@ -890,15 +1919,33 @@
       "floors": "최고 48층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.95,
+        84.97,
+        114.98,
+        114.99,
+        174.02
+      ],
+      "supply_type_labels": [
+        "111A",
+        "113B",
+        "144B",
+        "145A",
+        "219B",
+        "220A"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": "K-apt 공개 세대수 항목 차이: hoCnt 581세대, kaptdaCnt 578세대. 총세대수는 hoCnt 기준.",
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 116,
+      "supply_type_source_url": "https://kbland.kr/se/c/47270",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a10023361",
@@ -920,15 +1967,34 @@
       "floors": "최고 49층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.7,
+        84.87,
+        84.95,
+        101.73,
+        101.86,
+        101.99
+      ],
+      "supply_type_labels": [
+        "116A",
+        "117C",
+        "119B",
+        "140A",
+        "141C",
+        "142B"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 198,
+      "supply_type_source_url": "https://kbland.kr/se/c/45323",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a10024710",
@@ -950,7 +2016,12 @@
       "floors": "최고 49층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        84.8,
+        84.82,
+        85,
+        95.86
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -958,7 +2029,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 365
     },
     {
       "id": "kapt-a10024779",
@@ -979,15 +2052,42 @@
       "floors": "최고 38층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        74.9,
+        74.99,
+        84.2,
+        84.23,
+        84.46,
+        84.76,
+        84.92,
+        84.97,
+        84.98,
+        124.99
+      ],
+      "supply_type_labels": [
+        "99A",
+        "99B",
+        "111B",
+        "111C",
+        "111D",
+        "111E",
+        "111G",
+        "112A",
+        "112F",
+        "161"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 489,
+      "supply_type_source_url": "https://kbland.kr/se/c/37854",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a10025031",
@@ -1008,15 +2108,32 @@
       "floors": "최고 49층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        75.98,
+        84.8,
+        84.85,
+        84.89,
+        84.91
+      ],
+      "supply_type_labels": [
+        "101",
+        "111A",
+        "111C",
+        "112B",
+        "115P"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 310,
+      "supply_type_source_url": "https://kbland.kr/se/c/35942",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a10025071",
@@ -1037,15 +2154,37 @@
       "floors": "최고 43층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.96,
+        84.97,
+        99.92,
+        99.98,
+        129.85
+      ],
+      "supply_type_labels": [
+        "110A",
+        "110B",
+        "110C",
+        "128A",
+        "130B",
+        "171A",
+        "171C",
+        "171D",
+        "172B",
+        "172E"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 163,
+      "supply_type_source_url": "https://kbland.kr/se/c/34322",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a10025399",
@@ -1067,15 +2206,72 @@
       "floors": "최고 43층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        75.62,
+        84.65,
+        84.69,
+        84.82,
+        84.98,
+        99.99
+      ],
+      "supply_type_labels": [
+        "101",
+        "112A",
+        "113B",
+        "114C",
+        "114D",
+        "132"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 370,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 75.61,
+          "supply_m2": 101.63,
+          "supply_label": "101",
+          "source_url": "https://kbland.kr/c/33586"
+        },
+        {
+          "exclusive_m2": 84.65,
+          "supply_m2": 112.87,
+          "supply_label": "112A",
+          "source_url": "https://kbland.kr/c/33586",
+          "market_pyeong": 34
+        },
+        {
+          "exclusive_m2": 84.81,
+          "supply_m2": 113.13,
+          "supply_label": "113B",
+          "source_url": "https://kbland.kr/c/33586"
+        },
+        {
+          "exclusive_m2": 84.69,
+          "supply_m2": 114.11,
+          "supply_label": "114D",
+          "source_url": "https://kbland.kr/c/33586"
+        },
+        {
+          "exclusive_m2": 84.97,
+          "supply_m2": 114.18,
+          "supply_label": "114C",
+          "source_url": "https://kbland.kr/c/33586"
+        },
+        {
+          "exclusive_m2": 99.98,
+          "supply_m2": 132.83,
+          "supply_label": "132",
+          "source_url": "https://kbland.kr/c/33586"
+        }
+      ],
+      "supply_type_source_url": "https://kbland.kr/c/33586",
+      "area_type_pairs_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a10025443",
@@ -1097,15 +2293,34 @@
       "floors": "최고 36층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.92,
+        84.93,
+        84.97,
+        99.59,
+        129.44
+      ],
+      "supply_type_labels": [
+        "114A",
+        "115C",
+        "115D",
+        "116B",
+        "134A",
+        "177B",
+        "179A"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 122,
+      "supply_type_source_url": "https://kbland.kr/se/c/31824",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a10025745",
@@ -1127,7 +2342,15 @@
       "floors": "최고 49층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        64.17,
+        72.52,
+        84.08,
+        84.47,
+        101.12,
+        101.6,
+        159.23
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -1135,7 +2358,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 202
     },
     {
       "id": "kapt-a10025886",
@@ -1157,15 +2382,73 @@
       "floors": "최고 39층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        70.23,
+        70.38,
+        70.56,
+        84.25,
+        84.42
+      ],
+      "supply_type_labels": [
+        "95A",
+        "95B",
+        "95B-1",
+        "113B",
+        "114A"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 485,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 70.56,
+          "supply_m2": 95.43,
+          "supply_label": "95A",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=111552"
+        },
+        {
+          "exclusive_m2": 70.38,
+          "supply_m2": 95.54,
+          "supply_label": "95B",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=111552"
+        },
+        {
+          "exclusive_m2": 70.23,
+          "supply_m2": 95.51,
+          "supply_label": "95B-1",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=111552"
+        },
+        {
+          "exclusive_m2": 84.25,
+          "supply_m2": 113.9,
+          "supply_label": "113B",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=111552"
+        },
+        {
+          "exclusive_m2": 84.41,
+          "supply_m2": 114.21,
+          "supply_label": "114A",
+          "rooms": 4,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=111552"
+        }
+      ],
+      "area_type_pairs_source": "https://www.aldongsan.com/aptview.php?id=111552",
+      "area_type_pairs_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a10026038",
@@ -1187,15 +2470,78 @@
       "floors": "최고 47층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        59.97,
+        59.99,
+        72.99,
+        84.97,
+        101.99
+      ],
+      "supply_type_labels": [
+        "84A",
+        "85B",
+        "102",
+        "118",
+        "142",
+        "240A",
+        "242B"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 497,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 59.97,
+          "supply_m2": 84.77,
+          "supply_label": "84A",
+          "source_url": "https://kbland.kr/c/31288",
+          "market_pyeong": 25
+        },
+        {
+          "exclusive_m2": 59.99,
+          "supply_m2": 85.37,
+          "supply_label": "85B",
+          "source_url": "https://kbland.kr/c/31288"
+        },
+        {
+          "exclusive_m2": 72.99,
+          "supply_m2": 102.6,
+          "supply_label": "102",
+          "source_url": "https://kbland.kr/c/31288"
+        },
+        {
+          "exclusive_m2": 84.97,
+          "supply_m2": 118.39,
+          "supply_label": "118",
+          "source_url": "https://kbland.kr/c/31288"
+        },
+        {
+          "exclusive_m2": 101.99,
+          "supply_m2": 142.58,
+          "supply_label": "142",
+          "source_url": "https://kbland.kr/c/31288"
+        },
+        {
+          "exclusive_m2": 171.28,
+          "supply_m2": 240.85,
+          "supply_label": "240A",
+          "source_url": "https://kbland.kr/c/31288"
+        },
+        {
+          "exclusive_m2": 172.15,
+          "supply_m2": 242.71,
+          "supply_label": "242B",
+          "source_url": "https://kbland.kr/c/31288"
+        }
+      ],
+      "supply_type_source_url": "https://kbland.kr/c/31288",
+      "area_type_pairs_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a10026547",
@@ -1216,15 +2562,36 @@
       "floors": "최고 33층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        63.95,
+        63.97,
+        74.93,
+        74.95,
+        84.89,
+        84.94,
+        84.96
+      ],
+      "supply_type_labels": [
+        "88A",
+        "88B",
+        "102A",
+        "103B",
+        "116A",
+        "116B",
+        "116C"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 219,
+      "supply_type_source_url": "https://kbland.kr/se/c/30365",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a10027171",
@@ -1246,15 +2613,44 @@
       "floors": "최고 33층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        63.9,
+        63.95,
+        74.58,
+        74.94,
+        84.82,
+        84.96,
+        84.99,
+        113.4,
+        113.84,
+        113.87,
+        113.9
+      ],
+      "supply_type_labels": [
+        "86B",
+        "87A",
+        "100A",
+        "100B",
+        "114A",
+        "114B",
+        "116C",
+        "150A",
+        "151D",
+        "151B",
+        "153C"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 344,
+      "supply_type_source_url": "https://kbland.kr/se/c/29398",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a10027367",
@@ -1276,15 +2672,40 @@
       "floors": "최고 41층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        59.86,
+        59.94,
+        59.98,
+        72.22,
+        72.25,
+        84.52,
+        84.85,
+        105.9,
+        105.92
+      ],
+      "supply_type_labels": [
+        "82A",
+        "82C",
+        "83B",
+        "99A",
+        "99B",
+        "115A",
+        "115B",
+        "143A",
+        "143B"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 233,
+      "supply_type_source_url": "https://kbland.kr/se/c/28828",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a10027653",
@@ -1306,15 +2727,32 @@
       "floors": "최고 55층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        59.74,
+        59.86,
+        59.97,
+        84.58,
+        101.31
+      ],
+      "supply_type_labels": [
+        "91A",
+        "91C",
+        "92B",
+        "117",
+        "141"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 211,
+      "supply_type_source_url": "https://kbland.kr/se/c/27067",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a10027884",
@@ -1336,15 +2774,56 @@
       "floors": "최고 29층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        69.91,
+        84.72,
+        84.73,
+        104.85
+      ],
+      "supply_type_labels": [
+        "94",
+        "112B",
+        "114C",
+        "139"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 47,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 69.91,
+          "supply_m2": 94.2,
+          "supply_label": "94",
+          "source_url": "https://kbland.kr/c/28105"
+        },
+        {
+          "exclusive_m2": 84.72,
+          "supply_m2": 112.99,
+          "supply_label": "112B",
+          "source_url": "https://kbland.kr/c/28105"
+        },
+        {
+          "exclusive_m2": 84.73,
+          "supply_m2": 114.08,
+          "supply_label": "114C",
+          "source_url": "https://kbland.kr/c/28105",
+          "market_pyeong": 34
+        },
+        {
+          "exclusive_m2": 104.85,
+          "supply_m2": 139.47,
+          "supply_label": "139",
+          "source_url": "https://kbland.kr/c/28105"
+        }
+      ],
+      "supply_type_source_url": "https://kbland.kr/c/28105",
+      "area_type_pairs_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a10027887",
@@ -1365,15 +2844,40 @@
       "floors": "최고 46층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.92,
+        84.98,
+        96.52,
+        96.93,
+        143.68
+      ],
+      "supply_type_labels": [
+        "116A",
+        "116B",
+        "131B",
+        "131A",
+        "195",
+        "216",
+        "222",
+        "232",
+        "239",
+        "250",
+        "257",
+        "268",
+        "291"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 77,
+      "supply_type_source_url": "https://kbland.kr/se/c/26598",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a10027888",
@@ -1395,15 +2899,38 @@
       "floors": "최고 34층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.72,
+        84.73,
+        84.89,
+        99.6,
+        99.87,
+        115.14,
+        115.67,
+        117.39
+      ],
+      "supply_type_labels": [
+        "111B",
+        "112A",
+        "112C",
+        "131A",
+        "131B",
+        "150A",
+        "152B",
+        "154"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 100,
+      "supply_type_source_url": "https://kbland.kr/se/c/28106",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40673002",
@@ -1424,15 +2951,26 @@
       "floors": "최고 15층",
       "ev_chargers": 12,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.72,
+        114.89
+      ],
+      "supply_type_labels": [
+        "110",
+        "142"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 65,
+      "supply_type_source_url": "https://kbland.kr/se/c/13298",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a40673101",
@@ -1454,15 +2992,28 @@
       "floors": "최고 15층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        130.58,
+        156.41,
+        189.74
+      ],
+      "supply_type_labels": [
+        "153",
+        "180",
+        "215"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 19,
+      "supply_type_source_url": "https://kbland.kr/se/c/13299",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40673412",
@@ -1484,15 +3035,62 @@
       "floors": "최고 25층",
       "ev_chargers": 29,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.72,
+        84.92,
+        114.7
+      ],
+      "supply_type_labels": [
+        "110",
+        "110A",
+        "110B",
+        "112C",
+        "145"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 140,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 84.71,
+          "supply_m2": 110.37,
+          "supply_label": "110",
+          "source_url": "https://kbland.kr/c/13575",
+          "market_pyeong": 33
+        },
+        {
+          "exclusive_m2": 84.71,
+          "supply_m2": 110.79,
+          "supply_label": "110A",
+          "source_url": "https://kbland.kr/c/13575"
+        },
+        {
+          "exclusive_m2": 84.71,
+          "supply_m2": 110.79,
+          "supply_label": "110B",
+          "source_url": "https://kbland.kr/c/13575"
+        },
+        {
+          "exclusive_m2": 84.91,
+          "supply_m2": 112.33,
+          "supply_label": "112C",
+          "source_url": "https://kbland.kr/c/13575"
+        },
+        {
+          "exclusive_m2": 114.7,
+          "supply_m2": 145.02,
+          "supply_label": "145",
+          "source_url": "https://kbland.kr/c/13575"
+        }
+      ],
+      "supply_type_source_url": "https://kbland.kr/c/13575",
+      "area_type_pairs_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40673510",
@@ -1514,15 +3112,26 @@
       "floors": "최고 25층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.94,
+        84.96
+      ],
+      "supply_type_labels": [
+        "110",
+        "117"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 174,
+      "supply_type_source_url": "https://kbland.kr/se/c/13576",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40673603",
@@ -1544,15 +3153,26 @@
       "floors": "최고 20층",
       "ev_chargers": 11,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.94,
+        84.96
+      ],
+      "supply_type_labels": [
+        "110",
+        "118"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 82,
+      "supply_type_source_url": "https://kbland.kr/se/c/13577",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a40673901",
@@ -1603,15 +3223,40 @@
       "floors": "최고 30층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.87,
+        101.26,
+        101.8,
+        134.88,
+        149.41,
+        149.8,
+        177.31
+      ],
+      "supply_type_labels": [
+        "110A",
+        "126-2",
+        "126A",
+        "126T",
+        "163TE1",
+        "164T1",
+        "164T2",
+        "164TE2",
+        "181T1",
+        "182T2",
+        "215T"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 68,
+      "supply_type_source_url": "https://kbland.kr/se/c/15973",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40673903",
@@ -1632,15 +3277,36 @@
       "floors": "최고 30층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        76.24,
+        84.41,
+        84.91,
+        84.99,
+        101.13,
+        101.53,
+        118.02
+      ],
+      "supply_type_labels": [
+        "97",
+        "109A",
+        "109B",
+        "110C",
+        "130A",
+        "131B",
+        "152"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 90,
+      "supply_type_source_url": "https://kbland.kr/se/c/25464",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40673904",
@@ -1661,15 +3327,49 @@
       "floors": "최고 46층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        77.14,
+        78.3,
+        96.32,
+        106.93,
+        115.16,
+        125.61,
+        129.05,
+        152.33,
+        152.68,
+        170.69,
+        179
+      ],
+      "supply_type_labels": [
+        "104A",
+        "106B",
+        "129",
+        "143",
+        "154",
+        "167",
+        "171",
+        "203A",
+        "204B",
+        "228",
+        "239",
+        "377C",
+        "377D",
+        "377E",
+        "378A",
+        "378B"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 66,
+      "supply_type_source_url": "https://kbland.kr/se/c/21174",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40673905",
@@ -1720,15 +3420,43 @@
       "floors": "최고 40층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        101.32,
+        101.79,
+        101.81,
+        101.98,
+        111.81,
+        127.12,
+        150.3,
+        150.9,
+        162.31
+      ],
+      "supply_type_labels": [
+        "127A",
+        "128B",
+        "128C",
+        "128D",
+        "128E",
+        "142",
+        "162",
+        "191A",
+        "192B",
+        "206",
+        "338",
+        "342"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 70,
+      "supply_type_source_url": "https://kbland.kr/se/c/21205",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40673907",
@@ -1749,15 +3477,60 @@
       "floors": "최고 31층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.75,
+        94.48,
+        95.39,
+        101.7,
+        115.13,
+        116.82,
+        118.6,
+        120.75,
+        135.66,
+        144.36,
+        144.96,
+        147.66,
+        148.61,
+        273.63
+      ],
+      "supply_type_labels": [
+        "112",
+        "125",
+        "127B",
+        "130A",
+        "155B",
+        "156A",
+        "158C",
+        "161",
+        "179B",
+        "180A",
+        "192A",
+        "192B",
+        "192C",
+        "196",
+        "213",
+        "226",
+        "229",
+        "238",
+        "243",
+        "287",
+        "335",
+        "364",
+        "366A",
+        "366B"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 71,
+      "supply_type_source_url": "https://kbland.kr/se/c/16066",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40673908",
@@ -1778,15 +3551,149 @@
       "floors": "최고 39층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        94.48,
+        95.39,
+        115.13,
+        116.82,
+        118.6,
+        120.75,
+        135.66,
+        144.36,
+        144.96,
+        147.66,
+        148.61,
+        161.53,
+        182.19
+      ],
+      "supply_type_labels": [
+        "126A",
+        "127B",
+        "155B",
+        "156A",
+        "158C",
+        "161",
+        "179B",
+        "180A",
+        "192A",
+        "192B",
+        "196",
+        "237",
+        "242A",
+        "243B",
+        "287",
+        "367"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 69,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 94.47,
+          "supply_m2": 126.11,
+          "supply_label": "126A",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 95.39,
+          "supply_m2": 127.6,
+          "supply_label": "127B",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 115.13,
+          "supply_m2": 155.59,
+          "supply_label": "155B",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 116.82,
+          "supply_m2": 156.47,
+          "supply_label": "156A",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 118.6,
+          "supply_m2": 158.41,
+          "supply_label": "158C",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 120.74,
+          "supply_m2": 161.2,
+          "supply_label": "161",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 148.61,
+          "supply_m2": 179.13,
+          "supply_label": "179B",
+          "source_url": "https://kbland.kr/c/16065",
+          "market_pyeong": 54
+        },
+        {
+          "exclusive_m2": 135.66,
+          "supply_m2": 180.59,
+          "supply_label": "180A",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 144.36,
+          "supply_m2": 192.26,
+          "supply_label": "192A",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 144.95,
+          "supply_m2": 192.75,
+          "supply_label": "192B",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 147.65,
+          "supply_m2": 196.32,
+          "supply_label": "196",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 178.67,
+          "supply_m2": 237.76,
+          "supply_label": "237",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 182.18,
+          "supply_m2": 242.67,
+          "supply_label": "242A",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 161.52,
+          "supply_m2": 243.26,
+          "supply_label": "243B",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 235.77,
+          "supply_m2": 287.09,
+          "supply_label": "287",
+          "source_url": "https://kbland.kr/c/16065"
+        },
+        {
+          "exclusive_m2": 243.41,
+          "supply_m2": 367.21,
+          "supply_label": "367",
+          "source_url": "https://kbland.kr/c/16065"
+        }
+      ],
+      "area_type_pairs_checked_at": "2026-10-20",
+      "supply_type_source_url": "https://kbland.kr/c/16065"
     },
     {
       "id": "kapt-a40673910",
@@ -1808,7 +3715,17 @@
       "floors": "최고 48층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        71.76,
+        101.95,
+        104.74,
+        105.69,
+        133.55,
+        134.81,
+        146.51,
+        147,
+        291.34
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -1816,7 +3733,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 101
     },
     {
       "id": "kapt-a40673911",
@@ -1838,15 +3757,86 @@
       "floors": "최고 25층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.72,
+        84.84,
+        101.45,
+        101.97,
+        116.32,
+        134.31
+      ],
+      "supply_type_labels": [
+        "110B",
+        "112A",
+        "133",
+        "134",
+        "152",
+        "176",
+        "233",
+        "244"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 50,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 84.83,
+          "supply_m2": 110.9,
+          "supply_label": "110B",
+          "source_url": "https://kbland.kr/c/22016"
+        },
+        {
+          "exclusive_m2": 84.72,
+          "supply_m2": 112.84,
+          "supply_label": "112A",
+          "source_url": "https://kbland.kr/c/22016"
+        },
+        {
+          "exclusive_m2": 101.96,
+          "supply_m2": 133.38,
+          "supply_label": "133",
+          "source_url": "https://kbland.kr/c/22016"
+        },
+        {
+          "exclusive_m2": 101.45,
+          "supply_m2": 134.32,
+          "supply_label": "134",
+          "source_url": "https://kbland.kr/c/22016",
+          "market_pyeong": 40
+        },
+        {
+          "exclusive_m2": 116.31,
+          "supply_m2": 152.11,
+          "supply_label": "152",
+          "source_url": "https://kbland.kr/c/22016"
+        },
+        {
+          "exclusive_m2": 134.3,
+          "supply_m2": 176.64,
+          "supply_label": "176",
+          "source_url": "https://kbland.kr/c/22016"
+        },
+        {
+          "exclusive_m2": 180.47,
+          "supply_m2": 233.32,
+          "supply_label": "233",
+          "source_url": "https://kbland.kr/c/22016"
+        },
+        {
+          "exclusive_m2": 187.62,
+          "supply_m2": 244.6,
+          "supply_label": "244",
+          "source_url": "https://kbland.kr/c/22016"
+        }
+      ],
+      "supply_type_source_url": "https://kbland.kr/c/22016",
+      "area_type_pairs_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40673912",
@@ -1868,15 +3858,47 @@
       "floors": "최고 33층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.93,
+        101.07,
+        101.13,
+        101.32,
+        116.32,
+        117.94,
+        118.46,
+        120.31,
+        147.82,
+        195.42,
+        220.17
+      ],
+      "supply_type_labels": [
+        "115",
+        "132A",
+        "133B",
+        "136",
+        "154A",
+        "154B",
+        "154C",
+        "154D",
+        "191",
+        "201",
+        "247",
+        "254",
+        "257",
+        "297"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 95,
+      "supply_type_source_url": "https://kbland.kr/se/c/16181",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40673913",
@@ -1898,15 +3920,57 @@
       "floors": "최고 38층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.88,
+        84.92,
+        84.97,
+        92.86,
+        99.85,
+        113.3,
+        114.77,
+        116.47,
+        118.79,
+        119.48,
+        120.06,
+        151.6
+      ],
+      "supply_type_labels": [
+        "110A",
+        "111B",
+        "113",
+        "121",
+        "131",
+        "148",
+        "151A",
+        "151B",
+        "153B",
+        "155A",
+        "157",
+        "194",
+        "196"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 108,
+      "supply_type_source_url": "https://kbland.kr/se/c/22373",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 120.06,
+          "supply_m2": 157,
+          "supply_label": "157",
+          "source_url": "https://kbland.kr/c/22373",
+          "market_pyeong": 47
+        }
+      ],
+      "area_type_pairs_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40673914",
@@ -1927,15 +3991,40 @@
       "floors": "최고 28층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.99,
+        101.81,
+        101.94,
+        102,
+        111.65,
+        112.16,
+        117.25,
+        129.17
+      ],
+      "supply_type_labels": [
+        "114",
+        "128",
+        "131A",
+        "131B",
+        "131C",
+        "140A",
+        "141B",
+        "157",
+        "162",
+        "174"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 61,
+      "supply_type_source_url": "https://kbland.kr/se/c/22886",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a40673915",
@@ -1956,15 +4045,36 @@
       "floors": "최고 27층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.99,
+        101.81,
+        101.94,
+        102,
+        111.65,
+        112.16,
+        129.17
+      ],
+      "supply_type_labels": [
+        "114",
+        "128",
+        "131A",
+        "132C",
+        "132B",
+        "140A",
+        "141B"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 67,
+      "supply_type_source_url": "https://kbland.kr/se/c/22885",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a40673916",
@@ -1986,15 +4096,32 @@
       "floors": "최고 38층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.85,
+        84.92,
+        84.98,
+        113.91
+      ],
+      "supply_type_labels": [
+        "112A",
+        "113C",
+        "113B",
+        "149",
+        "178",
+        "213"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": "K-apt 공개 세대수 항목 차이: hoCnt 641세대, kaptdaCnt 638세대. 총세대수는 hoCnt 기준.",
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 73,
+      "supply_type_source_url": "https://kbland.kr/se/c/23019",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a40673917",
@@ -2016,7 +4143,12 @@
       "floors": "최고 32층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        84.98,
+        85,
+        110.25,
+        110.76
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -2024,7 +4156,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 65
     },
     {
       "id": "kapt-a40673918",
@@ -2046,7 +4180,11 @@
       "floors": "최고 20층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        129.39,
+        129.74,
+        142.66
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -2054,7 +4192,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 23
     },
     {
       "id": "kapt-a40673920",
@@ -2075,7 +4215,21 @@
       "floors": "최고 40층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        84.4,
+        84.44,
+        84.47,
+        84.48,
+        84.64,
+        111.46,
+        111.62,
+        123.31,
+        123.42,
+        123.53,
+        139.02,
+        139.29,
+        139.42
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -2083,7 +4237,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 168
     },
     {
       "id": "kapt-a40673921",
@@ -2105,15 +4261,42 @@
       "floors": "최고 45층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.98,
+        94.98,
+        94.99,
+        101.25,
+        101.98,
+        101.99,
+        115.93,
+        115.98,
+        134.96
+      ],
+      "supply_type_labels": [
+        "117A",
+        "130B",
+        "131",
+        "139B",
+        "139C",
+        "141A",
+        "155A1",
+        "155B",
+        "157A",
+        "183A",
+        "302"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 215,
+      "supply_type_source_url": "https://kbland.kr/se/c/23030",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40673922",
@@ -2135,7 +4318,15 @@
       "floors": "최고 42층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        64.7,
+        84.53,
+        84.85,
+        84.87,
+        98.24,
+        115.77,
+        125.93
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -2143,7 +4334,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 179
     },
     {
       "id": "kapt-a40673923",
@@ -2165,7 +4358,13 @@
       "floors": "최고 33층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        59.92,
+        72.51,
+        84.34,
+        84.87,
+        101.93
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -2173,7 +4372,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 148
     },
     {
       "id": "kapt-a40673924",
@@ -2194,15 +4395,36 @@
       "floors": "최고 32층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        74.89,
+        84.34,
+        84.87,
+        84.99,
+        99.98,
+        117.9,
+        124.88
+      ],
+      "supply_type_labels": [
+        "101",
+        "110B",
+        "111C",
+        "113A",
+        "129",
+        "150",
+        "154"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 97,
+      "supply_type_source_url": "https://kbland.kr/se/c/26152",
+      "supply_type_checked_at": "2026-10-20",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인"
     },
     {
       "id": "kapt-a40684004",
@@ -2224,15 +4446,53 @@
       "floors": "최고 15층",
       "ev_chargers": 26,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.89,
+        134.58,
+        148.97
+      ],
+      "supply_type_labels": [
+        "107",
+        "162",
+        "182"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 76,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 84.89,
+          "supply_m2": 107.6,
+          "supply_label": "107",
+          "rooms": 3,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=17453"
+        },
+        {
+          "exclusive_m2": 134.58,
+          "supply_m2": 162.11,
+          "supply_label": "162",
+          "rooms": 4,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=17453"
+        },
+        {
+          "exclusive_m2": 148.97,
+          "supply_m2": 182.78,
+          "supply_label": "182",
+          "rooms": 5,
+          "baths": 2,
+          "source_url": "https://www.aldongsan.com/aptview.php?id=17453"
+        }
+      ],
+      "area_type_pairs_source": "https://www.aldongsan.com/aptview.php?id=17453",
+      "area_type_pairs_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40684005",
@@ -2253,7 +4513,14 @@
       "floors": "최고 20층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        84.5,
+        84.78,
+        101.62,
+        101.86,
+        134.19,
+        182.2
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -2261,7 +4528,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 59
     },
     {
       "id": "kapt-a40684007",
@@ -2283,7 +4552,12 @@
       "floors": "최고 20층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        84.59,
+        84.66,
+        84.91,
+        134.51
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -2291,7 +4565,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 72
     },
     {
       "id": "kapt-a40684008",
@@ -2313,7 +4589,13 @@
       "floors": "최고 20층",
       "ev_chargers": 42,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        84.12,
+        84.96,
+        101.85,
+        123.19,
+        152.46
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -2321,7 +4603,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 51
     },
     {
       "id": "kapt-a40684009",
@@ -2343,15 +4627,98 @@
       "floors": "최고 15층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.96,
+        84.97,
+        101,
+        101.69,
+        101.99,
+        107.81,
+        119.79,
+        119.91,
+        134.99,
+        149.59,
+        180.5,
+        182.07
+      ],
+      "supply_type_labels": [
+        "107T",
+        "128T",
+        "134D",
+        "146A",
+        "146T",
+        "162A",
+        "164T",
+        "180T",
+        "205TEA"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": "K-apt 공개 세대수 항목 차이: hoCnt 812세대, kaptdaCnt 798세대. 총세대수는 hoCnt 기준.",
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 68,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 84.96,
+          "supply_m2": 107.69,
+          "supply_label": "107T",
+          "source_url": "https://kbland.kr/c/15132"
+        },
+        {
+          "exclusive_m2": 101.69,
+          "supply_m2": 128.68,
+          "supply_label": "128T",
+          "source_url": "https://kbland.kr/c/15132"
+        },
+        {
+          "exclusive_m2": 107.81,
+          "supply_m2": 134.46,
+          "supply_label": "134D",
+          "source_url": "https://kbland.kr/c/15132"
+        },
+        {
+          "exclusive_m2": 119.91,
+          "supply_m2": 146.28,
+          "supply_label": "146A",
+          "source_url": "https://kbland.kr/c/15132"
+        },
+        {
+          "exclusive_m2": 119.79,
+          "supply_m2": 146.72,
+          "supply_label": "146T",
+          "source_url": "https://kbland.kr/c/15132"
+        },
+        {
+          "exclusive_m2": 134.99,
+          "supply_m2": 162.75,
+          "supply_label": "162A",
+          "source_url": "https://kbland.kr/c/15132"
+        },
+        {
+          "exclusive_m2": 134.99,
+          "supply_m2": 164.77,
+          "supply_label": "164T",
+          "source_url": "https://kbland.kr/c/15132"
+        },
+        {
+          "exclusive_m2": 149.59,
+          "supply_m2": 180.46,
+          "supply_label": "180T",
+          "source_url": "https://kbland.kr/c/15132"
+        },
+        {
+          "exclusive_m2": 182.07,
+          "supply_m2": 205.89,
+          "supply_label": "205TEA",
+          "source_url": "https://kbland.kr/c/15132"
+        }
+      ],
+      "supply_type_source_url": "https://kbland.kr/c/15132",
+      "area_type_pairs_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40684011",
@@ -2373,15 +4740,134 @@
       "floors": "최고 15층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        84.96,
+        84.97,
+        101.69,
+        101.9,
+        101.99,
+        107.81,
+        119.79,
+        119.91,
+        134.99,
+        149.59,
+        180.5,
+        182.05
+      ],
+      "supply_type_labels": [
+        "107T",
+        "108A",
+        "127A",
+        "128C",
+        "128T",
+        "134D",
+        "145A",
+        "146T",
+        "163A",
+        "164T",
+        "164TE",
+        "165C",
+        "180T",
+        "206TE"
+      ],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
       "detail_note": null,
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 86,
+      "area_type_pairs": [
+        {
+          "exclusive_m2": 84.96,
+          "supply_m2": 107.45,
+          "supply_label": "107T",
+          "source_url": "https://kbland.kr/c/15114"
+        },
+        {
+          "exclusive_m2": 84.97,
+          "supply_m2": 108.31,
+          "supply_label": "108A",
+          "source_url": "https://kbland.kr/c/15114"
+        },
+        {
+          "exclusive_m2": 101.99,
+          "supply_m2": 127.1,
+          "supply_label": "127A",
+          "source_url": "https://kbland.kr/c/15114"
+        },
+        {
+          "exclusive_m2": 101.9,
+          "supply_m2": 128.19,
+          "supply_label": "128C",
+          "source_url": "https://kbland.kr/c/15114"
+        },
+        {
+          "exclusive_m2": 101.69,
+          "supply_m2": 128.38,
+          "supply_label": "128T",
+          "source_url": "https://kbland.kr/c/15114"
+        },
+        {
+          "exclusive_m2": 107.81,
+          "supply_m2": 134.14,
+          "supply_label": "134D",
+          "source_url": "https://kbland.kr/c/15114"
+        },
+        {
+          "exclusive_m2": 119.91,
+          "supply_m2": 145.92,
+          "supply_label": "145A",
+          "source_url": "https://kbland.kr/c/15114",
+          "market_pyeong": 44
+        },
+        {
+          "exclusive_m2": 119.79,
+          "supply_m2": 146.35,
+          "supply_label": "146T",
+          "source_url": "https://kbland.kr/c/15114"
+        },
+        {
+          "exclusive_m2": 134.99,
+          "supply_m2": 163.07,
+          "supply_label": "163A",
+          "source_url": "https://kbland.kr/c/15114"
+        },
+        {
+          "exclusive_m2": 143.97,
+          "supply_m2": 164.15,
+          "supply_label": "164TE",
+          "source_url": "https://kbland.kr/c/15114"
+        },
+        {
+          "exclusive_m2": 134.99,
+          "supply_m2": 164.35,
+          "supply_label": "164T",
+          "source_url": "https://kbland.kr/c/15114"
+        },
+        {
+          "exclusive_m2": 134.99,
+          "supply_m2": 165.11,
+          "supply_label": "165C",
+          "source_url": "https://kbland.kr/c/15114"
+        },
+        {
+          "exclusive_m2": 149.59,
+          "supply_m2": 180.01,
+          "supply_label": "180T",
+          "source_url": "https://kbland.kr/c/15114"
+        },
+        {
+          "exclusive_m2": 182.05,
+          "supply_m2": 206.17,
+          "supply_label": "206TE",
+          "source_url": "https://kbland.kr/c/15114"
+        }
+      ],
+      "supply_type_source_url": "https://kbland.kr/c/15114",
+      "area_type_pairs_checked_at": "2026-10-20"
     },
     {
       "id": "kapt-a40684013",
@@ -2403,7 +4889,24 @@
       "floors": "최고 63층",
       "ev_chargers": null,
       "floorplans": [],
-      "area_types_m2": [],
+      "area_types_m2": [
+        84.9,
+        84.99,
+        94.28,
+        101.75,
+        105.47,
+        116.13,
+        120.87,
+        123.02,
+        125.97,
+        140.52,
+        141.16,
+        146.7,
+        147.36,
+        172.55,
+        179.17,
+        222.78
+      ],
       "supply_type_labels": [],
       "source_url": "https://www.k-apt.go.kr/",
       "detail_source": "국토교통부 K-apt 공동주택 기본정보 공개 API",
@@ -2411,7 +4914,9 @@
       "detail_source_url": "https://www.k-apt.go.kr/",
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
-      "schools": []
+      "schools": [],
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 175
     },
     {
       "id": "verified-extra-01",
@@ -2433,8 +4938,24 @@
       "management_phone": "032-833-0812",
       "address": "인천광역시 연수구 컨벤시아대로42번길 96",
       "lot_address": "인천광역시 연수구 송도동 15-2",
-      "area_types_m2": [],
-      "supply_type_labels": [],
+      "area_types_m2": [
+        99.31,
+        113.76,
+        116.47,
+        118.21,
+        128.47,
+        129.18,
+        146.7
+      ],
+      "supply_type_labels": [
+        "121",
+        "139",
+        "142",
+        "144",
+        "157A",
+        "157B",
+        "179"
+      ],
       "floorplans": [],
       "schools": [],
       "source_url": "https://kbland.kr/se/c/24540",
@@ -2442,7 +4963,12 @@
       "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
       "detail_checked_at": "2026-10-19",
       "parent_catalog_id": "kapt-a40673901",
-      "detail_note": "K-apt는 6·9·10단지의 합계 1,337세대로 표시합니다. 이 값은 개별 단지의 세대수가 아니며, 본 단지는 단지별 공개자료 수치입니다."
+      "detail_note": "K-apt는 6·9·10단지의 합계 1,337세대로 표시합니다. 이 값은 개별 단지의 세대수가 아니며, 본 단지는 단지별 공개자료 수치입니다.",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 44,
+      "supply_type_source_url": "https://kbland.kr/se/c/24540",
+      "supply_type_source_status": "KB 단지 공급타입명 확인 · 전용면적 소수점 대응 미확인",
+      "supply_type_checked_at": "2026-10-20"
     },
     {
       "id": "verified-extra-02",
@@ -2464,7 +4990,15 @@
       "management_phone": null,
       "address": "인천광역시 연수구 컨벤시아대로42번길 77",
       "lot_address": "인천광역시 연수구 송도동 16-6",
-      "area_types_m2": [],
+      "area_types_m2": [
+        84.99,
+        99.31,
+        113.76,
+        116.34,
+        116.47,
+        126.48,
+        146.7
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
@@ -2473,7 +5007,9 @@
       "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
       "detail_checked_at": "2026-10-19",
       "parent_catalog_id": "kapt-a40673901",
-      "detail_note": "K-apt는 6·9·10단지의 합계 1,337세대로 표시합니다. 이 값은 개별 단지의 세대수가 아니며, 본 단지는 단지별 공개자료 수치입니다."
+      "detail_note": "K-apt는 6·9·10단지의 합계 1,337세대로 표시합니다. 이 값은 개별 단지의 세대수가 아니며, 본 단지는 단지별 공개자료 수치입니다.",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 72
     },
     {
       "id": "verified-extra-03",
@@ -2495,7 +5031,14 @@
       "management_phone": null,
       "address": "인천광역시 연수구 컨벤시아대로42번길 95",
       "lot_address": "인천광역시 연수구 송도동 16-4",
-      "area_types_m2": [],
+      "area_types_m2": [
+        84.99,
+        99.31,
+        115.07,
+        116.34,
+        128.47,
+        170.77
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
@@ -2506,7 +5049,9 @@
       "parent_catalog_id": "kapt-a40673901",
       "detail_note": "사용자 제공 네이버페이 부동산 원본 화면과 단지별 기본정보 대조 완료. K-apt 통합 관리단지(6·9·10단지 합계 1,337세대)와 별개로 10단지는 461세대·6개동입니다. 전기차 충전시설과 관리사무소 전화번호는 별도 확인 필요.",
       "naver_sample_verified": "2026-10-19",
-      "heating_detail": "지역난방 / 열병합"
+      "heating_detail": "지역난방 / 열병합",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 62
     },
     {
       "id": "verified-extra-04",
@@ -2528,7 +5073,16 @@
       "management_phone": null,
       "address": "인천광역시 연수구 해돋이로171번길 11",
       "lot_address": "인천광역시 연수구 송도동 22-12",
-      "area_types_m2": [],
+      "area_types_m2": [
+        84.01,
+        84.07,
+        84.37,
+        84.51,
+        84.55,
+        84.88,
+        84.92,
+        84.94
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
@@ -2536,7 +5090,9 @@
       "last_verified": "2026-10-19",
       "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
       "detail_checked_at": "2026-10-19",
-      "detail_note": "주차대수 출처차이: 당근부동산 124대 / 다른 공개 출처 123대. 당근 자료를 우선 표시, 관리사무소 확인 권장."
+      "detail_note": "주차대수 출처차이: 당근부동산 124대 / 다른 공개 출처 123대. 당근 자료를 우선 표시, 관리사무소 확인 권장.",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 27
     },
     {
       "id": "verified-extra-05",
@@ -2558,7 +5114,12 @@
       "management_phone": null,
       "address": "인천광역시 연수구 해돋이로 160-7",
       "lot_address": "인천광역시 연수구 송도동 21-34",
-      "area_types_m2": [],
+      "area_types_m2": [
+        46.6,
+        52.4,
+        53.28,
+        58.04
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
@@ -2568,7 +5129,9 @@
       "detail_checked_at": "2026-10-19",
       "naver_sample_verified": "2026-10-19",
       "heating_detail": "지역난방 / 열병합",
-      "detail_note": "사용자 제공 네이버페이 부동산 원본 화면과 기 등록 기본정보 일치. 주차 73대, 64세대, 1개동, 지역난방/열병합. 관리사무소 전화번호·전기차 충전 수는 미확인."
+      "detail_note": "사용자 제공 네이버페이 부동산 원본 화면과 기 등록 기본정보 일치. 주차 73대, 64세대, 1개동, 지역난방/열병합. 관리사무소 전화번호·전기차 충전 수는 미확인.",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 18
     },
     {
       "id": "verified-extra-06",
@@ -2590,7 +5153,9 @@
       "management_phone": null,
       "address": "인천광역시 연수구 해돋이로171번길 9-4",
       "lot_address": "인천광역시 연수구 송도동 22-6",
-      "area_types_m2": [],
+      "area_types_m2": [
+        41.1
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
@@ -2600,7 +5165,9 @@
       "detail_checked_at": "2026-10-19",
       "naver_sample_verified": "2026-10-19",
       "heating_detail": "지역난방 / 열병합",
-      "detail_note": "사용자 제공 네이버페이 부동산 '송도아리스타프라임(주상복합)' 화면의 아파트 90세대 기준. 오피스텔 수치와 합산하지 않음."
+      "detail_note": "사용자 제공 네이버페이 부동산 '송도아리스타프라임(주상복합)' 화면의 아파트 90세대 기준. 오피스텔 수치와 합산하지 않음.",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 19
     },
     {
       "id": "verified-extra-07",
@@ -2622,7 +5189,11 @@
       "management_phone": null,
       "address": "인천광역시 연수구 신송로 165-17",
       "lot_address": "인천광역시 연수구 송도동 21-16",
-      "area_types_m2": [],
+      "area_types_m2": [
+        78.98,
+        83.18,
+        84.6
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
@@ -2632,7 +5203,9 @@
       "detail_checked_at": "2026-10-19",
       "detail_note": "2026-10-19 사용자 제공 네이버페이 부동산 '월드메르디앙송도' 단지정보 화면 우선 반영. 기존 참고 자료에 1개동·주차 259대가 있었으나 네이버 원본은 4개동·주차 145대여서 수정. 출처별 정의 또는 과거 자료 차이가 있으므로 4개동·145대 기준으로 표시하고 확인사항 보존.",
       "naver_sample_verified": "2026-10-19",
-      "heating_detail": "지역난방 / 열병합"
+      "heating_detail": "지역난방 / 열병합",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 8
     },
     {
       "id": "verified-extra-08",
@@ -2654,7 +5227,10 @@
       "management_phone": null,
       "address": "인천광역시 연수구 신송로118번길 9",
       "lot_address": "인천광역시 연수구 송도동 2-5",
-      "area_types_m2": [],
+      "area_types_m2": [
+        120.06,
+        122.76
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
@@ -2662,7 +5238,9 @@
       "last_verified": "2026-10-19",
       "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
       "detail_checked_at": "2026-10-19",
-      "detail_note": "같은 주소에 공동주택 42세대와 별도 오피스텔 24세대가 존재합니다. 이 항목은 주상복합 내 공동주택 42세대만 의미합니다."
+      "detail_note": "같은 주소에 공동주택 42세대와 별도 오피스텔 24세대가 존재합니다. 이 항목은 주상복합 내 공동주택 42세대만 의미합니다.",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 9
     },
     {
       "id": "verified-extra-09",
@@ -2684,7 +5262,12 @@
       "management_phone": null,
       "address": "인천광역시 연수구 컨벤시아대로42번길 8",
       "lot_address": "인천광역시 연수구 송도동 15-12",
-      "area_types_m2": [],
+      "area_types_m2": [
+        134.82,
+        134.97,
+        148.31,
+        227.97
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
@@ -2692,7 +5275,9 @@
       "last_verified": "2026-10-19",
       "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
       "detail_checked_at": "2026-10-19",
-      "detail_note": "해당 건물에는 공동주택과 별도 오피스텔이 혼재합니다. 표시된 세대수·주차대수는 주상복합 공동주택 기준이며 오피스텔 수치를 합산하지 않습니다."
+      "detail_note": "해당 건물에는 공동주택과 별도 오피스텔이 혼재합니다. 표시된 세대수·주차대수는 주상복합 공동주택 기준이며 오피스텔 수치를 합산하지 않습니다.",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 15
     },
     {
       "id": "verified-extra-10",
@@ -2714,7 +5299,13 @@
       "management_phone": null,
       "address": "인천광역시 연수구 컨벤시아대로42번길 12",
       "lot_address": "인천광역시 연수구 송도동 15-11",
-      "area_types_m2": [],
+      "area_types_m2": [
+        134.82,
+        134.97,
+        148.31,
+        217.8,
+        227.97
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
@@ -2722,7 +5313,9 @@
       "last_verified": "2026-10-19",
       "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
       "detail_checked_at": "2026-10-19",
-      "detail_note": "해당 건물에는 공동주택과 별도 오피스텔이 혼재합니다. 표시된 세대수·주차대수는 주상복합 공동주택 기준이며 오피스텔 수치를 합산하지 않습니다."
+      "detail_note": "해당 건물에는 공동주택과 별도 오피스텔이 혼재합니다. 표시된 세대수·주차대수는 주상복합 공동주택 기준이며 오피스텔 수치를 합산하지 않습니다.",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 15
     },
     {
       "id": "verified-extra-11",
@@ -2744,14 +5337,21 @@
       "management_phone": null,
       "address": "인천광역시 연수구 컨벤시아대로 60",
       "lot_address": "인천광역시 연수구 송도동 20-23",
-      "area_types_m2": [],
+      "area_types_m2": [
+        127.05,
+        137.55,
+        138.27,
+        156.85
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
       "source_url": "https://kbland.kr/se/c/21999",
       "last_verified": "2026-10-19",
       "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
-      "detail_checked_at": "2026-10-19"
+      "detail_checked_at": "2026-10-19",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 10
     },
     {
       "id": "verified-extra-12",
@@ -2773,14 +5373,20 @@
       "management_phone": null,
       "address": "인천광역시 연수구 컨벤시아대로 116",
       "lot_address": "인천광역시 연수구 송도동 22-21",
-      "area_types_m2": [],
+      "area_types_m2": [
+        127.05,
+        138.27,
+        156.85
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
       "source_url": "https://kbland.kr/se/c/22000",
       "last_verified": "2026-10-19",
       "detail_source": "공개 단지별 기본정보: KB부동산·당근부동산·국토부 실거래 단지 주소 대조",
-      "detail_checked_at": "2026-10-19"
+      "detail_checked_at": "2026-10-19",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 8
     },
     {
       "id": "verified-extra-13",
@@ -2804,14 +5410,21 @@
       "ev_chargers": null,
       "management_phone": null,
       "lot_address": "인천광역시 연수구 송도동 21-59",
-      "area_types_m2": [],
+      "area_types_m2": [
+        131.37,
+        135.93,
+        142.13,
+        142.36
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
       "detail_source": "공개 아파트 단지정보(주소·공동주택 수치 확인)",
-      "detail_note": "KB부동산과 K-apt는 3·4·5·6단지 합계 476세대(8개동)를 제공하기도 합니다. 본 3단지는 118세대·2개동으로 별도 확인. 단독 주차대수는 추가 확인이 필요합니다."
+      "detail_note": "KB부동산과 K-apt는 3·4·5·6단지 합계 476세대(8개동)를 제공하기도 합니다. 본 3단지는 118세대·2개동으로 별도 확인. 단독 주차대수는 추가 확인이 필요합니다.",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 23
     },
     {
       "id": "verified-extra-14",
@@ -2835,14 +5448,20 @@
       "ev_chargers": null,
       "management_phone": null,
       "lot_address": "인천광역시 연수구 송도동 21-60",
-      "area_types_m2": [],
+      "area_types_m2": [
+        142.13,
+        142.36,
+        170.06
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
       "detail_source": "공개 아파트 단지정보(주소·공동주택 수치 확인)",
-      "detail_note": "K-apt 통합 관리단지와 별개로 표시하는 주상복합 내 공동주택 단지입니다."
+      "detail_note": "K-apt 통합 관리단지와 별개로 표시하는 주상복합 내 공동주택 단지입니다.",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 17
     },
     {
       "id": "verified-extra-15",
@@ -2866,14 +5485,21 @@
       "ev_chargers": null,
       "management_phone": null,
       "lot_address": "인천광역시 연수구 송도동 21-64",
-      "area_types_m2": [],
+      "area_types_m2": [
+        142.13,
+        142.36,
+        170.06,
+        239.72
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
       "detail_source": "공개 아파트 단지정보(주소·공동주택 수치 확인)",
-      "detail_note": "K-apt 통합 관리단지와 별개로 표시하는 주상복합 내 공동주택 단지입니다."
+      "detail_note": "K-apt 통합 관리단지와 별개로 표시하는 주상복합 내 공동주택 단지입니다.",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 15
     },
     {
       "id": "verified-extra-16",
@@ -2897,14 +5523,21 @@
       "ev_chargers": null,
       "management_phone": null,
       "lot_address": "인천광역시 연수구 송도동 21-65",
-      "area_types_m2": [],
+      "area_types_m2": [
+        142.13,
+        142.36,
+        173.3,
+        239.72
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
       "detail_source": "공개 아파트 단지정보(주소·공동주택 수치 확인)",
-      "detail_note": "K-apt 통합 관리단지와 별개로 표시하는 주상복합 내 공동주택 단지입니다."
+      "detail_note": "K-apt 통합 관리단지와 별개로 표시하는 주상복합 내 공동주택 단지입니다.",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 19
     },
     {
       "id": "verified-extra-17",
@@ -2927,14 +5560,27 @@
       "ev_chargers": null,
       "management_phone": null,
       "lot_address": "인천광역시 연수구 송도동 21-28",
-      "area_types_m2": [],
+      "area_types_m2": [
+        39.65,
+        43.68,
+        44.2,
+        45.27,
+        48.22,
+        49.72,
+        54.03,
+        57.78,
+        63.4,
+        64.93
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
       "detail_source": "공개 아파트 단지정보(주소·공동주택 수치 확인)",
-      "detail_note": null
+      "detail_note": null,
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 18
     },
     {
       "id": "verified-extra-18",
@@ -2957,14 +5603,20 @@
       "ev_chargers": null,
       "management_phone": null,
       "lot_address": "인천광역시 연수구 송도동 22-18",
-      "area_types_m2": [],
+      "area_types_m2": [
+        49.59,
+        49.79,
+        49.98
+      ],
       "supply_type_labels": [],
       "floorplans": [],
       "schools": [],
       "last_verified": "2026-10-19",
       "detail_checked_at": "2026-10-19",
       "detail_source": "공개 아파트 단지정보(주소·공동주택 수치 확인)",
-      "detail_note": "K-apt 미등록 소규모 단지. 건축물대장 기반 공개자료 48세대·2017-05-12·주차 60대를 사용했으며 동수·정확한 도로명주소는 미확인입니다."
+      "detail_note": "K-apt 미등록 소규모 단지. 건축물대장 기반 공개자료 48세대·2017-05-12·주차 60대를 사용했으며 동수·정확한 도로명주소는 미확인입니다.",
+      "area_types_source": "국토교통부 실거래가 공개자료에서 관측된 전용면적 · 모든 법정 타입을 보장하지 않음",
+      "area_types_observation_count": 10
     }
   ]
 }
