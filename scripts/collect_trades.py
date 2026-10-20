@@ -177,6 +177,8 @@ def normalize(row, category, month):
             'contract_term_raw': get(row, '계약기간', 'contractTerm'),
             'renewal_raw': get(row, '갱신요구권사용', 'useRRRight'),
             'contract_type_raw': get(row, '계약구분', 'contractType'),
+            'previous_deposit_raw': get(row, '종전계약보증금', 'preDeposit'),
+            'previous_monthly_raw': get(row, '종전계약월세', 'preMonthlyRent'),
         })
     return base
 
