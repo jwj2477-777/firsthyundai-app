@@ -1,0 +1,43 @@
+name: Check Gemini API Connection
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/check-gemini-key.yml']
+permissions:
+  contents: read
+jobs:
+  test-key:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Confirm secret is available and Gemini responds
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+          from urllib.request import Request,urlopen
+          from urllib.error import HTTPError,URLError
+          key=os.environ.get("GEMINI_API_KEY","").strip()
+          if not key:
+              print("FAIL: GEMINI_API_KEY is not set in this GitHub repository")
+              sys.exit(1)
+          url="https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent"
+          body=json.dumps({"contents":[{"parts":[{"text":"한국어로 확인이라고 한 단어만 답하세요."}]}],"generationConfig":{"maxOutputTokens":100}}).encode()
+          req=Request(url,data=body,headers={"x-goog-api-key":key,"Content-Type":"application/json"},method="POST")
+          try:
+              with urlopen(req,timeout=25) as response:
+                  obj=json.loads(response.read(20000))
+              parts=obj.get("candidates",[{}])[0].get("content",{}).get("parts",[])
+              text=" ".join(p.get("text","") for p in parts)
+              print("SUCCESS: Gemini API responded; output_chars:",len(text))
+              if not text.strip():
+                  print("WARNING: API worked but returned an empty text response")
+          except HTTPError as exc:
+              print("FAIL: Gemini HTTP",exc.code,"(secret value never printed)")
+              sys.exit(1)
+          except (URLError,ValueError,IndexError,OSError) as exc:
+              print("FAIL: Gemini network/response error:",type(exc).__name__)
+              sys.exit(1)
+          PY
