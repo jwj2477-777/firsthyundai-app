@@ -193,6 +193,7 @@ function recognize(raw){
  // Contract amount rules. Numerals next to "잔금" are never the total transaction price.
  let price=amountAfter(s,['전세\\s*보증금','보증금','전세금','전세가','전세\\s*대금','매매\\s*대금','매매가','매매금액','매매','집값','전세','보증금은']);
  let rentCombo=s.match(/(?:월세|반전세)\s+([일이삼사오육륙칠팔구한십백천\d,.억만원\\s]+?)\s*에\s*([일이삼사오육륙칠팔구한십백천\d,.억만원]+)(?![가-힣\d])/);
+ if(!rentCombo&&deal==='월세')rentCombo=s.match(/(?:^|\s|,)([일이삼사오육륙칠팔구한십백천\d,.억만원]+)\s*에\s*([일이삼사오육륙칠팔구한십백천\d,.억만원]+)(?=\s|,|$)/);
  if(!price&&rentCombo)price={amount:moneyPart(rentCombo[1]),raw:rentCombo[1]};
  if(price?.amount!=null)apply('price',price.amount,found);
  const explicitTotal=amountAfter(s,['약정\\s*계약금','총\\s*계약금','전체\\s*계약금','계약금\\s*전체는','계약금\\s*전체','계약금\\s*총액']);
