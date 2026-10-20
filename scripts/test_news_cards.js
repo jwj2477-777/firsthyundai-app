@@ -1,0 +1,15 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const html=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/index.html'),'utf8');
+assert.match(html,/newsSummaryBox\{[^}]*background:#eef7fa/);
+assert.match(html,/newsSummarySentences li\{[^}]*color:#285364/);
+assert.match(html,/newsSummaryCount/);
+assert.match(html,/let points=done\?String\(x\.summary\)\.split\(\/\\r\?\\n\/\)/);
+assert.match(html,/escapeHtml\(p\)/);
+assert.match(html,/newsDisplayLimit\+=45;renderNews\(\)/);
+assert.match(html,/let newsDisplayLimit=45/);
+assert.doesNotMatch(html,/원문 확인 필요/);
+assert.match(html,/AI 요약 완료/);
+console.log('Readable, escaped, progressive news cards regression test passed');
