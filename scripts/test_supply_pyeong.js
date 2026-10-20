@@ -37,7 +37,7 @@ assert(!script.includes('const exclusiveAreas='),'Never separately list trade-ex
 assert(!script.includes('const supplyOnly='),'Never separately list the very same supply housing types');
 assert(script.includes('한 주택형을 한 번만 표시합니다.'),'Clearly explain one record per home type');
 assert(script.includes('추가 대조 대상'),'Unmatched inventories are counted, not represented as false extra types');
-assert(script.includes('실거래 관측'),'Users must understand observed trade sizes are not complete legal types');
+assert(script.includes('한 주택형을 한 번만 표시합니다.'),'Housing types must not be duplicated from separate area inventories');
 assert(!script.includes('Math.round(g.area/3.305785)'),'Exclusive-to-pyeong shortcut forbidden');
 const normalization=script.slice(script.indexOf('function normalizeAptName('),script.indexOf('const FAVORITE_MATCH='));
 const funcs=script.slice(script.indexOf('function verifiedSupplyPairs('),script.indexOf('function displayComplexValue('));
