@@ -281,6 +281,7 @@ function parse(){
  const raw=val('rough');
  if(!raw){alert('먼저 현장 메모나 음성입력 내용을 적어 주세요.');return;}
  const result=recognize(raw);report(result);
+ return result;
 }
 function speech(result){
  if(result?.ok&&typeof result.text==='string'){
