@@ -17,6 +17,7 @@ from urllib.request import Request, build_opener, HTTPRedirectHandler
 NEWS=Path(__file__).resolve().parents[1]/"data"/"news.json"
 MODEL="gemini-3.5-flash-lite"
 MAX_NEW_SUMMARIES=8
+MAX_ARTICLE_FETCHES=18
 
 def safe_url(url):
     try:
@@ -139,7 +140,7 @@ def enrich(current,previous,key,read=read_article,generate=summarize,max_calls=M
     for b in previous.get("briefs",[]) if isinstance(previous,dict) else []:
         if b.get("summary_method")=="gemini_article" and b.get("summary"):
             cached[(b.get("id"),b.get("title"))]=b
-    reused=created=0
+    reused=created=attempts=0
     for brief in current["briefs"]:
         previous_brief=cached.get((brief.get("id"),brief.get("title")))
         if previous_brief:
@@ -149,12 +150,15 @@ def enrich(current,previous,key,read=read_article,generate=summarize,max_calls=M
             brief["verification"]="Gemini 기사 본문 요약 · 사실 미검증"
             reused+=1
             continue
-        if not key or created>=max_calls:
+        if not key or created>=max_calls or attempts>=MAX_ARTICLE_FETCHES:
             brief["summary"]="기사 본문을 아직 확인하지 못했습니다. 관련 기사 원문에서 확인해 주세요."
             brief["summary_method"]="headline_only"
             brief["verification"]="기사 제목 수집 · 본문 미확인"
             continue
         for src in brief.get("sources",[])[:2]:
+            if attempts>=MAX_ARTICLE_FETCHES:
+                break
+            attempts+=1
             body=read(src.get("link",""))
             if not body:
                 continue
@@ -170,7 +174,7 @@ def enrich(current,previous,key,read=read_article,generate=summarize,max_calls=M
             brief["summary"]="기사 본문을 아직 확인하지 못했습니다. 관련 기사 원문에서 확인해 주세요."
             brief["summary_method"]="headline_only"
             brief["verification"]="기사 제목 수집 · 본문 미확인"
-    current["ai_summary_stats"]={"created":created,"reused":reused,
+    current["ai_summary_stats"]={"created":created,"reused":reused,"article_fetches":attempts,
         "awaiting_body":sum(b.get("summary_method")!="gemini_article" for b in current["briefs"])}
     current["brief_method"]="RSS 제목 군집 · Gemini 기사 본문 요약(본문 확보 시에만)"
     return current
