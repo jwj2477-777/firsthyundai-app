@@ -497,6 +497,9 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
                     "summary_version":3,
                     "verification":"Groq 기사 본문 요약 · 사실 미검증"})
                 groq_created+=1
+            # Free Groq tier has per-minute token limits, not only request limits.
+            if offset+GROQ_BATCH < len(fallback_items) and not os.environ.get("FIRSTHYUNDAI_GROQ_BLOCKED"):
+                sleep(22)
         # Cost-limited second-opinion reviews only for newly summarized high-impact
         # policy/tax/loan stories with an accessible source body.
         priority=("정책·규제","세금·대출")
