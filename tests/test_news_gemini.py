@@ -24,7 +24,7 @@ class TestGeminiNews(unittest.TestCase):
             {"id":"2","title":"정책 B","sources":[{"link":"https://news.google.com/b","title":"정책 B","publisher":"B"}]},
             {"id":"3","title":"정책 C","sources":[{"link":"https://news.google.com/c","title":"정책 C","publisher":"C"}]}
         ]}
-        compact="송도 개발계획의 사업 일정을 재검토합니다.\n시공사 선정 절차를 다시 진행하기로 했습니다.\\n착공 시점은 추후 발표할 예정입니다."
+        compact="송도 개발계획의 사업 일정을 재검토합니다.\n시공사 선정 절차를 다시 진행하기로 했습니다.\n착공 시점은 추후 발표할 예정입니다."
         before={"briefs":[{"id":"1","title":"정책 A","summary_method":"gemini_article",
                             "summary":compact,"summary_version":3,
                             "summary_model":"gemini-3.5-flash-lite"}]}
