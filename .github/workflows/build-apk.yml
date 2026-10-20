@@ -19,6 +19,7 @@ on:
       - 'scripts/test_naver_basic_facts.js'
       - 'scripts/test_nearby.js'
       - 'scripts/test_mobile_navigation.js'
+      - 'scripts/test_contracts.js'
       - 'scripts/test_apartment_detail_navigation.js'
       - 'scripts/test_refresh_feedback.js'
       - 'scripts/test_public_hub.js'
@@ -36,7 +37,7 @@ on:
       - 'gradle.properties'
       - '.github/workflows/build-apk.yml'
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -80,6 +81,8 @@ jobs:
           node --check /tmp/firsthyundai-ui.js
           node scripts/test_nearby.js
           node scripts/test_mobile_navigation.js
+          node --check app/src/main/assets/contracts.js
+          node scripts/test_contracts.js
           node scripts/test_apartment_detail_navigation.js
           node scripts/test_refresh_feedback.js
           node scripts/test_public_hub.js
@@ -110,3 +113,18 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
+      - name: Publish successful v1.13.0 contract-composer APK
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.13.0.apk
+          unzip -t FirstHyundai-v1.13.0.apk | grep 'No errors detected'
+          if gh release view v1.13.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v1.13.0 FirstHyundai-v1.13.0.apk --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v1.13.0 FirstHyundai-v1.13.0.apk \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title '퍼스트현대 v1.13.0 · 계약문자 작성' \
+              --notes '계약금 일부 선송금 안내 문자 작성·금액 검증·특약·공유·복사·음성입력·단지 연동. 민감한 계약 내용은 GitHub에 저장하지 않습니다. 디버그 APK 서명 불일치로 재설치가 필요할 수 있으니 내 자료를 먼저 백업해 주세요.'
+          fi
