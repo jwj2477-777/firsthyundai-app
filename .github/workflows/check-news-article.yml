@@ -10,6 +10,9 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Diagnose Google News RSS link without third-party credentials
         env:
           NEWS_LINK: "https://news.google.com/rss/articles/CBMiYkFVX3lxTE1MNEdUc3VXNkcxU0FFQ1BlSHA5Z0MzNHNDbFdJRkpZV3prOG1HNVNHYmM2QXllcHdoQUxqeEdXeVRTSUxCQ3pITW5RdVRDbDRKUlVvVU5MU0Rucm1GZ0dvaDFB?oc=5"
