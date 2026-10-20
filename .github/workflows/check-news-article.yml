@@ -52,3 +52,19 @@ jobs:
           except Exception as exc:
               print("Decoder exception:",type(exc).__name__)
           PY
+      - uses: actions/checkout@v4
+      - name: Check resolved publisher body without storing copyrighted text
+        run: |
+          python3 - <<'PY'
+          import sys
+          from urllib.parse import urlsplit
+          from gnews_decoder import decode
+          sys.path.insert(0,"scripts")
+          from summarize_news import read_article
+          url="https://news.google.com/rss/articles/CBMiYkFVX3lxTE1MNEdUc3VXNkcxU0FFQ1BlSHA5Z0MzNHNDbFdJRkpZV3prOG1HNVNHYmM2QXllcHdoQUxqeEdXeVRTSUxCQ3pITW5RdVRDbDRKUlVvVU5MU0Rucm1GZ0dvaDFB?oc=5"
+          original=decode(url,timeout=10)
+          print("Resolved host:",urlsplit(original or "").hostname)
+          if original:
+              body=read_article(original)
+              print("Readable article characters:",len(body))
+          PY
