@@ -110,19 +110,19 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v1.12.7 APK from the stable official-API branch
+      - name: Publish v1.12.8 APK from the stable official-API branch
         if: github.ref == 'refs/heads/feature/official-apis-stable-continuation' && github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view v1.12.7 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo 'v1.12.7 release already exists; leaving the immutable APK untouched'
+          if gh release view v1.12.8 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'v1.12.8 release already exists; leaving the immutable APK untouched'
             exit 0
           fi
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.7.apk
-          unzip -t FirstHyundai-v1.12.7.apk | grep 'No errors detected'
-          sha256sum FirstHyundai-v1.12.7.apk
-          gh release create v1.12.7 FirstHyundai-v1.12.7.apk \
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.8.apk
+          unzip -t FirstHyundai-v1.12.8.apk | grep 'No errors detected'
+          sha256sum FirstHyundai-v1.12.8.apk
+          gh release create v1.12.8 FirstHyundai-v1.12.8.apk \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title '퍼스트현대 v1.12.7 (AI 뉴스 3~4문장 핵심 요약)' \
-            --notes 'v1.12.6 안정버전 기준. Gemini 뉴스를 핵심 발표·사건, 조치와 수치, 시행 시기·진행 상태 중심의 짧은 3~4개 문장으로 분리합니다. 각 문장을 줄바꿈해 표시해 가독성을 높입니다. 기사 원문에 없는 수치·시행일을 만들지 않도록 검증하며 관련 기사 링크를 유지합니다. Gemini가 JSON 객체 대신 배열을 반환할 때 발생한 오류를 수정하고 자동 테스트를 추가했습니다. 뉴스 요약은 공개된 기사 본문 확보 및 API 서비스 용량에 따릅니다. API 키는 GitHub Secrets에서만 사용하며 다른 기능을 유지합니다. 재설치 전 메모를 백업하세요.'
+            --title '퍼스트현대 v1.12.8 (인천 송도 종합뉴스 확대)' \
+            --notes '기존 v1.12.7 안정버전을 기반으로 인천 송도의 부동산·생활·문화·교육·기업·교통·사건사고 등 종합 뉴스를 추가로 수집합니다. 뉴스 필터에 송도 종합을 추가하고 Google 뉴스 RSS 검색어 10개를 확장했습니다. 기사 수집 최대 300건, 뉴스 묶음 최대 180개, 검색어당 최대 90건, 묶음 원문 최대 10건으로 상한을 확대했습니다. 기존 전국 부동산 정책 뉴스와 Gemini 핵심 요약 기능을 유지합니다. 기사는 최근 7일 기준이며 매체 RSS 노출에 따라 일부는 누락될 수 있습니다. APK 설치 전 메모 백업을 권장합니다.'
