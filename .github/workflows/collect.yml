@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - 'scripts/collect_trades.py'
+      - 'scripts/collect_news.py'
+      - 'scripts/summarize_news.py'
+      - 'tests/test_news_gemini.py'
       - 'tests/test_pipeline.py'
       - '.github/workflows/collect.yml'
   workflow_dispatch:
@@ -35,9 +38,16 @@ jobs:
           python-version: '3.11'
       - name: Run collector unit tests
         run: python -m unittest discover -s tests -v
+      - name: Retain previous news summaries for safe reuse
+        run: cp data/news.json /tmp/firsthyundai-previous-news.json
       - name: Collect RSS and create topic briefs
         if: ${{ github.event_name == 'workflow_dispatch' && (inputs.mode == 'all' || inputs.mode == 'news') || github.event.schedule == '17 */3 * * *' || github.event_name == 'push' }}
         run: python scripts/collect_news.py
+      - name: Enrich verified article text with Gemini (optional, capped)
+        if: ${{ github.event_name == 'workflow_dispatch' && (inputs.mode == 'all' || inputs.mode == 'news') || github.event.schedule == '17 */3 * * *' || github.event_name == 'push' }}
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/summarize_news.py --previous /tmp/firsthyundai-previous-news.json
       - name: Collect official apartment transactions
         if: ${{ github.event_name == 'workflow_dispatch' && (inputs.mode == 'all' || inputs.mode == 'trades') || github.event.schedule == '41 19 * * *' || github.event_name == 'push' }}
         env:
