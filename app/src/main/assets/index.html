@@ -726,6 +726,27 @@ function supplyPyeong(supplyM2,marketLabel=null){
  return Number.isSafeInteger(marketLabel)&&Math.abs(marketLabel-n/3.305785)<2?
   marketLabel:Math.round(n/3.305785);
 }
+// Each verified housing type is ONE row: exclusive㎡ + supply-based pyeong.
+// Never add the same type again from trade-observed exclusive areas or
+// supply-only labels; resolve duplicate source rows by rejecting conflicts.
+function canonicalAreaTypes(apt){
+ const map=new Map(),invalid=new Set();
+ for(const p of verifiedSupplyPairs(apt)){
+  const key=p.supply_label;
+  if(invalid.has(key))continue;
+  const existing=map.get(key);
+  if(existing){
+   if(Math.abs(existing.exclusive_m2-p.exclusive_m2)>0.011||
+      Math.abs(existing.supply_m2-p.supply_m2)>0.011){
+    map.delete(key);invalid.add(key);
+   }
+   continue;
+  }
+  map.set(key,p);
+ }
+ return [...map.values()].sort((a,b)=>a.exclusive_m2-b.exclusive_m2||
+    a.supply_m2-b.supply_m2||a.supply_label.localeCompare(b.supply_label,'ko'));
+}
 function supplyForExclusive(apt,exclusiveM2){
  const area=Number(exclusiveM2);
  if(!Number.isFinite(area)||area<=0)return null;
@@ -908,40 +929,26 @@ function renderComplexes(){
    '<p class="complexMeta">자료 확인일 '+escapeHtml(p.detail_checked_at||p.last_verified||'확인 전')+
     (ev!==null&&p.kapt_code?' · 전기차 충전 수치는 2026-09-09 K-apt 공개자료 기준':'')+'</p>'+
    (p.detail_note?'<details class="details"><summary>자료 차이·확인사항 보기</summary><p class="complexSectionNote">'+escapeHtml(p.detail_note)+'</p></details>':'');
-  const types=(Array.isArray(p.supply_type_labels)?p.supply_type_labels:[]).filter(v=>
-   typeof v==='string'&&/^[0-9]{2,3}(?:\.[0-9]{1,2})?[A-Za-z0-9-]{0,8}$/.test(v)).slice(0,45);
-  const verified=verifiedSupplyPairs(p);
-  const exclusiveAreas=[...new Set([
-   ...(Array.isArray(p.area_types_m2)?p.area_types_m2:[]),
-   ...verified.map(x=>x.exclusive_m2),
-   ...complexAreaStats(p).map(x=>x.area)
-  ].filter(x=>Number.isFinite(x)&&x>0&&x<1000).map(x=>Math.round(x*100)/100))].sort((a,b)=>a-b);
-  const verifiedLabels=new Set(verified.map(x=>x.supply_label));
-  const areaTypes=exclusiveAreas.length?'<div class="complexTypeList">'+exclusiveAreas.slice(0,55).map(v=>{
-   const match=supplyForExclusive(p,v);
-   return '<span>'+escapeHtml(displayExclusiveArea(v,p))+
-    (match?' · '+escapeHtml(match.types.join(' / '))+'타입':' · 공급평형 확인 중')+'</span>';
+  const matchedTypes=canonicalAreaTypes(p);
+  // Never render the source's raw exclusive list and the supply-type list as
+  // separate housing types. Those two lists often represent the SAME homes.
+  const areaTypes=matchedTypes.length?'<div class="complexTypeList">'+matchedTypes.map(t=>{
+   const label='전용 '+number(t.exclusive_m2)+'㎡ (약 '+
+    supplyPyeong(t.supply_m2,t.market_pyeong)+'평형)';
+   const secondary=' · '+t.supply_label+'타입 · 공급 '+number(t.supply_m2)+'㎡';
+   return '<span><strong>'+escapeHtml(label)+'</strong>'+
+     '<small class="tiny">'+escapeHtml(secondary)+'</small></span>';
   }).join('')+'</div>':
-   '<div class="empty">공식 실거래에서 관측된 전용면적이 아직 없습니다. 공급타입 자료를 확인해 주세요.</div>';
-  const partialSupplies=types.filter(x=>!verifiedLabels.has(x));
-  // Expand unpaired source-backed supply types immediately for previously blank complexes.
-  const supplyOnly=partialSupplies.length?'<details class="details"'+(!verified.length?' open':'')+'><summary>공급평형 '+partialSupplies.length+'타입 · 전용면적 연결 전</summary>'+
-   '<div class="complexTypeList">'+partialSupplies.map(x=>'<span>'+escapeHtml(displaySupplyType(p,x))+'</span>').join('')+'</div></details>':'';
-  const sourcePairs=[...new Set(verified.map(x=>x.source_url).filter(Boolean))];
-  const typeSources=sourcePairs.slice(0,4).map((url,i)=>sourceLink(url,'공급·전용 대응자료 '+(i+1))).join('')+
-   (types.length&&p.supply_type_source_url?sourceLink(p.supply_type_source_url,'공급타입 출처 · KB부동산'):'');
-  const planning=Array.isArray(p.exclusive_plan_labels)?p.exclusive_plan_labels.filter(x=>/^[0-9]{2,3}[A-Z]{0,2}$/.test(x)).slice(0,30):[];
-  const planningView=planning.length?'<details class="details"><summary>분양 당시 전용 타입 '+planning.length+'종 보기</summary>'+
-   '<div class="complexTypeList">'+planning.map(x=>'<span>전용 '+escapeHtml(x)+'형 · 공급평형 미대조</span>').join('')+'</div>'+
-   '<p class="tiny">타입명은 실제 면적 소수점 및 공급평형에 아직 연결되지 않았습니다.</p>'+
-   sourceLink(p.exclusive_plan_source_url,'전용 타입 구분 출처')+'</details>':'';
-  const count=Number.isSafeInteger(p.area_types_observation_count)?number(p.area_types_observation_count)+'건':'';
-  const sourceLookup='https://search.naver.com/search.naver?query='+encodeURIComponent('네이버페이 부동산 '+p.label+' 타입 공급면적 전용면적');
-  const areaView='<p class="tiny">면적 수치는 전용㎡, 약 ○평형은 확인된 공급면적 기준입니다. <strong>전용㎡를 나누어 평형으로 계산하지 않습니다.</strong></p>'+
-   '<p class="tiny">전용면적 '+exclusiveAreas.length+'종 · '+(count?'실거래 관측 '+count+' · ':'')+
-   '공급·전용 대응 검증 '+verified.length+'타입 · 공급면적 타입 '+types.length+'개</p>'+areaTypes+supplyOnly+planningView+
-   '<p class="tiny">실거래 관측 유형은 단지의 전체 법정 타입을 보장하지 않습니다. 공급평형은 확인된 타입에만 표시합니다.</p>'+
-   typeSources+(verified.length<exclusiveAreas.length?sourceLink(sourceLookup,'미확인 공급평형 원본 찾아보기'):'');
+   '<div class="empty">전용·공급면적 대응이 확인된 주택형을 추가 대조하고 있습니다.</div>';
+  const sources=[...new Set(matchedTypes.map(x=>x.source_url).filter(Boolean))];
+  const typeSources=sources.slice(0,4).map((url,i)=>sourceLink(url,'주택형 대조 출처 '+(i+1))).join('')+
+    (p.supply_type_source_url?sourceLink(p.supply_type_source_url,'KB부동산 타입 목록'):'');
+  const missing=(Array.isArray(p.supply_type_labels)?p.supply_type_labels:[])
+    .filter(label=>!matchedTypes.some(x=>x.supply_label===label)).length;
+  const areaView='<p class="tiny">한 주택형을 한 번만 표시합니다. ㎡는 전용면적, 약 ○평형은 해당 주택형의 공급면적을 기준으로 합니다.</p>'+
+   '<p class="tiny">공급·전용 확인 완료 '+matchedTypes.length+'개 주택형'+
+   (missing?' · 추가 대조 대상 '+missing+'개':'')+'</p>'+
+   areaTypes+typeSources;
   const stats=complexAreaStats(p),active=complexDealType;
   const dealButtons=[['','전체'],['매매','매매'],['전세','전세'],['월세','월세']]
    .map(([v,label])=>'<button type="button" class="'+(active===v?'active':'')+'" onclick="setComplexDealType(\''+v+'\')">'+label+'</button>').join('');
