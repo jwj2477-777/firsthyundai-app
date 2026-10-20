@@ -115,19 +115,19 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v1.12.13 APK from the stable official-API branch
+      - name: Publish v1.12.14 APK from the stable official-API branch
         if: github.ref == 'refs/heads/feature/official-apis-stable-continuation' && github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view v1.12.13 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo 'v1.12.13 release already exists; leaving the immutable APK untouched'
+          if gh release view v1.12.14 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'v1.12.14 release already exists; leaving the immutable APK untouched'
             exit 0
           fi
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.13.apk
-          unzip -t FirstHyundai-v1.12.13.apk | grep 'No errors detected'
-          sha256sum FirstHyundai-v1.12.13.apk
-          gh release create v1.12.13 FirstHyundai-v1.12.13.apk \
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.14.apk
+          unzip -t FirstHyundai-v1.12.14.apk | grep 'No errors detected'
+          sha256sum FirstHyundai-v1.12.14.apk
+          gh release create v1.12.14 FirstHyundai-v1.12.14.apk \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title '퍼스트현대 v1.12.13 (송도 아파트 공급·전용면적 검증 타입)' \
-            --notes '송도 아파트 평형·타입 1차 검증 확장: 총 95개 단지 중 공급타입이 없던 38개를 점검해 금호어울림 3개, e편한세상송도 5개, 럭스오션SK뷰 18개, 송도이안 1개 등 4개 단지 총 27개 공급·전용면적 실측 대응표를 출처 링크와 함께 추가했습니다. 타입 탭에서는 확인된 공급·전용면적, 타입명, 약 평수, 방·욕실 수를 카드 형태로 보여주며 임의로 전용면적을 공급면적이라고 이중 표기하지 않습니다. 기존 13개 관심단지, 보안·가족모드·실거래·뉴스 기능은 그대로 유지됩니다. 다른 단지의 공급타입을 검증 없이 채우지는 않았으며 업데이트 전 개인 메모는 백업하시기 바랍니다.'
+            --title '퍼스트현대 v1.12.14 (평형·타입 간결한 표 형식)' \
+            --notes '평형·타입의 크고 반복적인 카드를 모바일에서도 한눈에 비교되는 4열 표(타입, 공급면적, 전용면적, 평형)로 정리했습니다. 중복 면적 표시와 방·욕실 텍스트를 제거하고 반복된 자료 출처 링크는 표 아래 한곳에 모았습니다. A/B/H/S 등 독립적으로 확인된 타입과 공급·전용 매칭의 원본 정밀도·출처는 유지했습니다. 전용면적 매칭이 없는 타입은 임의로 채우지 않습니다. 기존 실거래·뉴스·관리자 모드 및 가족 조회 기능은 유지합니다. APK 업데이트 전에 개인 메모를 백업하세요.'

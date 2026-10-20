@@ -36,11 +36,24 @@ for(const [id,{count,one}] of Object.entries(audited)){
 }
 assert.equal(total,27);
 assert.match(html,/complexPairList/);
-assert.match(html,/complexTypeCard/);
+assert.match(html,/complexPairTable/);
+assert.match(html,/<th scope="col">타입<\/th>/);
+assert.match(html,/<th scope="col">공급면적<\/th>/);
+assert.match(html,/<th scope="col">전용면적<\/th>/);
+assert.match(html,/<th scope="col">평형<\/th>/);
 assert.match(html,/v\.supply_m2>=v\.exclusive_m2/);
 assert.match(html,/source_url\|\|p\.area_type_pairs_source/);
-assert.match(html,/공급 <b>/);
-assert.match(html,/전용 <b>/);
+assert.match(html,/pairSources=\[\.\.\.new Set/);
+assert.doesNotMatch(html,/complexTypeCard/,'No tall card per subtype');
+assert.doesNotMatch(html,/complexTypeValues/,'No duplicated area values');
+assert.doesNotMatch(html,/complexTypeRooms/,'Compact listing only contains four fields');
+assert.doesNotMatch(html,/complexTypeSource/,'No per-row links');
+assert.match(html,/평형은 공급면적을 기준으로 환산한 참고값입니다/);
+const artwin=data.records.find(x=>x.id==='artwin');
+assert.ok(artwin?.area_type_pairs?.length>=5);
+for(const label of ['120B','120B-H','120B-S','121A','121A-H']){
+ assert.ok(artwin.area_type_pairs.some(x=>x.supply_label===label),'Preserve separately verified subtype '+label);
+}
 const fav=['f13','f14','f15','m21','m22','m23','avenue','centennial','prime20','prime25','skcentral','artwin','central3'];
 for(const id of fav)assert.ok(rows.has(id));
 console.log('Verified 27 source-backed pairs across four complexes; no duplicates.');
