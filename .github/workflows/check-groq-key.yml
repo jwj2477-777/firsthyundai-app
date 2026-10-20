@@ -40,7 +40,7 @@ jobs:
           except HTTPError as error:
               try:
                   body=json.loads(error.read(3000)).get("error",{})
-                  print("FAIL: Groq HTTP",error.code,"error_code:",body.get("code","unknown"))
+                  print("FAIL: Groq HTTP",error.code,"error_code:",body.get("code","unknown"),"error_type:",body.get("type","unknown"),"message:",str(body.get("message",""))[:180])
               except (ValueError,TypeError):
                   print("FAIL: Groq HTTP",error.code)
               sys.exit(1)
