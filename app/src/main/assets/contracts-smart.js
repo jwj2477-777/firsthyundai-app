@@ -66,7 +66,7 @@ function choices(query){
   .slice(0,8);
 }
 function cleanPropertyText(raw){
- let s=String(raw||'').trim().replace(/^소재지\s*[:：]?\s*/,'').replace(/\s+(?:전세|월세|매매|보증금|동호수|계약금|잔금|입주).*$/,'');
+ let s=String(raw||'').trim().replace(/^소재지\s*[:：]?\s*/,'').replace(/\d{1,4}\s*동\s*\d{1,4}\s*호.*$/,'').replace(/\s+(?:전세|월세|매매|보증금|동호수|계약금|잔금|입주).*$/,'');
  return s.slice(0,100);
 }
 function notify(text,warn=false){
