@@ -282,7 +282,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #a0cbdc;outline-offset
 }
 @media(prefers-reduced-motion:reduce){.primaryNav button,.btn,.nearbyCard{transition:none}}
 
-\n/* Verified supply↔exclusive matching: lightweight cards, one row per verified subtype. */
+/* Verified supply↔exclusive matching: lightweight cards, one row per verified subtype. */
 .complexPairList{border:1px solid #dce8ee;border-radius:13px;overflow:hidden;background:#fff;margin:10px 0 0}
 .complexPairTable{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
 .complexPairTable th:first-child{width:26%}
@@ -303,6 +303,56 @@ input:focus,select:focus,textarea:focus{outline:2px solid #a0cbdc;outline-offset
 .complexPairSources .complexPairSourceLink{display:block;margin-top:9px}
 @media(max-width:370px){.complexPairTable th{padding:10px 5px;font-size:10px}
  .complexPairTable td{padding:11px 5px;font-size:11px}}
+
+/* Rounded calm theme: shared surfaces, generous corners, compact data rows. */
+:root{--blue:#4675b9;--navy:#294b77;--ink:#293b52;--slate:#68798b;--border:#e2e8f0;--fine-line:#e7ecf3;--shadow-soft:0 5px 20px rgba(45,67,100,.045)}
+body{background:#f4f6fa;color:var(--ink)}
+body>header{background:#fff;border:0;border-radius:0 0 30px 30px;padding:22px 20px;box-shadow:var(--shadow-soft)}
+.brandHeaderText h1{color:#294b77;font-weight:800}
+.brandHeaderText .eyebrow{color:#7186a0;letter-spacing:1.1px}
+.brandSubtitle{color:#687e96}
+.officeMark{border-radius:20px;border:1px solid #edf0f5;box-shadow:none;background:#fff}
+main{padding-top:18px}
+.modeBar{border-radius:20px;box-shadow:none;background:#edf1f7;border-color:transparent;padding:9px 12px}
+.modeBar small{color:#586d86}.modeAdmin{background:#e8effb}
+.primaryNav{gap:9px}
+.primaryNav button{border-radius:24px;border-color:transparent;color:#536b89;box-shadow:var(--shadow-soft);font-weight:700;min-height:86px}
+.primaryNav button .navIcon{display:flex;align-items:center;justify-content:center;width:34px;height:32px;border-radius:12px;background:#f0f4fa;font-size:21px}
+.primaryNav button.active{background:#4675b9;border-color:#4675b9;color:#fff;box-shadow:0 6px 16px #4675b926}
+.primaryNav button.active .navIcon{background:#ffffff20}
+.secondaryNav button,.utilityNav>button,.adminQuick summary{border-radius:17px;border-color:#e7ecf3;color:#596f8a;box-shadow:none;font-weight:650}
+.secondaryNav button.active,.utilityNav>button.active{background:#e7eefb;color:#315f9e;border-color:#cddcf3}
+.panel{border-radius:25px;border-color:#edf0f5;box-shadow:var(--shadow-soft);padding:17px}
+.sectionTitle h2{color:#304864;font-weight:750;font-size:18px}
+.metric{border:0;border-radius:22px;background:#eaf0fa;padding:15px 14px}
+.metric:nth-child(2){background:#eaf3ef}.metric:nth-child(3){background:#f4efe7}.metric:nth-child(4){background:#efedf8}
+.metric strong{color:#355c8d;font-size:25px}.metric small{color:#5e738c}
+.btn,.modeBar .btn{border-radius:16px;background:#4675b9;font-weight:700}
+.btn.alt{background:#edf2fa;color:#42648e}.btn.danger{background:#a33d3d}
+input,select,textarea{border-radius:16px;border-color:#dfe6ef;background:#fbfcfe}
+input:focus,select:focus,textarea:focus{outline-color:#9eb9e2}
+.pill,.dealRow .dealBadge{border-radius:999px}
+.details,.newsSummaryBox,.leaseRenewalMeta,.apiNotice,.refreshFeedback{border-radius:17px}
+.newsSummaryBox{background:#f0f4fa;border-left:0;border:1px solid #e3eaf4}
+.item h3{color:#304864;font-weight:700}
+.tradeStarter button,.tradeTypeBar button,.complexTabBar button,.complexTradeFilters button{border-radius:16px}
+.tradeStarter button.active,.tradeTypeBar button.active,.complexTabBar button.active,.complexTradeFilters button.active{background:#4675b9;border-color:#4675b9;color:#fff}
+.dealRow{border-radius:20px;box-shadow:none;border-left-width:4px}
+.nearbyCard{border-radius:21px;background:#fff;border-color:#e6ebf2;box-shadow:none;min-height:102px}
+.nearbyCard.selected{background:#edf3fc;border-color:#8caedc}
+.nearbyTotal,.complexFact,.complexSchoolRow,.complexTap,.complexIntro,.tradeFocusBanner,.complexQuickLinks a,.complexCallButton,.nearbyFacilityItem,.apiInfoCards article,.apiSchools>div{border-radius:18px}
+.complexFact,.complexSchoolRow,.complexIntro{background:#f6f8fc;border-color:#e7ecf3}
+.complexTap{background:#f8fafd;border-color:#e7ecf3}
+.complexPairList{border-radius:18px;border-color:#e4eaf2}
+.complexPairTable thead{background:#edf2fa}.complexPairTable tbody tr:nth-child(even){background:#f8fafd}
+.complexPairTable th,.complexPairTable td{padding-top:11px;padding-bottom:11px}
+.complexPairSources,.detailBackButton,.detailSwitchButton{border-radius:16px}
+.apartmentSheet.panel{border-radius:0;background:#fff}
+.detailSheetTop{border-color:#edf0f5}.detailBackButton{background:#edf2fa;color:#42648e;border-color:transparent}
+.dialog,dialog,#complexEditor{border-radius:25px}
+.foot{border-top:0;color:#77889c}
+@media(max-width:370px){.primaryNav button{border-radius:20px}.panel{padding:14px}.modeBar{gap:7px}}
+
 </style>
 </head>
 <body>
