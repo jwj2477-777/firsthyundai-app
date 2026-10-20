@@ -234,6 +234,11 @@ function recognize(raw){
   const duration=s.match(/(?:임대차\\s*기간|계약\\s*기간|기간은?|기간|(?:전세|월세))\s*(\d+\s*년(?:\s*\d+\s*개월)?|\d+\s*개월)/);
   if(duration)apply('leaseDuration',duration[1].replace(/\s+/g,''),found);
   else if(/(?:2년|이년)\s*(?:계약|거주|살|임대)/.test(s))apply('leaseDuration','2년',found);
+  else if(deal!=='매매'&&/(?:전세|월세|반전세|임대차|임차인)/.test(s)){
+   // "전세 ... 잔금 12월 30일. 2년." also states a duration.
+   const isolated=s.match(/(?:^|[,.;]\s*|\s)([1-9]\d?)\s*년(?!\s*(?:전|전부터|째|만에|전에|경과|뒤|후))(?:\s|$|[,.])/);
+   if(isolated&&Number(isolated[1])<=10)apply('leaseDuration',isolated[1]+'년',found);
+  }
  }
  // Preserve literal agreement clauses. Avoid inventing legal terms.
  if(!val('terms')){
