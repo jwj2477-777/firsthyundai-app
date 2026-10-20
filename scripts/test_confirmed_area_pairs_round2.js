@@ -6,7 +6,7 @@ const catalog=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../data/complex
 const rows=catalog.records.filter(x=>!x.aggregate_only);
 assert.equal(catalog.records.length,95);
 assert.equal(rows.length,93);
-assert.equal(rows.filter(x=>x.area_type_pairs?.length).length,70);
+assert.ok(rows.filter(x=>x.area_type_pairs?.length).length>=70,'Keep first 70 completed complexes');
 const list={
  'kapt-a40673903':7,'verified-extra-02':8,'verified-extra-03':6,
  'kapt-a40673923':5,'kapt-a40673922':6,'kapt-a10020527':3,
