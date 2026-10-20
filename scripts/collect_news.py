@@ -41,7 +41,7 @@ MAX_SOURCES_PER_BRIEF = 10
 # 전국 부동산 정책은 송도 언급이 없어도 실무에 유효할 수 있음.
 LOCAL_NEWS = re.compile(r'송도|연수구|인천대입구|GTX[ ]*[-–]?[ ]*B|워터프런트', re.I)
 INCHEON_SONGDO = re.compile(r'송도(?:국제도시|동)?', re.I)
-OTHER_SONGDO = re.compile(r'부산(?:시)?\\s*송도|포항(?:시)?\\s*송도|송도해수욕장|송도구름산책로|부산\\s*서구\\s*송도',re.I)
+OTHER_SONGDO = re.compile(r'부산(?:시)?\s*송도|포항(?:시)?\s*송도|송도해수욕장|송도구름산책로|부산\s*서구\s*송도',re.I)
 CRIME_REPORT = re.compile(r'검거|적발|단속|수사|체포|경찰|기소',re.I)
 HOUSING_NEWS = re.compile(
     r'주택|아파트|부동산|전세|월세|임대|분양|청약|입주|주담대|'
