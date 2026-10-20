@@ -30,7 +30,7 @@ jobs:
             "temperature":0.1
           },ensure_ascii=False).encode("utf-8")
           try:
-              check=Request("https://api.groq.com/openai/v1/models",headers={"Authorization":"Bearer "+key})
+              check=Request("https://api.groq.com/openai/v1/models",headers={"Authorization":"Bearer "+key,"User-Agent":"FirstHyundai-GroqClient/1.0 (python-news-collector)"})
               with urlopen(check,timeout=12) as resp:
                   d=json.loads(resp.read(30000))
               print("MODEL LIST: success, count:",len(d.get("data",[])))
@@ -39,7 +39,7 @@ jobs:
           except (URLError,ValueError,OSError) as e:
               print("MODEL LIST: unavailable",type(e).__name__)
           req=Request("https://api.groq.com/openai/v1/chat/completions",data=data,headers={
-            "Authorization":"Bearer "+key,"Content-Type":"application/json"},method="POST")
+            "Authorization":"Bearer "+key,"Content-Type":"application/json","User-Agent":"FirstHyundai-GroqClient/1.0 (python-news-collector)"},method="POST")
           try:
               with urlopen(req,timeout=30) as resp:
                   result=json.loads(resp.read(30000))
