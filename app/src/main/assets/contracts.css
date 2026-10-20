@@ -29,3 +29,28 @@
 .contractChoice small{display:block;color:#4d6a80;font-size:11px;font-weight:600;margin-top:4px;line-height:1.4}
 #ct_autoStatus{font-size:12px;padding:9px 12px;margin:7px 0 0}
 #ct_monthlyRent{max-width:100%}
+
+/* v1.16: write one memo first; keep corrections behind an accessible disclosure */
+#ct_rough{min-height:200px;width:100%;font-size:16px;line-height:1.7;resize:vertical}
+.contractEasyActions{display:grid;grid-template-columns:minmax(0,2fr) minmax(112px,1fr);gap:9px;margin-top:11px}
+.contractEasyActions .btn{min-height:57px;border-radius:12px;white-space:normal}
+.contractOneTap{font-size:16px;font-weight:800}
+.contractVoice{font-size:15px}
+.contractPolishToggle{display:flex;gap:9px;align-items:center;font-size:13px;color:#415d70;margin:13px 0}
+.contractPolishToggle input{height:19px;width:19px;min-width:19px;accent-color:#245f91}
+.contractOneTapStatus{border-left:3px solid #2375b5;background:#f3f8fc;padding:11px 12px;font-size:13px;line-height:1.6;border-radius:6px;margin:9px 0}
+.contractCompactDetails,.contractManual{border:1px solid #dce7ed;border-radius:12px;margin:13px 0;overflow:hidden;background:#fff}
+.contractCompactDetails summary,.contractManual summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:13px 15px;font-size:14px;font-weight:750;line-height:1.5;min-height:48px;list-style:none}
+.contractCompactDetails summary::-webkit-details-marker,.contractManual summary::-webkit-details-marker{display:none}
+.contractCompactDetails summary::after,.contractManual summary::after{content:'⌄';font-size:22px;margin-left:6px;color:#42718b;transform:rotate(-90deg)}
+.contractCompactDetails[open] summary::after,.contractManual[open] summary::after{transform:rotate(0deg)}
+.contractCompactDetails summary{background:#f7f9fb}
+.contractCompactDetails>.contractReview,.contractCompactDetails>.contractHint,.contractCompactDetails>.inputLabel,.contractCompactDetails>.contractCompareText,.contractCompactDetails>.contractActions{margin-left:13px;margin-right:13px}
+.contractManualWrap{margin:0 0 12px}
+.contractManual summary{background:#f2f5f7;font-size:15px}
+.contractManual summary small{font-size:11px;font-weight:500;color:#6a7b89}
+.contractManual .panel{border:0;box-shadow:none;margin:0;padding:0 14px 14px}
+.contractCompareText{padding:12px;border-radius:8px;border:1px solid #dce7ed;white-space:pre-wrap;line-height:1.75;background:#fafcfe;font-size:13px;word-break:break-word;margin-bottom:12px}
+.contractFix{width:100%;min-height:46px;margin-bottom:5px}
+#ct_resultPanel .contractPreview{min-height:330px}
+@media(max-width:430px){.contractEasyActions{grid-template-columns:minmax(0,1fr) 112px}.contractEasyActions .btn{padding:8px;font-size:13px}}
