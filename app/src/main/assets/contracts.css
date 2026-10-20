@@ -19,3 +19,13 @@
 .contractMoneySummary{background:#f2f7fb;border-radius:12px;padding:11px 14px;font-size:13px;line-height:1.9;white-space:pre-line;margin-top:14px}
 .contractComplexShortcut{width:100%;min-height:43px;margin:3px 0 9px}
 @media(max-width:430px){.contractFieldGrid{grid-template-columns:1fr}.contractActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.contractAutoRow{border:1px solid #cbdde8;border-radius:11px;padding:12px;margin-top:8px;background:#f5faff}
+.contractAutoRow label{display:flex;gap:9px;align-items:center;font-size:13px;font-weight:700;line-height:1.55}
+.contractAutoRow input[type=checkbox]{width:20px;min-width:20px;height:20px;accent-color:#225d91;margin:0}
+.contractAutoRow .contractHint{margin:7px 0 0;padding-left:29px}
+.contractSuggestions{display:grid;gap:6px;margin-top:7px}
+.contractChoice{width:100%;background:#eff7fc;border:1px solid #c3dcea;border-radius:10px;padding:10px 13px;text-align:left;font-size:14px;color:#124e7c;font-weight:800;min-height:57px;cursor:pointer}
+.contractChoice small{display:block;color:#4d6a80;font-size:11px;font-weight:600;margin-top:4px;line-height:1.4}
+#ct_autoStatus{font-size:12px;padding:9px 12px;margin:7px 0 0}
+#ct_monthlyRent{max-width:100%}
