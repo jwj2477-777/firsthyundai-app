@@ -1328,11 +1328,11 @@ function renderNews(){let payload=remote.news;if(!payload){$('newsContent').inne
 $('newsMeta').textContent=`마지막 수집 ${prettyTime(payload.checked_at)} · AI 핵심 요약 · 상세 내용은 원문 확인`;
 if(payload.state==='not_started'){$('newsContent').innerHTML='<div class="empty">아직 첫 뉴스 수집을 실행하지 않았습니다.</div>';return;}
 let cat=$('newsCategory').value;let filtered=(payload.briefs||[]).filter(x=>!cat||x.category===cat);
-let summarized=filtered.filter(x=>x.summary_method==='gemini_article'&&x.summary).length;
+let summarized=filtered.filter(x=>['gemini_article','openai_article'].includes(x.summary_method)&&x.summary).length;
 let header='<p class="tiny">뉴스 묶음 '+filtered.length+'개 · AI 요약 '+summarized+'개'+(payload.state==='partial'?' · 일부 RSS 요청 실패':'')+'</p>';
 let cards=filtered.slice(0,newsDisplayLimit).map(x=>{
  let sources=(x.sources||[]).map(t=>{let safe=safeLink(t.link);return '<li>'+(safe?'<a href="'+escapeHtml(safe)+'">'+escapeHtml(t.title)+'</a>':escapeHtml(t.title))+'<div class="tiny">'+escapeHtml(t.publisher)+' · '+escapeHtml(prettyTime(t.published_at))+'</div></li>';}).join('');
- let done=x.summary_method==='gemini_article'&&!!x.summary;
+ let done=['gemini_article','openai_article'].includes(x.summary_method)&&!!x.summary;
  let points=done?String(x.summary).split(/\r?\n/).map(t=>t.trim()).filter(Boolean):[];
  let summaryHtml=done?'<div class="newsSummaryBox" aria-label="AI 핵심 요약"><div class="newsSummaryHeading">AI 핵심 요약</div><ol class="newsSummarySentences">'+points.map((p,i)=>'<li><span class="newsSummaryCount">'+(i+1)+'</span><span>'+escapeHtml(p)+'</span></li>').join('')+'</ol></div>':'';
  return '<article class="item"><div class="tagbox"><span class="pill">'+escapeHtml(x.category)+'</span>'+(done?'<span class="pill">AI 요약 완료</span>':'')+'</div><h3>'+escapeHtml(x.title)+'</h3>'+summaryHtml+'<div class="meta">최근 보도: '+escapeHtml(prettyTime(x.last_published_at))+' · '+escapeHtml(x.article_count)+'건</div><details class="details"><summary>관련 기사 원문 '+escapeHtml(x.sources?.length||0)+'건 보기</summary><ul class="sources">'+sources+'</ul></details></article>';
