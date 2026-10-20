@@ -225,6 +225,15 @@ public class MainActivity extends Activity {
     }
 
     public final class Bridge {
+        @JavascriptInterface public String getAppVersion() {
+            try {
+                android.content.pm.PackageInfo info =
+                        getPackageManager().getPackageInfo(getPackageName(), 0);
+                return info.versionName == null ? "" : info.versionName;
+            } catch (Exception ignored) {
+                return "";
+            }
+        }
         @JavascriptInterface public String getMode() {
             return isAdminDeviceMode() ? "admin" : "family";
         }

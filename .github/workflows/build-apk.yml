@@ -111,19 +111,19 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v1.12.10 APK from the stable official-API branch
+      - name: Publish v1.12.11 APK from the stable official-API branch
         if: github.ref == 'refs/heads/feature/official-apis-stable-continuation' && github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view v1.12.10 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo 'v1.12.10 release already exists; leaving the immutable APK untouched'
+          if gh release view v1.12.11 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'v1.12.11 release already exists; leaving the immutable APK untouched'
             exit 0
           fi
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.10.apk
-          unzip -t FirstHyundai-v1.12.10.apk | grep 'No errors detected'
-          sha256sum FirstHyundai-v1.12.10.apk
-          gh release create v1.12.10 FirstHyundai-v1.12.10.apk \
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.11.apk
+          unzip -t FirstHyundai-v1.12.11.apk | grep 'No errors detected'
+          sha256sum FirstHyundai-v1.12.11.apk
+          gh release create v1.12.11 FirstHyundai-v1.12.11.apk \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title '퍼스트현대 v1.12.10 (Gemini + Groq 무료 AI 뉴스)' \
-            --notes 'v1.12.9 안정 버전의 모든 기능을 유지하며 뉴스 AI 요약 백엔드를 Gemini 1차, Groq 무료 플랜 2차 보완으로 전환했습니다. 삭제된 OpenAI 유료 키는 사용하지 않고 API 호출 코드 및 테스트도 제거했습니다. Groq GPT-OSS-120B 모델을 사용하며 Gemini 요약 실패·원문 확인 기사에만 제한적으로 요청합니다. 공식 원문에 없는 날짜·수치를 만들지 않고 주요 정책 뉴스에서 선택적 교차 검토를 수행합니다. Groq Cloudflare 403 차단 문제는 API 클라이언트 User-Agent를 지정해 테스트 호출에 성공했습니다. GitHub Secrets GROQ_API_KEY로 서버에서만 인증하며 앱에 키를 포함하지 않습니다. 업데이트 전 메모를 백업하세요.'
+            --title '퍼스트현대 v1.12.11 (소프트 모던 UI · 버전 자동 표시)' \
+            --notes '퍼스트현대 사무실 전용 앱 전체 UI를 부드럽고 모던한 블루 톤으로 정리했습니다. 메인 헤더와 로고·한글·영문 제목의 여백과 크기를 재구성하고, 홈 버튼·관리자/가족 전환·카드·실거래·뉴스·단지정보 요소를 일관된 디자인으로 통일했습니다. 하단 버전은 실제 설치된 Android APK의 PackageInfo.versionName에서 읽어 표시합니다. 이전 v1.10 고정 문자열을 제거했습니다. 기존 기능 및 API 연동은 유지되며 업데이트 전 개인 메모를 백업하세요.'
