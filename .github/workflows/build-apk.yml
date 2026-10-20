@@ -15,6 +15,7 @@ on:
       - 'scripts/test_complex_discovery.js'
       - 'scripts/test_simplified_complex_ui.js'
       - 'scripts/test_complex_facts.js'
+      - 'scripts/test_verified_area_pairs.js'
       - 'scripts/test_extended_complex_catalog.js'
       - 'scripts/test_naver_basic_facts.js'
       - 'scripts/test_nearby.js'
@@ -90,6 +91,7 @@ jobs:
           node scripts/test_family_mode.js
           node scripts/test_lease_contract_badges.js
           node scripts/test_admin_guards.js
+          node scripts/test_verified_area_pairs.js
           node scripts/test_complexes.js
           node scripts/test_catalog_editor.js
           node scripts/test_complex_discovery.js
@@ -113,19 +115,19 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v1.12.12 APK from the stable official-API branch
+      - name: Publish v1.12.13 APK from the stable official-API branch
         if: github.ref == 'refs/heads/feature/official-apis-stable-continuation' && github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view v1.12.12 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo 'v1.12.12 release already exists; leaving the immutable APK untouched'
+          if gh release view v1.12.13 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'v1.12.13 release already exists; leaving the immutable APK untouched'
             exit 0
           fi
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.12.apk
-          unzip -t FirstHyundai-v1.12.12.apk | grep 'No errors detected'
-          sha256sum FirstHyundai-v1.12.12.apk
-          gh release create v1.12.12 FirstHyundai-v1.12.12.apk \
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.12.13.apk
+          unzip -t FirstHyundai-v1.12.13.apk | grep 'No errors detected'
+          sha256sum FirstHyundai-v1.12.13.apk
+          gh release create v1.12.13 FirstHyundai-v1.12.13.apk \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title '퍼스트현대 v1.12.12 (소프트 모던 디자인 · 버전 자동 표시)' \
-            --notes '퍼스트현대 사무실 전용 앱 전체 UI를 부드럽고 모던한 블루 톤으로 정리했습니다. 메인 헤더와 로고·한글·영문 제목의 여백과 크기를 재구성하고, 홈 버튼·관리자/가족 전환·카드·실거래·뉴스·단지정보 요소를 일관된 디자인으로 통일했습니다. 하단 버전은 실제 설치된 Android APK의 PackageInfo.versionName에서 읽어 표시합니다. 이전 v1.10 고정 문자열을 제거했습니다. 기존 기능 및 API 연동은 유지되며 업데이트 전 개인 메모를 백업하세요.'
+            --title '퍼스트현대 v1.12.13 (송도 아파트 공급·전용면적 검증 타입)' \
+            --notes '송도 아파트 평형·타입 1차 검증 확장: 총 95개 단지 중 공급타입이 없던 38개를 점검해 금호어울림 3개, e편한세상송도 5개, 럭스오션SK뷰 18개, 송도이안 1개 등 4개 단지 총 27개 공급·전용면적 실측 대응표를 출처 링크와 함께 추가했습니다. 타입 탭에서는 확인된 공급·전용면적, 타입명, 약 평수, 방·욕실 수를 카드 형태로 보여주며 임의로 전용면적을 공급면적이라고 이중 표기하지 않습니다. 기존 13개 관심단지, 보안·가족모드·실거래·뉴스 기능은 그대로 유지됩니다. 다른 단지의 공급타입을 검증 없이 채우지는 않았으며 업데이트 전 개인 메모는 백업하시기 바랍니다.'
