@@ -325,6 +325,41 @@ public class MainActivity extends Activity {
                 }finally{if(conn!=null)conn.disconnect();}
             });
         }
+        @JavascriptInterface public void copyContract(String text) {
+            if(text==null || text.length()>20000)return;
+            runOnUiThread(() -> {
+                android.content.ClipboardManager cb=(android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+                android.content.ClipData clip=android.content.ClipData.newPlainText("계약문자",text);
+                if(android.os.Build.VERSION.SDK_INT>=33){android.os.PersistableBundle extras=new android.os.PersistableBundle();extras.putBoolean("android.content.extra.IS_SENSITIVE",true);clip.getDescription().setExtras(extras);}
+                cb.setPrimaryClip(clip);
+                Toast.makeText(MainActivity.this,"계약문자를 복사했습니다.",Toast.LENGTH_SHORT).show();
+            });
+        }
+        @JavascriptInterface public void draftContract(String text, String code, String requestId) {
+            if(text==null || text.length()>5000 || code==null || code.length()>128 || requestId==null || !requestId.matches("[0-9]{1,12}"))return;
+            io.execute(() -> {
+                HttpURLConnection conn=null; JSONObject result=new JSONObject();
+                try {
+                    result.put("id",requestId); result.put("ok",false);
+                    conn=(HttpURLConnection)new URL("https://firsthyundai-contract.jwj2477.workers.dev/draft").openConnection();
+                    conn.setRequestMethod("POST");conn.setDoOutput(true);conn.setUseCaches(false);
+                    conn.setConnectTimeout(15000);conn.setReadTimeout(45000);conn.setInstanceFollowRedirects(false);
+                    conn.setRequestProperty("Content-Type","application/json; charset=utf-8");
+                    conn.setRequestProperty("Authorization","Bearer "+code);conn.setRequestProperty("Cache-Control","no-store");
+                    JSONObject body=new JSONObject();body.put("text",text);
+                    try(OutputStream out=conn.getOutputStream()){out.write(body.toString().getBytes(StandardCharsets.UTF_8));}
+                    int status=conn.getResponseCode();
+                    if(status!=200)throw new Exception(status==401?"가족 입장 비밀번호를 확인해 주세요.":status==429?"요청이 많습니다. 1분 후 다시 시도해 주세요.":"AI 연결에 실패했습니다. 잠시 후 다시 시도해 주세요. ("+status+")");
+                    ByteArrayOutputStream out=new ByteArrayOutputStream();
+                    try(InputStream in=conn.getInputStream()){byte[] buf=new byte[4096];int n;while((n=in.read(buf))!=-1){out.write(buf,0,n);if(out.size()>30000)throw new Exception("AI 응답이 너무 깁니다. 내용을 나누어 입력해 주세요.");}}
+                    JSONObject payload=new JSONObject(out.toString("UTF-8"));
+                    if(payload.optInt("schema_version")!=1)throw new Exception("AI 응답 형식 오류");
+                    result.put("draft",payload.getJSONObject("draft"));result.put("ok",true);
+                }catch(Exception e){try{result.put("error",e instanceof java.net.SocketTimeoutException?"AI 응답 시간이 초과됐습니다. 다시 시도해 주세요.":e.getMessage()==null?"AI 연결 실패":e.getMessage());}catch(Exception ignored){}}
+                finally{if(conn!=null)conn.disconnect();}
+                deliver("onContractDraft",result);
+            });
+        }
         @JavascriptInterface public void saveBackup(String json) {
             if(!isAdminDeviceMode() || json==null || json.length()>2_000_000)return;
             pendingBackup=json;

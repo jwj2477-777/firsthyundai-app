@@ -1,0 +1,12 @@
+name = "firsthyundai-contract"
+main = "src/index.mjs"
+compatibility_date = "2026-10-20"
+workers_dev = true
+[observability]
+enabled = false
+[[ratelimits]]
+name = "LIMITER"
+namespace_id = "872015"
+[ratelimits.simple]
+limit = 10
+period = 60

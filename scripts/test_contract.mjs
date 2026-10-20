@@ -1,0 +1,18 @@
+import fs from 'node:fs';import vm from 'node:vm';import assert from 'node:assert/strict';import {webcrypto} from 'node:crypto';
+import worker,{cleanResult} from '../workers/contract/src/index.mjs';
+const source=fs.readFileSync('app/src/main/assets/contract.js','utf8');const env={console,window:{},Date};vm.createContext(env);vm.runInContext(source.replace(/contractInit\(\);\s*$/,''),env);
+const d={kind:'전세',address:'테스트시 테스트로 1',apartment:'검증아파트',unit:'1동 2호',total:'390000000',deposit:'39000000',partial:'5000000',partialDate:'2026년 12월 1일',depositDate:'2026년 12월 20일',middle:'0',middleDate:'',monthly:'',rentDay:'',term:'잔금일부터 2년',signDate:'2026년 12월 20일',balanceDate:'2027년 2월 28일',special:'임대인은 천장 파손을 수리한다.',bank:'테스트은행',account:'0000000000',holder:'검증용',owner:'',tenant:'',agreement:'',brokerage:''};
+let r=env.contractValidate(d);assert.equal(r.errors.length,0);let text=env.contractBuild(d,r.n);assert(text.includes('351,000,000원'));assert(text.includes('34,000,000원'));assert(text.includes('2026년 12월 20일'));assert(!text.includes('배액'));assert(!text.includes('중개보수 관련'));
+for(const patch of [{partial:'50000000'},{total:'3억9천'},{balanceDate:'2027년 2월 30일'},{balanceDate:'내년 2월 28일'},{partialDate:'2028년 1월 1일'},{depositDate:'2028년 1월 1일'},{middle:'10000000',middleDate:''},{middle:''},{kind:'월세',monthly:'',rentDay:''}])assert(env.contractValidate({...d,...patch}).errors.length>0,JSON.stringify(patch));
+const sale={...d,kind:'매매',middle:'100000000',middleDate:'2027년 1월 10일'};r=env.contractValidate(sale);assert.equal(r.errors.length,0);assert(env.contractBuild(sale,r.n).includes('251,000,000원'));
+assert.equal(env.contractDate('2028년 2월 29일')!==null,true);assert.equal(env.contractDate('2027년 2월 29일'),null);
+const sanitized=cleanResult({kind:'전세',total:390000000,questions:['확인',{}],account:'private'});assert.equal(sanitized.total,'');assert.equal(sanitized.account,undefined);assert.equal(sanitized.questions.length,1);
+if(!globalThis.crypto)Object.defineProperty(globalThis,"crypto",{value:webcrypto});
+let calls=0;const oldFetch=globalThis.fetch;globalThis.fetch=async()=>{calls++;throw Error('should not reach provider');};
+const serverEnv={GROQ_API_KEY:'test',ACCESS_CODE:'test-code',LIMITER:{limit:async()=>({success:true})}};
+assert.equal((await worker.fetch(new Request('https://test/draft',{method:'POST',headers:{Authorization:'Bearer wrong'},body:'{}'}),serverEnv)).status,401);
+assert.equal((await worker.fetch(new Request('https://test/draft',{method:'POST',headers:{Authorization:'Bearer test-code'},body:JSON.stringify({text:'x'.repeat(25000)})}),serverEnv)).status,413);
+assert.equal(calls,0);globalThis.fetch=oldFetch;
+assert(!source.includes('localStorage'));assert(!source.includes('innerHTML'));assert(source.includes('contractSnapshot!==JSON.stringify(contractRead())'));
+const html=fs.readFileSync('app/src/main/assets/index.html','utf8');assert(html.includes('src="contract.js"'));assert(html.includes("['contract','계약문자 작성']"));assert(html.includes('Groq AI'));assert(html.includes('ct_account'));assert(html.includes('contractConsent'));
+console.log('PASS contract: exact balances, ambiguous/invalid dates, missing fields, privacy, auth, request limits, canonical output.');
