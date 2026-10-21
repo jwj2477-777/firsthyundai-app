@@ -189,6 +189,7 @@ class PublicDataTests(unittest.TestCase):
   row={'sigunguCd':'28185','bjdongCd':'10600','bun':20,'ji':22,'mainPurpsCdNm':'공동주택(아파트)',
     'newPlatPlc':example['doroJuso'],'useAprDay':'20101119','grndFlrCnt':'20'}
   self.assertEqual(rf.verify_building_rows([row],example)['approval_date'],'2010-11-19')
+  self.assertEqual(rf.verify_building_rows([dict(row,dongNm='101동')],example)['buildings'][0],{'name':'101동','ground_floors':20,'approval_date':'2010-11-19'})
   self.assertIsNone(rf.verify_building_rows([dict(row,bun=21)],example))
   self.assertIsNone(rf.verify_building_rows([dict(row,newPlatPlc='서울특별시 강남구 역삼로 2')],example))
   self.assertIsNone(rf.verify_building_rows([dict(row,mainPurpsCdNm='근린생활시설')],example))

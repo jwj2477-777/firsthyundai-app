@@ -1135,23 +1135,28 @@ function renderSchoolPublicInfo(){
   sourceLink(PUBLIC_SRC.school,'나이스 학교정보')+'</div>';
 }
 function renderPublicComplexInfo(p){
- const items=[
-  ['건축물대장','건축물 용도·전유부 정보','building_registry'],
-  ['공동주택 관리비','단지 월별 관리비 통계','maintenance'],
-  ['도로명·지번주소','단지 주소 확인','addresses']
- ];
- return '<div class="apiInfoCards">'+items.map(([name,description,key])=>{
-  const records=verifiedRecords(key);
-  const found=records?.find(x=>x.complex_id===p.id);
-  const address=key==='addresses'&&typeof p.address==='string'?p.address.trim():'';
-  const summary=found&&typeof found.summary==='string'?found.summary.trim():'';
-  const detail=summary?'<p>'+escapeHtml(summary)+'</p>':
-   address?'<p>'+escapeHtml(address)+'</p>':
-   '<p class="tiny">아직 검증된 단지별 조회 자료가 없습니다. 공식 자료 연동 후 표시됩니다.</p>';
-  const lookup=address?sourceLink('https://map.kakao.com/?q='+encodeURIComponent(address),'카카오맵에서 주소 확인'):'';
-  return '<article><strong>'+escapeHtml(name)+'</strong><p>'+escapeHtml(description)+'</p>'+
-   detail+(key==='addresses'?lookup:'')+'</article>';
- }).join('')+'</div><p class="complexSectionNote">건축물대장·관리비는 검증된 자료만 표시합니다. 자료 미제공은 0원 또는 0건이 아니며, 관리비는 개별 세대의 실제 청구액과 다릅니다.</p>';
+ const find=key=>verifiedRecords(key)?.find(x=>x.complex_id===p.id);
+ const reg=find('building_registry'),fee=find('maintenance');
+ const fact=(label,value)=>value==null||value===''?'':'<div><dt>'+escapeHtml(label)+'</dt><dd>'+escapeHtml(value)+'</dd></div>';
+ const approved=reg?.approval_date||p.approved_date;
+ const buildings=Array.isArray(reg?.buildings)?reg.buildings:[];
+ const buildingRows=buildings.map(x=>'<tr><td>'+escapeHtml(x.name||'동 명칭 미제공')+'</td><td>'+escapeHtml(x.ground_floors==null?'—':x.ground_floors+'층')+'</td><td>'+escapeHtml(x.approval_date||'—')+'</td></tr>').join('');
+ const registry='<article><strong>건물·계약 대상 확인</strong><dl class="practiceFacts">'+
+ fact('사용승인일',approved)+fact('층수',reg?.top_ground_floor!=null?'확인 건물 중 최고 '+reg.top_ground_floor+'층':p.floors)+
+ fact('용도',reg?.purposes?.join(' · '))+fact('세대수',p.households?p.households.toLocaleString('ko-KR')+'세대':null)+
+ fact('주차',p.parking_total?p.parking_total.toLocaleString('ko-KR')+'대'+(p.households?' · 세대당 '+(p.parking_total/p.households).toFixed(2)+'대':''):null)+
+ '</dl>'+(buildingRows?'<details class="details"><summary>동별 층수·사용승인일 확인</summary><div class="practiceTable"><table><thead><tr><th>동</th><th>지상층</th><th>사용승인일</th></tr></thead><tbody>'+buildingRows+'</tbody></table></div></details>':'')+
+ '<p class="tiny">'+(reg?'건축물대장 확인 건물 기준. 세대수·주차는 단지정보 기준입니다.':'단지정보 기준 · 건축물대장 동별 자료는 아직 없습니다.')+'</p><p class="practiceNote">해당 호의 전용면적·대지권은 개별 서류로 확인하세요. 현재 조회는 전유부·등기부 조회가 아닙니다.</p></article>';
+ const phone=String(p.management_phone||'').replace(/[^0-9+]/g,'');
+ const feeMonth=/^\d{6}$/.test(fee?.month||'')?fee.month.slice(0,4)+'년 '+Number(fee.month.slice(4))+'월':'';
+ const costs=Object.entries(fee?.breakdown_won||{}).filter(([,v])=>typeof v==='number'&&Number.isFinite(v)&&v>=0);
+ const maintenance='<article><strong>관리비·입주 상담</strong><p class="practiceNote">평형별 실제 월 관리비는 아직 확보되지 않았습니다.</p><dl class="practiceFacts">'+
+ fact('난방 방식',p.heating_detail||p.heating)+fact('관리사무소',p.management_phone)+
+ '</dl>'+(phone?'<a class="btn" href="tel:'+escapeHtml(phone)+'">관리사무소 전화</a>':'')+
+ '<p class="tiny">문의할 내용: 해당 평형의 최근 고지액 · 여름/겨울 금액 · 전기·수도·난방 포함 여부 · 주차 추가요금</p>'+
+ (costs.length?'<details class="details"><summary>'+escapeHtml(feeMonth)+' 단지 전체 공개 비용 보기</summary><dl class="practiceFacts">'+costs.map(([k,v])=>fact(k,v.toLocaleString('ko-KR')+'원')).join('')+'</dl><p class="tiny">공개된 일부 항목만 표시합니다. 세대별 관리비나 전체 관리비 합계가 아닙니다.</p></details>':'')+'</article>';
+ const address=p.address?'<article><strong>도로명·지번주소</strong><p>'+escapeHtml(p.address)+'</p>'+sourceLink('https://map.kakao.com/?q='+encodeURIComponent(p.address),'지도에서 주소 확인')+'</article>':'';
+ return '<div class="apiInfoCards">'+registry+maintenance+address+'</div>';
 }
 function renderOfficeRentals(){
  const el=$('officeRentContent');if(!el)return;

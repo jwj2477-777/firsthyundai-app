@@ -53,7 +53,9 @@ jobs:
           elif [ "${{ github.event_name }}" = "push" ]; then
             # When this collector changes, immediately recheck newly configured NEIS
             # with its secret (never expose the key or publish partial results).
-            python scripts/collect_public_services.py --mode schools
+            if ! python scripts/collect_public_services.py --mode schools; then
+              echo "School refresh unavailable; preserving prior schools and continuing independent building/fee refresh."
+            fi
             python scripts/collect_public_services.py --mode complexinfo
           else
             python scripts/collect_public_services.py --mode "${{ inputs.mode }}"

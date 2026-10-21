@@ -131,7 +131,11 @@ def verify_building_rows(rows,basic):
        (' · 확인 건물 최고 지상 '+str(max(floors))+'층' if floors else ''))
     return dict(summary=summary[:290],title_count=len(validated),
         approval_date=dates[-1] if dates else None,
-        top_ground_floor=max(floors) if floors else None)
+        top_ground_floor=max(floors) if floors else None,
+        purposes=purposes,
+        buildings=[dict(name=str(r.get('dongNm') or '').strip()[:80],
+            ground_floors=won(r.get('grndFlrCnt')) if (won(r.get('grndFlrCnt')) or 0)<=300 else None,
+            approval_date=date8(r.get('useAprDay')) or None) for r in validated])
 
 def collect_registry(catalog,key,*,session=None,delay=0.06,max_codes=130):
     result=[];failures=0;matched=0

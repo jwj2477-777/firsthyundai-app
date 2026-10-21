@@ -21,12 +21,12 @@ const ctx=vm.createContext({
 vm.runInContext(snippet,ctx);
 const run=q=>vm.runInContext(q,ctx);
 const missing=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13'})");
-assert(missing.includes('건축물대장')&&missing.includes('공동주택 관리비'));
-assert(missing.includes('아직 검증된 단지별 조회 자료가 없습니다.'), 'Unverified units must be clearly marked unavailable');
+assert(missing.includes('건축물대장')&&missing.includes('관리비·입주 상담'));
+assert(missing.includes('동별 자료는 아직 없습니다.'), 'Unverified units must be clearly marked unavailable');
 assert(!missing.includes('공식 자료·신청'), 'Family users must never be sent to developer API signup pages');
 const addressed=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13',address:'인천광역시 연수구 컨벤시아대로252번길 70'})");
-assert(addressed.includes('카카오맵에서 주소 확인')&&addressed.includes('컨벤시아대로252번길 70'));
-assert(missing.includes('자료 미제공은 0원 또는 0건이 아니며'), 'Missing fee is clearly labeled unknown, not zero');
+assert(addressed.includes('지도에서 주소 확인')&&addressed.includes('컨벤시아대로252번길 70'));
+assert(missing.includes('평형별 실제 월 관리비는 아직 확보되지 않았습니다.'), 'Missing fee is clearly labeled unknown, not zero');
 assert(run('renderSchoolPublicInfo()').includes('배정학교가 아닙니다'));
 assert(run('renderSchoolPublicInfo()').includes('schoolzone.emac.kr'));
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('활용승인'));
@@ -58,3 +58,11 @@ assert(native.includes('"public_services.json".equals(filename)'));
 const snapshot=JSON.parse(fs.readFileSync(path.join(root,'data/public_services.json'),'utf8'));
 for(const name of ['schools','school_zones','office_rents','building_registry','maintenance','addresses','subscriptions'])assert(snapshot[name]);
 console.log('Public hub UI passed: school not falsely assigned, separate office rents, API approval statuses, three family menus');
+
+run("publicServices.maintenance={state:'verified',records:[{complex_id:'f13',month:'202608',breakdown_won:{'경비비':100000,'청소비':0}}]}");
+run("publicServices.building_registry={state:'verified',records:[{complex_id:'f13',approval_date:'2017-11-17',top_ground_floor:42,purposes:['공동주택'],buildings:[{name:'1301동',ground_floors:42,approval_date:'2017-11-17'}]}]}");
+const practical=run("renderPublicComplexInfo({id:'f13',households:100,parking_total:150,management_phone:'032-000-0000',heating:'지역난방'})");
+assert(practical.includes('tel:0320000000')&&practical.includes('지역난방'));
+assert(practical.includes('세대당 1.50대')&&practical.includes('1301동'));
+assert(practical.includes('<summary>2026년 8월 단지 전체 공개 비용 보기</summary>'));
+assert(practical.includes('100,000원')&&!practical.includes('1,000원'),'Never divide partial costs into a household invoice');

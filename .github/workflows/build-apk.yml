@@ -127,19 +127,19 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v1.19.1 warm-readable-ui APK
+      - name: Publish successful v1.19.2 warm-readable-ui APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.1.apk
-          unzip -t FirstHyundai-v1.19.1.apk | grep 'No errors detected'
-          if gh release view v1.19.1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.2.apk
+          unzip -t FirstHyundai-v1.19.2.apk | grep 'No errors detected'
+          if gh release view v1.19.2 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v1.19.1 FirstHyundai-v1.19.1.apk \
+            gh release create v1.19.2 FirstHyundai-v1.19.2.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.19.1 · 크림 테마 통일 · 동 번호로 블럭 인식' \
-              --notes '크림·살구·브라운 톤을 보조 메뉴, 아파트 상세, 평형·학군, 계약문자, 인증 화면 및 기본 대화상자까지 통일했습니다. 퍼팍 1502동은 15블럭, 마뷰 2301동은 23블럭으로 인식합니다. 알려진 여섯 블럭에만 적용하며 블럭과 동이 충돌하거나 여러 동을 입력하면 확인을 요청합니다. 직접 기재한 소재지를 보존하고 카탈로그 주소와 다르면 표시합니다. 계약 내용은 기기에서만 처리합니다.'
+              --title '퍼스트현대 v1.19.2 · 건물·관리비 상담 정보 정리' \
+              --notes '건물정보를 사용승인일·층수·세대수·주차로 정리하고, 수집되는 건축물대장 동별 층수와 사용승인일을 펼쳐 볼 수 있도록 했습니다. 관리비 카드에는 난방 방식과 관리사무소 전화 연결을 배치했습니다. 단지 전체 인건비·경비비·청소비는 접힌 상세에 표시하며, 아직 확보하지 못한 평형별 실제 관리비를 추정해 표시하지 않습니다.'
           fi
