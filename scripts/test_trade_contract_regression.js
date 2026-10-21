@@ -11,9 +11,36 @@ const a=script.indexOf('function tradeClass(type)'),b=script.indexOf('function r
 assert(a>=0&&b>a,'Shared trade badge formatting helpers must be present');
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,k=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[k]));
 const ctx=vm.createContext({escapeHtml});
+const moneyStart=script.indexOf('function number(n)'),moneyEnd=script.indexOf('function textState(',moneyStart);
+assert(moneyStart>=0&&moneyEnd>moneyStart,'Real value10k helper is required');
+vm.runInContext(script.slice(moneyStart,moneyEnd),ctx);
 vm.runInContext(script.slice(a,b),ctx);
 function badges(row){return vm.runInContext('tradeExtraBadges('+JSON.stringify(row)+')',ctx);}
 function broker(row){return vm.runInContext('tradeBrokerLocation('+JSON.stringify(row)+')',ctx);}
+function renewal(row){return vm.runInContext('tradeRenewalDetails('+JSON.stringify(row)+')',ctx);}
+for(const type of ['전세','월세']){
+ const filled=renewal({type,contract_type_raw:'갱신계약',renewal_raw:'사용',
+  contract_term_raw:'2025.11~2027.11',previous_deposit_raw:'35,000',previous_monthly_raw:'0'});
+ assert(filled.includes('갱신요구권 · 사용'),type+' renewal right');
+ assert(filled.includes('계약기간 · 2025.11~2027.11'),type+' contract term');
+ assert(filled.includes('종전 보증금 · 3억 5,000만원'),type+' previous deposit');
+ assert(filled.includes('종전 월세 · 0만원'),type+' prior zero rent is not missing');
+ const missing=renewal({type,contract_type_raw:'갱신'});
+ assert.equal((missing.match(/미기재/g)||[]).length,4,'Unknown fields must be marked 미기재');
+ const unused=renewal({type,contract_type_raw:'갱신',renewal_raw:'미사용',
+  previous_deposit_raw:'8,000',previous_monthly_raw:'105',contract_term_raw:'2년'});
+ assert(unused.includes('갱신요구권 · 미사용'));
+ assert(unused.includes('종전 보증금 · 8,000만원'));
+ assert(unused.includes('종전 월세 · 105만원'));
+ assert.equal(renewal({type,contract_type_raw:'신규계약',renewal_raw:'사용'}),'',
+  'New rental must not show the renewal information even if right is present');
+ assert.equal(renewal({type,contract_type_raw:'',renewal_raw:'사용'}),'',
+  'Right-use data alone does not prove renewal contract class');
+ const escaped=renewal({type,contract_type_raw:'갱신',contract_term_raw:'<script>alert(1)</script>'});
+ assert(escaped.includes('&lt;script&gt;'));
+ assert(!escaped.includes('<script>'));
+}
+assert.equal(renewal({type:'매매',contract_type_raw:'갱신'}),'','Sales never have rent renewal details');
 for(const type of ['전세','월세']){
  assert(badges({type,contract_type_raw:'갱신'}).includes('(갱신계약)'),type+' renewal');
  assert(badges({type,contract_type_raw:'갱신계약'}).includes('(갱신계약)'),type+' explicitly renewed');
@@ -40,6 +67,7 @@ for(const [name,start,end] of views){
  const section=script.slice(i,j);
  assert(section.includes('tradeExtraBadges(x)'),name+' must display new/renewed lease status');
  assert(section.includes('tradeBrokerLocation(x)'),name+' must show broker region on brokered sales');
+ assert(section.includes('tradeRenewalDetails(x)'),name+' must show four renewal fields only on renewed leases');
  assert(!section.includes('출처: 국토교통부'),name+' must not repeat the source on every card');
  assert(!section.includes('조회 계약연월'),name+' must not repeat contract month on every card');
  assert(!section.includes("x.source_month"),name+' must not show source month redundantly');
@@ -74,4 +102,4 @@ preview=E('ct_preview').value;
 assert(preview.includes('→ 임대인은 입주 전 도배를 마친다.'));
 assert(preview.includes('→ '+def));
 assert(preview.indexOf('→ 임대인은')<preview.indexOf('→ '+def));
-console.log('Trade card regressions passed (3 views) and default contract detailed-term clause confirmed.');
+console.log('Trade card regressions passed (3 views, 4 renewal-only fields) and default contract detailed-term clause confirmed.');
