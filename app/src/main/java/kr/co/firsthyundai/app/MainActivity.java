@@ -231,6 +231,12 @@ public class MainActivity extends Activity {
     }
 
     public final class Bridge {
+        @JavascriptInterface public String getInstalledAppVersion() {
+            return AppVersion.name(MainActivity.this);
+        }
+        @JavascriptInterface public int getInstalledAppBuildNumber() {
+            return AppVersion.buildNumber(MainActivity.this);
+        }
         @JavascriptInterface public String getMode() {
             return isAdminDeviceMode() ? "admin" : "family";
         }
