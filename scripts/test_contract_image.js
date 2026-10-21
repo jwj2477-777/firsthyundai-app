@@ -50,7 +50,7 @@ nodes.ct_imageDialog={showModal(){this.open=true},open:false,close(){this.open=f
 api.open();assert(nodes.ct_imageDialog.open);
 api.share();assert(env.sent&&env.sent.pages.length===p.length);
 approved=false;const previous=env.sent;api.share();assert.strictEqual(env.sent,previous,'Unapproved image must not be shared');
-const long='→ '+'긴 특약 문장 '.repeat(380);
+const long='→ '+'긴 특약 문장 '.repeat(900);
 const longPlan=api._test.plan('● 아파트 매매계약 ●\n'+long);
 assert(longPlan.length>1,'Long terms must paginate rather than truncate');
 console.log('Contract image checks passed:',p.length,'normal page(s),',longPlan.length,'long-text pages.');
