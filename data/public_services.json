@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "state": "awaiting_approval",
-  "updated_at": "2026-10-21T11:00:05+0900",
+  "updated_at": "2026-10-21T13:25:39+0900",
   "note": "신청·인증 전에는 빈 배열을 실제 조회 0건으로 해석하지 않습니다. 학구도와 가까운 학교를 배정학교로 자동 판단하지 않습니다. 키는 GitHub Secrets에만 보관.",
   "schools": {
     "state": "awaiting_key",
@@ -18,36 +18,30 @@
   },
   "building_registry": {
     "state": "verified",
-    "updated_at": "2026-10-21T01:56:34.046914+00:00",
+    "updated_at": "2026-10-21T04:22:33.083308+00:00",
     "source_url": "https://www.data.go.kr/data/15134735/openapi.do",
     "note": "송도동 법정동/지번과 K-apt 공식 단지코드, 건축물대장 표제부 주용도·주소 검증을 통과한 건물 정보만 표시. 단지 내 미일치 동은 표시하지 않음.",
     "scanned": 77,
-    "eligible": 77,
-    "failures": 0,
+    "eligible": 76,
+    "failures": 19,
     "records": [
-      {
-        "complex_id": "kapt-a10020270",
-        "kapt_code": "A10020270",
-        "summary": "건축물대장 표제부 1건 확인 · 주용도 공동주택 · 사용승인 2010-11-19 · 확인 건물 최고 지상 20층",
-        "title_count": 1,
-        "approval_date": "2010-11-19",
-        "top_ground_floor": 20
-      },
       {
         "complex_id": "kapt-a10020272",
         "kapt_code": "A10020272",
         "summary": "건축물대장 표제부 1건 확인 · 주용도 공동주택 · 사용승인 2010-11-19 · 확인 건물 최고 지상 20층",
         "title_count": 1,
         "approval_date": "2010-11-19",
-        "top_ground_floor": 20
-      },
-      {
-        "complex_id": "kapt-a10020527",
-        "kapt_code": "A10020527",
-        "summary": "건축물대장 표제부 37건 확인 · 주용도 공동주택 · 사용승인 2025-07-10 · 확인 건물 최고 지상 36층",
-        "title_count": 37,
-        "approval_date": "2025-07-10",
-        "top_ground_floor": 36
+        "top_ground_floor": 20,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "8단지",
+            "ground_floors": 20,
+            "approval_date": "2010-11-19"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10020539",
@@ -55,15 +49,137 @@
         "summary": "건축물대장 표제부 25건 확인 · 주용도 공동주택 · 사용승인 2025-06-20 · 확인 건물 최고 지상 70층",
         "title_count": 25,
         "approval_date": "2025-06-20",
-        "top_ground_floor": 70
-      },
-      {
-        "complex_id": "kapt-a10020712",
-        "kapt_code": "A10020712",
-        "summary": "건축물대장 표제부 25건 확인 · 주용도 공동주택 · 사용승인 2025-03-28 · 확인 건물 최고 지상 49층",
-        "title_count": 25,
-        "approval_date": "2025-03-28",
-        "top_ground_floor": 49
+        "top_ground_floor": 70,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "세대창고(주거)",
+            "ground_floors": 0,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "방재센터(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "경로당(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "201동",
+            "ground_floors": 70,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "지하주차장(주거)",
+            "ground_floors": 0,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "어린이집(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "멀티미디어룸(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "골프연습장(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "스카이라운지(주거)",
+            "ground_floors": 2,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "휘트니스센터(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "용역인실(주거)",
+            "ground_floors": 0,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "MDF(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "택배보관함(주거)",
+            "ground_floors": 0,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "폐기물보관소(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "경비실(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "게스트하우스(주거)",
+            "ground_floors": 2,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "맘스테이션(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "기계/전기실(주거)",
+            "ground_floors": 0,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "관리사무소(주거)",
+            "ground_floors": 0,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "북카페/주민회의실(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "피난안전구역(주거)",
+            "ground_floors": 2,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "작은도서관(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "사우나(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "주차계단실",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          },
+          {
+            "name": "키즈GYM(주거)",
+            "ground_floors": 1,
+            "approval_date": "2025-06-20"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10020744",
@@ -71,23 +187,117 @@
         "summary": "건축물대장 표제부 21건 확인 · 주용도 공동주택 · 사용승인 2025-02-25 · 확인 건물 최고 지상 49층",
         "title_count": 21,
         "approval_date": "2025-02-25",
-        "top_ground_floor": 49
-      },
-      {
-        "complex_id": "kapt-a10021000",
-        "kapt_code": "A10021000",
-        "summary": "건축물대장 표제부 22건 확인 · 주용도 공동주택 · 사용승인 2024-12-27 · 확인 건물 최고 지상 44층",
-        "title_count": 22,
-        "approval_date": "2024-12-27",
-        "top_ground_floor": 44
-      },
-      {
-        "complex_id": "kapt-a10022353",
-        "kapt_code": "A10022353",
-        "summary": "건축물대장 표제부 19건 확인 · 주용도 공동주택 · 사용승인 2024-07-30 · 확인 건물 최고 지상 10층",
-        "title_count": 19,
-        "approval_date": "2024-07-30",
-        "top_ground_floor": 10
+        "top_ground_floor": 49,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "207동 경비실-1",
+            "ground_floors": 1,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "216동 맘스카페",
+            "ground_floors": 1,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "210동 계단실-2",
+            "ground_floors": 1,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "202동 주민운동시설",
+            "ground_floors": 1,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "204동 티카페",
+            "ground_floors": 1,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 42,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 47,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 49,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 33,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "206동 클린에어스테이션-2",
+            "ground_floors": 1,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "208동 경비실-2",
+            "ground_floors": 1,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "215동 비오토피아카페",
+            "ground_floors": 1,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 49,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "211동 용역원휴게실",
+            "ground_floors": 0,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "209동 계단실-1",
+            "ground_floors": 1,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "205동 클린에어스테이션-1",
+            "ground_floors": 1,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "214동 지하주차장,기계전기실",
+            "ground_floors": 0,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "201동 주민공동시설",
+            "ground_floors": 2,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "203동 북카페",
+            "ground_floors": 1,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "105동",
+            "ground_floors": 35,
+            "approval_date": "2025-02-25"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 33,
+            "approval_date": "2025-02-25"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10022395",
@@ -95,7 +305,17 @@
         "summary": "건축물대장 표제부 1건 확인 · 주용도 공동주택 · 사용승인 2006-04-25 · 확인 건물 최고 지상 20층",
         "title_count": 1,
         "approval_date": "2006-04-25",
-        "top_ground_floor": 20
+        "top_ground_floor": 20,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "송도이안",
+            "ground_floors": 20,
+            "approval_date": "2006-04-25"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10022494",
@@ -103,23 +323,72 @@
         "summary": "건축물대장 표제부 12건 확인 · 주용도 공동주택 · 사용승인 2024-05-29 · 확인 건물 최고 지상 59층",
         "title_count": 12,
         "approval_date": "2024-05-29",
-        "top_ground_floor": 59
-      },
-      {
-        "complex_id": "kapt-a10022498",
-        "kapt_code": "A10022498",
-        "summary": "건축물대장 표제부 23건 확인 · 주용도 공동주택 · 사용승인 2024-06-27 · 확인 건물 최고 지상 42층",
-        "title_count": 23,
-        "approval_date": "2024-06-27",
-        "top_ground_floor": 42
-      },
-      {
-        "complex_id": "kapt-a10022954",
-        "kapt_code": "A10022954",
-        "summary": "건축물대장 표제부 25건 확인 · 주용도 공동주택 · 사용승인 2023-10-24 · 확인 건물 최고 지상 49층",
-        "title_count": 25,
-        "approval_date": "2023-10-24",
-        "top_ground_floor": 49
+        "top_ground_floor": 59,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "107동",
+            "ground_floors": 0,
+            "approval_date": "2024-05-29"
+          },
+          {
+            "name": "108동",
+            "ground_floors": 52,
+            "approval_date": "2024-05-29"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 49,
+            "approval_date": "2024-05-29"
+          },
+          {
+            "name": "105동",
+            "ground_floors": 10,
+            "approval_date": "2024-05-29"
+          },
+          {
+            "name": "110동",
+            "ground_floors": 1,
+            "approval_date": "2024-05-29"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 56,
+            "approval_date": "2024-05-29"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 59,
+            "approval_date": "2024-05-29"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 1,
+            "approval_date": "2024-05-29"
+          },
+          {
+            "name": "109동",
+            "ground_floors": 2,
+            "approval_date": "2024-05-29"
+          },
+          {
+            "name": "111동",
+            "ground_floors": 1,
+            "approval_date": "2024-05-29"
+          },
+          {
+            "name": "112동",
+            "ground_floors": 2,
+            "approval_date": "2024-05-29"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 51,
+            "approval_date": "2024-05-29"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10022964",
@@ -127,15 +396,67 @@
         "summary": "건축물대장 표제부 11건 확인 · 주용도 공동주택 · 사용승인 2023-09-26 · 확인 건물 최고 지상 48층",
         "title_count": 11,
         "approval_date": "2023-09-26",
-        "top_ground_floor": 48
-      },
-      {
-        "complex_id": "centennial",
-        "kapt_code": "A10023207",
-        "summary": "건축물대장 표제부 21건 확인 · 주용도 공동주택 · 사용승인 2023-04-10 · 확인 건물 최고 지상 39층",
-        "title_count": 21,
-        "approval_date": "2023-04-10",
-        "top_ground_floor": 39
+        "top_ground_floor": 48,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "408동",
+            "ground_floors": 1,
+            "approval_date": "2023-09-26"
+          },
+          {
+            "name": "406동",
+            "ground_floors": 0,
+            "approval_date": "2023-09-26"
+          },
+          {
+            "name": "401동",
+            "ground_floors": 1,
+            "approval_date": "2023-09-26"
+          },
+          {
+            "name": "409동",
+            "ground_floors": 0,
+            "approval_date": "2023-09-26"
+          },
+          {
+            "name": "405동",
+            "ground_floors": 1,
+            "approval_date": "2023-09-26"
+          },
+          {
+            "name": "402동",
+            "ground_floors": 1,
+            "approval_date": "2023-09-26"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 48,
+            "approval_date": "2023-09-26"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 48,
+            "approval_date": "2023-09-26"
+          },
+          {
+            "name": "403동",
+            "ground_floors": 1,
+            "approval_date": "2023-09-26"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 43,
+            "approval_date": "2023-09-26"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 48,
+            "approval_date": "2023-09-26"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10023361",
@@ -143,7 +464,107 @@
         "summary": "건축물대장 표제부 19건 확인 · 주용도 공동주택 · 사용승인 2023-02-14 · 확인 건물 최고 지상 49층",
         "title_count": 19,
         "approval_date": "2023-02-14",
-        "top_ground_floor": 49
+        "top_ground_floor": 49,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "128동(경비실-2)",
+            "ground_floors": 1,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "105동(공동주택)",
+            "ground_floors": 41,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "106동(공동주택)",
+            "ground_floors": 40,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "125동(맘스테이션-1)",
+            "ground_floors": 1,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "130동(경비실-4)",
+            "ground_floors": 1,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "104동(공동주택)",
+            "ground_floors": 47,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "123동(경로당)",
+            "ground_floors": 1,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "126동(맘스테이션-2)",
+            "ground_floors": 1,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "103동(공동주택)",
+            "ground_floors": 49,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "122동(어린이집)",
+            "ground_floors": 1,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "107동(공동주택)",
+            "ground_floors": 48,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "108동(공동주택)",
+            "ground_floors": 48,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "124동(스카이라운지)",
+            "ground_floors": 1,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "109동(공동주택)",
+            "ground_floors": 47,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "112동(지하주차장-공동주택)",
+            "ground_floors": 1,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "118동(관리사무소-공동주택)",
+            "ground_floors": 1,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "115동(기계전기실-공동주택)",
+            "ground_floors": 0,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "121동(주민공동시설-공동주택)",
+            "ground_floors": 1,
+            "approval_date": "2023-02-14"
+          },
+          {
+            "name": "129동(경비실-3)",
+            "ground_floors": 1,
+            "approval_date": "2023-02-14"
+          }
+        ]
       },
       {
         "complex_id": "central3",
@@ -151,7 +572,37 @@
         "summary": "건축물대장 표제부 5건 확인 · 주용도 공동주택 · 사용승인 2022-12-30 · 확인 건물 최고 지상 40층",
         "title_count": 5,
         "approval_date": "2022-12-30",
-        "top_ground_floor": 40
+        "top_ground_floor": 40,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "102동",
+            "ground_floors": 40,
+            "approval_date": "2022-12-30"
+          },
+          {
+            "name": "경비실(공동주택)",
+            "ground_floors": 1,
+            "approval_date": "2022-12-30"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 40,
+            "approval_date": "2022-12-30"
+          },
+          {
+            "name": "지하주차장,기계실,전기실,방재실(판매시설)",
+            "ground_floors": 0,
+            "approval_date": "2022-12-30"
+          },
+          {
+            "name": "지하주차장,기계실,전기실(공동주택)",
+            "ground_floors": 0,
+            "approval_date": "2022-12-30"
+          }
+        ]
       },
       {
         "complex_id": "prime20",
@@ -159,7 +610,77 @@
         "summary": "건축물대장 표제부 13건 확인 · 주용도 공동주택 · 사용승인 2022-07-29 · 확인 건물 최고 지상 37층",
         "title_count": 13,
         "approval_date": "2022-07-29",
-        "top_ground_floor": 37
+        "top_ground_floor": 37,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "2003동",
+            "ground_floors": 35,
+            "approval_date": "2022-07-29"
+          },
+          {
+            "name": "어린이집",
+            "ground_floors": 1,
+            "approval_date": "2022-07-29"
+          },
+          {
+            "name": "2002동",
+            "ground_floors": 37,
+            "approval_date": "2022-07-29"
+          },
+          {
+            "name": "2004동",
+            "ground_floors": 37,
+            "approval_date": "2022-07-29"
+          },
+          {
+            "name": "경로당, 주민공동시설1",
+            "ground_floors": 2,
+            "approval_date": "2022-07-29"
+          },
+          {
+            "name": "2001동",
+            "ground_floors": 32,
+            "approval_date": "2022-07-29"
+          },
+          {
+            "name": "주민공동시설3",
+            "ground_floors": 1,
+            "approval_date": "2022-07-29"
+          },
+          {
+            "name": "주민공동시설2",
+            "ground_floors": 1,
+            "approval_date": "2022-07-29"
+          },
+          {
+            "name": "지하주차장(기계실포함)",
+            "ground_floors": 1,
+            "approval_date": "2022-07-29"
+          },
+          {
+            "name": "경비실2",
+            "ground_floors": 1,
+            "approval_date": "2022-07-29"
+          },
+          {
+            "name": "2005동",
+            "ground_floors": 36,
+            "approval_date": "2022-07-29"
+          },
+          {
+            "name": "경비실1",
+            "ground_floors": 1,
+            "approval_date": "2022-07-29"
+          },
+          {
+            "name": "관리사무소",
+            "ground_floors": 1,
+            "approval_date": "2022-07-29"
+          }
+        ]
       },
       {
         "complex_id": "prime25",
@@ -167,7 +688,82 @@
         "summary": "건축물대장 표제부 14건 확인 · 주용도 공동주택 · 사용승인 2021-10-29 · 확인 건물 최고 지상 19층",
         "title_count": 14,
         "approval_date": "2021-10-29",
-        "top_ground_floor": 19
+        "top_ground_floor": 19,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "2502동",
+            "ground_floors": 16,
+            "approval_date": "2021-10-29"
+          },
+          {
+            "name": "2503동",
+            "ground_floors": 19,
+            "approval_date": "2021-10-29"
+          },
+          {
+            "name": "2501동",
+            "ground_floors": 16,
+            "approval_date": "2021-10-29"
+          },
+          {
+            "name": "주민공동시설2",
+            "ground_floors": 1,
+            "approval_date": "2021-10-29"
+          },
+          {
+            "name": "2504동",
+            "ground_floors": 19,
+            "approval_date": "2021-10-29"
+          },
+          {
+            "name": "경비실",
+            "ground_floors": 1,
+            "approval_date": "2021-10-29"
+          },
+          {
+            "name": "주민공동시설1",
+            "ground_floors": 1,
+            "approval_date": "2021-10-29"
+          },
+          {
+            "name": "경로당",
+            "ground_floors": 1,
+            "approval_date": "2021-10-29"
+          },
+          {
+            "name": "기계실1",
+            "ground_floors": 0,
+            "approval_date": "2021-10-29"
+          },
+          {
+            "name": "주민공동시설3",
+            "ground_floors": 1,
+            "approval_date": "2021-10-29"
+          },
+          {
+            "name": "관리사무소",
+            "ground_floors": 1,
+            "approval_date": "2021-10-29"
+          },
+          {
+            "name": "기계실2",
+            "ground_floors": 0,
+            "approval_date": "2021-10-29"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2021-10-29"
+          },
+          {
+            "name": "전기/발전기실",
+            "ground_floors": 0,
+            "approval_date": "2021-10-29"
+          }
+        ]
       },
       {
         "complex_id": "skcentral",
@@ -175,7 +771,47 @@
         "summary": "건축물대장 표제부 7건 확인 · 주용도 공동주택 · 사용승인 2020-10-15 · 확인 건물 최고 지상 36층",
         "title_count": 7,
         "approval_date": "2020-10-15",
-        "top_ground_floor": 36
+        "top_ground_floor": 36,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "주차장(공동주택)",
+            "ground_floors": 0,
+            "approval_date": "2020-10-15"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 36,
+            "approval_date": "2020-10-15"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 35,
+            "approval_date": "2020-10-15"
+          },
+          {
+            "name": "기계,전기실(공동주택)",
+            "ground_floors": 0,
+            "approval_date": "2020-10-15"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 33,
+            "approval_date": "2020-10-15"
+          },
+          {
+            "name": "경로당",
+            "ground_floors": 1,
+            "approval_date": "2020-10-15"
+          },
+          {
+            "name": "공동주택 부대복리시설",
+            "ground_floors": 1,
+            "approval_date": "2020-10-15"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10024710",
@@ -183,7 +819,97 @@
         "summary": "건축물대장 표제부 17건 확인 · 주용도 공동주택 · 사용승인 2020-07-16 · 확인 건물 최고 지상 49층",
         "title_count": 17,
         "approval_date": "2020-07-16",
-        "top_ground_floor": 49
+        "top_ground_floor": 49,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "108동",
+            "ground_floors": 48,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "111동",
+            "ground_floors": 0,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "117동",
+            "ground_floors": 1,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "116동",
+            "ground_floors": 1,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "112동",
+            "ground_floors": 1,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "114동",
+            "ground_floors": 2,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "113동",
+            "ground_floors": 1,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 48,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 49,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "115동",
+            "ground_floors": 1,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "105동",
+            "ground_floors": 49,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 46,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 46,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 49,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 49,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "109동",
+            "ground_floors": 1,
+            "approval_date": "2020-07-16"
+          },
+          {
+            "name": "110동",
+            "ground_floors": 0,
+            "approval_date": "2020-07-16"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10024779",
@@ -191,7 +917,197 @@
         "summary": "건축물대장 표제부 37건 확인 · 주용도 공동주택 · 사용승인 2020-07-13 · 확인 건물 최고 지상 38층",
         "title_count": 37,
         "approval_date": "2020-07-13",
-        "top_ground_floor": 38
+        "top_ground_floor": 38,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "205동(주민공동시설4)",
+            "ground_floors": 0,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "210동(지하주차장)",
+            "ground_floors": 0,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "122동",
+            "ground_floors": 29,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "203동(주민공동시설2)",
+            "ground_floors": 2,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "207동(경비실-2)",
+            "ground_floors": 1,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 34,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "202동(주민공동시설1)",
+            "ground_floors": 1,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "115동",
+            "ground_floors": 29,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "111동",
+            "ground_floors": 36,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "116동",
+            "ground_floors": 29,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 35,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "123동",
+            "ground_floors": 34,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 38,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "201동(경로당)",
+            "ground_floors": 1,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "211동(외부계단)",
+            "ground_floors": 1,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "109동",
+            "ground_floors": 34,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "105동",
+            "ground_floors": 38,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "208동(저류조관리층)",
+            "ground_floors": 0,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "120동",
+            "ground_floors": 38,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "110동",
+            "ground_floors": 34,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "117동",
+            "ground_floors": 38,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "209동(기계,전기실)",
+            "ground_floors": 0,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "113동",
+            "ground_floors": 35,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 38,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "119동",
+            "ground_floors": 38,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 38,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "201동(어린이집)",
+            "ground_floors": 1,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "114동",
+            "ground_floors": 35,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 38,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "112동",
+            "ground_floors": 35,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "121동",
+            "ground_floors": 29,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "124동",
+            "ground_floors": 8,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "204동(주민공동시설3)",
+            "ground_floors": 1,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "206동(경비실-1)",
+            "ground_floors": 1,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "108동",
+            "ground_floors": 36,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "125동",
+            "ground_floors": 28,
+            "approval_date": "2020-07-13"
+          },
+          {
+            "name": "118동",
+            "ground_floors": 38,
+            "approval_date": "2020-07-13"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10025031",
@@ -199,7 +1115,152 @@
         "summary": "건축물대장 표제부 28건 확인 · 주용도 공동주택 · 사용승인 2020-02-14 · 확인 건물 최고 지상 49층",
         "title_count": 28,
         "approval_date": "2020-02-14",
-        "top_ground_floor": 49
+        "top_ground_floor": 49,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "106동(피난대피공간)",
+            "ground_floors": 28,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 49,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "110동(피난대피공간)",
+            "ground_floors": 18,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "108동(피난대피공간)",
+            "ground_floors": 25,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "용역원실",
+            "ground_floors": 0,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "109동(피난대피공간)",
+            "ground_floors": 18,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "관리사무소/경로당",
+            "ground_floors": 1,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 1,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 46,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 44,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "110동",
+            "ground_floors": 38,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "103동(피난대피공간)",
+            "ground_floors": 25,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "108동",
+            "ground_floors": 44,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 37,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "109동",
+            "ground_floors": 38,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "기계/전기실",
+            "ground_floors": 0,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "107동(피난대피공간)",
+            "ground_floors": 18,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "102동(피난대피공간)",
+            "ground_floors": 18,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "어린이집",
+            "ground_floors": 1,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 34,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "주민공동시설/작은도서관",
+            "ground_floors": 1,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 41,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "105동",
+            "ground_floors": 49,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "104동(피난대피공간)",
+            "ground_floors": 26,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "경비실2",
+            "ground_floors": 1,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "105동(피난대피공간)",
+            "ground_floors": 28,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "101동(피난대피공간)",
+            "ground_floors": 18,
+            "approval_date": "2020-02-14"
+          },
+          {
+            "name": "경비실1",
+            "ground_floors": 1,
+            "approval_date": "2020-02-14"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10025071",
@@ -207,7 +1268,112 @@
         "summary": "건축물대장 표제부 20건 확인 · 주용도 공동주택 · 사용승인 2020-01-31 · 확인 건물 최고 지상 43층",
         "title_count": 20,
         "approval_date": "2020-01-31",
-        "top_ground_floor": 43
+        "top_ground_floor": 43,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "218동",
+            "ground_floors": 27,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "207동",
+            "ground_floors": 24,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "210동",
+            "ground_floors": 0,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "216동",
+            "ground_floors": 1,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "201동",
+            "ground_floors": 43,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "212동",
+            "ground_floors": 1,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "204동",
+            "ground_floors": 36,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "211동",
+            "ground_floors": 0,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "208동",
+            "ground_floors": 24,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "206동",
+            "ground_floors": 22,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "209동",
+            "ground_floors": 26,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "219동",
+            "ground_floors": 1,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "213동",
+            "ground_floors": 1,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "214동",
+            "ground_floors": 1,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "217동",
+            "ground_floors": 1,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "220동",
+            "ground_floors": 1,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "202동",
+            "ground_floors": 40,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "205동",
+            "ground_floors": 34,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "215동",
+            "ground_floors": 1,
+            "approval_date": "2020-01-31"
+          },
+          {
+            "name": "203동",
+            "ground_floors": 37,
+            "approval_date": "2020-01-31"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10025399",
@@ -215,7 +1381,107 @@
         "summary": "건축물대장 표제부 19건 확인 · 주용도 공동주택 · 사용승인 2019-07-09 · 확인 건물 최고 지상 43층",
         "title_count": 19,
         "approval_date": "2019-07-09",
-        "top_ground_floor": 43
+        "top_ground_floor": 43,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "108동",
+            "ground_floors": 38,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "207동(경비실-1,2)",
+            "ground_floors": 1,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 43,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "204동(티하우스)",
+            "ground_floors": 1,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 42,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "201동(주민공동시설-1)",
+            "ground_floors": 2,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 38,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "205동(웰컴라운지-1)",
+            "ground_floors": 1,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "202동(커뮤니티센터)",
+            "ground_floors": 0,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "206동(웰컴라운지-2)",
+            "ground_floors": 1,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "208동(지하주차장,기계실,전기실,발전기실,열교환기실,우수관리층,제연휀룸)",
+            "ground_floors": 0,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "109동",
+            "ground_floors": 40,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "110동",
+            "ground_floors": 43,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 42,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 33,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 41,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "111동",
+            "ground_floors": 38,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "105동",
+            "ground_floors": 40,
+            "approval_date": "2019-07-09"
+          },
+          {
+            "name": "203동(주민공동시설-2)",
+            "ground_floors": 2,
+            "approval_date": "2019-07-09"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10025443",
@@ -223,7 +1489,107 @@
         "summary": "건축물대장 표제부 19건 확인 · 주용도 공동주택 · 사용승인 2019-06-27 · 확인 건물 최고 지상 36층",
         "title_count": 19,
         "approval_date": "2019-06-27",
-        "top_ground_floor": 36
+        "top_ground_floor": 36,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "105동",
+            "ground_floors": 29,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 17,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 34,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "경비실1",
+            "ground_floors": 1,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "관리사무소",
+            "ground_floors": 1,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "라운지",
+            "ground_floors": 1,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 21,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "경로당",
+            "ground_floors": 1,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 36,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "기계,전기실",
+            "ground_floors": 0,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "경비실2",
+            "ground_floors": 1,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "108동",
+            "ground_floors": 23,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 29,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "작은도서관",
+            "ground_floors": 1,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "주민운동시설",
+            "ground_floors": 1,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "어린이집",
+            "ground_floors": 1,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 33,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "109동",
+            "ground_floors": 26,
+            "approval_date": "2019-06-27"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2019-06-27"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10025745",
@@ -231,7 +1597,37 @@
         "summary": "건축물대장 표제부 5건 확인 · 주용도 공동주택 · 사용승인 2018-10-26 · 확인 건물 최고 지상 49층",
         "title_count": 5,
         "approval_date": "2018-10-26",
-        "top_ground_floor": 49
+        "top_ground_floor": 49,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "102동",
+            "ground_floors": 49,
+            "approval_date": "2018-10-26"
+          },
+          {
+            "name": "주민공동시설",
+            "ground_floors": 24,
+            "approval_date": "2018-10-26"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2018-10-26"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 49,
+            "approval_date": "2018-10-26"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 49,
+            "approval_date": "2018-10-26"
+          }
+        ]
       },
       {
         "complex_id": "avenue",
@@ -239,7 +1635,92 @@
         "summary": "건축물대장 표제부 16건 확인 · 주용도 공동주택 · 사용승인 2018-11-22 · 확인 건물 최고 지상 46층",
         "title_count": 16,
         "approval_date": "2018-11-22",
-        "top_ground_floor": 46
+        "top_ground_floor": 46,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "경비실-2",
+            "ground_floors": 1,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "1601동",
+            "ground_floors": 46,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "동전기실",
+            "ground_floors": 0,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "1603동",
+            "ground_floors": 43,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "1604동",
+            "ground_floors": 41,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "주민공동시설-2",
+            "ground_floors": 2,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "옥외계단",
+            "ground_floors": 1,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "주민공동시설-1",
+            "ground_floors": 1,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "MDF",
+            "ground_floors": 1,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "기계실",
+            "ground_floors": 0,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "전기실,발전기실",
+            "ground_floors": 0,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "1602동",
+            "ground_floors": 46,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "경비실-1",
+            "ground_floors": 1,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "주민공동시설-3",
+            "ground_floors": 1,
+            "approval_date": "2018-11-22"
+          },
+          {
+            "name": "어린이집",
+            "ground_floors": 1,
+            "approval_date": "2018-11-22"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10025886",
@@ -247,7 +1728,182 @@
         "summary": "건축물대장 표제부 34건 확인 · 주용도 공동주택 · 사용승인 2018-11-06 · 확인 건물 최고 지상 39층",
         "title_count": 34,
         "approval_date": "2018-11-06",
-        "top_ground_floor": 39
+        "top_ground_floor": 39,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "전기실2",
+            "ground_floors": 0,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "기계실3",
+            "ground_floors": 0,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 39,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "기계실2",
+            "ground_floors": 0,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "경로당",
+            "ground_floors": 1,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "114동",
+            "ground_floors": 39,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "방재실",
+            "ground_floors": 0,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 38,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 38,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "우수저수조펌프실",
+            "ground_floors": 0,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 38,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "112동",
+            "ground_floors": 39,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "기계실1",
+            "ground_floors": 0,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "111동",
+            "ground_floors": 39,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "MDF",
+            "ground_floors": 1,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "경비실3",
+            "ground_floors": 1,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "115동",
+            "ground_floors": 39,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "경비실1",
+            "ground_floors": 1,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 37,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "관리사무소",
+            "ground_floors": 0,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "경비실2",
+            "ground_floors": 1,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "동전기실",
+            "ground_floors": 0,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "105동",
+            "ground_floors": 35,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "어린이집",
+            "ground_floors": 1,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 39,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "주동제연휀룸",
+            "ground_floors": 0,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "110동",
+            "ground_floors": 37,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 1,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "109동",
+            "ground_floors": 35,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "108동",
+            "ground_floors": 33,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "113동",
+            "ground_floors": 39,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "작은도서관",
+            "ground_floors": 0,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "전기실1",
+            "ground_floors": 0,
+            "approval_date": "2018-11-06"
+          },
+          {
+            "name": "주민공동시설",
+            "ground_floors": 1,
+            "approval_date": "2018-11-06"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10026038",
@@ -255,7 +1911,127 @@
         "summary": "건축물대장 표제부 23건 확인 · 주용도 공동주택 · 사용승인 2018-09-21 · 확인 건물 최고 지상 47층",
         "title_count": 23,
         "approval_date": "2018-09-21",
-        "top_ground_floor": 47
+        "top_ground_floor": 47,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "209동",
+            "ground_floors": 39,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "212동",
+            "ground_floors": 47,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "203동",
+            "ground_floors": 44,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "223동",
+            "ground_floors": 2,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "201동",
+            "ground_floors": 35,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "206동",
+            "ground_floors": 45,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "220동",
+            "ground_floors": 0,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "226동",
+            "ground_floors": 1,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "215동",
+            "ground_floors": 43,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "205동",
+            "ground_floors": 42,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "221동",
+            "ground_floors": 1,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "208동",
+            "ground_floors": 39,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "224동",
+            "ground_floors": 1,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "207동",
+            "ground_floors": 42,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "225동",
+            "ground_floors": 2,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "204동",
+            "ground_floors": 42,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "211동",
+            "ground_floors": 45,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "213동",
+            "ground_floors": 47,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "214동",
+            "ground_floors": 45,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "219동",
+            "ground_floors": 1,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "210동",
+            "ground_floors": 38,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "202동",
+            "ground_floors": 35,
+            "approval_date": "2018-09-21"
+          },
+          {
+            "name": "222동",
+            "ground_floors": 1,
+            "approval_date": "2018-09-21"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10026547",
@@ -263,7 +2039,127 @@
         "summary": "건축물대장 표제부 23건 확인 · 주용도 공동주택 · 사용승인 2017-11-01 · 확인 건물 최고 지상 33층",
         "title_count": 23,
         "approval_date": "2017-11-01",
-        "top_ground_floor": 33
+        "top_ground_floor": 33,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "202동",
+            "ground_floors": 33,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "209동",
+            "ground_floors": 15,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "펌프실",
+            "ground_floors": 0,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "201동",
+            "ground_floors": 33,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "208동",
+            "ground_floors": 15,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "관리사무소",
+            "ground_floors": 1,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "경비실-1",
+            "ground_floors": 1,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "주민공동시설",
+            "ground_floors": 0,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "작은도서관",
+            "ground_floors": 0,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "제연휀룸",
+            "ground_floors": 0,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "우수기계실",
+            "ground_floors": 0,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "206동",
+            "ground_floors": 33,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "전기실/발전기실",
+            "ground_floors": 0,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "204동",
+            "ground_floors": 33,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "203동",
+            "ground_floors": 33,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "207동",
+            "ground_floors": 29,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "수영장기계실",
+            "ground_floors": 0,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "피난안전구역",
+            "ground_floors": 19,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "경비실-2",
+            "ground_floors": 1,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "보육시설",
+            "ground_floors": 1,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "경로당",
+            "ground_floors": 1,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "205동",
+            "ground_floors": 33,
+            "approval_date": "2017-11-01"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2017-11-01"
+          }
+        ]
       },
       {
         "complex_id": "f13",
@@ -271,7 +2167,57 @@
         "summary": "건축물대장 표제부 9건 확인 · 주용도 공동주택 · 사용승인 2017-11-17 · 확인 건물 최고 지상 44층",
         "title_count": 9,
         "approval_date": "2017-11-17",
-        "top_ground_floor": 44
+        "top_ground_floor": 44,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "1305",
+            "ground_floors": 44,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1308",
+            "ground_floors": 1,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1307",
+            "ground_floors": 1,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1301",
+            "ground_floors": 44,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1306",
+            "ground_floors": 1,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1302",
+            "ground_floors": 44,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1309",
+            "ground_floors": 1,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1304",
+            "ground_floors": 38,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1303",
+            "ground_floors": 36,
+            "approval_date": "2017-11-17"
+          }
+        ]
       },
       {
         "complex_id": "f15",
@@ -279,7 +2225,57 @@
         "summary": "건축물대장 표제부 9건 확인 · 주용도 공동주택 · 사용승인 2017-11-17 · 확인 건물 최고 지상 43층",
         "title_count": 9,
         "approval_date": "2017-11-17",
-        "top_ground_floor": 43
+        "top_ground_floor": 43,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "1504",
+            "ground_floors": 37,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1506",
+            "ground_floors": 1,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1508",
+            "ground_floors": 1,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1502",
+            "ground_floors": 41,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1509",
+            "ground_floors": 1,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1507",
+            "ground_floors": 1,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1503",
+            "ground_floors": 34,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1505",
+            "ground_floors": 43,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1501",
+            "ground_floors": 42,
+            "approval_date": "2017-11-17"
+          }
+        ]
       },
       {
         "complex_id": "f14",
@@ -287,7 +2283,57 @@
         "summary": "건축물대장 표제부 9건 확인 · 주용도 공동주택 · 사용승인 2017-11-17 · 확인 건물 최고 지상 42층",
         "title_count": 9,
         "approval_date": "2017-11-17",
-        "top_ground_floor": 42
+        "top_ground_floor": 42,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "1407",
+            "ground_floors": 1,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1403",
+            "ground_floors": 35,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1409",
+            "ground_floors": 1,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1408",
+            "ground_floors": 1,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1401",
+            "ground_floors": 42,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1405",
+            "ground_floors": 41,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1404",
+            "ground_floors": 37,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1406",
+            "ground_floors": 1,
+            "approval_date": "2017-11-17"
+          },
+          {
+            "name": "1402",
+            "ground_floors": 41,
+            "approval_date": "2017-11-17"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10027171",
@@ -295,7 +2341,162 @@
         "summary": "건축물대장 표제부 30건 확인 · 주용도 공동주택 · 사용승인 2017-02-01 · 확인 건물 최고 지상 33층",
         "title_count": 30,
         "approval_date": "2017-02-01",
-        "top_ground_floor": 33
+        "top_ground_floor": 33,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "102동",
+            "ground_floors": 29,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "기계실(우수저수조)",
+            "ground_floors": 0,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "109동",
+            "ground_floors": 29,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "110동",
+            "ground_floors": 29,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "경로당",
+            "ground_floors": 1,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "피난안전구역",
+            "ground_floors": 20,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 29,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "115동",
+            "ground_floors": 15,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "108동",
+            "ground_floors": 29,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "보육시설",
+            "ground_floors": 1,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "114동",
+            "ground_floors": 15,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "경비실-1",
+            "ground_floors": 1,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "111동",
+            "ground_floors": 25,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "전기실/발전기실",
+            "ground_floors": 0,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "펌프실",
+            "ground_floors": 0,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "113동",
+            "ground_floors": 24,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "수영장기계실",
+            "ground_floors": 0,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 33,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 33,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "제연휀룸",
+            "ground_floors": 0,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 29,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "관리사무실",
+            "ground_floors": 1,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "작은도서관",
+            "ground_floors": 0,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 33,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "105동",
+            "ground_floors": 33,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "경비실-2",
+            "ground_floors": 1,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "열교환실",
+            "ground_floors": 0,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "112동",
+            "ground_floors": 24,
+            "approval_date": "2017-02-01"
+          },
+          {
+            "name": "주민공동시설",
+            "ground_floors": 0,
+            "approval_date": "2017-02-01"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10027367",
@@ -303,7 +2504,82 @@
         "summary": "건축물대장 표제부 14건 확인 · 주용도 공동주택 · 사용승인 2016-08-25 · 확인 건물 최고 지상 41층",
         "title_count": 14,
         "approval_date": "2016-08-25",
-        "top_ground_floor": 41
+        "top_ground_floor": 41,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "경비실2",
+            "ground_floors": 1,
+            "approval_date": "2016-08-25"
+          },
+          {
+            "name": "203",
+            "ground_floors": 41,
+            "approval_date": "2016-08-25"
+          },
+          {
+            "name": "주민공동시설,관리사무소",
+            "ground_floors": 2,
+            "approval_date": "2016-08-25"
+          },
+          {
+            "name": "202",
+            "ground_floors": 41,
+            "approval_date": "2016-08-25"
+          },
+          {
+            "name": "재활용창고",
+            "ground_floors": 1,
+            "approval_date": "2016-08-25"
+          },
+          {
+            "name": "208",
+            "ground_floors": 32,
+            "approval_date": "2016-08-25"
+          },
+          {
+            "name": "경비실3",
+            "ground_floors": 1,
+            "approval_date": "2016-08-25"
+          },
+          {
+            "name": "204",
+            "ground_floors": 41,
+            "approval_date": "2016-08-25"
+          },
+          {
+            "name": "경비실1",
+            "ground_floors": 1,
+            "approval_date": "2016-08-25"
+          },
+          {
+            "name": "201",
+            "ground_floors": 41,
+            "approval_date": "2016-08-25"
+          },
+          {
+            "name": "206",
+            "ground_floors": 33,
+            "approval_date": "2016-08-25"
+          },
+          {
+            "name": "205",
+            "ground_floors": 40,
+            "approval_date": "2016-08-25"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2016-08-25"
+          },
+          {
+            "name": "207",
+            "ground_floors": 36,
+            "approval_date": "2016-08-25"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10027653",
@@ -311,7 +2587,107 @@
         "summary": "건축물대장 표제부 19건 확인 · 주용도 공동주택 · 사용승인 2016-03-10 · 확인 건물 최고 지상 55층",
         "title_count": 19,
         "approval_date": "2016-03-10",
-        "top_ground_floor": 55
+        "top_ground_floor": 55,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "508",
+            "ground_floors": 1,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "507",
+            "ground_floors": 1,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "401",
+            "ground_floors": 0,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "512",
+            "ground_floors": 1,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "106",
+            "ground_floors": 46,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "501",
+            "ground_floors": 1,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "511",
+            "ground_floors": 1,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "506",
+            "ground_floors": 1,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "514",
+            "ground_floors": 1,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "103",
+            "ground_floors": 47,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "102",
+            "ground_floors": 49,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "502",
+            "ground_floors": 1,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "407",
+            "ground_floors": 0,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "104",
+            "ground_floors": 49,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "503",
+            "ground_floors": 1,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "513",
+            "ground_floors": 1,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "101",
+            "ground_floors": 55,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "402",
+            "ground_floors": 0,
+            "approval_date": "2016-03-10"
+          },
+          {
+            "name": "105",
+            "ground_floors": 47,
+            "approval_date": "2016-03-10"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10027884",
@@ -319,7 +2695,72 @@
         "summary": "건축물대장 표제부 12건 확인 · 주용도 공동주택 · 사용승인 2015-10-07 · 확인 건물 최고 지상 29층",
         "title_count": 12,
         "approval_date": "2015-10-07",
-        "top_ground_floor": 29
+        "top_ground_floor": 29,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "경비실",
+            "ground_floors": 1,
+            "approval_date": "2015-10-07"
+          },
+          {
+            "name": "복리시설3",
+            "ground_floors": 0,
+            "approval_date": "2015-10-07"
+          },
+          {
+            "name": "1701",
+            "ground_floors": 29,
+            "approval_date": "2015-10-07"
+          },
+          {
+            "name": "부대시설3",
+            "ground_floors": 1,
+            "approval_date": "2015-10-07"
+          },
+          {
+            "name": "복리시설2",
+            "ground_floors": 1,
+            "approval_date": "2015-10-07"
+          },
+          {
+            "name": "복리시설1",
+            "ground_floors": 1,
+            "approval_date": "2015-10-07"
+          },
+          {
+            "name": "부대시설2",
+            "ground_floors": 1,
+            "approval_date": "2015-10-07"
+          },
+          {
+            "name": "기계전기실",
+            "ground_floors": 0,
+            "approval_date": "2015-10-07"
+          },
+          {
+            "name": "1702",
+            "ground_floors": 26,
+            "approval_date": "2015-10-07"
+          },
+          {
+            "name": "1703",
+            "ground_floors": 29,
+            "approval_date": "2015-10-07"
+          },
+          {
+            "name": "부대시설1",
+            "ground_floors": 1,
+            "approval_date": "2015-10-07"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2015-10-07"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a10027887",
@@ -327,39 +2768,37 @@
         "summary": "건축물대장 표제부 5건 확인 · 주용도 공동주택 · 사용승인 2015-06-26 · 확인 건물 최고 지상 46층",
         "title_count": 5,
         "approval_date": "2015-06-26",
-        "top_ground_floor": 46
-      },
-      {
-        "complex_id": "kapt-a10027888",
-        "kapt_code": "A10027888",
-        "summary": "건축물대장 표제부 16건 확인 · 주용도 공동주택 · 사용승인 2015-10-07 · 확인 건물 최고 지상 34층",
-        "title_count": 16,
-        "approval_date": "2015-10-07",
-        "top_ground_floor": 34
-      },
-      {
-        "complex_id": "artwin",
-        "kapt_code": "A10027898",
-        "summary": "건축물대장 표제부 3건 확인 · 주용도 공동주택 · 사용승인 2015-08-27 · 확인 건물 최고 지상 60층",
-        "title_count": 3,
-        "approval_date": "2015-08-27",
-        "top_ground_floor": 60
-      },
-      {
-        "complex_id": "m21",
-        "kapt_code": "A10027925",
-        "summary": "건축물대장 표제부 11건 확인 · 주용도 공동주택 · 사용승인 2015-07-29 · 확인 건물 최고 지상 32층",
-        "title_count": 11,
-        "approval_date": "2015-07-29",
-        "top_ground_floor": 32
-      },
-      {
-        "complex_id": "m22",
-        "kapt_code": "A10027929",
-        "summary": "건축물대장 표제부 11건 확인 · 주용도 공동주택 · 사용승인 2015-07-29 · 확인 건물 최고 지상 32층",
-        "title_count": 11,
-        "approval_date": "2015-07-29",
-        "top_ground_floor": 32
+        "top_ground_floor": 46,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "101동",
+            "ground_floors": 42,
+            "approval_date": "2015-06-26"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 46,
+            "approval_date": "2015-06-26"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 43,
+            "approval_date": "2015-06-26"
+          },
+          {
+            "name": "지하주차장(공동주택)",
+            "ground_floors": 0,
+            "approval_date": "2015-06-26"
+          },
+          {
+            "name": "부대복리시설",
+            "ground_floors": 2,
+            "approval_date": "2015-06-26"
+          }
+        ]
       },
       {
         "complex_id": "m23",
@@ -367,23 +2806,62 @@
         "summary": "건축물대장 표제부 10건 확인 · 주용도 공동주택 · 사용승인 2015-07-29 · 확인 건물 최고 지상 34층",
         "title_count": 10,
         "approval_date": "2015-07-29",
-        "top_ground_floor": 34
-      },
-      {
-        "complex_id": "kapt-a40673002",
-        "kapt_code": "A40673002",
-        "summary": "건축물대장 표제부 21건 확인 · 주용도 공동주택 · 사용승인 2005-03-28 · 확인 건물 최고 지상 15층",
-        "title_count": 21,
-        "approval_date": "2005-03-28",
-        "top_ground_floor": 15
-      },
-      {
-        "complex_id": "kapt-a40673101",
-        "kapt_code": "A40673101",
-        "summary": "건축물대장 표제부 18건 확인 · 주용도 공동주택 · 사용승인 2005-03-28 · 확인 건물 최고 지상 15층",
-        "title_count": 18,
-        "approval_date": "2005-03-28",
-        "top_ground_floor": 15
+        "top_ground_floor": 34,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "지상주민공동시설",
+            "ground_floors": 1,
+            "approval_date": "2015-07-29"
+          },
+          {
+            "name": "2302동",
+            "ground_floors": 34,
+            "approval_date": "2015-07-29"
+          },
+          {
+            "name": "2304동",
+            "ground_floors": 32,
+            "approval_date": "2015-07-29"
+          },
+          {
+            "name": "보육시설/경로당",
+            "ground_floors": 1,
+            "approval_date": "2015-07-29"
+          },
+          {
+            "name": "경비실-2",
+            "ground_floors": 1,
+            "approval_date": "2015-07-29"
+          },
+          {
+            "name": "경비실-1",
+            "ground_floors": 1,
+            "approval_date": "2015-07-29"
+          },
+          {
+            "name": "2303동",
+            "ground_floors": 29,
+            "approval_date": "2015-07-29"
+          },
+          {
+            "name": "2301동",
+            "ground_floors": 34,
+            "approval_date": "2015-07-29"
+          },
+          {
+            "name": "2305동",
+            "ground_floors": 29,
+            "approval_date": "2015-07-29"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 1,
+            "approval_date": "2015-07-29"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673412",
@@ -391,7 +2869,142 @@
         "summary": "건축물대장 표제부 26건 확인 · 주용도 공동주택 · 사용승인 2005-07-18 · 확인 건물 최고 지상 25층",
         "title_count": 26,
         "approval_date": "2005-07-18",
-        "top_ground_floor": 25
+        "top_ground_floor": 25,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "106동",
+            "ground_floors": 20,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "111동",
+            "ground_floors": 15,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실4",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 24,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "108동",
+            "ground_floors": 22,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실1",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "지하주차장2",
+            "ground_floors": 0,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "118동",
+            "ground_floors": 14,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "115동",
+            "ground_floors": 18,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "113동",
+            "ground_floors": 15,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실5",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "관리동",
+            "ground_floors": 2,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "109동",
+            "ground_floors": 23,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 24,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "114동",
+            "ground_floors": 15,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실3",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 24,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "지하주차장1",
+            "ground_floors": 0,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "117동",
+            "ground_floors": 14,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 24,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "110동",
+            "ground_floors": 23,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "105동",
+            "ground_floors": 25,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실2",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "112동",
+            "ground_floors": 17,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "116동",
+            "ground_floors": 14,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 24,
+            "approval_date": "2005-07-18"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673510",
@@ -399,7 +3012,162 @@
         "summary": "건축물대장 표제부 30건 확인 · 주용도 공동주택 · 사용승인 2005-07-18 · 확인 건물 최고 지상 25층",
         "title_count": 30,
         "approval_date": "2005-07-18",
-        "top_ground_floor": 25
+        "top_ground_floor": 25,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "210동",
+            "ground_floors": 20,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "지하주차장2",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "지하주차장4",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "202동",
+            "ground_floors": 20,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "지하주차장1",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "204동",
+            "ground_floors": 25,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "212동",
+            "ground_floors": 20,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "201동",
+            "ground_floors": 20,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "205동",
+            "ground_floors": 24,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실7",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "207동",
+            "ground_floors": 15,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "213동",
+            "ground_floors": 15,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "지하주차장3",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "214동",
+            "ground_floors": 15,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실5",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실1",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "관리동",
+            "ground_floors": 2,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "209동",
+            "ground_floors": 15,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실3",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실2",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실4",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실8",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "203동",
+            "ground_floors": 20,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실6",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실9",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "기계.전기실",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "211동",
+            "ground_floors": 15,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "206동",
+            "ground_floors": 23,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "지하주차장5",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "208동",
+            "ground_floors": 20,
+            "approval_date": "2005-07-18"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673603",
@@ -407,7 +3175,92 @@
         "summary": "건축물대장 표제부 16건 확인 · 주용도 공동주택 · 사용승인 2005-07-18 · 확인 건물 최고 지상 20층",
         "title_count": 16,
         "approval_date": "2005-07-18",
-        "top_ground_floor": 20
+        "top_ground_floor": 20,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "지하주차장2",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실4",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "302동",
+            "ground_floors": 20,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "305동",
+            "ground_floors": 18,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실3",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "기계.전기실",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "지하주차장1",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "303동",
+            "ground_floors": 20,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "301동",
+            "ground_floors": 20,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "304동",
+            "ground_floors": 19,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "관리동",
+            "ground_floors": 2,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "307동",
+            "ground_floors": 15,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "306동",
+            "ground_floors": 15,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실5",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실2",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          },
+          {
+            "name": "경비실1",
+            "ground_floors": 1,
+            "approval_date": "2005-07-18"
+          }
+        ]
       },
       {
         "complex_id": "verified-extra-01",
@@ -415,7 +3268,107 @@
         "summary": "건축물대장 표제부 19건 확인 · 주용도 공동주택 · 사용승인 2009-09-30 · 확인 건물 최고 지상 15층",
         "title_count": 19,
         "approval_date": "2009-09-30",
-        "top_ground_floor": 15
+        "top_ground_floor": 15,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "613동",
+            "ground_floors": 1,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "615동",
+            "ground_floors": 1,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "611동",
+            "ground_floors": 1,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "607동",
+            "ground_floors": 0,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "602동",
+            "ground_floors": 15,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "603동",
+            "ground_floors": 15,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "605동",
+            "ground_floors": 15,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "601동",
+            "ground_floors": 15,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "608동",
+            "ground_floors": 1,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "618동",
+            "ground_floors": 1,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "609동",
+            "ground_floors": 1,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "610동",
+            "ground_floors": 1,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "619동",
+            "ground_floors": 0,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "616동",
+            "ground_floors": 1,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "604동",
+            "ground_floors": 15,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "612동",
+            "ground_floors": 1,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "606동",
+            "ground_floors": 15,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "617동",
+            "ground_floors": 1,
+            "approval_date": "2009-09-30"
+          },
+          {
+            "name": "614동",
+            "ground_floors": 1,
+            "approval_date": "2009-09-30"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673902",
@@ -423,7 +3376,112 @@
         "summary": "건축물대장 표제부 20건 확인 · 주용도 공동주택 · 사용승인 2010-02-12 · 확인 건물 최고 지상 30층",
         "title_count": 20,
         "approval_date": "2010-02-12",
-        "top_ground_floor": 30
+        "top_ground_floor": 30,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "416동(열교환실-2)",
+            "ground_floors": 0,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "412동(보육시설,갤러리&문화센터)",
+            "ground_floors": 1,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "409동(청소년센터,연회장,경비실-1)",
+            "ground_floors": 1,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "407동",
+            "ground_floors": 11,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "419동(지하주차장-3)",
+            "ground_floors": 1,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "418동(지하주차장-2)",
+            "ground_floors": 1,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "414동(기계/전기실)",
+            "ground_floors": 0,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "410동(경로당,관리사무실)",
+            "ground_floors": 0,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "420동(상가)",
+            "ground_floors": 0,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "402동",
+            "ground_floors": 25,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "406동",
+            "ground_floors": 11,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "408동",
+            "ground_floors": 10,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "405동",
+            "ground_floors": 21,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "413동(경비실-2)",
+            "ground_floors": 1,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "404동",
+            "ground_floors": 30,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "411동(휘트니스)",
+            "ground_floors": 0,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "417동(지하주차장-1)",
+            "ground_floors": 1,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "403동",
+            "ground_floors": 30,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "415동(열교환실-1)",
+            "ground_floors": 0,
+            "approval_date": "2010-02-12"
+          },
+          {
+            "name": "401동",
+            "ground_floors": 25,
+            "approval_date": "2010-02-12"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673903",
@@ -431,7 +3489,97 @@
         "summary": "건축물대장 표제부 17건 확인 · 주용도 공동주택 · 사용승인 2010-03-26 · 확인 건물 최고 지상 30층",
         "title_count": 17,
         "approval_date": "2010-03-26",
-        "top_ground_floor": 30
+        "top_ground_floor": 30,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "311동",
+            "ground_floors": 0,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "301동",
+            "ground_floors": 13,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "302동",
+            "ground_floors": 11,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "305동",
+            "ground_floors": 27,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "312동",
+            "ground_floors": 1,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "313동",
+            "ground_floors": 1,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "315동",
+            "ground_floors": 1,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "306동",
+            "ground_floors": 30,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "303동",
+            "ground_floors": 17,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "308동",
+            "ground_floors": 26,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "307동",
+            "ground_floors": 30,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "316동",
+            "ground_floors": 1,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "310동",
+            "ground_floors": 0,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "304동",
+            "ground_floors": 20,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "317동",
+            "ground_floors": 0,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "314동",
+            "ground_floors": 1,
+            "approval_date": "2010-03-26"
+          },
+          {
+            "name": "309동",
+            "ground_floors": 18,
+            "approval_date": "2010-03-26"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673904",
@@ -439,7 +3587,47 @@
         "summary": "건축물대장 표제부 7건 확인 · 주용도 공동주택 · 사용승인 2010-11-17 · 확인 건물 최고 지상 47층",
         "title_count": 7,
         "approval_date": "2010-11-17",
-        "top_ground_floor": 47
+        "top_ground_floor": 47,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "105동",
+            "ground_floors": 0,
+            "approval_date": "2010-11-17"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 47,
+            "approval_date": "2010-11-17"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 47,
+            "approval_date": "2010-11-17"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 1,
+            "approval_date": "2010-11-17"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 1,
+            "approval_date": "2010-11-17"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 0,
+            "approval_date": "2010-11-17"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 47,
+            "approval_date": "2010-11-17"
+          }
+        ]
       },
       {
         "complex_id": "verified-extra-13",
@@ -447,7 +3635,22 @@
         "summary": "건축물대장 표제부 2건 확인 · 주용도 공동주택 · 사용승인 2011-01-17 · 확인 건물 최고 지상 20층",
         "title_count": 2,
         "approval_date": "2011-01-17",
-        "top_ground_floor": 20
+        "top_ground_floor": 20,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "302",
+            "ground_floors": 19,
+            "approval_date": "2011-01-17"
+          },
+          {
+            "name": "301",
+            "ground_floors": 20,
+            "approval_date": "2011-01-17"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673906",
@@ -455,7 +3658,77 @@
         "summary": "건축물대장 표제부 13건 확인 · 주용도 공동주택 · 사용승인 2011-03-29 · 확인 건물 최고 지상 42층",
         "title_count": 13,
         "approval_date": "2011-03-29",
-        "top_ground_floor": 42
+        "top_ground_floor": 42,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "105",
+            "ground_floors": 31,
+            "approval_date": "2011-03-29"
+          },
+          {
+            "name": "부대복리시설-4",
+            "ground_floors": 1,
+            "approval_date": "2011-03-29"
+          },
+          {
+            "name": "부대복리시설-3",
+            "ground_floors": 2,
+            "approval_date": "2011-03-29"
+          },
+          {
+            "name": "부대복리시설-1",
+            "ground_floors": 3,
+            "approval_date": "2011-03-29"
+          },
+          {
+            "name": "107",
+            "ground_floors": 42,
+            "approval_date": "2011-03-29"
+          },
+          {
+            "name": "부대복리시설-2",
+            "ground_floors": 2,
+            "approval_date": "2011-03-29"
+          },
+          {
+            "name": "103",
+            "ground_floors": 18,
+            "approval_date": "2011-03-29"
+          },
+          {
+            "name": "104",
+            "ground_floors": 18,
+            "approval_date": "2011-03-29"
+          },
+          {
+            "name": "101",
+            "ground_floors": 15,
+            "approval_date": "2011-03-29"
+          },
+          {
+            "name": "106",
+            "ground_floors": 40,
+            "approval_date": "2011-03-29"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2011-03-29"
+          },
+          {
+            "name": "경비실",
+            "ground_floors": 1,
+            "approval_date": "2011-03-29"
+          },
+          {
+            "name": "102",
+            "ground_floors": 17,
+            "approval_date": "2011-03-29"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673907",
@@ -463,7 +3736,132 @@
         "summary": "건축물대장 표제부 24건 확인 · 주용도 공동주택 · 사용승인 2011-02-23 · 확인 건물 최고 지상 33층",
         "title_count": 24,
         "approval_date": "2011-02-23",
-        "top_ground_floor": 33
+        "top_ground_floor": 33,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "203동",
+            "ground_floors": 28,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실4",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "209동",
+            "ground_floors": 6,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "208동",
+            "ground_floors": 6,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실2",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "206동",
+            "ground_floors": 14,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실3",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실7",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "207동",
+            "ground_floors": 16,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "202동",
+            "ground_floors": 30,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "복지동3",
+            "ground_floors": 4,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "경비실1",
+            "ground_floors": 1,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실5",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "복지동2",
+            "ground_floors": 2,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실1",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "201동",
+            "ground_floors": 33,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "204동",
+            "ground_floors": 16,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "복지동4",
+            "ground_floors": 1,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "경비실2",
+            "ground_floors": 1,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "복지동1",
+            "ground_floors": 2,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "펌프실,휀룸",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실6",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "205동",
+            "ground_floors": 14,
+            "approval_date": "2011-02-23"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673908",
@@ -471,7 +3869,127 @@
         "summary": "건축물대장 표제부 23건 확인 · 주용도 공동주택 · 사용승인 2011-02-23 · 확인 건물 최고 지상 41층",
         "title_count": 23,
         "approval_date": "2011-02-23",
-        "top_ground_floor": 41
+        "top_ground_floor": 41,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "102동",
+            "ground_floors": 28,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실3",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실7",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 16,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "105동",
+            "ground_floors": 16,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 41,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실1",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실5",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "복지동2",
+            "ground_floors": 2,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "복지동4",
+            "ground_floors": 1,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실4",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 16,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "복지동1",
+            "ground_floors": 2,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "경비실2",
+            "ground_floors": 1,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "경비실1",
+            "ground_floors": 1,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 16,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "펌프실,휀룸",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "복지동3",
+            "ground_floors": 4,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실2",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 27,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "기계실,전기실6",
+            "ground_floors": 0,
+            "approval_date": "2011-02-23"
+          },
+          {
+            "name": "108동",
+            "ground_floors": 6,
+            "approval_date": "2011-02-23"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673910",
@@ -479,7 +3997,47 @@
         "summary": "건축물대장 표제부 7건 확인 · 주용도 공동주택 · 사용승인 2011-08-25 · 확인 건물 최고 지상 49층",
         "title_count": 7,
         "approval_date": "2011-08-25",
-        "top_ground_floor": 49
+        "top_ground_floor": 49,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "207동",
+            "ground_floors": 1,
+            "approval_date": "2011-08-25"
+          },
+          {
+            "name": "205동",
+            "ground_floors": 0,
+            "approval_date": "2011-08-25"
+          },
+          {
+            "name": "202동",
+            "ground_floors": 42,
+            "approval_date": "2011-08-25"
+          },
+          {
+            "name": "204동",
+            "ground_floors": 0,
+            "approval_date": "2011-08-25"
+          },
+          {
+            "name": "206동",
+            "ground_floors": 1,
+            "approval_date": "2011-08-25"
+          },
+          {
+            "name": "203동",
+            "ground_floors": 49,
+            "approval_date": "2011-08-25"
+          },
+          {
+            "name": "201동",
+            "ground_floors": 42,
+            "approval_date": "2011-08-25"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673911",
@@ -487,7 +4045,57 @@
         "summary": "건축물대장 표제부 9건 확인 · 주용도 공동주택 · 사용승인 2011-04-22 · 확인 건물 최고 지상 25층",
         "title_count": 9,
         "approval_date": "2011-04-22",
-        "top_ground_floor": 25
+        "top_ground_floor": 25,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "1402동",
+            "ground_floors": 24,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "1401동",
+            "ground_floors": 25,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "부대시설A동",
+            "ground_floors": 1,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "1403동",
+            "ground_floors": 11,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "1404동",
+            "ground_floors": 11,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "부대시설B동",
+            "ground_floors": 1,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "부대시설C동",
+            "ground_floors": 1,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "부대시설D동",
+            "ground_floors": 1,
+            "approval_date": "2011-04-22"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673912",
@@ -495,7 +4103,77 @@
         "summary": "건축물대장 표제부 13건 확인 · 주용도 공동주택 · 사용승인 2011-04-22 · 확인 건물 최고 지상 33층",
         "title_count": 13,
         "approval_date": "2011-04-22",
-        "top_ground_floor": 33
+        "top_ground_floor": 33,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "1308동",
+            "ground_floors": 14,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "1301동",
+            "ground_floors": 33,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "1307동",
+            "ground_floors": 15,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "상가동",
+            "ground_floors": 1,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "1305동",
+            "ground_floors": 13,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "1302동",
+            "ground_floors": 33,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "1304동",
+            "ground_floors": 14,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "1303동",
+            "ground_floors": 24,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "1306동",
+            "ground_floors": 24,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "부대시설A동",
+            "ground_floors": 1,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "부대시설C동",
+            "ground_floors": 1,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2011-04-22"
+          },
+          {
+            "name": "부대시설D동",
+            "ground_floors": 1,
+            "approval_date": "2011-04-22"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673913",
@@ -503,7 +4181,82 @@
         "summary": "건축물대장 표제부 14건 확인 · 주용도 공동주택 · 사용승인 2012-04-23 · 확인 건물 최고 지상 38층",
         "title_count": 14,
         "approval_date": "2012-04-23",
-        "top_ground_floor": 38
+        "top_ground_floor": 38,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "부대시설D동(경비실)",
+            "ground_floors": 1,
+            "approval_date": "2012-04-23"
+          },
+          {
+            "name": "1506동",
+            "ground_floors": 14,
+            "approval_date": "2012-04-23"
+          },
+          {
+            "name": "부대시설C동(휘트니스센타)",
+            "ground_floors": 2,
+            "approval_date": "2012-04-23"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2012-04-23"
+          },
+          {
+            "name": "1507동",
+            "ground_floors": 14,
+            "approval_date": "2012-04-23"
+          },
+          {
+            "name": "1508동",
+            "ground_floors": 14,
+            "approval_date": "2012-04-23"
+          },
+          {
+            "name": "1504동",
+            "ground_floors": 14,
+            "approval_date": "2012-04-23"
+          },
+          {
+            "name": "부대시설A동(관리사무소,멀티미디어실,문고,클럽하우스)",
+            "ground_floors": 2,
+            "approval_date": "2012-04-23"
+          },
+          {
+            "name": "상가동",
+            "ground_floors": 2,
+            "approval_date": "2012-04-23"
+          },
+          {
+            "name": "1502동",
+            "ground_floors": 38,
+            "approval_date": "2012-04-23"
+          },
+          {
+            "name": "1501동",
+            "ground_floors": 34,
+            "approval_date": "2012-04-23"
+          },
+          {
+            "name": "1505동",
+            "ground_floors": 14,
+            "approval_date": "2012-04-23"
+          },
+          {
+            "name": "1503동",
+            "ground_floors": 14,
+            "approval_date": "2012-04-23"
+          },
+          {
+            "name": "부대시설B동(보육시설,경로당)",
+            "ground_floors": 2,
+            "approval_date": "2012-04-23"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673914",
@@ -511,7 +4264,92 @@
         "summary": "건축물대장 표제부 16건 확인 · 주용도 공동주택 · 사용승인 2012-06-11 · 확인 건물 최고 지상 28층",
         "title_count": 16,
         "approval_date": "2012-06-11",
-        "top_ground_floor": 28
+        "top_ground_floor": 28,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "809동",
+            "ground_floors": 14,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "813동(부대복리)",
+            "ground_floors": 1,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "811동",
+            "ground_floors": 12,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "801동",
+            "ground_floors": 28,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "816동(기계/전기실,지하주차장)",
+            "ground_floors": 0,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "815동(경비실)",
+            "ground_floors": 1,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "810동",
+            "ground_floors": 14,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "807동",
+            "ground_floors": 14,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "806동",
+            "ground_floors": 14,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "808동",
+            "ground_floors": 14,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "803동",
+            "ground_floors": 28,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "802동",
+            "ground_floors": 28,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "804동",
+            "ground_floors": 12,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "805동",
+            "ground_floors": 12,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "814동(부대복리)",
+            "ground_floors": 1,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "812동(부대복리)",
+            "ground_floors": 1,
+            "approval_date": "2012-06-11"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673915",
@@ -519,7 +4357,87 @@
         "summary": "건축물대장 표제부 15건 확인 · 주용도 공동주택 · 사용승인 2012-06-11 · 확인 건물 최고 지상 27층",
         "title_count": 15,
         "approval_date": "2012-06-11",
-        "top_ground_floor": 27
+        "top_ground_floor": 27,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "711동(부대복리)",
+            "ground_floors": 1,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "710동",
+            "ground_floors": 12,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "701동",
+            "ground_floors": 27,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "715동(기계/전기실,지하주차장)",
+            "ground_floors": 0,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "713동(부대복리)",
+            "ground_floors": 1,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "709동",
+            "ground_floors": 12,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "714동(경비실)",
+            "ground_floors": 1,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "707동",
+            "ground_floors": 12,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "706동",
+            "ground_floors": 12,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "702동",
+            "ground_floors": 25,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "705동",
+            "ground_floors": 12,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "703동",
+            "ground_floors": 27,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "704동",
+            "ground_floors": 12,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "708동",
+            "ground_floors": 12,
+            "approval_date": "2012-06-11"
+          },
+          {
+            "name": "712동(부대복리)",
+            "ground_floors": 1,
+            "approval_date": "2012-06-11"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673916",
@@ -527,7 +4445,37 @@
         "summary": "건축물대장 표제부 5건 확인 · 주용도 공동주택 · 사용승인 2012-12-03 · 확인 건물 최고 지상 38층",
         "title_count": 5,
         "approval_date": "2012-12-03",
-        "top_ground_floor": 38
+        "top_ground_floor": 38,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "303동",
+            "ground_floors": 25,
+            "approval_date": "2012-12-03"
+          },
+          {
+            "name": "305동",
+            "ground_floors": 38,
+            "approval_date": "2012-12-03"
+          },
+          {
+            "name": "304동",
+            "ground_floors": 34,
+            "approval_date": "2012-12-03"
+          },
+          {
+            "name": "301동",
+            "ground_floors": 36,
+            "approval_date": "2012-12-03"
+          },
+          {
+            "name": "302동",
+            "ground_floors": 32,
+            "approval_date": "2012-12-03"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673917",
@@ -535,7 +4483,67 @@
         "summary": "건축물대장 표제부 11건 확인 · 주용도 공동주택 · 사용승인 2012-10-25 · 확인 건물 최고 지상 32층",
         "title_count": 11,
         "approval_date": "2012-10-25",
-        "top_ground_floor": 32
+        "top_ground_floor": 32,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "104",
+            "ground_floors": 32,
+            "approval_date": "2012-10-25"
+          },
+          {
+            "name": "110",
+            "ground_floors": 1,
+            "approval_date": "2012-10-25"
+          },
+          {
+            "name": "105",
+            "ground_floors": 30,
+            "approval_date": "2012-10-25"
+          },
+          {
+            "name": "111",
+            "ground_floors": 1,
+            "approval_date": "2012-10-25"
+          },
+          {
+            "name": "102",
+            "ground_floors": 25,
+            "approval_date": "2012-10-25"
+          },
+          {
+            "name": "108",
+            "ground_floors": 1,
+            "approval_date": "2012-10-25"
+          },
+          {
+            "name": "109",
+            "ground_floors": 1,
+            "approval_date": "2012-10-25"
+          },
+          {
+            "name": "107",
+            "ground_floors": 1,
+            "approval_date": "2012-10-25"
+          },
+          {
+            "name": "101",
+            "ground_floors": 23,
+            "approval_date": "2012-10-25"
+          },
+          {
+            "name": "106",
+            "ground_floors": 30,
+            "approval_date": "2012-10-25"
+          },
+          {
+            "name": "103",
+            "ground_floors": 28,
+            "approval_date": "2012-10-25"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673918",
@@ -543,7 +4551,32 @@
         "summary": "건축물대장 표제부 4건 확인 · 주용도 공동주택 · 사용승인 2012-07-27 · 확인 건물 최고 지상 20층",
         "title_count": 4,
         "approval_date": "2012-07-27",
-        "top_ground_floor": 20
+        "top_ground_floor": 20,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "303",
+            "ground_floors": 20,
+            "approval_date": "2012-07-27"
+          },
+          {
+            "name": "301",
+            "ground_floors": 20,
+            "approval_date": "2012-07-27"
+          },
+          {
+            "name": "302",
+            "ground_floors": 20,
+            "approval_date": "2012-07-27"
+          },
+          {
+            "name": "부속동",
+            "ground_floors": 0,
+            "approval_date": "2012-07-27"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673920",
@@ -551,7 +4584,102 @@
         "summary": "건축물대장 표제부 18건 확인 · 주용도 공동주택 · 사용승인 2013-09-30 · 확인 건물 최고 지상 40층",
         "title_count": 18,
         "approval_date": "2013-09-30",
-        "top_ground_floor": 40
+        "top_ground_floor": 40,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "213",
+            "ground_floors": 28,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "218",
+            "ground_floors": 1,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "204",
+            "ground_floors": 29,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "215",
+            "ground_floors": 1,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "207",
+            "ground_floors": 36,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "208",
+            "ground_floors": 40,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "214",
+            "ground_floors": 1,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "217",
+            "ground_floors": 1,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "211",
+            "ground_floors": 26,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "201",
+            "ground_floors": 25,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "212",
+            "ground_floors": 24,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "216",
+            "ground_floors": 1,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "202",
+            "ground_floors": 25,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "206",
+            "ground_floors": 33,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "210",
+            "ground_floors": 32,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "203",
+            "ground_floors": 27,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "205",
+            "ground_floors": 29,
+            "approval_date": "2013-09-30"
+          },
+          {
+            "name": "209",
+            "ground_floors": 36,
+            "approval_date": "2013-09-30"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673921",
@@ -559,7 +4687,122 @@
         "summary": "건축물대장 표제부 22건 확인 · 주용도 공동주택 · 사용승인 2013-10-15 · 확인 건물 최고 지상 45층",
         "title_count": 22,
         "approval_date": "2013-10-15",
-        "top_ground_floor": 45
+        "top_ground_floor": 45,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "410동",
+            "ground_floors": 0,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "402동",
+            "ground_floors": 0,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "403동",
+            "ground_floors": 0,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "301동",
+            "ground_floors": 1,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "406동",
+            "ground_floors": 0,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "305동",
+            "ground_floors": 1,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "109동",
+            "ground_floors": 36,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 35,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 40,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "110동",
+            "ground_floors": 35,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "407동",
+            "ground_floors": 0,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "105동",
+            "ground_floors": 45,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "302동",
+            "ground_floors": 1,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 45,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "303동",
+            "ground_floors": 1,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "409동",
+            "ground_floors": 1,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "304동",
+            "ground_floors": 1,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 41,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "108동",
+            "ground_floors": 35,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 41,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 35,
+            "approval_date": "2013-10-15"
+          },
+          {
+            "name": "401동",
+            "ground_floors": 0,
+            "approval_date": "2013-10-15"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673922",
@@ -567,7 +4810,97 @@
         "summary": "건축물대장 표제부 17건 확인 · 주용도 공동주택 · 사용승인 2014-03-11 · 확인 건물 최고 지상 42층",
         "title_count": 17,
         "approval_date": "2014-03-11",
-        "top_ground_floor": 42
+        "top_ground_floor": 42,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "117동",
+            "ground_floors": 1,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "118동",
+            "ground_floors": 1,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "115동",
+            "ground_floors": 1,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "110동",
+            "ground_floors": 15,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 42,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "109동",
+            "ground_floors": 39,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 42,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "112동",
+            "ground_floors": 15,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 39,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "116동",
+            "ground_floors": 1,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "119동",
+            "ground_floors": 0,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "105동",
+            "ground_floors": 42,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 39,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "111동",
+            "ground_floors": 15,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 38,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "101동",
+            "ground_floors": 38,
+            "approval_date": "2014-03-11"
+          },
+          {
+            "name": "108동",
+            "ground_floors": 39,
+            "approval_date": "2014-03-11"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673923",
@@ -575,7 +4908,122 @@
         "summary": "건축물대장 표제부 22건 확인 · 주용도 공동주택 · 사용승인 2014-08-29 · 확인 건물 최고 지상 33층",
         "title_count": 22,
         "approval_date": "2014-08-29",
-        "top_ground_floor": 33
+        "top_ground_floor": 33,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "1604동",
+            "ground_floors": 33,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "1606동",
+            "ground_floors": 30,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "1603동",
+            "ground_floors": 33,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "2동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "12동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "3동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "10동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "7동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "4동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "5동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "14동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "6동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "15동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "1602동",
+            "ground_floors": 24,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "16동",
+            "ground_floors": 0,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "8동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "1605동",
+            "ground_floors": 26,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "9동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "1601동",
+            "ground_floors": 30,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "13동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "11동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "1동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40673924",
@@ -583,15 +5031,127 @@
         "summary": "건축물대장 표제부 23건 확인 · 주용도 공동주택 · 사용승인 2014-08-29 · 확인 건물 최고 지상 32층",
         "title_count": 23,
         "approval_date": "2014-08-29",
-        "top_ground_floor": 32
-      },
-      {
-        "complex_id": "kapt-a40684004",
-        "kapt_code": "A40684004",
-        "summary": "건축물대장 표제부 15건 확인 · 주용도 공동주택 · 사용승인 2005-06-24 · 확인 건물 최고 지상 15층",
-        "title_count": 15,
-        "approval_date": "2005-06-24",
-        "top_ground_floor": 15
+        "top_ground_floor": 32,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "1103동",
+            "ground_floors": 32,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "10동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "9동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "2동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "1101동",
+            "ground_floors": 32,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "1106동",
+            "ground_floors": 32,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "1동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "3동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "15동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "16동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "6동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "5동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "7동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "17동",
+            "ground_floors": 0,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "14동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "8동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "1102동",
+            "ground_floors": 23,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "4동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "13동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "1104동",
+            "ground_floors": 32,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "11동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "12동",
+            "ground_floors": 1,
+            "approval_date": "2014-08-29"
+          },
+          {
+            "name": "1105동",
+            "ground_floors": 24,
+            "approval_date": "2014-08-29"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40684005",
@@ -599,39 +5159,117 @@
         "summary": "건축물대장 표제부 21건 확인 · 주용도 공동주택 · 사용승인 2005-08-26 · 확인 건물 최고 지상 20층",
         "title_count": 21,
         "approval_date": "2005-08-26",
-        "top_ground_floor": 20
-      },
-      {
-        "complex_id": "kapt-a40684007",
-        "kapt_code": "A40684007",
-        "summary": "건축물대장 표제부 20건 확인 · 주용도 공동주택 · 사용승인 2006-06-14 · 확인 건물 최고 지상 20층",
-        "title_count": 20,
-        "approval_date": "2006-06-14",
-        "top_ground_floor": 20
-      },
-      {
-        "complex_id": "kapt-a40684008",
-        "kapt_code": "A40684008",
-        "summary": "건축물대장 표제부 24건 확인 · 주용도 공동주택 · 사용승인 2006-05-12 · 확인 건물 최고 지상 20층",
-        "title_count": 24,
-        "approval_date": "2006-05-12",
-        "top_ground_floor": 20
-      },
-      {
-        "complex_id": "kapt-a40684009",
-        "kapt_code": "A40684009",
-        "summary": "건축물대장 표제부 34건 확인 · 주용도 공동주택 · 사용승인 2007-08-24 · 확인 건물 최고 지상 15층",
-        "title_count": 34,
-        "approval_date": "2007-08-24",
-        "top_ground_floor": 15
-      },
-      {
-        "complex_id": "kapt-a40684011",
-        "kapt_code": "A40684011",
-        "summary": "건축물대장 표제부 35건 확인 · 주용도 공동주택 · 사용승인 2008-02-01 · 확인 건물 최고 지상 15층",
-        "title_count": 35,
-        "approval_date": "2008-02-01",
-        "top_ground_floor": 15
+        "top_ground_floor": 20,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "101동",
+            "ground_floors": 10,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "113동",
+            "ground_floors": 20,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "경비실2",
+            "ground_floors": 1,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "지하주차장2",
+            "ground_floors": 0,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "관리동",
+            "ground_floors": 1,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "경비실5",
+            "ground_floors": 1,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "111동",
+            "ground_floors": 14,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "103동",
+            "ground_floors": 10,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "경비실4",
+            "ground_floors": 1,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "108동",
+            "ground_floors": 14,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "105동",
+            "ground_floors": 10,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "112동",
+            "ground_floors": 20,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "104동",
+            "ground_floors": 10,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "경비실1",
+            "ground_floors": 1,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "106동",
+            "ground_floors": 15,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "102동",
+            "ground_floors": 10,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "109동",
+            "ground_floors": 20,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "107동",
+            "ground_floors": 13,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "지하주차장1",
+            "ground_floors": 0,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "110동",
+            "ground_floors": 20,
+            "approval_date": "2005-08-26"
+          },
+          {
+            "name": "경비실3",
+            "ground_floors": 1,
+            "approval_date": "2005-08-26"
+          }
+        ]
       },
       {
         "complex_id": "kapt-a40684013",
@@ -639,18 +5277,128 @@
         "summary": "건축물대장 표제부 21건 확인 · 주용도 공동주택 · 사용승인 2009-01-22 · 확인 건물 최고 지상 64층",
         "title_count": 21,
         "approval_date": "2009-01-22",
-        "top_ground_floor": 64
+        "top_ground_floor": 64,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "연결통로",
+            "ground_floors": 0,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "계단실 #1",
+            "ground_floors": 1,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "4동",
+            "ground_floors": 64,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "3동",
+            "ground_floors": 64,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "경비실 #2",
+            "ground_floors": 1,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "경비실 #1",
+            "ground_floors": 1,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "2동",
+            "ground_floors": 26,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "1동",
+            "ground_floors": 64,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "5동",
+            "ground_floors": 26,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "선큰엘리베이터",
+            "ground_floors": 1,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "TEA HOUSE",
+            "ground_floors": 1,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "셔틀엘리베이터 #3",
+            "ground_floors": 1,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "계단실 #3",
+            "ground_floors": 1,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "6동",
+            "ground_floors": 64,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "지하주차장",
+            "ground_floors": 0,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "셔틀엘리베이터 #4",
+            "ground_floors": 1,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "셔틀엘리베이터 #1",
+            "ground_floors": 1,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "셔틀엘리베이터 #2",
+            "ground_floors": 1,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "선큰엘리베이터",
+            "ground_floors": 1,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "계단실 #4",
+            "ground_floors": 1,
+            "approval_date": "2009-01-22"
+          },
+          {
+            "name": "계단실 #2",
+            "ground_floors": 1,
+            "approval_date": "2009-01-22"
+          }
+        ]
       }
     ]
   },
   "maintenance": {
     "state": "verified",
-    "updated_at": "2026-10-21T02:00:05.497317+00:00",
+    "updated_at": "2026-10-21T04:25:39.078419+00:00",
     "source_url": "https://www.data.go.kr/data/15057937/openapi.do",
     "month": "202608",
     "scanned": 77,
     "eligible": 77,
-    "failures": 0,
+    "failures": 1,
     "note": "국토교통부 K-apt 공용관리비 API의 인건비·경비비·청소비 공개항목만 표시. 전체 관리비와 별개이며 실제 세대 청구액이 아님.",
     "records": [
       {
@@ -758,18 +5506,6 @@
           "인건비": 0,
           "경비비": 6104000,
           "청소비": 3246000
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "kapt-a10022494",
-        "kapt_code": "A10022494",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 61,464,130원 · 경비비 55,967,043원 · 청소비 52,238,550원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 61464130,
-          "경비비": 55967043,
-          "청소비": 52238550
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
