@@ -1240,6 +1240,28 @@ async function refreshPublicServices(manual=false){
 function tradeClass(type){return type==='매매'?'sale':type==='전세'?'lease':type==='월세'?'monthly':'';}
 function dealBadge(type){return '<span class="dealBadge '+tradeClass(type)+'">'+escapeHtml(type||'기타')+'</span>';}
 function dealArticleClass(row,extra=''){return 'dealRow '+tradeClass(row.type)+(row.status==='해제'?' cancelled':'')+(extra?' '+extra:'');}
+
+function tradeExtraBadges(row){
+ // Sale dealing-type and rent contract-type are separate official API fields.
+ if(row.type==='전세'||row.type==='월세'){
+  const raw=String(row.contract_type_raw||'').trim().replace(/\s+/g,'');
+  const label=raw.includes('갱신')?'갱신계약':raw.includes('신규')?'신규계약':'계약구분 미기재';
+  return '<span class="pill gray tradeContractKind">('+escapeHtml(label)+')</span>';
+ }
+ if(row.type==='매매'){
+  const raw=String(row.dealing_type||'').trim().replace(/\s+/g,'');
+  if(raw.includes('중개'))return '<span class="pill gray tradeDealingKind">중개거래</span>';
+  if(raw.includes('직거래'))return '<span class="pill gray tradeDealingKind">직거래</span>';
+ }
+ return '';
+}
+function tradeBrokerLocation(row){
+ // Broker region belongs only on brokered apartment sales (never direct sales or rentals).
+ if(row.type!=='매매'||!String(row.dealing_type||'').includes('중개'))return '';
+ const region=String(row.broker_region_raw||'').trim();
+ return region?'<div class="meta tradeBrokerRegion">중개사 소재지 · '+escapeHtml(region)+'</div>':'';
+}
+
 function renderTypeButtons(id,type){
  const el=$(id);if(!el)return;
  const buttons=el.querySelectorAll?Array.from(el.querySelectorAll('button')):[];
@@ -1414,14 +1436,14 @@ function renderNearbyDetails(resetLimit){
    const name=FAVORITE_APTS.find(z=>z.id===favoriteIdForBuilding(x.building))?.label||x.building;
    return '<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+
     dealBadge(x.type)+
-    '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+
+    '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+tradeExtraBadges(x)+
     '</div><h3>'+escapeHtml(name)+'</h3>'+
     ''+
     '<div class="money">'+escapeHtml(value)+'</div>'+
     '<div class="meta">계약일 '+escapeHtml(x.contract_date)+
     ' · '+escapeHtml(displayExclusiveArea(x.area_m2,catalogForTradeName(x.building)))+' · '+escapeHtml(x.floor||'층 정보 없음')+'층</div>'+
     (x.status==='해제'?'<p class="tiny">해제 사유일: '+escapeHtml(x.cancel_date_raw||'정보 없음')+'</p>':'')+
-    '</article>';
+    tradeBrokerLocation(x)+'</article>';
   }).join('') :
   '<div class="empty">선택한 단지·유형에 해당하는 공개 거래가 없습니다.<br>자료의 조회 기간과 갱신 상태를 확인하세요.</div>';
  $('nearbyMore').classList.toggle('hidden',shown.length>=rows.length);
@@ -1482,12 +1504,12 @@ function renderTrades(){
     x.type==='전세'?'보증금 '+value10k(x.deposit_10k):
     '보증금 '+value10k(x.deposit_10k)+' / 월세 '+value10k(x.monthly_10k);
    return '<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+dealBadge(x.type)+
-    '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span></div>'+
+    '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+tradeExtraBadges(x)+'</div>'+
     '<h3>'+escapeHtml(x.building)+'</h3><div class="money">'+escapeHtml(val)+'</div>'+
     '<div class="meta">계약일 '+escapeHtml(x.contract_date)+' · '+escapeHtml(displayExclusiveArea(x.area_m2,catalogForTradeName(x.building)))+
     ' · '+escapeHtml(x.floor||'층 정보 없음')+'층</div>'+
     (x.status==='해제'?'<p class="pill red">계약 해제일: '+escapeHtml(x.cancel_date_raw||'정보 미제공')+'</p>':'')+
-    '<p class="meta">출처: 국토교통부 · 조회 계약연월 '+escapeHtml(x.source_month)+'</p></article>';
+    tradeBrokerLocation(x)+'</article>';
   }).join(''):'<div class="empty">선택한 조건에 해당하는 실거래가 없습니다. 다른 유형이나 아파트를 선택해 주세요.</div>');
 }
 function renderNews(){
@@ -1715,13 +1737,13 @@ function renderNew(){
       '보증금 '+value10k(x.deposit_10k)+' / 월세 '+value10k(x.monthly_10k);
    return '<article class="'+dealArticleClass(x,'newTop')+'"><div class="tagbox">'+
     dealBadge(x.type)+
-    '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+
+    '<span class="pill '+(x.status==='해제'?'red dealCancelLabel':'gray')+'">'+escapeHtml(x.status||'신고')+'</span>'+tradeExtraBadges(x)+
     '</div><h3>'+escapeHtml(x.building)+'</h3>'+
     '<div class="money">'+escapeHtml(value)+'</div>'+
     '<div class="meta"><b>신규 공개 확인 '+escapeHtml(x.first_seen_date)+'</b>'+
     ' · 실제 계약일 '+escapeHtml(x.contract_date)+
     ' · '+escapeHtml(displayExclusiveArea(x.area_m2,catalogForTradeName(x.building)))+' · '+escapeHtml(x.floor||'정보 없음')+'층</div>'+
-    '<p class="tiny">출처: 국토교통부 아파트 실거래가 API</p></article>';
+    tradeBrokerLocation(x)+'</article>';
   }).join('');
 }
 
