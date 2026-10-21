@@ -391,7 +391,7 @@ body.apartmentSheetActive{overflow:hidden}
   <h3 class="contractSection">1. 메모 하나로 작성</h3>
   <p class="contractHint">예: “퍼스트파크 15블럭 1501동 1203호 전세 3억9천, 계약금은 10%, 500 먼저 보내고 잔금 12월30일. 특약은 에어컨 수리해주는 걸로.”</p>
   <label class="inputLabel" for="ct_rough">현장 메모 / 음성 인식 결과</label>
-  <textarea id="ct_rough" maxlength="12000" placeholder="평소 말하듯 자유롭게 입력해 보세요.&#10;&#10;퍼스트파크 15블럭 1501동 1203호 전세 3억9천, 먼저 500 보내고 12월30일 잔금. 2년 계약. 신한은행 110-123-456789 예금주 홍길동. 특약은 에어컨 수리해주기로."></textarea>
+  <textarea id="ct_rough" maxlength="12000" placeholder="예: 퍼팍 15블럭 1501동 1203호 전세 3억9천, 오늘 500 보낼 거고 잔금은 12월30일. 은행·예금주를 말씀해 주셔도 됩니다.&#10;특약: 에어컨은 임대인이 수리해 주기로 함."></textarea>
   <div class="contractEasyActions"><button type="button" class="btn contractOneTap" onclick="FirstHyundaiEasy.compose()">✦ 메모로 계약문자 만들기</button><button type="button" class="btn alt contractVoice" onclick="FirstHyundaiContracts.voice()">🎙 말하기</button></div>
   <label class="contractPolishToggle"><input id="ct_polishTerms" type="checkbox" checked> 특약 문구도 읽기 좋게 정리</label>
   <div id="ct_oneTapSummary" class="contractOneTapStatus" role="status" aria-live="polite">메모 한 번으로 계약문자를 만들어 보세요.</div>
@@ -406,7 +406,7 @@ body.apartmentSheetActive{overflow:hidden}
     <div class="contractActions"><button type="button" class="btn alt" onclick="FirstHyundaiEasy.useOriginalTerms()">원문 사용</button><button type="button" class="btn alt" onclick="FirstHyundaiEasy.usePolishedTerms()">정리 문구 사용</button></div>
     <p id="ct_termNotice" class="contractHint"></p>
   </details>
-  <p class="contractHint">입력한 내용은 외부 AI 서버로 보내지 않고 휴대폰 안에서 정리합니다. 이해하지 못하거나 빠진 정보는 아래에서 확인할 수 있습니다.</p>
+  <p class="contractHint">입력한 내용은 외부 AI 서버로 보내지 않고 휴대폰 안에서 정리합니다. '오늘 500', '금일 천만원', '퍼팍 13블럭', '마뷰 21블럭' 같은 현장 표현도 인식합니다. 빠진 정보는 아래에서 확인할 수 있습니다.</p>
  </div>
  <div class="contractManualWrap"><details id="ct_manualPanel" class="contractManual"><summary>✎ 직접 입력·수정하기 <small>필요할 때만 펼치기</small></summary>
  <div class="panel">
@@ -427,6 +427,7 @@ body.apartmentSheetActive{overflow:hidden}
  <div class="wide contractAutoRow"><label><input id="ct_autoDeposit" type="checkbox" checked> 계약금 미입력 시 총액의 10% 자동 제안</label><div id="ct_depositHelp" class="contractHint">계약금이 비어 있으면 10%를 제안합니다. 실제 합의 금액을 우선합니다.</div></div>
     <div><label class="inputLabel" for="ct_advance">이번에 먼저 보낼 금액 (만원)</label><input id="ct_advance" inputmode="decimal" placeholder="500"></div>
     <div><label class="inputLabel" for="ct_interim">중도금 (만원 · 없으면 빈칸)</label><input id="ct_interim" inputmode="decimal" placeholder="0"></div>
+    <div><label class="inputLabel" for="ct_interimDate">중도금 지급일 (선택·협의 가능)</label><input id="ct_interimDate" maxlength="100" placeholder="2026년 12월 중 협의"></div>
    </div>
    <div id="ct_amountSummary" class="contractMoneySummary" aria-live="polite">계약 금액을 입력해 주세요.</div>
    <h3 class="contractSection">2. 계약 일정</h3>
@@ -454,12 +455,17 @@ body.apartmentSheetActive{overflow:hidden}
  </div></details></div>
  <div id="ct_resultPanel" class="panel hidden">
   <h3 class="contractSection">3. 계약문자 확인</h3>
+  <div class="contractNoticeControls">
+    <label class="contractPolishToggle"><input type="checkbox" id="ct_includeNotice" checked onchange="FirstHyundaiEasy.afterManualEdit()"> 계약 성립·해제·중개보수 관련 합의 안내문 포함</label>
+    <p class="contractHint">실제 보내주신 안내문의 핵심을 유지합니다. 계약금 일부 수령액의 배액상환·송금액 포기 등은 법률상 항상 자동 적용되는 조항이 아닙니다. 당사자 간 실제 합의와 일치하는지 확인하여 사용하세요.</p>
+  </div>
   <div id="ct_missing" class="contractReview" role="status" aria-live="polite">필수 내용이 채워지면 복사·공유할 수 있습니다.</div>
   <button id="ct_fixMissing" type="button" class="btn alt contractFix hidden" onclick="FirstHyundaiEasy.openManual()">부족하거나 잘못 인식된 부분 수정</button>
   <p class="contractHint">생성된 문구를 직접 수정할 수 있습니다. 금액·날짜·계좌·특약을 당사자와 재확인한 다음 공유하세요.</p>
   <div id="ct_status" class="contractReview" role="status" aria-live="polite">조건을 입력하면 초안을 생성할 수 있습니다.</div>
   <label class="inputLabel" for="ct_preview">최종 계약 안내 문자 (직접 수정 가능)</label>
   <textarea id="ct_preview" class="contractPreview" maxlength="20000" oninput="FirstHyundaiContracts.edited()" placeholder="먼저 ‘계약문자 초안 생성’을 눌러주세요."></textarea>
+  <label class="contractPolishToggle contractNoticeConfirm"><input type="checkbox" id="ct_noticeConfirmed" onchange="FirstHyundaiContracts.updateSummary()"> 위 계약조건·계좌 및 하단 합의 내용이 실제 당사자 합의와 일치함을 확인했습니다.</label>
   <button type="button" class="btn alt contractPrimary" onclick="FirstHyundaiContracts.approve()">✓ 내용 확인 완료</button>
   <div class="contractActions">
    <button type="button" class="btn" onclick="FirstHyundaiContracts.copy()">문자 복사</button>
