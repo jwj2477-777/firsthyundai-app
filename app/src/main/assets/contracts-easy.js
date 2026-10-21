@@ -16,7 +16,7 @@ function ending(line){
  // Standardization only; do not introduce parties, amounts, deadlines or remedies.
  s=s.replace(/애완동물/g,'반려동물').replace(/입주청소/g,'입주 청소')
   .replace(/근저당(?!권)/g,'근저당권')
-  .replace(/상호합의하에/g,'상호 합의하에').replace(/앞당길수/g,'앞당길 수')
+  .replace(/상호합의하에/g,'상호 합의하에').replace(/앞당길수/g,'앞당길 수').replace(/부서진곳/g,'부서진 곳')
   .replace(/해주기로\s*(?:함|했음|했어|했어요)?$/,'해주기로 한다')
   .replace(/해주는\s*걸로\s*(?:함|했음|했어|했어요)?$/,'해주기로 한다')
   .replace(/주기로\s*(?:함|했음|했어|했어요)?$/,'주기로 한다')
@@ -40,8 +40,8 @@ function inferImplicitSpecials(text){
  const result=[];
  for(const line of lines){
   if(/^(?:※|▶|→)?\s*(?:주소|소재지|아파트|단지|동호|매매|전세|월세|보증금|계약금|중도금|잔금일\s*[:：]?\s*\d|입금|송금|계좌|은행|예금주)\b/.test(line))continue;
-  const repairs=/(?:수리|수선|보수|교체|도배|청소|설치|철거|말소|원상복구).{0,45}(?:해\s*주기로|해주기로|하기로|기로\s*함|해\s*주기로\s*함)/.test(line);
-  const agreedDate=/(?:잔금일|중도금일|입주일|계약일).{0,70}(?:상호\s*합의|상호합의|합의\s*하에|협의).{0,70}(?:앞당길|조정|변경)|(?:상호\s*합의|협의).{0,55}(?:잔금일|입주일).{0,55}(?:앞당길|변경)/.test(line);
+  const repairs=/(?:수리|수선|보수|교체|도배|청소|설치|철거|말소|원상복구).{0,55}(?:해\s*준다|해준다|해\s*주기로|해주기로|하기로|해\s*줄|해줄|한다|해\s*주기로\s*함)/.test(line);
+  const agreedDate=/(?:중도금(?:일|지급일)?|잔금일|입주일|계약일).{0,80}(?:앞당길\s*수|앞당길수|앞당기|조정|변경|연기)|(?:상호\s*합의|상호합의|협의).{0,55}(?:중도금|잔금일|입주일).{0,55}(?:앞당길|변경|조정)/.test(line);
   if((repairs||agreedDate)&&!result.includes(line))result.push(line.replace(/^[→➜➡•-]\s*/,''));
  }
  return result.join('\n').slice(0,6000);
