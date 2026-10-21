@@ -25,6 +25,8 @@ on:
       - 'scripts/test_contract_broker.js'
       - 'scripts/test_contract_transfer.js'
       - 'scripts/test_trade_contract_regression.js'
+      - 'scripts/test_app_version.js'
+      - 'scripts/check_apk_version.py'
       - 'scripts/test_apartment_detail_navigation.js'
       - 'scripts/test_refresh_feedback.js'
       - 'scripts/test_public_hub.js'
@@ -98,6 +100,7 @@ jobs:
           node --check app/src/main/assets/contracts-transfer.js
           node scripts/test_contract_transfer.js
           node scripts/test_trade_contract_regression.js
+          node scripts/test_app_version.js
           node scripts/test_apartment_detail_navigation.js
           node scripts/test_refresh_feedback.js
           node scripts/test_public_hub.js
@@ -123,25 +126,27 @@ jobs:
         run: python3 scripts/test_launcher_safezone.py
       - name: Build APK
         run: gradle --no-daemon assembleDebug
+      - name: Verify actual APK version matches Gradle and release
+        run: python3 scripts/check_apk_version.py app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
           name: FirstHyundai-Free-Auto-APK
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v1.19.4 four-renewal-details-restored APK
+      - name: Publish successful v1.19.5 installed-version-correct APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.4.apk
-          unzip -t FirstHyundai-v1.19.4.apk | grep 'No errors detected'
-          if gh release view v1.19.4 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.5.apk
+          unzip -t FirstHyundai-v1.19.5.apk | grep 'No errors detected'
+          if gh release view v1.19.5 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v1.19.4 FirstHyundai-v1.19.4.apk \
+            gh release create v1.19.5 FirstHyundai-v1.19.5.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.19.4 · 갱신계약 4가지 실무정보 복원' \
-              --notes '실거래 전체 최신순·관심단지·새소식 모든 화면에서 갱신계약에만 갱신요구권 사용 여부, 계약기간, 종전 보증금, 종전 월세 네 가지를 금액 및 계약일 아래 작은 보조 영역으로 복구했습니다. 원본에서 제공하지 않는 값은 미기재로 표시하며 원본의 0원은 그대로 보존합니다. 신규계약과 매매에서는 노출되지 않습니다. 이전 v1.19.3의 중개사 소재지, 매매 중개/직거래, 중복 출처 제거, 기본 특약과 기존 뉴스 AI 3문장 등은 모두 유지합니다. 별도의 전용 회귀 테스트로 다음 개편에서도 누락을 방지합니다. 설치 전 내 자료를 백업해 주세요.'
+              --title '퍼스트현대 v1.19.5 · 실제 설치된 앱 버전 표시 개선' \
+              --notes '앱 하단의 오래된 v1.10 고정 문구를 제거했습니다. Android PackageManager에서 실제 설치된 APK의 versionName과 versionCode를 읽어 가족용 앱 하단, 관리자 보안 화면, 최초 잠금 화면에 표시합니다. 웹 미리보기 등 안드로이드 메타데이터가 없는 화면에서는 버전을 임의로 표시하지 않습니다. CI는 APK 자체의 AndroidManifest 버전과 Gradle 및 GitHub 배포 태그가 서로 일치하는지 자동 검증합니다. 이전 v1.19.4의 갱신계약 네 가지 세부정보, 실거래 표시 및 계약문자 특약 등의 기능은 유지됩니다. 설치 전 내 자료 백업을 권장합니다.'
           fi
