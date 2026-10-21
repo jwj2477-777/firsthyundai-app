@@ -104,8 +104,8 @@ class TestGeminiNews(unittest.TestCase):
         self.assertEqual(compact_summary(example+["연관된 논의가 계속되고 있습니다.","추가됐습니다."]),"")
         four=example+["지자체는 차기 보완 계획도 검토하고 있습니다."]
         self.assertEqual(compact_summary(four),"","New model responses must have exactly three sentences")
-        self.assertEqual(compact_summary(four,allow_legacy_four=True).count("\\n"),3)
-        self.assertEqual(compact_summary(example).count("\\n"),2)
+        self.assertEqual(compact_summary(four,allow_legacy_four=True).count("\n"),3)
+        self.assertEqual(compact_summary(example).count("\n"),2)
         self.assertEqual(compact_summary([example[0]]*3),"")
     def test_api_accepts_object_or_bare_array(self):
         payload=[{"id":"1","sentences":["공급정책 개편안을 공식 발표했습니다.",
