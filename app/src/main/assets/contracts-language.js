@@ -68,10 +68,11 @@ function moneyPart(text){
 function tokenizeMoney(s){
  const text=String(s||'');
  // Units written as separate Korean speech words are still part of the amount.
- const rx=/(\d[\d,.]*(?:\s*(?:억|천|백|십|만|원))?(?:\s*\d[\d,.]*(?:\s*(?:억|천|백|십|만|원))?)*|[일이삼사오육륙칠팔구한십백천]+(?:\s*(?:억|만원|만|원))?(?:\s*[일이삼사오육륙칠팔구한십백천]+(?:천|백|십|만|원)?)*)/g;
+ const rx=/(?<![가-힣])(\d[\d,.]*(?:\s*(?:억|천|백|십|만|원))?(?:\s*\d[\d,.]*(?:\s*(?:억|천|백|십|만|원))?)*|[일이삼사오육륙칠팔구한십백천]+(?:\s*(?:억|만원|만|원))?(?:\s*[일이삼사오육륙칠팔구한십백천]+(?:천|백|십|만|원)?)*)/g;
  let m,res=[];
  while((m=rx.exec(text))!==null){
   const normalized=m[0].trim();
+  if(normalized.length===1&&/[가-힣]/.test(text[rx.lastIndex]||''))continue; // 금일·오늘은 금액이 아님
   // Exclude possible apartment dong/ho numbers, year/month/day pieces.
   const behind=text.slice(rx.lastIndex).trimStart();
   if(/^(?:동|호|월|일|년|블럭|블록|bl\b|층)/i.test(behind))continue;
