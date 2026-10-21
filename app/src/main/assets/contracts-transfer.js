@@ -105,18 +105,19 @@ function moneyCandidates(text,account){
   const prior=text.slice(Math.max(0,tok.start-36),tok.start);
   const recent=prior.split(/[,.;\n]/).pop()||prior;
   const next=text.slice(tok.end,tok.end+24);
-  const exactTransfer=/송금액|입금액|이체액|보낼\s*금액|송금할\s*금액|이번\s*송금|오늘\s*보낼|오늘\s*입금|금일\s*송금|금일\s*입금|계약금\s*(?:의|중)\s*일부|일부\s*계약금/.test(recent);
-  const beforeToday=/(?:오늘|금일|이번|우선|일단|먼저|당일)\s*(?:보낼|보내는|입금|송금|이체|납부)?\s*$/.test(recent);
-  const nextTransfer=/^\s*(?:만|만원|원|정도)?\s*(?:먼저|송금|입금|이체|보내|넣|부칠|보낼|입금할|송금할|보내기로)/.test(next);
+  const exactTransfer=/(?:송금액|입금액|이체액|선입금|선송금|가계약금|보낼\s*돈|넣을\s*돈|보낼\s*금액|송금할\s*금액|이번\s*(?:송금|입금|이체)|오늘\s*(?:보낼|넣을|입금|송금)|금일\s*(?:입금|송금)|계약금\s*(?:의|중)\s*(?:일부)?|일부\s*계약금)\s*(?::|：|은|는|으로)?\s*$/.test(recent);
+  const beforeToday=/(?:오늘|금일|이번|우선|일단|먼저|당일|지금)\s*(?:보낼|보내는|입금|송금|이체|납부|넣을)?\s*$/.test(recent);
+  const nextTransfer=/^\s*(?:만|만원|원|정도)?\s*(?:(?:오늘|금일|지금)\s*)?(?:먼저|송금|입금|이체|보내|넣|부칠|보낼|입금할|송금할|보내기로|입금하기로|넣기로|보냈|입금했|송금했)/.test(next);
   const nearVerb=/(?:^|\s)(?:송금|입금|이체|보내|보낼)/.test(next.slice(0,18));
   const followedToday=/(?:오늘|금일|이번|당일)\s*(?:보내|입금|송금|이체|넣|납부)/.test(next.slice(0,20));
-  const totalLabel=/(?:매매대금|매매금액|매매가|매매|전세보증금|전세금|전세|보증금|총\s*금액|중도금|계약금\s*(?!일부|중\s*일부|의\s*일부))\s*[:：]?\s*$/.test(recent);
+  const totalLabel=/(?:매매대금|매매금액|매매가|매매|전세보증금|전세금|전세|보증금|총\s*금액|중도금|월세|잔금|계약금\s*(?!일부|중\s*일부|의\s*일부))\s*(?:은|는|이|가)?\s*[:：]?\s*$/.test(recent);
   let score=10;
   if(exactTransfer)score+=115;
   else if(beforeToday)score+=90;
   if(nextTransfer||nearVerb||followedToday)score+=75;
   if(/일부\s*\(?\s*$/.test(recent))score+=90;
-  if(totalLabel)score-=120;
+  if(totalLabel&&!nextTransfer)score-=140;
+  if(/(?:계약금|중도금|보증금|매매대금|월세|잔금)\s*[:：]?\s*$/.test(text.slice(Math.max(0,tok.start-16),tok.start))&&!nextTransfer)score-=90;
   if(account&&Math.abs(tok.start-account.start)<90)score+=12;
   if([v('price'),v('contractDeposit'),v('interim')].includes(String(tok.amount)))score-=80;
   // Account-looking numbers and years are never payments.
