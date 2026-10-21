@@ -1,11 +1,12 @@
 /* FirstHyundai — foreground-only newly published favorite transactions.
    Only the office's fixed 14 groups; never infer a block from similar names.
    This is not Android background push or the government's exact publication timestamp.
-   No external APIs, personal data or notifications permission required. */
+   Android system notifications additionally require the user's explicit opt-in and permission. */
 (function(){
 'use strict';
 const PREFIX='firsthyundai-favorite-trades-alerts-v1:';
 const PREF='firsthyundai-favorite-trades-alert-enabled-v1';
+const NATIVE_PREF='firsthyundai-favorite-trades-native-alert-enabled-v1';
 let pending=[];
 let latestContext=null;
 let memory=new Map();
@@ -24,9 +25,45 @@ function enabled(){
  const raw=load(PREF);
  return raw!=='0'&&memoryEnabled;
 }
+function nativeEnabled(){return enabled()&&load(NATIVE_PREF)==='1';}
+function nativePermissionStatus(){
+ try{return window.FirstHyundaiNative?.getTradeNotificationPermissionStatus?.()||'unavailable';}
+ catch(e){return 'unavailable';}
+}
+function syncNativeStatus(){
+ const label=get('favoriteTradeNativeStatus');
+ if(!label)return;
+ const setting=get('favoriteTradeNativeEnabled');
+ if(setting)setting.checked=load(NATIVE_PREF)==='1';
+ const status=nativePermissionStatus();
+ const wanted=load(NATIVE_PREF)==='1';
+ label.textContent=status==='enabled'?
+  (wanted?'휴대폰 알림 사용 중 · 앱을 열거나 갱신하면 알려드립니다.':'휴대폰 알림 권한 허용됨 · 알림을 사용하려면 위 옵션을 켜세요.') :
+  status==='permission_required'?'휴대폰 알림 권한이 필요합니다. 허용 요청 후에도 차단되면 휴대폰 설정에서 변경하세요.' :
+  status==='blocked'?'휴대폰 설정에서 퍼스트현대 알림이 차단됐습니다. 앱 정보 → 알림에서 허용해 주세요.' :
+  '웹 미리보기에서는 휴대폰 알림을 사용할 수 없습니다.';
+}
+function setNativeEnabled(flag){
+ save(NATIVE_PREF,flag?'1':'0');
+ if(flag){
+  // Called directly from user tapping the checkbox; request the platform permission.
+  try{window.FirstHyundaiNative?.requestTradeNotificationPermission?.();}catch(e){}
+ }
+ syncNativeStatus();
+}
+function notifyPhone(items){
+ if(!nativeEnabled()||nativePermissionStatus()!=='enabled'||!items.length)return;
+ const grouped=new Map();
+ for(const {group} of items)grouped.set(group.id,{label:group.label,n:(grouped.get(group.id)?.n||0)+1});
+ const detail=[...grouped.values()].slice(0,5).map(x=>x.label+' '+x.n+'건').join(' · ')+
+  (grouped.size>5?' 외 '+(grouped.size-5)+'개 단지':'');
+ try{window.FirstHyundaiNative?.postFavoriteTradeNotification?.(Math.min(items.length,100),detail.slice(0,240));}
+ catch(e){/* The in-app popup remains available even without Android permission. */}
+}
 function syncOption(){
  const checkbox=get('favoriteTradeAlertEnabled');
  if(checkbox)checkbox.checked=enabled();
+ syncNativeStatus();
 }
 function setEnabled(flag){
  memoryEnabled=!!flag;
@@ -135,9 +172,10 @@ function process(payload,context){
   pending=[...pending,...fresh.filter(x=>!ids.has(x.key))];
   render();
   tryPopup();
+  notifyPhone(fresh);
  }
  return {status:initialized?'updated':'baseline',newCount:fresh.length};
 }
-window.FirstHyundaiTradeAlerts={process,setEnabled,enabled,syncOption,open,view,dismiss,
+window.FirstHyundaiTradeAlerts={process,setEnabled,enabled,syncOption,syncNativeStatus,setNativeEnabled,open,view,dismiss,
  _test:{stableId,select,formatAmount,hide}};
 })();
