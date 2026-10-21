@@ -48,3 +48,14 @@ header{background:linear-gradient(125deg,#805033,#a66f43)}
 ::selection{background:#e5c49b;color:#392719}
 
 .practiceFacts{margin:14px 0}.practiceFacts>div{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid #eadcc9}.practiceFacts dt{font-size:13px;color:#79664f}.practiceFacts dd{margin:0;font-size:15px;font-weight:650;overflow-wrap:anywhere}.apiInfoCards article .practiceNote{font-size:14px;line-height:1.8;background:#f4e7d4;padding:12px;border-radius:12px}.practiceTable{overflow-x:auto}.practiceTable table{width:100%;border-collapse:collapse;font-size:13px}.practiceTable th,.practiceTable td{text-align:left;padding:10px 7px;border-bottom:1px solid #e5d5bd}
+
+
+/* Compact renewal-only transaction information, beneath the main amount/date. */
+.tradeRenewalDetail{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 14px;
+ border-left:3px solid #c49c78;background:#f8f2e9;
+ border-radius:0 10px 10px 0;padding:10px 12px;margin:10px 0 3px;
+ font-size:12px;line-height:1.65;color:#6c5949;
+}
+.tradeRenewalDetail span{min-width:0;overflow-wrap:anywhere}
+@media(max-width:370px){.tradeRenewalDetail{grid-template-columns:1fr}}
