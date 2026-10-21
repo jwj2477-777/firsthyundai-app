@@ -165,8 +165,9 @@ function makePreview(){
   out.push('위 계약조건과 송금 계좌, 계약 성립·해제 조건을 당사자 모두 확인해 주시기 바랍니다.');
  }
  E('ct_preview').value=out.join('\n');
- created=true;approved=false;
+ created=false;approved=false;
  updateSummary();
+ created=true; // A newly generated preview remains approvable; only later form edits invalidate it.
  E('ct_status').className='contractReview '+(d.errors.length?'bad':'');
  E('ct_status').textContent=d.errors.length?'⚠ 발송 전 보완: '+d.errors.join(' · '):
   '계약내용·금액·계좌·당사자 합의를 대조한 뒤 ‘내용 확인 완료’를 누르세요.';
