@@ -1,0 +1,73 @@
+name: Backup AI Project Knowledge
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - 'README.md'
+      - 'docs/**'
+      - 'scripts/export_ai_handoff.py'
+      - 'app/build.gradle'
+      - '.github/workflows/backup-ai-handoff.yml'
+  schedule:
+    - cron: '19 21 1 * *'
+permissions:
+  contents: write
+concurrency:
+  group: firsthyundai-ai-handoff-backup
+  cancel-in-progress: true
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Export portable AI handoff Markdown and ZIP
+        run: python3 scripts/export_ai_handoff.py --out dist/ai-handoff
+      - name: Verify bundled source-of-truth documents and ZIP
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          folder=Path('dist/ai-handoff')
+          bundles=sorted(folder.glob('*.zip'))
+          assert len(bundles)==1
+          with ZipFile(bundles[0]) as z:
+              assert z.testzip() is None
+              names=z.namelist()
+              for item in ('AGENTS.md','CLAUDE.md','docs/AI_HANDOFF.md',
+                  'docs/PRODUCT_REQUIREMENTS.md','docs/PROJECT_HISTORY.md',
+                  'docs/RECOVERY_PLAYBOOK.md','docs/CHANGE_LOG_FOR_AI.md'):
+                  assert item in names,item
+              assert len(z.read('docs/AI_HANDOFF.md'))>4000
+              assert not any(n.startswith('data/') for n in names), 'Exclude user or verifier data'
+          print('Verified portable AI handoff archive:',len(names),'entries')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FirstHyundai-AI-Handoff-Backup
+          path: dist/ai-handoff/*
+          retention-days: 90
+          if-no-files-found: error
+      - name: Attach durable backup to matching published Android release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: \${{ github.token }}
+        run: |
+          version=$(sed -n "s/.*versionName '\([^']*\)'.*/\1/p" app/build.gradle)
+          if [ -z "$version" ]; then echo "Cannot detect app version"; exit 1; fi
+          tag="v\${version}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" \
+              dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md \
+              dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip \
+              --repo "$GITHUB_REPOSITORY" --clobber
+            echo "AI knowledge backup attached to release: $tag"
+          else
+            echo "Matching APK release $tag not published yet: artifact saved; rerun this workflow after APK is released."
+          fi
