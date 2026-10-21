@@ -142,21 +142,21 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v1.19.10 transfer-memo-recognition APK
+      - name: Publish successful v1.19.11 interim-and-special-clauses APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.10.apk
-          unzip -t FirstHyundai-v1.19.10.apk | grep 'No errors detected'
-          if gh release view v1.19.10 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.11.apk
+          unzip -t FirstHyundai-v1.19.11.apk | grep 'No errors detected'
+          if gh release view v1.19.11 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v1.19.10 FirstHyundai-v1.19.10.apk \
+            gh release create v1.19.11 FirstHyundai-v1.19.11.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.19.10 · 계약메모 송금액·예금주 인식 개선' \
-              --notes '계약 메모에서 유일한 사람 이름을 예금주 후보로 우선 표시하고 입금/송금/넣기로 표현 인식을 강화했습니다. 복수 인명과 임차인만 있는 경우는 확인 요청합니다. 문자/PNG 공유와 다른 기존 기능 유지. 정확한 계좌 및 금액은 발송 전에 직접 확인하세요.'
+              --title '퍼스트현대 v1.19.11 · 중도금·특약 인식 개선' \
+              --notes '현장 메모에서 중도금 바로 뒤의 날짜 오타가 중도금액을 삭제하던 오류를 수정했습니다. 12년20일 등의 불명확한 날짜는 직접 확인하기 전까지 공유를 차단합니다. 특약이라는 머리말 없이 작성한 수리 약속·잔금일 상호합의 문장을 특약에 보존하고 고객 안내문의 불필요한 계약금 잔여액을 삭제했습니다. 기존 PNG 계약 안내 및 알림 기능 유지. 발송 전 실제 계약 조건을 확인하세요.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v1.19.10 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v1.19.11 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"

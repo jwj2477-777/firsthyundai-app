@@ -88,3 +88,13 @@ e('ct_rough').value='';
 assert.equal(easy.compose(),false);
 assert(alerts.some(a=>a.includes('먼저 메모')));
 console.log('Contract one-memo workflow passed: collapsed manual UI, local clause polish, source comparison, field reset, stale bank safety, amount checks and copy review.');
+
+
+input('퍼팍 15블럭 1502동 3004호 매매 15억 중도금 4억 12년20일 잔금일 1월 30일\n매도인이 화장실 수리해주기로\n잔금일은 상호합의하에 앞당길수 있다');
+assert.equal(e('ct_interim').value,'40000','Do not lose interim amount when date is mistyped');
+assert.equal(e('ct_terms').value.split('\n').length,2,'Infer two unlabelled obligations');
+assert(e('ct_terms').value.includes('화장실 수리해주기로 한다.'));
+assert(e('ct_terms').value.includes('잔금일은 상호 합의하에 앞당길 수 있다.'));
+assert(!e('ct_preview').value.includes('계약금 잔여액'));
+assert(e('ct_languageWarnings').textContent.includes('월/년 표기가 불명확'));
+console.log('Unlabelled field memo clause regression passed.');

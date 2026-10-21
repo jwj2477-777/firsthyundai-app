@@ -92,3 +92,40 @@ assert.equal(transfer.packet('임차인 김철수 국민은행 123-456-789012 �
 assert.equal(transfer.packet('오늘 500 송금, 계약금 4000, 중도금 2000').amount,500);
 assert.equal(transfer.packet('계약금 4000, 중도금 2000').amount,null,'Totals are not remittance');
 console.log('Unique payee and spoken remittance checks passed.');
+
+
+// End-to-end regression: informal memo, middle payment followed by mistyped date,
+// lone recipient, unlabelled repair/date clauses. All names and accounts are fictional.
+const sampleMemo=[
+ '퍼팍 1502동 3004호',
+ '매매 15억',
+ '중도금 4억 12년20일',
+ '잔금일 1월 30일',
+ '김가람 국민은행 123-456-789012',
+ '1000만원',
+ '',
+ '매도인이 화장실 수리해주기로',
+ '잔금일은 상호합의하에 앞당길수 있다'
+].join('\n');
+el('ct_rough').value=sampleMemo;
+assert.equal(easy.compose(),true);
+assert.equal(el('ct_price').value,'150000');
+assert.equal(el('ct_interim').value,'40000','Four-eok interim survives malformed date suffix');
+assert.equal(el('ct_advance').value,'1000');
+assert.equal(el('ct_accountHolder').value,'김가람');
+assert.equal(el('ct_unit').value,'1502동 3004호');
+assert.equal(el('ct_contractDeposit').value,'15000');
+assert.equal(el('ct_interimDate').value,'','Ambiguous 12년20일 must not be silently fixed');
+assert(el('ct_languageWarnings').textContent.includes('월/년 표기가 불명확'));
+assert(el('ct_preview').value.includes('▶ 중도금 : 40,000만원'));
+assert(el('ct_preview').value.includes('▶ 중도금 지급일 : [메모 날짜 확인 필요]'));
+assert(el('ct_preview').value.includes('▶ 잔금 : 95,000만원'));
+assert(!el('ct_preview').value.includes('계약금 잔여액'));
+assert(el('ct_preview').value.includes('화장실 수리해주기로 한다.'));
+assert(el('ct_preview').value.includes('잔금일은 상호 합의하에 앞당길 수 있다.'));
+assert(el('ct_status').textContent.includes('중도금 지급일 오타 확인'),'Cannot approve unclear date');
+el('ct_interimDate').value='2026-12-20'; // deliberate human correction
+easy.afterManualEdit();
+assert(el('ct_preview').value.includes('▶ 중도금 지급일 : 2026-12-20'));
+assert(!ctx.window.FirstHyundaiContracts._test.collect().errors.includes('중도금 지급일 오타 확인'));
+console.log('User-pattern memo regression passed: interim, corrected balance, implicit clauses and date review.');
