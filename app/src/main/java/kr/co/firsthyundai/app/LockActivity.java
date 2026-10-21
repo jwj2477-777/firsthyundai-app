@@ -107,6 +107,17 @@ public class LockActivity extends Activity {
         foot.setPadding(0, dp(32), 0, 0);
         root.addView(foot);
 
+        TextView installedVersion = new TextView(this);
+        String installedName = AppVersion.name(this);
+        int installedBuild = AppVersion.buildNumber(this);
+        installedVersion.setText(installedName.isEmpty() ? "설치된 앱 버전 확인 불가" :
+                "설치된 앱 v" + installedName + (installedBuild > 0 ? " · 빌드 " + installedBuild : ""));
+        installedVersion.setTextSize(12);
+        installedVersion.setGravity(Gravity.CENTER);
+        installedVersion.setTextColor(Color.rgb(120, 105, 92));
+        installedVersion.setPadding(0, dp(14), 0, 0);
+        root.addView(installedVersion);
+
         codeField.setEnabled(false);
         unlock.setEnabled(false);
         status.setText("최신 가족 보안 정책을 확인하는 중...");
