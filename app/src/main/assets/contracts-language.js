@@ -109,11 +109,13 @@ function dateIn(part,now=new Date()){
  const text=String(part||'');
  const iso=text.match(/(?:20)?(\d{2})[.\/-]\s*(\d{1,2})[.\/-]\s*(\d{1,2})(?!\d)/);
  const verbose=text.match(/(20\d{2})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일?/);
+ const shortYear=text.match(/(?<!\d)(\d{2})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일?(?!\d)/);
  const month=text.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일?/);
  const slash=text.match(/(?:^|\s)(\d{1,2})[./]\s*(\d{1,2})(?:일|(?=$|\s|[,;]))/);
  let year,mo,day,assumed=false;
  if(verbose){year=+verbose[1];mo=+verbose[2];day=+verbose[3];}
  else if(iso){year=+iso[1];if(year<100)year+=2000;mo=+iso[2];day=+iso[3];}
+ else if(shortYear){year=2000+Number(shortYear[1]);mo=+shortYear[2];day=+shortYear[3];}
  else if(month||slash){
   const m=month||slash;year=now.getFullYear();mo=+m[1];day=+m[2];assumed=true;
   const check=new Date(year,mo-1,day);
@@ -285,6 +287,17 @@ function recognize(raw){
  if(deal==='월세'){
   const n=rentCombo?moneyPart(rentCombo[2]):rent?.amount;
   if(n!=null)apply('monthlyRent',n,found);
+ }
+ // "잔금 27년 1월30일" is a DATE, not a monetary amount.
+ // Require a date-shaped token immediately following the standalone 잔금 label,
+ // so "잔금 8억" or "중도금 및 잔금일 앞당길..." will not be misclassified.
+ const bareBalance=s.match(/(?:^|[\s,;])잔금\s*[:：]?\s*((?:(?:20)?\d{2}\s*년\s*\d{1,2}\s*월\s*\d{1,2}\s*일?|(?:20)?\d{2}[./-]\d{1,2}[./-]\d{1,2}|\d{1,2}\s*월\s*\d{1,2}\s*일?))/);
+ if(bareBalance){
+  const d=dateIn(bareBalance[1]);
+  if(d){
+   apply('balanceDate',d.value,found);
+   if(d.assumed)review.push('잔금일의 연도를 자동 추정했습니다. 실제 날짜를 확인해 주세요.');
+  }
  }
  for(const [id,terms] of [
   ['balanceDate',['잔금\\s*날','잔금일','잔금\\s*예정일','잔금은','잔금\\s*치르','잔금\\s*처리','잔금']],
