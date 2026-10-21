@@ -38,10 +38,12 @@ function extractSpecial(raw){
  const m=tag.exec(text);
  if(!m)return '';
  let tail=text.slice(m.index+m[0].length);
- tail=tail.split(/\n(?=\s*(?:계좌번호|입금계좌|송금계좌|예금주|은행|잔금일|전세보증금|매매대금|계약일)\s*[:：])/)[0];
+ // The pre-agreed payment/cancellation paragraph is a separate section, not a special clause.
+ tail=tail.split(/\n(?=\s*(?:※|▶\s*(?:계약금|중도금|잔금|계좌|예금주)|계좌번호|입금계좌|송금계좌|예금주|은행|잔금일|전세보증금|매매대금|계약일)\s*[:：]?\s*)/)[0];
+ tail=tail.split(/※\s*(?:금일|오늘|상기|본|위)\s*(?:계약금|내용|조건)/)[0];
  tail=tail.replace(/^\s*(?:은|는)\s*/,'').trim();
- const lines=tail.split(/\n+|(?:\s|^)(?=\d+[.)]\s+)|;\s*|[，,]\s*(?=(?:임대인|임차인|매도인|매수인|잔금|도배|청소|에어컨|반려동물|근저당|현상태|현재|붙박이|하자|특약|계약))/)
-  .map(s=>s.trim().replace(/^[-•]\s*/,'')) .filter(Boolean);
+ const lines=tail.split(/\n+|(?=→)|(?:\s|^)(?=\d+[.)]\s+)|;\s*|[，,]\s*(?=(?:임대인|임차인|매도인|매수인|잔금|도배|청소|에어컨|반려동물|근저당|현상태|현재|붙박이|하자|특약|계약))/)
+  .map(s=>s.trim().replace(/^[→➜➡•-]\s*/,'')) .filter(Boolean);
  return lines.join('\n').slice(0,6000);
 }
 function polishTerms(text){
