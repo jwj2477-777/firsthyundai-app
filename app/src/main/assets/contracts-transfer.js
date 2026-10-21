@@ -46,33 +46,34 @@ function bankCandidates(text,account){
  }
  return found.sort((a,b)=>b.strength-a.strength||a.start-b.start);
 }
+const familyNames='김이박최정강조윤장임한오서신권황안송전홍유고문양손배백허노남심하주구성차우민진엄채원천방공현함변염여추도소곽표';
+const notName=/^(?:매매|전세|월세|계약|보증금|중도금|잔금|가계약|오늘|금일|이번|당일|먼저|지금|내일|입금|송금|이체|보내|보낼|넣을|은행|계좌|명의|계약서|예금주|아파트|송도|퍼스트|마스터|퍼팍|마뷰|프라임|센트럴|더샵|신한|국민|우리|하나|농협|기업|카카오|토스|새마을|우체국|부동산|내용|날짜|기간|확인|특약|임대인|매도인|임차인|매수인|집주인|세입자|소재지|계약금|만원|상담|계좌번호|거래|계약일|잔금일|입주일|동호수|금액|사무실)/;
 function holderCandidate(text,account,bank){
- const explicit=/(?:예금주|계좌주|입금\s*받는\s*분|입금\s*받을\s*분|수취인|명의자)\s*[:：]?\s*([가-힣]{2,5})/g;
- let m,explicitList=[];
- while((m=explicit.exec(text)))if(!reserved.test(m[1])&&!explicitList.some(x=>x.value===m[1]))explicitList.push({value:m[1],score:150,pos:m.index});
- if(explicitList.length===1)return {value:explicitList[0].value,confidence:'explicit'};
- if(explicitList.length>1)return {value:null,warning:'예금주가 여러 명 언급되어 확인이 필요합니다.'};
- if(!account)return {value:null};
- const all=[];
- const reg=/[가-힣]{2,5}/g;
- while((m=reg.exec(text))){
-  if(reserved.test(m[0]))continue;
-  const k=m[0];
-  if(/^(?:송도|퍼스트|마스터|아파트|부동산|구청|만원|국민은행|신한은행|우리은행|하나은행|농협은행|기업은행|카카오|토스)/.test(k))continue;
-  const dist=Math.min(Math.abs(m.index-account.start),Math.abs(m.index-account.end),
-   bank?Math.abs(m.index-bank.start):Infinity);
-  if(dist>24)continue;
-  const prev=text.slice(Math.max(0,m.index-9),m.index);
-  // Names explicitly marked as the buyer should never silently become the recipient.
-  if(/(?:매수인|임차인|세입자)\s*[:：]?\s*$/.test(prev))continue;
-  const score=100-dist*2+(/(?:예금주|계좌주|명의)/.test(prev)?30:0);
-  all.push({value:k,score,pos:m.index});
+ const s=String(text||'');
+ const explicit=/(?:예금주|계좌주|계좌\s*명의자|명의자|수취인|입금\s*받는\s*분)\s*[:：]?\s*([가-힣]{2,5})(?=\s|$|[,.;)\/\]])/g;
+ const specified=[...new Set([...s.matchAll(explicit)].map(m=>m[1]).filter(name=>!reserved.test(name)&&!notName.test(name)))];
+ if(specified.length===1)return {value:specified[0],confidence:'explicit'};
+ if(specified.length>1)return {value:null,warning:'서로 다른 예금주가 적혀 있습니다. 명의를 확인해 주세요.'};
+ const memo=s.split(/(?:^|\n)\s*(?:특약(?:사항)?|합의사항)\s*[:：]/m)[0];
+ const people=new Map();
+ for(const m of memo.matchAll(/(?<![가-힣])([가-힣]{2,4})(?![가-힣])/g)){
+  const name=m[1];
+  if(!familyNames.includes(name[0])||reserved.test(name)||notName.test(name))continue;
+  if(/(?:금|월|년|은행|계좌|계약|만원|송금|입금|기간)$/.test(name))continue;
+  const before=memo.slice(Math.max(0,m.index-16),m.index);
+  const buyer=/(?:매수인|임차인|세입자)\s*[:：]?\s*$/.test(before);
+  const owner=/(?:매도인|임대인|집주인)\s*[:：]?\s*$/.test(before);
+  const nearAccount=!!account&&Math.abs(m.index-account.start)<65;
+  const nearBank=!!bank&&Math.abs(m.index-bank.start)<65;
+  if(name.length===2&&!owner&&!buyer&&!nearAccount&&!nearBank)continue;
+  const old=people.get(name)||{name,buyer:false};
+  old.buyer=old.buyer||buyer;people.set(name,old);
  }
- all.sort((a,b)=>b.score-a.score);
- if(!all.length)return {value:null};
- if(all[1]&&all[0].score-all[1].score<18&&all[0].value!==all[1].value)
-  return {value:null,warning:'계좌 주변에서 서로 다른 이름이 발견되었습니다. 예금주를 확인하세요.'};
- return {value:all[0].value,confidence:'adjacent'};
+ const names=[...people.values()].filter(x=>!x.buyer);
+ if(names.length>1)return {value:null,warning:'서로 다른 이름이 여러 개 있어 예금주를 선택하지 않았습니다.'};
+ if(names.length===1)return {value:names[0].name,confidence:'inferred-name',warning:'메모의 유일한 이름을 예금주로 추정했습니다. 실제 계좌 명의와 확인해 주세요.'};
+ if(people.size)return {value:null,warning:'매수인·임차인 이름만 있습니다. 예금주를 확인해 주세요.'};
+ return {value:null};
 }
 function moneyCandidates(text,account){
  const dates=dateRanges(text);
