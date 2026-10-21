@@ -4,12 +4,12 @@
 > **이 문서를 받은 ChatGPT, Gemini, Claude 또는 개발자는 이전 채팅을 모른다고 가정**한다. 반드시 [AGENTS.md](../AGENTS.md) → 이 문서 → [요구사항](PRODUCT_REQUIREMENTS.md) → [이력](PROJECT_HISTORY.md) → [복구·운영](RECOVERY_PLAYBOOK.md)을 읽고, 최신 소스와 실제 배포본을 대조한 뒤 작업한다. 이 문서는 사람의 모든 대화 내용을 한 글자도 빠짐없이 저장하는 원문 아카이브가 아니라 **합의된 요구와 구현의 구조화된 복원본**이다.
 
 ## 0. 프로젝트 식별자·기준 소스
-- 공식 GitHub: **https://github.com/jwj2477-777/firsthyundai-app** (공개 저장소), 기본 브랜치 \`main\`, Android 앱 applicationId \`kr.co.firsthyundai.app\`.
+- 공식 GitHub: **https://github.com/jwj2477-777/firsthyundai-app** (공개 저장소), 기본 브랜치 `main`, Android 앱 applicationId `kr.co.firsthyundai.app`.
 - 이름 **퍼스트현대**, 사무실 전용 송도 부동산 실무 앱; 사용자는 공인중개사이며 부모님 등 가족이 실무 조회에 함께 사용. **판매용/상용 SaaS 아님, 가급적 무료 운영**.
-- 2026-10-21 확인된 마지막 성공 배포는 **v1.19.7**, \`app/build.gradle\` 의 \`versionCode=39\`, \`versionName='1.19.7'\`. **이것은 문서 점검 당시의 기록이다. 이후 최신 버전은 Gradle과 Releases를 확인할 것.**
+- 2026-10-21 확인된 마지막 성공 배포는 **v1.19.7**, `app/build.gradle` 의 `versionCode=39`, `versionName='1.19.7'`. **이것은 문서 점검 당시의 기록이다. 이후 최신 버전은 Gradle과 Releases를 확인할 것.**
 - 출처 우선순위: **사용자의 최신 명시적 결정 > 실제 현재 앱 소스와 성공한 빌드 > 검증된 공개 JSON/API 응답 > 이 인수인계와 관련 테스트 > 과거 릴리스 이력 > 오래된 README > AI의 추측**. 최신 사용자의 요청은 테스트·문서를 갱신하고 적용한다.
 - 최신 릴리스 보기: https://github.com/jwj2477-777/firsthyundai-app/releases · CI: https://github.com/jwj2477-777/firsthyundai-app/actions
-- **주의: 기존 \`README.md\`의 첫 문단은 v1.11을 기준으로 하며 현재 Gemini·Groq AI 뉴스, 성공한 APK 빌드 등과 상충하는 낡은 문장이 있다.** README를 역사 기록으로만 읽고 실제 현 상태의 단일 출처로 믿지 말 것.
+- **주의: 기존 `README.md`의 첫 문단은 v1.11을 기준으로 하며 현재 Gemini·Groq AI 뉴스, 성공한 APK 빌드 등과 상충하는 낡은 문장이 있다.** README를 역사 기록으로만 읽고 실제 현 상태의 단일 출처로 믿지 말 것.
 
 ## 1. 사용자 의도와 작업 방식
 - 원하는 것은 **내 사무실에서 실제로 쓸 수 있는 직관적 앱**. 누락/회귀를 싫어함. 사용자가 "진행해줘"라고 하면 실무에 적절한 선택 후 구현, 테스트, 배포까지 수행할 것. 단지 장황한 제안에 머물지 않는다.
@@ -18,30 +18,30 @@
 - 구현 설명은 **완료/미완료/미검증을 정확히 구분**하고 APK는 빌드 결과와 릴리스 파일까지 검증된 경우에만 '배포 완료'라고 말할 것.
 
 ## 2. 실제 코드 구조
-- \`app/src/main/java/kr/co/firsthyundai/app/\`: \`MainActivity.java\` (WebView, JS ↔ Android 브리지·네트워크·백업·음성입력·알림 연계), \`LockActivity.java\` (가족 인증), \`AccessPolicy.java\`, \`AdminPolicy.java\`, \`AppVersion.java\` (실제 설치된 패키지 버전), \`TradeNotifications.java\` (알림 권한/알림센터).
-- \`app/src/main/assets/index.html\`: 웹 UI·인라인 자바스크립트·거래 표시·단지정보·뉴스·모드 전환·API 갱신. \`theme.css\`는 따뜻한 테마. \`contracts.css\` 계약문자 UI.
-- \`contracts.js\` 계약문자 미리보기·금액·기본 특약; \`contracts-smart.js\` 단지 검색/주소 보조; \`contracts-language.js\` 자연어, \`contracts-transfer.js\` 송금 계좌/은행/예금주/금액 순서무관 보강; \`contracts-easy.js\` 한 문장 메모 중심 작성·검토. 계약 상세는 **기기 내 분석**.
-- \`trade-alerts.js\`: 관심단지 '처음 수집 기준 저장 → 실제 새로 관측한 거래 1회 알림' 흐름, 동네/블럭 오인식 방지, 브라우저 로컬 상태; OS 알림은 명시적인 권한·토글이 있을 때만 Android 네이티브 브리지로 요청.
-- \`scripts/collect_trades.py\`: 국토부 매매/전세/월세 아파트 거래 12개월; 이전 JSON과 비교해 새로 발견한 계약을 \`new_trades.json\`에 보존. **first_seen_date는 정부 공표일이나 계약일이 아닌 '앱의 최초 관측일'.**
-- \`scripts/collect_complexes.py\`: K-apt 아파트 기본 정보/공식 데이터·사용자 검증 카탈로그 병합. \`scripts/collect_public_services.py\`, \`collect_registry_maintenance.py\`: 나이스·청약·오피스텔·건축물대장·관리비 등 검증된 승인별 수집; 미승인/오류는 기존 자료를 보존.
-- \`scripts/collect_news.py\`: 뉴스 RSS 묶음; \`summarize_news.py\` Gemini 기사본문 3문장 요약; \`groq_news.py\` 무료 제한 내 보완·일부 중요 정책 뉴스 검토. **본문이 확보되지 않으면 AI 요약을 꾸며내지 않는다.**
-- \`workers/kakao-nearby/\`: 카카오 지역 주변시설 Cloudflare Worker 관련 프로젝트. 접근키는 저장소 Secret/Worker에만; APK에 직접 넣지 않는다.
-- 정기 실행: \`.github/workflows/collect.yml\` 실거래 매일 새벽(KST), 뉴스 약 3시간 간격(예약 지연 가능); \`sync-kapt.yml\`, \`sync-public-services.yml\` 선택 수집; \`deploy-kakao-nearby.yml\`; \`build-apk.yml\` 테스트/빌드/버전검사/Release 등록; 가족/관리자 비밀번호 관리 워크플로.
-- \`data/trades.json\`, \`data/new_trades.json\`, \`data/news.json\`, \`data/complexes.json\`, \`data/public_services.json\`, \`data/nearby_config.json\`은 배포된 **공개 게시자료**. \`data/access_policy.json\`과 \`data/admin_policy.json\`은 **비밀번호 원문이 아니라 PBKDF2 검증 정보**이며 공개 저장이 가능한 방식의 위험도 숙지한다. **고객 자료·실제 계약서·계좌·메모·키는 절대 게시하지 않는다.**
+- `app/src/main/java/kr/co/firsthyundai/app/`: `MainActivity.java` (WebView, JS ↔ Android 브리지·네트워크·백업·음성입력·알림 연계), `LockActivity.java` (가족 인증), `AccessPolicy.java`, `AdminPolicy.java`, `AppVersion.java` (실제 설치된 패키지 버전), `TradeNotifications.java` (알림 권한/알림센터).
+- `app/src/main/assets/index.html`: 웹 UI·인라인 자바스크립트·거래 표시·단지정보·뉴스·모드 전환·API 갱신. `theme.css`는 따뜻한 테마. `contracts.css` 계약문자 UI.
+- `contracts.js` 계약문자 미리보기·금액·기본 특약; `contracts-smart.js` 단지 검색/주소 보조; `contracts-language.js` 자연어, `contracts-transfer.js` 송금 계좌/은행/예금주/금액 순서무관 보강; `contracts-easy.js` 한 문장 메모 중심 작성·검토. 계약 상세는 **기기 내 분석**.
+- `trade-alerts.js`: 관심단지 '처음 수집 기준 저장 → 실제 새로 관측한 거래 1회 알림' 흐름, 동네/블럭 오인식 방지, 브라우저 로컬 상태; OS 알림은 명시적인 권한·토글이 있을 때만 Android 네이티브 브리지로 요청.
+- `scripts/collect_trades.py`: 국토부 매매/전세/월세 아파트 거래 12개월; 이전 JSON과 비교해 새로 발견한 계약을 `new_trades.json`에 보존. **first_seen_date는 정부 공표일이나 계약일이 아닌 '앱의 최초 관측일'.**
+- `scripts/collect_complexes.py`: K-apt 아파트 기본 정보/공식 데이터·사용자 검증 카탈로그 병합. `scripts/collect_public_services.py`, `collect_registry_maintenance.py`: 나이스·청약·오피스텔·건축물대장·관리비 등 검증된 승인별 수집; 미승인/오류는 기존 자료를 보존.
+- `scripts/collect_news.py`: 뉴스 RSS 묶음; `summarize_news.py` Gemini 기사본문 3문장 요약; `groq_news.py` 무료 제한 내 보완·일부 중요 정책 뉴스 검토. **본문이 확보되지 않으면 AI 요약을 꾸며내지 않는다.**
+- `workers/kakao-nearby/`: 카카오 지역 주변시설 Cloudflare Worker 관련 프로젝트. 접근키는 저장소 Secret/Worker에만; APK에 직접 넣지 않는다.
+- 정기 실행: `.github/workflows/collect.yml` 실거래 매일 새벽(KST), 뉴스 약 3시간 간격(예약 지연 가능); `sync-kapt.yml`, `sync-public-services.yml` 선택 수집; `deploy-kakao-nearby.yml`; `build-apk.yml` 테스트/빌드/버전검사/Release 등록; 가족/관리자 비밀번호 관리 워크플로.
+- `data/trades.json`, `data/new_trades.json`, `data/news.json`, `data/complexes.json`, `data/public_services.json`, `data/nearby_config.json`은 배포된 **공개 게시자료**. `data/access_policy.json`과 `data/admin_policy.json`은 **비밀번호 원문이 아니라 PBKDF2 검증 정보**이며 공개 저장이 가능한 방식의 위험도 숙지한다. **고객 자료·실제 계약서·계좌·메모·키는 절대 게시하지 않는다.**
 
 ## 3. 사용자가 특히 중요하게 여기는 기능별 합의
 ### A. 실거래·14개 관심 아파트
 - 국토부 송도동 아파트 매매/전세/월세를 계약일 최신순으로. 매매 중개거래/직거래, **중개거래 시 중개사 소재지**. 취소 거래는 '해제' 별도 강조. 전월세에 **신규계약/갱신계약/계약구분 미기재**.
-- 갱신계약이 명시된 전월세 거래의 금액·계약일 아래 작게 네 항목 **갱신요구권 사용 여부, 계약기간, 종전 보증금, 종전 월세**. 미기재를 '0'으로 만들지 않는다. \`갱신요구권 사용\`만으로 그 거래가 갱신계약임을 단정하지 않는다.
-- 거래별 반복 문구 **'출처: 국토교통부'**, **'조회 계약연월'** 제거. 실제 **계약일은 유지**. 이 규칙을 \`renderTrades\`, \`renderNearbyDetails\`, \`renderNew\` 세 화면에 모두 적용. 테스트 \`scripts/test_trade_contract_regression.js\`.
-- 14개 즐겨찾기 ID: \`f13\` 퍼스트파크13, \`f14\` 퍼스트파크14, \`f15\` 퍼스트파크15, \`m21\` 마스터뷰21, \`m22\` 마스터뷰22, \`m23\` 마스터뷰23, \`avenue\` 파크애비뉴, \`centennial\` 센터니얼, \`prime20\` 프라임뷰20, \`prime25\` 프라임뷰25, \`skcentral\` SK뷰센트럴, \`artwin\` 아트윈푸르지오, \`central3\` 센트럴파크3차, \`kapt-a10027887\` 센트럴파크푸르지오. **3차와 푸르지오, 프라임뷰 20과 25는 다른 단지**. \`FAVORITE_APTS\` 매칭 규칙/테스트 필수.
-- 관심 단지 새 거래: 첫 성공 수집은 기준선, 이후 \`data/new_trades.json\`의 새로 관측된 계약만 알린다. 버전 **v1.19.6** 앱 내부 팝업, **v1.19.7** 옵트인 Android 13+ POST_NOTIFICATIONS와 로컬 알림센터 통지. **앱이 종료된 상태의 실시간 FCM 푸시/백그라운드 감시는 미구현**. 오인식/중복 알림 금지.
+- 갱신계약이 명시된 전월세 거래의 금액·계약일 아래 작게 네 항목 **갱신요구권 사용 여부, 계약기간, 종전 보증금, 종전 월세**. 미기재를 '0'으로 만들지 않는다. `갱신요구권 사용`만으로 그 거래가 갱신계약임을 단정하지 않는다.
+- 거래별 반복 문구 **'출처: 국토교통부'**, **'조회 계약연월'** 제거. 실제 **계약일은 유지**. 이 규칙을 `renderTrades`, `renderNearbyDetails`, `renderNew` 세 화면에 모두 적용. 테스트 `scripts/test_trade_contract_regression.js`.
+- 14개 즐겨찾기 ID: `f13` 퍼스트파크13, `f14` 퍼스트파크14, `f15` 퍼스트파크15, `m21` 마스터뷰21, `m22` 마스터뷰22, `m23` 마스터뷰23, `avenue` 파크애비뉴, `centennial` 센터니얼, `prime20` 프라임뷰20, `prime25` 프라임뷰25, `skcentral` SK뷰센트럴, `artwin` 아트윈푸르지오, `central3` 센트럴파크3차, `kapt-a10027887` 센트럴파크푸르지오. **3차와 푸르지오, 프라임뷰 20과 25는 다른 단지**. `FAVORITE_APTS` 매칭 규칙/테스트 필수.
+- 관심 단지 새 거래: 첫 성공 수집은 기준선, 이후 `data/new_trades.json`의 새로 관측된 계약만 알린다. 버전 **v1.19.6** 앱 내부 팝업, **v1.19.7** 옵트인 Android 13+ POST_NOTIFICATIONS와 로컬 알림센터 통지. **앱이 종료된 상태의 실시간 FCM 푸시/백그라운드 감시는 미구현**. 오인식/중복 알림 금지.
 ### B. 아파트정보·평형·학군
 - 검증된 송도 아파트 **95개 레코드 중 2개는 합산 관리단지**, 독립 표시 **93개** (2026-10-20 기록). 공급면적·전용면적은 단지 및 A/B 타입별 **실제 짝을 확인한 값만**; 93개 단지에 최소 일부 타입 매칭을 확보했으나 '모든 타입 완전 수집'을 뜻하지 않음.
 - 사용자 선호 표: **타입 / 공급면적 / 전용면적 / 평형**의 간결한 4열 표. 공급/전용이 같은 타입인데 두 줄로 이중 표기하거나 근거 없는 정밀도를 추가하지 말 것. 평면도 저작권/출처 확인 필요.
 - 퍼팍=퍼스트파크, 마뷰=마스터뷰. **퍼팍 1502동→15블럭, 마뷰 2301동→23블럭**, 알려진 블럭만 추론하고 충돌하면 재확인. 실제 자료에 없는 다른 블럭을 지어내지 않는다. 단지별 주소·세대·난방·주차 등은 K-apt/사용자 원본에서 검증; 출처 충돌은 숨기지 않는다.
-- \`public_services.json\` 최신 점검 당시 \`building_registry\` 검증 **58**, \`maintenance\` 검증 **71**, \`subscriptions\` 검증 **97**개; **이 숫자는 스냅샷 의존, 다시 확인해야 한다**. 관리비는 단지 전체 관리비 통계와 개별 전용 평형/가구 고지 금액을 구분; 없는 평형별 고지액 추정하지 않는다.
-- NEIS 기본학교정보 \`schools.state='awaiting_key'\`/0건(2026-10-21 공개 스냅샷 기준) — **키가 아예 미등록이라는 의미로 단정하지 않는다**. 사용자는 GitHub Secret을 등록·갱신했으나 진단에서 공개 샘플·실제 키·XML·별도 서비스 호출 모두 **HTTP 500**을 받음. 인증 유효 여부가 검증됐다는 주장 금지. **NEIS 기본정보≠배정학교**, 공식 학구도 경계+교육청 고시 별도 필요.
+- `public_services.json` 최신 점검 당시 `building_registry` 검증 **58**, `maintenance` 검증 **71**, `subscriptions` 검증 **97**개; **이 숫자는 스냅샷 의존, 다시 확인해야 한다**. 관리비는 단지 전체 관리비 통계와 개별 전용 평형/가구 고지 금액을 구분; 없는 평형별 고지액 추정하지 않는다.
+- NEIS 기본학교정보 `schools.state='awaiting_key'`/0건(2026-10-21 공개 스냅샷 기준) — **키가 아예 미등록이라는 의미로 단정하지 않는다**. 사용자는 GitHub Secret을 등록·갱신했으나 진단에서 공개 샘플·실제 키·XML·별도 서비스 호출 모두 **HTTP 500**을 받음. 인증 유효 여부가 검증됐다는 주장 금지. **NEIS 기본정보≠배정학교**, 공식 학구도 경계+교육청 고시 별도 필요.
 ### C. 계약문자 자동작성
 - 필드가 빽빽한 복잡한 서식보다 **자연어 메모 한 덩어리→문자 초안→자동 추출 필드 검토→복사/공유**. 기본 정보/특약/당사자와 계좌를 꼼꼼하게 검토. 송금액·이름·계좌번호·은행은 **어떤 순서라도 인식**하도록 24개 순열 테스트가 있다. 전화번호/계좌/날짜/동호수 혼동 주의.
 - 기본 특약 문구: **'기타 상세한 특약사항은 본계약서 작성 시 협의하여 기재한다.'**. 내용상 유사 문구 있으면 중복 안 됨. 고객이 추가한 특약은 보존.
@@ -52,13 +52,13 @@
 - 기사 원문을 확보하지 못한 경우 '본문 요약 대기' 등 적절한 상태 표시; **AI 요약인 척 빈 출처 내용을 만들어 내지 말 것**. AI 요약 수·대기 수 표기. 공공 정책/세금/대출은 공식 원문 직접 확인 필요.
 ### E. 접근성·보안·알림
 - 가족/관리자 화면 구분, 관리자 도구 숨김, 변경 시 인증; 개인 메모 로컬 저장·내보내기/복원. 앱 재설치/디버그 서명 변경 전에 별도 파일로 '내 자료' 백업.
-- 화면 하단/보안/잠금 화면의 실제 설치 앱 버전은 Android PackageManager(\`versionName\`/\`versionCode\`)에서 표시. \`v1.10\`처럼 고정된 오래된 버전 글자 다시 쓰면 안 됨. \`scripts/test_app_version.js\`, \`scripts/check_apk_version.py\`.
+- 화면 하단/보안/잠금 화면의 실제 설치 앱 버전은 Android PackageManager(`versionName`/`versionCode`)에서 표시. `v1.10`처럼 고정된 오래된 버전 글자 다시 쓰면 안 됨. `scripts/test_app_version.js`, `scripts/check_apk_version.py`.
 
 ## 4. 2026-10-21 현재 공개 스냅샷 점검 사실 (점검일 이후 수시 변경)
-- \`data/complexes.json\` 95개 항목/2개 합산; 93개 독립 단지 표시.
-- \`data/public_services.json\` 학교 0개/연동 대기, 건축물대장 58개 검증, 관리비 71개 검증, 청약·분양 97개 검증, 오피스텔 전월세와 도로명주소 일부 미승인/대기.
-- \`data/news.json\` 최신 조회 시 묶음 **160개**, 해당 시점 AI 통계 \`created=18\`, \`reused=140\`, \`awaiting_body=26\`. 숫자를 영구 사양처럼 고정하지 말고 실행마다 재확인.
-- \`data/new_trades.json\`은 **첫 발견일과 자료 수집 시각**을 보유; 정확한 신고일·공식 공개일과 혼동하지 말 것.
+- `data/complexes.json` 95개 항목/2개 합산; 93개 독립 단지 표시.
+- `data/public_services.json` 학교 0개/연동 대기, 건축물대장 58개 검증, 관리비 71개 검증, 청약·분양 97개 검증, 오피스텔 전월세와 도로명주소 일부 미승인/대기.
+- `data/news.json` 최신 조회 시 묶음 **160개**, 해당 시점 AI 통계 `created=18`, `reused=140`, `awaiting_body=26`. 숫자를 영구 사양처럼 고정하지 말고 실행마다 재확인.
+- `data/new_trades.json`은 **첫 발견일과 자료 수집 시각**을 보유; 정확한 신고일·공식 공개일과 혼동하지 말 것.
 - Android 알림 테스트는 통과한 APK라도 **실기기 알림 권한 UI / 소리·배터리 제한 / OS 설정**은 실제 폰에서 별도 검증해야 한다.
 
 ## 5. 기존에 재발한 심각한 회귀 — 반드시 예방
@@ -66,9 +66,9 @@
 2. 출처·조회 계약연월이 각 카드에 다시 나옴 → 반복 삭제 규칙 고정.
 3. 계약문자 **'기타 상세 특약은 본계약 시 협의 기재'**가 빠짐 → 기본 생성기 필수.
 4. 뉴스 AI 사용 중 화면에 **'생성형 AI 아님'** 오래된 안내, 3문장 시각 구분 누락 → v1.18.1~1.18.2~1.19.0 보정.
-5. 앱 버전명 \`v1.10\` 고정 → v1.19.5부터 OS 설치 버전에서 직접 읽음.
+5. 앱 버전명 `v1.10` 고정 → v1.19.5부터 OS 설치 버전에서 직접 읽음.
 6. NEIS HTTP 500을 인증 실패로 단정하거나, API key 등록만으로 학교 자료 수집 완료라고 주장하지 말 것.
-7. \`README.md\` 과거 버전 기준 문서와 실제 소스를 혼동하지 말 것.
+7. `README.md` 과거 버전 기준 문서와 실제 소스를 혼동하지 말 것.
 
 ## 6. 미완성, 미검증, 앞으로 고려할 항목
 - **앱 종료 상태에서 즉시 휴대폰에 도착하는 푸시**: 미구현. 향후 FCM + 기기 토큰 보안 저장 + 최소 무료 백엔드 + 인증/권한/개인정보 처리 설계 필요. 로컬 알림과 구분.
@@ -79,9 +79,9 @@
 - UI 동작·학군·Android 13/16 알림은 **실사용 휴대폰에서 추가 테스트** 필요. CI 성공을 실기기 사용 확인으로 과장하지 않는다.
 
 ## 7. 다음 AI가 처음 시작할 때 할 순서
-1. \`AGENTS.md\`, \`docs/PRODUCT_REQUIREMENTS.md\`, \`docs/PROJECT_HISTORY.md\`, \`docs/RECOVERY_PLAYBOOK.md\`를 읽고 변동 여부를 점검.
-2. 현재 \`main\` 최종 커밋, \`app/build.gradle\` 버전, GitHub Actions 빌드 상태, 해당 Releases APK 존재를 확인; **새 릴리스가 더 최근이라면 이 문서의 '2026-10-21' 정보보다 그것을 우선**.
+1. `AGENTS.md`, `docs/PRODUCT_REQUIREMENTS.md`, `docs/PROJECT_HISTORY.md`, `docs/RECOVERY_PLAYBOOK.md`를 읽고 변동 여부를 점검.
+2. 현재 `main` 최종 커밋, `app/build.gradle` 버전, GitHub Actions 빌드 상태, 해당 Releases APK 존재를 확인; **새 릴리스가 더 최근이라면 이 문서의 '2026-10-21' 정보보다 그것을 우선**.
 3. 변경하는 기능의 실제 JS/Java/Python/data 파일과 기존 테스트를 읽고, 테스트에서 요구사항을 보호하도록 수정 후 코드 변경.
 4. 배포 성공 및 직접 검증 가능한 결과만 사용자에게 보고. 릴리스 태그만 존재해도 테스트 실패면 성공이라 하지 말 것.
 5. 변경 후 이 인수인계 문서·[요구사항](PRODUCT_REQUIREMENTS.md)·[개발 이력](PROJECT_HISTORY.md)·[AI 변경 로그](CHANGE_LOG_FOR_AI.md) 갱신.
-6. 대화/기억이 통째로 사라졌다면 \`docs/RECOVERY_PLAYBOOK.md\`의 'AI 재시작 프롬프트'를 읽고, GitHub 원본 및 사용자가 보유한 채팅 내보내기/개인자료 백업본을 추가 대조한다.
+6. 대화/기억이 통째로 사라졌다면 `docs/RECOVERY_PLAYBOOK.md`의 'AI 재시작 프롬프트'를 읽고, GitHub 원본 및 사용자가 보유한 채팅 내보내기/개인자료 백업본을 추가 대조한다.
