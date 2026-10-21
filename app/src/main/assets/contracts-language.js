@@ -218,7 +218,7 @@ function recognize(raw){
  // "오늘 500", "금일 천만원", and "(계약금의 일부 1,000만원)" are advance payments, not total deposit.
  if(!advance)advance=amountAfter(s,['오늘(?:은|에|부터)?','금일(?:은|에)?','당일(?:은|에)?','오늘\\s*입금','금일\\s*송금']);
  if(!advance){
-  const m=s.match(/계약금(?:의|중)?\s*일부\s*\(?\s*([\d,.일이삼사오육륙칠팔구한십백천억만원\s]+?)\s*\)?(?=\s*(?:가|를|을|은|는|로|으로|송금|이체|입금|보내|[),.;]|$))/);
+  const m=s.match(/계약금(?:의|중)?\s*일부\s*\(?\s*([\d,]+(?:억|천|백|만원|만|원)?|[일이삼사오육륙칠팔구한십백천억만원]+)\s*\)?/);
   const n=m?moneyPart(m[1]):null;
   if(n!==null)advance={amount:n,raw:m[1]};
  }
@@ -300,8 +300,8 @@ function recognize(raw){
  // Broker shorthand: "집주인 김철수 / 세입자 이영희".
  const owner=s.match(/(?:집주인|임대인|매도인)\s*[:：]?\s*([가-힣]{2,4})(?=\s|$|[,.;/])/);
  const buyer=s.match(/(?:세입자|임차인|매수인)\s*[:：]?\s*([가-힣]{2,4})(?=\s|$|[,.;/])/);
- if(owner)apply('owner',owner[1],found);
- if(buyer)apply('buyer',buyer[1],found);
+ if(owner&&!/^(?:계좌|계약|송금|명의|은행|예금주)$/.test(owner[1]))apply('owner',owner[1],found);
+ if(buyer&&!/^(?:계좌|계약|송금|명의|은행|예금주)$/.test(buyer[1]))apply('buyer',buyer[1],found);
  // Warn on a separately dictated remaining balance that differs from the calculated balance.
  const spokenBalance=amountAfter(s,['최종\\s*잔금','남은\\s*잔금','잔금액','잔금금액']);
  const computed=base._test.collect();
@@ -309,7 +309,7 @@ function recognize(raw){
   review.push('말씀하신 잔금 '+spokenBalance.amount.toLocaleString('ko-KR')+'만원과 자동 계산 금액 '+computed.balance.toLocaleString('ko-KR')+'만원이 다릅니다. 확인하세요.');
  }
  if(val('price'))smart.changed({target:E('price')}); // Derive the 10% default when missing.
- if(val('property'))smart.onOpen();
+ if(val('property')&&!validAddress)smart.onOpen();
  base.updateSummary();
  return {found,review};
 }
