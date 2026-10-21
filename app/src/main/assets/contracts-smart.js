@@ -10,7 +10,7 @@ const edited=new Set();
 let autoDeposit=null, acceptedComplex='', alerts=[], candidates=[];
 let mute=false;
 function key(v){
- return String(v||'').normalize('NFKC').toLowerCase().replace(/더\s*샵/g,'더샵').replace(/블럭|블록|bl\b|block/g,'bl')
+ return String(v||'').normalize('NFKC').toLowerCase().replace(/퍼스트팍|퍼팍|프팍/g,'퍼스트파크').replace(/마뷰|마스터뵤/g,'마스터뷰').replace(/더\s*샵/g,'더샵').replace(/블럭|블록|bl\b|block/g,'bl')
  .replace(/송도|인천|광역시|연수구|아파트|주상복합|더샵/g,'')
  .replace(/[^가-힣a-z0-9]/g,'');
 }
