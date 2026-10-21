@@ -72,6 +72,23 @@ eq('account','123-456-78901');
 eq('accountHolder','김영희');
 reset();
 tryNote('퍼스트파크 1501동 1203호 전세 3억9천 잔금일 2026년 12월 30일');
-assert(!el('ct_address').value,'Block cannot be invented');
-assert(!el('ct_property').value||el('ct_languageWarnings').textContent.includes('단지명'));
+eq('property','퍼스트파크 15블럭');
+eq('address',catalog[1].address);
+assert(el('ct_languageWarnings').textContent.includes('앞 두 자리'));
 console.log('Natural-language contract extraction passed: mixed colloquial sentences, spoken numbers, unique blocks, partial dates, monthly rent, accounts, balances.');
+
+for(const [family,blocks,prefix] of [['퍼스트파크',[13,14,15],'f'],['마스터뷰',[21,22,23],'m']]){
+ for(const b of blocks)if(!catalog.some(x=>x.id===prefix+b))catalog.push({id:prefix+b,label:family+' '+b+'블럭',address:'인천 연수구 테스트로 '+b,aliases:[]});
+ for(const b of blocks){
+  reset();tryNote((prefix==='f'?'퍼팍':'마뷰')+' '+b+'02동 903호 전세 5억');
+  eq('property',family+' '+b+'블럭');eq('unit',b+'02동 903호');
+ }
+}
+reset();tryNote('마뷰2301동 1002호 전세 5억');eq('property','마스터뷰 23블럭');
+reset();tryNote('퍼팍 15블럭 1402동 903호 전세 5억');
+assert(!el('ct_address').value);assert(el('ct_languageWarnings').textContent.includes('다릅니다'));
+reset();tryNote('1502동 903호 전세 5억');assert(!el('ct_address').value,'Dong alone cannot identify an apartment family');
+reset();tryNote('퍼팍 2301동 903호 전세 5억');assert(!el('ct_address').value,'Unknown family/block combination must not match');
+reset();tryNote('퍼팍 1402동 또는 1502동 903호 전세 5억');assert(!el('ct_address').value,'Multiple buildings require confirmation');
+reset();tryNote('퍼팍 전세 5억');assert(!el('ct_address').value,'No dong or block means ambiguous');
+console.log('Songdo dong-prefix inference passed: six blocks, attached alias, conflicting block, unknown family and multiple dongs.');

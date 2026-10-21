@@ -127,19 +127,19 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v1.19.0 warm-readable-ui APK
+      - name: Publish successful v1.19.1 warm-readable-ui APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.0.apk
-          unzip -t FirstHyundai-v1.19.0.apk | grep 'No errors detected'
-          if gh release view v1.19.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.1.apk
+          unzip -t FirstHyundai-v1.19.1.apk | grep 'No errors detected'
+          if gh release view v1.19.1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v1.19.0 FirstHyundai-v1.19.0.apk \
+            gh release create v1.19.1 FirstHyundai-v1.19.1.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.19.0 · 따뜻한 화면 · 뉴스 가독성 · 계약문자 개선' \
-              --notes '따뜻한 아이보리·브라운 테마와 둥근 카드, 큰 계약문자 입력·확인 화면을 적용했습니다. 뉴스 핵심 요약을 번호가 있는 문장별 카드로 표시하고 줄바꿈 없는 요약도 분리합니다. 띄어 쓴 계좌번호와 반복된 예금주를 인식하며 전화번호 오인식을 방지합니다. 계약 내용은 기기 안에서 처리합니다. 나이스 재진단은 모든 호출에서 HTTP 500으로 연결 및 키 유효성 확인이 보류되었습니다. 디버그 APK 서명 문제로 재설치가 필요하면 먼저 내 자료를 백업해 주세요.'
+              --title '퍼스트현대 v1.19.1 · 크림 테마 통일 · 동 번호로 블럭 인식' \
+              --notes '크림·살구·브라운 톤을 보조 메뉴, 아파트 상세, 평형·학군, 계약문자, 인증 화면 및 기본 대화상자까지 통일했습니다. 퍼팍 1502동은 15블럭, 마뷰 2301동은 23블럭으로 인식합니다. 알려진 여섯 블럭에만 적용하며 블럭과 동이 충돌하거나 여러 동을 입력하면 확인을 요청합니다. 직접 기재한 소재지를 보존하고 카탈로그 주소와 다르면 표시합니다. 계약 내용은 기기에서만 처리합니다.'
           fi

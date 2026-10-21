@@ -41,7 +41,7 @@ public class LockActivity extends Activity {
 
         ScrollView scroll = new ScrollView(this);
         scroll.setFillViewport(true);
-        scroll.setBackgroundColor(Color.rgb(242, 246, 250));
+        scroll.setBackgroundColor(Color.rgb(247, 237, 223));
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setGravity(Gravity.CENTER_VERTICAL);
@@ -51,7 +51,7 @@ public class LockActivity extends Activity {
         TextView title = new TextView(this);
         title.setText("퍼스트현대");
         title.setTextSize(29);
-        title.setTextColor(Color.rgb(23, 59, 96));
+        title.setTextColor(Color.rgb(128, 80, 51));
         title.setGravity(Gravity.CENTER);
         title.setTypeface(null, 1);
         root.addView(title);
@@ -59,7 +59,7 @@ public class LockActivity extends Activity {
         TextView detail = new TextView(this);
         detail.setText("가족 전용 부동산 정보센터\n접근 보안코드를 입력해 주세요.");
         detail.setTextSize(15);
-        detail.setTextColor(Color.rgb(70, 93, 113));
+        detail.setTextColor(Color.rgb(112, 88, 65));
         detail.setGravity(Gravity.CENTER);
         detail.setPadding(0, dp(18), 0, dp(26));
         root.addView(detail);
@@ -76,6 +76,8 @@ public class LockActivity extends Activity {
         Button unlock = new Button(this);
         unlockButton = unlock;
         unlock.setAllCaps(false);
+        unlock.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(137, 87, 55)));
+        unlock.setTextColor(Color.WHITE);
         unlock.setText("인증하고 앱 열기");
         LinearLayout.LayoutParams buttonParams =
                 new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(54));

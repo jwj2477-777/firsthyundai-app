@@ -165,8 +165,27 @@ function recognize(raw){
  const found=[],review=[];
  const deal=/월세|반전세|반 전세|월차임/.test(s)?'월세':/매매|매도|매수|팔기로|사기로/.test(s)?'매매':/전세|임차|임대/.test(s)?'전세':null;
  if(deal&&(!val('price')||!val('unit'))&&E('dealType')){E('dealType').value=deal;found.push({id:'dealType',value:deal,source:'문맥'});}
- const block=s.match(/(?:^|[^0-9])(\d{1,2})\s*(?:블럭|블록|bl\b|block\b)/i);
- const buildings=apartmentCandidates(s).filter(x=>{
+ let block=s.match(/(?:^|[^0-9])(\d{1,2})\s*(?:블럭|블록|bl\b|block\b)/i);
+ // Only known Songdo families use this dong-prefix rule. A number alone is insufficient.
+ const normalized=key(s);
+ const families=[['퍼스트파크',['13','14','15']],['마스터뷰',['21','22','23']]].filter(([name])=>normalized.includes(name));
+ const dongs=[...new Set(Array.from(s.matchAll(/(?<!\d)(\d{4})\s*동/g),m=>m[1]))];
+ let searchText=s, blockConflict=false;
+ if(families.length===1&&dongs.length===1){
+  const [family,allowed]=families[0],prefix=dongs[0].slice(0,2);
+  if(allowed.includes(prefix)){
+   if(block&&block[1]!==prefix){
+    blockConflict=true;
+    review.push('입력한 '+block[1]+'블럭과 '+dongs[0]+'동의 블럭('+prefix+'블럭)이 다릅니다. 단지·동을 확인해 주세요.');
+   }else if(!block){
+    block=['',prefix];searchText=family+' '+prefix+'블럭 '+s;
+    review.push(dongs[0]+'동의 앞 두 자리로 '+family+' '+prefix+'블럭을 추정했습니다. 단지와 주소를 확인해 주세요.');
+   }
+  }else{blockConflict=true;review.push('이 단지의 알려진 블럭과 동 번호가 맞지 않습니다. 단지를 직접 확인해 주세요.');}
+ }else if(families.length>1||families.length&&dongs.length>1){
+  blockConflict=true;review.push('여러 단지 또는 동이 입력되었습니다. 계약 대상 한 곳을 확인해 주세요.');
+ }
+ const buildings=(blockConflict?[]:apartmentCandidates(searchText)).filter(x=>{
   if(!block)return true;
   const rowBlock=x.row.label.match(/(\d{1,2})\s*(?:블럭|블록|bl\b|block\b)/i);
   return !rowBlock||rowBlock[1]===block[1];
@@ -282,7 +301,10 @@ function recognize(raw){
  }
  if(validAddress&&E('address')){
   if(!val('address'))apply('address',validAddress,found);
-  else if(val('address')!==validAddress)review.push('입력한 소재지와 등록 단지의 도로명주소가 다릅니다. 실제 소재지를 확인하세요.');
+  else if(val('address')!==validAddress){
+   if(found.some(x=>x.id==='property')){E('address').value=validAddress;found.push({id:'address',value:validAddress,source:'직접 입력한 소재지'});}
+   review.push('입력한 소재지와 등록 단지의 도로명주소가 다릅니다. 직접 입력한 소재지를 확인하세요.');
+  }
  }
  // Account: a bank-name + plausible account-number + Korean payee name is high-confidence, even without an "account" label.
  const bankName='(?:KB\\s*)?(?:국민|신한|우리|하나|농협|기업|카카오|토스|새마을|우체국|수협|SC|부산|대구|경남|전북|광주|제주|케이뱅크)(?:은행)?';
