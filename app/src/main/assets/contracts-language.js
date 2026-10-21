@@ -250,13 +250,37 @@ function recognize(raw){
   if(m){const n=moneyPart(m[1].replace(/\s+/g,''));if(n!==null)advance={amount:n,raw:m[1]};}
  }
  if(advance?.amount!=null)apply('advance',advance.amount,found);
- const interimDate=s.match(/중도금\s*(?:지급일|지급\s*예정일|날짜|일정)\s*[:：]?\s*([^\n;。]+)/);
- if(interimDate){
-  const t=interimDate[1].split(/(?=\s*(?:▶|중도금\s*[:：]|잔금일|잔금\s*[:：]))/)[0].replace(/[.\s]+$/,'').trim();
-  if(t)apply('interimDate',t.slice(0,100),found);
- }
- const interim=amountAfter(s,['중도금(?!\\s*(?:지급일|지급\\s*예정일|일정|날짜))']);
+ // First isolate the interim payment from trailing dates. E.g., 4억 12년20일
+ // is 4억 plus an unclear date, NOT a malformed monetary amount.
+ const interimContext=/중도금(?!\s*(?:지급일|지급\s*예정일|일정|날짜))\s*(?:은|는)?\s*[:：]?\s*((?:\d[\d,.]*|[일이삼사오육륙칠팔구한십백천]+)\s*(?:억|천|백|만원|만|원))/.exec(s);
+ const explicitInterim=interimContext?moneyPart(interimContext[1]):null;
+ const interim=explicitInterim!==null?{amount:explicitInterim,raw:interimContext[1]}:
+  amountAfter(s,['중도금(?!\\s*(?:지급일|지급\\s*예정일|일정|날짜))']);
  if(interim?.amount!=null)apply('interim',interim.amount,found);
+ const interimLines=String(raw||'').replace(/\r/g,'').split('\n').filter(line=>/중도금/.test(line));
+ for(const line of interimLines){
+  const schedule=line.match(/중도금\s*(?:지급일|지급\s*예정일|날짜|일정)\s*[:：]?\s*(.+)/);
+  if(schedule){
+   const due=schedule[1].split(/(?=\s*(?:▶|잔금일|잔금\s*[:：]))/)[0].trim();
+   if(due){apply('interimDate',due.slice(0,100),found);break;}
+  }
+  if(!interim?.amount)continue;
+  const after=line.slice(line.indexOf('중도금')+3);
+  const malformed=after.match(/(?:^|\s)(\d{1,2})\s*년\s*(\d{1,2})\s*일(?=\s|$|[,.;])/);
+  if(malformed&&Number(malformed[1])<=12){
+   review.push('중도금 일정 "'+malformed[0].trim()+'"은 월/년 표기가 불명확합니다. 실제 지급일을 직접 확인해 주세요.');
+   break;
+  }
+  const token=after.match(/(?:20\d{2}\s*년\s*)?\d{1,2}\s*월\s*\d{1,2}\s*일?|20\d{2}[./-]\d{1,2}[./-]\d{1,2}/);
+  if(token){
+   const d=dateIn(token[0]);
+   if(d){
+    apply('interimDate',d.value,found);
+    if(d.assumed)review.push('중도금 지급일의 연도를 추정했습니다. 실제 날짜를 확인해 주세요.');
+   }
+   break;
+  }
+ }
  const rent=amountAfter(s,['월차임','월세액','월세\\s*금액','월세는','월세']);
  if(deal==='월세'){
   const n=rentCombo?moneyPart(rentCombo[2]):rent?.amount;
