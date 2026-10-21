@@ -129,19 +129,19 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v1.19.3 restored-trade-display-and-standard-contract-terms APK
+      - name: Publish successful v1.19.4 four-renewal-details-restored APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.3.apk
-          unzip -t FirstHyundai-v1.19.3.apk | grep 'No errors detected'
-          if gh release view v1.19.3 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.4.apk
+          unzip -t FirstHyundai-v1.19.4.apk | grep 'No errors detected'
+          if gh release view v1.19.4 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v1.19.3 FirstHyundai-v1.19.3.apk \
+            gh release create v1.19.4 FirstHyundai-v1.19.4.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.19.3 · 실거래 표시·특약 기본문구 복구' \
-              --notes '실거래 최신순·관심단지·새소식 3개 화면에서 전월세 신규계약/갱신계약/미기재, 매매 중개거래/직거래, 중개거래 중개사 소재지를 국토부 원본 근거에 따라 복원했습니다. 카드별 반복 출처와 조회 계약연월은 제거하고 계약일은 유지합니다. 계약문자 특약에는 기타 상세한 특약사항은 본계약서 작성 시 협의하여 기재한다 문구를 기본 포함하고 의미상 중복을 방지합니다. 기존 단지정보·AI 뉴스 3문장 요약·나이스 연동·송금 인식은 유지합니다. 설치 전 내 자료 백업을 권장합니다.'
+              --title '퍼스트현대 v1.19.4 · 갱신계약 4가지 실무정보 복원' \
+              --notes '실거래 전체 최신순·관심단지·새소식 모든 화면에서 갱신계약에만 갱신요구권 사용 여부, 계약기간, 종전 보증금, 종전 월세 네 가지를 금액 및 계약일 아래 작은 보조 영역으로 복구했습니다. 원본에서 제공하지 않는 값은 미기재로 표시하며 원본의 0원은 그대로 보존합니다. 신규계약과 매매에서는 노출되지 않습니다. 이전 v1.19.3의 중개사 소재지, 매매 중개/직거래, 중복 출처 제거, 기본 특약과 기존 뉴스 AI 3문장 등은 모두 유지합니다. 별도의 전용 회귀 테스트로 다음 개편에서도 누락을 방지합니다. 설치 전 내 자료를 백업해 주세요.'
           fi
