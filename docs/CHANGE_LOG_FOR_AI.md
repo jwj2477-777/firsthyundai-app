@@ -3,33 +3,33 @@
 
 ## 2026-10-21 · 기억 손실 대응 / 여러 AI의 협업을 위한 문서화
 - **사용자 요청:** ChatGPT의 이전 대화가 사라지거나 Gemini·Claude 등 모델을 교체하더라도 앱 목적·이력·합의된 요구·수정 진행을 안전하게 이어받을 별도 백업을 원함.
-- **결정:** 공개 저장소 최상단 \`AGENTS.md\`, \`CLAUDE.md\`를 공통 AI 진입점으로 구성. \`docs/AI_HANDOFF.md\`, \`docs/PRODUCT_REQUIREMENTS.md\`, \`docs/PROJECT_HISTORY.md\`, \`docs/RECOVERY_PLAYBOOK.md\`, 이 로그에 검증 가능한 맥락을 분산 보관.
-- **검증:** 현재 \`main\`·최신 성공 릴리스 v1.19.7·아파트/뉴스/학교 공개 JSON·안드로이드 소스 및 CI·기존 README를 비교. **README의 v1.11 기준 서술은 일부 최신 기능과 불일치**하므로 문서 우선순위를 바로잡음.
+- **결정:** 공개 저장소 최상단 `AGENTS.md`, `CLAUDE.md`를 공통 AI 진입점으로 구성. `docs/AI_HANDOFF.md`, `docs/PRODUCT_REQUIREMENTS.md`, `docs/PROJECT_HISTORY.md`, `docs/RECOVERY_PLAYBOOK.md`, 이 로그에 검증 가능한 맥락을 분산 보관.
+- **검증:** 현재 `main`·최신 성공 릴리스 v1.19.7·아파트/뉴스/학교 공개 JSON·안드로이드 소스 및 CI·기존 README를 비교. **README의 v1.11 기준 서술은 일부 최신 기능과 불일치**하므로 문서 우선순위를 바로잡음.
 - **개인정보:** 키 원문, 개인 연락처, 계약/계좌, 가족/관리자 비밀번호, 기기 로컬 메모는 포함하지 않음.
 - **유지관리:** 이후 실제 기능이 바뀌면 구현/테스트/Release와 동시에 문서를 갱신하고 별도 AI 백업본을 다시 발행.
 - **미완료:** 이 문서들만으로 사용자와 AI 사이의 **모든 대화 원문을 100% 복원할 수는 없음**. 사용자 본인의 대화 내보내기/별도 보존이 필요. 로컬 메모도 독립 백업 필요.
 
 ## 2026-10-21 · v1.19.7 — 안드로이드 알림 권한 / 알림센터
 - **이유:** 사용자 휴대폰 '애플리케이션 정보 → 알림: 차단됨, 요청된 권한 없음' 스크린샷.
-- **구현:** Manifest \`POST_NOTIFICATIONS\`, Android 알림 채널, 사용자의 명시적인 켜기/권한 요청, 관심 14개 단지에서 새 거래가 관측됐을 때만 앱 내 팝업과 별도 OS 알림센터에 통지. 가족 인증 잠금 우회 금지.
-- **테스트:** \`scripts/test_android_trade_notifications.js\`, \`scripts/test_favorite_trade_alerts.js\`, 빌드/릴리스 성공.
+- **구현:** Manifest `POST_NOTIFICATIONS`, Android 알림 채널, 사용자의 명시적인 켜기/권한 요청, 관심 14개 단지에서 새 거래가 관측됐을 때만 앱 내 팝업과 별도 OS 알림센터에 통지. 가족 인증 잠금 우회 금지.
+- **테스트:** `scripts/test_android_trade_notifications.js`, `scripts/test_favorite_trade_alerts.js`, 빌드/릴리스 성공.
 - **한계:** 앱 완전 종료 중 서버에서 보내는 실시간 푸시 FCM은 없음. 허용된 OS 권한만으로 동작하는 실시간 수신이라 주장하지 말 것.
 
 ## 2026-10-21 · v1.19.6 — 14개 관심 단지 '새 실거래' 팝업
 - **이유:** 사용자가 자신이 실무로 자주 다루는 14개 단지에 새 거래가 등장하면 알려달라고 요청.
-- **구현:** 기존 공개 \`new_trades.json\` 첫 관측일 기반, 저장소별 최초 스냅샷 기준/1회 중복방지, 각 블럭 독립 매칭, 관심단지 신규 거래 화면 이동 및 알림 끄기.
-- **테스트:** \`scripts/test_favorite_trade_alerts.js\`.
+- **구현:** 기존 공개 `new_trades.json` 첫 관측일 기반, 저장소별 최초 스냅샷 기준/1회 중복방지, 각 블럭 독립 매칭, 관심단지 신규 거래 화면 이동 및 알림 끄기.
+- **테스트:** `scripts/test_favorite_trade_alerts.js`.
 - **한계:** GitHub 자동 수집 시각/실제 정부 공식 공개일은 다름.
 
 ## 2026-10-21 · v1.19.5 — 버전 표시 오류 복구
-- **이유:** 실제 최신 APK에서도 하단에 \`v1.10\`이 나오던 하드코딩 회귀.
-- **구현:** 설치된 실제 Android 패키지의 \`versionName\`/\`versionCode\`를 읽어 하단/보안/잠금 화면에 표기.
-- **테스트:** \`scripts/test_app_version.js\`, \`scripts/check_apk_version.py\`.
+- **이유:** 실제 최신 APK에서도 하단에 `v1.10`이 나오던 하드코딩 회귀.
+- **구현:** 설치된 실제 Android 패키지의 `versionName`/`versionCode`를 읽어 하단/보안/잠금 화면에 표기.
+- **테스트:** `scripts/test_app_version.js`, `scripts/check_apk_version.py`.
 
 ## 2026-10-21 · v1.19.4 및 v1.19.3 — 실거래 상세/특약 복구
 - **이유:** 화면 개편 중 갱신계약 표시/중개사 소재지/출처 중복과 기본 특약이 반복 누락됨.
 - **구현:** v1.19.3 거래유형·갱신 배지·중개사 지역/반복 출처 삭제/기본 특약 복구. v1.19.4에서 **갱신요구권 사용, 계약기간, 종전 보증금, 종전 월세** 4정보 추가; 0과 미기재 구분.
-- **테스트:** \`scripts/test_trade_contract_regression.js\` (세 실거래 렌더러, 계약문자 미리보기).
+- **테스트:** `scripts/test_trade_contract_regression.js` (세 실거래 렌더러, 계약문자 미리보기).
 
 ## 2026-10-21 · v1.19.0~v1.19.2 — 따뜻한 전체 UI/단지 및 문장별 뉴스
 - **목표:** 부모님도 읽기 편한 심플 모던 + 따뜻한 크림·브라운; 퍼팍/마뷰 동번호 블럭 식별. 건축물대장·관리비를 실무형 카드로.
@@ -46,7 +46,7 @@
 ---
 **다음 항목 작성 템플릿**
 
-\`\`\`md
+```md
 ## YYYY-MM-DD · vX.Y.Z — 기능명
 - 사용자 요청 / 문제:
 - 구현 코드와 영향 범위:
@@ -56,4 +56,4 @@
 - GitHub Actions 실행 및 Release:
 - 미완료 / 오류 / 다음 담당자 TODO:
 - AI 인수인계 및 요구사항 문서 갱신 여부:
-\`\`\`
+```
