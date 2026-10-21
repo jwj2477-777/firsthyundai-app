@@ -1518,9 +1518,12 @@ function renderNews(){
     escapeHtml(src.title))+'<div class="tiny">'+escapeHtml(src.publisher)+' · '+
     escapeHtml(prettyTime(src.published_at))+'</div></li>';
   }).join('');
+  const summarySentences=ai?String(x.summary).split(/\r?\n/).map(part=>part.trim()).filter(Boolean):[];
   const content=ai?'<div class="newsAiBody" aria-label="기사 핵심 요약">'+
-   String(x.summary).split(/\r?\n/).map(part=>part.trim()).filter(Boolean)
-    .map(part=>'<p class="newsAiSentence">'+escapeHtml(part)+'</p>').join('')+'</div>':
+    summarySentences.slice(0,3).map(part=>'<p class="newsAiSentence">'+escapeHtml(part)+'</p>').join('')+'</div>'+
+    (summarySentences.length>3?'<details class="details"><summary>기존 요약의 추가 문장 보기</summary>'+
+     summarySentences.slice(3).map(part=>'<p class="newsAiSentence">'+escapeHtml(part)+'</p>').join('')+'</details>':''):
+    '<p class="newsAwaiting">기사 본문 확보 또는 요약 검증이 완료되지 않았습니다. 아래 원문을 확인해 주세요.</p>';
     '<p class="newsAwaiting">기사 본문 확보 또는 요약 검증이 완료되지 않았습니다. 아래 원문을 확인해 주세요.</p>';
   return '<article class="item"><div class="tagbox"><span class="pill">'+
    escapeHtml(x.category)+'</span><span class="pill '+(ai?'':'gray')+'">'+
