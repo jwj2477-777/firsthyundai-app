@@ -1,0 +1,34 @@
+/* Warm, readable surfaces shared across the existing app. */
+:root{--navy:#765543;--blue:#875b42;--light:#f5efe7;--slate:#756c63;--border:#e6ddd2;--ink:#342e29;--orange:#a76532}
+body{background:#f7f4ef;color:var(--ink)}
+header{background:linear-gradient(125deg,#654b3d,#8c6b51);padding-top:26px;padding-bottom:25px}
+header p,.eyebrow{color:#f2e4d3}.officeMark{background:#fffaf3;border-color:#e6d4bf;box-shadow:none}
+main{padding-top:18px}.panel,.item{border-color:var(--border);border-radius:20px;box-shadow:0 3px 14px #59412808}
+.panel{padding:18px}.primaryNav button{border-color:var(--border);border-radius:18px;color:#685342;box-shadow:0 2px 8px #59412806}
+.primaryNav button.active,.tabs button.active,.nearbyFacilityButtons button.active{background:#765543;border-color:#765543;color:#fff}
+.btn{border-radius:13px;background:#765543;color:#fff;min-height:46px}.btn.alt{background:#f3ece3;color:#634936;border-color:#ddcebd}.btn.danger{background:#a63e36;color:#fff}
+input,select,textarea{border-color:#d8cdbf;border-radius:12px;background:#fffefa;color:#342e29;min-height:44px}
+input:focus,select:focus,textarea:focus{outline:2px solid #9b785a;outline-offset:2px}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #9b785a;outline-offset:3px}
+.pill{background:#eee3d5;color:#6b4b32;border-radius:9px}.pill.gray{background:#f0ece6;color:#696158}
+.apiNotice,.contractReview,.contractInfo{background:#f7f1e9;border-color:#e1d3c2;color:#665342}
+.apiInfoCards article,.apiSchools>div,.nearbyFacilityItem{border-color:var(--border);border-radius:14px}
+.details{border-color:var(--border)}.details summary{padding:10px 0;min-height:44px;color:#71543f}
+.item.newsCard{padding:20px;margin:14px 0;border:1px solid #e5dacc;background:#fffefa}
+.newsCard h3{font-size:19px;line-height:1.55;letter-spacing:-.45px;margin:14px 0}
+.newsSummaryLabel{font-size:12px;font-weight:800;color:#876247;letter-spacing:.5px;margin:16px 0 8px}
+.newsCard .newsAiBody{counter-reset:news-point;gap:0;background:#f5efe6;border-radius:15px;padding:5px 15px;margin:0 0 15px}
+.newsCard .newsAiBody .newsAiSentence{position:relative;counter-increment:news-point;font-size:16px;line-height:1.8;padding:14px 0 14px 31px;margin:0;word-break:keep-all;overflow-wrap:anywhere;color:#3e352e}
+.newsCard .newsAiBody .newsAiSentence:before{content:counter(news-point);position:absolute;left:0;top:18px;width:21px;height:21px;border-radius:50%;background:#e4d3bd;color:#65482e;font-size:12px;line-height:21px;text-align:center;font-weight:800}
+.newsCard .newsAiSentence+.newsAiSentence{border-color:#e4d9ca}.newsCard .meta{font-size:12px;line-height:1.7;color:#796e62}
+.contractHero h2{color:#4b382c;font-size:25px}.contractHero p{line-height:1.8;color:#746659}
+.contractSteps{display:flex;gap:8px;padding:0;list-style:none;margin:16px 0 22px}.contractSteps li{flex:1;padding:10px 4px;border-radius:12px;background:#eee4d6;color:#6a4e37;font-size:13px;font-weight:750;text-align:center}
+#contracts .contractSection{font-size:19px;color:#503a29;margin-bottom:14px}
+#contracts .contractHint{line-height:1.8;color:#75695e}#contracts .inputLabel{font-size:15px;margin:15px 0 9px}
+#ct_rough{min-height:190px;padding:16px;font-size:17px;line-height:1.85;background:#fffdf8;border:1px solid #d9cbb8}
+.contractEasyActions{gap:10px;margin-top:14px}.contractEasyActions .btn{min-height:56px;font-size:16px}
+.contractPolishToggle{padding:12px;border-radius:12px;background:#f7f2eb;line-height:1.7}.contractPolishToggle input{min-height:22px;accent-color:#765543}
+.contractManual,.contractCompactDetails{border-color:#e1d5c5;border-radius:14px;background:#fffcf7}.contractManual>summary,.contractCompactDetails>summary{padding:15px;color:#71523a;min-height:48px}
+#ct_resultPanel .contractPreview{font-size:17px;line-height:1.9;background:#fffdf8;border-color:#d5c3ab;padding:16px;min-height:420px}
+.contractMoneySummary{background:#f5ecdf;border-color:#decdb8}.contractOneTapStatus{line-height:1.8;padding:12px;border-radius:12px}
+@media(max-width:430px){main{padding-left:12px;padding-right:12px}.item.newsCard,.panel{padding:16px}.newsCard .newsAiBody{padding:3px 12px}.contractEasyActions{grid-template-columns:minmax(0,1fr) 100px}.contractEasyActions .btn{font-size:14px}.contractSteps li{font-size:12px}}

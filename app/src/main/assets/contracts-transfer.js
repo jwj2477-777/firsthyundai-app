@@ -14,11 +14,12 @@ const dateRanges=t=>[
 const overlap=(a,b,range)=>range.some(([s,e])=>a<e&&b>s);
 function accountCandidates(text){
  const results=[];
- const rx=/\d{2,8}(?:-\d{2,8}){1,4}|\d{10,16}/g; // A separated transfer amount cannot merge into the account
+ const rx=/\d{2,8}(?:-\d{2,8}){1,4}|\d{3,6}[ \t]+\d{2,6}[ \t]+\d{5,8}(?!\d)|\d{10,16}/g; // A separated transfer amount cannot merge into the account
  const dates=dateRanges(text);
  let m;
  while((m=rx.exec(text))){
   const numbers=m[0].replace(/\D/g,'');
+  if(/^01[016789]\d{8}$/.test(numbers))continue;
   if(numbers.length<10||numbers.length>16||overlap(m.index,rx.lastIndex,dates))continue;
   if(text[rx.lastIndex]==='호'||text[rx.lastIndex]==='동')continue;
   const left=text.slice(Math.max(0,m.index-20),m.index);
@@ -48,7 +49,7 @@ function bankCandidates(text,account){
 function holderCandidate(text,account,bank){
  const explicit=/(?:예금주|계좌주|입금\s*받는\s*분|입금\s*받을\s*분|수취인|명의자)\s*[:：]?\s*([가-힣]{2,5})/g;
  let m,explicitList=[];
- while((m=explicit.exec(text)))if(!reserved.test(m[1]))explicitList.push({value:m[1],score:150,pos:m.index});
+ while((m=explicit.exec(text)))if(!reserved.test(m[1])&&!explicitList.some(x=>x.value===m[1]))explicitList.push({value:m[1],score:150,pos:m.index});
  if(explicitList.length===1)return {value:explicitList[0].value,confidence:'explicit'};
  if(explicitList.length>1)return {value:null,warning:'예금주가 여러 명 언급되어 확인이 필요합니다.'};
  if(!account)return {value:null};

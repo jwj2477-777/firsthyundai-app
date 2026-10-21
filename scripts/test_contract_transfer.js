@@ -60,3 +60,10 @@ const snap=JSON.parse(fs.readFileSync(path.join(root,'data/public_services.json'
 assert(['awaiting_key','verified'].includes(snap.schools.state));
 assert(snap.school_zones.records.length===0);
 console.log('Transfer permutation regression passed: 24 field orders, Korean words, labels, account safety, explicit review, no false assigned schools.');
+compose('우리은행 1002 999 123456 예금주 가상인 오늘 500만원 송금');
+assert.equal(el('ct_account').value,'1002999123456','Spaced account is extracted without the transfer amount');
+assert.equal(el('ct_advance').value,'500');
+assert.equal(el('ct_accountHolder').value,'가상인');
+let spaced=transfer.packet('우리은행 1002 999 123456 예금주 가상인 예금주 가상인 오늘 500만원');
+assert.equal(spaced.holder,'가상인','Repeated identical payee is not ambiguous');
+assert.equal(transfer.packet('국민은행 연락처 010-1234-5678').account,null,'Phone number cannot become an account');

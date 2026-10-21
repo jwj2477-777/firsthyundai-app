@@ -51,3 +51,7 @@ const news=JSON.parse(fs.readFileSync(path.join(root,'data/news.json'),'utf8'));
 const ai=news.briefs.filter(b=>['gemini_article','groq_article','openai_article'].includes(b.summary_method)&&typeof b.summary==='string'&&b.summary.trim().length>=20);
 assert(ai.length>0,'Published news should retain AI summaries, not accidentally erase them');
 console.log('News UI regression passed. Published AI summaries: '+ai.length+'/'+news.briefs.length);
+out=render({state:'ok',briefs:[{...data[0],summary:'금리는 3.5%로 발표했습니다. 거래량은 증가했습니다. 일정은 확인 중입니다.'}]});
+assert.equal((out.match(/class="newsAiSentence"/g)||[]).length,3,'Single paragraph is separated into three readable facts');
+assert(out.includes('3.5%'),'Decimal values remain intact');
+assert(out.includes('newsCard')&&out.includes('핵심 요약'));
