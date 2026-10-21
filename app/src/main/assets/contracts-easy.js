@@ -68,8 +68,8 @@ function isDealField(line){
 }
 function extractSpecial(raw){
  const text=String(raw||'').replace(/\r/g,'');
- const marker=/(?:특약(?:사항)?|합의사항|추가\s*조건|별도\s*합의)(?:은|는|으로는|은요)?\s*(?:[:：-]\s*|\s+)/;
- const lines=text.split('\n'),collected=[];
+ // The header may appear mid-sentence: '... 기간 2년. 특약은 ...'.
+ const lines=text.replace(/(?:[.;]\s*|\s+)(?=특약(?:사항)?(?:은|는|으로는|은요)?(?:[:：-]|\s))/g,'\n').split('\n'),collected=[];
  let section=false,everLabel=false;
  for(const rawLine of lines){
   let line=rawLine.trim();
