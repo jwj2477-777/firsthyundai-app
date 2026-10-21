@@ -48,7 +48,7 @@ input('퍼스트팍 15블럭 1501동 1203호 전세 삼억구천, 오백 먼저 
 eq('property','퍼스트파크 15블럭');
 eq('address',data[1].address);
 eq('price','39000');eq('contractDeposit','3900');eq('advance','500');eq('leaseDuration','2년');
-assert(e('ct_preview').value.includes('▶ 약정 계약금 : 3,900만원'));
+assert(e('ct_preview').value.includes('▶ 계약금 : 3,900만원'));
 eq('terms','임대인이 도배 해주기로 한다.');
 assert.equal(e('ct_termOriginal').textContent,'임대인이 도배 해주는 걸로');
 assert.equal(e('ct_resultPanel').classList.contains('hidden'),false);
@@ -67,7 +67,7 @@ input('파크애비뉴 1601동 901호 매매 8억 계약금 전체는 8천 중�
 eq('account','');eq('bank','');eq('accountHolder','');eq('terms','');
 eq('price','80000');eq('contractDeposit','8000');eq('advance','1000');eq('interim','20000');
 assert(e('ct_preview').value.includes('▶ 중도금 : 20,000만원'));
-assert(e('ct_preview').value.includes('▶ 최종 잔금 : 52,000만원'));
+assert(e('ct_preview').value.includes('▶ 잔금 : 52,000만원'));
 // Missing interim amount must never produce an empty row.
 input('월세 파크애비뉴 1601동 901호 2천에 150 먼저 오백 보내 잔금 2026년 12월 30일 기간 2년, 특약은 반려동물 안돼');
 eq('price','2000');eq('monthlyRent','150');eq('advance','500');
@@ -83,7 +83,7 @@ eq('contractDeposit','1950');
 assert(e('ct_languageWarnings').textContent.includes('5%'));
 input('퍼스트파크 15블럭 1501동 1203호 전세 3억9천, 계약금 10%, 선입금 500만원 잔금 2026.12.30 기간 2년');
 eq('contractDeposit','3900');
-assert(e('ct_preview').value.includes('▶ 약정 계약금 : 3,900만원'));
+assert(e('ct_preview').value.includes('▶ 계약금 : 3,900만원'));
 e('ct_rough').value='';
 assert.equal(easy.compose(),false);
 assert(alerts.some(a=>a.includes('먼저 메모')));
