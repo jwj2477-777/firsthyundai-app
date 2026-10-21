@@ -92,6 +92,7 @@ public class MainActivity extends Activity {
 
     @Override protected void onResume() {
         super.onResume();
+        updateNotificationPermissionUI();
         final String activeAdmin=adminSessionIdentity;
         if(activeAdmin!=null && !activeAdmin.isEmpty()) {
             io.execute(()->{
