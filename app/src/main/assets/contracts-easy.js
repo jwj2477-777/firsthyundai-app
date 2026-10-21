@@ -47,20 +47,53 @@ function inferImplicitSpecials(text){
  }
  return result.join('\n').slice(0,6000);
 }
+// Real payment information always takes precedence over a "특약" heading.
+// Bank/account rows are not promises merely because they occur after the heading.
+function isPaymentLine(line){
+ const s=String(line||'').trim().replace(/^[▶→•※\s]+/,'');
+ const bank=/(?:국민|신한|우리|하나|농협|기업|카카오|토스|새마을|우체국|수협|SC제일|부산|대구|경남|전북|광주|제주|케이)(?:은행|뱅크|금고)?/;
+ const account=/\d{2,8}(?:-\d{2,8}){1,4}|\d{10,16}/;
+ if(account.test(s)&&(bank.test(s)||/계좌|예금주|송금|입금|명의/.test(s)))return true;
+ if(/^(?:은행|예금주|계좌번호|입금계좌|송금계좌|송금액|입금액|선입금|이번\s*송금)\s*[:：]/.test(s))return true;
+ // Account lines containing bank, payee and an amount with no "계좌" label.
+ if(bank.test(s)&&account.test(s))return true;
+ return false;
+}
+function isDealField(line){
+ const s=String(line||'').trim().replace(/^[▶→•\s]+/,'');
+ if(/^(?:매매대금|매매가|매매금액|전세보증금|보증금|계약금|중도금|월세|차임)\s*[:：]?\s*[\d일이삼사오육륙칠팔구십백천]/.test(s))return true;
+ if(/^(?:잔금일?|중도금\s*지급일|계약(?:서)?\s*작성일?|본계약|입주일|만기일)\s*[:：]?\s*(?:\d|추후|미정)/.test(s))return true;
+ if(/^(?:소재지|주소|단지명|아파트명|동호수)\s*[:：]/.test(s))return true;
+ return false;
+}
 function extractSpecial(raw){
  const text=String(raw||'').replace(/\r/g,'');
- // An explicit "특약/합의사항/추가 조건" label is required to avoid turning narration into obligations.
- const tag=/(?:^|[\n.;]\s*|\s)(?:특약(?:사항)?|합의사항|추가\s*조건|별도\s*합의)(?:은|는|으로는|은요)?\s*(?:[:：-]\s*|\s+)/m;
- const m=tag.exec(text);
- if(!m)return inferImplicitSpecials(text);
- let tail=text.slice(m.index+m[0].length);
- // The pre-agreed payment/cancellation paragraph is a separate section, not a special clause.
- tail=tail.split(/\n(?=\s*(?:※|▶\s*(?:계약금|중도금|잔금|계좌|예금주)|계좌번호|입금계좌|송금계좌|예금주|은행|잔금일|전세보증금|매매대금|계약일)\s*[:：]?\s*)/)[0];
- tail=tail.split(/※\s*(?:금일|오늘|상기|본|위)\s*(?:계약금|내용|조건)/)[0];
- tail=tail.replace(/^\s*(?:은|는)\s*/,'').trim();
- const lines=tail.split(/\n+|(?=→)|(?:\s|^)(?=\d+[.)]\s+)|;\s*|[，,]\s*(?=(?:임대인|임차인|매도인|매수인|잔금|도배|청소|에어컨|반려동물|근저당|현상태|현재|붙박이|하자|특약|계약))/)
-  .map(s=>s.trim().replace(/^[→➜➡•-]\s*/,'')) .filter(Boolean);
- return lines.join('\n').slice(0,6000);
+ const marker=/(?:특약(?:사항)?|합의사항|추가\s*조건|별도\s*합의)(?:은|는|으로는|은요)?\s*(?:[:：-]\s*|\s+)/;
+ const lines=text.split('\n'),collected=[];
+ let section=false,everLabel=false;
+ for(const rawLine of lines){
+  let line=rawLine.trim();
+  if(!line)continue;
+  const header=line.match(/^(?:[▶→•]\s*)?(?:특약(?:사항)?|합의사항|추가\s*조건|별도\s*합의)(?:은|는|으로는|은요)?(?:\s*[:：-]\s*|\s+)?(.*)$/);
+  if(header){
+   section=true;everLabel=true;
+   line=(header[1]||'').trim();
+   if(!line)continue;
+  }
+  if(isPaymentLine(line)||/^\s*※/.test(line)) {
+   // Do not copy bank/accounts or consent/footer paragraphs into special clauses.
+   if(section)section=false;
+   continue;
+  }
+  if(section&&isDealField(line)){section=false;continue;}
+  if(section){
+   // Bank line may be separated by spaces and have unusual number grouping.
+   if(/^\s*(?:국민|신한|우리|하나|농협|기업|카카오|토스|새마을|우체국|수협|SC제일)\s*(?:은행|뱅크|금고)/.test(line)&&/\d/.test(line)){section=false;continue;}
+   collected.push(line.replace(/^[→➜➡•-]\s*/,'').replace(/^\d+[.)]\s*/,''));
+  }
+ }
+ if(!everLabel)return inferImplicitSpecials(text);
+ return collected.filter(Boolean).join('\n').slice(0,6000);
 }
 function polishTerms(text){
  const src=String(text||'').replace(/\r/g,'').trim();
