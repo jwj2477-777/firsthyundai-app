@@ -164,3 +164,46 @@ assert(el('ct_preview').value.includes('▶ 잔금 : 85,000만원'));
 for(const term of ['중도금 및 잔금일 앞당길 수 있다.','매도인은 부서진 곳을 수리해준다.'])assert(el('ct_preview').value.includes(term));
 assert(!el('ct_preview').value.includes('계약금 잔여액'));
 console.log('Unlabeled balance / special terms regression passed with one memo.');
+
+
+// Brokerage memo with a bare "특약" header followed by bank details.
+// All personal details below are synthetic and must never match customer records.
+const negotiatedMemo=[
+ '퍼팍 1502동3004호',
+ '매매 16억',
+ '계약금 6천',
+ '중도금 4억 12월4일',
+ '잔금 1월5일',
+ '',
+ '계약은 10월중 협의',
+ '특약',
+ '화장실는 매도인이 수리해주기로',
+ '애완동물 금지하기로 한다',
+ '',
+ '하나은행 김가람 123-45678-01 500'
+].join('\n');
+el('ct_rough').value=negotiatedMemo;
+assert.equal(easy.compose(),true,'One-memo workflow should complete');
+for(const [id,expected] of [
+ ['property','퍼스트파크 15블럭'],
+ ['unit','1502동 3004호'],
+ ['price','160000'],['contractDeposit','6000'],
+ ['interim','40000'],['bank','하나은행'],
+ ['account','123-45678-01'],['accountHolder','김가람'],
+ ['advance','500'],['contractDate','10월중 협의']
+])assert.equal(el('ct_'+id).value,expected,'Field '+id);
+assert(el('ct_interimDate').value.endsWith('-12-04'),'Interim date extracted');
+assert(el('ct_balanceDate').value.endsWith('-01-05'),'Balance date extracted');
+assert(el('ct_preview').value.includes('▶ 계약일 : 10월중 협의'),'Negotiated signing window visible in SMS and image preview');
+assert(el('ct_preview').value.includes('▶ 잔금 : 114,000만원'),'Deal minus contractual deposit minus interim');
+assert(el('ct_terms').value.includes('화장실는 매도인이 수리해주기로 한다.'));
+assert(el('ct_terms').value.includes('반려동물 금지하기로 한다.'));
+assert.equal(el('ct_terms').value.split('\n').length,2,'Only the two negotiated clauses');
+for(const secret of ['123-45678-01','김가람','하나은행','500']){
+ assert(!el('ct_terms').value.includes(secret),'Transfer row must never leak into special clause: '+secret);
+}
+assert(!el('ct_preview').value.includes('→ 하나은행'),'No accidental banking special term');
+assert(el('ct_preview').value.includes('하나은행 123-45678-01 (예금주 김가람)'));
+assert(el('ct_languageWarnings').textContent.includes('협의 일정'),'Flexible signing schedule should prompt human review');
+assert.equal(easy._test.extractSpecial('특약:\n도배는 매도인이 해주기로\n국민은행 123-456-789012 김철수 700'),'도배는 매도인이 해주기로');
+console.log('Labeled clauses isolated from banking row; flexible contract date and transfer verified.');
