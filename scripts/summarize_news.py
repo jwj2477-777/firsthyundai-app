@@ -233,14 +233,14 @@ def resolve_rss_links(urls):
         print("Google News publisher link decoding unavailable:",type(error).__name__)
     return direct
 
-def compact_summary(sentences):
-    """Validate 3–4 distinct short, complete sentences; do not clip facts."""
+def compact_summary(sentences, *, allow_legacy_four=False):
+    """Accept exactly three new factual sentences; retain historical four-line cache without rewriting facts."""
     if isinstance(sentences,str):
         # Preserve existing JSON-string output as well as the preferred list form.
         source=sentences.strip()
         sentences=source.splitlines() if "\n" in source else re.split(r"(?<=[.!?])\s+",source)
         sentences=[part.strip() for part in sentences if part.strip()]
-    if not isinstance(sentences,list) or not 3<=len(sentences)<=4:
+    if not isinstance(sentences,list) or len(sentences) not in ((3,4) if allow_legacy_four else (3,)):
         return ""
     parts=[]
     for part in sentences:
@@ -272,12 +272,12 @@ def summarize_batch(items, key, opener=None):
     if not source_items:
         return {}
     guide = (
-         "기사 원문에서 확인된 핵심 사실을 3문장으로 나눠 간결하게 정리하세요. 필요하면 4문장까지 가능합니다. "
+         "기사 원문에서 확인된 핵심 사실을 반드시 정확히 3문장으로 나눠 간결하게 정리하세요. 4문장 이상이나 2문장 이하는 허용하지 않습니다. "
         "각 문장은 10~85자이고 마침표로 끝나야 합니다. 전체는 약 90~230자를 권장합니다. "
         '반드시 JSON 객체 {"items":[{"id":"기사ID","sentences":["문장1.","문장2.","문장3."]}]} 형식으로 답하세요. '
         "첫 문장에는 가장 중요한 발표·사건·변화 방향을 쓰세요. "
         "두 번째 문장에는 구체적인 핵심 조치, 수치나 비교를 쓰세요. "
-        "세 번째 또는 네 번째 문장에는 확정된 시행 시기, 일정, 진행 상태, 공식 반응을 쓰세요. "
+        "세 번째 문장에는 확인된 시행 시기, 일정, 진행 상태 또는 공식 반응을 쓰세요. "
         "날짜·금액·퍼센트는 본문에 명시된 것만 사용하세요. 없는 정보를 만들거나 문장을 채우려고 "
         "추측하지 마세요. 논의·건의·발표·확정·시행을 절대 혼동하지 마세요. "
         "같은 내용을 반복하거나 평가·서론을 추가하지 말고, 각 문장은 완결된 사실로 쓰세요. "
@@ -341,7 +341,7 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
     """Enrich as many visible news groups as can be grounded within bounded work.
 
     Fetch article pages concurrently; Gemini groups five texts per API request.
-    Cache only v3 concise multi-sentence summaries matched to the same headline/ID.
+    Reuse matching historical v3 summaries without inventing data; require precisely three sentences in new AI outputs.
     """
     if current.get("schema_version") != 1 or not isinstance(current.get("briefs"), list):
         raise ValueError("Unexpected news data")
@@ -352,7 +352,7 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
         if b.get("summary_method") not in ("gemini_article", "groq_article", "openai_article") or not b.get("summary"):
             continue
         keypair = (b.get("id"), b.get("title"))
-        if b.get("summary_version") == 3 and compact_summary(b["summary"]):
+        if b.get("summary_version") == 3 and compact_summary(b["summary"], allow_legacy_four=True):
             cached[keypair] = b
         else:
             legacy[keypair] = b
