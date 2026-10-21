@@ -69,11 +69,11 @@ def check_format(secret):
     return issues
 
 
-def probe(key=None, *, typ="json", opener=urlopen):
-    args = dict(PARAMS, Type=typ)
+def probe(key=None, *, typ="json", opener=urlopen, endpoint=URL, params=None):
+    args = dict(PARAMS if params is None else params, Type=typ)
     if key is not None:
         args["KEY"] = key
-    req = Request(URL + "?" + urlencode(args), headers={
+    req = Request(endpoint + "?" + urlencode(args), headers={
         "User-Agent": "FirstHyundai-NEIS-Diagnostic/1.0",
         "Accept": "application/json, application/xml",
     })
@@ -151,20 +151,31 @@ def run(secret, opener=urlopen):
         print("진단: 공개 조회가 동작하지만 등록된 키의 요청은 실패했습니다.")
         print("결론: 인증키 값·권한·요청 제한을 우선 점검해야 합니다. 원인 확정은 제공기관 오류코드가 필요합니다.")
         return "suspect"
-    if all(x["http"] == 500 for x in (baseline, bad, real)):
-        print("결론: 정상 키·잘못된 키 여부와 관계없이 HTTP 500입니다.")
-        print("서버 또는 통신망 문제로 키가 맞는지 지금은 판정할 수 없습니다. 키 재발급이 필요하다는 증거는 없습니다.")
-        return "indeterminate"
-    # Try a different response type. A failure here must not be interpreted as invalid key.
+    # Distinguish a schoolInfo gateway error from a service-wide credential failure.
+    # Never print query URLs, secret data or returned school records.
     xml = probe(secret.strip(), typ="xml", opener=opener)
-    print("저장된 키의 XML 방식 조회: " + public(xml))
+    print("저장된 키 · 학교정보 XML 호출: " + public(xml))
     if xml["kind"] == "ok":
-        print("결론: XML 방식에서 등록된 키의 인증이 확인됐습니다. JSON 방식/서비스 장애를 점검하세요.")
+        print("결론: 등록된 키로 나이스 학교정보(XML) 인증에 성공했습니다.")
         return "valid"
     if xml["kind"] == "key_invalid":
-        print("결론: XML 방식에서 나이스 인증키 오류를 받았습니다. 등록된 키를 확인하세요.")
+        print("결론: 나이스에서 등록된 키를 거부했습니다(XML). 비밀키를 대조하세요.")
         return "invalid"
-    print("결론: 현재 API 결과만으로 인증키 오입력 여부를 판정할 수 없습니다.")
+    other_endpoint = "https://open.neis.go.kr/hub/SchoolSchedule"
+    other_params = {"pIndex": 1, "pSize": 5, "ATPT_OFCDC_SC_CODE": "T10", "SD_SCHUL_CODE": "9296071"}
+    other = probe(secret.strip(), typ="json", opener=opener, endpoint=other_endpoint, params=other_params)
+    print("저장된 키 · 다른 나이스 서비스(학사일정): " + public(other))
+    if other["kind"] == "ok":
+        print("결론: 등록된 키가 다른 나이스 서비스에서 정상 동작합니다. 학교정보 API 오류 가능성이 높습니다.")
+        return "valid"
+    if other["kind"] == "key_invalid":
+        print("결론: 다른 나이스 서비스에서 키 인증 오류가 확인됐습니다. 입력한 키를 대조하세요.")
+        return "invalid"
+    if all(x["http"] == 500 for x in (baseline, bad, real, xml, other)):
+        print("결론: 정상 키·잘못된 키·무키·XML·별도 나이스 서비스가 모두 HTTP 500입니다.")
+        print("API 서버 또는 GitHub에서 나이스로 가는 통신망이 공통으로 오류를 반환해 키의 실제 유효성을 판정할 수 없습니다.")
+        return "indeterminate"
+    print("결론: 여러 API 방식에서도 인증키 오입력 여부가 구별되지 않았습니다. NEIS 포털 발급키와 GitHub Secret을 직접 대조해야 합니다.")
     return "indeterminate"
 
 
