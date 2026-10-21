@@ -54,3 +54,11 @@
 .contractFix{width:100%;min-height:46px;margin-bottom:5px}
 #ct_resultPanel .contractPreview{min-height:330px}
 @media(max-width:430px){.contractEasyActions{grid-template-columns:minmax(0,1fr) 112px}.contractEasyActions .btn{padding:8px;font-size:13px}}
+
+/* NEIS public school directory: accessible school-level filters */
+.neisLevelButtons{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
+.neisLevelButtons button{border:1px solid #cddce6;background:#f6f8fa;color:#36516b;padding:9px 13px;border-radius:10px;min-height:42px;font-size:13px;font-weight:650;cursor:pointer}
+.neisLevelButtons button.active{background:#e5f2fc;border-color:#5ca0cf;color:#184d74;font-weight:800}
+.apiSchools>div{padding:11px 5px;border-bottom:1px solid #e8eef2}
+.apiSchools>div:last-child{border-bottom:0}
+.apiSchools>div .tiny{display:block;line-height:1.6;margin-top:2px}
