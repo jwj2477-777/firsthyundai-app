@@ -52,7 +52,7 @@ eq('interim','20000');
 eq('advance','1000');
 app.makePreview();
 assert(el('ct_preview').value.includes('▶ 중도금 : 20,000만원'));
-assert(el('ct_preview').value.includes('▶ 최종 잔금 : 52,000만원'));
+assert(el('ct_preview').value.includes('▶ 잔금 : 52,000만원'));
 reset();
 tryNote('월세 파크애비뉴 1601동 901호 2천에 150, 먼저 오백 보내, 잔금 2026년 12월 30일 기간 2년');
 eq('dealType','월세');
