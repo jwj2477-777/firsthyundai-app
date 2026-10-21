@@ -85,7 +85,15 @@ function moneyCandidates(text,account){
  // This prevents the earlier tokenizer joining "123-456-789012 500" into one number.
  const masked=Array.from(text);
  for(const [start,end] of forbidden)for(let i=start;i<end;i++)masked[i]='§';
- const words=language._test.tokenizeMoney(masked.join(''));
+ const clean=masked.join('');
+ const words=language._test.tokenizeMoney(clean);
+ // Spoken Korean numbers following a different amount sometimes get swallowed
+ // by the old greedy tokenizer, e.g. "계약금 1억200만원 천만원 오늘 입금".
+ for(const m of clean.matchAll(/(?<![가-힣0-9])([일이삼사오육륙칠팔구한십백천]{2,12}(?:만원|만|원)?)(?![가-힣0-9])/g)){
+  const amount=language._test.moneyPart(m[1]);
+  if(amount!==null&&amount>0&&!words.some(t=>t.start===m.index&&t.end===m.index+m[1].length))
+   words.push({amount,start:m.index,end:m.index+m[1].length,raw:m[1]});
+ }
  const unique=[];
  for(const tok of words){
   if(overlap(tok.start,tok.end,forbidden))continue;
