@@ -65,7 +65,7 @@ function formatAmount(row){
   const whole=Math.floor(val/10000),remain=val%10000;
   return whole?(whole+'억'+(remain?' '+remain.toLocaleString('ko-KR')+'만':'')+'원'):(val.toLocaleString('ko-KR')+'만원');
  };
- return row.type==='매매'?formatAmount.maybe||n(row.amount_10k):
+ return row.type==='매매'?n(row.amount_10k):
   row.type==='전세'?'보증금 '+n(row.deposit_10k):
   row.type==='월세'?'보증금 '+n(row.deposit_10k)+' / 월세 '+n(row.monthly_10k):'금액 확인 필요';
 }
