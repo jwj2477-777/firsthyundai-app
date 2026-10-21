@@ -1,3 +1,11 @@
+> **2026-10-21 최신 개발 안내 / AI 인수인계:** 이 README는 프로젝트 초기 **v1.11 무렵의 역사적 설명**을 포함하며, 첫 문단의 빌드·AI 뉴스 상태 등은 **현재 구현 상태와 일치하지 않을 수 있습니다.** 최신 소스/실제 APK 버전/Actions 검증을 먼저 확인하세요.
+>
+> **새 AI(ChatGPT·Gemini·Claude)가 반드시 먼저 읽을 문서:** [AGENTS.md](AGENTS.md) → [AI 전체 인수인계](docs/AI_HANDOFF.md) → [사용자 요구사항](docs/PRODUCT_REQUIREMENTS.md) → [개발 연혁](docs/PROJECT_HISTORY.md) → [비상 복구·백업](docs/RECOVERY_PLAYBOOK.md) → [AI 변경 로그](docs/CHANGE_LOG_FOR_AI.md). 대화 기록이 없어도 프로젝트를 재개할 수 있도록 별도 ZIP·통합 Markdown 백업도 GitHub Release에 보관합니다.
+>
+> [최신 공식 APK 및 AI 백업 내려받기](https://github.com/jwj2477-777/firsthyundai-app/releases) · [GitHub 실행 로그](https://github.com/jwj2477-777/firsthyundai-app/actions)
+>
+> ---
+
 # 퍼스트현대 무료 자동 수집 안드로이드 앱 v1.11.0
 
 > **중요:** 현재 제공 파일은 Android APK *빌드 가능 소스*입니다. 실거래 API 키·GitHub 저장소 연결·자동 실행은 각자 계정에서 설정해야 합니다. 이 작업 환경에서는 실제 APK 컴파일과 실휴대폰 설치 검증을 아직 수행하지 못했습니다. 데이터 파일에는 허위 샘플 거래/뉴스를 넣지 않았습니다.
