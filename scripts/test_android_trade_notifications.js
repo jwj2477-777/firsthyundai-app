@@ -1,0 +1,86 @@
+// Regression: Android 13+ permission, opt-in system alerts and background-push boundary.
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const root=path.resolve(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const manifest=read('app/src/main/AndroidManifest.xml');
+const native=read('app/src/main/java/kr/co/firsthyundai/app/TradeNotifications.java');
+const activity=read('app/src/main/java/kr/co/firsthyundai/app/MainActivity.java');
+const markup=read('app/src/main/assets/index.html');
+const js=read('app/src/main/assets/trade-alerts.js');
+new vm.Script(js);
+assert(manifest.includes('android.permission.POST_NOTIFICATIONS'),'Android notifications permission must be declared in manifest');
+assert(native.includes('Manifest.permission.POST_NOTIFICATIONS'));
+assert(native.includes('Build.VERSION.SDK_INT >= 33'));
+assert(native.includes('requestPermissions('),'Permission only after explicit user opt-in');
+assert(native.includes('manager.createNotificationChannel(channel)'));
+assert(native.includes('manager.areNotificationsEnabled()'));
+assert(native.includes('manager.getNotificationChannel(CHANNEL_ID)'));
+assert(native.includes('new Intent(activity, LockActivity.class)'),'Notification must not bypass family lock');
+assert(!native.includes('new Intent(activity, MainActivity.class)'));
+assert(native.includes('PendingIntent.FLAG_IMMUTABLE'));
+assert(activity.includes('@JavascriptInterface public String getTradeNotificationPermissionStatus()'));
+assert(activity.includes('@JavascriptInterface public void requestTradeNotificationPermission()'));
+assert(activity.includes('@JavascriptInterface public void postFavoriteTradeNotification('));
+assert(markup.includes('id="favoriteTradeNativeEnabled"'));
+assert(markup.includes('FirstHyundaiTradeAlerts.setNativeEnabled(this.checked)'));
+const ui=markup.split('<script>')[1].split('</script>')[0];
+const k=ui.indexOf('/* FAVORITES_MAPPING_START:');
+const e=ui.indexOf('/* FAVORITES_MAPPING_END */');
+const mapping=vm.runInNewContext(ui.slice(k,e+'/* FAVORITES_MAPPING_END */'.length)+
+ '\n({lookup:favoriteIdForBuilding,groups:FAVORITE_APTS})');
+const cache=new Map();
+const els=new Map();
+function el(id){if(!els.has(id))els.set(id,{checked:false,textContent:'',innerHTML:'',
+ classList:{add(){},remove(){}},open:false,showModal(){this.open=true},close(){this.open=false}});
+ return els.get(id);}
+let requested=0,status='permission_required',notifications=[];
+const window={localStorage:{getItem:key=>cache.get(key)||null,setItem:(key,val)=>cache.set(key,val)},
+ FirstHyundaiNative:{getTradeNotificationPermissionStatus:()=>status,
+ requestTradeNotificationPermission:()=>{requested++;},
+ postFavoriteTradeNotification:(n,t)=>notifications.push({n,t})}};
+const ctx=vm.createContext({window,document:{getElementById:el},console});
+vm.runInContext(js,ctx);
+const a=window.FirstHyundaiTradeAlerts;
+const context={favorites:mapping.groups,lookup:mapping.lookup,repository:'office/realty',openNew:()=>{}};
+const row=(id,building)=>({id,building,type:'전세',first_seen_date:'2026-10-21',
+ deposit_10k:60000,contract_date:'2026-10-20',area_m2:84,floor:5});
+let rows=[row('old','송도더샵퍼스트파크F15BL')];
+assert.equal(a.process({state:'ok',records:rows},context).status,'baseline');
+assert.equal(notifications.length,0);
+a.setNativeEnabled(true);
+assert.equal(requested,1,'Grant notifications only after user explicitly selects toggle');
+assert.equal(el('favoriteTradeNativeEnabled').checked,true);
+assert(el('favoriteTradeNativeStatus').textContent.includes('권한'));
+rows.push(row('new-1','송도더샵퍼스트파크F15BL'));
+a.process({state:'ok',records:rows},context);
+assert.equal(notifications.length,0,'Denied OS permission must not be bypassed');
+status='enabled';
+a.syncNativeStatus();
+assert(el('favoriteTradeNativeStatus').textContent.includes('사용 중'));
+rows.push(row('new-2','더샵송도프라임뷰20BL'));
+a.process({state:'ok',records:rows},context);
+assert.equal(notifications.length,1);
+assert.equal(notifications[0].n,1);
+assert(notifications[0].t.includes('프라임뷰 20블럭'));
+a.process({state:'ok',records:rows},context);
+assert.equal(notifications.length,1,'Rechecking unchanged data must not replay OS notification');
+a.setNativeEnabled(false);
+rows.push(row('new-3','더샵송도프라임뷰25BL'));
+a.process({state:'ok',records:rows},context);
+assert.equal(notifications.length,1,'Opt-out must suppress OS notification');
+a.setNativeEnabled(true);
+rows.push(row('new-4','송도더샵마스터뷰23-1BL'));
+a.process({state:'ok',records:rows},context);
+assert.equal(notifications.length,2);
+assert(notifications[1].t.includes('마스터뷰 23블럭'));
+status='blocked';
+rows.push(row('new-5','송도더샵마스터뷰21BL'));
+a.process({state:'ok',records:rows},context);
+assert.equal(notifications.length,2,'OS channel blocked must not send notification');
+a.setEnabled(false);
+status='enabled';
+rows.push(row('new-6','송도더샵퍼스트파크F13-1BL'));
+a.process({state:'ok',records:rows},context);
+assert.equal(notifications.length,2,'Global in-app alerts off also suppresses OS notification');
+console.log('Notification regression passed: manifest, runtime permission, opt-in, block, identity, baseline, de-duplication and family lock.');
