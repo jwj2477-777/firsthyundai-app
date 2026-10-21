@@ -14,7 +14,7 @@ const dateRanges=t=>[
 const overlap=(a,b,range)=>range.some(([s,e])=>a<e&&b>s);
 function accountCandidates(text){
  const results=[];
- const rx=/\d{2,8}(?:[- ]\d{2,8}){1,4}|\d{10,16}/g;
+ const rx=/\d{2,8}(?:-\d{2,8}){1,4}|\d{10,16}/g; // A separated transfer amount cannot merge into the account
  const dates=dateRanges(text);
  let m;
  while((m=rx.exec(text))){
@@ -94,12 +94,13 @@ function moneyCandidates(text,account){
   const exactTransfer=/송금액|입금액|이체액|보낼\s*금액|송금할\s*금액|이번\s*송금|오늘\s*보낼|오늘\s*입금|금일\s*송금|금일\s*입금|계약금\s*(?:의|중)\s*일부|일부\s*계약금/.test(recent);
   const beforeToday=/(?:오늘|금일|이번|우선|일단|먼저|당일)\s*(?:보낼|보내는|입금|송금|이체|납부)?\s*$/.test(recent);
   const nextTransfer=/^\s*(?:만|만원|원|정도)?\s*(?:먼저|송금|입금|이체|보내|넣|부칠|보낼|입금할|송금할|보내기로)/.test(next);
-  const nearVerb=/\b(?:송금|입금|이체|보내|보낼)/.test(next.slice(0,18));
+  const nearVerb=/(?:^|\s)(?:송금|입금|이체|보내|보낼)/.test(next.slice(0,18));
+  const followedToday=/(?:오늘|금일|이번|당일)\s*(?:보내|입금|송금|이체|넣|납부)/.test(next.slice(0,20));
   const totalLabel=/(?:매매대금|매매금액|매매가|매매|전세보증금|전세금|전세|보증금|총\s*금액|중도금|계약금\s*(?!일부|중\s*일부|의\s*일부))\s*[:：]?\s*$/.test(recent);
   let score=10;
   if(exactTransfer)score+=115;
   else if(beforeToday)score+=90;
-  if(nextTransfer||nearVerb)score+=75;
+  if(nextTransfer||nearVerb||followedToday)score+=75;
   if(/일부\s*\(?\s*$/.test(recent))score+=90;
   if(totalLabel)score-=120;
   if(account&&Math.abs(tok.start-account.start)<90)score+=12;
@@ -140,7 +141,23 @@ function merge(result){
   const field=E(id);if(!field)return;
   if(!v(id)){field.value=String(value);found.push({id,value:String(value),source:'송금정보 순서무관 분석'});}
  };
- set('bank',p.bank,'은행');set('account',p.account,'계좌번호');set('accountHolder',p.holder,'예금주');
+ set('bank',p.bank,'은행');set('account',p.account,'계좌번호');
+ if(p.account&&v('account')!==p.account){
+  // An old positional parse may have accidentally joined 500 or another standalone amount to the account.
+  E('account').value=p.account;
+  found.push({id:'account',value:p.account,source:'계좌번호 독립 추출'});
+  review.push('계좌번호가 다른 숫자와 붙어 인식되어 다시 분리했습니다. 실제 계좌를 확인하세요.');
+ }
+ const previousHolder=v('accountHolder');
+ if(p.holder&&(previousHolder===''||previousHolder===p.holder)){
+  set('accountHolder',p.holder,'예금주');
+ }else if(p.holder&&previousHolder!==p.holder){
+  if(/^(?:잔금일|금일|오늘|예금주|계좌|은행|계약금|매도인|매수인|입금|송금)$/.test(previousHolder)){
+   E('accountHolder').value=p.holder;
+   found.push({id:'accountHolder',value:p.holder,source:'예금주 독립 추출'});
+   review.push('계좌 주변의 계약 용어를 예금주로 오인식하여 정정했습니다. 예금주를 확인하세요.');
+  }else review.push('예금주 후보가 둘입니다. 계좌 명의자 '+previousHolder+' / '+p.holder+' 중 실제 값을 확인하세요.');
+ }
  // High-confidence new context overrides only an existing *unverified parser guess* when different.
  if(p.amount!==null){
   const old=v('advance'),wanted=String(p.amount);
