@@ -22,6 +22,7 @@ on:
       - 'scripts/test_contracts.js'
       - 'scripts/test_contract_language.js'
       - 'scripts/test_contract_easy.js'
+      - 'scripts/test_contract_broker.js'
       - 'scripts/test_apartment_detail_navigation.js'
       - 'scripts/test_refresh_feedback.js'
       - 'scripts/test_public_hub.js'
@@ -90,6 +91,7 @@ jobs:
           node scripts/test_contract_language.js
           node --check app/src/main/assets/contracts-easy.js
           node scripts/test_contract_easy.js
+          node scripts/test_contract_broker.js
           node scripts/test_apartment_detail_navigation.js
           node scripts/test_refresh_feedback.js
           node scripts/test_public_hub.js
@@ -120,18 +122,18 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v1.16.0 one-memo-contract-composer APK
+      - name: Publish successful v1.17.0 broker-negotiated-contract-message APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.16.0.apk
-          unzip -t FirstHyundai-v1.16.0.apk | grep 'No errors detected'
-          if gh release view v1.16.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload v1.16.0 FirstHyundai-v1.16.0.apk --repo "$GITHUB_REPOSITORY" --clobber
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.17.0.apk
+          unzip -t FirstHyundai-v1.17.0.apk | grep 'No errors detected'
+          if gh release view v1.17.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v1.17.0 FirstHyundai-v1.17.0.apk --repo "$GITHUB_REPOSITORY" --clobber
           else
-            gh release create v1.16.0 FirstHyundai-v1.16.0.apk \
+            gh release create v1.17.0 FirstHyundai-v1.17.0.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.16.0 · 메모 하나로 계약문자' \
-              --notes '메모 하나로 계약문자 초안 생성, 접어두는 수동입력, 인식 항목·누락 조건 확인, 특약 문구 보수적 정리 및 원문 비교·원문 복원, 계약별 고객정보 초기화. 모든 계약문자 데이터는 기기에서 분석하며 외부 서버로 업로드하지 않습니다. 민감한 계약 내용은 GitHub에 저장하지 않습니다. 디버그 APK 서명 불일치로 재설치가 필요할 수 있으니 내 자료를 먼저 백업해 주세요.'
+              --title '퍼스트현대 v1.17.0 · 실무형 계약문자' \
+              --notes '중개실무 계약안내 문자 형식, 당사자 간 사전 합의된 계약 성립·해제·배액상환·중개보수 조항의 내용 유지 및 합의 확인, 퍼팍/마뷰 별명과 금일/오늘 송금 금액 인식, 은행계좌·예금주와 중도금 지급일 인식 개선, 특약/송금 안내 분리. 모든 계약문자 데이터는 기기에서 분석하며 외부 서버로 업로드하지 않습니다. 민감한 계약 내용은 GitHub에 저장하지 않습니다. 디버그 APK 서명 불일치로 재설치가 필요할 수 있으니 내 자료를 먼저 백업해 주세요.'
           fi
