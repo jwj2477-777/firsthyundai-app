@@ -1255,6 +1255,37 @@ function tradeExtraBadges(row){
  }
  return '';
 }
+function tradeRenewalDetails(row){
+ // A rental renewal is identified ONLY by contract_type_raw; renewal-request use alone is insufficient.
+ if(!['전세','월세'].includes(row.type)||!String(row.contract_type_raw||'').replace(/\s+/g,'').includes('갱신'))return '';
+ const present=raw=>{
+  const text=String(raw??'').trim();
+  return text&&!/^(?:-|–|—|없음|미기재|정보없음|null|undefined)$/i.test(text)?text:'미기재';
+ };
+ const rightRaw=present(row.renewal_raw);
+ const normalizedRight=rightRaw.replace(/\s+/g,'');
+ const right=normalizedRight==='미기재'?'미기재':
+   /^(?:미사용|사용안함|미행사|N|NO|0)$/i.test(normalizedRight)?'미사용':
+   /^(?:사용|사용함|행사|Y|YES|1)$/i.test(normalizedRight)?'사용':rightRaw;
+ const previous=raw=>{
+  const v=present(raw);
+  if(v==='미기재')return v;
+  if(/^\d[\d,]*$/.test(v)){
+   const numberValue=Number(v.replace(/,/g,''));
+   if(Number.isSafeInteger(numberValue)){
+    const formatted=value10k(numberValue);
+    return formatted.endsWith('만')?formatted+'원':formatted+'원';
+   }
+  }
+  return v;
+ };
+ return '<div class="tradeRenewalDetail" aria-label="갱신계약 추가 정보">'+
+  '<span>갱신요구권 · '+escapeHtml(right)+'</span>'+
+  '<span>계약기간 · '+escapeHtml(present(row.contract_term_raw))+'</span>'+
+  '<span>종전 보증금 · '+escapeHtml(previous(row.previous_deposit_raw))+'</span>'+
+  '<span>종전 월세 · '+escapeHtml(previous(row.previous_monthly_raw))+'</span>'+
+  '</div>';
+}
 function tradeBrokerLocation(row){
  // Broker region belongs only on brokered apartment sales (never direct sales or rentals).
  if(row.type!=='매매'||!String(row.dealing_type||'').includes('중개'))return '';
@@ -1443,7 +1474,7 @@ function renderNearbyDetails(resetLimit){
     '<div class="meta">계약일 '+escapeHtml(x.contract_date)+
     ' · '+escapeHtml(displayExclusiveArea(x.area_m2,catalogForTradeName(x.building)))+' · '+escapeHtml(x.floor||'층 정보 없음')+'층</div>'+
     (x.status==='해제'?'<p class="tiny">해제 사유일: '+escapeHtml(x.cancel_date_raw||'정보 없음')+'</p>':'')+
-    tradeBrokerLocation(x)+'</article>';
+    tradeRenewalDetails(x)+tradeBrokerLocation(x)+'</article>';
   }).join('') :
   '<div class="empty">선택한 단지·유형에 해당하는 공개 거래가 없습니다.<br>자료의 조회 기간과 갱신 상태를 확인하세요.</div>';
  $('nearbyMore').classList.toggle('hidden',shown.length>=rows.length);
@@ -1509,7 +1540,7 @@ function renderTrades(){
     '<div class="meta">계약일 '+escapeHtml(x.contract_date)+' · '+escapeHtml(displayExclusiveArea(x.area_m2,catalogForTradeName(x.building)))+
     ' · '+escapeHtml(x.floor||'층 정보 없음')+'층</div>'+
     (x.status==='해제'?'<p class="pill red">계약 해제일: '+escapeHtml(x.cancel_date_raw||'정보 미제공')+'</p>':'')+
-    tradeBrokerLocation(x)+'</article>';
+    tradeRenewalDetails(x)+tradeBrokerLocation(x)+'</article>';
   }).join(''):'<div class="empty">선택한 조건에 해당하는 실거래가 없습니다. 다른 유형이나 아파트를 선택해 주세요.</div>');
 }
 function renderNews(){
@@ -1743,7 +1774,7 @@ function renderNew(){
     '<div class="meta"><b>신규 공개 확인 '+escapeHtml(x.first_seen_date)+'</b>'+
     ' · 실제 계약일 '+escapeHtml(x.contract_date)+
     ' · '+escapeHtml(displayExclusiveArea(x.area_m2,catalogForTradeName(x.building)))+' · '+escapeHtml(x.floor||'정보 없음')+'층</div>'+
-    tradeBrokerLocation(x)+'</article>';
+    tradeRenewalDetails(x)+tradeBrokerLocation(x)+'</article>';
   }).join('');
 }
 
