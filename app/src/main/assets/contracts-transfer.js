@@ -70,7 +70,7 @@ function holderCandidate(text,account,bank){
    if(!sameLine.includes(name))sameLine.push(name);
   }
  }
- if(sameLine.length===1)return {value:sameLine[0],confidence:'bank-line'};
+ if(sameLine.length===1)return {value:sameLine[0],confidence:'bank-line',warning:'은행·계좌가 있는 줄의 사람 이름을 예금주로 추정했습니다. 실제 계좌 명의를 확인해 주세요.'};
  if(sameLine.length>1)return {value:null,warning:'계좌가 기재된 줄에 여러 사람 이름이 있어 예금주 확인이 필요합니다.'};
 
  const memo=s.split(/(?:^|\n)\s*(?:특약(?:사항)?|합의사항)\s*[:：]/m)[0];
