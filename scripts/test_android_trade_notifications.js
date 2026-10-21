@@ -84,3 +84,6 @@ rows.push(row('new-6','송도더샵퍼스트파크F13-1BL'));
 a.process({state:'ok',records:rows},context);
 assert.equal(notifications.length,2,'Global in-app alerts off also suppresses OS notification');
 console.log('Notification regression passed: manifest, runtime permission, opt-in, block, identity, baseline, de-duplication and family lock.');
+const beforePreview=notifications.length;
+a.preview();a.view();
+assert.equal(notifications.length,beforePreview,'Design preview never posts a real phone notification');

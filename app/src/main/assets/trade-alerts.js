@@ -8,6 +8,7 @@ const PREFIX='firsthyundai-favorite-trades-alerts-v1:';
 const PREF='firsthyundai-favorite-trades-alert-enabled-v1';
 const NATIVE_PREF='firsthyundai-favorite-trades-native-alert-enabled-v1';
 let pending=[];
+let previewing=false;
 let latestContext=null;
 let memory=new Map();
 let memoryEnabled=true;
@@ -77,7 +78,12 @@ function hide(){
  const dialog=get('favoriteTradeAlertDialog');
  if(dialog?.open)dialog.close();
 }
-function dismiss(){pending=[];hide();}
+function later(){
+ const dialog=get('favoriteTradeAlertDialog');
+ if(dialog?.open)dialog.close();
+ previewing=false;
+}
+function dismiss(){pending=[];previewing=false;hide();}
 function stableId(r){
  if(r?.id&&typeof r.id==='string'&&r.id.length<160)return r.id;
  // Safe fallback in case a legacy collector omitted a unique record ID.
@@ -98,7 +104,8 @@ function select(records,context){
  return selected;
 }
 function formatAmount(row){
- const n=x=>{let val=Number(x||0);if(!Number.isFinite(val)||val<0)return '금액 확인 필요';
+ const n=x=>{if(x==null||String(x).trim()==='')return '금액 미기재';
+  let val=Number(x);if(!Number.isFinite(val)||val<0)return '금액 확인 필요';
   const whole=Math.floor(val/10000),remain=val%10000;
   return whole?(whole+'억'+(remain?' '+remain.toLocaleString('ko-KR')+'만':'')+'원'):(val.toLocaleString('ko-KR')+'만원');
  };
@@ -106,49 +113,74 @@ function formatAmount(row){
   row.type==='전세'?'보증금 '+n(row.deposit_10k):
   row.type==='월세'?'보증금 '+n(row.deposit_10k)+' / 월세 '+n(row.monthly_10k):'금액 확인 필요';
 }
+function renderDialog(items,isPreview=false){
+ const types={매매:0,전세:0,월세:0};
+ const groups=new Map();
+ for(const item of items){
+  if(item.row.type in types)types[item.row.type]++;
+  if(!groups.has(item.group.id))groups.set(item.group.id,{label:item.group.label,rows:[]});
+  groups.get(item.group.id).rows.push(item.row);
+ }
+ const title=get('favoriteTradeAlertTitle');
+ if(title)title.textContent=isPreview?'알림 화면 미리보기':'새 실거래 '+items.length+'건';
+ const caption=get('favoriteTradeAlertCaption');
+ if(caption)caption.textContent=isPreview?'예시 화면입니다. 실제 거래나 휴대폰 알림이 아닙니다.':groups.size+'개 관심 단지에서 새로 확인했습니다.';
+ const summary=get('favoriteTradeAlertSummary');
+ if(summary)summary.innerHTML=Object.entries(types).filter(([,n])=>n).map(([type,n])=>
+  '<span class="alertType '+(type==='매매'?'sale':type==='전세'?'lease':'monthly')+'">'+type+' <b>'+n+'건</b></span>').join('');
+ const viewButton=get('favoriteTradeAlertView');if(viewButton)viewButton.textContent=isPreview?'미리보기 닫기':'신규 거래 보기';
+ const body=get('favoriteTradeAlertRows');
+ if(body)body.innerHTML=[...groups.values()].map(g=>{
+  const sorted=g.rows.slice().sort((a,b)=>String(b.first_seen_date).localeCompare(String(a.first_seen_date)));
+  const byType={매매:0,전세:0,월세:0};for(const row of sorted)if(row.type in byType)byType[row.type]++;
+  const breakdown=Object.entries(byType).filter(([,n])=>n).map(([type,n])=>type+' '+n+'건').join(' · ');
+  return '<li class="favoriteTradeAlertItem"><div class="alertComplexHeading"><strong>'+html(g.label)+'</strong><span>'+html(breakdown)+'</span></div>'+sorted.slice(0,3).map(row=>{
+   const kind=row.type==='매매'?'sale':row.type==='전세'?'lease':'monthly';
+   const area=row.area_m2!=null&&Number(row.area_m2)>0?'전용 '+row.area_m2+'㎡':'면적 미기재';
+   const floor=row.floor!=null&&String(row.floor).trim()!==''?row.floor+'층':'층 미기재';
+   const renewal=['갱신','갱신계약'].includes(row.contract_type_raw)?' · 갱신계약':['신규','신규계약'].includes(row.contract_type_raw)?' · 신규계약':'';
+   return '<div class="alertTransaction"><div class="alertTransactionTop"><span class="alertDealLabel '+kind+'">'+html(row.type)+html(renewal)+'</span>'+
+    (row.status==='해제'?'<span class="alertCancelled">해제</span>':'')+'</div><p class="alertAmount">'+html(formatAmount(row))+'</p><p class="alertDetails">'+html(area)+' · '+html(floor)+'</p><p class="alertDate">계약 '+html(row.contract_date||'미기재')+' · 확인 '+html(row.first_seen_date)+'</p></div>';
+  }).join('')+(sorted.length>3?'<p class="alertExtra">외 '+(sorted.length-3)+'건은 신규 거래 보기에서 확인하세요.</p>':'')+'</li>';
+ }).join('');
+}
 function render(){
  if(!pending.length||!enabled()){hide();return;}
- const banner=get('favoriteTradeAlertBanner');
- const count=get('favoriteTradeAlertCount');
- if(count)count.textContent='🔔 관심 단지 신규 실거래 '+pending.length+'건';
+ const banner=get('favoriteTradeAlertBanner'),count=get('favoriteTradeAlertCount');
+ if(count)count.textContent='새 실거래 '+pending.length+'건';
+ const names=[...new Set(pending.map(x=>x.group.label))];
+ const detail=get('favoriteTradeAlertBannerDetail');
+ if(detail)detail.textContent=names[0]+(names.length>1?' 외 '+(names.length-1)+'개 단지':'');
  if(banner)banner.classList.remove('hidden');
- const headline=get('favoriteTradeAlertTitle');
- if(headline)headline.textContent='관심 단지에 새 실거래 '+pending.length+'건이 확인됐어요';
- const body=get('favoriteTradeAlertRows');
- if(body){
-  const groups=new Map();
-  for(const item of pending){
-   const k=item.group.id;
-   if(!groups.has(k))groups.set(k,{label:item.group.label,rows:[]});
-   groups.get(k).rows.push(item.row);
-  }
-  const sorted=[...groups.values()].sort((a,b)=>b.rows.length-a.rows.length);
-  body.innerHTML=sorted.slice(0,8).map(g=>{
-   const byType={매매:0,전세:0,월세:0};
-   for(const row of g.rows)if(row.type in byType)byType[row.type]++;
-   const breakdown=Object.entries(byType).filter(([,n])=>n).map(([type,n])=>type+' '+n+'건').join(' · ');
-   const newest=g.rows.slice().sort((a,b)=>String(b.first_seen_date).localeCompare(String(a.first_seen_date)))[0];
-   return '<li class="favoriteTradeAlertItem"><strong>'+html(g.label)+'</strong>'+
-    '<span>'+html(breakdown)+'</span>'+
-    '<small>최근 확인일 '+html(newest?.first_seen_date||'미확인')+
-    ' · '+html(formatAmount(newest||{}))+'</small></li>';
-  }).join('')+(sorted.length>8?'<li class="favoriteTradeAlertMore">외 '+(sorted.length-8)+'개 단지</li>':'');
- }
+ if(!previewing)renderDialog(pending);
 }
-function tryPopup(){
+function tryPopup(manual=false){
  const dialog=get('favoriteTradeAlertDialog');
- if(!dialog||!pending.length||!enabled()||dialog.open)return;
- // Avoid opening a second modal over currently edited notes or the apartment sheet.
+ if(!dialog||(!previewing&&(!pending.length||!enabled()))||dialog.open)return;
  const others=['noteDialog','complexEditor'].some(id=>get(id)?.open);
  if(others)return;
+ if(!manual&&(document.activeElement?.matches?.('input,textarea,select,[contenteditable="true"]')||
+   document.body?.classList?.contains?.('apartmentSheetActive')||
+   (typeof currentPage!=='undefined'&&currentPage==='contracts')))return;
  try{if(typeof dialog.showModal==='function')dialog.showModal();}catch(e){/* banner remains actionable */}
 }
-function open(){if(!pending.length)return;render();tryPopup();}
+function open(){if(!pending.length)return;previewing=false;render();tryPopup(true);}
+function preview(){
+ if(['noteDialog','complexEditor'].some(id=>get(id)?.open))return;
+ previewing=true;
+ renderDialog([
+  {group:{id:'f15',label:'퍼스트파크 15블럭'},row:{type:'매매',amount_10k:95000,area_m2:84.9,floor:18,contract_date:'2026-10-18',first_seen_date:'2026-10-21'}},
+  {group:{id:'m23',label:'마스터뷰 23블럭'},row:{type:'전세',deposit_10k:52000,area_m2:84.9,floor:12,contract_date:'2026-10-19',first_seen_date:'2026-10-21',contract_type_raw:'갱신'}}
+ ],true);
+ tryPopup(true);
+}
 function view(){
+ if(previewing){later();return;}
  if(!latestContext||!pending.length)return;
  const date=pending.map(x=>x.row.first_seen_date).sort().reverse()[0];
+ const ids=pending.map(x=>x.key);
  dismiss();
- latestContext.openNew(date);
+ latestContext.openNew(date,ids);
 }
 function process(payload,context){
  if(!payload||!['ok','partial'].includes(payload.state)||!Array.isArray(payload.records)||
@@ -176,6 +208,7 @@ function process(payload,context){
  }
  return {status:initialized?'updated':'baseline',newCount:fresh.length};
 }
-window.FirstHyundaiTradeAlerts={process,setEnabled,enabled,syncOption,syncNativeStatus,setNativeEnabled,open,view,dismiss,
+get('favoriteTradeAlertDialog')?.addEventListener?.('close',()=>{previewing=false;});
+window.FirstHyundaiTradeAlerts={process,setEnabled,enabled,syncOption,syncNativeStatus,setNativeEnabled,open,view,dismiss,later,preview,stableId,
  _test:{stableId,select,formatAmount,hide}};
 })();

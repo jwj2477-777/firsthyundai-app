@@ -92,3 +92,37 @@ assert.equal(a._test.select(data.records,context).size,
  new Set((data.records||[]).filter(r=>lookup(r.building)).map(r=>r.id)).size,
  'Actual public new-trade records should use exact 14-complex mapping');
 console.log('Favorite popup alerts regression passed: first sync baseline, one-time updates, modal, 14 blocks, preferences, persistence, no server push.');
+// v1.19.8: preview is isolated; Later preserves the banner; multi-day alerts retain every ID.
+const storedBefore=JSON.stringify(stores),viewCount=views.length;
+a.preview();
+assert(element('favoriteTradeAlertDialog').open);
+assert(element('favoriteTradeAlertCaption').textContent.includes('실제 거래'));
+a.view();
+assert.equal(JSON.stringify(stores),storedBefore,'Preview cannot change the baseline or seen IDs');
+assert.equal(views.length,viewCount,'Preview cannot navigate to fabricated transactions');
+assert.equal(a._test.formatAmount({type:'매매'}),'금액 미기재');
+let routed=null;
+const uiContext={...context,repository:'ui/alerts',openNew:(date,ids)=>{routed={date,ids:Array.from(ids)}}};
+a.process({state:'ok',records:[]},uiContext);
+const older={...re('older-unread','송도더샵퍼스트파크F15BL','매매','2026-10-20'),area_m2:84.9,floor:18,status:'해제'};
+const newer={...re('newer-unread','송도더샵마스터뷰23-1BL','전세','2026-10-21'),area_m2:84.9,floor:12,contract_type_raw:'갱신'};
+ctx.document.activeElement={matches:()=>true};
+a.process({state:'ok',records:[older,newer]},uiContext);
+assert(!element('favoriteTradeAlertDialog').open,'Typing must not be interrupted by an automatic modal');
+assert(!element('favoriteTradeAlertBanner').classList.contains('hidden'));
+ctx.document.activeElement=null;
+a.open();
+assert(element('favoriteTradeAlertRows').innerHTML.includes('계약 2026-10-18'));
+assert(element('favoriteTradeAlertRows').innerHTML.includes('84.9㎡'));
+assert(element('favoriteTradeAlertRows').innerHTML.includes('해제'));
+assert(element('favoriteTradeAlertRows').innerHTML.includes('갱신계약'));
+a.later();
+assert(!element('favoriteTradeAlertDialog').open);
+assert(!element('favoriteTradeAlertBanner').classList.contains('hidden'),'Later retains an actionable banner');
+a.open();assert(element('favoriteTradeAlertDialog').open);
+a.view();assert.deepEqual(routed,{date:'2026-10-21',ids:['older-unread','newer-unread']});
+const malicious={...re('escape','송도더샵퍼스트파크F15BL'),contract_date:'<img src=x onerror=bad()>',floor:'<script>'};
+a.process({state:'ok',records:[older,newer,malicious]},uiContext);
+assert(!element('favoriteTradeAlertRows').innerHTML.includes('<img'));
+assert(element('favoriteTradeAlertRows').innerHTML.includes('&lt;script&gt;'));
+console.log('Popup UX passed: isolated example, later/reopen, no typing interruption, exact multi-day navigation, escaped fields and no false zero.');

@@ -139,19 +139,21 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v1.19.7 Android-notification-permission APK
+      - name: Publish successful v1.19.8 warm-trade-notification-popup APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.7.apk
-          unzip -t FirstHyundai-v1.19.7.apk | grep 'No errors detected'
-          if gh release view v1.19.7 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.8.apk
+          unzip -t FirstHyundai-v1.19.8.apk | grep 'No errors detected'
+          if gh release view v1.19.8 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v1.19.7 FirstHyundai-v1.19.7.apk \
+            gh release create v1.19.8 FirstHyundai-v1.19.8.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.19.7 · 휴대폰 알림 권한 및 알림센터 지원' \
-              --notes '기존 v1.19.6의 앱 내부 관심 14개 단지 신규 실거래 팝업에 더해 안드로이드 시스템 알림 권한을 요청하고 알림센터에 알림을 표시할 수 있습니다. 관심단지 탭에서 휴대폰 알림센터에서도 받기를 켜면 Android 13 이상에서 권한 허용창이 나타납니다. 허용 후 앱을 열거나 새 거래 데이터를 갱신하여 최초 발견되는 거래만 통지하며, 최초 수집 및 동일 거래 재확인에는 알리지 않습니다. 앱 알림이 차단됐다면 설정의 앱 알림에서 허용해야 합니다. 휴대폰이 앱을 종료한 상태에선 새 자료를 감시하지 않으므로 실시간 백그라운드 푸시는 포함되지 않습니다. 가족 인증 잠금은 우회하지 않고, 기존 계약/실거래/뉴스/버전표시 기능은 유지합니다. 기존 내 자료는 설치 전 백업하세요.'
+              --title '퍼스트현대 v1.19.8 · 따뜻한 새 실거래 알림 팝업' \
+              --notes '관심 14개 단지의 새 실거래를 크림색 미니 배너와 단지별 상세 팝업으로 표시합니다. 금액·전용면적·층·계약일·확인일, 갱신 및 해제 표시를 포함합니다. 관심단지 탭에서 알림 화면 미리보기로 실제 새 거래 없이 디자인을 확인할 수 있으며 예시 거래는 실제 알림이나 확인 이력에 섞이지 않습니다. 나중에는 현재 앱 세션의 배너를 유지하고, 신규 거래 보기는 여러 확인일의 알림 거래를 함께 보여줍니다. 계약문자 입력과 아파트 상세 조회 중 자동 팝업을 띄우지 않습니다. 기존 기본 특약·갱신 4정보·중개사 소재지·출처 중복 제거·3문장 뉴스·동별 블럭 인식은 보존했습니다. 앱을 열거나 갱신할 때 확인하는 알림이며 앱 종료 중 실시간 푸시는 아직 지원하지 않습니다. 내 자료는 설치 전 별도 백업해 주세요.'
           fi
+          python3 scripts/export_ai_handoff.py --out dist/ai-handoff
+          gh release upload v1.19.8 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"

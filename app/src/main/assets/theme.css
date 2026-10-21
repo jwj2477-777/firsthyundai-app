@@ -65,19 +65,23 @@ header{background:linear-gradient(125deg,#805033,#a66f43)}
 .favoriteTradeAlertSwitch{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:750;color:#654b39;cursor:pointer;padding:6px 0}
 .favoriteTradeAlertSwitch input{width:18px;height:18px;min-height:18px;accent-color:#895737;flex:0 0 auto}
 .favoriteTradeAlertHint{font-size:12px;line-height:1.65;color:#75685a;margin:4px 0 12px}
-.favoriteTradeAlertBanner{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 0;padding:13px 14px;border:1px solid #dfc9af;border-radius:14px;background:#fff4e5;color:#765238}
-.favoriteTradeAlertBanner.hidden{display:none}
-.favoriteTradeAlertBanner strong{font-size:14px}
-.favoriteTradeAlertBanner>div{display:flex;gap:7px;align-items:center}
-.favoriteTradeAlertBanner .btn{min-height:38px;padding:6px 12px}
-.favoriteTradeAlertDismiss{min-height:38px;min-width:38px;border:0;background:transparent;color:#70533c;font-size:24px;cursor:pointer}
-.favoriteTradeAlertDialog{width:min(420px,calc(100% - 32px));max-height:min(80vh,680px);overflow:auto;border:1px solid #d6c5b3;border-radius:20px;background:#fffaf3;box-shadow:0 20px 65px #2f211e30;padding:22px;color:#42362a}
-.favoriteTradeAlertDialog::backdrop{background:#23181075}
-.favoriteTradeAlertDialog h2{font-size:19px;margin:0 0 8px;color:#5c422e}
-.favoriteTradeAlertRows{padding:0;margin:12px 0 18px;list-style:none;display:grid;gap:8px}
-.favoriteTradeAlertItem{display:flex;flex-direction:column;gap:3px;border:1px solid #e4d8ca;background:#fff;border-radius:12px;padding:12px}
-.favoriteTradeAlertItem strong{font-size:14px;color:#544134}
-.favoriteTradeAlertItem span{font-size:13px;color:#845b38;font-weight:700}
-.favoriteTradeAlertItem small,.favoriteTradeAlertMore{font-size:12px;color:#7c746a}
-.favoriteTradeAlertActions{display:flex;gap:8px;flex-wrap:wrap}
-.favoriteTradeAlertActions .btn{flex:1;min-width:110px;font-size:13px}
+
+/* Compact, warm notification banner; shared with the detail popup. */
+.favoriteTradeAlertBanner{position:fixed;z-index:180;left:50%;bottom:max(16px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(510px,calc(100% - 24px));display:flex;align-items:center;gap:10px;padding:13px 10px 13px 14px;border:1px solid #d9bea0;border-radius:20px;background:#fff8ec;color:#553c29;box-shadow:0 8px 32px #54351d30}
+.favoriteTradeAlertBanner.hidden{display:none}.alertBell{display:flex;align-items:center;justify-content:center;flex:0 0 44px;width:44px;height:44px;background:#f0dfc7;color:#80522d;border:1px solid #e7cfae;border-radius:15px}.alertBell svg{width:24px;height:24px}
+.alertBannerCopy{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.alertEyebrow{display:block;font-size:11px;font-weight:700;letter-spacing:.3px;color:#856747}.alertBannerCopy strong{font-size:17px;color:#513925}.alertBannerCopy small{font-size:12px;color:#79684f;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.favoriteTradeAlertBanner .btn{padding:8px 14px;min-height:44px;flex:0 0 auto}.favoriteTradeAlertDismiss{width:44px;min-width:44px;height:44px;min-height:44px;border:0;background:transparent;color:#765c45;font-size:27px;line-height:1;cursor:pointer;border-radius:12px}
+.favoriteTradeAlertDismiss:hover{background:#f1e3d0}.alertPreviewButton{margin:2px 0 12px}
+.favoriteTradeAlertDialog{width:min(460px,calc(100% - 24px));max-height:min(88vh,780px);max-height:min(88dvh,780px);overflow:auto;border:1px solid #dec7a9;border-radius:26px;background:#fff9ef;box-shadow:0 24px 80px #31221945;padding:22px 20px 0;color:#423327;overscroll-behavior:contain}
+.favoriteTradeAlertDialog::backdrop{background:#30261d65;backdrop-filter:blur(3px)}
+.alertDialogHeader{display:flex;gap:12px;align-items:center}.alertDialogHeader>div{flex:1;min-width:0}.alertDialogHeader .favoriteTradeAlertDismiss{align-self:flex-start;margin:-8px -9px 0 0}
+.favoriteTradeAlertDialog h2{font-size:25px;line-height:1.35;letter-spacing:-.65px;margin:4px 0 0;color:#4e3622}
+.alertCaption{font-size:14px;line-height:1.7;color:#79664e;margin:16px 0 13px}.alertSummary{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px}
+.alertType{font-size:13px;border-radius:9px;padding:7px 10px}.alertType.sale,.alertDealLabel.sale{color:#315777;background:#e9eff3}.alertType.lease,.alertDealLabel.lease{color:#466540;background:#e8eedd}.alertType.monthly,.alertDealLabel.monthly{color:#8c5c27;background:#f5e5cc}
+.favoriteTradeAlertRows{padding:0;margin:0;list-style:none;display:grid;gap:13px}.favoriteTradeAlertItem{border:1px solid #e6d9c4;background:#fffdf8;border-radius:17px;padding:0 15px;min-width:0}.alertComplexHeading{padding:14px 0 11px;display:flex;flex-direction:column;gap:4px;border-bottom:1px solid #eee2d2}.alertComplexHeading strong{font-size:16px;line-height:1.5;color:#5b412d}.alertComplexHeading>span{font-size:12px;color:#806b55}
+.alertTransaction{padding:13px 0 14px}.alertTransaction+.alertTransaction{border-top:1px solid #eee2d2}.alertTransactionTop{display:flex;flex-wrap:wrap;gap:6px}.alertDealLabel{font-size:12px;font-weight:700;padding:4px 7px;border-radius:7px}.alertCancelled{font-size:12px;background:#f9e0d9;color:#983b31;padding:4px 7px;border-radius:7px;font-weight:700}
+.alertTransaction .alertAmount{font-size:22px;font-weight:800;color:#4b3526;letter-spacing:-.6px;margin:9px 0 6px;line-height:1.5;overflow-wrap:anywhere}.alertTransaction .alertDetails{font-size:14px;color:#6c5946;margin:0 0 5px;line-height:1.6}.alertTransaction .alertDate{font-size:12px;color:#89745d;margin:0;line-height:1.7}.alertExtra{font-size:12px;color:#79644d;line-height:1.7;padding-bottom:10px}
+.alertDialogFooter{position:sticky;bottom:0;background:#fff9ef;padding:14px 0 20px;border-top:1px solid #eadcc9;margin-top:18px}.alertDialogFooter .favoriteTradeAlertHint{font-size:11px;line-height:1.6;margin:0 0 11px;color:#88725a}.favoriteTradeAlertActions{display:grid;grid-template-columns:1fr 1.8fr;gap:9px}.favoriteTradeAlertActions .btn{font-size:15px;min-height:50px;border-radius:13px}
+@media(max-width:360px){.favoriteTradeAlertDialog{padding:18px 14px 0}.favoriteTradeAlertDialog h2{font-size:22px}.alertDialogHeader{gap:9px}.alertDialogHeader .alertBell{flex-basis:38px;width:38px;height:38px}.favoriteTradeAlertBanner{gap:6px;padding-left:10px}.favoriteTradeAlertBanner .alertBell{display:none}.alertTransaction .alertAmount{font-size:20px}}
+@media(prefers-reduced-motion:no-preference){.favoriteTradeAlertDialog[open]{animation:alert-enter .18s ease-out}@keyframes alert-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}}
+.favoriteTradeAlertActions .btn,.favoriteTradeAlertBanner .btn,.alertPreviewButton{font-family:inherit}
