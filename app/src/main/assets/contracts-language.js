@@ -218,7 +218,7 @@ function recognize(raw){
  // "오늘 500", "금일 천만원", and "(계약금의 일부 1,000만원)" are advance payments, not total deposit.
  if(!advance)advance=amountAfter(s,['오늘(?:은|에|부터)?','금일(?:은|에)?','당일(?:은|에)?','오늘\\s*입금','금일\\s*송금']);
  if(!advance){
-  const m=s.match(/계약금(?:의|중)?\\s*일부\\s*\\(?\\s*([\\d,.일이삼사오육륙칠팔구한십백천억만원\\s]+?)\\s*\\)?(?=\\s*(?:가|를|을|은|는|로|으로|송금|이체|입금|보내|[),.;]|$))/);
+  const m=s.match(/계약금(?:의|중)?\s*일부\s*\(?\s*([\d,.일이삼사오육륙칠팔구한십백천억만원\s]+?)\s*\)?(?=\s*(?:가|를|을|은|는|로|으로|송금|이체|입금|보내|[),.;]|$))/);
   const n=m?moneyPart(m[1]):null;
   if(n!==null)advance={amount:n,raw:m[1]};
  }
@@ -230,14 +230,13 @@ function recognize(raw){
   if(m){const n=moneyPart(m[1].replace(/\s+/g,''));if(n!==null)advance={amount:n,raw:m[1]};}
  }
  if(advance?.amount!=null)apply('advance',advance.amount,found);
- const interimDate=s.match(/(?:중도금\\s*(?:지급일|지급\\s*예정일|날짜|일정))\\s*[:：]?\\s*([^\\n;。]+)/);
+ const interimDate=s.match(/중도금\s*(?:지급일|지급\s*예정일|날짜|일정)\s*[:：]?\s*([^\n;。]+)/);
  if(interimDate){
-  // Intermediate schedule can intentionally be "2023년 10월 중 협의".
-  const t=interimDate[1].split(/(?=\\s*(?:▶|중도금\\s*[:：]|잔금일|잔금\\s*[:：]))/)[0]
-   .replace(/[.\\s]+$/,'').trim();
+  const t=interimDate[1].split(/(?=\s*(?:▶|중도금\s*[:：]|잔금일|잔금\s*[:：]))/)[0].replace(/[.\s]+$/,'').trim();
   if(t)apply('interimDate',t.slice(0,100),found);
  }
- const interim=amountAfter(s,['중도금(?!\\s*(?:지급일|지급\\s*예정일|일정|날짜))']);if(interim?.amount!=null)apply('interim',interim.amount,found);
+ const interim=amountAfter(s,['중도금(?!\\s*(?:지급일|지급\\s*예정일|일정|날짜))']);
+ if(interim?.amount!=null)apply('interim',interim.amount,found);
  const rent=amountAfter(s,['월차임','월세액','월세\\s*금액','월세는','월세']);
  if(deal==='월세'){
   const n=rentCombo?moneyPart(rentCombo[2]):rent?.amount;
@@ -272,18 +271,17 @@ function recognize(raw){
   if(m&&m[1])apply('terms',m[1].trim().slice(0,6000),found);
  }
  // An explicitly typed cadastral/road address overrides fuzzy complex lookup; never fabricate a block.
- const addressLine=String(raw||'').match(/(?:^|\\n)\\s*[▶→•]?\\s*(?:소재지|주소)\\s*[:：-]\\s*([^\\n]+)/m);
- const explicitAddress=addressLine?.[1]?.trim().replace(/[.\\s]+$/,'')||'';
- const addressBefore=explicitAddress&&/^(?:인천|서울|경기|부산|대구|광주|대전|울산|세종|제주|충남|충북|경남|경북|전남|전북|강원)/.test(explicitAddress)?explicitAddress:'';
- // Pick the written apartment name but leave block numbers uncertain until selected.
- const writtenApartment=String(raw||'').match(/(?:^|\\n)\\s*[▶→•]?\\s*(?:아파트명|단지명)\\s*[:：-]\\s*([^\\n]+)/m);
+ const addressLine=String(raw||'').match(/(?:^|\n)\s*[▶→•]?\s*(?:소재지|주소)\s*[:：-]\s*([^\n]+)/m);
+ const explicitAddress=addressLine?.[1]?.trim().replace(/[.\s]+$/,'')||'';
+ const validAddress=explicitAddress&&/^(?:인천|서울|경기|부산|대구|광주|대전|울산|세종|제주|충남|충북|경남|경북|전남|전북|강원)/.test(explicitAddress)?explicitAddress:'';
+ const writtenApartment=String(raw||'').match(/(?:^|\n)\s*[▶→•]?\s*(?:아파트명|단지명)\s*[:：-]\s*([^\n]+)/m);
  if(writtenApartment&&!val('property')){
-  const name=writtenApartment[1].replace(/\\d{3,4}\\s*동.*$/,'').replace(/[.\\s]+$/,'').trim();
+  const name=writtenApartment[1].replace(/\d{3,4}\s*동.*$/,'').replace(/[.\s]+$/,'').trim();
   if(name)apply('property',name,found);
  }
- if(addressBefore&&E('address')){
-  if(!val('address'))apply('address',addressBefore,found);
-  else if(val('address')!==addressBefore)review.push('입력한 소재지와 등록 단지의 도로명주소가 다릅니다. 실제 소재지를 확인하세요.');
+ if(validAddress&&E('address')){
+  if(!val('address'))apply('address',validAddress,found);
+  else if(val('address')!==validAddress)review.push('입력한 소재지와 등록 단지의 도로명주소가 다릅니다. 실제 소재지를 확인하세요.');
  }
  // Account: a bank-name + plausible account-number + Korean payee name is high-confidence, even without an "account" label.
  const bankName='(?:KB\\s*)?(?:국민|신한|우리|하나|농협|기업|카카오|토스|새마을|우체국|수협|SC|부산|대구|경남|전북|광주|제주|케이뱅크)(?:은행)?';
