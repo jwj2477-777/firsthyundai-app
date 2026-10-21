@@ -27,6 +27,7 @@ on:
       - 'scripts/test_apartment_detail_navigation.js'
       - 'scripts/test_refresh_feedback.js'
       - 'scripts/test_public_hub.js'
+      - 'scripts/test_news_ai_ui.js'
       - 'scripts/test_kakao_nearby.mjs'
       - 'data/nearby_config.json'
       - 'scripts/collect_public_services.py'
@@ -98,6 +99,7 @@ jobs:
           node scripts/test_apartment_detail_navigation.js
           node scripts/test_refresh_feedback.js
           node scripts/test_public_hub.js
+          node scripts/test_news_ai_ui.js
           node scripts/test_kakao_nearby.mjs
           node scripts/test_family_mode.js
           node scripts/test_admin_guards.js
@@ -125,18 +127,18 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v1.18.0 remittance-order-and-neis-school APK
+      - name: Publish successful v1.18.1 news-ai-status-fix APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.18.0.apk
-          unzip -t FirstHyundai-v1.18.0.apk | grep 'No errors detected'
-          if gh release view v1.18.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload v1.18.0 FirstHyundai-v1.18.0.apk --repo "$GITHUB_REPOSITORY" --clobber
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.18.1.apk
+          unzip -t FirstHyundai-v1.18.1.apk | grep 'No errors detected'
+          if gh release view v1.18.1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload v1.18.1 FirstHyundai-v1.18.1.apk --repo "$GITHUB_REPOSITORY" --clobber
           else
-            gh release create v1.18.0 FirstHyundai-v1.18.0.apk \
+            gh release create v1.18.1 FirstHyundai-v1.18.1.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.18.0 · 실무형 계약문자' \
-              --notes '송금액·예금주·계좌번호·은행명을 모든 순서로 인식하는 독립 분석기와 숫자·날짜·계좌 구분 및 예금주 검증을 강화했습니다. 나이스 학교기본정보를 단지정보 학교·학군 탭에서 학교급별 확인하도록 개선했습니다. 실제 학교자료 자동 수집은 사용자가 GitHub Actions Secret NEIS_EDU_KEY를 등록한 후 동작합니다. 배정학교는 NEIS 기본정보만으로 확정하지 않습니다. 모든 계약문자 데이터는 기기에서 분석하며 외부 서버로 업로드하지 않습니다. 민감한 계약 내용은 GitHub에 저장하지 않습니다. 디버그 APK 서명 불일치로 재설치가 필요할 수 있으니 내 자료를 먼저 백업해 주세요.'
+              --title '퍼스트현대 v1.18.1 · 뉴스 AI요약 표시 수정' \
+              --notes '뉴스 기사 본문을 이용하는 Gemini·Groq AI 요약이 실제로 있는 기사에 정확히 표시되도록 개선했습니다. 이전의 생성형 AI 아님 안내를 정정하고 AI 요약 건수 및 원문 요약 대기 상태를 구분합니다. 기존 계약문자와 나이스 학교정보 기능은 유지됩니다. 모든 계약문자 데이터는 기기에서 분석하며 외부 서버로 업로드하지 않습니다. 민감한 계약 내용은 GitHub에 저장하지 않습니다. 디버그 APK 서명 불일치로 재설치가 필요할 수 있으니 내 자료를 먼저 백업해 주세요.'
           fi
