@@ -184,8 +184,8 @@ function recognize(raw){
   }
  }
  // Match a 3-4 digit dong and 1-4 digit ho, allowing natural filler words.
- const unit=s.match(/(\d{1,4})\s*동\s*(?:에|의|이고|에있는|에\s*있는|,)?\s*(\d{1,4})\s*호/);
- if(unit)apply('unit',unit[1]+'동 '+unit[2]+'호',found);
+ const unit=s.match(/(\d{1,4})\s*동\s*(?:에|의|이고|에있는|에\s*있는|,)?\s*(\d{1,4})\s*호\s*(\((?:\d{2,3}(?:\.\d+)?[A-Za-z가-힣0-9-]{0,8})\))?/);
+ if(unit)apply('unit',unit[1]+'동 '+unit[2]+'호'+(unit[3]||''),found);
  else{
   const short=s.match(/(?:동\s*호수|동호수|호실|대상물)\s*[:：]?\s*(\d{3,4})\s*[-/]\s*(\d{1,4})/);
   if(short)apply('unit',short[1]+'동 '+short[2]+'호',found);
@@ -215,6 +215,13 @@ function recognize(raw){
  }
  if(deposit?.amount!=null)apply('contractDeposit',deposit.amount,found);
  let advance=amountAfter(s,['선입금','선송금','선금','일부\\s*계약금','이번\\s*송금액','이번\\s*입금','가계약금','먼저\\s*보낼','일단\\s*보낼','우선\\s*보낼']);
+ // "오늘 500", "금일 천만원", and "(계약금의 일부 1,000만원)" are advance payments, not total deposit.
+ if(!advance)advance=amountAfter(s,['오늘(?:은|에|부터)?','금일(?:은|에)?','당일(?:은|에)?','오늘\\s*입금','금일\\s*송금']);
+ if(!advance){
+  const m=s.match(/계약금(?:의|중)?\\s*일부\\s*\\(?\\s*([\\d,.일이삼사오육륙칠팔구한십백천억만원\\s]+?)\\s*\\)?(?=\\s*(?:가|를|을|은|는|로|으로|송금|이체|입금|보내|[),.;]|$))/);
+  const n=m?moneyPart(m[1]):null;
+  if(n!==null)advance={amount:n,raw:m[1]};
+ }
  if(!advance)advance=amountAfter(s,['먼저','우선','일단']);
  if(!advance)advance=amountBefore(s,['먼저\\s*보내','먼저\\s*입금','먼저\\s*송금','먼저','선입금','송금해','입금해','보내고']);
  if(!advance){
@@ -223,7 +230,14 @@ function recognize(raw){
   if(m){const n=moneyPart(m[1].replace(/\s+/g,''));if(n!==null)advance={amount:n,raw:m[1]};}
  }
  if(advance?.amount!=null)apply('advance',advance.amount,found);
- const interim=amountAfter(s,['중도금']);if(interim?.amount!=null)apply('interim',interim.amount,found);
+ const interimDate=s.match(/(?:중도금\\s*(?:지급일|지급\\s*예정일|날짜|일정))\\s*[:：]?\\s*([^\\n;。]+)/);
+ if(interimDate){
+  // Intermediate schedule can intentionally be "2023년 10월 중 협의".
+  const t=interimDate[1].split(/(?=\\s*(?:▶|중도금\\s*[:：]|잔금일|잔금\\s*[:：]))/)[0]
+   .replace(/[.\\s]+$/,'').trim();
+  if(t)apply('interimDate',t.slice(0,100),found);
+ }
+ const interim=amountAfter(s,['중도금(?!\\s*(?:지급일|지급\\s*예정일|일정|날짜))']);if(interim?.amount!=null)apply('interim',interim.amount,found);
  const rent=amountAfter(s,['월차임','월세액','월세\\s*금액','월세는','월세']);
  if(deal==='월세'){
   const n=rentCombo?moneyPart(rentCombo[2]):rent?.amount;
@@ -233,7 +247,7 @@ function recognize(raw){
   ['balanceDate',['잔금\\s*날','잔금일','잔금\\s*예정일','잔금은','잔금\\s*치르','잔금\\s*처리','잔금']],
   ['leaseStart',['입주일','입주\\s*날','입주\\s*예정','입주','이사\\s*날','이사일','이사','임대차\\s*시작','임대차\\s*개시']],
   ['leaseEnd',['만기일','종료일','임대차\\s*종료']],
-  ['contractDate',['계약서\\s*작성일','본계약\\s*작성일','계약서\\s*쓰','계약서\\s*작성','본계약\\s*날']]
+  ['contractDate',['계약서\\s*작성일','본계약\\s*작성일','본계약일','계약일','계약서\\s*쓰','계약서\\s*작성','본계약\\s*날']]
  ]){
   const d=dateFor(s,terms);if(d){
    apply(id,d.value,found);
@@ -257,13 +271,33 @@ function recognize(raw){
   const m=raw.match(/(?:^|\n)\s*(?:특약|특약사항|합의사항)\s*[:：]\s*([^\n]+(?:\n(?!\s*(?:계약금|보증금|잔금|계좌|은행|예금주))[\s\S]*)?)/m);
   if(m&&m[1])apply('terms',m[1].trim().slice(0,6000),found);
  }
- // Account: recognition only when a clear field label exists, not by guessing a bank/account holder.
- const bank=s.match(/(?:은행|송금계좌|입금계좌)\s*[:：]?\s*((?:국민|신한|우리|하나|농협|기업|카카오|토스|새마을|우체국|수협|SC|부산|대구|경남|전북|광주|제주)(?:은행)?)/i)
-  ||s.match(/\b((?:국민|신한|우리|하나|농협|기업|카카오|토스|새마을|우체국|수협)(?:은행)?)\s+\d{2,5}[-\d]+/);
- if(bank)apply('bank',bank[1],found);
- const account=s.match(/(?:계좌번호|입금계좌|송금계좌|계좌는|계좌)\s*[:：]?\s*(?:[가-힣A-Za-z]{2,8}\s*)?(\d{2,6}(?:[- ]?\d{2,8}){2,5})/);
- if(account)apply('account',account[1],found);
- const holder=s.match(/(?:예금주|명의자)\s*[:：]?\s*([가-힣]{2,5})(?=\s|$|[,.;])/);
+ // An explicitly typed cadastral/road address overrides fuzzy complex lookup; never fabricate a block.
+ const addressLine=String(raw||'').match(/(?:^|\\n)\\s*[▶→•]?\\s*(?:소재지|주소)\\s*[:：-]\\s*([^\\n]+)/m);
+ const explicitAddress=addressLine?.[1]?.trim().replace(/[.\\s]+$/,'')||'';
+ const addressBefore=explicitAddress&&/^(?:인천|서울|경기|부산|대구|광주|대전|울산|세종|제주|충남|충북|경남|경북|전남|전북|강원)/.test(explicitAddress)?explicitAddress:'';
+ // Pick the written apartment name but leave block numbers uncertain until selected.
+ const writtenApartment=String(raw||'').match(/(?:^|\\n)\\s*[▶→•]?\\s*(?:아파트명|단지명)\\s*[:：-]\\s*([^\\n]+)/m);
+ if(writtenApartment&&!val('property')){
+  const name=writtenApartment[1].replace(/\\d{3,4}\\s*동.*$/,'').replace(/[.\\s]+$/,'').trim();
+  if(name)apply('property',name,found);
+ }
+ if(addressBefore&&E('address')){
+  if(!val('address'))apply('address',addressBefore,found);
+  else if(val('address')!==addressBefore)review.push('입력한 소재지와 등록 단지의 도로명주소가 다릅니다. 실제 소재지를 확인하세요.');
+ }
+ // Account: a bank-name + plausible account-number + Korean payee name is high-confidence, even without an "account" label.
+ const bankName='(?:KB\\s*)?(?:국민|신한|우리|하나|농협|기업|카카오|토스|새마을|우체국|수협|SC|부산|대구|경남|전북|광주|제주|케이뱅크)(?:은행)?';
+ const bankAccountRx=new RegExp('('+bankName+')\\s*[:：(]?\\s*([0-9]{2,8}(?:[- ]?[0-9]{2,8}){2,5})(?:\\s+([가-힣]{2,4}))?','i');
+ const bankTriplet=bankAccountRx.exec(s);
+ const bankNamed=s.match(/(?:은행|송금계좌|입금계좌)\s*[:：]?\s*((?:국민|신한|우리|하나|농협|기업|카카오|토스|새마을|우체국|수협|SC|부산|대구|경남|전북|광주|제주)(?:은행)?)/i);
+ if(bankTriplet){
+  apply('bank',bankTriplet[1].trim(),found);
+  apply('account',bankTriplet[2].replace(/\s/g,''),found);
+  if(bankTriplet[3])apply('accountHolder',bankTriplet[3],found);
+ }else if(bankNamed)apply('bank',bankNamed[1],found);
+ const account=s.match(/(?:계좌번호|입금계좌|송금계좌|계좌는|계좌)\s*[:：]?\s*(?:[가-힣A-Za-z]{2,8}\s*)?(\d{2,8}(?:[- ]?\d{2,8}){2,5})/);
+ if(account)apply('account',account[1].replace(/\s/g,''),found);
+ const holder=s.match(/(?:예금주|명의자)\s*[:：]?\s*([가-힣]{2,5})(?=\s|$|[,.;)\]])/);
  if(holder)apply('accountHolder',holder[1],found);
  // Broker shorthand: "집주인 김철수 / 세입자 이영희".
  const owner=s.match(/(?:집주인|임대인|매도인)\s*[:：]?\s*([가-힣]{2,4})(?=\s|$|[,.;/])/);
@@ -288,7 +322,7 @@ function report(data){
   const labels={dealType:'거래유형',property:'아파트',unit:'동·호수',price:'총 금액',contractDeposit:'약정 계약금',
    advance:'선송금액',interim:'중도금',monthlyRent:'월세',balanceDate:'잔금일',leaseStart:'입주일',
    leaseEnd:'종료일',contractDate:'본계약일',leaseDuration:'임대차 기간',bank:'은행',account:'계좌번호',
-   accountHolder:'예금주',owner:'임대인·매도인',buyer:'임차인·매수인',terms:'특약'};
+   accountHolder:'예금주',interimDate:'중도금 지급일',address:'소재지',owner:'임대인·매도인',buyer:'임차인·매수인',terms:'특약'};
   view.textContent=data.found.length?
    '✓ 자동 인식: '+data.found.map(x=>labels[x.id]||x.id).join(' · '):
    '자동으로 확정할 수 있는 항목을 찾지 못했습니다. 아래 입력란에서 직접 확인해 주세요.';
