@@ -235,7 +235,7 @@ body.apartmentSheetActive{overflow:hidden}
   <p class="tiny">아래는 추가 기능용 공식 신청 페이지입니다. 공공데이터포털 서비스마다 활용승인이 필요하며 같은 서비스키를 재사용할 수 있습니다. 비밀키는 공개 앱·채팅·GitHub 소스에 입력하지 마세요.</p>
   <h3>① 건축물대장 · 단지 상세</h3><p>동별 층수·용도·전유공용면적 확인. 승인 후 건축물 식별자 대조 및 수치 검증.</p><p><a href="https://www.data.go.kr/data/15134735/openapi.do">건축HUB 활용신청 ↗</a></p>
   <h3>② K-apt 공동주택 관리비</h3><p>월별 공용관리비와 단지별 비교. 개별 세대 고지 금액과 구별합니다.</p><p><a href="https://www.data.go.kr/data/15057937/openapi.do">공용관리비 활용신청 ↗</a></p>
-  <h3>③ 나이스 학교 기본정보</h3><p>학교 주소·연락처·홈페이지. 앱 수집기용 비밀키 이름: <code>NEIS_EDU_KEY</code>. 배정학교는 이 API만으로 판단하지 않습니다.</p><p><a href="https://open.neis.go.kr/portal/guide/apiGuidePage.do">나이스 인증키 신청 안내 ↗</a></p>
+  <h3>③ 나이스 학교 기본정보</h3><p>학교 주소·연락처·홈페이지. 앱 수집기용 비밀키 이름: <code>NEIS_EDU_KEY</code>. 배정학교는 이 API만으로 판단하지 않습니다.</p><p>발급받은 키는 채팅이나 공개 코드에 올리지 말고 GitHub Actions Secret에 <code>NEIS_EDU_KEY</code>라는 이름으로 등록하세요. 등록 후 학교 수집 워크플로를 실행해 <b>schools</b>를 선택하면 단지정보 → 학교·학군 탭에 반영됩니다.</p><p><a href="https://github.com/jwj2477-777/firsthyundai-app/settings/secrets/actions">① 나이스 키 안전하게 등록 ↗</a> · <a href="https://github.com/jwj2477-777/firsthyundai-app/actions/workflows/sync-public-services.yml">② 학교정보 수집 실행 ↗</a> · <a href="https://open.neis.go.kr/portal/guide/apiGuidePage.do">나이스 인증키 안내 ↗</a></p>
   <h3>④ 도로명주소 검색</h3><p>동일 단지명·지번·도로명 정규화 및 자료 중복 방지. 향후 비밀키 이름: <code>JUSO_CONFIRM_KEY</code>.</p><p><a href="https://business.juso.go.kr/">주소기반산업지원서비스 · API 신청 ↗</a></p>
   <h3>⑤ 오피스텔 전월세 실거래</h3><p>아파트와 별도 목록으로 송도 오피스텔 전세·월세 검색. 수집기 준비됨, 추가 활용승인 필요.</p><p><a href="https://www.data.go.kr/data/15126475/openapi.do">오피스텔 전월세 활용신청 ↗</a></p>
   <h3>⑥ 청약홈 분양정보</h3><p>송도 신규 분양·무순위·오피스텔 공고를 뉴스/분양 탭과 연결. 승인 후 실제 연동 구현.</p><p><a href="https://www.data.go.kr/data/15098547/openapi.do">청약홈 분양정보 활용신청 ↗</a></p>
@@ -1101,15 +1101,35 @@ function verifiedRecords(key){
  const p=publicServices?.[key];
  return p?.state==='verified'&&Array.isArray(p.records)?p.records:null;
 }
+let neisSchoolLevel='all';
+function selectNeisSchoolLevel(level){
+ if(!['all','초등학교','중학교','고등학교'].includes(level))return;
+ neisSchoolLevel=level;
+ renderComplexes();
+}
 function renderSchoolPublicInfo(){
  const schools=verifiedRecords('schools');
- let details=schools===null?'<div class="apiNotice">나이스 인증키 등록 후 송도 학교 기본정보를 자동 조회합니다.</div>':
- schools.length?'<div class="apiSchools">'+schools.slice(0,35).map(x=>'<div><strong>'+escapeHtml(x.level)+' · '+escapeHtml(x.name)+'</strong>'+
- '<span class="tiny">'+escapeHtml(x.address)+'</span></div>').join('')+'</div>':
- '<div class="apiNotice">현재 확인된 송도 학교 기본정보가 없습니다.</div>';
- return '<div class="apiSmallCard"><h3>송도 학교 기본정보</h3><p class="complexSectionNote">이 목록은 배정학교가 아닙니다. 통학구역은 교육청 공식 학구도로 확인하세요.</p>'+
- details+sourceLink(PUBLIC_SRC.zone,'공식 학구도에서 해당 주소 검색')+
- sourceLink(PUBLIC_SRC.school,'나이스 학교정보')+'</div>';
+ const levels=[['all','전체'],['초등학교','초등'],['중학교','중등'],['고등학교','고등']];
+ const buttons=levels.map(([value,label])=>'<button type="button" class="'+(neisSchoolLevel===value?'active':'')+
+   '" aria-pressed="'+(neisSchoolLevel===value?'true':'false')+'" onclick="selectNeisSchoolLevel(\''+value+'\')">'+label+
+   (schools?' '+(value==='all'?schools.length:schools.filter(x=>x.level===value).length):'')+'</button>').join('');
+ const filtered=schools?schools.filter(x=>neisSchoolLevel==='all'||x.level===neisSchoolLevel).slice().sort((a,b)=>
+  String(a.name||'').localeCompare(String(b.name||''),'ko')):[];
+ const when=publicServices?.schools?.updated_at?prettyTime(publicServices.schools.updated_at):'아직 확인되지 않음';
+ const rows=filtered.length?'<div class="apiSchools">'+filtered.map(x=>'<div><strong>'+escapeHtml(x.level)+' · '+escapeHtml(x.name)+'</strong>'+
+  '<span class="tiny">'+escapeHtml(x.address||'주소 확인 중')+'</span>'+
+  (x.phone?'<span class="tiny">연락처 '+escapeHtml(x.phone)+'</span>':'')+
+  (safeLink(x.homepage)?sourceLink(x.homepage,'학교 홈페이지'):'')+'</div>').join('')+'</div>':
+  '<div class="apiNotice">'+(schools===null?'나이스 연동 대기 · GitHub Secrets에서 NEIS_EDU_KEY를 등록하고 학교정보 수집을 실행해 주세요.':
+   '해당 학교급의 확인된 학교정보가 없습니다.')+'</div>';
+ return '<div class="apiSmallCard"><h3>나이스 송도 학교 기본정보</h3>'+
+  '<p class="complexSectionNote">송도 지역 학교 정보이며 현재 선택한 아파트의 배정학교 목록이 아닙니다. 실제 통학구역·배정은 교육청 공식 학구도와 최신 공고로 확인해야 합니다.</p>'+
+  '<p class="tiny">데이터 확인: '+escapeHtml(when)+'</p>'+
+  (schools?'<div class="neisLevelButtons">'+buttons+'</div>':'')+
+  rows+
+  '<div class="contractActions"><button type="button" class="btn alt" onclick="refreshPublicServices(true)">공개 학교자료 새로 확인</button></div>'+
+  sourceLink(PUBLIC_SRC.zone,'공식 학구도에서 해당 주소 검색')+
+  sourceLink(PUBLIC_SRC.school,'나이스 학교정보')+'</div>';
 }
 function renderPublicComplexInfo(p){
  const items=[
