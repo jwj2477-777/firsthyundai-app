@@ -54,3 +54,37 @@ const long='→ '+'긴 특약 문장 '.repeat(380);
 const longPlan=api._test.plan('● 아파트 매매계약 ●\n'+long);
 assert(longPlan.length>1,'Long terms must paginate rather than truncate');
 console.log('Contract image checks passed:',p.length,'normal page(s),',longPlan.length,'long-text pages.');
+
+
+const typical=[
+ '안녕하세요. 퍼스트현대부동산입니다.',
+ '● 아파트 매매계약 ●',
+ '▶ 소재지 : 인천 연수구 가상로 30',
+ '▶ 아파트명 : 퍼스트파크 15블럭 1502동 3004호',
+ '▶ 매매대금 : 150,000만원',
+ '▶ 계약금 : 15,000만원 (매매대금의 10%)',
+ '▶ 중도금 지급일 : 2026-12-05',
+ '▶ 중도금 : 50,000만원',
+ '▶ 잔금일 : 2027.01.30.',
+ '▶ 잔금 : 85,000만원',
+ '▶ 특약사항',
+ '→ 중도금 및 잔금일 앞당길 수 있다.',
+ '→ 매도인은 부서진 곳을 수리해준다.',
+ '→ 기타 상세한 특약사항은 본계약서 작성 시 협의하여 기재한다.',
+ '※ 계약금 일부 송금 및 계약 성립·해제 조건 확인',
+ '금일 위 계약조건에 따라 계약금 중 일부인 700만원을 매도인 계좌(하나은행 123-45678-01 (예금주 김가람))로 송금하기로 합니다.',
+ '당사자들은 위 금액의 이체와 동시에 본계약이 체결된 것으로 보기로 하며, 일방의 변심으로 계약을 해제하는 경우 매도인은 실제 수령한 금액의 배액을 상환하고 매수인은 실제 송금한 금액을 포기하는 조건으로 합의합니다.',
+ '또한 위 사유로 계약이 해제되더라도 그 사실만으로 중개보수 지급의무가 없어지는 것은 아니라는 점을 확인합니다.'
+].join('\n');
+const premium=api._test.plan(typical);
+assert.strictEqual(premium.length,1,'Normal complete customer notice must be a single image');
+assert(premium[0].bottom<3100,'No content should be clipped under footer');
+assert(premium[0].heading.includes('매매계약 안내'));
+const semantic=premium.flatMap(page=>page.items.map(item=>item.text)).join('');
+for(const text of ['150,000만원','50,000만원','85,000만원','김가람','부서진 곳을 수리해준다.','실제 송금한 금액을 포기'])assert(semantic.includes(text),'Premium sheet lost content: '+text);
+assert.strictEqual(api._test.clean('▶ 잔금 : 85,000만원','row'),'잔금 : 85,000만원');
+assert.strictEqual(api._test.clean('→ 수리해준다.','term'),'수리해준다.');
+nodes.ct_preview.value=typical;
+api.open();assert(nodes.ct_imageDialog.open,'Premium sheet preview opens');
+api.share();assert(env.sent&&env.sent.pages.length===1,'Only one PNG must be handed to native share for an ordinary contract');
+console.log('Premium single-sheet layout and legal text preservation passed.');
