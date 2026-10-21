@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 const E=id=>document.getElementById(id);
-const FIELDS=['dealType','property','address','unit','owner','buyer','price','monthlyRent','contractDeposit','advance','interim','contractDate','balanceDate','balanceTime','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms','cancellation','brokerFee','rough'];
+const FIELDS=['dealType','property','address','unit','owner','buyer','price','monthlyRent','contractDeposit','advance','interim','interimDate','contractDate','balanceDate','balanceTime','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms','cancellation','brokerFee','rough'];
 let created=false, approved=false;
 function field(id){return String(E('ct_'+id)?.value||'').trim();}
 function setField(id,value,force){const e=E('ct_'+id);if(e&&(force||!e.value.trim()))e.value=String(value||'');}
@@ -98,6 +98,7 @@ function collect(){
  if(deposit!==null&&advance!==null&&advance>deposit)errors.push('이번 송금액이 계약금보다 큼');
  if(price!==null&&deposit!==null&&interim!==null&&price-deposit-interim<0)errors.push('잔금 계산이 음수');
  if(!field('balanceDate'))errors.push('잔금 예정일');
+ if(field('interimDate')&&!(interim>0))errors.push('중도금 일정은 있는데 금액이 없음');
  if(!field('bank')||!field('account')||!field('accountHolder'))errors.push('송금 은행·계좌·예금주');
  if(type==='월세'&&(amount('monthlyRent')===null||amount('monthlyRent')<=0))errors.push('월세 금액');
  if(type!=='매매'&&!field('leaseDuration')&&!(field('leaseStart')&&field('leaseEnd')))errors.push('임대차 기간');
@@ -115,51 +116,60 @@ function updateSummary(){
   (data.interim>0?' (중도금 '+money(data.interim)+' 별도)':'');
  if(created&&E('ct_preview').value){
   created=false;approved=false; // Invalidate stale preview after any upstream condition changed.
-  E('ct_status').textContent='조건이 변경되었습니다. 새로 초안을 생성하고 다시 검토해 주세요.';
+  E('ct_status').textContent='조건이 변경되었습니다. 문자를 다시 생성해 검토해 주세요.';
   E('ct_status').className='contractReview bad';
  }
 }
 function makePreview(){
  const d=collect();
+ const moneyOr=n=>n===null?'[확인 필요]':money(n);
+ const who=d.type==='매매'?'매도인':'임대인',paying=d.type==='매매'?'매수인':'임차인';
  const totalName=d.type==='매매'?'매매대금':d.type==='전세'?'전세보증금':'보증금';
- const who=d.type==='매매'?'매도인':'임대인';
- const paying=d.type==='매매'?'매수인':'임차인';
- const out=['안녕하세요. 퍼스트현대부동산입니다.','',
-  '● 아파트 '+d.type+'계약 조건 안내 ●','',
-  '▶ 아파트 : '+(field('property')||'[확인 필요]'),
-  '▶ 소재지 : '+(field('address')||'[주소 확인 필요]'),
-  '▶ 대상물 : '+(field('unit')||'[확인 필요]')];
+ const typeLine='● 아파트 '+d.type+'계약 ●';
+ const out=['안녕하세요. 퍼스트현대부동산입니다.','',typeLine,''];
+ out.push('▶ 소재지 : '+(field('address')||'[주소 확인 필요]'));
+ out.push('▶ 아파트명 : '+(field('property')||'[단지 확인 필요]')+(field('unit')?' '+field('unit'):' [동·호수 확인 필요]'));
  if(field('owner'))out.push('▶ '+who+' : '+field('owner'));
  if(field('buyer'))out.push('▶ '+paying+' : '+field('buyer'));
- out.push('▶ '+totalName+' : '+(d.price===null?'[확인 필요]':money(d.price)));
- if(d.type==='월세')out.push('▶ 월 차임 : '+(amount('monthlyRent')===null?'[확인 필요]':money(amount('monthlyRent'))));
- if(d.type!=='매매'){
-  out.push('▶ 임대차 기간 : '+(field('leaseDuration')||(field('leaseStart')&&field('leaseEnd')?dateLabel(field('leaseStart'))+' ~ '+dateLabel(field('leaseEnd')):'[확인 필요]')));
+ out.push('','▶ '+totalName+' : '+moneyOr(d.price));
+ if(d.type==='월세')out.push('▶ 월세 : '+moneyOr(amount('monthlyRent')));
+ if(d.type!=='매매')out.push('▶ 임대차 기간 : '+(field('leaseDuration')||(field('leaseStart')&&field('leaseEnd')?dateLabel(field('leaseStart'))+' ~ '+dateLabel(field('leaseEnd')):'[확인 필요]')));
+ if(field('contractDate'))out.push('▶ 계약일 : '+dateLabel(field('contractDate')));
+ const ratio=d.price>0&&d.deposit!==null?d.deposit/d.price*100:null;
+ out.push('▶ 계약금 : '+moneyOr(d.deposit)+(ratio!==null&&Math.abs(ratio-10)<0.00001?' (매매대금의 10%)'.replace('매매대금',totalName):''));
+ if(d.remainder!==null&&d.remainder>0)out.push('▶ 계약금 잔여액 : '+money(d.remainder));
+ if(d.interim>0){
+  if(field('interimDate'))out.push('▶ 중도금 지급일 : '+field('interimDate'));
+  out.push('▶ 중도금 : '+money(d.interim));
  }
- if(field('contractDate'))out.push('▶ 계약서 작성 예정 : '+field('contractDate'));
- out.push('▶ 약정 계약금 : '+(d.deposit===null?'[확인 필요]':money(d.deposit)));
- out.push('▶ 이번 선송금 예정액 : '+(d.advance===null?'[확인 필요]':money(d.advance)));
- if(d.remainder===null||d.remainder>0)out.push('▶ 남은 계약금 : '+(d.remainder===null?'[확인 필요]':money(d.remainder)));
- if(d.interim>0)out.push('▶ 중도금 : '+money(d.interim));
- out.push('▶ 최종 잔금 : '+(d.balance===null?'[확인 필요]':money(d.balance)));
- out.push('▶ 잔금 지급 예정 : '+(field('balanceDate')?dateLabel(field('balanceDate')):'[확인 필요]')+(field('balanceTime')?' '+field('balanceTime'):''));
- if(field('leaseStart'))out.push('▶ 입주/임대차 개시 : '+dateLabel(field('leaseStart')));
- out.push('','▶ '+who+' 송금 계좌 : '+(field('bank')||'[은행 확인]')+' '+(field('account')||'[계좌 확인]'));
- out.push('▶ 예금주 : '+(field('accountHolder')||'[예금주 확인]'));
+ out.push('','▶ 잔금일 : '+(field('balanceDate')?dateLabel(field('balanceDate')):'[확인 필요]')+(field('balanceTime')?' '+field('balanceTime'):''));
+ out.push('▶ 잔금 : '+moneyOr(d.balance));
+ if(field('leaseStart'))out.push('▶ 입주일 : '+dateLabel(field('leaseStart')));
  const terms=safeLines(field('terms'));
- if(terms.length){out.push('','● 특약 및 합의사항 ●');terms.forEach((line,i)=>out.push((i+1)+'. '+line.replace(/^\d+[.)]\s*/,'')));}
- if(field('cancellation'))out.push('','● 해제·위약 관련 합의 ●',field('cancellation'));
- if(field('brokerFee'))out.push('','● 중개보수 관련 합의 ●',field('brokerFee'));
- out.push('','위 조건과 송금 계좌·예금주를 당사자 모두 확인해 주시기 바랍니다.',
- '계약금 일부 송금 및 이후 계약서 작성에 관한 합의 내용을 확인한 후 진행해 주시기 바랍니다.');
+ if(terms.length){
+  out.push('','▶ 특약사항');
+  terms.forEach(t=>out.push('→ '+t.replace(/^\d+[.)]\s*/,'')));
+ }
+ if(field('cancellation'))out.push('','▶ 별도 해제·위약 합의',field('cancellation'));
+ if(field('brokerFee'))out.push('','▶ 별도 중개보수 합의',field('brokerFee'));
+ const account=field('bank')&&field('account')&&field('accountHolder')?
+  field('bank')+' '+field('account')+' (예금주 '+field('accountHolder')+')':
+  '[은행·계좌번호·예금주 확인 필요]';
+ if(E('ct_includeNotice')?.checked){
+  out.push('','※ 계약금 일부 송금 및 계약 성립·해제 조건 확인');
+  out.push('금일 위 계약조건에 따라 계약금 중 일부 '+moneyOr(d.advance)+'를 '+who+' 계좌('+account+')로 송금하기로 합니다.');
+  out.push('당사자들은 위 금액의 이체와 동시에 본계약이 체결된 것으로 보기로 하며, 일방의 변심으로 계약을 해제하는 경우 '+who+'은 실제 수령한 금액의 배액을 상환하고 '+paying+'은 실제 송금한 금액을 포기하는 조건으로 합의합니다.');
+  out.push('또한 위 사유로 계약이 해제되더라도 그 사실만으로 중개보수 지급의무가 없어지는 것은 아니라는 점을 확인합니다.');
+ }else{
+  out.push('','※ 계약금 중 일부 '+moneyOr(d.advance)+'를 '+who+' 계좌('+account+')로 송금할 예정입니다.');
+  out.push('위 계약조건과 송금 계좌, 계약 성립·해제 조건을 당사자 모두 확인해 주시기 바랍니다.');
+ }
  E('ct_preview').value=out.join('\n');
- created=true;
- approved=false; // Human confirmation is mandatory even for a fully populated template.
+ created=true;approved=false;
  updateSummary();
  E('ct_status').className='contractReview '+(d.errors.length?'bad':'');
- E('ct_status').textContent=d.errors.length?
-  '⚠ 미완성 초안 · 발송 전 보완: '+d.errors.join(' · '):
-  '필수 항목이 채워졌습니다. 문자와 계좌를 직접 대조한 뒤 ‘내용 확인 완료’를 눌러 주세요.';
+ E('ct_status').textContent=d.errors.length?'⚠ 발송 전 보완: '+d.errors.join(' · '):
+  '계약내용·금액·계좌·당사자 합의를 대조한 뒤 ‘내용 확인 완료’를 누르세요.';
 }
 function edited(){
  approved=false;E('ct_status').className='contractReview bad';
@@ -169,11 +179,16 @@ function approve(){
  const d=collect();
  if(d.errors.length){E('ct_status').textContent='다음 필수 항목을 먼저 보완하세요: '+d.errors.join(' · ');E('ct_status').className='contractReview bad';return;}
  if(!created||!field('property')||!E('ct_preview').value.trim()){alert('먼저 문자 초안을 생성해 주세요.');return;}
+ if(E('ct_includeNotice')?.checked&&!E('ct_noticeConfirmed')?.checked){
+  E('ct_status').className='contractReview bad';
+  E('ct_status').textContent='하단의 계약 성립·해제·중개보수 조건은 법률상 자동 적용되는 내용이 아닙니다. 당사자 간 실제 합의를 확인했다면 ‘하단 합의 내용 확인’에 체크해 주세요.';
+  return;
+ }
  approved=true;
  E('ct_status').className='contractReview ok';E('ct_status').textContent='직접 확인 완료 · 복사 또는 공유할 수 있습니다.';
 }
 function assertReady(){
- if(!created||!approved||collect().errors.length){alert('계약 조건 입력 → 초안 생성 → 내용 확인 완료 순서로 진행해 주세요.');return false;}
+ if(!created||!approved||collect().errors.length||(E('ct_includeNotice')?.checked&&!E('ct_noticeConfirmed')?.checked)){alert('계약 조건·하단 합의문을 확인한 뒤 내용 확인 완료를 눌러주세요.');return false;}
  return true;
 }
 async function copy(){
@@ -205,6 +220,7 @@ function clearForNewMemo(){
  const memo=field('rough');
  FIELDS.forEach(id=>{if(id!=='rough'&&E('ct_'+id))E('ct_'+id).value='';});
  E('ct_dealType').value='전세';
+ if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false;
  E('ct_preview').value='';
  E('ct_rough').value=memo;
  E('ct_status').textContent='메모에서 새 계약조건을 분석합니다.';
@@ -217,6 +233,7 @@ function reset(){
  if(!confirm('현재 작성 중인 계약 내용을 모두 지우시겠습니까? 저장된 사본은 없습니다.'))return;
  FIELDS.forEach(id=>{const el=E('ct_'+id);if(el)el.value='';});
  E('ct_dealType').value='전세';E('ct_preview').value='';
+ if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false;
  E('ct_status').textContent='조건을 입력하면 초안을 생성할 수 있습니다.';
  E('ct_status').className='contractReview';
  created=false;approved=false;updateSummary();
