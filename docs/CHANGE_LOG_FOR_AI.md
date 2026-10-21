@@ -1,5 +1,7 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-21 / v1.19.12**: Recognize bare balance dates with two-digit years; unlabeled interim/balance scheduling and repair terms. Redesigned single-PNG premium customer contract cards from final approved preview text, with complete legal text and overflow rejection.
+
 - **2026-10-21 / v1.19.11**: Fixed interim amount followed by malformed schedule; explicit review gate for invalid date; inferred standalone repair and agreed-date special clauses; removed deposit remainder from customer notice. Synthetic regression fixtures.
 
 - **2026-10-21 / v1.19.10**: Unique name as a local payee draft irrespective of bank proximity, transfer colloquialisms and guarded ambiguous-role handling. Fictional regression samples only.
