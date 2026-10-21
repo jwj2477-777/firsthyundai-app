@@ -34,6 +34,20 @@ function normalizeDate(raw){
   String(y)+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0'):'';
 }
 function safeLines(v){return String(v||'').replace(/\r/g,'').split('\n').map(x=>x.trim()).filter(Boolean);}
+const DEFAULT_DETAIL_TERM='기타 상세한 특약사항은 본계약서 작성 시 협의하여 기재한다.';
+function previewSpecialTerms(raw){
+ const lines=safeLines(raw);
+ // Avoid adding a duplicate if the memo already says the remaining details will be agreed at signing.
+ const isEquivalent=line=>{
+  const clean=String(line||'').replace(/^[①②③④⑤⑥⑦⑧⑨⑩→•\d.)\s-]+/g,'').replace(/\s+/g,'');
+  return clean.includes(DEFAULT_DETAIL_TERM.replace(/\s+/g,'')) ||
+   /(?:기타|그외|나머지|세부|상세).{0,16}(?:사항|특약|조건).{0,20}(?:본계약|계약서|계약시|계약때).{0,15}(?:협의|작성|기재|정한다)/.test(clean) ||
+   /(?:기타|그외|나머지).{0,8}사항.{0,12}(?:계약시|본계약).{0,12}(?:협의|정한다|작성)/.test(clean);
+ };
+ if(!lines.some(isEquivalent))lines.push(DEFAULT_DETAIL_TERM);
+ return lines;
+}
+
 function extractNotes(){
  const raw=field('rough');if(!raw){alert('먼저 메모 또는 음성입력 내용을 적어 주세요.');return;}
  const lines=raw.replace(/\r/g,'').split('\n');
@@ -145,7 +159,7 @@ function makePreview(){
  out.push('','▶ 잔금일 : '+(field('balanceDate')?dateLabel(field('balanceDate')):'[확인 필요]')+(field('balanceTime')?' '+field('balanceTime'):''));
  out.push('▶ 잔금 : '+moneyOr(d.balance));
  if(field('leaseStart'))out.push('▶ 입주일 : '+dateLabel(field('leaseStart')));
- const terms=safeLines(field('terms'));
+ const terms=previewSpecialTerms(field('terms'));
  if(terms.length){
   out.push('','▶ 특약사항');
   terms.forEach(t=>out.push('→ '+t.replace(/^\d+[.)]\s*/,'')));
@@ -256,6 +270,6 @@ window.FirstHyundaiContracts={
   const r=catalogRows().find(x=>x.id===id);
   if(r){setField('property',r.label,true);setField('address',r.address||'',true);switchPage('contracts');window.FirstHyundaiSmart?.select(r.id);updateSummary();}
  },
- _test:{contractValue,normalizeDate,collect,clearForNewMemo}
+ _test:{contractValue,normalizeDate,collect,clearForNewMemo,previewSpecialTerms,DEFAULT_DETAIL_TERM}
 };
 })();
