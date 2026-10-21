@@ -1,6 +1,7 @@
 """Public source adapter tests: parsing, scope, approval gating and data safety."""
 import importlib.util,json,tempfile,unittest
 from urllib.parse import parse_qs,urlsplit
+from urllib.error import HTTPError
 from pathlib import Path
 
 root=Path(__file__).resolve().parents[1]
@@ -51,6 +52,35 @@ class PublicDataTests(unittest.TestCase):
   self.assertEqual(school['state'],'verified')
   self.assertEqual(len(school['records']),2)
   self.assertIn('배정학교',school['note'])
+ def test_neis_recovers_from_500_by_using_smaller_pages(self):
+  calls=[]
+  def mock(req):
+   args=parse_qs(urlsplit(req.full_url).query)
+   calls.append(int(args['pSize'][0]))
+   if int(args['pSize'][0])>=100:
+    raise HTTPError(req.full_url,500,'simulated NEIS service error',None,None)
+   return neis_payload()
+  school=p.collect_schools('mock-neis-key',opener=mock)
+  self.assertEqual(school['state'],'verified')
+  self.assertEqual(len(school['records']),2)
+  self.assertEqual(calls,[100,25])
+  self.assertTrue(all('assigned' not in record for record in school['records']))
+
+ def test_neis_http_500_all_pages_never_publishes_sample_rows_or_key(self):
+  calls=[]
+  def mock(req):
+   args=parse_qs(urlsplit(req.full_url).query)
+   key=args['KEY'][0]
+   calls.append((key,int(args['pSize'][0])))
+   if key=='sample':return neis_payload()
+   raise HTTPError(req.full_url,500,'simulated upstream failure',None,None)
+  with self.assertRaises(RuntimeError) as error:
+   p.collect_schools('private-neis-key',opener=mock)
+  self.assertIn('sample 조회는 정상',str(error.exception))
+  self.assertNotIn('private-neis-key',str(error.exception))
+  self.assertEqual(calls,[('private-neis-key',100),('private-neis-key',25),
+                          ('private-neis-key',5),('sample',5)])
+
  def test_neis_invalid_answer_fails_closed(self):
   with self.assertRaises(RuntimeError):
    p.school_rows(b'{"RESULT":{"CODE":"ERROR-300"}}')
@@ -170,7 +200,10 @@ class PublicDataTests(unittest.TestCase):
  def test_official_zone_is_download_and_never_auto_assigned(self):
   snap=json.loads((root/'data'/'public_services.json').read_text(encoding='utf8'))
   self.assertEqual(snap['school_zones']['state'],'published_download_available')
-  self.assertEqual(snap['schools']['state'],'awaiting_key')
+  self.assertIn(snap['schools']['state'],('awaiting_key','verified'))
+  if snap['schools']['state']=='verified':
+   self.assertTrue(snap['schools']['records'])
+   self.assertTrue(all('assigned' not in x for x in snap['schools']['records']))
   self.assertIn(snap['maintenance']['state'],('awaiting_approval','verified'))
   self.assertFalse(snap['school_zones']['records'])
 
