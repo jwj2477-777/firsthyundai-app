@@ -129,3 +129,38 @@ easy.afterManualEdit();
 assert(el('ct_preview').value.includes('▶ 중도금 지급일 : 2026-12-20'));
 assert(!ctx.window.FirstHyundaiContracts._test.collect().errors.includes('중도금 지급일 오타 확인'));
 console.log('User-pattern memo regression passed: interim, corrected balance, implicit clauses and date review.');
+
+
+// A new real-world office memo shape (entirely invented recipient/account).
+// Bare 잔금 is a payment-date heading; no literal "특약:" label is necessary.
+const looseDateMemo=[
+ '퍼팍 1502동3004호',
+ '매매 15억',
+ '중도금 5억 12월5일',
+ '잔금 27년 1월30일',
+ '',
+ '김가람 하나은행 123-45678-01 700만',
+ '중도금 및 잔금일 앞당길수있다',
+ '매도인은 부서진곳을 수리해준다'
+].join('\n');
+el('ct_rough').value=looseDateMemo;
+assert.equal(easy.compose(),true);
+assert.equal(el('ct_property').value,'퍼스트파크 15블럭');
+assert.equal(el('ct_unit').value,'1502동 3004호');
+assert.equal(el('ct_price').value,'150000');
+assert.equal(el('ct_contractDeposit').value,'15000');
+assert.equal(el('ct_interim').value,'50000');
+assert(el('ct_interimDate').value.endsWith('-12-05'),'Interim date 12월5일');
+assert.equal(el('ct_balanceDate').value,'2027-01-30','Short year after bare balance keyword');
+assert.equal(el('ct_bank').value,'하나은행');
+assert.equal(el('ct_accountHolder').value,'김가람');
+assert.equal(el('ct_advance').value,'700');
+assert.equal(el('ct_terms').value.split('\n').length,2);
+assert(el('ct_terms').value.includes('중도금 및 잔금일 앞당길 수 있다.'));
+assert(el('ct_terms').value.includes('매도인은 부서진 곳을 수리해준다.'));
+assert(el('ct_preview').value.includes('▶ 중도금 : 50,000만원'));
+assert(el('ct_preview').value.includes('▶ 잔금일 : 2027.01.30.'));
+assert(el('ct_preview').value.includes('▶ 잔금 : 85,000만원'));
+for(const term of ['중도금 및 잔금일 앞당길 수 있다.','매도인은 부서진 곳을 수리해준다.'])assert(el('ct_preview').value.includes(term));
+assert(!el('ct_preview').value.includes('계약금 잔여액'));
+console.log('Unlabeled balance / special terms regression passed with one memo.');
