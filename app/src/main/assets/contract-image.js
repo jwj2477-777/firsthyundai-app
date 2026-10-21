@@ -106,9 +106,9 @@ function plan(raw){
   const p=layout(text,profile,false);
   if(p.length===1&&p[0].bottom<=LIMIT)return p;
  }
- const p=layout(text,profiles[2],true);
- if(!p.length)throw Error('이미지로 만들 계약 내용이 없습니다.');
- return p;
+ // The customer-facing artifact is always ONE PNG. Never silently truncate,
+ // split a contract into separate images, or make tiny unreadable legal text.
+ throw Error('계약 안내가 한 장에 담기기에는 너무 깁니다. 내용을 검토·정리한 뒤 다시 생성해 주세요.');
 }
 function draw(page,index,total){
  const canvas=document.createElement('canvas');canvas.width=WIDTH;
