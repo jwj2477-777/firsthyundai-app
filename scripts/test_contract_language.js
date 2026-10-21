@@ -92,3 +92,25 @@ reset();tryNote('퍼팍 2301동 903호 전세 5억');assert(!el('ct_address').va
 reset();tryNote('퍼팍 1402동 또는 1502동 903호 전세 5억');assert(!el('ct_address').value,'Multiple buildings require confirmation');
 reset();tryNote('퍼팍 전세 5억');assert(!el('ct_address').value,'No dong or block means ambiguous');
 console.log('Songdo dong-prefix inference passed: six blocks, attached alias, conflicting block, unknown family and multiple dongs.');
+
+
+// Date field is free text for mutually negotiated writing schedules, not date-only.
+for(const [memo,expected,flexible] of [
+ ['계약은 10월중 협의','10월중 협의',true],
+ ['본계약은 추후 협의','추후 협의',true],
+ ['계약일은 10월 말 예정','10월 말 예정',true],
+ ['계약은 잔금 전 작성','잔금 전 작성',true],
+ ['계약일 2027년 10월 25일','2027-10-25',false],
+ ['계약은 27년 10월25일','2027-10-25',false]
+]){
+ const result=language._test.contractScheduleCandidate(memo);
+ assert(result,'Contract date memo missing: '+memo);
+ assert.equal(result.value,expected);
+ assert.equal(result.flexible,flexible);
+}
+assert.equal(language._test.contractScheduleCandidate('계약금 6천'),null,'Contract money is never a writing date');
+reset();
+tryNote('퍼팍 15블럭 1502동 3004호 매매 16억 계약금 6천 잔금 27년 1월5일\n계약은 10월중 협의');
+eq('contractDate','10월중 협의');
+assert(el('ct_preview').value===''||!el('ct_preview').value.includes('계약금 6천 협의'));
+console.log('Negotiated signing window and precise Korean date test passed.');
