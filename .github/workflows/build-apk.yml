@@ -18,6 +18,7 @@ on:
       - 'scripts/test_extended_complex_catalog.js'
       - 'scripts/test_naver_basic_facts.js'
       - 'scripts/test_nearby.js'
+      - 'scripts/test_favorite_trade_alerts.js'
       - 'scripts/test_mobile_navigation.js'
       - 'scripts/test_contracts.js'
       - 'scripts/test_contract_language.js'
@@ -88,6 +89,8 @@ jobs:
           python3 -c "from pathlib import Path; x=Path('app/src/main/assets/index.html').read_text(encoding='utf-8'); Path('/tmp/firsthyundai-ui.js').write_text(x.split('<script>',1)[1].split('</script>',1)[0],encoding='utf-8')"
           node --check /tmp/firsthyundai-ui.js
           node scripts/test_nearby.js
+          node --check app/src/main/assets/trade-alerts.js
+          node scripts/test_favorite_trade_alerts.js
           node scripts/test_mobile_navigation.js
           node --check app/src/main/assets/contracts.js
           node --check app/src/main/assets/contracts-smart.js
@@ -134,19 +137,19 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v1.19.5 installed-version-correct APK
+      - name: Publish successful v1.19.6 14-favorites-new-trade-popup APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.5.apk
-          unzip -t FirstHyundai-v1.19.5.apk | grep 'No errors detected'
-          if gh release view v1.19.5 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.6.apk
+          unzip -t FirstHyundai-v1.19.6.apk | grep 'No errors detected'
+          if gh release view v1.19.6 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v1.19.5 FirstHyundai-v1.19.5.apk \
+            gh release create v1.19.6 FirstHyundai-v1.19.6.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.19.5 · 실제 설치된 앱 버전 표시 개선' \
-              --notes '앱 하단의 오래된 v1.10 고정 문구를 제거했습니다. Android PackageManager에서 실제 설치된 APK의 versionName과 versionCode를 읽어 가족용 앱 하단, 관리자 보안 화면, 최초 잠금 화면에 표시합니다. 웹 미리보기 등 안드로이드 메타데이터가 없는 화면에서는 버전을 임의로 표시하지 않습니다. CI는 APK 자체의 AndroidManifest 버전과 Gradle 및 GitHub 배포 태그가 서로 일치하는지 자동 검증합니다. 이전 v1.19.4의 갱신계약 네 가지 세부정보, 실거래 표시 및 계약문자 특약 등의 기능은 유지됩니다. 설치 전 내 자료 백업을 권장합니다.'
+              --title '퍼스트현대 v1.19.6 · 관심 14개 단지 새 실거래 팝업' \
+              --notes '관심 14개 단지에서 새로 확인된 실거래를 앱 실행 또는 데이터 갱신 시 집계해 부드러운 팝업으로 안내합니다. 첫 연결은 기존 거래 기준으로 저장해 과거 거래 폭탄 알림을 방지하고, 같은 거래는 재실행해도 반복하지 않습니다. 퍼스트파크·마스터뷰·프라임뷰 블록을 각각 분리하며, 알림 끄기 기능과 알림에서 새소식 관심 14개 단지로 바로 이동하는 기능을 제공합니다. 신규 확인일은 국토부의 실제 공개일이 아닌 앱 수집 첫 발견일입니다. 앱을 완전히 종료한 상태의 실시간 OS 푸시는 별도의 전용 서버 푸시 연동이 필요하며 이번 버전에는 포함되지 않습니다. 이전 기능과 버전 표시 검증은 유지합니다. 설치 전에 내 자료 백업을 권장합니다.'
           fi
