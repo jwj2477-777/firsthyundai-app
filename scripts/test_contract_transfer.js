@@ -1,0 +1,62 @@
+// Privacy-safe memo field permutations and source-backed NEIS tab integration.
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const root=path.resolve(__dirname,'..'),dir=path.join(root,'app/src/main/assets');
+const html=fs.readFileSync(path.join(dir,'index.html'),'utf8');
+assert(html.includes('<script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script>'),'Load order is essential');
+assert(html.includes('neisSchoolLevel')&&html.includes('selectNeisSchoolLevel'));
+assert(html.includes('NEIS_EDU_KEY')&&!html.includes('KEY=SECRET'));
+assert(html.includes('data')||html.includes('publicServices'));
+const elems=new Map();function el(id){
+ if(!elems.has(id)){const state=new Set();elems.set(id,{
+  id,value:'',textContent:'',innerHTML:'',className:'',open:false,
+  checked:['ct_autoDeposit','ct_includeNotice','ct_polishTerms'].includes(id),
+  classList:{add:x=>state.add(x),remove:x=>state.delete(x),toggle:(x,flag)=>flag?state.add(x):state.delete(x),contains:x=>state.has(x)},
+  focus(){},select(){},closest(){return null},scrollIntoView(){}});
+ }return elems.get(id);
+}
+const complex=[{id:'f15',label:'퍼스트파크 15블럭',address:'인천 연수구 테스트로 15',aliases:[]}];
+const ctx=vm.createContext({window:{},document:{getElementById:el},catalogRows:()=>complex,alert(){},confirm(){return true},console,Date,Number,String,navigator:{}});
+for(const file of ['contracts.js','contracts-smart.js','contracts-language.js','contracts-transfer.js','contracts-easy.js']){
+ const js=fs.readFileSync(path.join(dir,file),'utf8');
+ new vm.Script(js);
+ assert(!/\b(?:fetch|XMLHttpRequest|localStorage)\b/.test(js),file+' cannot leak bank account data to the network');
+ vm.runInContext(js,ctx);
+}
+const easy=ctx.window.FirstHyundaiEasy,transfer=ctx.window.FirstHyundaiTransfer;
+function compose(notes){el('ct_rough').value='퍼팍 15블럭 1501동 1203호 매매 10억 2000 계약금 1억 200만원 '+notes+' 잔금일 2026년 12월 30일';assert.equal(easy.compose(),true);}
+function permute(a){if(!a.length)return [[]];return a.flatMap((v,i)=>permute(a.filter((_,j)=>i!==j)).map(x=>[v,...x]));}
+const four=['김철수','123-456-789012','500','국민은행'];
+const permutations=permute(four);
+assert.equal(permutations.length,24);
+for(const p of permutations){
+ compose(p.join(' '));
+ assert.equal(el('ct_bank').value,'국민은행',p.join('|')+' bank');
+ assert.equal(el('ct_account').value,'123-456-789012',p.join('|')+' account must not contain 500');
+ assert.equal(el('ct_accountHolder').value,'김철수',p.join('|')+' recipient');
+ assert.equal(el('ct_advance').value,'500',p.join('|')+' remittance');
+ assert(el('ct_preview').value.includes('계약금 중 일부인 500만원을'),'contract text uses proper remittance');
+ assert(!el('ct_preview').value.includes('▶ 이번 선송금 예정액'));
+}
+compose('천만원 오늘 입금 이영희 신한은행 110-222-334455');
+assert.equal(el('ct_advance').value,'1000','Korean spoken remittance before today works');
+assert.equal(el('ct_accountHolder').value,'이영희');
+compose('금일 1,000만 원 박민수 국민은행 111-222-333444');
+assert.equal(el('ct_advance').value,'1000','Commas and spaced won work');
+assert.equal(el('ct_accountHolder').value,'박민수');
+compose('송금액 500 매도인 김갑수 매수인 이을희 예금주 박영희 기업은행 110-222-334455');
+assert.equal(el('ct_advance').value,'500');
+assert.equal(el('ct_accountHolder').value,'박영희','Never use owner/buyer as account holder where payee is specified');
+compose('매수인 이영희 계좌 123-456-789012 은행 국민은행 500 김철수');
+assert.equal(el('ct_advance').value,'500');
+assert(el('ct_languageWarnings').textContent.includes('추정했습니다'),'Unlabeled transfer is explicitly tentative');
+// Separate amounts without bank and account cannot be a reliable remittance.
+compose('매매대금 10억 2000만원 계약금 1억 200만원 중도금 2억');
+assert.equal(el('ct_advance').value,'');
+const p=transfer.packet('계좌 111-222-333333 계좌 444-555-666666 국민은행 홍길동 500');
+assert.equal(p.account,null,'Ambiguous multiple accounts cannot be auto-confirmed');
+assert(p.warning.includes('계좌번호'));
+const snap=JSON.parse(fs.readFileSync(path.join(root,'data/public_services.json'),'utf8'));
+assert(['awaiting_key','verified'].includes(snap.schools.state));
+assert(snap.school_zones.records.length===0);
+console.log('Transfer permutation regression passed: 24 field orders, Korean words, labels, account safety, explicit review, no false assigned schools.');
