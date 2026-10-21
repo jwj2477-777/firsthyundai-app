@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "state": "awaiting_approval",
-  "updated_at": "2026-10-21T08:31:10+0900",
+  "updated_at": "2026-10-21T11:00:05+0900",
   "note": "신청·인증 전에는 빈 배열을 실제 조회 0건으로 해석하지 않습니다. 학구도와 가까운 학교를 배정학교로 자동 판단하지 않습니다. 키는 GitHub Secrets에만 보관.",
   "schools": {
     "state": "awaiting_key",
@@ -18,12 +18,12 @@
   },
   "building_registry": {
     "state": "verified",
-    "updated_at": "2026-10-19T19:30:52.404416+00:00",
+    "updated_at": "2026-10-21T01:56:34.046914+00:00",
     "source_url": "https://www.data.go.kr/data/15134735/openapi.do",
     "note": "송도동 법정동/지번과 K-apt 공식 단지코드, 건축물대장 표제부 주용도·주소 검증을 통과한 건물 정보만 표시. 단지 내 미일치 동은 표시하지 않음.",
     "scanned": 77,
     "eligible": 77,
-    "failures": 8,
+    "failures": 0,
     "records": [
       {
         "complex_id": "kapt-a10020270",
@@ -98,12 +98,36 @@
         "top_ground_floor": 20
       },
       {
+        "complex_id": "kapt-a10022494",
+        "kapt_code": "A10022494",
+        "summary": "건축물대장 표제부 12건 확인 · 주용도 공동주택 · 사용승인 2024-05-29 · 확인 건물 최고 지상 59층",
+        "title_count": 12,
+        "approval_date": "2024-05-29",
+        "top_ground_floor": 59
+      },
+      {
+        "complex_id": "kapt-a10022498",
+        "kapt_code": "A10022498",
+        "summary": "건축물대장 표제부 23건 확인 · 주용도 공동주택 · 사용승인 2024-06-27 · 확인 건물 최고 지상 42층",
+        "title_count": 23,
+        "approval_date": "2024-06-27",
+        "top_ground_floor": 42
+      },
+      {
         "complex_id": "kapt-a10022954",
         "kapt_code": "A10022954",
         "summary": "건축물대장 표제부 25건 확인 · 주용도 공동주택 · 사용승인 2023-10-24 · 확인 건물 최고 지상 49층",
         "title_count": 25,
         "approval_date": "2023-10-24",
         "top_ground_floor": 49
+      },
+      {
+        "complex_id": "kapt-a10022964",
+        "kapt_code": "A10022964",
+        "summary": "건축물대장 표제부 11건 확인 · 주용도 공동주택 · 사용승인 2023-09-26 · 확인 건물 최고 지상 48층",
+        "title_count": 11,
+        "approval_date": "2023-09-26",
+        "top_ground_floor": 48
       },
       {
         "complex_id": "centennial",
@@ -314,6 +338,14 @@
         "top_ground_floor": 34
       },
       {
+        "complex_id": "artwin",
+        "kapt_code": "A10027898",
+        "summary": "건축물대장 표제부 3건 확인 · 주용도 공동주택 · 사용승인 2015-08-27 · 확인 건물 최고 지상 60층",
+        "title_count": 3,
+        "approval_date": "2015-08-27",
+        "top_ground_floor": 60
+      },
+      {
         "complex_id": "m21",
         "kapt_code": "A10027925",
         "summary": "건축물대장 표제부 11건 확인 · 주용도 공동주택 · 사용승인 2015-07-29 · 확인 건물 최고 지상 32층",
@@ -474,6 +506,22 @@
         "top_ground_floor": 38
       },
       {
+        "complex_id": "kapt-a40673914",
+        "kapt_code": "A40673914",
+        "summary": "건축물대장 표제부 16건 확인 · 주용도 공동주택 · 사용승인 2012-06-11 · 확인 건물 최고 지상 28층",
+        "title_count": 16,
+        "approval_date": "2012-06-11",
+        "top_ground_floor": 28
+      },
+      {
+        "complex_id": "kapt-a40673915",
+        "kapt_code": "A40673915",
+        "summary": "건축물대장 표제부 15건 확인 · 주용도 공동주택 · 사용승인 2012-06-11 · 확인 건물 최고 지상 27층",
+        "title_count": 15,
+        "approval_date": "2012-06-11",
+        "top_ground_floor": 27
+      },
+      {
         "complex_id": "kapt-a40673916",
         "kapt_code": "A40673916",
         "summary": "건축물대장 표제부 5건 확인 · 주용도 공동주택 · 사용승인 2012-12-03 · 확인 건물 최고 지상 38층",
@@ -482,12 +530,28 @@
         "top_ground_floor": 38
       },
       {
+        "complex_id": "kapt-a40673917",
+        "kapt_code": "A40673917",
+        "summary": "건축물대장 표제부 11건 확인 · 주용도 공동주택 · 사용승인 2012-10-25 · 확인 건물 최고 지상 32층",
+        "title_count": 11,
+        "approval_date": "2012-10-25",
+        "top_ground_floor": 32
+      },
+      {
         "complex_id": "kapt-a40673918",
         "kapt_code": "A40673918",
         "summary": "건축물대장 표제부 4건 확인 · 주용도 공동주택 · 사용승인 2012-07-27 · 확인 건물 최고 지상 20층",
         "title_count": 4,
         "approval_date": "2012-07-27",
         "top_ground_floor": 20
+      },
+      {
+        "complex_id": "kapt-a40673920",
+        "kapt_code": "A40673920",
+        "summary": "건축물대장 표제부 18건 확인 · 주용도 공동주택 · 사용승인 2013-09-30 · 확인 건물 최고 지상 40층",
+        "title_count": 18,
+        "approval_date": "2013-09-30",
+        "top_ground_floor": 40
       },
       {
         "complex_id": "kapt-a40673921",
@@ -581,12 +645,12 @@
   },
   "maintenance": {
     "state": "verified",
-    "updated_at": "2026-10-19T19:34:37.680250+00:00",
+    "updated_at": "2026-10-21T02:00:05.497317+00:00",
     "source_url": "https://www.data.go.kr/data/15057937/openapi.do",
     "month": "202608",
     "scanned": 77,
     "eligible": 77,
-    "failures": 1,
+    "failures": 0,
     "note": "국토교통부 K-apt 공용관리비 API의 인건비·경비비·청소비 공개항목만 표시. 전체 관리비와 별개이며 실제 세대 청구액이 아님.",
     "records": [
       {
@@ -850,6 +914,18 @@
           "인건비": 43210520,
           "경비비": 18991020,
           "청소비": 26590240
+        },
+        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
+      },
+      {
+        "complex_id": "kapt-a10025399",
+        "kapt_code": "A10025399",
+        "month": "202608",
+        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 81,472,890원 · 경비비 42,569,271원 · 청소비 70,038,972원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "breakdown_won": {
+          "인건비": 81472890,
+          "경비비": 42569271,
+          "청소비": 70038972
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
@@ -1282,6 +1358,18 @@
           "인건비": 30199670,
           "경비비": 22114460,
           "청소비": 13075980
+        },
+        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
+      },
+      {
+        "complex_id": "kapt-a40673916",
+        "kapt_code": "A40673916",
+        "month": "202608",
+        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 32,105,806원 · 경비비 27,777,330원 · 청소비 17,430,700원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "breakdown_won": {
+          "인건비": 32105806,
+          "경비비": 27777330,
+          "청소비": 17430700
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
