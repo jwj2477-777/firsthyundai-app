@@ -209,6 +209,9 @@ body.apartmentSheetActive{overflow:hidden}
   <h3 style="margin:0 0 8px">즐겨찾기 14개 단지</h3>
   <label class="favoriteTradeAlertSwitch"><input type="checkbox" id="favoriteTradeAlertEnabled" checked onchange="FirstHyundaiTradeAlerts.setEnabled(this.checked)"> <span>🔔 관심 단지 새 실거래 팝업 알림</span></label>
   <p class="tiny favoriteTradeAlertHint">앱을 열거나 새 거래 자료를 갱신할 때 새로 확인된 매매·전세·월세를 한 번만 알려드립니다. 최초 연결 시에는 기존 거래를 알리지 않습니다.</p>
+  <label class="favoriteTradeAlertSwitch"><input type="checkbox" id="favoriteTradeNativeEnabled" onchange="FirstHyundaiTradeAlerts.setNativeEnabled(this.checked)"> <span>휴대폰 알림센터에서도 받기</span></label>
+  <p class="tiny favoriteTradeAlertHint" id="favoriteTradeNativeStatus" role="status">휴대폰 알림 권한 확인 중…</p>
+  <p class="tiny favoriteTradeAlertHint">휴대폰 알림은 앱 실행·새 거래 자료 갱신 시에만 생성됩니다. 앱을 종료한 상태의 실시간 푸시 알림은 별도의 연동이 필요합니다.</p>
   
   <button id="nearbyAll" class="btn alt nearbyTotal" type="button" onclick="chooseNearby('all')"><span>★ 관심 14개 단지 전체 보기</span><strong id="nearbyAllCount">—</strong></button>
   <div id="nearbyCards" class="nearbyGrid"></div>
