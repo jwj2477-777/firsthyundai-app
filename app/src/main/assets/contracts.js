@@ -265,7 +265,7 @@ window.firstHyundaiContractSpeech=function(result){
  }else if(result&&!result.cancelled)alert('음성입력에 실패했습니다. 직접 입력을 이용해 주세요.');
 };
 window.FirstHyundaiContracts={
- onOpen(){window.FirstHyundaiSmart?.onOpen();updateSummary();},updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,
+ onOpen(){window.FirstHyundaiSmart?.onOpen();updateSummary();},canShare:assertReady,updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,
  fromComplex(id){
   const r=catalogRows().find(x=>x.id===id);
   if(r){setField('property',r.label,true);setField('address',r.address||'',true);switchPage('contracts');window.FirstHyundaiSmart?.select(r.id);updateSummary();}

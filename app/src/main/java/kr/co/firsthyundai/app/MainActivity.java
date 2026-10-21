@@ -378,6 +378,9 @@ public class MainActivity extends Activity {
                 }
             });
         }
+        @JavascriptInterface public void shareContractImages(String imageJson) {
+            ContractImageShare.share(MainActivity.this, imageJson);
+        }
         @JavascriptInterface public void startContractDictation() {
             runOnUiThread(() -> {
                 Intent intent=new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);

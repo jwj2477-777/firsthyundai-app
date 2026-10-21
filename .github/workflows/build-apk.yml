@@ -26,6 +26,7 @@ on:
       - 'scripts/test_contract_easy.js'
       - 'scripts/test_contract_broker.js'
       - 'scripts/test_contract_transfer.js'
+      - 'scripts/test_contract_image.js'
       - 'scripts/test_trade_contract_regression.js'
       - 'scripts/test_app_version.js'
       - 'scripts/check_apk_version.py'
@@ -104,6 +105,8 @@ jobs:
           node scripts/test_contract_broker.js
           node --check app/src/main/assets/contracts-transfer.js
           node scripts/test_contract_transfer.js
+          node --check app/src/main/assets/contract-image.js
+          node scripts/test_contract_image.js
           node scripts/test_trade_contract_regression.js
           node scripts/test_app_version.js
           node scripts/test_apartment_detail_navigation.js
@@ -139,21 +142,21 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v1.19.8 warm-trade-notification-popup APK
+      - name: Publish successful v1.19.9 contract-image-card APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.8.apk
-          unzip -t FirstHyundai-v1.19.8.apk | grep 'No errors detected'
-          if gh release view v1.19.8 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.9.apk
+          unzip -t FirstHyundai-v1.19.9.apk | grep 'No errors detected'
+          if gh release view v1.19.9 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v1.19.8 FirstHyundai-v1.19.8.apk \
+            gh release create v1.19.9 FirstHyundai-v1.19.9.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.19.8 · 따뜻한 새 실거래 알림 팝업' \
-              --notes '관심 14개 단지의 새 실거래를 크림색 미니 배너와 단지별 상세 팝업으로 표시합니다. 금액·전용면적·층·계약일·확인일, 갱신 및 해제 표시를 포함합니다. 관심단지 탭에서 알림 화면 미리보기로 실제 새 거래 없이 디자인을 확인할 수 있으며 예시 거래는 실제 알림이나 확인 이력에 섞이지 않습니다. 나중에는 현재 앱 세션의 배너를 유지하고, 신규 거래 보기는 여러 확인일의 알림 거래를 함께 보여줍니다. 계약문자 입력과 아파트 상세 조회 중 자동 팝업을 띄우지 않습니다. 기존 기본 특약·갱신 4정보·중개사 소재지·출처 중복 제거·3문장 뉴스·동별 블럭 인식은 보존했습니다. 앱을 열거나 갱신할 때 확인하는 알림이며 앱 종료 중 실시간 푸시는 아직 지원하지 않습니다. 내 자료는 설치 전 별도 백업해 주세요.'
+              --title '퍼스트현대 v1.19.9 · 계약 안내 PNG 이미지 자동 생성' \
+              --notes '승인한 계약 안내 문자를 기기 안에서 따뜻한 아이보리·브라운 톤의 고해상도 PNG로 변환하여 카카오톡·문자 앱으로 공유합니다. 긴 특약은 여러 페이지로 자동 분할하며 원문과 당사자 합의를 바꾸거나 고객정보를 외부 서버로 전송하지 않습니다. 기존 텍스트 공유, 알림 팝업, 실거래 정보, 가족·관리자 분리, 뉴스 및 기본 특약 기능은 유지됩니다. 이미지 공유 전 계약조건을 반드시 검토하세요. 내 자료는 설치 전 별도 백업해 주세요.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v1.19.8 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v1.19.9 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"

@@ -1,4 +1,6 @@
 # 퍼스트현대 — 개발 연혁·버전별 의사결정·실패 재발 방지
+
+- **v1.19.9 (2026-10-21)**: 승인 완료 계약 안내의 오프라인 PNG 자동 렌더링·다중 페이지 미리보기·Android FileProvider 공유. 최종 문구/특약/계좌 확인 절차 유지. 빌드·릴리스 결과는 Actions 확인 필요.
 > 작성 2026-10-21 KST. **이 페이지는 정확한 모든 채팅 원문이 아니다.** 사용자가 명시적으로 요청한 것과 성공한 GitHub 릴리스 기반으로 정리한 AI 협업용 사건 기록. 사용자의 최신 요청과 실제 소스/Release를 우선한다.
 >
 > 태그·실제 배포 파일: https://github.com/jwj2477-777/firsthyundai-app/releases · 커밋: https://github.com/jwj2477-777/firsthyundai-app/commits/main · Workflows: https://github.com/jwj2477-777/firsthyundai-app/actions
