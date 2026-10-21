@@ -75,13 +75,17 @@ function holderCandidate(text,account,bank){
 }
 function moneyCandidates(text,account){
  const dates=dateRanges(text);
- const words=language._test.tokenizeMoney(text);
  const forbidden=[
   ...dates,
   ...Array.from(text.matchAll(/\d{1,4}\s*동\s*\d{1,4}\s*호/g),m=>[m.index,m.index+m[0].length]),
   ...Array.from(text.matchAll(/\d{1,2}\s*(?:월|일|년|블럭|블록)/g),m=>[m.index,m.index+m[0].length]),
  ];
  if(account)forbidden.push([account.start,account.end]);
+ // Mask dates, dong/ho, and account before monetary tokenization.
+ // This prevents the earlier tokenizer joining "123-456-789012 500" into one number.
+ const masked=Array.from(text);
+ for(const [start,end] of forbidden)for(let i=start;i<end;i++)masked[i]='§';
+ const words=language._test.tokenizeMoney(masked.join(''));
  const unique=[];
  for(const tok of words){
   if(overlap(tok.start,tok.end,forbidden))continue;
