@@ -127,13 +127,15 @@ function moneyCandidates(text,account){
 function packet(text){
  const s=String(text||'').normalize('NFKC').replace(/\r/g,'');
  const accountList=accountCandidates(s);
- const account=accountList[0]||null;
+ const ambiguousAccount=accountList.length>1&&accountList[0].strength===accountList[1].strength&&accountList[0].value!==accountList[1].value;
+ const account=ambiguousAccount?null:accountList[0]||null;
  const banks=bankCandidates(s,account);
  const bank=banks[0]||null;
  const holder=holderCandidate(s,account,bank);
  const possible=moneyCandidates(s,account);
  const known=possible.filter(x=>x.score>=65);
  let amount=null,confidence='none',warning=holder.warning||'';
+ if(ambiguousAccount)warning+=(warning?'\n':'')+'계좌번호가 둘 이상 발견되어 자동 선택하지 않았습니다.';
  if(known.length){
   if(known.length===1||known[0].score-known[1].score>=22||known[0].amount===known[1].amount){
    amount=known[0].amount;confidence='context';
@@ -180,6 +182,7 @@ function merge(result){
    review.push('송금액이 다른 금액과 혼동되어 '+wanted+'만원으로 다시 분석했습니다. 실제 송금액을 확인하세요.');
   }
  }
+ if(p.confidence==='inferred')review.push('송금액 '+p.amount+'만원은 네 항목 중 유일한 독립 금액으로 추정했습니다. 입금 전에 확인하세요.');
  if(p.warning)review.push(p.warning);
  const labels={bank:'은행',account:'계좌번호',accountHolder:'예금주',advance:'이번 송금액'};
  const status=E('recognized');
