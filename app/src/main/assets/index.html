@@ -1123,7 +1123,7 @@ function renderSchoolPublicInfo(){
   '<div class="apiNotice">'+(schools===null?'나이스 연동 대기 · GitHub Secrets에서 NEIS_EDU_KEY를 등록하고 학교정보 수집을 실행해 주세요.':
    '해당 학교급의 확인된 학교정보가 없습니다.')+'</div>';
  return '<div class="apiSmallCard"><h3>나이스 송도 학교 기본정보</h3>'+
-  '<p class="complexSectionNote">송도 지역 학교 정보이며 현재 선택한 아파트의 배정학교 목록이 아닙니다. 실제 통학구역·배정은 교육청 공식 학구도와 최신 공고로 확인해야 합니다.</p>'+
+  '<p class="complexSectionNote">송도 지역 학교 정보이며 현재 선택한 아파트의 배정학교가 아닙니다. 실제 통학구역·배정은 교육청 공식 학구도와 최신 공고로 확인해야 합니다.</p>'+
   '<p class="tiny">데이터 확인: '+escapeHtml(when)+'</p>'+
   (schools?'<div class="neisLevelButtons">'+buttons+'</div>':'')+
   rows+
