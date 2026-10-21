@@ -59,3 +59,25 @@ header{background:linear-gradient(125deg,#805033,#a66f43)}
 }
 .tradeRenewalDetail span{min-width:0;overflow-wrap:anywhere}
 @media(max-width:370px){.tradeRenewalDetail{grid-template-columns:1fr}}
+
+
+/* Foreground-only notifications for newly discovered transactions at 14 favorite complexes. */
+.favoriteTradeAlertSwitch{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:750;color:#654b39;cursor:pointer;padding:6px 0}
+.favoriteTradeAlertSwitch input{width:18px;height:18px;min-height:18px;accent-color:#895737;flex:0 0 auto}
+.favoriteTradeAlertHint{font-size:12px;line-height:1.65;color:#75685a;margin:4px 0 12px}
+.favoriteTradeAlertBanner{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:10px 0;padding:13px 14px;border:1px solid #dfc9af;border-radius:14px;background:#fff4e5;color:#765238}
+.favoriteTradeAlertBanner.hidden{display:none}
+.favoriteTradeAlertBanner strong{font-size:14px}
+.favoriteTradeAlertBanner>div{display:flex;gap:7px;align-items:center}
+.favoriteTradeAlertBanner .btn{min-height:38px;padding:6px 12px}
+.favoriteTradeAlertDismiss{min-height:38px;min-width:38px;border:0;background:transparent;color:#70533c;font-size:24px;cursor:pointer}
+.favoriteTradeAlertDialog{width:min(420px,calc(100% - 32px));max-height:min(80vh,680px);overflow:auto;border:1px solid #d6c5b3;border-radius:20px;background:#fffaf3;box-shadow:0 20px 65px #2f211e30;padding:22px;color:#42362a}
+.favoriteTradeAlertDialog::backdrop{background:#23181075}
+.favoriteTradeAlertDialog h2{font-size:19px;margin:0 0 8px;color:#5c422e}
+.favoriteTradeAlertRows{padding:0;margin:12px 0 18px;list-style:none;display:grid;gap:8px}
+.favoriteTradeAlertItem{display:flex;flex-direction:column;gap:3px;border:1px solid #e4d8ca;background:#fff;border-radius:12px;padding:12px}
+.favoriteTradeAlertItem strong{font-size:14px;color:#544134}
+.favoriteTradeAlertItem span{font-size:13px;color:#845b38;font-weight:700}
+.favoriteTradeAlertItem small,.favoriteTradeAlertMore{font-size:12px;color:#7c746a}
+.favoriteTradeAlertActions{display:flex;gap:8px;flex-wrap:wrap}
+.favoriteTradeAlertActions .btn{flex:1;min-width:110px;font-size:13px}
