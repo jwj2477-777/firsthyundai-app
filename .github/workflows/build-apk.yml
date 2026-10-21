@@ -142,21 +142,21 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v1.19.9 contract-image-card APK
+      - name: Publish successful v1.19.10 transfer-memo-recognition APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.9.apk
-          unzip -t FirstHyundai-v1.19.9.apk | grep 'No errors detected'
-          if gh release view v1.19.9 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.10.apk
+          unzip -t FirstHyundai-v1.19.10.apk | grep 'No errors detected'
+          if gh release view v1.19.10 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v1.19.9 FirstHyundai-v1.19.9.apk \
+            gh release create v1.19.10 FirstHyundai-v1.19.10.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.19.9 · 계약 안내 PNG 이미지 자동 생성' \
-              --notes '승인한 계약 안내 문자를 기기 안에서 따뜻한 아이보리·브라운 톤의 고해상도 PNG로 변환하여 카카오톡·문자 앱으로 공유합니다. 긴 특약은 여러 페이지로 자동 분할하며 원문과 당사자 합의를 바꾸거나 고객정보를 외부 서버로 전송하지 않습니다. 기존 텍스트 공유, 알림 팝업, 실거래 정보, 가족·관리자 분리, 뉴스 및 기본 특약 기능은 유지됩니다. 이미지 공유 전 계약조건을 반드시 검토하세요. 내 자료는 설치 전 별도 백업해 주세요.'
+              --title '퍼스트현대 v1.19.10 · 계약메모 송금액·예금주 인식 개선' \
+              --notes '계약 메모에서 유일한 사람 이름을 예금주 후보로 우선 표시하고 입금/송금/넣기로 표현 인식을 강화했습니다. 복수 인명과 임차인만 있는 경우는 확인 요청합니다. 문자/PNG 공유와 다른 기존 기능 유지. 정확한 계좌 및 금액은 발송 전에 직접 확인하세요.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v1.19.9 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v1.19.10 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
