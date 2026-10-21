@@ -465,7 +465,7 @@ body.apartmentSheetActive{overflow:hidden}
   <div id="ct_status" class="contractReview" role="status" aria-live="polite">조건을 입력하면 초안을 생성할 수 있습니다.</div>
   <label class="inputLabel" for="ct_preview">최종 계약 안내 문자 (직접 수정 가능)</label>
   <textarea id="ct_preview" class="contractPreview" maxlength="20000" oninput="FirstHyundaiContracts.edited()" placeholder="먼저 ‘계약문자 초안 생성’을 눌러주세요."></textarea>
-  <label class="contractPolishToggle contractNoticeConfirm"><input type="checkbox" id="ct_noticeConfirmed" onchange="FirstHyundaiContracts.updateSummary()"> 위 계약조건·계좌 및 하단 합의 내용이 실제 당사자 합의와 일치함을 확인했습니다.</label>
+  <label class="contractPolishToggle contractNoticeConfirm"><input type="checkbox" id="ct_noticeConfirmed"> 위 계약조건·계좌 및 하단 합의 내용이 실제 당사자 합의와 일치함을 확인했습니다.</label>
   <button type="button" class="btn alt contractPrimary" onclick="FirstHyundaiContracts.approve()">✓ 내용 확인 완료</button>
   <div class="contractActions">
    <button type="button" class="btn" onclick="FirstHyundaiContracts.copy()">문자 복사</button>
