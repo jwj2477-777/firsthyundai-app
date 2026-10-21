@@ -134,6 +134,23 @@ function dateFor(text,keywords){
  if(!part)return null;
  return dateIn(part);
 }
+// Standalone "계약은 10월중 협의" belongs in the existing free-text contractDate field.
+// Keep a verified calendar date as YYYY-MM-DD; leave negotiable schedules as written.
+function contractScheduleCandidate(raw){
+ const lines=String(raw||'').replace(/\r/g,'').split('\n');
+ for(const item of lines){
+  const line=item.trim().replace(/^[▶•]\s*/,'');
+  const m=line.match(/^(?:본계약(?:서)?(?:\s*작성)?(?:일|날짜)?|계약서\s*작성(?:일|날짜)?|계약일|계약)(?:은|는|을|를)?\s*(?:[:：]\s*|\s+)(.+?)\s*$/);
+  if(!m)continue; // "계약금 6천" is NOT a contract date.
+  const rawValue=m[1].trim().replace(/[.。]\s*$/,'');
+  const d=dateIn(rawValue);
+  if(d)return {value:d.value,assumed:d.assumed,flexible:false};
+  // A time window must not be faked into a specific date.
+  const flexible=/^(?:(?:(?:20)?\d{2}\s*년\s*)?\d{1,2}\s*월\s*(?:초|중(?:순)?|말|상순|하순|경|내)(?:\s*(?:협의|예정|작성|진행))?|(?:추후|향후|차후|별도|상호)\s*(?:협의|조율|결정|예정)|(?:잔금|입주|이사)\s*전\s*(?:협의|작성|예정)|(?:일정|날짜)\s*(?:추후|별도)\s*협의|미정|협의\s*예정)$/;
+  if(flexible.test(rawValue))return {value:rawValue,assumed:false,flexible:true};
+ }
+ return null;
+}
 function apartmentCandidates(text){
  const baseWords=String(text||'').replace(/[，,.:;!?]/g,' ').split(/\s+/).filter(Boolean);
  const windows=[];
@@ -312,6 +329,13 @@ function recognize(raw){
    review.push((id==='balanceDate'?'잔금일':id==='leaseStart'?'입주일':'날짜')+'이 대략적으로 표현되어 정확한 날짜를 직접 선택해야 합니다.');
   }
  }
+ const contractSchedule=contractScheduleCandidate(raw);
+ if(contractSchedule){
+  if(apply('contractDate',contractSchedule.value,found)){
+   if(contractSchedule.flexible)review.push('본계약 작성일은 "'+contractSchedule.value+'" 협의 일정으로 반영했습니다. 정확한 작성일이 정해지면 갱신해 주세요.');
+   else if(contractSchedule.assumed)review.push('본계약 작성일의 연도를 자동 추정했습니다. 확인해 주세요.');
+  }
+ }
  if(!val('leaseDuration')){
   const duration=s.match(/(?:임대차\\s*기간|계약\\s*기간|기간은?|기간|(?:전세|월세))\s*(\d+\s*년(?:\s*\d+\s*개월)?|\d+\s*개월)/);
   if(duration)apply('leaseDuration',duration[1].replace(/\s+/g,''),found);
@@ -406,5 +430,5 @@ function speech(result){
 window.firstHyundaiContractSpeech=speech;
 base.extractNotes=parse;
 smart.extractNotes=parse;
-window.FirstHyundaiLanguage={parse,recognize,_test:{koreanNumber,moneyPart,tokenizeMoney,amountAfter,amountBefore,dateIn,apartmentCandidates}};
+window.FirstHyundaiLanguage={parse,recognize,_test:{koreanNumber,moneyPart,tokenizeMoney,amountAfter,amountBefore,dateIn,contractScheduleCandidate,apartmentCandidates}};
 })();
