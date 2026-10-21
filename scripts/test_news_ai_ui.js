@@ -32,7 +32,7 @@ assert(out.includes('<p class="newsAiSentence">첫 문장입니다.</p>'));
 assert(out.includes('<p class="newsAiSentence">두 번째 문장입니다.</p>'));
 assert(out.includes('<p class="newsAiSentence">세 번째 문장입니다.</p>'));
 assert.equal((out.match(/class="newsAiSentence"/g)||[]).length,6,'Two AI briefs should render three distinct sentences each');
-out=render({state:'ok',briefs:[{...data[0],summary:'첫째 주요 사실입니다.\\n둘째 수치에 관한 사실입니다.\\n셋째는 진행 상황입니다.\\n넷째는 이전 방식의 추가 설명입니다.'}]});
+out=render({state:'ok',briefs:[{...data[0],summary:'첫째 주요 사실입니다.\n둘째 수치에 관한 사실입니다.\n셋째는 진행 상황입니다.\n넷째는 이전 방식의 추가 설명입니다.'}]});
 assert.equal((out.match(/<div class="newsAiBody"/g)||[]).length,1);
 assert(out.includes('기존 요약의 추가 문장 보기'),'Legacy fourth line must be preserved, not discarded');
 assert(out.includes('<p class="newsAiSentence">넷째는 이전 방식의 추가 설명입니다.</p>'));
