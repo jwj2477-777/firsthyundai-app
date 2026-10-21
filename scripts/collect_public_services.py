@@ -65,27 +65,71 @@ def parse_schools(payload):
             homepage=homepage,source_url=SCHOOL_SOURCE))
     return list({r['code']:r for r in selected}.values())
 
+def _collect_schools_with_page_size(key, page_size, opener=None):
+    """Read every page or raise; partial school data must never be published."""
+    selected={}
+    total=None
+    max_pages=(7000+page_size-1)//page_size
+    for page in range(1,max_pages+1):
+        try:
+            raw=retrieve(NEIS,{'KEY':key,'Type':'json','pIndex':page,'pSize':page_size,
+                'ATPT_OFCDC_SC_CODE':'E10'},opener)
+            data=json.loads(raw.decode('utf-8-sig') if isinstance(raw,bytes) else raw)
+            info=data.get('schoolInfo')
+            if not isinstance(info,list) or len(info)<2:
+                # Preserve the provider error code, not the key or raw request.
+                school_rows(raw)
+                raise RuntimeError('NEIS 학교 기본정보 응답 형식 불일치')
+            if page==1:
+                for heading in info[0].get('head',[]):
+                    if isinstance(heading,dict) and 'list_total_count' in heading:
+                        total=int(heading['list_total_count'])
+                if total is None or not 1<=total<=7000:
+                    raise RuntimeError('NEIS 결과 건수 비정상')
+            for row in parse_schools(raw):selected[row['code']]=row
+        except (RuntimeError,ValueError,KeyError,json.JSONDecodeError) as exc:
+            raise RuntimeError('NEIS 학교정보 요청 실패 (페이지 '+str(page)+
+                ', 요청건수 '+str(page_size)+'): '+str(exc)) from None
+        if page*page_size>=total:break
+    else:
+        raise RuntimeError('NEIS pagination incomplete; no partial publication')
+    if not selected:
+        raise RuntimeError('NEIS 학교자료에서 송도 학교 0건: 빈 결과를 정상 수집으로 저장하지 않습니다.')
+    return sorted(selected.values(),key=lambda x:(x['level'],x['name']))
+
 def collect_schools(key,opener=None):
+    key=str(key or '').strip()
     if not key:raise RuntimeError('GitHub secret NEIS_EDU_KEY 미설정')
-    # API must be paginated; 1000 items/page for E10; no guessing assigned schools.
-    selected={};total=0
-    for page in range(1,8):
-        raw=retrieve(NEIS,{'KEY':key,'Type':'json','pIndex':page,'pSize':1000,
+    # The NEIS guide documents 100 records as the baseline. The former
+    # 1000-record request returned HTTP 500; smaller pages are more resilient.
+    transient=('API HTTP 500','API HTTP 502','API HTTP 503','API HTTP 504','API HTTP 429')
+    failures=[]
+    for page_size in (100,25,5):
+        try:
+            selected=_collect_schools_with_page_size(key,page_size,opener)
+            if failures:
+                print('NEIS 이전 페이지 크기의 일시적 오류를 피해 '+str(page_size)+
+                      '건 단위 전체 페이지 수집 성공 (수집 결과는 공식 키 기준)')
+            return dict(state='verified',updated_at=fresh_date(),source_url=SCHOOL_SOURCE,
+                note='인천시교육청 학교 기본정보 중 송도 주소 학교. 아파트 배정학교·통학구역은 이 자료로 판정하지 않음.',
+                records=selected)
+        except RuntimeError as exc:
+            reason=str(exc)
+            if not any(err in reason for err in transient):raise
+            failures.append(str(page_size)+'건 단위 '+reason.split(':')[-1].strip())
+            print('NEIS 서버 오류: '+str(page_size)+'건 단위 호출 실패 · 작은 페이지로 재시도',
+                  file=sys.stderr)
+    # Diagnostic probe with the public sample key; its rows are NEVER saved.
+    # This distinguishes a provider outage from errors specific to the user's key.
+    try:
+        probe=retrieve(NEIS,{'KEY':'sample','Type':'json','pIndex':1,'pSize':5,
             'ATPT_OFCDC_SC_CODE':'E10'},opener)
-        data=json.loads(raw.decode('utf-8-sig') if isinstance(raw,bytes) else raw)
-        info=data.get('schoolInfo')
-        if not isinstance(info,list) or not info:raise RuntimeError('학교 목록을 찾을 수 없음. 인증키·응답 확인')
-        if page==1:
-            for heading in info[0].get('head',[]):
-                if isinstance(heading,dict) and 'list_total_count' in heading:
-                    total=int(heading['list_total_count'])
-            if total<1 or total>7000:raise RuntimeError('NEIS 결과 건수 비정상')
-        for row in parse_schools(raw):selected[row['code']]=row
-        if page*1000>=total:break
-    else:raise RuntimeError('NEIS pagination incomplete; no partial publication')
-    return dict(state='verified',updated_at=fresh_date(),source_url=SCHOOL_SOURCE,
-       note='인천시교육청 학교 기본정보 중 송도 주소 학교. 아파트 배정학교·통학구역은 이 자료로 판정하지 않음.',
-       records=sorted(selected.values(),key=lambda x:(x['level'],x['name'])))
+        school_rows(probe)
+        context='공개 sample 조회는 정상: GitHub에 등록한 키가 나이스 전용 인증키인지, 유효기간과 사용 권한을 확인하세요.'
+    except (RuntimeError,ValueError,json.JSONDecodeError):
+        context='공개 sample 조회도 실패: 나이스 API 서버 상태 또는 호출 제한을 확인하세요.'
+    raise RuntimeError('NEIS 학교정보 전체 수집 실패 (HTTP 500 등, 기존 자료 보존). '+context)
+
 
 def office_items(payload):
     root=ET.fromstring(payload)
