@@ -142,21 +142,21 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v1.19.12 one-sheet-contract-card APK
+      - name: Publish successful v1.19.13 negotiated-signing-and-banking-terms APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.12.apk
-          unzip -t FirstHyundai-v1.19.12.apk | grep 'No errors detected'
-          if gh release view v1.19.12 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.13.apk
+          unzip -t FirstHyundai-v1.19.13.apk | grep 'No errors detected'
+          if gh release view v1.19.13 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v1.19.12 FirstHyundai-v1.19.12.apk \
+            gh release create v1.19.13 FirstHyundai-v1.19.13.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.19.12 · 잔금일·특약·한 장 이미지 개선' \
-              --notes '잔금 27년 1월30일 같은 라벨 없는 날짜와 2자리 연도 입력을 인식하고 중도금 및 잔금일 조정·수리 약속 등 특약 머리말 없는 문장도 추출합니다. 계약 이미지는 문자기호 대신 금액 정보 행·특약·안내를 나눈 따뜻한 고급 카드 레이아웃으로 만들며 일반 계약은 한 장 PNG로 전송합니다. 지나치게 긴 내용은 누락되거나 두 장으로 잘리지 않도록 생성 전에 안내합니다. 모든 계좌·합의·날짜는 발송 전 직접 확인하세요.'
+              --title '퍼스트현대 v1.19.13 · 협의형 계약일·특약·계좌 구분 개선' \
+              --notes '계약은 10월중 협의·본계약은 추후 협의 등 유동적인 계약서 작성 일정을 계약일 항목에 그대로 표시합니다. 확정된 계약일은 정확한 날짜로 표시합니다. 특약 아래 은행명·계좌·예금주·송금액 줄이 와도 특약에 포함하지 않고 지급정보로 인식하며 예금주 확인 안내를 유지합니다. 기존 단지·잔금·중도금·한 장 PNG 이미지 및 합의 확인 기능 유지. 보내기 전 계약과 송금 조건을 직접 검토하세요.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v1.19.12 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v1.19.13 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
