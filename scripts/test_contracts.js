@@ -72,7 +72,7 @@ assert(el('ct_preview').value.includes('▶ 소재지 : '+catalog[1].address));
 assert(el('ct_preview').value.includes('▶ 계약금 : 3,900만원'));
 assert(el('ct_preview').value.includes('전세보증금의 10%'));
 assert(el('ct_preview').value.includes('금 중 일부 500만원'));
-assert(el('ct_preview').value.includes('▶ 계약금 잔여액 : 3,400만원'));
+assert(!el('ct_preview').value.includes('계약금 잔여액'),'Avoid misleading remainder in customer notice');
 assert(el('ct_preview').value.includes('▶ 잔금 : 35,100만원'));
 assert(!el('ct_preview').value.includes('▶ 중도금 :'),'Absent interim must not render a row');
 assert(!el('ct_preview').value.includes('계약금 포기'));
