@@ -53,6 +53,7 @@ public class MainActivity extends Activity {
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TradeNotifications.ensureChannel(this);
         web = new WebView(this);
         web.setWebViewClient(new WebViewClient() {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -126,6 +127,19 @@ public class MainActivity extends Activity {
                     finish();
                 });
             });
+        }
+    }
+
+    private void updateNotificationPermissionUI() {
+        if (web == null || isFinishing() || isDestroyed()) return;
+        web.evaluateJavascript("window.FirstHyundaiTradeAlerts?.syncNativeStatus?.()", null);
+    }
+
+    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                                     int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == TradeNotifications.REQUEST_PERMISSION) {
+            updateNotificationPermissionUI();
         }
     }
 
@@ -231,6 +245,19 @@ public class MainActivity extends Activity {
     }
 
     public final class Bridge {
+        @JavascriptInterface public String getTradeNotificationPermissionStatus() {
+            return TradeNotifications.status(MainActivity.this);
+        }
+        @JavascriptInterface public void requestTradeNotificationPermission() {
+            runOnUiThread(() -> {
+                TradeNotifications.requestPermission(MainActivity.this);
+                updateNotificationPermissionUI();
+            });
+        }
+        @JavascriptInterface public void postFavoriteTradeNotification(int count, String detail) {
+            if (count < 1 || count > 100 || detail == null || detail.length() > 240) return;
+            runOnUiThread(() -> TradeNotifications.post(MainActivity.this, count, detail));
+        }
         @JavascriptInterface public String getInstalledAppVersion() {
             return AppVersion.name(MainActivity.this);
         }
