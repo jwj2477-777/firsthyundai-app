@@ -51,6 +51,9 @@ jobs:
               python scripts/collect_public_services.py --mode subscriptions
             fi
           elif [ "${{ github.event_name }}" = "push" ]; then
+            # When this collector changes, immediately recheck newly configured NEIS
+            # with its secret (never expose the key or publish partial results).
+            python scripts/collect_public_services.py --mode schools
             python scripts/collect_public_services.py --mode complexinfo
           else
             python scripts/collect_public_services.py --mode "${{ inputs.mode }}"
