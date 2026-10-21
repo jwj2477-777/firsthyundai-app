@@ -13,6 +13,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 URL = "https://open.neis.go.kr/hub/schoolInfo"
+# Force a NEW workflow queue event so the current NEIS_EDU_KEY secret is reloaded.
 PARAMS = {"Type": "json", "pIndex": 1, "pSize": 5, "ATPT_OFCDC_SC_CODE": "E10"}
 VALID = {"INFO-000", "INFO-100", "INFO-200"}
 KEY_ERROR = {"ERROR-290", "INFO-300"}
