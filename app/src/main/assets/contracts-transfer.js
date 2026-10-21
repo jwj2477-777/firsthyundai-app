@@ -47,13 +47,32 @@ function bankCandidates(text,account){
  return found.sort((a,b)=>b.strength-a.strength||a.start-b.start);
 }
 const familyNames='김이박최정강조윤장임한오서신권황안송전홍유고문양손배백허노남심하주구성차우민진엄채원천방공현함변염여추도소곽표';
-const notName=/^(?:매매|전세|월세|계약|보증금|중도금|잔금|가계약|오늘|금일|이번|당일|먼저|지금|내일|입금|송금|이체|보내|보낼|넣을|은행|계좌|명의|계약서|예금주|아파트|송도|퍼스트|마스터|퍼팍|마뷰|프라임|센트럴|더샵|신한|국민|우리|하나|농협|기업|카카오|토스|새마을|우체국|부동산|내용|날짜|기간|확인|특약|임대인|매도인|임차인|매수인|집주인|세입자|소재지|계약금|만원|상담|계좌번호|거래|계약일|잔금일|입주일|동호수|금액|사무실)/;
+const notName=/^(?:한다|있다|된다|예정|완료|확인|금지|수리|허용|변경|협의|상호|매매|전세|월세|계약|보증금|중도금|잔금|가계약|오늘|금일|이번|당일|먼저|지금|내일|입금|송금|이체|보내|보낼|넣을|은행|계좌|명의|계약서|예금주|아파트|송도|퍼스트|마스터|퍼팍|마뷰|프라임|센트럴|더샵|신한|국민|우리|하나|농협|기업|카카오|토스|새마을|우체국|부동산|내용|날짜|기간|확인|특약|임대인|매도인|임차인|매수인|집주인|세입자|소재지|계약금|만원|상담|계좌번호|거래|계약일|잔금일|입주일|동호수|금액|사무실)/;
 function holderCandidate(text,account,bank){
  const s=String(text||'');
  const explicit=/(?:예금주|계좌주|계좌\s*명의자|명의자|수취인|입금\s*받는\s*분)\s*[:：]?\s*([가-힣]{2,5})(?=\s|$|[,.;)\/\]])/g;
  const specified=[...new Set([...s.matchAll(explicit)].map(m=>m[1]).filter(name=>!reserved.test(name)&&!notName.test(name)))];
  if(specified.length===1)return {value:specified[0],confidence:'explicit'};
  if(specified.length>1)return {value:null,warning:'서로 다른 예금주가 적혀 있습니다. 명의를 확인해 주세요.'};
+
+ // An account/bank line in office memos identifies the payee more reliably
+ // than an unrelated standalone action word in a special clause.
+ const accountLines=s.split(/\n/).filter(line=>
+  /(?:국민|신한|우리|하나|농협|기업|카카오|토스|새마을|우체국|수협|SC제일|부산|대구|경남|전북|광주|제주|케이)(?:은행|뱅크|금고)?/.test(line)&&
+  /\d{2,8}(?:-\d{2,8}){1,4}|\d{10,16}/.test(line));
+ const sameLine=[];
+ for(const line of accountLines){
+  for(const m of line.matchAll(/(?<![가-힣])([가-힣]{2,4})(?![가-힣])/g)){
+   const name=m[1];
+   if(!familyNames.includes(name[0])||reserved.test(name)||notName.test(name))continue;
+   if(/(?:금|월|년|은행|계좌|계약|만원|송금|입금|기간)$/.test(name))continue;
+   if(/(?:매수인|임차인|세입자)\s*[:：]?\s*$/.test(line.slice(Math.max(0,m.index-14),m.index)))continue;
+   if(!sameLine.includes(name))sameLine.push(name);
+  }
+ }
+ if(sameLine.length===1)return {value:sameLine[0],confidence:'bank-line'};
+ if(sameLine.length>1)return {value:null,warning:'계좌가 기재된 줄에 여러 사람 이름이 있어 예금주 확인이 필요합니다.'};
+
  const memo=s.split(/(?:^|\n)\s*(?:특약(?:사항)?|합의사항)\s*[:：]/m)[0];
  const people=new Map();
  for(const m of memo.matchAll(/(?<![가-힣])([가-힣]{2,4})(?![가-힣])/g)){
