@@ -1,15 +1,23 @@
-/* Contract image cards: local-only Canvas rendering of the exact approved preview. */
+/* FirstHyundai premium contract image: on-device, document-like cards.
+ * The final reviewed preview text is the sole source to preserve user edits.
+ * Prefer one complete PNG. Long exceptional notes paginate rather than truncate.
+ */
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const WIDTH=1080, LEFT=82, RIGHT=998, TOP=278, LIMIT=1890, MAX_PAGES=12;
-const styles={
- title:{font:'700 47px sans-serif',color:'#5e3f28',line:66,before:22,after:23},
- section:{font:'700 36px sans-serif',color:'#66452b',line:55,before:27,after:12},
- row:{font:'600 32px sans-serif',color:'#352e29',line:52,before:9,after:10},
- term:{font:'400 32px sans-serif',color:'#3e3833',line:52,before:9,after:14},
- body:{font:'400 31px sans-serif',color:'#494038',line:51,before:5,after:12},
- notice:{font:'600 32px sans-serif',color:'#714f33',line:53,before:24,after:12}
+const WIDTH=1080, LEFT=90, RIGHT=990, TOP=285, LIMIT=3040, MAX_PAGES=12;
+const profiles=[
+ {name:'spacious',scale:1,gap:1},
+ {name:'compact',scale:0.88,gap:0.70},
+ {name:'dense',scale:0.78,gap:0.50}
+];
+const specs={
+ row:{size:30,line:48,before:5,after:5},
+ section:{size:34,line:53,before:22,after:8},
+ term:{size:29,line:46,before:5,after:5},
+ body:{size:28,line:45,before:6,after:8},
+ notice:{size:30,line:51,before:22,after:12},
+ 'notice-body':{size:26,line:42,before:5,after:9}
 };
 let canvases=[];
 function kindFor(line){
@@ -20,86 +28,144 @@ function kindFor(line){
  if(/^\s*→/.test(line))return 'term';
  return 'body';
 }
+function clean(line,kind){
+ const t=String(line||'').trim();
+ return kind==='title'?t.replace(/^●\s*|\s*●$/g,'').trim():
+  kind==='notice'?t.replace(/^※\s*/,''):
+  kind==='row'||kind==='section'?t.replace(/^▶\s*/,''):
+  kind==='term'?t.replace(/^→\s*/,''):t;
+}
 function wrapText(ctx,text,width){
- if(!text)return [''];
  const lines=[];let cur='';
  for(const char of Array.from(text)){
   if(cur&&ctx.measureText(cur+char).width>width){
-   lines.push(cur.trimEnd());
+   lines.push(cur);
    cur=char===' '? '':char;
   }else cur+=char;
  }
  if(cur)lines.push(cur);
  return lines.length?lines:[''];
 }
-function plan(raw){
- const text=String(raw||'').replace(/\r/g,'');
- if(!text.trim())throw Error('계약 안내 내용을 먼저 작성해 주세요.');
- if(text.length>12000)throw Error('이미지 내용이 너무 깁니다. 문구를 확인해 주세요.');
- const measure=document.createElement('canvas').getContext('2d');
- if(!measure)throw Error('휴대폰에서 이미지 생성 기능을 사용할 수 없습니다.');
- const pages=[{items:[],bottom:TOP}],newPage=()=>{
-  if(pages.length>=MAX_PAGES)throw Error('안내 내용이 너무 깁니다. 12장을 초과하지 않도록 정리해 주세요.');
-  const p={items:[],bottom:TOP};pages.push(p);return p;
- };
- let page=pages[0];
- const sourceLines=text.split('\n');
- for(let index=0;index<sourceLines.length;index++){
-  const rawLine=sourceLines[index];
-  if(!rawLine.trim()){
-   if(page.items.length)page.bottom+=Math.min(22,LIMIT-page.bottom);
-   continue;
-  }
-  const kind=kindFor(rawLine),spec=styles[kind];
-  measure.font=spec.font;
-  // Retain every source line including user-edited special terms and negotiated clauses.
-  const pieces=wrapText(measure,rawLine.trim(),RIGHT-LEFT-4);
-  const needed=spec.before+pieces.length*spec.line+spec.after;
-  if(page.items.length&&page.bottom+needed>LIMIT && needed<(LIMIT-TOP)){
-   page=newPage();
-  }
-  page.bottom+=spec.before;
-  for(const part of pieces){
-   if(page.bottom+spec.line+32>LIMIT && page.items.length)page=newPage();
-   page.items.push({kind,text:part,y:page.bottom});
-   page.bottom+=spec.line;
-  }
-  page.bottom+=spec.after;
- }
- if(!pages.some(p=>p.items.length))throw Error('이미지에 넣을 내용이 없습니다.');
- return pages.filter(p=>p.items.length);
-}
-function roundedRect(c,x,y,w,h,r){
+function round(c,x,y,w,h,r){
  c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);
  c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
  c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);
  c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();
 }
-function draw(page,index,total){
- const canvas=document.createElement('canvas');
- canvas.width=WIDTH;
- canvas.height=Math.max(890,Math.min(2100,Math.ceil(page.bottom+148)));
- const c=canvas.getContext('2d');
- if(!c)throw Error('이미지를 그릴 수 없습니다.');
- c.fillStyle='#f7f3ed';c.fillRect(0,0,WIDTH,canvas.height);
- c.fillStyle='#ffffff';roundedRect(c,35,35,WIDTH-70,canvas.height-70,30);c.fill();
- c.strokeStyle='#e9e0d7';c.lineWidth=2;c.stroke();
- c.fillStyle='#6c4b31';roundedRect(c,LEFT,83,91,54,10);c.fill();
- c.font='700 30px sans-serif';c.fillStyle='#ffffff';c.fillText('FHD',LEFT+14,121);
- c.font='700 23px sans-serif';c.fillStyle='#6e503a';c.fillText('FIRST HYUNDAI',LEFT+108,112);
- c.font='700 42px sans-serif';c.fillStyle='#352e29';c.fillText('계약 안내',LEFT,203);
- c.font='400 23px sans-serif';c.fillStyle='#968173';c.fillText('퍼스트현대부동산',RIGHT-196,196);
- c.strokeStyle='#e7ded4';c.lineWidth=2;c.beginPath();c.moveTo(LEFT,235);c.lineTo(RIGHT,235);c.stroke();
- for(const item of page.items){
-  const s=styles[item.kind];c.font=s.font;c.fillStyle=s.color;
-  c.fillText(item.text,LEFT,item.y+s.line-12);
+function layout(text,profile,allowPages){
+ const c=document.createElement('canvas').getContext('2d');
+ if(!c)throw Error('휴대폰에서 계약 이미지를 생성할 수 없습니다.');
+ const headingMatch=text.match(/^\s*●\s*([^●\n]+)\s*●/m);
+ const heading=headingMatch?headingMatch[1].trim().replace(/\s*계약$/,'계약')+' 안내':'계약 안내';
+ const pages=[{items:[],bottom:TOP,heading,profile:profile.name}],newPage=()=>{
+  if(pages.length===MAX_PAGES)throw Error('안내 내용이 너무 깁니다. 특약을 정리한 뒤 다시 시도해 주세요.');
+  const p={items:[],bottom:TOP,heading,profile:profile.name};pages.push(p);return p;
+ };
+ let page=pages[0],inNotice=false;
+ const blank=Math.round(13*profile.gap);
+ for(const rawLine of text.split('\n')){
+  if(!rawLine.trim()){
+   if(page.items.length)page.bottom+=blank;
+   continue;
+  }
+  const initial=kindFor(rawLine);
+  if(initial==='title')continue; // The heading is rendered as the hero title instead.
+  if(initial==='notice')inNotice=true;
+  const kind=inNotice&&initial==='body'?'notice-body':initial;
+  const style=specs[kind],size=Math.max(21,Math.round(style.size*profile.scale));
+  const lineHeight=Math.round(style.line*profile.scale);
+  const before=Math.round(style.before*profile.gap),after=Math.round(style.after*profile.gap);
+  const data=clean(rawLine,initial);
+  let label='',value=data;
+  if(kind==='row'){
+   const m=data.match(/^([^:：]{1,16})\s*[:：]\s*(.*)$/);
+   if(m){label=m[1].trim();value=m[2];}
+  }
+  c.font=(kind==='row'?'600 ':'400 ')+size+'px sans-serif';
+  const usable=label?RIGHT-LEFT-300:RIGHT-LEFT-20;
+  const pieces=wrapText(c,value,usable);
+  const total=before+pieces.length*lineHeight+after;
+  if(allowPages&&page.items.length&&page.bottom+total>LIMIT&&total<LIMIT-TOP)page=newPage();
+  page.bottom+=before;
+  for(let i=0;i<pieces.length;i++){
+   if(allowPages&&page.bottom+lineHeight+16>LIMIT&&page.items.length)page=newPage();
+   const full=label&&i===0?label+' : '+pieces[i]:pieces[i];
+   page.items.push({kind,text:full,label:i===0?label:'',value:pieces[i],continuation:i>0,y:page.bottom,line:lineHeight,size});
+   page.bottom+=lineHeight;
+  }
+  page.bottom+=after;
  }
- const footerY=canvas.height-99;
- c.strokeStyle='#e7ded4';c.beginPath();c.moveTo(LEFT,footerY-25);c.lineTo(RIGHT,footerY-25);c.stroke();
- c.fillStyle='#8e8074';c.font='400 22px sans-serif';
- c.fillText('안내된 계약조건과 계좌정보를 당사자께서 확인해 주세요.',LEFT,footerY+12);
- c.textAlign='right';c.font='600 24px sans-serif';c.fillText(String(index+1).padStart(2,'0')+' / '+String(total).padStart(2,'0'),RIGHT,footerY+12);
- c.textAlign='left';
+ return pages.filter(x=>x.items.length);
+}
+function plan(raw){
+ const text=String(raw||'').replace(/\r/g,'');
+ if(!text.trim())throw Error('계약 안내 내용을 먼저 작성해 주세요.');
+ if(text.length>12000)throw Error('계약 안내가 너무 깁니다. 내용을 검토해 주세요.');
+ // Try one high-quality sheet; tighten typography only if truly necessary.
+ for(const profile of profiles){
+  const p=layout(text,profile,false);
+  if(p.length===1&&p[0].bottom<=LIMIT)return p;
+ }
+ const p=layout(text,profiles[2],true);
+ if(!p.length)throw Error('이미지로 만들 계약 내용이 없습니다.');
+ return p;
+}
+function draw(page,index,total){
+ const canvas=document.createElement('canvas');canvas.width=WIDTH;
+ canvas.height=Math.max(1000,Math.min(3330,Math.ceil(page.bottom+150)));
+ const c=canvas.getContext('2d');if(!c)throw Error('계약 이미지 화면을 그릴 수 없습니다.');
+ c.fillStyle='#f5f0e9';c.fillRect(0,0,WIDTH,canvas.height);
+ c.fillStyle='#fffdfa';round(c,32,30,WIDTH-64,canvas.height-60,30);c.fill();
+ c.strokeStyle='#e4d9ce';c.lineWidth=2;c.stroke();
+ c.fillStyle='#805c43';round(c,LEFT,76,92,53,11);c.fill();
+ c.fillStyle='#fff';c.font='700 28px sans-serif';c.fillText('FHD',LEFT+17,113);
+ c.fillStyle='#5c4534';c.font='700 24px sans-serif';c.fillText('FIRST HYUNDAI',LEFT+110,108);
+ c.fillStyle='#a18e7c';c.font='400 20px sans-serif';c.fillText('REAL ESTATE',LEFT+112,136);
+ c.fillStyle='#3d312a';c.font='700 46px sans-serif';c.fillText(page.heading,LEFT,215);
+ c.fillStyle='#9b826d';c.font='400 23px sans-serif';c.textAlign='right';c.fillText('퍼스트현대부동산',RIGHT,214);c.textAlign='left';
+ c.fillStyle='#be9371';round(c,LEFT,244,78,5,2);c.fill();
+ c.fillStyle='#e7e0d7';c.fillRect(LEFT+93,246,RIGHT-LEFT-93,2);
+ const items=page.items;
+ // Background grouping: restrained warm-taupe areas for terms and notices, not SMS glyphs.
+ for(let i=0;i<items.length;i++){
+  const item=items[i],prev=items[i-1];
+  if(item.kind==='notice'&&(i===0||prev?.kind!=='notice')){
+   const end=items.slice(i).filter(x=>x.kind==='notice'||x.kind==='notice-body').at(-1);
+   if(end){
+    c.fillStyle='#f8f2ea';round(c,LEFT-17,item.y-9,RIGHT-LEFT+34,end.y+end.line-item.y+17,16);c.fill();
+   }
+  }
+ }
+ for(const item of items){
+  const y=item.y+item.line-11;
+  if(item.kind==='row'){
+   const prominent=/^(?:매매대금|전세보증금|보증금|잔금|이번 송금액|계약금)$/.test(item.label);
+   if(prominent&&!item.continuation){
+    c.fillStyle='#f5f0e9';round(c,LEFT-10,item.y-5,RIGHT-LEFT+20,item.line+8,9);c.fill();
+   }
+   if(item.label){
+    c.font='500 '+Math.max(22,item.size-3)+'px sans-serif';c.fillStyle='#897260';
+    c.fillText(item.label,LEFT+10,y);
+   }
+   c.font='600 '+item.size+'px sans-serif';c.fillStyle=prominent?'#5a3d2b':'#40352d';
+   c.fillText(item.value,item.label?LEFT+300:LEFT+300,y);
+  }else if(item.kind==='section'){
+   c.fillStyle='#ad805d';round(c,LEFT,item.y+6,5,item.line-9,2);c.fill();
+   c.fillStyle='#5b4332';c.font='700 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+17,y);
+  }else if(item.kind==='term'){
+   c.fillStyle='#a58368';round(c,LEFT+6,item.y+Math.round(item.line/2),7,7,3);c.fill();
+   c.fillStyle='#453a33';c.font='400 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+25,y);
+  }else if(item.kind==='notice'){
+   c.fillStyle='#654630';c.font='700 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+11,y);
+  }else{
+   c.fillStyle=item.kind==='notice-body'?'#665547':'#5d5045';
+   c.font='400 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+(item.kind==='notice-body'?10:0),y);
+  }
+ }
+ const foot=canvas.height-87;
+ c.fillStyle='#ded5ca';c.fillRect(LEFT,foot-25,RIGHT-LEFT,2);
+ c.fillStyle='#998577';c.font='400 22px sans-serif';c.fillText('계약조건·계좌정보·합의사항을 발송 전에 확인해 주세요.',LEFT,foot+11);
+ if(total>1){c.textAlign='right';c.font='600 22px sans-serif';c.fillText(index+1+' / '+total,RIGHT,foot+11);c.textAlign='left';}
  return canvas;
 }
 function ready(){
@@ -167,5 +233,5 @@ async function share(){
   status.textContent='공유 실패: '+(e.message||'다시 시도해 주세요.');
  }
 }
-window.FirstHyundaiContractImage={open,close,share,_test:{plan,kindFor}};
+window.FirstHyundaiContractImage={open,close,share,_test:{plan,kindFor,clean}};
 })();
