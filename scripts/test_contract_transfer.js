@@ -67,3 +67,28 @@ assert.equal(el('ct_accountHolder').value,'가상인');
 let spaced=transfer.packet('우리은행 1002 999 123456 예금주 가상인 예금주 가상인 오늘 500만원');
 assert.equal(spaced.holder,'가상인','Repeated identical payee is not ambiguous');
 assert.equal(transfer.packet('국민은행 연락처 010-1234-5678').account,null,'Phone number cannot become an account');
+
+
+// The only unlabelled person is normally the receiving account holder; a draft guess is reviewable.
+for(const [memo,holder,advance] of [
+ ['김철수 전세 4억, 계약금 4천 오늘 500만원 입금','김철수',500],
+ ['오늘 500만원 이체 / 신한은행 123-456-789012 김철수','김철수',500],
+ ['김철수 국민은행 123-456-789012 보낼 돈 500','김철수',500],
+ ['국민은행 123-456-789012 김철수 계약금 중 500 보내기로','김철수',500],
+ ['송금액 500 김철수 국민은행 123-456-789012','김철수',500],
+ ['박민수 500만원 넣기로 국민은행 123-456-789012','박민수',500],
+ ['선입금 500 홍길동 국민은행 123-456-789012','홍길동',500]
+]){
+ const result=transfer.packet(memo);
+ assert.equal(result.holder,holder,'Payee is memo-wide: '+memo);
+ assert.equal(result.amount,advance,'This remittance is not the full deposit: '+memo);
+}
+compose('김가람 오늘 500만원 입금, 국민은행 123-456-789012');
+assert.equal(el('ct_accountHolder').value,'김가람');
+assert(el('ct_languageWarnings').textContent.includes('추정했습니다'),'Unlabeled name must be reviewed');
+assert.equal(transfer.packet('예금주 박민수 임대인 김철수 국민은행 123-456-789012 오늘 500 송금').holder,'박민수');
+assert.equal(transfer.packet('김철수 박민수 국민은행 123-456-789012 오늘 500 송금').holder,null,'Two names are ambiguous');
+assert.equal(transfer.packet('임차인 김철수 국민은행 123-456-789012 오늘 500 송금').holder,null,'Buyer alone is not payee');
+assert.equal(transfer.packet('오늘 500 송금, 계약금 4000, 중도금 2000').amount,500);
+assert.equal(transfer.packet('계약금 4000, 중도금 2000').amount,null,'Totals are not remittance');
+console.log('Unique payee and spoken remittance checks passed.');
