@@ -69,11 +69,11 @@ el('ct_terms').value='현 상태로 인도한다.\n권리관계 변경이 없어
 assert.equal(collect().errors.length,0,JSON.stringify(collect().errors));
 api.makePreview();
 assert(el('ct_preview').value.includes('▶ 소재지 : '+catalog[1].address));
-assert(el('ct_preview').value.includes('▶ 약정 계약금 : 3,900만원'));
-assert(el('ct_preview').value.includes('10% 임시산정'));
-assert(el('ct_preview').value.includes('▶ 이번 선송금 예정액 : 500만원'));
-assert(el('ct_preview').value.includes('▶ 남은 계약금 : 3,400만원'));
-assert(el('ct_preview').value.includes('▶ 최종 잔금 : 35,100만원'));
+assert(el('ct_preview').value.includes('▶ 계약금 : 3,900만원'));
+assert(el('ct_preview').value.includes('전세보증금의 10%'));
+assert(el('ct_preview').value.includes('금 중 일부 500만원'));
+assert(el('ct_preview').value.includes('▶ 계약금 잔여액 : 3,400만원'));
+assert(el('ct_preview').value.includes('▶ 잔금 : 35,100만원'));
 assert(!el('ct_preview').value.includes('▶ 중도금 :'),'Absent interim must not render a row');
 assert(!el('ct_preview').value.includes('계약금 포기'));
 el('ct_price').value='40000';
@@ -88,7 +88,7 @@ assert.equal(el('ct_contractDeposit').value,'3500','Explicit contract deposit al
 el('ct_interim').value='5000';
 api.makePreview();
 assert(el('ct_preview').value.includes('▶ 중도금 : 5,000만원'));
-assert(el('ct_preview').value.includes('▶ 최종 잔금 : 33,500만원'));
+assert(el('ct_preview').value.includes('▶ 잔금 : 33,500만원'));
 el('ct_autoDeposit').checked=false;
 assistant.changed({target:el('ct_autoDeposit')});
 assert.equal(el('ct_contractDeposit').value,'3500','Disabling auto never deletes manual deposit');
