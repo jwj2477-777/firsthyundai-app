@@ -239,3 +239,20 @@ body[data-office-role="admin"] .familySimpleNote{display:none!important}
 @media(prefers-reduced-motion:reduce){
  .btn,button,.item,.nearbyCard{transition:none!important}
 }
+
+/* Selected tabs stay unmistakable when system high-contrast modes or focus are used. */
+#nav .primaryNav button.active:focus-visible,
+#nav .secondaryNav button.active:focus-visible,
+#nav .utilityNav>button.active:focus-visible,
+#news .newsCategoryTabs>button[aria-selected="true"]:focus-visible{
+ outline:4px solid #F3BD73;outline-offset:3px;
+}
+#nav .primaryNav button:not(.active):focus-visible,
+#news .newsCategoryTabs>button[aria-selected="false"]:focus-visible{
+ background:#F8FAFD;
+}
+@media(hover:hover){
+ #nav .primaryNav button:not(.active):hover{background:#EFF4FA;border-color:#9BAFC7}
+ #nav .secondaryNav button:not(.active):hover{background:#EFF4FC}
+ #nav .utilityNav>button:not(.active):hover{background:#F7F9FD}
+}
