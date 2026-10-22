@@ -250,7 +250,7 @@ body.apartmentSheetActive{overflow:hidden}
   <h3>① 건축물대장 · 단지 상세</h3><p>동별 층수·용도·전유공용면적 확인. 승인 후 건축물 식별자 대조 및 수치 검증.</p><p><a href="https://www.data.go.kr/data/15134735/openapi.do">건축HUB 활용신청 ↗</a></p>
   <h3>② K-apt 공동주택 관리비</h3><p>월별 공용관리비와 단지별 비교. 개별 세대 고지 금액과 구별합니다.</p><p><a href="https://www.data.go.kr/data/15057937/openapi.do">공용관리비 활용신청 ↗</a></p>
   <h3>③ 나이스 학교 기본정보</h3><p>학교 주소·연락처·홈페이지. 앱 수집기용 비밀키 이름: <code>NEIS_EDU_KEY</code>. 배정학교는 이 API만으로 판단하지 않습니다.</p><p>발급받은 키는 채팅이나 공개 코드에 올리지 말고 GitHub Actions Secret에 <code>NEIS_EDU_KEY</code>라는 이름으로 등록하세요. 등록 후 학교 수집 워크플로를 실행해 <b>schools</b>를 선택하면 단지정보 → 학교·학군 탭에 반영됩니다.</p><p><a href="https://github.com/jwj2477-777/firsthyundai-app/settings/secrets/actions">① 나이스 키 안전하게 등록 ↗</a> · <a href="https://github.com/jwj2477-777/firsthyundai-app/actions/workflows/sync-public-services.yml">② 학교정보 수집 실행 ↗</a> · <a href="https://open.neis.go.kr/portal/guide/apiGuidePage.do">나이스 인증키 안내 ↗</a></p>
-  <h3>③-2 교육부 학교위치 표준데이터 (나이스 장애 대비)</h3><p>나이스와 별개로 공식 초·중·고 위치자료를 수집합니다. 기존 <code>DATA_GO_KR_SERVICE_KEY</code>를 사용하지만 이 서비스의 <b>별도 활용신청(자동승인)</b>이 필요합니다. 신청 전에는 학교 위치자료를 확인된 자료라고 표시하지 않습니다.</p><p><a href="https://www.data.go.kr/data/15021148/standard.do">학교위치 표준데이터 · 활용신청 ↗</a> · <a href="https://github.com/jwj2477-777/firsthyundai-app/actions/workflows/sync-public-services.yml">학교정보 수집 재실행 ↗</a></p>
+  <h3>③-2 학교 위치자료 (나이스 장애 대비)</h3><p>2026.10.01. 기준 공식 CSV에서 송도동 소재 운영학교 31곳을 검증·등록했습니다. 별도 API 이용 승인이 없어도 CSV에서 확인된 자료를 표시합니다. 자동 최신화는 해당 API의 별도 활용신청이 필요합니다. 이 데이터는 아파트별 배정학교를 확정하지 않습니다.</p><p><a href="https://www.data.go.kr/data/15021148/standard.do">학교위치 표준데이터 · 활용신청 ↗</a> · <a href="https://github.com/jwj2477-777/firsthyundai-app/actions/workflows/sync-public-services.yml">학교정보 수집 재실행 ↗</a></p>
   <h3>④ 도로명주소 검색</h3><p>동일 단지명·지번·도로명 정규화 및 자료 중복 방지. 향후 비밀키 이름: <code>JUSO_CONFIRM_KEY</code>.</p><p><a href="https://business.juso.go.kr/">주소기반산업지원서비스 · API 신청 ↗</a></p>
   <h3>⑤ 오피스텔 전월세 실거래</h3><p>아파트와 별도 목록으로 송도 오피스텔 전세·월세 검색. 수집기 준비됨, 추가 활용승인 필요.</p><p><a href="https://www.data.go.kr/data/15126475/openapi.do">오피스텔 전월세 활용신청 ↗</a></p>
   <h3>⑥ 청약홈 분양정보</h3><p>송도 신규 분양·무순위·오피스텔 공고를 뉴스/분양 탭과 연결. 승인 후 실제 연동 구현.</p><p><a href="https://www.data.go.kr/data/15098547/openapi.do">청약홈 분양정보 활용신청 ↗</a></p>
@@ -1247,7 +1247,7 @@ function renderSchoolPublicInfo(){
  const neis=verifiedRecords('schools');
  const alternative=verifiedRecords('school_locations');
  const schools=neis?.length?neis:alternative?.length?alternative:null;
- const officialSource=neis?.length?'나이스 학교기본정보':alternative?.length?'교육부 학교위치 표준데이터':'수집 대기';
+ const officialSource=neis?.length?'나이스 학교기본정보':alternative?.length?(publicServices?.school_locations?.import_method==='official_csv'?'교육시설안전원 학교위치 CSV':'교육부 학교위치 표준데이터 API'):'수집 대기';
  const levels=[['all','전체'],['초등학교','초등'],['중학교','중등'],['고등학교','고등']];
  const buttons=levels.map(([value,label])=>'<button type="button" class="'+(neisSchoolLevel===value?'active':'')+
    '" aria-pressed="'+(neisSchoolLevel===value?'true':'false')+'" onclick="selectNeisSchoolLevel(\''+value+'\')">'+label+
@@ -1272,7 +1272,7 @@ function renderSchoolPublicInfo(){
    '선택한 학교급의 확인된 학교정보가 없습니다.')+'</div>';
  return '<div class="apiSmallCard"><h3>송도 학교 정보</h3>'+
   '<p class="complexSectionNote">이 목록은 송도 소재 학교의 기본정보입니다. 현재 선택한 아파트의 배정학교가 아닙니다. 실제 통학구역·배정은 교육청 공식 학구도 및 고시로 확인해 주세요.</p>'+
-  '<p class="tiny">정보 출처: '+escapeHtml(officialSource)+' · 확인: '+escapeHtml(updated)+'</p>'+
+  '<p class="tiny">정보 출처: '+escapeHtml(officialSource)+' · 자료 기준: '+escapeHtml(publicServices?.[origin]?.reference_date||'미기재')+' · 확인: '+escapeHtml(updated)+'</p>'+
   (schools?'<div class="neisLevelButtons">'+buttons+'</div>':'')+
   rows+
   '<div class="contractActions"><button type="button" class="btn alt" onclick="refreshPublicServices(true)">학교 자료 다시 확인</button></div>'+

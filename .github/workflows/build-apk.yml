@@ -45,6 +45,8 @@ on:
       - 'scripts/collect_school_locations.py'
       - 'tests/test_public_services.py'
       - 'tests/test_school_locations.py'
+      - 'tests/test_school_csv_snapshot.py'
+      - 'scripts/import_school_locations_csv.py'
       - 'data/public_services.json'
       - 'scripts/generate_launcher_icon.py'
       - 'scripts/test_launcher_safezone.py'
@@ -175,21 +177,21 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.10 source-verified school location fallback APK
+      - name: Publish successful v2.0.11 verified official CSV schools APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v2.0.10.apk
-          unzip -t FirstHyundai-v2.0.10.apk | grep 'No errors detected'
-          if gh release view v2.0.10 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v2.0.11.apk
+          unzip -t FirstHyundai-v2.0.11.apk | grep 'No errors detected'
+          if gh release view v2.0.11 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.10 FirstHyundai-v2.0.10.apk \
+            gh release create v2.0.11 FirstHyundai-v2.0.11.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.10 · 송도 학교정보 공식 대체 연동' \
-              --notes '나이스 NEIS 서버가 실패해도 교육부·한국교육시설안전원의 전국초중등학교위치표준데이터 API를 독립적으로 검증·수집하고 송도동 소재 운영학교의 학교급·이름·공식 주소·좌표를 학교·학군 탭에 표시할 수 있도록 대체 연동했습니다. 실제 API 별도 활용승인 및 전체 수집 성공 전에는 확인되지 않은 학교목록을 만들어 표시하지 않습니다. 나이스가 정상일 때는 나이스 정보 우선, 대체 학교 위치자료는 지도보기와 출처 확인에 사용합니다. 배정학군은 공식 고시 검증 전 임의 표기하지 않습니다. 기존 v2.0.9 계약일 필수 확인·계약안내 이미지·실거래·카카오·뉴스·가족/관리자 기능은 보존했습니다.'
+              --title '퍼스트현대 v2.0.11 · 송도 초중고 31곳 공식 학교위치 등록' \
+              --notes '사용자가 제공한 한국교육시설안전원 전국초중등학교위치 공식 CSV(자료기준일 2026-10-01)를 검증하여 인천 연수구 송도동 운영학교 31개(초등 16곳, 중학 9곳, 고등 6곳)의 학교명·도로명주소·지도 좌표를 학교·학군 탭에 게시했습니다. 나이스 HTTP 500, 대체 공식 API HTTP 403 상황에서도 CSV 검증 자료로 조회할 수 있습니다. 앱 화면에 자료 기준일과 공식 CSV 출처를 명시하고 초·중·고 필터와 학교 위치 지도 링크를 제공합니다. 학교가 가까운지 여부나 특정 아파트 배정학교는 검증되지 않아 표시하지 않습니다. 나이스 복구 시 해당 실시간 자료를 우선하며 기존 v2.0.10과 계약·실거래·뉴스·가족/관리자 기능 모두 보존합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.10 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.11 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"

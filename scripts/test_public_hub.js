@@ -41,6 +41,16 @@ const sample={
  office_rents:{state:'verified',records:[{building:'송도 오피스텔',type:'전세',deposit_10k:20000,monthly_10k:0,area_m2:42,contract_date:'2026-10-03'}]},
  subscriptions:{state:'awaiting_approval',records:[]}
 };
+run("publicServices="+JSON.stringify({
+ schools:{state:'awaiting_key',records:[]},
+ school_locations:{state:'verified',import_method:'official_csv',reference_date:'2026-10-01',updated_at:'2026-10-22T09:00:00Z',records:[
+ {code:'B000025226',name:'인천송일초등학교',level:'초등학교',address:'인천광역시 연수구 컨벤시아대로252번길 15',lat:37.38,lng:126.63}
+ ]},
+ office_rents:{state:'awaiting_approval',records:[]},subscriptions:{state:'awaiting_approval',records:[]}
+}));
+const csvSchool=run('renderSchoolPublicInfo()');
+assert(csvSchool.includes('인천송일초등학교')&&csvSchool.includes('교육시설안전원 학교위치 CSV'),'CSV provider and school name shown');
+assert(csvSchool.includes('2026-10-01')&&csvSchool.includes('지도에서 학교 위치 보기'),'CSV reference date and map link shown');
 run('publicServices='+JSON.stringify(sample));
 const schools=run('renderSchoolPublicInfo()');
 assert(schools.includes('송도초등학교')&&!schools.includes('배정학교 확인'));
@@ -54,7 +64,7 @@ run("publicServices="+JSON.stringify({
 }));
 const fallback=run('renderSchoolPublicInfo()');
 assert(fallback.includes('송도모의초등학교')&&fallback.includes('송도모의중학교'),'Show verified official fallback when NEIS fails');
-assert(fallback.includes('교육부 학교위치 표준데이터')&&fallback.includes('지도에서 학교 위치 보기'),'Display actual source and map action');
+assert(fallback.includes('교육부 학교위치 표준데이터 API')&&fallback.includes('지도에서 학교 위치 보기'),'Display actual source and map action');
 assert(!fallback.includes('배정학교 확인'),'Location alone cannot verify catchment');
 run("selectNeisSchoolLevel('중학교')");
 const secondary=run('renderSchoolPublicInfo()');
