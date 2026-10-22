@@ -76,3 +76,80 @@
 .contractImagePageTag{color:#7b644f;font-size:12px;font-weight:700;margin:4px 3px 8px}
 .contractImageDialog .contractActions{margin:12px 0 3px}
 @media(max-width:430px){.contractImageDialog{padding:12px}.contractImageDialog .contractActions{display:block}.contractImageDialog .contractActions .btn{width:100%;margin:5px 0}}
+
+
+/* v1.19.14 · Accessible, unmistakable contract memo entry for family users.
+   Layout, step number, weight and border carry meaning without color vision. */
+#contracts .contractMemoCard{
+ position:relative;box-sizing:border-box;padding:24px 22px 19px;
+ border:3px solid #806047;border-radius:22px;background:#fffcf8;
+ box-shadow:0 9px 28px #51351e1a;margin-bottom:17px;
+}
+#contracts .contractMemoHeading{display:flex;align-items:flex-start;gap:15px;margin:1px 0 20px}
+#contracts .contractMemoStep{
+ box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+ width:54px;height:54px;min-width:54px;border:3px solid #6f4b2f;
+ border-radius:15px;background:#fff7e9;color:#513821;
+ font-size:28px;font-weight:900;line-height:1;
+}
+#contracts .contractMemoIntro{min-width:0;flex:1}
+#contracts .contractMemoTitle{font-size:23px;line-height:1.35;letter-spacing:-.5px;
+ font-weight:900;color:#362d26;margin:0 0 10px}
+#contracts .contractMemoHelp{font-size:15px;line-height:1.65;
+ font-weight:600;color:#66564a;margin:0}
+#contracts .contractMemoInputArea{min-width:0}
+#contracts .contractMemoLabel{
+ display:flex;align-items:center;flex-wrap:wrap;gap:10px;
+ margin:0 0 9px;font-size:18px;font-weight:850;color:#352d27;
+}
+#contracts .contractMemoStart{
+ display:inline-flex;align-items:center;justify-content:center;
+ padding:4px 10px;border:2px solid #75604d;border-radius:8px;
+ font-size:12px;line-height:1.35;font-weight:850;color:#513d2d;background:#f6ece0;
+}
+#contracts .contractMemoCard #ct_rough{
+ box-sizing:border-box;display:block;width:100%;min-height:310px;
+ padding:18px 19px;border:3px solid #70523a;border-radius:15px;
+ background:#ffffff;color:#302923;font-size:18px;line-height:1.75;
+ font-weight:500;resize:vertical;box-shadow:inset 0 1px 4px #4c362012;
+}
+#contracts .contractMemoCard #ct_rough::placeholder{color:#726558;opacity:1;font-weight:450}
+#contracts .contractMemoCard #ct_rough:focus{
+ border-color:#5b3a23;outline:4px solid #c5ac91;outline-offset:3px;
+ box-shadow:0 0 0 2px #fff,inset 0 1px 4px #4c362012;
+}
+#contracts .contractMemoWriteTip{
+ margin:11px 0 0;font-size:14px;font-weight:650;line-height:1.5;color:#584b3f;
+}
+#contracts .contractMemoCard .contractEasyActions{
+ display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);
+ gap:11px;margin-top:20px;
+}
+#contracts .contractMemoCard .contractEasyActions .btn{
+ box-sizing:border-box;min-height:67px;padding:12px 14px;
+ border-radius:14px;border-width:2px;font-size:17px;line-height:1.4;
+ font-weight:850;white-space:normal;overflow-wrap:break-word;
+}
+#contracts .contractMemoCard .contractOneTap{
+ background:#745034;color:#fff;border:2px solid #624126;
+ box-shadow:0 5px 0 #4b3222;
+}
+#contracts .contractMemoCard .contractVoice{
+ border:2px solid #96806c;background:#f9f4ee;color:#4c3828;
+}
+#contracts .contractMemoCard .contractOneTap:active{box-shadow:0 2px 0 #4b3222;transform:translateY(3px)}
+#contracts .contractMemoCard .contractEasyActions .btn:focus-visible{outline:4px solid #c5ac91;outline-offset:4px}
+@media(max-width:540px){
+ #contracts .contractMemoCard{padding:20px 15px 17px;border-width:3px;border-radius:19px}
+ #contracts .contractMemoHeading{gap:11px;margin-bottom:18px}
+ #contracts .contractMemoStep{width:47px;height:47px;min-width:47px;font-size:25px}
+ #contracts .contractMemoTitle{font-size:21px}
+ #contracts .contractMemoHelp{font-size:14px}
+ #contracts .contractMemoCard #ct_rough{min-height:285px;padding:16px;font-size:17px}
+ #contracts .contractMemoCard .contractEasyActions{grid-template-columns:minmax(0,1fr)}
+ #contracts .contractMemoCard .contractEasyActions .btn{min-height:63px;font-size:17px}
+ #contracts .contractMemoCard .contractVoice{min-height:57px}
+}
+@media(prefers-reduced-motion:reduce){
+ #contracts .contractMemoCard .contractOneTap:active{transform:none}
+}

@@ -1,0 +1,26 @@
+/* Guard the parent-friendly memo input affordances without changing contract logic. */
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const base=path.join(__dirname,'../app/src/main/assets');
+const html=fs.readFileSync(path.join(base,'index.html'),'utf8');
+const css=fs.readFileSync(path.join(base,'contracts.css'),'utf8');
+const contract=html.slice(html.indexOf('<div id="contracts"'),html.indexOf('<div id="notes"'));
+assert(contract.includes('class="panel contractMemoCard"'),'Top memo must be a separate prominent card');
+assert(contract.indexOf('class="panel contractMemoCard"')<contract.indexOf('ct_manualPanel'),'Memo comes before advanced fields');
+assert(contract.includes('id="ct_memoTitle"')&&contract.includes('여기에 계약 메모를 적으세요'),'Clear heading');
+assert(contract.includes('class="contractMemoStep"')&&contract.includes('>1</span>'),'Textual step number');
+assert(contract.includes('<label class="contractMemoLabel" for="ct_rough">'),'Associated large input label');
+assert(contract.includes('id="ct_rough" rows="10"'),'Existing memo input is not duplicated or removed');
+assert(contract.includes('aria-describedby="ct_memoHelp ct_memoWriteTip"'),'Accessible explanatory text');
+assert(contract.includes('메모 입력 완료 → 계약문자 만들기'),'Descriptive primary action');
+assert(contract.includes('onclick="FirstHyundaiEasy.compose()"'),'One-memo composition hook still works');
+assert(contract.includes('음성으로 메모 입력')&&contract.includes('onclick="FirstHyundaiContracts.voice()"'),'Voice entry remains');
+assert(contract.includes('id="ct_polishTerms"')&&contract.includes('ct_termOriginal'),'Clause review remains');
+assert(contract.includes('id="ct_manualPanel"')&&contract.includes('id="ct_resultPanel"'),'Manual review/result remain');
+assert(!/<details id="ct_manualPanel"[^>]*\sopen(?:\s|>)/.test(contract),'Advanced entry remains closed');
+assert(/#contracts \.contractMemoCard\s*\{[^}]*border:3px/.test(css),'Physical card border');
+assert(/#contracts \.contractMemoCard #ct_rough\s*\{[^}]*min-height:310px/.test(css),'Large textarea');
+assert(/#contracts \.contractMemoCard #ct_rough:focus\s*\{[^}]*outline:4px/.test(css),'Visible focus');
+assert(/@media\(max-width:540px\)[\s\S]*?#contracts \.contractMemoCard \.contractEasyActions\{grid-template-columns:minmax\(0,1fr\)\}/.test(css),'Single-column accessible mobile actions');
+assert(/#contracts \.contractMemoCard \.contractEasyActions \.btn\s*\{[^}]*min-height:67px/.test(css),'Large touch controls');
+console.log('Contract memo accessibility regression passed: visible step, explicit label, large field, mobile actions and preserved workflows.');
