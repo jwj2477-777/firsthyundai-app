@@ -130,18 +130,38 @@ function prepareSpecials(raw){
  }
  presentSpecials();
 }
-function refreshReport(result){
+// Parents need one actionable sentence, not parser keys or a running list of
+// successfully recognized fields. Admins retain their full diagnostics below.
+function simpleMissing(errors){
+ if(!errors?.length)return '✓ 필수정보 입력 완료. 문자 내용과 실제 합의를 확인해 주세요.';
+ const friendly={
+  '소재지 도로명주소':'주소','아파트 단지 선택 확인':'단지 선택',
+  '매매대금 또는 보증금':'거래금액','약정 계약금':'계약금',
+  '이번 송금액':'이번 송금액','잔금 예정일':'잔금일',
+  '송금 은행·계좌·예금주':'입금 은행·계좌·예금주',
+  '동·호수':'동·호수','임대차 기간':'임대차 기간',
+  '중도금 숫자':'중도금 금액','월세 금액':'월세 금액'
+ };
+ return '⚠ 확인할 정보 '+errors.length+'가지: '+errors.map(v=>friendly[v]||v).join(' · ');
+}
+function refreshMissing(){
  const errors=app._test.collect().errors;
+ const missing=E('missing');
+ if(missing){
+  missing.textContent=simpleMissing(errors);
+  missing.className='contractReview contractMissingSummary'+(errors.length?' bad':' ok');
+ }
+ if(E('fixMissing')?.classList?.toggle)E('fixMissing').classList.toggle('hidden',!errors.length);
+ return errors;
+}
+function refreshReport(result){
+ const errors=refreshMissing();
  const total=(result?.found||[]).length;
  if(E('oneTapSummary'))E('oneTapSummary').textContent='메모에서 '+total+'개 항목 인식 · '+
   (errors.length?errors.length+'개 필수 정보 확인 필요':'필수 정보 입력 완료')+
   (sourceClause?' · 특약 '+sourceClause.split('\n').filter(Boolean).length+'건':'');
- const missing=E('missing');
- if(missing){missing.textContent=errors.length?'추가 확인이 필요한 내용: '+errors.join(' · '):
- '입력된 조건을 확인하고 ‘내용 확인 완료’를 눌러주세요.';missing.className='contractReview'+(errors.length?' bad':'');}
  const details=E('reviewDetails');
- if(details && errors.length)details.open=true;
- if(E('fixMissing')?.classList?.toggle)E('fixMissing').classList.toggle('hidden',!errors.length);
+ if(details)details.open=!!errors.length&&document.body?.getAttribute?.('data-office-role')==='admin';
 }
 function showPreview(){
  const panel=E('resultPanel'); if(panel?.classList?.remove)panel.classList.remove('hidden');
@@ -162,8 +182,7 @@ function compose(){
 }
 function afterManualEdit(){
  app.makePreview();showPreview();
- const missing=E('missing');
- if(missing){const errors=app._test.collect().errors;missing.textContent=errors.length?'확인할 사항: '+errors.join(' · '):'입력된 계약조건을 확인하세요.';missing.className='contractReview'+(errors.length?' bad':'');}
+ refreshMissing();
 }
 function openManual(){
  const d=E('manualPanel');if(d){d.open=true;if(d.scrollIntoView)d.scrollIntoView({behavior:'smooth',block:'start'});}
@@ -206,6 +225,6 @@ window.firstHyundaiContractSpeech=function(result){
   compose();
  }else oldSpeech(result);
 };
-window.FirstHyundaiEasy={compose,afterManualEdit,openManual,useOriginalTerms,usePolishedTerms,reset,
+window.FirstHyundaiEasy={refreshMissing,compose,afterManualEdit,openManual,useOriginalTerms,usePolishedTerms,reset,
  _test:{extractSpecial,polishTerms,ending}};
 })();
