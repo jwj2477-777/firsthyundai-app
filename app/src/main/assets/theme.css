@@ -85,3 +85,279 @@ header{background:linear-gradient(125deg,#805033,#a66f43)}
 @media(max-width:360px){.favoriteTradeAlertDialog{padding:18px 14px 0}.favoriteTradeAlertDialog h2{font-size:22px}.alertDialogHeader{gap:9px}.alertDialogHeader .alertBell{flex-basis:38px;width:38px;height:38px}.favoriteTradeAlertBanner{gap:6px;padding-left:10px}.favoriteTradeAlertBanner .alertBell{display:none}.alertTransaction .alertAmount{font-size:20px}}
 @media(prefers-reduced-motion:no-preference){.favoriteTradeAlertDialog[open]{animation:alert-enter .18s ease-out}@keyframes alert-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}}
 .favoriteTradeAlertActions .btn,.favoriteTradeAlertBanner .btn,.alertPreviewButton{font-family:inherit}
+
+
+/* v1.19.15 · Family-first visual system.
+ * Lagoon teal + porcelain mint + warm peach. Color reinforces text, never replaces it.
+ * Focus, selection borders, explicit mode labels, and touch size remain visible without color. */
+:root{
+ --navy:#173e48;--blue:#155a66;--light:#eaf3f2;--slate:#536570;
+ --border:#d1dfdf;--ink:#26333a;--orange:#a56624;
+ --fhd-primary:#155a66;--fhd-dark:#163c46;--fhd-soft:#eaf3f2;
+ --fhd-paper:#ffffff;--fhd-page:#f2f6f6;--fhd-peach:#fff1df;
+ --fhd-danger:#963a34;--fhd-separator:#d1dfdf;
+}
+html{color-scheme:light;-webkit-text-size-adjust:100%}
+body{background:var(--fhd-page);color:var(--ink);font-size:16px;line-height:1.65}
+header{background:linear-gradient(120deg,#163b46,#216b72);padding-top:23px;padding-bottom:23px}
+header h1,.brandHeaderText h1{color:#ffffff;letter-spacing:-.6px}
+header p,header .eyebrow{color:#eaf6f3}
+.officeMark{background:#fff;border-color:#cce6e2;box-shadow:0 2px 12px #082e3633}
+main{padding-top:17px}
+.panel,.item,.apiInfoCards article,dialog,.nearbyFacilityItem{
+ background:var(--fhd-paper);border-color:var(--border);
+ border-radius:17px;box-shadow:0 3px 14px #163d4510;
+}
+.panel{padding:18px}
+.sectionTitle{align-items:center;gap:12px;margin:14px 0}
+.sectionTitle h2{font-size:21px;line-height:1.4;color:var(--fhd-dark);letter-spacing:-.3px}
+h2,h3{overflow-wrap:break-word}
+.tiny,.smaller,.item .meta,.complexMeta,.complexDetailAddress,.muted{
+ color:var(--slate);font-size:14px;line-height:1.7;
+}
+p,.item p,.apiInfoCards article p{line-height:1.75;font-size:15px}
+.inputLabel{font-size:15px;line-height:1.55;font-weight:750;color:#254650;margin:14px 0 7px}
+button,input,select,textarea{font-family:inherit}
+input,select,textarea{
+ box-sizing:border-box;min-height:50px;border:1.5px solid #aebfc4;
+ border-radius:11px;background:#fff;color:#25343a;font-size:16px;
+}
+input::placeholder,textarea::placeholder{color:#617178;opacity:1}
+input:focus,select:focus,textarea:focus{
+ outline:3px solid #82b9bd;outline-offset:2px;border-color:var(--fhd-primary);
+}
+button:focus-visible,a:focus-visible,summary:focus-visible,
+[role="button"]:focus-visible{
+ outline:3px solid #1b8289;outline-offset:3px;
+}
+.btn,button.btn{
+ min-height:50px;border-radius:12px;background:var(--fhd-primary);
+ border:1px solid #124c54;color:#fff;font-size:15px;font-weight:800;
+ padding:11px 15px;line-height:1.45;white-space:normal;
+}
+.btn.alt,button.btn.alt{
+ background:#edf4f4;color:#16434f;border:1.5px solid #a9c6c8;
+}
+.btn.danger{background:var(--fhd-danger);border-color:#842b29}
+.btn:disabled,button:disabled{opacity:.62}
+a{color:#145c6a;text-decoration:underline;text-underline-offset:3px}
+a.btn{text-decoration:none}
+a:hover{text-decoration:underline}
+.notice,.apiNotice,.contractInfo{
+ background:#eaf4f4;border:1px solid #bbd6d7;color:#244850;
+ border-radius:13px;font-size:14px;line-height:1.75;
+}
+.apiSourceLink{font-size:14px;color:#145c6a}
+.refreshFeedback{min-height:52px;border:1px solid #bed4d8;
+ background:#e8f2f3;color:#204752;font-size:14px}
+.refreshFeedback.success,.contractReview.ok{background:#e5f5eb;border-color:#8fcbaa;color:#195c42}
+.refreshFeedback.warning,.contractReview.bad{background:#fff1de;border-color:#dbb684;color:#74420f}
+.refreshFeedback.error{background:#ffebe8;border-color:#dfa49e;color:#8b2d2a}
+.modeBar,.modeFamily,.modeAdmin{
+ background:#e8f3f2;border:1.5px solid #a8ced0;
+ border-radius:13px;padding:12px 13px;gap:10px;
+}
+.modeBar small{font-size:14px;line-height:1.45;font-weight:800;color:#204c57}
+.modeBar .btn{min-height:48px;padding:9px 12px;font-size:14px}
+.modeAdmin{background:#fff1df;border-color:#dec19f}
+.modeAdmin small{color:#734715}
+.tabs{gap:10px}
+.primaryNav{gap:9px}
+.primaryNav button{
+ min-height:96px;background:#fff;border:2px solid #c0d7d9;
+ border-radius:16px;color:#234c57;font-size:16px;font-weight:850;
+ line-height:1.3;gap:5px;box-shadow:0 2px 8px #123c4810;padding:12px 5px;
+}
+.primaryNav button .navIcon{font-size:25px;line-height:1.1}
+.primaryNav button.active,.primaryNav button[aria-current="page"]{
+ color:#fff;background:#155a66;border:3px solid #0d3c45;
+ box-shadow:0 0 0 2px #a5d7d6,0 4px 14px #134d5430;
+}
+.primaryNav button.active::after{
+ content:'현재 메뉴';font-size:11px;font-weight:900;line-height:1.15;
+ color:#143b42;background:#e2f3ee;padding:3px 7px;border-radius:6px;
+}
+.secondaryNav{gap:8px}
+.secondaryNav button{
+ min-height:54px;background:#fff;border:1.5px solid #b9d1d4;
+ border-radius:11px;color:#294d59;font-size:15px;font-weight:750;line-height:1.35;
+ padding:8px 5px;
+}
+.secondaryNav button.active,.secondaryNav button[aria-current="page"]{
+ background:#e0f0ed;color:#124954;border:2px solid #14727c;font-weight:850;
+ box-shadow:inset 0 -3px 0 #14727c;
+}
+.utilityNav{gap:8px;align-items:stretch}
+.utilityNav>button,.adminQuick summary{
+ min-height:52px;background:#fff;border:1.5px solid #b9cfd1;
+ border-radius:11px;color:#244d57;font-size:15px;font-weight:800;
+ padding:11px 13px;line-height:1.4;
+}
+.utilityNav>button.active,.utilityNav>button[aria-current="page"]{
+ background:#dceeed;border:2px solid #13636d;
+ color:#134751;box-shadow:inset 0 -3px 0 #13636d;
+}
+.utilityNav>button:nth-of-type(2):not(.active){
+ background:#eaf4f3;border:2px solid #a9caca;color:#155864;
+}
+.adminQuick summary{min-height:52px}
+.adminQuickLinks{background:#fff;border:1px solid var(--border)}
+.adminQuickLinks button{min-height:50px;font-size:14px;color:#1a4d56}
+.tradeStarter button,.tradeTypeBar button,.nearbyFacilityButtons button,.complexTabBar button{
+ min-height:55px;border:1.5px solid #b7ced1;
+ background:#fff;color:#254e58;border-radius:12px;font-size:15px;
+ font-weight:800;line-height:1.35;padding:9px 6px;
+}
+.tradeStarter button.active,.tradeTypeBar button.active,.nearbyFacilityButtons button.active,
+.complexTabBar button.active{
+ background:#155a66;border:3px solid #0d4854;color:#fff;
+ box-shadow:0 2px 7px #173e481b;
+}
+.tradeTypeBar button.active.sale{background:#205c9a;border-color:#163d70}
+.tradeTypeBar button.active.lease{background:#196e56;border-color:#0b4837}
+.tradeTypeBar button.active.monthly{background:#925808;border-color:#704006}
+.tradeStarter button.active{background:#155a66;border-color:#0d4854}
+.nearbyGrid{gap:11px}
+.nearbyCard,.nearbyFacilityItem{
+ background:#fff;border:1.5px solid #c9d9db;color:#253c44;
+ border-radius:14px;
+}
+.nearbyCard{min-height:121px;padding:14px 12px;gap:8px;box-shadow:0 2px 7px #173e480d}
+.nearbyCard strong{font-size:16px;line-height:1.45}
+.nearbyCard small,.nearbyCard .complexCardAddress{font-size:13px;line-height:1.6;color:#586972}
+.nearbyCard .star{color:#8d581c;font-size:14px;font-weight:800}
+.nearbyCard.selected,.nearbyCard[aria-pressed="true"]{
+ background:#e4f2f0;border:3px solid #166572;padding:12px 10px;
+}
+.nearbyTotal{min-height:54px}
+.metric,.complexFact,.tradeSearchOptions,.details{
+ background:#eaf4f3;border:1px solid #d0e1e0;border-radius:13px;
+}
+.metric{padding:17px 14px}
+.metric small,.complexFact small{color:#52646d;font-size:13px}
+.metric strong{color:#174953;font-size:26px}
+.complexFact strong{font-size:16px}
+.complexIntro,.tradeFocusBanner{background:#edf5f4;border-color:#bbd9d7;color:#264b54}
+.complexLinks a,.complexQuickLinks a,.detailSwitchButton,.detailBackButton,.contractChoice{
+ min-height:48px;background:#e6f1f0;color:#155764;border:1px solid #b4d0d0;
+ border-radius:11px;font-size:15px;
+}
+.complexCallButton{background:#e3f2e9;color:#165c43;border:1px solid #acd1be}
+.complexTypeList span{background:#e3f0ee;color:#1c5860;font-size:14px}
+.practiceFacts dt{color:#566771;font-size:14px}
+.practiceFacts dd{font-size:16px}
+.apiInfoCards article .practiceNote{background:#ecf4f3;font-size:15px}
+.practiceTable table{font-size:14px}
+.practiceTable th,.practiceTable td{padding:12px 8px;border-bottom:1px solid #d4e2e2}
+.pill{background:#e6f2f1;color:#174f59;border:1px solid #b7d6d8;font-size:13px}
+.pill.gray{background:#eff3f3;color:#4c636d;border-color:#d0dddd}
+.pill.orange{background:#fff0db;color:#825016;border-color:#e2c69b}
+.pill.red{background:#ffebe8;color:#923530;border-color:#dbada8}
+.dealRow{background:#fff;border-color:#d7e3e3;box-shadow:0 2px 8px #173e480d}
+.dealRow.sale{background:#f0f6ff;border-left-color:#205c9a}
+.dealRow.lease{background:#f1faf6;border-left-color:#196e56}
+.dealRow.monthly{background:#fff8eb;border-left-color:#925808}
+.dealBadge.sale{background:#dceafe;color:#154a80}
+.dealBadge.lease{background:#ddf2e7;color:#135a44}
+.dealBadge.monthly{background:#ffebc9;color:#764505}
+.tradeSearchOptions select{font-size:16px}
+.tradeAdvanced{background:#f6fbfa;border-color:#cfe1e2;padding:12px}
+.tradeAdvanced summary,.details summary{color:#184f5c;font-size:15px;min-height:45px}
+.tradeLegend{font-size:14px}
+.newTop{border-left-color:#186a75}
+.newsCard h3,.item.newsCard h3{font-size:20px;color:#263b43;line-height:1.55}
+.item.newsCard{background:#fff;border-color:#d2e2e2}
+.newsSummaryLabel{font-size:14px;color:#165966}
+.newsCard .newsAiBody{background:#eaf4f3}
+.newsCard .newsAiBody .newsAiSentence{font-size:16px;color:#293e46}
+.newsCard .newsAiBody .newsAiSentence:before{background:#c6e2df;color:#164b53}
+.newsCard .meta,.newsCard .newsAiBody .newsAiSentence+.newsAiSentence{border-color:#cbdedc}
+.newsAwaiting,.empty{background:#f0f6f5;color:#556971;font-size:14px}
+.favoriteTradeAlertSwitch{font-size:15px;color:#264b55;min-height:48px}
+.favoriteTradeAlertSwitch input{width:23px;height:23px;min-height:23px;accent-color:#166571}
+.favoriteTradeAlertHint{font-size:14px;color:#546871}
+.favoriteTradeAlertBanner{
+ background:#ffffff;border:2px solid #77adb2;color:#244854;
+ box-shadow:0 9px 36px #1138412f;
+}
+.alertBell{background:#e1f0ef;color:#155b66;border-color:#b6d8d8}
+.alertBannerCopy strong{color:#1b4c58;font-size:18px}
+.alertEyebrow,.alertBannerCopy small{color:#536772;font-size:13px}
+.favoriteTradeAlertDialog{background:#fff;border:1.5px solid #a8ccce;color:#243c43}
+.favoriteTradeAlertDialog h2{color:#164851}
+.alertCaption{color:#55676d;font-size:15px}
+.favoriteTradeAlertItem{background:#fff;border-color:#cfe0e1}
+.alertComplexHeading strong{color:#204a55;font-size:17px}
+.alertComplexHeading>span,.alertTransaction .alertDate,.alertExtra{color:#566a72;font-size:14px}
+.alertTransaction .alertAmount{color:#233b44}
+.alertTransaction .alertDetails{color:#526570;font-size:15px}
+.alertDialogFooter{background:#fff;border-color:#d4e1e2}
+.alertDialogFooter .favoriteTradeAlertHint{font-size:13px;color:#566a72}
+.contractHero{background:linear-gradient(125deg,#e0f1ee,#f9fdfc);border:1.5px solid #bad9d9}
+.contractHero h2{color:#194a55;font-size:25px}
+.contractHero p{color:#4b626d;font-size:15px}
+.contractSteps{gap:8px}
+.contractSteps li{background:#e8f2f1;border:1.5px solid #c0dadd;color:#234d58;font-size:14px}
+#contracts .contractMemoCard{border-color:#18616e;background:#fff}
+#contracts .contractMemoStep{
+ background:#e5f4f2;border-color:#165d6b;color:#174a54;
+}
+#contracts .contractMemoTitle{color:#203b44}
+#contracts .contractMemoHelp,#contracts .contractMemoWriteTip{color:#50616b}
+#contracts .contractMemoStart{background:#e7f3f1;color:#15545e;border-color:#8cb9be}
+#contracts .contractMemoLabel{color:#244d57}
+#contracts .contractMemoCard #ct_rough{border-color:#247481;background:#fff;color:#213941}
+#contracts .contractMemoCard #ct_rough:focus{border-color:#155a66;outline-color:#9acdd0}
+#contracts .contractMemoCard .contractOneTap{background:#155a66;border-color:#0c414b;box-shadow:0 5px 0 #0c414b}
+#contracts .contractMemoCard .contractVoice{background:#edf5f4;color:#184c57;border-color:#9bc4c7}
+#contracts .contractPolishToggle{background:#edf5f4;color:#274d57}
+#contracts .contractPolishToggle input{accent-color:#155a66}
+#contracts .contractSection{color:#204b55;font-size:19px}
+#contracts .contractHint{color:#566771;font-size:14px}
+#contracts .inputLabel{font-size:15px;color:#284a55}
+#contracts .contractManual,#contracts .contractCompactDetails{background:#fff;border-color:#c9dfe0}
+#contracts .contractManual>summary,#contracts .contractCompactDetails>summary{
+ min-height:52px;color:#1e505d;font-size:15px;background:#eaf4f3;
+}
+#contracts .contractMoneySummary,#contracts .contractOneTapStatus{
+ background:#e7f3f2;border-color:#bedbdc;color:#294c58;font-size:15px;
+}
+#contracts .contractReview{background:#f0f6f5;color:#3e5962;border-color:#cfe0e0;font-size:14px}
+#contracts .contractReview.bad{background:#fff1de;color:#74420f;border-color:#dbb684}
+#contracts .contractReview.ok{background:#e4f4e9;color:#195c42;border-color:#8fcbaa}
+#contracts #ct_resultPanel .contractPreview{background:#fff;border-color:#b9d0d3;font-size:17px}
+.contractImageDialog{background:#f7fbfa;border-color:#afcdd0;color:#253e46}
+.contractImageSheet{background:#e5f0ef;border-color:#c1d8d9}
+.contractImagePageTag{color:#315862;font-size:14px}
+.foot{color:#597079;font-size:13px}
+::selection{background:#bfe3df;color:#173f49}
+@media(max-width:540px){
+ main{padding-left:12px;padding-right:12px}
+ .panel{padding:16px}
+ .sectionTitle h2{font-size:20px}
+ .primaryNav button{min-height:96px;font-size:15px}
+ .secondaryNav button{min-height:52px;font-size:14px}
+ .utilityNav>button,.adminQuick summary{font-size:14px}
+ .contractSteps li{font-size:13px;padding:10px 3px}
+ .tradeStarter button{font-size:14px}
+ .tradeTypeBar button{font-size:14px}
+ .complexFacts{gap:8px}
+ .favoriteTradeAlertDialog{padding:18px 16px 0}
+}
+@media(max-width:360px){
+ .modeBar{align-items:stretch;flex-direction:column}
+ .modeBar .btn{width:100%}
+ .primaryNav button{font-size:14px}
+ .tradeTypeBar button{font-size:13px;padding:9px 2px}
+ .nearbyGrid{grid-template-columns:1fr}
+ .utilityNav>button{flex:1}
+}
+@media(prefers-contrast:more){
+ :root{--border:#8ea5ab;--slate:#394e58}
+ .panel,.nearbyCard,.metric,.modeBar,.complexFact{border-width:2px}
+ .primaryNav button,.secondaryNav button,.utilityNav>button{border-width:3px}
+ .tiny,.muted,.item .meta{color:#344c58}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
