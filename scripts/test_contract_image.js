@@ -95,6 +95,7 @@ for(const text of ['150,000만원','50,000만원','85,000만원','김가람','�
 assert.strictEqual(api._test.clean('▶ 잔금 : 85,000만원','row'),'잔금 : 85,000만원');
 assert.strictEqual(api._test.clean('→ 수리해준다.','term'),'수리해준다.');
 nodes.ct_preview.value=typical;
+approved=true;
 api.open();assert(nodes.ct_imageDialog.open,'Premium sheet preview opens');
 for(const literal of ['오늘 송금액','700만원','하나은행','123-45678-01','예금주  김가람','계약내용과 입금 계좌를 확인하시고'])assert(drawnLabels.some(s=>s.includes(literal)),'Image must visibly show verified '+literal);
 assert(!drawnLabels.some(s=>s.includes('발송 전에 확인해 주세요')),'Recipient must not see internal sending instructions');
