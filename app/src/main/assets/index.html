@@ -1366,7 +1366,8 @@ function tradeClass(type){return type==='매매'?'sale':type==='전세'?'lease':
 function dealBadge(type){return '<span class="dealBadge tradeMainBadge '+tradeClass(type)+'">'+escapeHtml(type||'기타')+'</span>';}
 function tradeStatusBadge(row){
  const raw=String(row.status||'신고').trim();
- const label=raw==='신고'&&['전세','월세'].includes(row.type)?'임대차 신고':raw;
+ const reported=/^신고(?:\s*\(\s*임대차\s*\))?$/.test(raw);
+ const label=reported&&['전세','월세'].includes(row.type)?'임대차 신고':raw;
  return '<span class="tradeInfoBadge tradeReportBadge'+(raw==='해제'?' tradeCancelledBadge':'')+'">'+escapeHtml(label)+'</span>';
 }
 function dealArticleClass(row,extra=''){return 'dealRow '+tradeClass(row.type)+(row.status==='해제'?' cancelled':'')+(extra?' '+extra:'');}
