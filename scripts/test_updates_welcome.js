@@ -16,7 +16,8 @@ assert(html.includes('<h1>퍼스트현대</h1>'));
 assert(html.includes('brandSubtitle'));
 assert(!html.includes('fill="#FF0000"'),'Top logo should not use vivid red');
 assert(html.includes('fill="#116A71"'),'Original FHD paths recolored to teal');
-assert(icon.includes('fillColor="#116A71"'),'Launcher and startup badge in same teal');
+assert(icon.includes('GOLD_STOPS')&&icon.includes('TEAL_STOPS')&&icon.includes('WHITE_LOGO'),'Launcher and startup badge preserve the original FHD FIRST vector with true gold and teal gradients');
+assert(html.includes('style="fill:url(#fhdPremiumGold)"'),'Header follows the premium gold and emerald branding');
 assert(lock.includes('R.drawable.ic_launcher_badge')&&lock.includes('showWelcome(stage)'));
 assert(lock.includes('if(!welcomeDone){openAfterWelcome=true;return;}'),'Startup must not bypass splash and login');
 assert(lock.includes('loadLatestPolicy()')&&lock.includes('AccessPolicy.authorized('),'Authentication stays intact');
@@ -25,7 +26,7 @@ assert(main.includes('openVerifiedAppUpdate()')&&main.includes('AppUpdate.allowe
 assert(java.includes('https://api.github.com/repos/jwj2477-777/firsthyundai-app/releases/latest')===false);
 assert(java.includes('releases/latest')&&java.includes('allowedDownload'));
 assert(java.includes('compareVersion(version,installed)<=0'),'Reject downgrade and same version');
-assert(gradle.includes("versionName '2.0.14'"));
+assert(gradle.includes("versionName '2.0.15'"));
 assert(gradle.includes('FHD_SIGNING_KEYSTORE'),'Release signing must use persistent private key');
 const objects={};
 function E(id){if(!objects[id])objects[id]={hidden:id==='appUpdateBanner',textContent:'',
