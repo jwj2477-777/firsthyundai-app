@@ -27,8 +27,19 @@ jobs:
                   with urllib.request.urlopen(req,timeout=timeout) as r:
                       body=r.read(250_000);return r.status,json.loads(body)
               except urllib.error.HTTPError as e:
-                  try: body=json.loads(e.read(6000))
+                  raw=e.read(6000)
+                  try: body=json.loads(raw)
                   except Exception: body={}
+                  if e.code==403:
+                      import re
+                      title=re.search(rb'<title[^>]*>(.*?)</title>',raw,re.I|re.S)
+                      info=(title.group(1).decode('utf-8','replace').strip() if title else '')
+                      detail=(str(body.get('error') or body.get('message') or '') if isinstance(body,dict) else '')
+                      print('HTTP_403_EDGE_DIAGNOSTICS:',
+                        'server=',str(e.headers.get('Server',''))[:65],
+                        'type=',str(e.headers.get('Content-Type',''))[:65],
+                        'cf_mitigated=',str(e.headers.get('cf-mitigated',''))[:65],
+                        'title=',info[:120], 'detail=',detail[:120])
                   return e.code,body
               except Exception:
                   return 0,{}
