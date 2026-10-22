@@ -28,7 +28,7 @@ const card=row=>vm.runInContext(
   'dealBadge('+JSON.stringify(row.type)+')+tradeStatusBadge('+JSON.stringify(row)+')+tradeExtraBadges('+JSON.stringify(row)+')',trade);
 for(const row of [
  {type:'매매',status:'신고',dealing_type:'직거래'},
- {type:'전세',status:'신고',contract_type_raw:'신규계약'},
+ {type:'전세',status:'신고(임대차)',contract_type_raw:'신규계약'},
  {type:'월세',status:'신고',contract_type_raw:'갱신계약'}
 ]){
  const markup=card(row);

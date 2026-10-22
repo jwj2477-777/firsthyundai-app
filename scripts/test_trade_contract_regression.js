@@ -58,6 +58,7 @@ for(const type of ['전세','월세']){
  assert(!badges({type,contract_type_raw:'신규'}).includes('(신규계약)'),'No pointless parentheses around new contract');
  assert(!badges({type,contract_type_raw:'갱신'}).includes('(갱신계약)'),'No pointless parentheses around renewed contract');
 }
+assert(statusBadge({type:'전세',status:'신고(임대차)'}).includes('임대차 신고'),'Real official rental status is normalized for parents');
 assert(statusBadge({type:'매매',status:'신고'}).includes('신고'),'Sale reported state remains');
 assert(statusBadge({type:'매매',status:'해제'}).includes('tradeCancelledBadge'),'Cancelled record must visibly retain its status');
 assert(!statusBadge({type:'매매',status:'신고'}).includes('임대차 신고'));
