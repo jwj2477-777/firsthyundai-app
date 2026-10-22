@@ -366,3 +366,33 @@ a:hover{text-decoration:underline}
 #contracts .contractMemoCard .contractOneTap:active{box-shadow:0 2px 0 #0c414b}
 .detailSheetTop{background:#fff;border-bottom:1px solid #c8dddd}
 .detailSheetTop strong{font-size:18px;color:#204a55}
+
+
+/* v1.19.16 — Short, task-first family views. Keep all explanation in administrator
+ * mode and preserve concise safety instructions in family mode. */
+body:not([data-office-role="admin"]) .adminExplain{display:none!important}
+body[data-office-role="admin"] .familySimpleNote{display:none!important}
+.familySimpleNote{font-size:14px;line-height:1.55;color:#425c64;margin:8px 0 12px}
+.familyBriefCaution{
+ border-left:4px solid #27808a;padding:9px 12px;
+ background:#edf6f5;border-radius:0 9px 9px 0;color:#28535d;
+ font-size:14px;font-weight:650;
+}
+.familyShortSafety{
+ padding:8px 11px;border:1px solid #d8e6e3;
+ border-radius:10px;background:#f2f8f6;
+ color:#324f57;font-size:14px;line-height:1.55;
+}
+#contracts .familyShortSafety{background:#f2f8f6;color:#324f57}
+#newsFamilyMeta{font-size:14px;font-weight:700;margin:6px 0}
+#contracts .contractNoticeControls .familyShortSafety{margin-top:7px}
+#contracts #ct_resultPanel>.familyShortSafety{margin-top:14px}
+.sectionTitle>.refreshAction,.sectionTitle>button.refreshAction{
+ flex:0 0 auto;min-width:71px;min-height:49px;
+ padding:8px 12px;white-space:nowrap;word-break:keep-all;
+ align-self:flex-start;
+}
+@media(max-width:410px){
+ .sectionTitle{gap:8px}
+ .sectionTitle>.refreshAction{min-width:68px;padding:8px 9px;font-size:14px}
+}
