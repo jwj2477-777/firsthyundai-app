@@ -485,3 +485,77 @@ input:focus,select:focus,textarea:focus{
  #contracts .contractMemoCard #ct_rough{border-width:4px}
  #contracts .contractMemoStart{border-width:3px}
 }
+
+
+/* v1.19.18 · One navigation choice per destination.
+ * News has one functional pair of tabs; complexes has one clear search form. */
+#nav .primaryNav{margin-bottom:3px}
+#nav .secondaryNav{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#nav .secondaryNav button{
+ min-height:55px;line-height:1.4;font-size:14px;
+ padding:9px 5px;white-space:normal;overflow-wrap:break-word;
+}
+#nav .utilityNav{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;
+ align-items:stretch;
+}
+#nav .utilityNav>button{
+ min-width:0;width:100%;min-height:56px;padding:10px 7px;
+ font-size:15px;line-height:1.4;
+}
+#nav .utilityNav>.adminQuick{
+ grid-column:1/-1;min-width:0;width:100%;
+}
+#nav .utilityNav>.adminQuick summary{
+ min-height:50px;display:flex;justify-content:center;align-items:center;
+}
+#complexes .complexSearchPanel{background:#fff;border:1.5px solid #cbdede}
+#complexes .complexSearchHeading{
+ margin:0 0 6px;color:#1b505d;font-size:19px;line-height:1.5;
+}
+#complexes .complexSearchFields{display:grid;grid-template-columns:1fr;gap:8px 14px}
+#complexes .complexSearchInput,#complexes .complexTools{min-width:0;width:100%}
+#complexes .complexTools{
+ display:flex;flex-direction:column;align-items:stretch;gap:0;
+}
+#complexes .complexSearchFields .inputLabel{
+ display:block;margin:8px 0 7px;color:#254b58;font-size:15px;
+}
+#complexes #complexSearch,#complexes #complexScope{
+ width:100%;max-width:none;min-height:58px;font-size:16px;
+ border:2px solid #9bbfc4;border-radius:12px;
+ background:#edf7f6;color:#254851;
+ padding:12px 13px;
+}
+#complexes #complexSearch::placeholder{color:#526b73;opacity:1}
+#complexes #complexSearch:focus,#complexes #complexScope:focus{
+ outline:3px solid #7fbec4;outline-offset:2px;border-color:#155a66;
+}
+#complexes .complexResultsMeta{
+ margin:13px 0 12px;font-size:14px;color:#405d66;
+}
+.newsCategoryTabs{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:10px;margin:16px 0 22px;
+}
+.newsCategoryTabs>button{
+ display:flex;align-items:center;justify-content:center;
+ min-width:0;width:100%;min-height:61px;
+ font-size:16px;line-height:1.4;white-space:normal;
+ word-break:keep-all;padding:10px 9px;
+}
+.newsCategoryTabs>button[aria-selected="true"]{
+ background:#155a66;color:#fff;border:3px solid #0e414b;
+ box-shadow:0 3px 12px #184c5324;
+}
+.newsCategoryTabs>button[aria-selected="false"]{
+ background:#edf4f4;color:#16434f;border:2px solid #accbd0;
+}
+@media(min-width:740px){
+ #complexes .complexSearchFields{grid-template-columns:minmax(0,1.65fr) minmax(0,1fr)}
+}
+@media(max-width:400px){
+ #nav .secondaryNav button{font-size:13px;min-height:57px}
+ #nav .utilityNav>button{font-size:14px}
+ .newsCategoryTabs>button{font-size:14px;min-height:61px;padding:9px 6px}
+}
