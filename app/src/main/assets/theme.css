@@ -361,3 +361,8 @@ a:hover{text-decoration:underline}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
+
+/* Keep the pressed primary contract button visually coherent with the family palette. */
+#contracts .contractMemoCard .contractOneTap:active{box-shadow:0 2px 0 #0c414b}
+.detailSheetTop{background:#fff;border-bottom:1px solid #c8dddd}
+.detailSheetTop strong{font-size:18px;color:#204a55}

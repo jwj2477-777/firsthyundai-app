@@ -1,5 +1,7 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-22 / v1.19.15**: Family-first accessible redesign: consistent high-contrast lagoon teal, porcelain mint and warm peach across app screens, larger touch/text, visible active outlines and semantic state attributes. Native security gate colors and one-sheet contract PNG branding aligned without changing business logic; static color contrast/touch/regression checks.
+
 - **2026-10-22 / v1.19.14**: Made one-memo contract entry unmistakable for family users using a large labeled step-one card, 3px entry borders, higher legibility, focus visibility, tactile primary/voice buttons, stacked mobile layout; maintained all existing memo IDs and handlers and added UI regression test.
 
 - **2026-10-21 / v1.19.13**: Payment rows after special clauses excluded, inline special headers preserved; negotiated contract signing windows and precise dates recognized in free-text field; payee on bank line prioritized with explicit verification warning; synthetic regression tests.
