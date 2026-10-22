@@ -259,3 +259,38 @@ body[data-office-role="admin"] .familySimpleNote{display:none!important}
 
 /* Small labels in an active tab stay legible without crowding the 3-column grid. */
 #nav .primaryNav button.active::after{max-width:100%;white-space:nowrap}
+
+
+/* v2.0.1 · Exact source-backed apartment areas & meaningful contract shortcut */
+#complexes .complexAreaGuide{font-size:15px;line-height:1.65;color:#314d53;margin:12px 0}
+#complexes .complexAreaCounts{font-size:14px;color:#526773;font-weight:750;margin:10px 0 16px}
+#complexes .complexTypeRows{display:grid;gap:10px;margin:12px 0 20px}
+#complexes .complexAreaItem{
+ display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+ border:1.5px solid #d0dfe0;border-left:5px solid #136d63;
+ border-radius:14px;background:#fff;padding:14px 15px;
+}
+#complexes .complexAreaItem.observed{background:#f5f8fb;border-left-color:#6d819b}
+#complexes .complexAreaFacts{min-width:0;flex:1 1 170px;display:grid;gap:6px}
+#complexes .complexAreaFacts strong{font-size:17px;color:#1b414b;line-height:1.45}
+#complexes .complexAreaFacts small{font-size:13px;color:#516773;line-height:1.55}
+#complexes .complexAreaContract{
+ min-height:49px;border:1.5px solid #b0d3cd;border-radius:11px;
+ background:#e8f4f0;color:#12584d;font-size:14px;font-weight:850;
+ padding:10px 14px;line-height:1.4;white-space:normal;text-align:center;
+}
+#complexes .complexAreaContract:focus-visible{
+ outline:3px solid #de9d67;outline-offset:3px;
+}
+#contracts .contractComplexContext{
+ margin:0 0 16px;background:#e9f5ef;border:2px solid #89bf9e;
+ border-left:6px solid #176d4e;border-radius:13px;
+ padding:13px 15px;color:#1a513e;line-height:1.65;
+ font-size:16px;font-weight:800;
+}
+#contracts .contractComplexContext.hidden{display:none!important}
+@media(max-width:540px){
+ #complexes .complexAreaItem{padding:13px;gap:10px}
+ #complexes .complexAreaContract{width:100%;min-height:51px}
+ #complexes .complexAreaFacts strong{font-size:17px}
+}
