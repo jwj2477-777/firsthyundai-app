@@ -134,6 +134,7 @@ jobs:
           node scripts/test_color_input_roles.js
           node scripts/test_navigation_clarity.js
           node scripts/test_ui_v2.js
+          node scripts/test_scroll_to_top.js
           node scripts/test_contract_broker.js
           node --check app/src/main/assets/contracts-transfer.js
           node scripts/test_contract_transfer.js
@@ -177,21 +178,21 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.12 teal remittance image APK
+      - name: Publish successful v2.0.13 floating scroll-to-top APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v2.0.12.apk
-          unzip -t FirstHyundai-v2.0.12.apk | grep 'No errors detected'
-          if gh release view v2.0.12 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v2.0.13.apk
+          unzip -t FirstHyundai-v2.0.13.apk | grep 'No errors detected'
+          if gh release view v2.0.13 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.12 FirstHyundai-v2.0.12.apk \
+            gh release create v2.0.13 FirstHyundai-v2.0.13.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.12 · 계약 이미지 송금액 청록색 통일' \
-              --notes '고객용 계약 안내 이미지에서 이번 송금액(예: 500만원)의 적갈색 텍스트 색상을 은행명(예: 하나은행)·계좌번호·예금주와 완전히 동일한 청록색(#0c6269)으로 통일했습니다. 실제 송금액 숫자의 굵기, 크기, 위치와 법률 문장/송금 계좌, FHD 원본 로고 및 하단 푸터 삭제 상태는 그대로 유지합니다. 기존 v2.0.11 학교위치 31개 목록과 계약일 필수 검증, 실거래, 뉴스, 관리자/가족 모드 등 모든 기능은 보존합니다.'
+              --title '퍼스트현대 v2.0.13 · 모든 탭 맨 위로 바로가기' \
+              --notes '모든 메인 탭과 아파트 상세·관심단지 상세 화면에서 아래로 스크롤했을 때 우측 하단에 작고 단순한 원형 맨 위로(↑) 버튼이 표시됩니다. 버튼은 화면에 고정되고 현재 화면 스크롤만 최상단으로 부드럽게 이동시킵니다. 상단에서는 자동으로 숨겨지며 Android 화면 안전영역을 고려하고 마지막 본문이 버튼에 가려지지 않도록 하단 여백을 확보했습니다. 화면 전환/상세화면 열고 닫을 때 상태가 정확히 갱신되며 줄어든 동작 설정을 존중합니다. 기존 v2.0.12 계약 이미지 및 v2.0.11 학교 목록 등 기능은 그대로 보존합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.12 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.13 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
