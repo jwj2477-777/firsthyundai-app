@@ -49,7 +49,7 @@ assert(/input,select,textarea\s*\{[^}]*min-height:50px/.test(css),'Input touch t
 assert(/\.nearbyCard strong\s*\{[^}]*font-size:16px/.test(css),'Apartment names legible');
 assert(/\.tiny,\.smaller,\.item \.meta,\.complexMeta,\.complexDetailAddress,\.muted\s*\{[^}]*font-size:14px/.test(css),'Secondary text not micro-sized');
 assert(/\.sectionTitle h2\s*\{[^}]*font-size:21px/.test(css),'Readable section headings');
-gr(html,'<meta name="theme-color" content="#163b46">');
+gr(html,'<meta name="theme-color" content="#182C46">');
 gr(html,'aria-current="\'+(id===\'overview\'?\'page\':\'false\')');
 gr(html,'aria-current="\'+(id===\'contracts\'?\'page\':\'false\')');
 gr(html,"document.title='퍼스트현대 · '+pageNames[id]");
