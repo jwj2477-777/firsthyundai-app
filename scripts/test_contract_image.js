@@ -7,10 +7,11 @@ const html=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/index.htm
 const java=fs.readFileSync(path.join(__dirname,'../app/src/main/java/kr/co/firsthyundai/app/ContractImageShare.java'),'utf8');
 const manifest=fs.readFileSync(path.join(__dirname,'../app/src/main/AndroidManifest.xml'),'utf8');
 const drawnLabels=[];
+const drawnColors=[];
 const ctx={
  font:'',measureText(s){return {width:Array.from(s).length*21}},
  fillRect(){},beginPath(){},moveTo(){},lineTo(){},quadraticCurveTo(){},closePath(){},
- fill(){},stroke(){},fillText(s){drawnLabels.push(String(s))},set textAlign(x){},set fillStyle(x){},set strokeStyle(x){},set lineWidth(x){}
+ fill(){},stroke(){},fillText(s){drawnLabels.push(String(s));drawnColors.push({text:String(s),color:this._fillStyle})},set textAlign(x){},set fillStyle(x){this._fillStyle=x},get fillStyle(){return this._fillStyle},set strokeStyle(x){},set lineWidth(x){}
 };
 const nodes={ct_preview:{value:'안녕하세요. 퍼스트현대부동산입니다.\n\n● 아파트 전세계약 ●\n▶ 전세보증금 : 39,000만원\n▶ 특약사항\n→ 기타 상세한 특약사항은 본계약서 작성 시 협의하여 기재한다.\n※ 당사자 합의에 따른 안내\n실제 협의한 해제 조건을 확인해 주세요.'}};
 let approved=false, alerts=[];
@@ -106,7 +107,10 @@ assert(!drawnLabels.some(s=>s.includes('계약내용과 입금 계좌를 확인�
 assert(!drawnLabels.some(s=>s.includes('발송 전에 확인해 주세요')),'Recipient must not see internal sending instructions');
 assert(source.includes('document.querySelector?.(\'.officeMarkSvg\')'),'Render genuine brand SVG from the app header');
 assert(source.includes('new Path2D(d)'),'Use the original paths instead of redrawing the logo');
-assert(source.includes("run.kind==='amount'?'#AC3930'"),'Partial remittance has restrained red highlight');
+assert(source.includes("c.fillStyle=run.emphasis?'#0c6269':'#50646b'"),'Transfer amount and bank/account/payee use exactly the same teal color');
+assert(!source.includes('#AC3930'),'Do not use contrasting red on actual remittance amounts');
+assert(drawnColors.some(x=>x.text==='700만원'&&x.color==='#0c6269'),'Partial remittance is rendered in the same teal color as the bank');
+assert(drawnColors.some(x=>x.text==='하나은행'&&x.color==='#0c6269'),'Bank is rendered in the same teal color as the remittance');
 assert(!source.includes('FHD 임시'),'Do not add a placeholder logo');
 assert(!source.includes('const footer='),'No bottom footer in the exported contract PNG');
 assert(source.includes("fill==='#FF0000'?'#155a66'"),'Recolor only the original company logo');

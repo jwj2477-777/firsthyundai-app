@@ -241,7 +241,7 @@ function draw(page,index,total){
    let x=LEFT+10;
    for(const run of item.runs){
     c.font=run.kind==='amount'?'800 '+(item.size+3)+'px sans-serif':(run.emphasis?'700 '+(item.size+2):'400 '+item.size)+'px sans-serif';
-    c.fillStyle=run.kind==='amount'?'#AC3930':run.emphasis?'#0c6269':'#50646b';
+    c.fillStyle=run.emphasis?'#0c6269':'#50646b';
     c.fillText(run.text,x,y);
     const measured=c.measureText(run.text).width;
     if(run.underline){c.fillStyle='#0c6269';c.fillRect(x,y+5,measured,2);}
