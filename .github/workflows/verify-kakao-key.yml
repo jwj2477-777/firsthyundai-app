@@ -35,6 +35,8 @@ jobs:
                       title=re.search(rb'<title[^>]*>(.*?)</title>',raw,re.I|re.S)
                       info=(title.group(1).decode('utf-8','replace').strip() if title else '')
                       detail=(str(body.get('error') or body.get('message') or '') if isinstance(body,dict) else '')
+                      if not detail and not info and e.headers.get('Content-Type','').startswith('text/plain'):
+                          detail=re.sub(r'[^-A-Za-z0-9 _.:()/#]', '',raw.decode('utf-8','replace')[:220])
                       print('HTTP_403_EDGE_DIAGNOSTICS:',
                         'server=',str(e.headers.get('Server',''))[:65],
                         'type=',str(e.headers.get('Content-Type',''))[:65],

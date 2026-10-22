@@ -12,7 +12,7 @@ const workerName=wrangler.match(/^name\s*=\s*"([^"]+)"/m)?.[1];
 assert(workerName,"Worker name must be explicit in wrangler.toml");
 assert.equal(config.backend_url,"https://"+workerName+".jwj2477.workers.dev",
  "App backend address must match the actual Cloudflare Wrangler deployment");
-assert(src.includes("return url==="+JSON.stringify(config.backend_url)),
+assert(src.includes("return url==='"+config.backend_url+"'")||src.includes('return url==='+JSON.stringify(config.backend_url)),
  "Android WebView URL safety allowlist and cloud backend URL must match exactly");
 assert(!src.includes("https://firsthyundai-kakao.jwj2477.workers.dev"),
  "Remove defunct Worker host from built Android app");
