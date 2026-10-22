@@ -493,3 +493,28 @@ header .officeMarkSvg{width:55px;height:55px}
 .appUpdateActions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}
 #appUpdateCheck{min-height:38px;padding:7px 12px;font-size:13px}
 #appUpdateStatus{font-size:12px;color:#526A71}
+
+/* v2.0.17 compact role switch occupies unused header space only. */
+header .brandHeader{display:flex;align-items:center;gap:10px;min-width:0}
+header .brandHeaderText{flex:1;min-width:0}
+header #modeBar{display:flex;align-items:center;justify-content:flex-end;margin:0 0 0 auto;padding:0;
+ background:transparent;box-shadow:none;border:0;border-radius:0;min-width:0;flex:0 0 auto}
+header .roleScreenReader{position:absolute!important;width:1px;height:1px;padding:0;
+ margin:-1px;border:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+header #roleButton{appearance:none;background:#FFFFFF12;color:#F4F8F7;font:inherit;font-size:12px;
+ font-weight:750;white-space:nowrap;border:1px solid #C2DCDA77;border-radius:9px;
+ padding:7px 10px;min-width:0;min-height:34px;line-height:1.2;box-shadow:none}
+header .modeAdmin #roleButton{border-color:#EACB86;color:#FBE7B2;background:#F1D28C1C}
+header #roleButton:focus-visible{outline:2px solid #FBE9BB;outline-offset:3px}
+@media(max-width:375px){header .brandHeader{gap:8px}header .brandWordmark h1{font-size:22px}
+ header .brandSubtitle{font-size:9px;letter-spacing:.4px}header #roleButton{font-size:11px;padding:7px 8px}}
+.favoriteAlertCompact{margin:0 0 12px;border:1px solid #D7E6E2;border-radius:11px;background:#F8FBFA}
+.favoriteAlertCompact>summary{list-style:none;cursor:pointer;padding:11px 13px;font-size:13px;
+ font-weight:750;color:#1D5058;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.favoriteAlertCompact>summary::-webkit-details-marker{display:none}
+.favoriteAlertCompact>summary span{color:#71858A;font-size:11px;font-weight:500}
+.favoriteAlertCompact[open]>summary span{font-size:0}
+.favoriteAlertCompact[open]>summary span:after{content:"접기";font-size:11px}
+.favoriteAlertCompactInner{padding:2px 13px 11px;border-top:1px solid #DFE9E8}
+.favoriteAlertCompactInner .favoriteTradeAlertSwitch{margin:9px 0}
+.favoriteAlertCompactInner .alertPreviewButton{margin:5px 0}

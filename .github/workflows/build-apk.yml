@@ -145,6 +145,7 @@ jobs:
           node scripts/test_trade_confirmation_states.js
           node scripts/test_app_version.js
           node scripts/test_updates_welcome.js
+          node scripts/test_direct_updater.js
           node scripts/test_apartment_detail_navigation.js
           node scripts/test_area_contract_bridge.js
           node scripts/test_refresh_feedback.js
@@ -230,21 +231,21 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.16 unified contract date display APK
+      - name: Publish successful v2.0.17 in-app verified update APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.16.apk
-          unzip -t FirstHyundai-v2.0.16.apk | grep 'No errors detected'
-          if gh release view v2.0.16 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.17.apk
+          unzip -t FirstHyundai-v2.0.17.apk | grep 'No errors detected'
+          if gh release view v2.0.17 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.16 FirstHyundai-v2.0.16.apk \
+            gh release create v2.0.17 FirstHyundai-v2.0.17.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.16 · 중도금 지급일 날짜 표기 통일' \
-              --notes '계약 안내 문자에서 중도금 지급일만 YYYY-MM-DD(예: 2026-12-04)로 보이던 문제를 수정했습니다. 계약일 및 잔금일과 동일한 YYYY.MM.DD.(예: 2026.12.04.) 형식으로 표기합니다. 입력란의 원본 날짜 값은 바꾸지 않으며 12월 중 상호 협의 같은 협의 일정은 그대로 유지합니다. 계약문자 텍스트와 이를 사용하는 고객용 계약 안내 이미지에 동일하게 반영됩니다. 기존 프리미엄 골드 FHD 아이콘, 고정 서명 업데이트, 송도 학교정보, 실거래, 관리자/가족 기능 및 개인정보 보호는 유지합니다.'
+              --title '퍼스트현대 v2.0.17 · 앱 내 다운로드 업데이트와 간결한 설정' \
+              --notes '새 버전 확인 버튼에서 GitHub 정식 APK를 찾으면 앱 내부에서 직접 다운로드하고 진행률을 표시합니다. 기존 앱과 APK의 패키지·서명 인증서 및 더 높은 버전을 확인한 뒤 안드로이드 설치 확인 화면으로 연결합니다. 최초 출처 설치 허용과 최종 설치는 사용자가 승인하며 무음 설치하지 않습니다. 고정 서명키를 유지하여 기존 자료 보존 업데이트를 지원합니다. 관리자 전환은 메인 상단 우측의 작은 버튼으로 변경해 불필요한 모드 안내 박스 삭제. 관심단지 알림 설정은 한 줄로 접고 펼치는 방식으로 바꾸고 반복 설명을 정리했습니다. 기존 v2.0.16 계약문자·학교정보·실거래·골드 FHD 마크 등 기능은 보존합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.16 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.17 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"

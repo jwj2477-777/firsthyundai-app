@@ -15,8 +15,6 @@ assert(css.includes('body[data-office-role="admin"] .familySimpleNote{display:no
 for(const section of [favorites,news,contract])
  assert(section.includes('adminExplain'),'Each family-facing workflow must remove a technical paragraph');
 for(const phrase of [
- '최초 연결 시에는 기존 거래를 알리지 않습니다',
- '앱을 종료한 상태의 실시간 푸시 알림은 별도의 연동이 필요합니다',
  'Gemini·Groq가 핵심 내용을 요약',
  '금일 천만원',
  '일방 변심에 따른 해제 조건',
@@ -30,6 +28,10 @@ for(const phrase of [
         phrase==='Gemini·Groq가 핵심 내용을 요약'&&html.lastIndexOf('class="notice adminExplain"',idx)>html.lastIndexOf('<div',idx),
         'Long explanation must be explicitly scoped to admin: '+phrase);
 }
+for(const removed of [
+ '최초 연결 시에는 기존 거래를 알리지 않습니다',
+ '앱을 종료한 상태의 실시간 푸시 알림은 별도의 연동이 필요합니다'
+])assert(!favorites.includes(removed),'Unnecessary verbose notification explanation removed');
 for(const phrase of [
  '뉴스 요약은 참고용입니다. 중요한 정보는 원문에서 확인하세요.',
  '실제 합의한 조건인지 확인해 주세요.'
@@ -56,7 +58,7 @@ assert(embedded,'App script exists');
 new vm.Script(embedded);
 const fn=embedded.slice(embedded.indexOf('function updateRoleBar(){'),embedded.indexOf('function toggleAdminMode(){'));
 const node={attributes:{},setAttribute(k,v){this.attributes[k]=v}};
-const elements={roleLabel:{textContent:''},roleButton:{textContent:''},modeBar:{className:''}};
+const elements={roleLabel:{textContent:''},roleButton:{textContent:'',setAttribute(k,v){this[k]=v}},modeBar:{className:''}};
 const ctx=vm.createContext({role:'family',document:{body:node},$:id=>elements[id]});
 vm.runInContext(fn,ctx);
 vm.runInContext('updateRoleBar()',ctx);
@@ -64,6 +66,11 @@ assert.equal(node.attributes['data-office-role'],'family');
 ctx.role='admin';vm.runInContext('updateRoleBar()',ctx);
 assert.equal(node.attributes['data-office-role'],'admin');
 assert(elements.roleLabel.textContent.includes('관리자'));
+assert.equal(elements.roleButton.textContent,'가족 전환');
 ctx.role='family';vm.runInContext('updateRoleBar()',ctx);
 assert.equal(node.attributes['data-office-role'],'family','Role must switch without reloading app');
+assert(html.includes('id="favoriteAlertCompact"')&&html.includes('<summary>🔔 관심단지 알림 설정'),'Alert options collapsed by default');
+assert(html.includes('id="favoriteTradeAlertEnabled"')&&html.includes('id="favoriteTradeNativeEnabled"'));
+assert(!html.includes('송도 3공구 퍼스트파크 15블럭 사무실 중심'));
+assert(html.indexOf('id="modeBar"')<html.indexOf('</header>'));
 console.log('Family concise mode passed: explanation visibility, role switching, all actionable controls and safety notes preserved.');

@@ -13,6 +13,9 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import android.content.Intent;
 import android.content.Context;
+import android.os.Build;
+import android.provider.Settings;
+import java.io.File;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.speech.RecognizerIntent;
@@ -42,6 +45,7 @@ public class MainActivity extends Activity {
     private static final int DICTATE_CONTRACT = 1024;
     private static final int LIMIT = 8 * 1024 * 1024;
     private volatile String verifiedUpdateUrl = "";
+    private volatile boolean updateDownloading = false;
     private WebView web;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private String pendingBackup = "";
@@ -129,6 +133,41 @@ public class MainActivity extends Activity {
                     finish();
                 });
             });
+        }
+    }
+
+    /** Only pass an APK verified against this exact installed package and signer to Android. */
+    private void beginVerifiedInstallation(File apk){
+        if(isFinishing()||isDestroyed())return;
+        try{
+            AppUpdateInstaller.verifyPackage(this,apk);
+            if(Build.VERSION.SDK_INT>=26 && !getPackageManager().canRequestPackageInstalls()){
+                deliver("onFirstHyundaiAppUpdateProgress",
+                    AppUpdateInstaller.event("permission",100,"앱 설치 권한 확인 필요"));
+                new AlertDialog.Builder(this)
+                    .setTitle("퍼스트현대 업데이트 설치 허용")
+                    .setMessage("안드로이드 설정에서 이 앱의 '이 출처 허용'을 켠 뒤 돌아와 업데이트를 다시 눌러 주세요.")
+                    .setNegativeButton("취소",null)
+                    .setPositiveButton("설정 열기",(dialog,which)->{
+                        try{startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                            Uri.parse("package:"+getPackageName())));}
+                        catch(Exception exc){
+                            Toast.makeText(this,"안드로이드 설정을 열지 못했습니다.",Toast.LENGTH_LONG).show();
+                        }
+                    }).show();
+                return;
+            }
+            Intent installer=new Intent(Intent.ACTION_VIEW);
+            installer.setDataAndType(AppUpdateInstaller.shareUri(this,apk),
+                "application/vnd.android.package-archive");
+            installer.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(installer);
+            deliver("onFirstHyundaiAppUpdateProgress",
+                AppUpdateInstaller.event("installing",100,"설치 확인 화면을 표시했습니다."));
+        }catch(Exception exc){
+            deliver("onFirstHyundaiAppUpdateProgress",
+                AppUpdateInstaller.event("error",-1,
+                    "업데이트 설치를 준비하지 못했습니다. 저장공간이나 보안 설정을 확인해 주세요."));
         }
     }
 
@@ -274,14 +313,22 @@ public class MainActivity extends Activity {
                 deliver("onFirstHyundaiAppUpdate",check);
             });
         }
-        @JavascriptInterface public void openVerifiedAppUpdate() {
+        @JavascriptInterface public void downloadAndInstallVerifiedAppUpdate() {
+            if(updateDownloading)return;
             String url=verifiedUpdateUrl;
             if(!AppUpdate.allowedDownload(url))return;
-            runOnUiThread(()->{
-                try {startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)));}
-                catch(Exception ignored){
-                    Toast.makeText(MainActivity.this,"업데이트 다운로드 페이지를 열지 못했습니다.",Toast.LENGTH_LONG).show();
-                }
+            updateDownloading=true;
+            io.execute(()->{
+                try{
+                    File apk=AppUpdateInstaller.download(MainActivity.this,url,
+                        (phase,percent,message)->deliver("onFirstHyundaiAppUpdateProgress",
+                            AppUpdateInstaller.event(phase,percent,message)));
+                    runOnUiThread(()->beginVerifiedInstallation(apk));
+                }catch(Exception exc){
+                    deliver("onFirstHyundaiAppUpdateProgress",
+                        AppUpdateInstaller.event("error",-1,
+                            "다운로드 또는 APK 검증 실패 · 인터넷 연결과 설치 버전을 확인해 주세요."));
+                }finally{updateDownloading=false;}
             });
         }
         @JavascriptInterface public String getMode() {
