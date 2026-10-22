@@ -87,7 +87,7 @@ for(const [name,start,end] of views){
 }
 const elements=new Map();
 function E(id){
- if(!elements.has(id))elements.set(id,{value:'',textContent:'',className:'',checked:id==='ct_includeNotice',focus(){},select(){}});
+ if(!elements.has(id))elements.set(id,{value:'',textContent:'',className:'',checked:false,focus(){},select(){}});
  return elements.get(id);
 }
 const w={};

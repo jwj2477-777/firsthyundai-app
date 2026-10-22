@@ -10,7 +10,7 @@ assert(html.includes('data')||html.includes('publicServices'));
 const elems=new Map();function el(id){
  if(!elems.has(id)){const state=new Set();elems.set(id,{
   id,value:'',textContent:'',innerHTML:'',className:'',open:false,
-  checked:['ct_autoDeposit','ct_includeNotice','ct_polishTerms'].includes(id),
+  checked:['ct_autoDeposit','ct_polishTerms'].includes(id),
   classList:{add:x=>state.add(x),remove:x=>state.delete(x),toggle:(x,flag)=>flag?state.add(x):state.delete(x),contains:x=>state.has(x)},
   focus(){},select(){},closest(){return null},scrollIntoView(){}});
  }return elems.get(id);

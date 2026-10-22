@@ -32,16 +32,22 @@ for(const phrase of [
 }
 for(const phrase of [
  '뉴스 요약은 참고용입니다. 중요한 정보는 원문에서 확인하세요.',
- '당사자와 합의한 경우에만 포함하세요.',
  '실제 합의한 조건인지 확인해 주세요.'
 ])assert(html.includes(phrase),'Keep short family safety instruction '+phrase);
 for(const k of [
  'id="favoriteTradeAlertEnabled"','id="favoriteTradeNativeEnabled"',
  'id="favoriteTradeNativeStatus"','id="newsCategory"','id="newsContent"',
  'id="ct_rough"','id="ct_languageWarnings"','id="ct_missing"',
- 'id="ct_noticeConfirmed"','id="ct_includeNotice"',
  'FirstHyundaiContracts.approve()','FirstHyundaiContractImage.open()'
 ])assert(html.includes(k),'Do not hide or remove essential control/status '+k);
+assert(!contract.includes('id="ct_noticeConfirmed"')&&!contract.includes('id="ct_includeNotice"'),
+ 'Parent UI no longer asks for redundant pre-negotiated contract agreement');
+const visual=fs.readFileSync(path.join(dir,'ui-v2.css'),'utf8');
+for(const token of [
+ 'body:not([data-office-role="admin"]) #ct_missing.ok',
+ 'body:not([data-office-role="admin"]) #ct_status',
+ 'body:not([data-office-role="admin"]) #ct_confirmHelp'
+])assert(visual.includes(token),'Family no longer sees repeated informational notes: '+token);
 assert(html.includes('id="newsFamilyMeta"'),'Family can still see readable recent news count/time');
 assert(html.includes("$('newsFamilyMeta').textContent='최근 뉴스 '+briefs.length"),'Family news date remains dynamic');
 assert(css.includes('word-break:keep-all')&&css.includes('.sectionTitle>.refreshAction'),'Do not vertically wrap refresh button');

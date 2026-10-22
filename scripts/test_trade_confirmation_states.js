@@ -1,5 +1,5 @@
-// v2.0.3: trade cards must be scannable and contract confirmation must show
-// pending -> ready -> confirmed -> pending after consent or text changes.
+// v2.0.4: trade cards compact; contract button pending -> ready -> confirmed.
+// No redundant cancellation or agreement checkboxes; final confirmation click is mandatory.
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.join(__dirname,'../app/src/main/assets');
@@ -19,7 +19,8 @@ for(const sel of [
 assert(html.includes('id="ct_confirmButton"'));
 assert(html.includes('disabled onclick="FirstHyundaiContracts.approve()"'));
 assert(html.includes('id="ct_confirmHelp"'));
-assert(html.includes('onchange="FirstHyundaiContracts.onConsentChange()"'));
+assert(!html.includes('ct_includeNotice')&&!html.includes('ct_noticeConfirmed'),
+ 'Pre-negotiated agreement terms must not require redundant checkboxes');
 const m=htmlJs.slice(htmlJs.indexOf('function tradeClass(type)'),htmlJs.indexOf('function renderTypeButtons('));
 const esc=v=>String(v??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 const trade=vm.createContext({escapeHtml:esc});
@@ -47,7 +48,7 @@ const elements=new Map(),alerts=[];
 function E(id){
  if(!elements.has(id)){
   const flags=new Set();
-  elements.set(id,{id,value:'',textContent:'',innerHTML:'',className:'',checked:id==='ct_includeNotice'||id==='ct_autoDeposit',
+  elements.set(id,{id,value:'',textContent:'',innerHTML:'',className:'',checked:id==='ct_autoDeposit',
    disabled:false,attributes:{},
    classList:{add:k=>flags.add(k),remove:k=>flags.delete(k),contains:k=>flags.has(k),toggle:(k,on)=>on?flags.add(k):flags.delete(k)},
    setAttribute(k,v){this.attributes[k]=v},focus(){},select(){},closest(){return null},scrollIntoView(){}});
@@ -58,7 +59,7 @@ const context=vm.createContext({window:{},document:{getElementById:E},Date,Numbe
  console,alert:m=>alerts.push(m),confirm:()=>true,navigator:{}});
 vm.runInContext(cjs,context);
 const contract=context.window.FirstHyundaiContracts;
-const button=E('ct_confirmButton'),hint=E('ct_confirmHelp'),check=E('ct_noticeConfirmed');
+const button=E('ct_confirmButton'),hint=E('ct_confirmHelp');
 const state=()=>button.attributes['data-review-state'];
 contract.syncReviewButton();
 assert.equal(state(),'pending');
@@ -71,43 +72,40 @@ const fields={dealType:'전세',property:'가상단지',address:'가상주소 1'
 for(const [key,value] of Object.entries(fields))E('ct_'+key).value=value;
 contract.makePreview();
 assert.equal(contract._test.collect().errors.length,0);
-assert.equal(state(),'pending','Without checking the agreement it must still be pending');
-assert(button.disabled);
-assert(hint.textContent.includes('체크박스'));
-check.checked=true;contract.onConsentChange();
-assert.equal(state(),'ready');
+assert.equal(state(),'ready','Complete contract does not require another checkbox');
 assert.equal(button.textContent,'✓ 내용 확인 완료하기');
 assert.equal(button.disabled,false);
+assert(hint.textContent.includes('확인 버튼'));
+const beforeApproval=E('ct_preview').value;
+for(const paragraph of [
+ '※ 계약금 일부 송금 및 계약 성립·해제 조건 확인',
+ '당사자들은 위 금액의 이체와 동시에 본계약이 체결된 것으로 보기로 하며',
+ '매수인은 실제 송금한 금액을 포기하는 조건으로 합의합니다.',
+ '중개보수 지급의무가 없어지는 것은 아니라는 점을 확인합니다.'
+])assert(beforeApproval.includes(paragraph),'Agreed terms always included: '+paragraph);
+assert.equal(contract.canShare(),false,'Review approval button is still mandatory');
 contract.approve();
-assert.equal(state(),'done','Confirmed state must change after clicking');
+assert.equal(state(),'done','Confirmed state must change visibly after clicking');
 assert.equal(button.textContent,'✓ 확인 완료됨');
 assert.equal(button.attributes['aria-pressed'],'true');
 assert.equal(contract.canShare(),true,'Confirmed draft can be shared');
 assert(hint.textContent.includes('공유'));
-check.checked=false;contract.onConsentChange();
-assert.equal(state(),'pending','Unchecking after approval revokes approval');
-assert.equal(button.disabled,true);
-assert.equal(contract.canShare(),false,'Unchecking blocks sharing');
-check.checked=true;contract.onConsentChange();
-assert.equal(state(),'ready','Rechecking requires a fresh confirmation click');
-contract.approve();
-assert.equal(state(),'done');
 E('ct_preview').value+=' [확인 필요]';contract.edited();
-assert.equal(state(),'pending','Manual text change invalidates approval');
-assert(button.disabled,'Unverified placeholder cannot be confirmed');
+assert.equal(state(),'pending','Unverified edit invalidates the previous approval');
+assert(button.disabled);
+assert.equal(contract.canShare(),false);
 E('ct_preview').value=E('ct_preview').value.replace(' [확인 필요]','');contract.edited();
-assert.equal(state(),'pending','Edited text requires checking the consent box again');
-check.checked=true;contract.onConsentChange();
-assert.equal(state(),'ready','Fresh consent enables the final approval button');
+assert.equal(state(),'ready','Edited verified text needs just final approval');
+assert.equal(contract.canShare(),false,'Previous approval is still revoked after edits');
 contract.approve();assert.equal(state(),'done');
 E('ct_price').value='40000';contract.updateSummary();
-assert.equal(state(),'pending','Changed contract terms invalidate the old preview');
+assert.equal(state(),'pending','Changed contract terms invalidate the old notice');
 assert.equal(button.disabled,true);
 contract.makePreview();
-assert.equal(state(),'pending','Regeneration requires review again');
-check.checked=true;contract.onConsentChange();
-assert.equal(state(),'ready');
+assert.equal(state(),'ready','New correct draft can be confirmed without agreement checkboxes');
+assert.equal(contract.canShare(),false,'Regenerated draft requires a fresh click');
+contract.approve();assert.equal(state(),'done');
 contract.reset();
 assert.equal(state(),'pending','Reset must clear confirmation');
 assert.equal(button.attributes['aria-pressed'],'false');
-console.log('Three approval states, consent reversal, edited placeholders, term changes and compact trade tags passed.');
+console.log('Contract approval states, mandatory dissolution clauses, no consent checkbox, editing and sharing guard passed.');

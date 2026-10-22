@@ -19,6 +19,9 @@ for(const selector of [
 assert(css.includes('color:#A91D26')&&css.includes('text-decoration:underline'),
  'Missing placeholders need legible red + non-color underline');
 assert(!css.includes(':has(#ct_preview.contractEditing)'),'Do not depend on modern :has for switching');
+assert(css.includes('body:not([data-office-role="admin"]) #ct_missing.ok'),'Hide green no-action warning when all required info is present');
+assert(css.includes('body:not([data-office-role="admin"]) #ct_status'),'Hide repeated parent status note');
+assert(!section.includes('ct_includeNotice')&&!section.includes('ct_noticeConfirmed'),'Remove redundant contract agreement controls');
 const nodes=new Map(),warnings=[];
 function E(id){
  if(!nodes.has(id)){
