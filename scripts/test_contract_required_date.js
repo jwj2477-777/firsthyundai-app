@@ -33,7 +33,8 @@ workflow.openManual();assert(E('ct_contractDate').focused,'Fix missing date shou
 for(const date of ['2026-10-22','10월중 협의']){
  E('ct_contractDate').value=date;app.makePreview();workflow.refreshMissing();
  assert(!app._test.collect().errors.includes('계약일'));
- assert(E('ct_preview').value.includes('▶ 계약일 : '+date));
+ const displayed=date==='2026-10-22'?'2026.10.22.':date;
+ assert(E('ct_preview').value.includes('▶ 계약일 : '+displayed),'Expected signing date display: '+displayed);
  assert(!E('ct_missing').textContent.includes('확인할 정보'));
  app.approve();assert.equal(app.canShare(),true);
 }
