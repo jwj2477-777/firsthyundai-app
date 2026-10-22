@@ -11,6 +11,8 @@ assert(contract.includes('id="ct_memoTitle"')&&contract.includes('여기에 계�
 assert(contract.includes('class="contractMemoStep"')&&contract.includes('>1</span>'),'Textual step number');
 assert(contract.includes('<label class="contractMemoLabel" for="ct_rough">'),'Associated large input label');
 assert(contract.includes('id="ct_rough" rows="10"'),'Existing memo input is not duplicated or removed');
+assert.equal((contract.match(/id="ct_rough"/g)||[]).length,1,'There must be exactly one contract memo entry field');
+assert(contract.indexOf('메모 입력 완료 → 계약문자 만들기')<contract.indexOf('ct_manualPanel'),'Main action must precede advanced options');
 assert(contract.includes('aria-describedby="ct_memoHelp ct_memoWriteTip"'),'Accessible explanatory text');
 assert(contract.includes('메모 입력 완료 → 계약문자 만들기'),'Descriptive primary action');
 assert(contract.includes('onclick="FirstHyundaiEasy.compose()"'),'One-memo composition hook still works');
