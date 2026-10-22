@@ -156,6 +156,35 @@ function collect(){
  return {type,price,deposit,advance,interim,errors,balance:price!==null&&deposit!==null&&interim!==null?price-deposit-interim:null,
   remainder:deposit!==null&&advance!==null?deposit-advance:null};
 }
+// Three explicit states: pending (disabled), ready to confirm, confirmed.
+// Keep the existing field validation and consent requirements; this function
+// only expresses that state to parents instead of leaving one green button.
+function syncReviewButton(){
+ const button=E('ct_confirmButton');if(!button)return;
+ const hasDraft=created&&!!E('ct_preview')?.value?.trim();
+ const valid=hasDraft&&!collect().errors.length&&!previewContainsMissing();
+ const consent=!E('ct_includeNotice')?.checked||!!E('ct_noticeConfirmed')?.checked;
+ if(approved&&(!valid||!consent))approved=false;
+ const state=approved?'done':valid&&consent?'ready':'pending';
+ button.disabled=state==='pending';
+ button.textContent=state==='done'?'✓ 확인 완료됨':state==='ready'?'✓ 내용 확인 완료하기':'내용 확인 필요';
+ button.setAttribute?.('data-review-state',state);
+ button.setAttribute?.('aria-pressed',state==='done'?'true':'false');
+ const help=E('ct_confirmHelp');
+ if(help)help.textContent=state==='done'?'확인을 마쳤습니다. 문자 복사 또는 공유할 수 있습니다.':
+  state==='ready'?'확인 버튼을 눌러 공유를 준비해 주세요.':
+  !hasDraft?'계약문자를 먼저 만들어 주세요.':
+  !valid?'확인이 필요한 계약정보를 먼저 보완해 주세요.':
+  '위 계약내용을 확인한 뒤 체크박스를 선택해 주세요.';
+}
+function onConsentChange(){
+ if(approved&&!E('ct_noticeConfirmed')?.checked&&E('ct_includeNotice')?.checked){
+  approved=false;
+  E('ct_status').className='contractReview bad';
+  E('ct_status').textContent='내용 확인이 해제되었습니다. 합의 내용을 다시 확인해 주세요.';
+ }
+ syncReviewButton();
+}
 function updateSummary(){
  const data=collect();
  E('ct_amountSummary').textContent='총액: '+(data.price===null?'미입력':money(data.price))+
@@ -168,6 +197,7 @@ function updateSummary(){
   E('ct_status').textContent='조건이 변경되었습니다. 문자를 다시 생성해 검토해 주세요.';
   E('ct_status').className='contractReview bad';
  }
+ syncReviewButton();
 }
 function makePreview(){
  const d=collect();
@@ -232,13 +262,16 @@ function makePreview(){
  E('ct_status').className='contractReview '+(d.errors.length?'bad':'');
  E('ct_status').textContent=d.errors.length?'⚠ 발송 전 보완: '+d.errors.join(' · '):
   '계약내용·금액·계좌·당사자 합의를 대조한 뒤 ‘내용 확인 완료’를 누르세요.';
+ syncReviewButton();
 }
 function edited(){
  refreshHighlightedNotice();
  approved=false;E('ct_status').className='contractReview bad';
  E('ct_status').textContent='미리보기를 직접 수정했습니다. 복사·공유하려면 ‘내용 확인 완료’ 버튼으로 다시 검토해 주세요.';
+ syncReviewButton();
 }
 function approve(){
+ syncReviewButton();
  const d=collect();
  if(previewContainsMissing()){
   E('ct_status').textContent='⚠ 계약문자에 빨간 확인 필요 항목이 남아 있습니다. 먼저 내용을 보완해 주세요.';
@@ -254,6 +287,7 @@ function approve(){
  }
  approved=true;
  E('ct_status').className='contractReview ok';E('ct_status').textContent='직접 확인 완료 · 복사 또는 공유할 수 있습니다.';
+ syncReviewButton();
 }
 function assertReady(){
  if(!created||!approved||collect().errors.length||previewContainsMissing()||(E('ct_includeNotice')?.checked&&!E('ct_noticeConfirmed')?.checked)){alert('계약 조건·하단 합의문을 확인한 뒤 내용 확인 완료를 눌러주세요.');return false;}
@@ -336,6 +370,7 @@ function reset(){
  E('ct_status').textContent='조건을 입력하면 초안을 생성할 수 있습니다.';
  E('ct_status').className='contractReview';
  created=false;approved=false;updateSummary();
+ syncReviewButton();
 }
 function voice(){
  if(!window.FirstHyundaiNative?.startContractDictation){alert('음성입력은 안드로이드 설치형 앱에서 사용해 주세요.');return;}
@@ -349,7 +384,7 @@ window.firstHyundaiContractSpeech=function(result){
  }else if(result&&!result.cancelled)alert('음성입력에 실패했습니다. 직접 입력을 이용해 주세요.');
 };
 window.FirstHyundaiContracts={
- onOpen(){window.FirstHyundaiSmart?.onOpen();updateSummary();refreshHighlightedNotice();},canShare:assertReady,updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,togglePreviewEdit,refreshHighlightedNotice,
+ onOpen(){window.FirstHyundaiSmart?.onOpen();updateSummary();refreshHighlightedNotice();syncReviewButton();},canShare:assertReady,updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,togglePreviewEdit,refreshHighlightedNotice,syncReviewButton,onConsentChange,
  fromComplex(id){
   const r=catalogRows().find(x=>x.id===id);
   if(!r)return false;
