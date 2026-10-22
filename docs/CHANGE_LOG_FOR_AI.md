@@ -1,5 +1,7 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-22 / v2.0.16**: Contract interim payment date in rendered customer notice now uses the existing dateLabel helper (YYYY.MM.DD.) shared by contract/balance dates. Raw ISO form fields and flexible agreed schedules remain unmodified; date formatting regression tests added. APK release version 2.0.16/67, immutable signer reused.
+
 - **2026-10-22 / v2.0.15**: Replace low-quality one-tone office launcher with high-DPI-safe premium gold-on-emerald FHD FIRST **layered original-vector** emblem across launcher, startup welcome and header. Metallic gradient via aapt complex color, fine glints/embossing, no raster upscale/cropped FIRST lettering, maintains contract image's approved teal/white logo (original fill attrs untouched). Stable Android release signing and all existing features preserved.
 
 - **2026-10-22 / v2.0.14**: Release signing now requires single private GitHub secret FHD_SIGNING_BUNDLE_B64 with stable PKCS12 key, pinned signer SHA-256; never release a debug-signed APK. Native installed-vs-GitHub Release update checker and browser download, 1-second original FHD welcome, compact recolored teal header. First migration may require one-time backup/reinstall. Pending user registration of signing Secret.

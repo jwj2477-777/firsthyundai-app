@@ -230,21 +230,21 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.15 premium original FHD mark APK
+      - name: Publish successful v2.0.16 unified contract date display APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.15.apk
-          unzip -t FirstHyundai-v2.0.15.apk | grep 'No errors detected'
-          if gh release view v2.0.15 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.16.apk
+          unzip -t FirstHyundai-v2.0.16.apk | grep 'No errors detected'
+          if gh release view v2.0.16 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.15 FirstHyundai-v2.0.15.apk \
+            gh release create v2.0.16 FirstHyundai-v2.0.16.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.15 · 프리미엄 골드 FHD 앱 아이콘' \
-              --notes '사용자가 승인한 고급 금색·에메랄드 FHD FIRST 아이콘 분위기를 원본 건물 지붕·FHD·FIRST 벡터 경로 그대로 재현했습니다. 안드로이드 앱 런처·원형 런처·최초 실행 웰컴스크린에는 픽셀이 깨지지 않는 실제 Android VectorDrawable 골드 메탈릭 다단계 그라데이션과 짙은 청록 바탕, 섬세한 광택을 적용했습니다. 메인 헤더 FHD 마크에도 동일한 골드 색조를 적용했습니다. 계약 안내 PNG의 이전 청록·흰색 원본 로고 색상과 법률문구는 유지했습니다. 기존 v2.0.14 고정 서명과 앱 내 업데이트, 계약문자, 실거래, 학교정보, 알림 등 전체 기능을 보존합니다. 동일한 고정 서명으로 기존 v2.0.14 위에 설치할 수 있습니다.'
+              --title '퍼스트현대 v2.0.16 · 중도금 지급일 날짜 표기 통일' \
+              --notes '계약 안내 문자에서 중도금 지급일만 YYYY-MM-DD(예: 2026-12-04)로 보이던 문제를 수정했습니다. 계약일 및 잔금일과 동일한 YYYY.MM.DD.(예: 2026.12.04.) 형식으로 표기합니다. 입력란의 원본 날짜 값은 바꾸지 않으며 12월 중 상호 협의 같은 협의 일정은 그대로 유지합니다. 계약문자 텍스트와 이를 사용하는 고객용 계약 안내 이미지에 동일하게 반영됩니다. 기존 프리미엄 골드 FHD 아이콘, 고정 서명 업데이트, 송도 학교정보, 실거래, 관리자/가족 기능 및 개인정보 보호는 유지합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.15 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.16 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"

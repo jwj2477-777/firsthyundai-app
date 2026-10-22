@@ -3,7 +3,12 @@
 >
 > **이 문서를 받은 ChatGPT, Gemini, Claude 또는 개발자는 이전 채팅을 모른다고 가정**한다. 반드시 [AGENTS.md](../AGENTS.md) → 이 문서 → [요구사항](PRODUCT_REQUIREMENTS.md) → [이력](PROJECT_HISTORY.md) → [복구·운영](RECOVERY_PLAYBOOK.md)을 읽고, 최신 소스와 실제 배포본을 대조한 뒤 작업한다. 이 문서는 사람의 모든 대화 내용을 한 글자도 빠짐없이 저장하는 원문 아카이브가 아니라 **합의된 요구와 구현의 구조화된 복원본**이다.
 
-## 최신 작업 · v2.0.15 (2026-10-22) 원본 FHD FIRST 프리미엄 고해상도 아이콘
+## 최신 작업 · v2.0.16 (2026-10-22) 계약안내 중도금 지급일 날짜 형식 일치
+- `contracts.js`의 `makePreview()`: 중도금 지급일만 `field('interimDate')` 원문으로 출력해 YYYY-MM-DD가 노출되는 버그를 `dateLabel(field('interimDate'))`로 수정. 계약일/잔금일의 **YYYY.MM.DD.** 포맷과 동일해짐. 입력값/저장된 날짜/추정/협의 일정은 그대로 유지. 고객용 이미지 입력 텍스트도 통일된 문자를 사용.
+- `scripts/test_contracts.js`, `scripts/test_contract_transfer.js`: 메모 교정 및 실제 계약 초안 예시에서 점 구분/마침표 확인, '12월 중 상호 협의' 문구 보존, 입력 필드 변경 금지 확인. 기타 계약 내용·서명키·브랜드 전부 보존.
+- v2.0.16(versionCode 67) 동일 릴리스 서명으로 정식 GitHub APK 배포.
+
+## 직전 작업 · v2.0.15 (2026-10-22) 원본 FHD FIRST 프리미엄 고해상도 아이콘
 - 사용자가 선택한 에메랄드·골드 렌더링을 참고해 원본 회사 마크 **기존 `RED_OUTLINE`, `WHITE_LOGO` 경로를 손상 없이 유지**, `scripts/generate_launcher_icon.py`에서 금속 금색 7-stop Android VectorDrawable gradient, 어두운 청록 레이어와 금빛 윤곽 및 얇은 광선으로 레이어 구현. 픽셀 기반 무손실 확대의 한계가 없음. `ic_launcher_badge`, `ic_launcher_foreground`, `ic_launcher_background_art`, 일반/원형 adaptive launcher 자동 생성. Android safe zone 0.60 유지.
 - 가족 로그인 전 웰컴 애니메이션은 이 새로운 전체 벡터 배지를 144dp로 사용, 배경 딥 틸/자막 골드 통일. 메인 상단 인라인 SVG 역시 원본 paths 유지하면서 SVG gold/teal gradients 표시. **`fill` 속성은 그대로 둬서 `contract-image.js`의 Canvas Path2D 원본 회사 로고는 승인된 청록/흰색으로 유지**.
 - 새 테스트로 원본 PATH 보존·메탈릭 다단계 그라데이션·Android 리소스·adaptive safe zone·계약 이미지 영향 없음 검증. v2.0.14 동일 고정 배포 서명 Secret 사용, v2.0.15 versionCode 66, 기존 설치 유지 업데이트.
