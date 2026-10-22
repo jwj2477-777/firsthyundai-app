@@ -6,6 +6,16 @@ import {readFileSync} from "node:fs";
 const src=readFileSync(new URL("../app/src/main/assets/index.html",import.meta.url),"utf8");
 assert.match(src,/\['nearby','주변시설'\]/);
 assert.match(src,/refreshNearbyConfig\(\)/);
+const config=JSON.parse(readFileSync(new URL("../data/nearby_config.json",import.meta.url),"utf8"));
+const wrangler=readFileSync(new URL("../workers/kakao-nearby/wrangler.toml",import.meta.url),"utf8");
+const workerName=wrangler.match(/^name\s*=\s*"([^"]+)"/m)?.[1];
+assert(workerName,"Worker name must be explicit in wrangler.toml");
+assert.equal(config.backend_url,"https://"+workerName+".jwj2477.workers.dev",
+ "App backend address must match the actual Cloudflare Wrangler deployment");
+assert(src.includes("return url==="+JSON.stringify(config.backend_url)),
+ "Android WebView URL safety allowlist and cloud backend URL must match exactly");
+assert(!src.includes("https://firsthyundai-kakao.jwj2477.workers.dev"),
+ "Remove defunct Worker host from built Android app");
 assert.match(src,/window\.FirstHyundaiNative\.fetchNearby/);
 assert.match(src,/카카오맵에서/);
 assert.doesNotMatch(src,/localStorage\.setItem\(['"]kakao/i);

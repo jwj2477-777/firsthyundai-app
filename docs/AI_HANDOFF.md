@@ -3,7 +3,14 @@
 >
 > **이 문서를 받은 ChatGPT, Gemini, Claude 또는 개발자는 이전 채팅을 모른다고 가정**한다. 반드시 [AGENTS.md](../AGENTS.md) → 이 문서 → [요구사항](PRODUCT_REQUIREMENTS.md) → [이력](PROJECT_HISTORY.md) → [복구·운영](RECOVERY_PLAYBOOK.md)을 읽고, 최신 소스와 실제 배포본을 대조한 뒤 작업한다. 이 문서는 사람의 모든 대화 내용을 한 글자도 빠짐없이 저장하는 원문 아카이브가 아니라 **합의된 요구와 구현의 구조화된 복원본**이다.
 
-## 최신 작업 · v2.0.6 (2026-10-22) 정품 로고/수신자 중심 송금 정보 강조
+## 최신 작업 · v2.0.7 (2026-10-22) 카카오 실시간 주변시설 Worker 주소 불일치 복구
+- 사고원인: 키 교체 후 배포 워크플로 `Deploy Kakao Live Nearby Worker`가 `firsthyundai-nearby.jwj2477.workers.dev`로 배포/Secret 등록 성공했음에도, 앱 내 허용 Worker URL 및 공개 `data/nearby_config.json`은 더 이상 사용하지 않는 `firsthyundai-kakao.jwj2477.workers.dev`를 가리켜 403 응답 발생. 새 키 자체는 GitHub Actions 직접 Kakao 호출 HTTP 200.
+- `index.html`의 `validNearbyWorker()` 허용 주소와 `data/nearby_config.json`의 `backend_url`을 **실제 배포 주소** `https://firsthyundai-nearby.jwj2477.workers.dev`로 정확히 통일. 이 주소는 공개 엔드포인트이고 Kakao Secret은 Cloudflare 런타임 Secret로만 저장.
+- `scripts/test_kakao_nearby.mjs`는 Wrangler Worker name, 공개 구성 주소, 앱 URL allowlist 세 값이 동일한지 검증하여 재발 차단.
+- `verify-kakao-key.yml`은 근본 원인인 `data/nearby_config.json` 변경에도 자동 재검증. health ready & live facilities HTTP 200 확인이 실제 복구 기준. 이전 APK에는 오래된 Worker URL이 내장되어 **v2.0.7 신규 APK 설치가 필요**.
+- 기존 계약/실거래/뉴스/가족 권한·카카오 POI 결과 비저장·20회/분 제한 유지.
+
+## 직전 작업 · v2.0.6 (2026-10-22) 정품 로고/수신자 중심 송금 정보 강조
 - `contract-image.js`의 고급 계약 PNG에서 임시 'FHD' 사각형을 없애고 **기존 앱 헤더 `.officeMarkSvg`의 원래 SVG `path` 데이터를 Canvas `Path2D`로 직접 그린다**. 원본 path/비율/여백/외곽 고정, 기존 #FF0000 채색만 이미지 청록 톤 #155a66으로 치환. 이미지 생성 과정에 이미지 생성 AI를 사용하거나 원본 로고 경로를 재설계하지 않는다. Path2D 미지원 시 문장형 브랜드만 표시하며 도형의 왜곡된 모방을 생성하지 않는다.
 - 고객용 단일 PNG의 기존 발송자 안내 푸터 `계약조건·계좌정보·합의사항을 발송 전에 확인해 주세요.` → 수신자용 `계약내용과 입금 계좌를 확인하시고, 문의 사항은 퍼스트현대부동산으로 연락해 주세요.`; 너비에 맞게 글꼴 크기 조절.
 - `parseTransfer`는 **사용자가 이미 승인한 최종 계약 안내 평문**의 `금일 … 계약금 중 일부인 X만원을 … 계좌(은행번호 (예금주 ...))로 송금` 문장에서 실제 오늘 송금액, 은행, 계좌, 예금주만 추출. **계약금 총액과 오늘 송금액을 절대로 혼동하지 않음**. 금일 송금액과 계좌 정보 모두 유효할 때만 특약 이전에 별도 강조 카드 출력. 오늘 송금액은 붉은 고대비 굵은 글씨, 계좌번호는 더 큰 청록 굵은 글씨와 밑줄, 예금주도 함께 명시. 숫자/계좌를 원문과 다르게 수정하거나 지어내지 않음.

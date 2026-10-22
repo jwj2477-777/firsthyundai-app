@@ -1,4 +1,5 @@
-# 카카오 로컬 실시간 연동 · 퍼스트현대 v1.12
+# 카카오 로컬 실시간 연동 · 퍼스트현대 v2.0.7
+> 2026-10-22: 실제 배포된 Worker 이름은 `firsthyundai-nearby`, 공개 주소는 `https://firsthyundai-nearby.jwj2477.workers.dev`. 앱 URL 허용목록, 공개 설정 및 Worker 실제 배포명이 일치해야 정상 동작. `firsthyundai-kakao` 주소는 과거 잘못 설정된 주소로 사용 금지. Cloudflare/GitHub 키는 소스와 APK에 저장하지 않는다.
 
 ## 현재 완료된 일
 

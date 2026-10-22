@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - '.github/workflows/verify-kakao-key.yml'
+      - 'data/nearby_config.json'
+      - 'workers/kakao-nearby/wrangler.toml'
 permissions:
   contents: read
 jobs:
