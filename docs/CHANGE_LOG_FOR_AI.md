@@ -1,5 +1,7 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-22 / v2.0.6**: On-device contract image generator uses exact officeMarkSvg Path2D path data, recolouring only for document tone; removes sender-only footer. Highlights reviewed message's actual today remittance and bank/account/payee in a separate customer-first card before special clauses. Covers midpayment, rent, deposits, final balance with consistent money emphasis. Guards against conflating full deposit and today's partial transfer; no invented financial figures.
+
 - **2026-10-22 / v2.0.5**: Family contract UX: eliminate redundant notice-inclusion toggle and consent checkbox, plus repeated help/success panels. Always include the office's pre-negotiated formation/cancellation/forfeiture/brokerage wording in generated SMS drafts; generated-draft validity, approval button and missing-placeholder checks still required before sharing. Show a missing-fields warning only when actionable and keep clause context admin-only.
 
 - **2026-10-22 / v2.0.4**: Add official `contract_date` date-range search (inclusive) to the existing trade advanced filters. Simple day-only and reset controls, reversible range validation, preserving building/area/type/cancelled filters. Navigating into a selected complex clears prior dates. New `scripts/test_trade_contract_date_filter.js` in CI; Gradle APK metadata 2.0.4/55 and versioned release workflow. No API/transaction data changes. Verify Actions success and actual release artifact separately.

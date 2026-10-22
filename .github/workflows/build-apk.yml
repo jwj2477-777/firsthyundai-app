@@ -156,21 +156,21 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.5 family-minimal-contract-review-always-on-terms APK
+      - name: Publish successful v2.0.6 exact-logo-recipient-payment-emphasis APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v2.0.5.apk
-          unzip -t FirstHyundai-v2.0.5.apk | grep 'No errors detected'
-          if gh release view v2.0.5 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v2.0.6.apk
+          unzip -t FirstHyundai-v2.0.6.apk | grep 'No errors detected'
+          if gh release view v2.0.6 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.5 FirstHyundai-v2.0.5.apk \
+            gh release create v2.0.6 FirstHyundai-v2.0.6.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.5 · 가족 계약 확인 간결화·합의조항 기본 포함' \
-              --notes '퍼스트현대 계약문자 작성 화면에서 부모님이 보던 계약 성립·해제·중개보수 포함 체크박스와 안내문, 중복 확인 체크를 제거했습니다. 사전에 협의한 계약 성립 시점·계약금 일부 이체·일방 변심 시 해제/배액상환/송금액 포기·중개보수 관련 고정 안내 조항은 매매/전세/월세 모든 초안에 항상 포함됩니다. 단지·동호수·금액·날짜·계좌 등 부족한 정보가 있을 때만 명확한 경고를 부모님께 표시하며, 필수정보가 모두 갖춰지면 초록색 성공 배너와 반복 안내를 숨깁니다. 최종 계약안내 문자는 직접 편집할 수 있고, 기존 누락값 빨간색 강조·초안 유효성 검사·내용 확인 완료 버튼 3단계·복사 및 공유 전 최종 확인은 그대로 유지합니다. 세부 계약 검증과 합의 조항 설명은 관리자 모드에서 확인할 수 있습니다.'
+              --title '퍼스트현대 v2.0.6 · 정품 사무실 로고·오늘 송금액·계좌 강조 이미지' \
+              --notes '고객에게 보내는 한 장짜리 계약 PNG의 임시 FHD 문자 마크를 없애고 앱 헤더의 실제 FIRST HYUNDAI 로고 SVG 원본 경로를 변형 없이 사용합니다. 로고의 붉은 색상만 이미지 톤에 맞는 청록색으로 바꾸고 비율/형태를 유지합니다. 맨 아래 발송자용 점검 문구는 수신자용 계좌·계약조건 확인/문의 안내로 변경했습니다. 고객이 입금할 때 중요한 오늘 송금액(계약금 전체와 혼동 금지)·입금 은행·계좌번호(굵고 밑줄)·예금주를 실제 최종 계약문자 원문에서 추출해 특약 전 별도 강조 카드로 표시합니다. 자료가 없으면 돈이나 계좌를 만들어 넣지 않습니다. 매매대금·보증금·월세·계약금·중도금·잔금도 동일한 강조 규칙을 적용합니다. 문자 텍스트는 바꾸지 않고 전체 원문과 고지 조항을 한 장 PNG에 보존합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.5 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.6 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
