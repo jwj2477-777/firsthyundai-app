@@ -61,9 +61,9 @@ for(const workflow of ['FirstHyundaiEasy.compose()','FirstHyundaiContracts.voice
  gr(html,workflow);
 }
 gr(contractCSS,'#contracts .contractMemoCard #ct_rough');
-gr(native,'<item name="android:statusBarColor">#163B46</item>');
-gr(native,'<item name="android:navigationBarColor">#F2F6F6</item>');
-gr(lock,'Color.rgb(21, 90, 102)');
+gr(native,'<item name="android:statusBarColor">#182C46</item>');
+gr(native,'<item name="android:navigationBarColor">#F4F6FA</item>');
+gr(lock,'Color.rgb(36, 86, 170)');
 gr(lock,'codeField.setContentDescription("가족 보안코드 입력칸")');
 gr(lock,'foot.setTextSize(14)');
 gr(lock,'ViewGroup.LayoutParams.MATCH_PARENT, dp(60)');

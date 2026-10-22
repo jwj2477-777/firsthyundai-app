@@ -1,0 +1,241 @@
+/* FIRST HYUNDAI 2.0 — accessible, app-grade visual language.
+   This sheet deliberately owns presentation only. Contracts, records and
+   notification behavior remain in their existing modules. */
+:root{
+ --ui2-bg:#F4F6FA;--ui2-card:#FFFFFF;--ui2-ink:#202D40;--ui2-muted:#526276;
+ --ui2-line:#DCE3ED;--ui2-navy:#182C46;--ui2-trades:#2456AA;
+ --ui2-homes:#136D63;--ui2-news:#6547A5;--ui2-summary:#464DA5;
+ --ui2-contracts:#A44A27;--ui2-write:#FFF5E8;--ui2-shadow:0 5px 24px #20395112;
+}
+html{color-scheme:light;scroll-padding-top:12px}
+body{background:var(--ui2-bg);color:var(--ui2-ink);font-size:16px;line-height:1.62}
+header{background:linear-gradient(120deg,#152741,#244465 75%,#235969);padding:20px 18px 22px}
+.brandHeader{gap:14px}
+.brandHeaderText .eyebrow{color:#D6E7F0;font-weight:650;letter-spacing:1.3px;font-size:11px}
+.brandWordmark{display:flex;align-items:center;gap:11px}
+.brandWordmark h1{margin:0;font-size:27px;letter-spacing:-1px;color:#fff}
+.brandEdition{display:inline-flex;align-items:center;justify-content:center;
+ background:#FFFFFF20;color:#EAF7FF;border:1px solid #FFFFFF63;
+ border-radius:8px;padding:2px 8px;font-size:13px;font-weight:900;letter-spacing:.2px}
+header .officeMark{background:#fff;border-color:#D8E5ED}
+main{max-width:1024px;margin:0 auto;padding-top:14px}
+.panel,.item,.nearbyCard,.apiInfoCards article,dialog,.nearbyFacilityItem{
+ background:var(--ui2-card);border:1px solid var(--ui2-line);
+ border-radius:19px;box-shadow:var(--ui2-shadow)
+}
+.panel{padding:19px}
+.item{padding:17px}
+.sectionTitle{margin:19px 0 13px}
+.sectionTitle h2{font-size:22px;line-height:1.37;font-weight:850;letter-spacing:-.7px;color:var(--ui2-ink)}
+.sectionTitle h3{font-size:19px;line-height:1.42;letter-spacing:-.35px;color:var(--ui2-ink)}
+.tiny,.muted,.item .meta,.complexMeta,.complexDetailAddress{color:var(--ui2-muted);font-size:14px}
+label,.inputLabel{color:#304458}
+button,.btn,input,textarea,select,summary{touch-action:manipulation}
+.btn,button.btn{border-radius:12px;min-height:50px;background:#244D75;
+ border:1px solid #244D75;color:#fff;font-size:15px;font-weight:800;
+ box-shadow:none;transition:background-color .16s ease,box-shadow .16s ease,transform .16s ease}
+.btn.alt,button.btn.alt{color:#2D4762;background:#F6F8FC;border:1.5px solid #C4CFDD}
+.btn.danger{background:#963B37;border-color:#963B37}
+.btn:focus-visible,button:focus-visible,summary:focus-visible,a:focus-visible{
+ outline:3px solid #F1AE61;outline-offset:3px}
+input,select,textarea{border:1.5px solid #BBCBDD;border-radius:12px;font-size:16px;color:#20344A}
+select,input[type="search"]{background:#EFF6FA!important;border-color:#B9CFDD}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]):not([type="search"]),textarea{background:#FFF9F0}
+input:focus,select:focus,textarea:focus{border-color:#3469B7;outline:3px solid #9AC5EC;outline-offset:2px}
+.refreshAction{background:#FFFFFF!important;color:#325273!important;border:1.5px solid #C6D4E4!important;
+ min-width:76px;min-height:49px!important;font-size:14px!important;box-shadow:none!important}
+.refreshAction:active{background:#EBF4FF!important}
+.modeBar{background:#EDF2F8;border:1px solid #C8D7E8;border-radius:14px;
+ box-shadow:0 2px 8px #1830470a;margin-bottom:13px}
+.modeBar small{color:#344C64;font-size:14px;font-weight:800}
+.modeAdmin{background:#FFF2E5;border-color:#E9C8AA}
+.modeAdmin small{color:#70401C}
+.modeBar .btn{background:#fff;border:1.5px solid #B4C7D9;color:#2D4B65;min-height:50px}
+.modeAdmin .btn{background:#FFF8EF;color:#764421;border-color:#DBBA9C}
+/* 1 — Global destination tabs: each active one has its OWN recognizable hue.
+   Inactive buttons stay white, never a pale version of the same active hue. */
+#nav{gap:9px;margin-bottom:16px}
+#nav .primaryNav{gap:10px}
+#nav .primaryNav button{
+ position:relative;min-height:102px;padding:14px 4px 11px;
+ border-radius:18px;border:1.5px solid #CFDAE6;
+ background:#fff;color:#374F67;
+ box-shadow:0 4px 13px #2039510f;
+ font-size:16px;font-weight:850;line-height:1.25;gap:6px
+}
+#nav .primaryNav button .navIcon{font-size:27px;line-height:1.05;color:inherit}
+#nav .primaryNav button.active,#nav .primaryNav button[aria-current="page"]{
+ border:3px solid #142D49;color:white;
+ box-shadow:0 5px 14px #1D344030,0 0 0 2px #FFFFFF;
+}
+#nav .primaryNav button:nth-child(1).active{background:var(--ui2-trades);border-color:#153E81}
+#nav .primaryNav button:nth-child(2).active{background:var(--ui2-homes);border-color:#064A43}
+#nav .primaryNav button:nth-child(3).active{background:var(--ui2-news);border-color:#472C87}
+#nav .primaryNav button.active::after{
+ content:'✓ 선택됨';font-size:11px;line-height:1.1;font-weight:900;
+ color:#213B53;background:#fff;padding:4px 8px;border-radius:6px;
+}
+#nav .primaryNav button:not(.active)::after{content:none}
+#nav .primaryNav button:active{transform:scale(.985)}
+/* 2 — Secondary pages are not primary CTAs; trade group uses shared blue. */
+#nav .secondaryNav{gap:8px}
+#nav .secondaryNav button{
+ min-height:56px;min-width:0;border:1.5px solid #C9D6E6;border-radius:12px;
+ background:#fff;color:#3E526A;font-size:14px;font-weight:800;padding:10px 4px
+}
+#nav .secondaryNav button.active,#nav .secondaryNav button[aria-current="page"]{
+ background:#2456AA;color:#fff;border:2.5px solid #173E80;
+ box-shadow:inset 0 -4px 0 #173E80;position:relative
+}
+/* 3 — Overview and contract are compact, distinct purpose-specific shortcuts. */
+#nav .utilityNav{gap:10px}
+#nav .utilityNav>button{
+ background:#fff;color:#364B62;border:1.5px solid #C9D6E5;
+ border-radius:13px;min-height:58px;font-size:15px;font-weight:800;
+ box-shadow:0 2px 9px #2039510b
+}
+#nav .utilityNav>button:nth-child(1):not(.active){border-left:4px solid #787FCA}
+#nav .utilityNav>button:nth-child(2):not(.active){border-left:4px solid #D99A7B}
+#nav .utilityNav>button:nth-child(1).active{
+ background:var(--ui2-summary);color:#fff;border:2.5px solid #303986
+}
+#nav .utilityNav>button:nth-child(2).active{
+ background:var(--ui2-contracts);color:#fff;border:2.5px solid #793515
+}
+#nav .utilityNav>button.active::after{content:' ✓';font-size:13px}
+#nav .utilityNav .adminQuick summary{background:#fff;border-color:#C8D4E1;color:#3B5068}
+/* Section accent headings reinforce menu identity, not whole-screen paint. */
+.page>.sectionTitle:first-child{position:relative;padding-left:13px}
+.page>.sectionTitle:first-child:before{
+ content:'';position:absolute;left:0;top:4px;bottom:4px;
+ width:5px;border-radius:6px;background:#8794A9
+}
+body[data-section="trades"] .page#trades>.sectionTitle:before,
+body[data-section="nearby"] .page#nearby>.sectionTitle:before,
+body[data-section="new"] .page#new>.sectionTitle:before{background:var(--ui2-trades)}
+body[data-section="complexes"] #complexes>.sectionTitle:before{background:var(--ui2-homes)}
+body[data-section="news"] #news>.sectionTitle:before{background:var(--ui2-news)}
+body[data-section="overview"] #overview>.sectionTitle:before{background:var(--ui2-summary)}
+body[data-section="contracts"] #contracts>.sectionTitle:before{background:var(--ui2-contracts)}
+/* Trades — blue location, semantic sale/lease/monthly colors unchanged. */
+#trades .tradeStarter button{border:1.5px solid #CCD8E6;background:#F9FBFD;color:#3C536B;
+ min-height:77px;border-radius:14px}
+#trades .tradeStarter button.active{background:#2456AA;color:#fff;border:3px solid #153E81;
+ box-shadow:inset 0 -4px 0 #153E81}
+.tradeTypeBar button{min-height:55px;border:1.5px solid #CAD8E6;background:#fff;color:#364D65;border-radius:12px}
+.tradeTypeBar button.active{background:#314A68;color:#fff;border:3px solid #203650}
+.tradeTypeBar button.active.sale{background:#2456AA;color:#fff;border:3px solid #173D7C}
+.tradeTypeBar button.active.lease{background:#146A50;color:#fff;border:3px solid #0B4D38}
+.tradeTypeBar button.active.monthly{background:#875007;color:#fff;border:3px solid #643B06}
+.tradeTypeBar button[aria-pressed="true"]{box-shadow:inset 0 -4px 0 #0000001f}
+#trades .tradeSearchOptions{background:#EEF4FB;border-color:#D5E2F0}
+.dealRow{border:1px solid #DBE5EE;background:#fff;border-radius:13px}
+.dealRow.sale{border-left:5px solid #2456AA;background:#F2F6FE}
+.dealRow.lease{border-left:5px solid #146A50;background:#F2FAF7}
+.dealRow.monthly{border-left:5px solid #875007;background:#FFFAF0}
+/* Apartments — green/teal means a discoverable information space. */
+#complexes .complexSearchPanel{background:#fff;border:1.5px solid #D2E4E1}
+#complexes .complexSearchHeading{color:#12695E}
+#complexes #complexSearch,#complexes #complexScope{
+ border:2px solid #9BC8C1;background:#F0F9F6!important;
+ color:#284D49;min-height:58px
+}
+#complexes #complexSearch:focus,#complexes #complexScope:focus{border-color:#136D63;outline-color:#93D0C5}
+#complexes .nearbyCard{border-color:#C9DFDA}
+#complexes .nearbyCard.selected,#complexes .nearbyCard[aria-pressed="true"],
+#nearby .nearbyCard.selected,#nearby .nearbyCard[aria-pressed="true"]{
+ background:#E3F3EE;border:3px solid #136D63;box-shadow:0 4px 12px #136D6324
+}
+#complexes .complexTabBar button.active,#complexes .complexTabBar button[aria-selected="true"]{
+ background:#136D63;color:#fff;border:3px solid #064B44
+}
+.detailSheetTop{background:#fff;border-bottom:1px solid #D5E3E8}
+.detailBackButton,.detailSwitchButton{min-height:52px}
+/* News — purple, consistent in both primary menu and actual screen tabs. */
+#news .newsCategoryTabs{gap:10px}
+#news .newsCategoryTabs>button{min-height:64px;border-radius:14px;font-weight:850;font-size:15px}
+#news .newsCategoryTabs>button[aria-selected="true"]{
+ background:var(--ui2-news);color:#fff;border:3px solid #472C87;
+ box-shadow:inset 0 -4px 0 #472C87
+}
+#news .newsCategoryTabs>button[aria-selected="true"]::before{content:'✓ ';font-weight:900}
+#news .newsCategoryTabs>button[aria-selected="false"]{
+ background:#fff;color:#4C4962;border:1.5px solid #CBC9DB;box-shadow:0 2px 7px #2A255713
+}
+#news .newsCard,.item.newsCard{border-color:#E2DDEC}
+#news .newsCard h3{color:#2D2B41}
+#news .newsCard .newsAiBody{background:#F5F1FD}
+#news .newsCard .newsAiSentence:before{background:#E3DAF8;color:#54398D}
+#news .familyBriefCaution{background:#F6F1FD;border-left-color:#6547A5;color:#493775}
+/* Overview — visually focused metrics; reduced boilerplate in family mode. */
+#overview .metric{background:#F2F4FE;border:1px solid #E0E3F7}
+#overview .metric strong{color:#4149A1}
+#overview .sectionTitle .refreshAction{border-color:#C7CCE6!important}
+/* Contract — visible apricot writing area, terracotta key actions. */
+#contracts .contractHero{
+ background:linear-gradient(125deg,#FFF1E5,#FFF9F3);
+ border:1.5px solid #F0CEB7;border-radius:19px
+}
+#contracts .contractHero h2{color:#873D22}
+#contracts .contractSteps li{background:#FBE9DE;color:#79452C;border-color:#EFD0BB}
+#contracts .contractMemoCard{background:#fff;border-color:#A44A27}
+#contracts .contractMemoStep{background:#FDE9D8;color:#853F23;border-color:#A44A27}
+#contracts .contractMemoTitle{color:#74391F}
+#contracts .contractMemoLabel{color:#794322}
+#contracts .contractMemoInputArea{background:#FFF0DC;border-color:#DFB58D}
+#contracts .contractMemoStart{background:#A44A27;color:#fff;border-color:#A44A27}
+#contracts .contractMemoCard #ct_rough{background:#FFF8ED;border-color:#AE7340;color:#263747}
+#contracts .contractMemoCard #ct_rough:focus{background:#fffaf2;border-color:#A44A27;outline-color:#F0B586}
+#contracts .contractMemoCard .contractOneTap{
+ background:#A44A27;color:#fff;border-color:#793515;box-shadow:0 5px 0 #793515
+}
+#contracts .contractMemoCard .contractOneTap:active{box-shadow:0 2px 0 #793515}
+#contracts .contractMemoCard .contractVoice{background:#FFF8F0;border-color:#E1BEA3;color:#75432E}
+#contracts .contractPolishToggle{background:#FFF9F3;border-color:#E6D0BF}
+#contracts .contractSection{color:#74422C}
+#contracts .contractCompactDetails>summary,#contracts .contractManual>summary{background:#FFF5ED;color:#805039}
+#contracts #ct_resultPanel .contractNoticeConfirm{background:#EBF7EF;border-color:#A9CFB5}
+#contracts #ct_resultPanel .contractActions .btn{min-height:57px;border-radius:13px}
+#contracts #ct_resultPanel .contractActions .btn:nth-child(1){background:#fff;color:#634F45;border:1.5px solid #D3C3B6}
+#contracts #ct_resultPanel .contractActions .btn:nth-child(2){background:#FFF2E8;color:#874125;border:2px solid #CB805D}
+#contracts #ct_resultPanel .contractActions .btn:nth-child(3){background:#A44A27;color:#fff;border:2px solid #793515}
+#contracts #ct_resultPanel .contractActions .btn:nth-child(4){background:#F3F4F5;color:#5F6A76;border:1.5px solid #D6DBE3}
+#contracts #ct_resultPanel .contractPrimary{background:#176A50;color:#fff;border:1.5px solid #0B523D}
+/* Saved and confirmed have green state; warnings amber and errors red. */
+.contractReview.ok,.refreshFeedback.success{background:#E8F5EB;border-color:#8EC6A6;color:#195D40}
+.contractReview.bad,.refreshFeedback.warning{background:#FFF1DB;border-color:#DBB786;color:#784610}
+.refreshFeedback.error{background:#FDEBE9;border-color:#DCAAAC;color:#8D302D}
+/* Family and admin keep same brand; operational density is still role-aware. */
+body[data-office-role="admin"] .modeBar{border-left:5px solid #A44A27}
+body:not([data-office-role="admin"]) .modeBar{border-left:5px solid #136D63}
+body:not([data-office-role="admin"]) .adminExplain{display:none!important}
+body[data-office-role="admin"] .familySimpleNote{display:none!important}
+.foot{color:#677688;font-size:13px}
+@media(max-width:540px){
+ header{padding:17px 16px 19px}
+ main{padding:12px}
+ #nav .primaryNav{gap:8px}
+ #nav .primaryNav button{min-height:97px;padding:11px 3px;font-size:15px;border-radius:15px}
+ #nav .primaryNav button .navIcon{font-size:25px}
+ #nav .primaryNav button.active::after{font-size:10px;padding:3px 7px}
+ #nav .utilityNav>button{font-size:14px;min-height:56px}
+ #nav .secondaryNav button{font-size:13px;min-height:56px}
+ .panel{padding:16px;border-radius:17px}
+ .sectionTitle h2{font-size:20px}
+ #news .newsCategoryTabs>button{font-size:14px}
+ #contracts .contractMemoCard{border-width:2.5px}
+}
+@media(max-width:350px){
+ #nav .primaryNav button{font-size:13px}
+ #nav .primaryNav button .navIcon{font-size:23px}
+ #nav .secondaryNav button{font-size:12px}
+ #nav .utilityNav>button{font-size:13px}
+}
+@media(prefers-contrast:more){
+ #nav .primaryNav button,#nav .secondaryNav button,
+ #nav .utilityNav>button,.nearbyCard{border-width:2.5px}
+ #nav .primaryNav button.active,#news .newsCategoryTabs>button[aria-selected="true"]{border-width:4px}
+}
+@media(prefers-reduced-motion:reduce){
+ .btn,button,.item,.nearbyCard{transition:none!important}
+}

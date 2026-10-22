@@ -1,5 +1,7 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-22 / v2.0.0**: Major family-first commercial-grade UI refresh. Added ui-v2.css as a standalone override sheet, explicit distinct active hues per workflow (blue/teal/purple/indigo/terracotta), neutral inactive tabs, checked active-state labeling, refined card/input/nav systems and Android native theme. Existing parsed contract data, announcements, roles, trade feeds and one-sheet PNG untouched.
+
 - **2026-10-22 / v1.19.18**: Consolidated navigation to remove duplicate dead-end submenu buttons on apartments and news; retained three distinct trade pages, two real news/lottery tabs, and prominent apartment search/scope controls. Pressing selected apartments focuses search, primary news resets to briefing. Added navigation behavior tests and kept existing family/admin authorization and contract actions.
 
 - **2026-10-22 / v1.19.17**: Color-code writable contract memo (apricot/cream) versus lookup/filter (mint) and confirm/attention statuses (green/amber) without relying solely on hue. Keep strong text labels, focus/selection outlines, primary teal action, and all existing contract workflows. New static contrast and role tests.
