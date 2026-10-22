@@ -52,7 +52,8 @@ assert(theme.includes('body:not([data-office-role="admin"]) .adminExplain'),'Fam
 for(const hook of ["FirstHyundaiEasy.compose()","FirstHyundaiContracts.voice()","FirstHyundaiContracts.approve()","FirstHyundaiContractImage.open()","refreshOne('trades',true)","switchNewsPane('subscriptions')","setTradeType('매매')"]){
  assert(html.includes(hook),'Core workflow missing '+hook);
 }
-assert(native.includes('<item name="android:statusBarColor">#182C46</item>'));
-assert(lock.includes('Color.rgb(36, 86, 170)'));
+assert(native.includes('<item name="android:statusBarColor">#133E48</item>'));
+assert(lock.includes('Color.rgb(17, 106, 113)'));
+assert(native.includes('<item name="android:colorAccent">#116A71</item>'));
 assert(html.includes('aria-current=')&&html.includes('aria-selected="true"'));
 console.log('v2.0.0 UI regression passed: independent selection hues, 4.5+ contrast, native branding, screen state and existing actions.');
