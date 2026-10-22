@@ -1,5 +1,7 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-22 / v2.0.12**: Customer contract PNG actual partial remittance amount (e.g. 500만원) now exactly matches bank/account/payee teal `#0c6269` instead of terracotta `#AC3930`. Font emphasis and content unchanged. Tests assert both amount and bank canvas fill colors; preserve all v2.0.11 functionality.
+
 - **2026-10-22 / v2.0.11**: Publish 31 real Songdo-dong running schools (16 elementary, 9 middle, 6 high) directly from an owner-provided official 2026-10-01 Korea Education Facilities school-location CSV. School-ID/address/coordinates/date validated; no nationwide raw file or private data committed. App shows verified CSV source/date and school map link without NEIS/standard API connectivity. Re-import safeguards and tests added. No unverified school assignments.
 
 - **2026-10-22 / v2.0.10**: Add independently verified official nationwide school-location API fallback for NEIS HTTP 500: separate `school_locations` source and strict full-page validation/operating schools/Songdo lot address/coordinates. Snapshot retained on API denial/failure. NEIS source takes precedence when verified. School directory shows school level, official source/updated time, safe map link, never asserts school assignment; hides misleading "register key" message. Regression tests for provider failures and UI; API endpoint has separate automatic usage approval, not assumed working without live verification.

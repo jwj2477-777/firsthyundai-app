@@ -177,21 +177,21 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.11 verified official CSV schools APK
+      - name: Publish successful v2.0.12 teal remittance image APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v2.0.11.apk
-          unzip -t FirstHyundai-v2.0.11.apk | grep 'No errors detected'
-          if gh release view v2.0.11 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v2.0.12.apk
+          unzip -t FirstHyundai-v2.0.12.apk | grep 'No errors detected'
+          if gh release view v2.0.12 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.11 FirstHyundai-v2.0.11.apk \
+            gh release create v2.0.12 FirstHyundai-v2.0.12.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.11 · 송도 초중고 31곳 공식 학교위치 등록' \
-              --notes '사용자가 제공한 한국교육시설안전원 전국초중등학교위치 공식 CSV(자료기준일 2026-10-01)를 검증하여 인천 연수구 송도동 운영학교 31개(초등 16곳, 중학 9곳, 고등 6곳)의 학교명·도로명주소·지도 좌표를 학교·학군 탭에 게시했습니다. 나이스 HTTP 500, 대체 공식 API HTTP 403 상황에서도 CSV 검증 자료로 조회할 수 있습니다. 앱 화면에 자료 기준일과 공식 CSV 출처를 명시하고 초·중·고 필터와 학교 위치 지도 링크를 제공합니다. 학교가 가까운지 여부나 특정 아파트 배정학교는 검증되지 않아 표시하지 않습니다. 나이스 복구 시 해당 실시간 자료를 우선하며 기존 v2.0.10과 계약·실거래·뉴스·가족/관리자 기능 모두 보존합니다.'
+              --title '퍼스트현대 v2.0.12 · 계약 이미지 송금액 청록색 통일' \
+              --notes '고객용 계약 안내 이미지에서 이번 송금액(예: 500만원)의 적갈색 텍스트 색상을 은행명(예: 하나은행)·계좌번호·예금주와 완전히 동일한 청록색(#0c6269)으로 통일했습니다. 실제 송금액 숫자의 굵기, 크기, 위치와 법률 문장/송금 계좌, FHD 원본 로고 및 하단 푸터 삭제 상태는 그대로 유지합니다. 기존 v2.0.11 학교위치 31개 목록과 계약일 필수 검증, 실거래, 뉴스, 관리자/가족 모드 등 모든 기능은 보존합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.11 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.12 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
