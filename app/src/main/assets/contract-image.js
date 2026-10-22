@@ -89,10 +89,11 @@ function wrapAccountLine(c,text,width,size,transfer){
  // Keep them in the legal sentence, not in a second payment panel.
  const fields=[
   {text:transfer.account,kind:'account'},
+  {text:transfer.amount,kind:'amount'},
   {text:transfer.bank,kind:'bank'},
   {text:transfer.payee,kind:'payee'}
  ].filter(x=>x.text);
- const escaped=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\function layout(text,profile,allowPages){');
+ const escaped=s=>Array.from(s).map(ch=>'\\.^$*+?()[]{}|'.includes(ch)?'\\'+ch:ch).join('');
  const pattern=new RegExp(fields.map(x=>escaped(x.text)).join('|'),'g');
  const lines=[],runs=[];let length=0;
  function flush(){
@@ -102,7 +103,7 @@ function wrapAccountLine(c,text,width,size,transfer){
   const chunks=kind?[text]:(text.match(/\s+|[^\s]+/g)||[]);
   for(const chunk of chunks){
    if(!chunk)continue;
-   c.font=(kind?'700 '+(size+2):'400 '+size)+'px sans-serif';
+   c.font=kind==='amount'?'800 '+(size+3)+'px sans-serif':(kind?'700 '+(size+2):'400 '+size)+'px sans-serif';
    const w=c.measureText(chunk).width;
    if(length&&length+w>width)flush();
    if(!length&&/^\s+$/.test(chunk))continue;
@@ -110,11 +111,11 @@ function wrapAccountLine(c,text,width,size,transfer){
     for(const char of Array.from(chunk)){
      const cw=c.measureText(char).width;
      if(length&&length+cw>width)flush();
-     runs.push({text:char,emphasis:!!kind,underline:kind==='account'});
+     runs.push({text:char,emphasis:!!kind,kind,underline:kind==='account'});
      length+=cw;
     }
    }else{
-    runs.push({text:chunk,emphasis:!!kind,underline:kind==='account'});
+    runs.push({text:chunk,emphasis:!!kind,kind,underline:kind==='account'});
     length+=w;
    }
   }
@@ -239,8 +240,8 @@ function draw(page,index,total){
   }else if(item.kind==='notice-body'&&item.runs?.length){
    let x=LEFT+10;
    for(const run of item.runs){
-    c.font=(run.emphasis?'700 '+(item.size+2):'400 '+item.size)+'px sans-serif';
-    c.fillStyle=run.emphasis?'#0c6269':'#50646b';
+    c.font=run.kind==='amount'?'800 '+(item.size+3)+'px sans-serif':(run.emphasis?'700 '+(item.size+2):'400 '+item.size)+'px sans-serif';
+    c.fillStyle=run.kind==='amount'?'#AC3930':run.emphasis?'#0c6269':'#50646b';
     c.fillText(run.text,x,y);
     const measured=c.measureText(run.text).width;
     if(run.underline){c.fillStyle='#0c6269';c.fillRect(x,y+5,measured,2);}
