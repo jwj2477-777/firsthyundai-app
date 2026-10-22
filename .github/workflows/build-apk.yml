@@ -205,6 +205,17 @@ jobs:
           else
             gradle --no-daemon assembleRelease
           fi
+      - name: Exercise release signing with disposable PR key (not a public release)
+        if: github.event_name == 'pull_request'
+        run: |
+          keytool -genkeypair -noprompt -alias disposable-ci-only -keyalg RSA -keysize 2048 -keystore "$RUNNER_TEMP/disposable-ci-only.p12" -storetype PKCS12 -validity 1 -storepass "DISPOSABLE_CI_ONLY_2026" -keypass "DISPOSABLE_CI_ONLY_2026" -dname "CN=Disposable PR Build, O=Not For Distribution, C=KR" >/dev/null 2>&1
+          export FHD_SIGNING_KEYSTORE="$RUNNER_TEMP/disposable-ci-only.p12"
+          export FHD_SIGNING_STORE_PASSWORD="DISPOSABLE_CI_ONLY_2026"
+          export FHD_SIGNING_KEY_ALIAS="disposable-ci-only"
+          export FHD_SIGNING_KEY_PASSWORD="DISPOSABLE_CI_ONLY_2026"
+          gradle --no-daemon assembleRelease
+          apksigner verify app/build/outputs/apk/release/app-release.apk
+          rm -rf app/build/outputs/apk/release "$RUNNER_TEMP/disposable-ci-only.p12"
       - name: Verify APK version and immutable release signing identity
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
