@@ -371,6 +371,16 @@ body.apartmentSheetActive{overflow:hidden}
     <summary>＋ 상세 검색 조건 (필요할 때만)</summary>
     <label class="inputLabel" for="aptFilter">아파트 이름 직접 검색</label>
     <input id="aptFilter" placeholder="아파트 이름 입력" oninput="renderTrades()" aria-label="아파트 단지명">
+    <label class="inputLabel" for="tradeDateFrom">계약일 검색</label>
+    <div class="tradeDateRange" role="group" aria-label="계약일 기간 선택">
+      <label for="tradeDateFrom"><span>시작일</span><input id="tradeDateFrom" type="date" onchange="renderTrades()" aria-label="계약 시작일"></label>
+      <label for="tradeDateTo"><span>종료일</span><input id="tradeDateTo" type="date" onchange="renderTrades()" aria-label="계약 종료일"></label>
+    </div>
+    <div class="tradeDateActions">
+      <button type="button" onclick="sameTradeDateOnly()">선택한 하루만</button>
+      <button type="button" onclick="resetTradeDateFilter()">날짜 초기화</button>
+    </div>
+    <p id="tradeDateError" class="tradeDateError hidden" role="alert"></p>
     <label class="inputLabel" for="statusFilter">해제 거래 표시</label>
     <select id="statusFilter" onchange="renderTrades()"><option value="">해제 포함 전체</option><option value="notcancel">해제 제외</option><option value="cancel">해제 거래만</option></select>
     <select class="hidden" id="typeFilter" aria-label="거래유형 내부 필터"><option value="">전체</option><option>매매</option><option>전세</option><option>월세</option></select>
@@ -1503,6 +1513,7 @@ function showComplexTrades(id,area,type){
  $('aptFilter').value='';
  $('typeFilter').value=type;
  $('statusFilter').value='';
+ $('tradeDateFrom').value='';$('tradeDateTo').value='';
  $('tradesFavoriteFilter').value='';
  switchPage('trades');
 }
@@ -1615,6 +1626,25 @@ function renderNearbyDetails(resetLimit){
 }
 
 function renderOverview(){let list=remote.trades?.records||[];$('totalDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.length):'—';$('saleDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.filter(x=>x.type==='매매').length):'—';$('rentDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.filter(x=>x.type==='전세'||x.type==='월세').length):'—';$('newsGroups').textContent=remote.news&&remote.news.state!=='not_started'?number(remote.news.briefs?.length):'—';$('newDeals').textContent=remote.new_trades&&remote.new_trades.state!=='not_started'?number((remote.new_trades.records||[]).filter(x=>x.first_seen_date===new Date(Date.now()+9*3600000).toISOString().slice(0,10)).length):'—';$('overviewStatus').innerHTML=`<div>${escapeHtml(textState(remote.trades,'실거래가'))}</div><div>${escapeHtml(textState(remote.news,'뉴스'))}</div>${issues.trades?`<div class="flash bad">실거래가 연결 오류: ${escapeHtml(issues.trades)}</div>`:''}${issues.news?`<div class="flash bad">뉴스 연결 오류: ${escapeHtml(issues.news)}</div>`:''}`;}
+// National trade snapshots store the signed CONTRACT date in ISO (YYYY-MM-DD).
+// Compare inclusive date boundaries; missing/invalid source dates never match a date-limited search.
+function tradeContractDateMatches(contractDate,start,end){
+ if(!start&&!end)return true;
+ const day=String(contractDate||'');
+ return /^\d{4}-\d{2}-\d{2}$/.test(day)&&(!start||day>=start)&&(!end||day<=end);
+}
+function sameTradeDateOnly(){
+ const date=$('tradeDateFrom').value||$('tradeDateTo').value;
+ if(!date)return;
+ $('tradeDateFrom').value=date;
+ $('tradeDateTo').value=date;
+ renderTrades();
+}
+function resetTradeDateFilter(){
+ $('tradeDateFrom').value='';
+ $('tradeDateTo').value='';
+ renderTrades();
+}
 function renderTrades(){
  const payload=remote.trades;
  // Active state has both a visible border and an accessible pressed label.
@@ -1644,6 +1674,15 @@ function renderTrades(){
  }
  const q=$('aptFilter').value.trim().toLowerCase();
  const type=$('typeFilter').value,s=$('statusFilter').value;
+ const dateFrom=$('tradeDateFrom').value,dateTo=$('tradeDateTo').value;
+ const dateError=$('tradeDateError');
+ const reversed=!!(dateFrom&&dateTo&&dateFrom>dateTo);
+ dateError.textContent=reversed?'종료일은 시작일과 같거나 이후여야 합니다.':'';
+ dateError.classList.toggle('hidden',!reversed);
+ if(reversed){
+  $('tradesContent').innerHTML='<div class="empty">계약일 검색 기간을 확인해 주세요.</div>';
+  return;
+ }
  const favoriteOnly=$('tradesFavoriteFilter').value==='favorites';
  const focused=tradeFocus&&catalogRows().find(x=>x.id===tradeFocus.id);
  $('tradeFocusBanner').innerHTML=focused?
@@ -1663,7 +1702,8 @@ function renderTrades(){
   (!q||String(x.building||'').toLowerCase().includes(q))&&
   (tradeMode!=='search'||!selectedTradeBuilding||x.building===selectedTradeBuilding)&&
   (tradeMode!=='search'||!selectedTradeArea||areaKey(x.area_m2)===selectedTradeArea)&&
-  (s==='cancel'?x.status==='해제':s==='notcancel'?x.status!=='해제':true));
+  (s==='cancel'?x.status==='해제':s==='notcancel'?x.status!=='해제':true)&&
+  tradeContractDateMatches(x.contract_date,dateFrom,dateTo));
  records.sort((a,b)=>(b.contract_date||'').localeCompare(a.contract_date||''));
  const rows=records.slice(0,70);
  $('tradesContent').innerHTML=

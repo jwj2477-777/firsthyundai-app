@@ -30,6 +30,7 @@ on:
       - 'scripts/test_contract_transfer.js'
       - 'scripts/test_contract_image.js'
       - 'scripts/test_trade_contract_regression.js'
+      - 'scripts/test_trade_contract_date_filter.js'
       - 'scripts/test_trade_confirmation_states.js'
       - 'scripts/test_app_version.js'
       - 'scripts/check_apk_version.py'
@@ -118,6 +119,7 @@ jobs:
           node --check app/src/main/assets/contract-image.js
           node scripts/test_contract_image.js
           node scripts/test_trade_contract_regression.js
+          node scripts/test_trade_contract_date_filter.js
           node scripts/test_trade_confirmation_states.js
           node scripts/test_app_version.js
           node scripts/test_apartment_detail_navigation.js
@@ -154,21 +156,21 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.3 clear-trade-badges-confirmation-state APK
+      - name: Publish successful v2.0.4 contract-date-filter APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v2.0.3.apk
-          unzip -t FirstHyundai-v2.0.3.apk | grep 'No errors detected'
-          if gh release view v2.0.3 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v2.0.4.apk
+          unzip -t FirstHyundai-v2.0.4.apk | grep 'No errors detected'
+          if gh release view v2.0.4 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.3 FirstHyundai-v2.0.3.apk \
+            gh release create v2.0.4 FirstHyundai-v2.0.4.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.3 · 실거래 카드 간결화·내용 확인 버튼 3단계 표시' \
-              --notes '실거래 카드 상단은 매매·전세·월세를 진한 대표 배지 하나로, 신고/임대차 신고·직거래/중개거래·신규계약/갱신계약은 작은 보조 배지로 재정렬했습니다. (신규계약), (갱신계약)의 불필요한 괄호를 제거하고 계약구분이 미기재인 경우 빈 정보 배지를 표시하지 않습니다. 관심 단지·전체 실거래·새 거래 3개 화면 모두 동일하게 개선했습니다. 계약문자 내용 확인 완료 버튼은 미확인 회색/비활성, 조건과 체크박스 확인 후 진초록색 확인 가능, 누른 뒤 연녹색 확인 완료됨의 명확한 3단계로 구분합니다. 동의 체크 해제, 문자 직접 수정, 금액·조건 변경 시 기존 확인 완료 상태는 자동 해제됩니다. 기존 계약 안전검증·공유·이미지 기능과 뉴스/아파트정보 데이터는 그대로 유지합니다.'
+              --title '퍼스트현대 v2.0.4 · 실거래 계약일 날짜 검색' \
+              --notes '실거래 상세 검색에 계약일 시작·종료 날짜 필터를 추가했습니다. 시작일·종료일은 모두 포함하며 하루 검색·초기화 버튼을 지원합니다. 아파트명·거래유형·면적·계약해제 필터와 함께 적용하고 잘못된 날짜 범위는 바로 알립니다. 단지 상세에서 실거래로 이동하면 이전 날짜 조건이 초기화됩니다. 기존 거래카드·계약문자·관리자 구분은 유지합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.3 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.4 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"

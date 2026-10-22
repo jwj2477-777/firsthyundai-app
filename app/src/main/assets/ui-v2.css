@@ -425,3 +425,14 @@ body:not([data-office-role="admin"]) #ct_preview.contractEditing ~ .contractPrev
  .dealRow .tradeInfoBadge{font-size:12px;padding:5px 8px}
  #contracts #ct_resultPanel #ct_confirmButton{font-size:17px}
 }
+
+
+/* Contract-date filters are concise, touch-friendly and remain readable on narrow phones. */
+#trades .tradeDateRange{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px}
+#trades .tradeDateRange label{min-width:0;color:#334D63;font-weight:750;font-size:13px}
+#trades .tradeDateRange label span{display:block;margin-bottom:5px}
+#trades .tradeDateRange input{width:100%;max-width:100%;min-width:0;box-sizing:border-box;min-height:51px;padding:9px 8px;background:#F4F9FD;border:1.5px solid #B8CADB;color:#203F58;font-size:14px}
+#trades .tradeDateActions{display:flex;gap:8px;flex-wrap:wrap;margin:9px 0 2px}
+#trades .tradeDateActions button{min-height:43px;padding:8px 12px;border:1px solid #CCD8E5;border-radius:9px;background:#fff;color:#294D70;font-size:13px;font-weight:750}
+#trades .tradeDateError{margin:8px 0 2px;color:#A33535;font-weight:750;font-size:13px}
+@media(max-width:370px){#trades .tradeDateRange{grid-template-columns:1fr}}
