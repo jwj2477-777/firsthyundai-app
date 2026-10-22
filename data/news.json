@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-10-22T12:39:01+09:00",
+  "checked_at": "2026-10-22T15:47:30+09:00",
   "state": "ok",
   "errors": [],
   "source": "Google 뉴스 RSS (보도 제목·출처 메타데이터)",
@@ -8,15 +8,72 @@
   "warning": "언론 기사 제목은 공식 확정 발표가 아닙니다. 사업 일정, 세금, 대출, 시행일은 기관 원문 확인 필요.",
   "briefs": [
     {
-      "id": "9083a9b9cc632a",
-      "category": "세금·대출",
-      "title": "당국, 사내대출 DSR 규제 적용 검토…이억원 \"방법론적 고민 필요\"",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
+      "id": "222ad874061354",
+      "category": "송도 종합",
+      "title": "송도 토양정화 무시 부영, 금융이익 수백억 추산 벌금은 ‘쥐꼬리’",
+      "summary": "부영주택이 인천 송도테마파크 토양정화명령을 이행하지 않아 누적된 금융이익이 376억~658억원으로 추산됐다.\n연수구는 1차부터 4차까지 정화명령을 내렸으나 부영주택이 확정받은 벌금은 1000만원에 불과하다.\n연구진은 정화비용 불이행에 따른 금융이익을 범죄수익으로 산정하는 등의 개선안을 제시했다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
       "article_count": 1,
       "publisher_count": 1,
-      "last_published_at": "2026-10-22T11:43:21+09:00",
+      "last_published_at": "2026-10-22T15:19:34+09:00",
       "sources": [
+        {
+          "title": "송도 토양정화 무시 부영, 금융이익 수백억 추산 벌금은 ‘쥐꼬리’",
+          "publisher": "인천투데이",
+          "published_at": "2026-10-22T15:19:34+09:00",
+          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE0tTldseFZaWV9TeDdWSmJCTWc4RS1NRFhPTzRmRV9KNG5zbEpwVUpCeGhmaDh0TDFnaG5lMXhLbFktZnNQYkh6U0FsMzBVeVFaajQ2bTlkcGtUQThndDRjVjU1QTQ0Q0NZWVdHd3RTbG8?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.incheontoday.com/news/articleView.html?idxno=325313",
+      "summary_version": 3
+    },
+    {
+      "id": "2e097e83879780",
+      "category": "정책·규제",
+      "title": "KB부동산 \"서울서 강남구만 나홀로 하락…화성시 매매·전세 급등\"",
+      "summary": "KB부동산은 10월 셋째 주(19일 기준) 서울 아파트 매매가격 상승률이 0.18%라고 발표했다.\n강남구는 같은 기간에 매매가격이 0.05% 하락해 유일하게 하락세를 보였다.\n이번 주 서울 매수우위지수는 67.2로 전주보다 2.3포인트 감소했다.",
+      "verification": "2개 AI 검토 · 사실 확인은 원문 기준",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-10-22T15:19:13+09:00",
+      "sources": [
+        {
+          "title": "KB부동산 \"서울서 강남구만 나홀로 하락…화성시 매매·전세 급등\"",
+          "publisher": "KB Think",
+          "published_at": "2026-10-22T15:19:13+09:00",
+          "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE1ZX2diOS1HZGlGVjljMEN4dHNud1Q3ZmhwbFB6TVhGWFZKZFNISkV3X0VLNjBoRlAweHNacVJGcS1QbzJrTUN0YzVpTTFGUXpxcGpxTEUwa2J5NEliaDZxcldwTnNUSjFHUTU4dVE0eDFpdw?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://kbthink.com/news-list/view.html?newsId=20261022151914382",
+      "summary_version": 3,
+      "groq_reviewed": true
+    },
+    {
+      "id": "369bf9bb860fe2",
+      "category": "세금·대출",
+      "title": "금융당국, 사내대출 DSR 규제 적용 검토…이억원 위원장 \"취지 공감\" [국감]",
+      "summary": "금융당국이 기업 임직원 사내 주택대출에 DSR 규제 적용을 검토하고 있습니다.\n7대 그룹 사내 주택대출 잔액은 올해 8월 말 기준 6370억7000만원입니다.\n금융위와 금감원은 이와 관련해 실무 논의에 착수한 상태입니다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 3,
+      "publisher_count": 3,
+      "last_published_at": "2026-10-22T15:15:00+09:00",
+      "sources": [
+        {
+          "title": "금융당국, 사내대출 DSR 규제 적용 검토…이억원 위원장 \"취지 공감\" [국감]",
+          "publisher": "이투데이",
+          "published_at": "2026-10-22T15:15:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE5fcXVWcmk0b2V3dGxQS1JrOWwzVnFHUlhRRno1V0I1eG01bW1McnBXeHhqWnJmQTVJT3p4bDZLeUhDNnNrSlFxcVNVZWZNbmwwQk1IMzFnM2Iwd0NmQnFxM2FDRHZhWk9tV09kRGQ3bV9HX0xD?oc=5"
+        },
+        {
+          "title": "이억원 금융위원장 “사내대출 규제 취지 공감”…대기업 주택대출도 DSR 묶이나",
+          "publisher": "코리아데일리",
+          "published_at": "2026-10-22T13:41:10+09:00",
+          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE1Oa3NDWU90S041ZmhEWmt5T2pYY25wQ2dnZFg2OFBqTnFVdDJQd0pXYjIxTHJveGVueDktQmkycU1nY0JLWElNZ3dYRGMwSHB4Y0tPT2MzSnc4cWotV08wYk9VOEw1OUw2TDdRT2tZYk4?oc=5"
+        },
         {
           "title": "당국, 사내대출 DSR 규제 적용 검토…이억원 \"방법론적 고민 필요\"",
           "publisher": "뉴시스",
@@ -24,14 +81,91 @@
           "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE1xOU0yajVSSXVGa1dRcS15RDJ4VjVLei00VlNaSUhfdUUzbWhXYmZfTkZhSzN4QThFTkJGaHdVa1RCQi1jR2UwQ1p2VkJlNWo3Z3ZjdS0ySFF6b3JmTGJnWNIBeEFVX3lxTE4xUkpfMmZKSHh3WloxN1pQREtVcFNJbFVPMUpJTW5WQl9XZ3pYNWpzVHJvVmkxREVPaUNPWVNaTDR6em9BWl84VEg2alZMNjU4WFZaU2ZaUUJzdm01WXNkMWxoeHVLdEpJVFhaX2J6dnAxaTktZXdZMg?oc=5"
         }
       ],
-      "summary_method": "headline_only"
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.etoday.co.kr/news/view/2639007?trc=right_categori_news",
+      "summary_version": 3
+    },
+    {
+      "id": "c41cb37302bb9a",
+      "category": "송도 종합",
+      "title": "인천 송도에 재외동포교육문화센터 추진…박찬대 \"글로벌 한인 네트워크 중심\"",
+      "summary": "인천시와 재외동포청은 송도에 재외동포교육문화센터 조성을 위한 양해각서를 체결했다.\n센터는 인천도시역사관을 리모델링해 이주 역사 전시와 교육을 지원하는 복합시설로 건립된다.\n센터 리모델링은 내년부터 시작되며 조성 이후 운영과 관리는 재외동포청이 맡을 예정이다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 6,
+      "publisher_count": 6,
+      "last_published_at": "2026-10-22T14:55:00+09:00",
+      "sources": [
+        {
+          "title": "인천 송도에 재외동포교육문화센터 추진…박찬대 \"글로벌 한인 네트워크 중심\"",
+          "publisher": "뉴스핌",
+          "published_at": "2026-10-22T14:55:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE5xdGxWMjhQRUVLWmVOcnU2aS1YekRFX0d4V2ZBYjdnUVlKeTVmRGpzM3hEdlhFYzlRYURjcFA1SHFseVJhb1haQ2kzQ3IzTnZzeE5jbFpYOFA1WlZt?oc=5"
+        },
+        {
+          "title": "재외동포청 세종 이전에 인천시, 송도에 ‘재외동포교육문화센터’ 조성",
+          "publisher": "경향신문",
+          "published_at": "2026-10-22T13:17:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFBWUVIzRTFVOWlfaFhWT05GdkxQZC1UeDl6Z2hfRnRwVF9KUC1od29HZGV3ZzNocXQxVDN4d24zSEJIVW5iYkVRVU1BUlVKdEN6NkJITVpMdGtQUdIBX0FVX3lxTE9qS01hdDU4cDdfUU5uWHpXZk1UbnBJQmFyQ0E4YmtTdi0tTFNNY2h6akc2NUdXUnhnLVJzUTBzQ0kxUThFQ1dZd2MzbHNOdVBpU2FCc2pDaXU3YlFDNzBR?oc=5"
+        },
+        {
+          "title": "[사설] 인천 송도 재외동포청 세종 이전 재검토해야",
+          "publisher": "경인일보",
+          "published_at": "2026-10-15T20:34:53+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTFBHZ3dBUWktSVJDRFZkRjZBR3QyUEZWbTNmTlBlWmZZYk1PUjVpa1RjbXprNmlLU3ZTOF9CYnVCcFoyQW1jRjQ2MkxnRWVsRG5Qemc?oc=5"
+        },
+        {
+          "title": "인천 연수구의회 민주당 의원들 “재외동포청 송도 존치…이전 전면 재검토해야”",
+          "publisher": "인천일보",
+          "published_at": "2026-10-15T16:55:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9vN3FibTVTNkFaZnhMZWdEdXRYQzJlTmdTaC1oY3hoSFctOFFkTE42M2ZBNmZzRWEtQ0dZeHgxSUdoRnpQN0FxM1IzRG5tNDBhZGJjMEZrNURkZ0hRTEFodDZxdjBmc1pZZVhRNnNIUkc?oc=5"
+        },
+        {
+          "title": "민주당 연수구의회 의원들, \"재외동포청은 인천 송도에, 세종시 이전 결사 반대\"",
+          "publisher": "인천뉴스",
+          "published_at": "2026-10-15T16:45:30+09:00",
+          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE1XWkI0aHRmaVJ6SGxmcUdxVzQweUZWclpuTzRDSV9PeTBnYlk1QlR0TGVrdHg1a0JtVnZNQmFzV2lCTUhVVmVjbHpEcHlLbXMwNU5ZeWNQOUtpMmdUdWxRTjViTkQyUFJHcmFwVVlHdw?oc=5"
+        },
+        {
+          "title": "민주당 인천 연수구의원들 “재외동포청 세종 이전 반대”…송도 존치 촉구",
+          "publisher": "경기일보",
+          "published_at": "2026-10-15T15:48:10+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE5XbC0zOTAwcTI1SUZTNklRZjVTSU12RkFHcUc0NGhEY2NaWlZORkZaemREVl9qVFBNMUlHSV93dXdSTUllcHZTUEhJOENDMmQtZ1VhWGY5eWxxZnM?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.newspim.com/news/view/20261022000948",
+      "summary_version": 3
+    },
+    {
+      "id": "f701acd057dd92",
+      "category": "송도 종합",
+      "title": "인천 송도국제도시, 캘빈매니토바국제학교 한복 입고 등교… 한복의 날 행사 3년째",
+      "summary": "인천 송도국제도시의 캘빈매니토바국제학교 학생들이 한복의 날인 지난 21일 한복을 입고 등교했다.\n교사의 제안으로 시작된 이 학교의 한복의 날 행사는 올해로 3년째를 맞이했다.\n학교는 국적과 문화적 배경이 다른 구성원들이 한복을 경험하도록 행사를 이어 가고 있다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-10-22T13:49:00+09:00",
+      "sources": [
+        {
+          "title": "인천 송도국제도시, 캘빈매니토바국제학교 한복 입고 등교… 한복의 날 행사 3년째",
+          "publisher": "기호일보",
+          "published_at": "2026-10-22T13:49:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE13NDVNZmcwTWVCc1hsNUJvbzc4aUprX2duY0lQVlQ3UDdKUUxLNHJVdFlMc3ZkVmt5Wll3UVB0aHl4UkktemVTSDdadEdXTmRmRTU2alRUbmhWYm50NFZrWmZlb3dJYm83RVdvSFNNVQ?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.kihoilbo.co.kr/news/articleView.html?idxno=3038498",
+      "summary_version": 3
     },
     {
       "id": "fa01c3aeff87f6",
       "category": "정책·규제",
       "title": "국토장관 \"월세 부담 완화 총력…주택 공급 확대가 해법\"",
       "summary": "홍지선 국토교통부 장관은 서민 주거비 부담을 줄이기 위해 지원책을 확대하겠다고 밝혔다.\n총급여 5500만원 이하 근로자가 월 100만원의 월세를 낼 경우 연간 최대 170만원까지 세액공제를 받을 수 있다.\n정부는 연내에 민간 월세 주택을 공공 전세 형태로 공급하는 전월세 안심신탁사업 공모를 진행할 예정이다.",
-      "verification": "2개 AI 검토 · 사실 확인은 원문 기준",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-10-22T11:35:21+09:00",
@@ -73,7 +207,7 @@
       "category": "송도 종합",
       "title": "장기 공실 송도 생숙...'오피스텔 용도변경' 마침표 찍었다",
       "summary": "인천 송도 생활형숙박시설의 오피스텔 용도변경 절차가 최종 완료됐다.\n이번에 신청한 214실이 정식으로 오피스텔로 전환되며 시행사는 공공기여금 43억원을 부담했다.\n인천경제자유구역청은 최근 힐스테이트 송도 스테이에디션의 용도변경을 마무리했다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-10-22T10:44:37+09:00",
@@ -98,13 +232,13 @@
       "verification": "기사 본문 요약 대기",
       "article_count": 1,
       "publisher_count": 1,
-      "last_published_at": "2026-10-22T10:42:21+09:00",
+      "last_published_at": "2026-10-22T10:38:09+09:00",
       "sources": [
         {
           "title": "K-바이오 품은 송도 11공구, 592가구 신규 공급",
           "publisher": "리버티코리아포스트",
-          "published_at": "2026-10-22T10:42:21+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE5pYVN5YjNUVVk5aTRzcU5id1l2bG1Zd0RIRkxTOFlSQjNEeVgzbGVQTWg2RVhvT2I1eWx1NTRiTWp6cnhyNTYtR0hoZko5Tm9LMjIydkh2emxzS0lTOURGdkw2NVV6MEnSAWdBVV95cUxOaWFTeWIzVFVZOWk0c3FOYndZdmxtWXdESEZMUzhZUkIzRHlYM2xlUE1oNkVYb09iNXlsdTU0Yk1qenJ4cjU2LUdIaGZKOU5vSzIyMnZIdnpsc0tJUzlERnZMNjVVejBJ?oc=5"
+          "published_at": "2026-10-22T10:38:09+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBJSWQxX0o3ZHE2bm9uVlVOdmctLXcxclBScDkyeWhSZWdDVDAwb25rRWJnR2RMOGNGXzFiOXZVZXBHTGIxYkR0OXVIS0FDUjlZd0h0a25ZQ2MycUNQLUN6c2REQdIBZ0FVX3lxTE5pYVN5YjNUVVk5aTRzcU5id1l2bG1Zd0RIRkxTOFlSQjNEeVgzbGVQTWg2RVhvT2I1eWx1NTRiTWp6cnhyNTYtR0hoZko5Tm9LMjIydkh2emxzS0lTOURGdkw2NVV6MEk?oc=5"
         }
       ],
       "summary_method": "headline_only"
@@ -114,9 +248,9 @@
       "category": "송도 종합",
       "title": "AI·로봇 치안기술 한자리에 '국제치안산업대전' 송도컨벤시아에서 개막",
       "summary": "AI와 로봇을 활용한 첨단 치안기술을 선보이는 2026 국제치안산업대전이 송도컨벤시아에서 개막했다.\n이번 행사에는 245개 기업이 880개 부스를 마련해 미래 치안산업의 기술과 제품을 소개한다.\n경찰청과 인천시가 공동 주최하는 이번 전시회는 오는 24일까지 나흘간 열린다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
-      "article_count": 8,
-      "publisher_count": 7,
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
+      "article_count": 3,
+      "publisher_count": 2,
       "last_published_at": "2026-10-22T09:53:14+09:00",
       "sources": [
         {
@@ -124,12 +258,6 @@
           "publisher": "디스커버리뉴스(DISCOVERYNEWS)",
           "published_at": "2026-10-22T09:53:14+09:00",
           "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE9TZ3lpb2ZCcFRjRnhvNnppUHF4YW5YYV9vT29hYm9kY0lNMlZNR0V0NGpVZFJnM2RBZlVzT3hHbjd5OVhLVVRmUFkydWlNUHVMVVVDcGxicDRvOTVZT3FiSnk0TndYXzJaY1FsNjlwTUhEdw?oc=5"
-        },
-        {
-          "title": "‘K-치안’ 송도서 선보인다…2026 국제치안산업대전 개막",
-          "publisher": "기호일보",
-          "published_at": "2026-10-22T04:06:47+09:00",
-          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE03UkJCMk4xcEVnWDBIeDRuaVdQSHRlUzdqQk52YUh5ME1wc1VaSzlDLUFTUkVVRjB2bjNMbWdsNGhINUNteVF2d2U2Y3lXWFktaXZvc2g1NVNONjg0UHA3X0NJckdSa3Bnc0ZfMldXdw?oc=5"
         },
         {
           "title": "2026 국제치안산업대전, 송도에서 최신 치안기술 선보여",
@@ -142,18 +270,40 @@
           "publisher": "경기도민일보 미디어",
           "published_at": "2026-10-21T23:59:23+09:00",
           "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE1HM19xOFRleGtyQjN2RnAtbXQ4eHJ0N3lnUjVXeDIwS2NuX2dMeGZwc2ZfUllzTHlNalV5ejJ4b0xlSlNyU3NjU3RNUmpPZnNPZGdteGZQWVVjTDJpTC15a3BGdEVxQWZiT2c?oc=5"
-        },
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.discoverynews.kr/news/articleView.html?idxno=1104628",
+      "summary_version": 3
+    },
+    {
+      "id": "69098d7ee02f7f",
+      "category": "송도 종합",
+      "title": "인천시,국제치안산업대전 24일까지 송도컨벤시아서 개최",
+      "summary": "치안산업 전문 전시회인 2026 국제치안산업대전이 인천 송도컨벤시아에서 개막했다.\n이번 행사에는 245개 기업이 880부스 규모로 참가해 첨단 치안기술을 선보인다.\n해당 전시회는 지난 21일에 개막해 오는 24일까지 나흘간 개최된다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 5,
+      "publisher_count": 5,
+      "last_published_at": "2026-10-22T09:41:26+09:00",
+      "sources": [
         {
-          "title": "AI·로봇이 만드는 더 안전한 대한민국,『2026 국제치안산업대전』 21일 송도컨벤시아서 개막",
-          "publisher": "내외일보",
-          "published_at": "2026-10-21T18:03:09+09:00",
-          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE9scHRaczNneVNfaHByZEYzbjRTeEJxaDFpMlE1S2VQZXJSZk1lZU95OThwbEpQWDJXRGQ0dFlyTXlSQklOS3k5Z1pSZ1dlRkh0SHc0cVNpSGtzczhVeE92MElCV0UyQUZ5cFEzN25wQQ?oc=5"
+          "title": "인천시,국제치안산업대전 24일까지 송도컨벤시아서 개최",
+          "publisher": "메트로신문",
+          "published_at": "2026-10-22T09:41:26+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE4ya1I0elJKRzl4a08wQTNfRm04MWMyRjA5eVY1dnB5eE90dzAzanhZdElKWnhWbVA5ZDBUZ012US0yUnd0SkxzYi1BWC1hbVlLQnd2LWk4TTFjdUMyd3Q4cA?oc=5"
         },
         {
           "title": "'2026 국제치안산업대전' 21일 인천 송도컨벤시아서 개막 - 보도자료 | 기사",
           "publisher": "더팩트",
           "published_at": "2026-10-21T17:43:33+09:00",
           "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFBXeUhxdk9NVl9oVTIyQTFDX0hzclpCOTIxbmNuOWhHTVdsaVVET3dqb0laQm90NWxaWEZpZ0xnU2gycHllZlNaLVA4cGpXRHNwM1pGN2lVR3VrQjFWM2tn?oc=5"
+        },
+        {
+          "title": "‘국제치안산업대전’ 21일 송도컨벤시아서 개막",
+          "publisher": "중부일보",
+          "published_at": "2026-10-21T16:46:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5jcnJjbzF3Yk53RUROODJzaEdfdUVWc3NoblJNb1hmZm9VY2tLeE1tVUlGNXVTTWdFNTliVEFMUjVUVXFXLXhWMWtDaXE1djdnRXNwREE4X0loMnVUYXlYOEY0dzBVY2Y0R0JOaWp2QQ?oc=5"
         },
         {
           "title": "2026 국제치안산업대전 21일 송도컨벤시아서 개막",
@@ -170,27 +320,30 @@
       ],
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.discoverynews.kr/news/articleView.html?idxno=1104628",
+      "summary_source_url": "https://www.metroseoul.co.kr/article/20261021500626",
       "summary_version": 3
     },
     {
-      "id": "69098d7ee02f7f",
-      "category": "송도 종합",
-      "title": "인천시,국제치안산업대전 24일까지 송도컨벤시아서 개최",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
+      "id": "6fa72edb819551",
+      "category": "정책·규제",
+      "title": "인천 아파트값 두 달째 내림세..전세 0.50% 급등",
+      "summary": "인천 주택 매매 가격이 8월에 이어 9월에도 하락하며 두 달 연속 내림세를 기록했다.\n지난달 인천의 전세가격지수 변동률은 0.50%로 전월보다 크게 뛰었다.\n인천시는 챗GPT 기반의 부동산 동향 서비스를 구축해 시민에게 맞춤형 정보를 제공한다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
       "article_count": 1,
       "publisher_count": 1,
-      "last_published_at": "2026-10-22T09:41:26+09:00",
+      "last_published_at": "2026-10-22T09:21:48+09:00",
       "sources": [
         {
-          "title": "인천시,국제치안산업대전 24일까지 송도컨벤시아서 개최",
-          "publisher": "메트로신문",
-          "published_at": "2026-10-22T09:41:26+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE4ya1I0elJKRzl4a08wQTNfRm04MWMyRjA5eVY1dnB5eE90dzAzanhZdElKWnhWbVA5ZDBUZ012US0yUnd0SkxzYi1BWC1hbVlLQnd2LWk4TTFjdUMyd3Q4cA?oc=5"
+          "title": "인천 아파트값 두 달째 내림세..전세 0.50% 급등",
+          "publisher": "일간경기",
+          "published_at": "2026-10-22T09:21:48+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1iaVRWdEs0bmV5bTd1ZWpRdFdVb2t4LU1qZTF5R3JVRHJfQUdUc1FxMDB0a1g0T2IxX05Celd1Uy1nRXkyRGg2cDFSWFVZVmxQS3RpY2F3S1BCY2ZvaXVrUXFta1g5anN2?oc=5"
         }
       ],
-      "summary_method": "headline_only"
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.1gan.co.kr/news/articleView.html?idxno=412320",
+      "summary_version": 3
     },
     {
       "id": "74776abdb8d345",
@@ -231,6 +384,58 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://news.mtn.co.kr/article/2026102116220082351",
+      "summary_version": 3
+    },
+    {
+      "id": "bfd31ac2d07bba",
+      "category": "송도 종합",
+      "title": "“갯벌, 인천이 품은 보물” 축제 24일 송도 해돋이공원 개최",
+      "summary": "인천지역 환경단체와 기업이 함께하는 갯벌 축제가 송도 해돋이공원에서 개최된다.\n행사장에는 갯벌과 철새 및 해양생물을 주제로 한 다양한 체험부스가 마련된다.\n이번 행사는 오는 10월 24일 오후 1시부터 5시까지 진행될 예정이다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 6,
+      "publisher_count": 6,
+      "last_published_at": "2026-10-22T05:56:11+09:00",
+      "sources": [
+        {
+          "title": "“갯벌, 인천이 품은 보물” 축제 24일 송도 해돋이공원 개최",
+          "publisher": "저널25방송",
+          "published_at": "2026-10-22T05:56:11+09:00",
+          "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE53MXlZZWxQYzAyay1NcUtOdnAyRl9kckhacnpOUHdYUFY0R2ZUQkoyMk5PTGIybE0zMlAtaXliM3NSdFR1M212eXA1YTZJT1RCTnpNWTVsME93OGZCa0lWUE5NczhYZjFsU2x6bw?oc=5"
+        },
+        {
+          "title": "“갯벌, 인천이 품은 보물” 축제 24일 송도 해돋이공원서 개최",
+          "publisher": "로컬세계",
+          "published_at": "2026-10-21T14:28:18+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE93YklIZWQ0WGFNZWQ0V2F0d05WckFpX0ptcGU4QmFSQ1V1U0JwOHg0anpvMno1ZEZrcU9wU1BMMmhObllZTzNpWk5qaGZSb1JZVjJ2bTRhRjDSAVhBVV95cUxPd2JJSGVkNFhhTWVkNFdhdHdOVnJBaV9KbXBlOEJhUkNVdVNCcDh4NGp6bzJ6NWRGa3FPcFNQTDJoTm5ZWU8zaVpOamhmUm9SWVYydm00YUYw?oc=5"
+        },
+        {
+          "title": "“갯벌, 인천이 품은 보물” 축제, 24일 송도 해돋이공원 개최",
+          "publisher": "ASK Inno",
+          "published_at": "2026-10-21T11:09:54+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFB4ZEdmRmFGNzJZSE1fbEdBYnV2QUM2SVBEbHhQRkxkZEgwc1laVHpNSVJzWS1CVjlhdWdpRXBlUDR4NFZjcmxNc0w4ZHEzQWx4a0FoSE1jbzA2RTYtZjVybzhjWk5ldkR2?oc=5"
+        },
+        {
+          "title": "송도 해돋이공원서 24일 ‘갯벌, 인천이 품은 보물’ 환경인식 개선 축제",
+          "publisher": "인천투데이",
+          "published_at": "2026-10-21T10:57:45+09:00",
+          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE1JV0RCdWgweWY3VHh3QjV4TmpibXZ6V3Z3endrMlFtd0QzblFCYXBiYUVacEhuZG4tc0pPdmNlN192bkdoTnpzbWthaExVQ1R0aTNmN3ZKdWp4NUdDdTlTMFZwUURtUlMxUzFmaXZYWkM?oc=5"
+        },
+        {
+          "title": "인천 갯벌 가치 알리는 ‘갯벌, 인천이 품은 보물’ 축제 24일 송도서 열려",
+          "publisher": "기호일보",
+          "published_at": "2026-10-21T10:03:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE45UTNUSHNYYzAtMHc1Z1A5U2ZqY0p3T09LSUJPaTJSXzZLVkZfMmlFaDNwXzhMS0c0bTE3SjVmVnMzeDNuUnFlRkJELU5US3N3dURjWTZBUkY0Q2p6TG9qRWdfZlo3c3pQZUVuUEEyYw?oc=5"
+        },
+        {
+          "title": "송도 해돋이공원서 ‘갯벌, 인천이 품은 보물’ 축제 개최...SK인천석유화학 후원",
+          "publisher": "중부일보",
+          "published_at": "2026-10-21T09:50:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5sN2pwZTktb2pQN1NCYngyWXJDR2psY2dVMFgzRW9OT2NaclVGZXkyT0t4WGpwNy0yNkdPTERSdmx0UGZJSFkwNGduOXhkOUI4ck1HTHU3V0lPZTBiRG44LTVteERaaURUMVBQQ1dwYw?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.journal25.com/news/articleView.html?idxno=567704",
       "summary_version": 3
     },
     {
@@ -295,7 +500,7 @@
           "title": "인천글로벌캠퍼스, '초기 진화부터 응급구조까지' 송도소방서와 실전합동훈련",
           "publisher": "중도일보",
           "published_at": "2026-10-21T16:48:59+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE95YnV1VUk0cVZRaE5DWm5aenJYNndwMW56ZlJXcWpueU8wT2JVQmZ0S0h2LVBWTVpndVgxT1lzbE1QVDVZYm43bG9QLXQ3eG9taGNXeWV6bm1CZC1tMkIxbFVIejk?oc=5"
+          "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE81bHZKQ18wT0xNN040VmVpRk0yekZaY3F3eERGV1NxU3hiNFNsMHBEbEtUVHBwY0NvY1dTelBXcGxUTjdHTlRRd1ZJU1BlNUJYNU42RE92b0ZFa3BjbkdEejdfYTFYVTl3UWR1Xw?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -396,20 +601,23 @@
       "id": "6e40d289b45d2e",
       "category": "송도 종합",
       "title": "인천 송도 바이오기업 3분기 영업이익 공개...삼성바이오 6401억·셀트리온 5100억",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
+      "summary": "인천 송도 바이오클러스터 핵심 기업인 삼성바이오로직스와 셀트리온의 올해 3분기 실적이 공개됐다.\n삼성바이오는 영업이익 6401억원을 기록했고 셀트리온은 분기 기준 최대 실적을 달성했다.\n삼성바이오는 21일 공시를 통해 3분기 실적을 발표하며 관련 내용을 공식화했다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
       "article_count": 1,
       "publisher_count": 1,
-      "last_published_at": "2026-10-21T16:46:04+09:00",
+      "last_published_at": "2026-10-21T16:46:00+09:00",
       "sources": [
         {
           "title": "인천 송도 바이오기업 3분기 영업이익 공개...삼성바이오 6401억·셀트리온 5100억",
           "publisher": "중부일보",
-          "published_at": "2026-10-21T16:46:04+09:00",
-          "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE5pa3BjeDNSdFlnUGZ1dzF3SUk0NU9OUGItSVZIdU1uN1VwM1JHbFFEU19KYnVMQjlrM0g5SDNJRXVaSWlQVXZjb3ZuNmpJNkU5N0ZzMFZZbWpOdTFRamdEUDJEOWJ0eEwwMVVSQ0hR?oc=5"
+          "published_at": "2026-10-21T16:46:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE9QZXpIUk5qa0xWM0tvbWVlajRUYzUtVUtsM0pWOG14NllqdjRrOHp3eC1YTXpvYWdLTWd0eFdlOXQtbWNyR3VxNHloREZKRmhvaDNsU0RuS0xJc3F0eFQ0UE9BZUt4QTJlbUdnbmV1QQ?oc=5"
         }
       ],
-      "summary_method": "headline_only"
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.joongboo.com/news/articleView.html?idxno=363740070",
+      "summary_version": 3
     },
     {
       "id": "e14cde6bc9b166",
@@ -502,8 +710,8 @@
       "title": "인천 송도, 글로벌 바이오 인재 양성 거점 도약…실습교육장 문 열어",
       "summary": "인천 송도 연세대학교 국제캠퍼스에 글로벌 바이오 캠퍼스 실습교육장이 문을 열었다.\n교육장은 전체 면적 약 2492제곱미터 규모로 바이오의약품 생산과 품질관리 실습시설을 갖췄다.\n인천경제청은 오는 2028년까지 장비를 추가 확충해 전 공정 실습교육 기반을 완성할 방침이다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 2,
-      "publisher_count": 2,
+      "article_count": 1,
+      "publisher_count": 1,
       "last_published_at": "2026-10-21T15:46:20+09:00",
       "sources": [
         {
@@ -511,12 +719,6 @@
           "publisher": "STN SPORTS",
           "published_at": "2026-10-21T15:46:20+09:00",
           "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE95T0ZRVEdpR0dxdHVNeXdyWHpLUXZha3dkZGE4dWJoaWhpbTVUVEIwZXduNFJjS1hXcUtTTFVYVVBKOHEwLW9QbmljMUQ0Q3I5MnNMWVBOemdCOTVzaDlKZkNYaFdvZGlVV2tsNDNuRQ?oc=5"
-        },
-        {
-          "title": "송도, 세계 바이오 인재 키운다…글로벌 실습교육장 개소",
-          "publisher": "데일리안",
-          "published_at": "2026-10-21T14:20:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMilwJBVV95cUxQSHNyUzdHbllQem9YZ2R4aThWXzJjaDQzWjJxbG5id2tfWFJMS0tzVFZWb3dqckM1YmhsZDZhZGVLMmFOcEJ6LXlVRlYtQ19DcWxXWVlPa0YtX2NVVDZDNFV2SzNUX2VXOU1VTGdVcGY4Wl84b2F3bHdIR1JyUVB1X0RHTnQ4dDQxTzBkRFhjZVBhWklGZUtXVWk5SXpVcXBUWm5XRm5PY3Y1UjlpSTB4YTQxUVo1dndmeTRVVV9sMUROVWVlUUhuTlVndG5FY1pOdm01VVlKWU9ndmUydFFhRDh2Y055LXQwWC1YSEI0dW1QbmZiWkRIcVdsbUdUX2FyU19XQmR4YlNBekVzRmNhcnBCbnhSS1k?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -598,25 +800,6 @@
       "summary_version": 3
     },
     {
-      "id": "4c4cf29bdab844",
-      "category": "세금·대출",
-      "title": "7대 대기업 사내 주택대출 6370억원…현대차 2698억원 최다",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-21T14:39:55+09:00",
-      "sources": [
-        {
-          "title": "7대 대기업 사내 주택대출 6370억원…현대차 2698억원 최다",
-          "publisher": "서울이코노미뉴스",
-          "published_at": "2026-10-21T14:39:55+09:00",
-          "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTFBBUHNLZWYwOHZTcVJUeEpiTVQ0QmZHWnZVaVhObW4yei1yNnVtTnBmSjBGZnJWd085WU41eXFseExQbHlyemVRQVoyZWhCelJ2UG1fdjhibkJoOERhTFRVS2tXVUV3cUNRTWVnR19n?oc=5"
-        }
-      ],
-      "summary_method": "headline_only"
-    },
-    {
       "id": "3ea1f199214371",
       "category": "세금·대출",
       "title": "직장이 가른 내 집 마련 기회, 국힘 의원도 ‘사내 대출’ 규제 목소리",
@@ -662,58 +845,6 @@
       "summary_version": 3
     },
     {
-      "id": "ae43c5dd73741f",
-      "category": "송도 종합",
-      "title": "“갯벌, 인천이 품은 보물” 축제 24일 송도 해돋이공원서 개최",
-      "summary": "인천지역 환경단체와 기업이 함께하는 2026 갯벌 인천이 품은 보물 축제가 24일 개최된다.\n올해로 3회째를 맞는 이번 축제는 송도 해돋이공원 잔디광장에서 오후 1시부터 5시까지 열린다.\n행사장에는 갯벌과 철새 등을 주제로 한 체험부스와 시민 참여형 퀴즈대회가 운영된다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 6,
-      "publisher_count": 6,
-      "last_published_at": "2026-10-21T14:28:18+09:00",
-      "sources": [
-        {
-          "title": "“갯벌, 인천이 품은 보물” 축제 24일 송도 해돋이공원서 개최",
-          "publisher": "로컬세계",
-          "published_at": "2026-10-21T14:28:18+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE93YklIZWQ0WGFNZWQ0V2F0d05WckFpX0ptcGU4QmFSQ1V1U0JwOHg0anpvMno1ZEZrcU9wU1BMMmhObllZTzNpWk5qaGZSb1JZVjJ2bTRhRjDSAVhBVV95cUxPd2JJSGVkNFhhTWVkNFdhdHdOVnJBaV9KbXBlOEJhUkNVdVNCcDh4NGp6bzJ6NWRGa3FPcFNQTDJoTm5ZWU8zaVpOamhmUm9SWVYydm00YUYw?oc=5"
-        },
-        {
-          "title": "“갯벌, 인천이 품은 보물” 축제, 24일 송도 해돋이공원 개최",
-          "publisher": "ASK Inno",
-          "published_at": "2026-10-21T11:09:54+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFB4ZEdmRmFGNzJZSE1fbEdBYnV2QUM2SVBEbHhQRkxkZEgwc1laVHpNSVJzWS1CVjlhdWdpRXBlUDR4NFZjcmxNc0w4ZHEzQWx4a0FoSE1jbzA2RTYtZjVybzhjWk5ldkR2?oc=5"
-        },
-        {
-          "title": "갯벌, 인천이 품은 보물 축제 24일 송도 해돋이공원 개최",
-          "publisher": "인천뉴스",
-          "published_at": "2026-10-21T11:08:38+09:00",
-          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE11cnpRN0pzTWNpa1ZNSVFtQkJCVTJSYmk3c2lyVXpraWxEWFNxUmpnWnBHQzI3MmI0VFBaZEJHTlpLWWNFak9mM0dmS0RYYnRoekZtT3g2UDNTVndTaTBIWi1lVDNQdFNXcGtzMHNLUQ?oc=5"
-        },
-        {
-          "title": "송도 해돋이공원서 24일 ‘갯벌, 인천이 품은 보물’ 환경인식 개선 축제",
-          "publisher": "인천투데이",
-          "published_at": "2026-10-21T10:57:45+09:00",
-          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE1JV0RCdWgweWY3VHh3QjV4TmpibXZ6V3Z3endrMlFtd0QzblFCYXBiYUVacEhuZG4tc0pPdmNlN192bkdoTnpzbWthaExVQ1R0aTNmN3ZKdWp4NUdDdTlTMFZwUURtUlMxUzFmaXZYWkM?oc=5"
-        },
-        {
-          "title": "인천 갯벌 가치 알리는 ‘갯벌, 인천이 품은 보물’ 축제 24일 송도서 열려",
-          "publisher": "기호일보",
-          "published_at": "2026-10-21T10:03:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE45UTNUSHNYYzAtMHc1Z1A5U2ZqY0p3T09LSUJPaTJSXzZLVkZfMmlFaDNwXzhMS0c0bTE3SjVmVnMzeDNuUnFlRkJELU5US3N3dURjWTZBUkY0Q2p6TG9qRWdfZlo3c3pQZUVuUEEyYw?oc=5"
-        },
-        {
-          "title": "송도 해돋이공원서 ‘갯벌, 인천이 품은 보물’ 축제 개최...SK인천석유화학 후원",
-          "publisher": "중부일보",
-          "published_at": "2026-10-21T09:50:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5sN2pwZTktb2pQN1NCYngyWXJDR2psY2dVMFgzRW9OT2NaclVGZXkyT0t4WGpwNy0yNkdPTERSdmx0UGZJSFkwNGduOXhkOUI4ck1HTHU3V0lPZTBiRG44LTVteERaaURUMVBQQ1dwYw?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://localsegye.co.kr/amp/1065590722555110",
-      "summary_version": 3
-    },
-    {
       "id": "bcce290d9bcab1",
       "category": "세금·대출",
       "title": "갈수록 불어나는 대기업 사내대출…직장 복지가 가르는 ‘내집 마련’ 격차",
@@ -741,8 +872,8 @@
       "title": "송도건강센터, ‘허리통증 예방과 운동법’ 강좌 개최",
       "summary": "인천시 연수구 송도건강생활지원센터가 허리통증 예방과 운동법 건강강좌를 개최한다.\n경인권역재활병원 물리치료사가 허리통증 원인과 가정에서 할 수 있는 운동법을 안내한다.\n참여를 원하는 주민은 10월 22일부터 연수문화포털이나 전화로 선착순 신청할 수 있다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
+      "article_count": 2,
+      "publisher_count": 2,
       "last_published_at": "2026-10-21T14:17:03+09:00",
       "sources": [
         {
@@ -750,6 +881,12 @@
           "publisher": "인천자치신문",
           "published_at": "2026-10-21T14:17:03+09:00",
           "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTFBxNDU1dndNLWtwdFFlS3dpdmdaRmYwSXFEdUx2RmtNbkplSU92cEk0TWtuTnNkUkpMWWl5ZGJwSzNiamRQdHU1RkxrNTBuTUt6NkVXaXJqTFkxLU5peWtyWVVDdjhCaXM?oc=5"
+        },
+        {
+          "title": "송도건강생활지원센터, ‘허리통증 예방과 운동법’ 건강강좌 참가자 모집",
+          "publisher": "미디어생활",
+          "published_at": "2026-10-21T10:30:42+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE9WLVd2OF84NzBrMnhDMFFEMFVHV3dHQ0xDUHM4dTVQbzU5Q1JkSW43TnpKUmlYODlvU3FhMThyOHZMajk2bHZWdVZrYU1TUUtoaGdIYWxBX080UUZxdXd0X0NLTHBDZjBWbkE?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -758,21 +895,15 @@
       "summary_version": 3
     },
     {
-      "id": "b39e3cfa892ec3",
+      "id": "8c729f43eb0cbf",
       "category": "송도 종합",
-      "title": "송도3동 지역사회보장협의체, 취약계층 30가구에 가정용 구급함 지원",
-      "summary": "인천 연수구 송도3동 지역사회보장협의체는 취약계층 30가구에 가정용 구급함을 지원한다고 밝혔다.\n이번 사업은 한국가스공사 인천기지본부 공모사업비 186만 원으로 마련됐다.\n협의체 위원들은 오는 10월 말까지 대상 가구를 방문해 구급함을 전달할 예정이다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 2,
-      "publisher_count": 2,
-      "last_published_at": "2026-10-21T12:21:29+09:00",
+      "title": "연수구 송도3동 취약계층 30가구에 구급함 지원",
+      "summary": "연수구 송도3동 지역사회보장협의체는 취약계층 30가구에 가정용 구급함을 지원했다.\n이번 사업은 한국가스공사 인천기지본부 공모 사업비 186만 원을 활용해 진행됐다.\n협의체 위원들은 10월 말까지 대상 가구를 방문해 구급함을 전달할 예정이다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-10-21T11:53:54+09:00",
       "sources": [
-        {
-          "title": "송도3동 지역사회보장협의체, 취약계층 30가구에 가정용 구급함 지원",
-          "publisher": "세정포커스",
-          "published_at": "2026-10-21T12:21:29+09:00",
-          "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE5oczN1Wm40VWs3YXlESG9Sa3YzNFg0N3NaOGt6cWZsZmZvOXhvOTFhS3JCQ0FlTE1QSXlrcDQxajZKUnZ0N25YZjBfVWdENldMRmV5UDA2V1llalNjWG9qN1NvbnQ3SkNWSnB3Nzh3?oc=5"
-        },
         {
           "title": "연수구 송도3동 취약계층 30가구에 구급함 지원",
           "publisher": "국제뉴스",
@@ -782,7 +913,7 @@
       ],
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.sejungfocus.com/news/articleView.html?idxno=19263",
+      "summary_source_url": "https://www.gukjenews.com/news/articleView.html?idxno=3727877",
       "summary_version": 3
     },
     {
@@ -903,8 +1034,8 @@
       "title": "인천경제청, IFEZ 송도에 글로벌 바이오 캠퍼스 실습교육장 오픈… 국제 바이오 인력양성 거점 강화",
       "summary": "인천경제청은 송도 연세대학교 국제캠퍼스에서 글로벌 바이오 캠퍼스 실습교육장 개소식을 개최했다.\n실습교육장은 연세대학교 국제캠퍼스 내에 위치하며 면적은 2,492㎡ 규모로 조성됐다.\n인천경제청은 2024년부터 2028년까지 글로벌 바이오 캠퍼스 교육훈련 운영에 총 90억 원을 지원한다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 15,
-      "publisher_count": 14,
+      "article_count": 11,
+      "publisher_count": 11,
       "last_published_at": "2026-10-21T10:20:34+09:00",
       "sources": [
         {
@@ -933,27 +1064,9 @@
         },
         {
           "title": "송도에 글로벌 바이오 캠퍼스 실습교육장 문 열어…국제 바이오 인력양성 거점 강화",
-          "publisher": "한국시사경제",
-          "published_at": "2026-10-20T22:10:07+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE5UU3hfVE1WVGJ4UjhIV3BtSFJvRjgtZUVGcFBPSGVOZlVwNWNJT3J6RTUxaDBkV2JuekdoRkE0YloxOTRsTGZ3V1hZNDBUQjZGYmNrdjFxNGtBTlo1RzZfOVYxdlJPSlBYM2c?oc=5"
-        },
-        {
-          "title": "송도에 글로벌 바이오 캠퍼스 실습교육장 문 열어…국제 바이오 인력양성 거점 강화",
           "publisher": "문화매일신문",
           "published_at": "2026-10-20T21:59:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBPT08wWXRRRndjTlMwbTJGZXBUQ0EyTy1ieTdKRzRMa1NBUkZNQjZldkU2UktzLVA3NnNRdXFaUHVrQUR1blNLTVVIVzAwTzFLLURWeEJWUEZpNjVvYVlsTFhVVQ?oc=5"
-        },
-        {
-          "title": "송도에 글로벌 바이오 실습교육장 개소…WHO 협력 강화 : 건강",
-          "publisher": "재경일보",
-          "published_at": "2026-10-20T18:20:55+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE9sS3pYS044T0JHZVo4a2lpcjVqQjN4UnowN280NTQ2VU9mRGRBUlRhVmNBT0RIMHJjSDF6ckZxTXd5NW53MXJHMWlKSQ?oc=5"
-        },
-        {
-          "title": "인천 송도에 글로벌 바이오 실습교육장 개소…정부·WHO 협력(종합)",
-          "publisher": "연합뉴스",
-          "published_at": "2026-10-20T17:30:53+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1sdlE1VnZFNExEaXhsc0JGbUh1akxUeWg2XzdVSE1ZLWhTYkJ5VVVCRXhndGZmOTFXRjRFc0pzelpsempybERhMm4tX1p4ZVphVUFTZGFpZXRCN3PSAWBBVV95cUxNTUMzTkJ0dFQ1OGJJbTZGSVhWWU5OYWVrM2VDemR2c0cwLWNpZVRLbF8xbjVnNjNId0RIRkJqOGNNcFJvNWRXdmlWVDY0YzhHSksyTU9mdTJDSWRQVDB2ODI?oc=5"
+          "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE5NdG9VYjh2SFAta1UwMHJoTVc4ZmFXMUVfRlpCNngwSnREclpKdzZyb0hZUDZ1SXZqN2JZM1Q1ZzRjWU9TVWJtdTZsNWxYVmJ6bEFRR0h3?oc=5"
         },
         {
           "title": "송도 글로벌 바이오캠퍼스 실습교육장 개소···인력양성 거점",
@@ -966,6 +1079,24 @@
           "publisher": "브릿지경제",
           "published_at": "2026-10-20T17:17:00+09:00",
           "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE9ETjduT3BjNHpWLVlUTHY3TVo4al9ZU0lpZExQVlV4blRKRHFkcUhsOGpzQUJubXNQdHZLSUpJbzQyV1N1R0wwSWpCdmtDRUVtb3BFRC1SbTQyQQ?oc=5"
+        },
+        {
+          "title": "인천 송도에 ‘글로벌 바이오 캠퍼스 실습교육장’ 개소… 국제 인력양성 거점 강화",
+          "publisher": "헤럴드경제",
+          "published_at": "2026-10-20T16:59:20+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE14a2NzRUNVc1kwQTRmMUxoRF9HODE1NDBGNHY5c0N1RUVRSGZJbC1udktTa3RvWElJNEw0TGQzZkxfQl9FdWh3LTc5M2JDaHA5Ny16M0t3?oc=5"
+        },
+        {
+          "title": "송도 글로벌 바이오 캠퍼스 실습교육장 문 열어",
+          "publisher": "인천in 시민의 손으로 만드는 인터넷신문",
+          "published_at": "2026-10-20T16:40:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1YRWhEbFZPaWJXaU1iN0RFSktuNlo1MDNHSkhMZ3hkcEstMkUxc2wtMTUxYk8wb1NuVUZNd19IcnJldDdRX3dpSUIwWGJJNklla1JPQVlCak1zWS1WQnpRbG9JYWFTVHRpbHhkeA?oc=5"
+        },
+        {
+          "title": "송도 글로벌 바이오 캠퍼스 실습교육장 문 열어…중·저소득국 바이오 인력 양성",
+          "publisher": "경기일보",
+          "published_at": "2026-10-20T16:27:51+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE4ta0NEZkJqWU03RnJJcV8tcVYyV0NvY2JMa2lLSGpWMF96THZ2ZU03NG0ySF9ITEEyQnVHdXU1OS1JNVo1WkJrTEQ1MHBaNnNwYU9sbDQ5Q0NKSWc?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -1045,8 +1176,8 @@
       "title": "송도에 WHO ‘글로벌 바이오 캠퍼스 실습교육장’ 둥지",
       "summary": "인천 송도 연세대 국제캠퍼스에 글로벌 바이오캠퍼스 실습교육장이 개소했다.\n연면적 2492㎡ 규모의 교육장 운영은 글로벌바이오인력양성허브지원재단이 맡는다.\n인천경제청은 2028년까지 총 90억 원을 지원해 실습교육 기반을 확충할 예정이다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 5,
-      "publisher_count": 5,
+      "article_count": 1,
+      "publisher_count": 1,
       "last_published_at": "2026-10-21T09:45:00+09:00",
       "sources": [
         {
@@ -1054,30 +1185,6 @@
           "publisher": "인천자치신문",
           "published_at": "2026-10-21T09:45:00+09:00",
           "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTFBUd0ZuLXg0b215Mnh4eERvV2IzM0J2Y3RnSmUzcnA4WEh0SkxtRzJqRzdKcDA2bWF1ZDIwSVZiTVFNMjR1TUpRcU9HUF9GWlpoTklSbHZvMVNqS2V2UWVZaVB6aFo4NTA?oc=5"
-        },
-        {
-          "title": "인천 송도에 ‘글로벌 바이오 캠퍼스 실습교육장’ 개소",
-          "publisher": "기호일보",
-          "published_at": "2026-10-21T06:02:35+09:00",
-          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE4wd0NabzM5blJlRXFHN0ViUHE0LUF1NlFqcF9yZVpQNUFMbUZ4QXRNMFgybzFTWVduUzJKWEJvendDWUJsREFTV3dLZXp0UWhfM0tOa3A4SUVBUURKWnd6WTR4NmI4NS01STFNVmx4SQ?oc=5"
-        },
-        {
-          "title": "인천 송도에 글로벌바이오캠퍼스 실습교육장 개소",
-          "publisher": "뉴스1",
-          "published_at": "2026-10-20T21:50:54+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE00Vno0NmM3amRBX0VaNUlFaVFvVGJxVjl0dHhydnlPLW9EN3pvWDJacWIyUVVNR2g4U2xNWlRXclVCcDBoanVyNFNnbw?oc=5"
-        },
-        {
-          "title": "인천 송도에 글로벌 바이오 실습교육장 개소…WHO 사무총장 참석",
-          "publisher": "신아일보",
-          "published_at": "2026-10-20T16:43:59+09:00",
-          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTFBUWTVYQl8xallfeE5QeVFjdlhMU294dTZXRFA4clN5aFU4WHlXMnZvMHVNVFowTURpTi16OTNqV1pHYUlIT2k0RWIxeERHSWM3RURCY01lQndIN0FiZ2ZWZ3BncmpPQncwcjhQaVZfNGY?oc=5"
-        },
-        {
-          "title": "WHO 사무총장 찾은 인천 송도...글로벌 바이오 캠퍼스 실습교육장 개소",
-          "publisher": "미디어인천신문",
-          "published_at": "2026-10-19T16:00:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE0tNC10TEZjT25nNmRlTmRHUi0wNl9nMmRxRGRxb29jalkyMEE1MFBTLVR0MUtmbUJsSnVUNFBLN2pnMWJ2d2VIa3hySzVrQk9XY2ozVnByY1pXNVNRekxtSXZpaWRvYUNJRkpz?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -1154,8 +1261,8 @@
       "title": "인천 송도에 ‘글로벌 바이오 캠퍼스 실습교육장’ 개소… 전문인력 양성 추진",
       "summary": "중·저소득국 백신 생산인력을 양성하기 위한 글로벌 바이오 캠퍼스 실습교육장이 개소했다.\n실습교육장은 인천 연세대학교 국제캠퍼스 내에 자리 잡았으며 면적은 약 2492㎡이다.\n해당 시설은 20일 개소식을 갖고 문을 열었다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 3,
-      "publisher_count": 3,
+      "article_count": 9,
+      "publisher_count": 8,
       "last_published_at": "2026-10-21T09:05:48+09:00",
       "sources": [
         {
@@ -1171,10 +1278,46 @@
           "link": "https://news.google.com/rss/articles/CBMiekFVX3lxTE1Oc0pCRS1RdzhZUm9xVnpuMWNSZ2h2bHdwdmMwTUxfX3pSRlpHdlE5VmxERlA5Mk1Tc2U0S0F3SXBLVWMwaEF2VnNtRXA5bURfTnF1Y05WNXJNMkVOWFo1SjAwNEZxSjB3enktSFNYZVZsSDNmcE5wVzFB0gF_QVVfeXFMTmNXbmxUS3I4NjZlOUZlSDFweVJjdWJySVc3RE5OS2dBZXBWUzB2ajYwVFJNcGs0alIzejJsUk9lbnRtMXFlVDRhdTZnaFlpTnF2NndlSHhtTlplU3BvYldBMElrQXJSaVN3aWlnQmhnQTNpNHVCamRiaDVCS3BVaw?oc=5"
         },
         {
+          "title": "인천 송도에 ‘글로벌 바이오 캠퍼스 실습교육장’ 개소",
+          "publisher": "기호일보",
+          "published_at": "2026-10-21T06:02:35+09:00",
+          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE4wd0NabzM5blJlRXFHN0ViUHE0LUF1NlFqcF9yZVpQNUFMbUZ4QXRNMFgybzFTWVduUzJKWEJvendDWUJsREFTV3dLZXp0UWhfM0tOa3A4SUVBUURKWnd6WTR4NmI4NS01STFNVmx4SQ?oc=5"
+        },
+        {
+          "title": "인천 송도에 글로벌바이오캠퍼스 실습교육장 개소",
+          "publisher": "뉴스1",
+          "published_at": "2026-10-20T21:50:54+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE00Vno0NmM3amRBX0VaNUlFaVFvVGJxVjl0dHhydnlPLW9EN3pvWDJacWIyUVVNR2g4U2xNWlRXclVCcDBoanVyNFNnbw?oc=5"
+        },
+        {
           "title": "인천 송도에 글로벌 바이오 실습교육장 개소…바이오 전문 인력 양성",
           "publisher": "뉴스핌",
           "published_at": "2026-10-20T19:15:00+09:00",
           "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE9kRl9fcURUMXpXa3JOSjRLRF9LTTd2Q1dWUTlvaXNIQnVvNVFlRy1yRXoyUklvdnlYZG01MTZHQkJ2eVpTXzE0UFJVQ3BsUndPd1ZCMS1yLVRGWWtX?oc=5"
+        },
+        {
+          "title": "인천 송도에 글로벌 바이오 실습교육장 개소…정부·WHO 협력(종합)",
+          "publisher": "연합뉴스",
+          "published_at": "2026-10-20T17:30:53+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1sdlE1VnZFNExEaXhsc0JGbUh1akxUeWg2XzdVSE1ZLWhTYkJ5VVVCRXhndGZmOTFXRjRFc0pzelpsempybERhMm4tX1p4ZVphVUFTZGFpZXRCN3PSAWBBVV95cUxNTUMzTkJ0dFQ1OGJJbTZGSVhWWU5OYWVrM2VDemR2c0cwLWNpZVRLbF8xbjVnNjNId0RIRkJqOGNNcFJvNWRXdmlWVDY0YzhHSksyTU9mdTJDSWRQVDB2ODI?oc=5"
+        },
+        {
+          "title": "인천 송도국제도시에 글로벌 바이오캠퍼스 실습교육장 개소",
+          "publisher": "연합뉴스",
+          "published_at": "2026-10-20T16:52:26+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE8zNEJISEdmb0NIaUJTYTdENmdnV0FrMGpnMkhaTWlOVEx6eGtpN0s1X0dUNlFaUmxnaWRCUHd0ZVpSYmctNmRHX0cwZlZUQXNZeUNiSWNCa0tUMXfSAWBBVV95cUxPelNlNV9Yek9oa2NkV1lfeGdUbGRFX3VhdnRXLVAwU3lSeWNUSkVRaEJJZWo1YXg5WWJDeVk5cVcwVzU2bUhoQkU0VVFiaFdKSlFXNTlYb19vTGNHaTg1aGI?oc=5"
+        },
+        {
+          "title": "인천 송도에 글로벌 바이오 실습교육장 개소…WHO 사무총장 참석",
+          "publisher": "신아일보",
+          "published_at": "2026-10-20T16:43:59+09:00",
+          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTFBUWTVYQl8xallfeE5QeVFjdlhMU294dTZXRFA4clN5aFU4WHlXMnZvMHVNVFowTURpTi16OTNqV1pHYUlIT2k0RWIxeERHSWM3RURCY01lQndIN0FiZ2ZWZ3BncmpPQncwcjhQaVZfNGY?oc=5"
+        },
+        {
+          "title": "WHO 사무총장 찾은 인천 송도...글로벌 바이오 캠퍼스 실습교육장 개소",
+          "publisher": "미디어인천신문",
+          "published_at": "2026-10-19T16:00:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE0tNC10TEZjT25nNmRlTmRHUi0wNl9nMmRxRGRxb29jalkyMEE1MFBTLVR0MUtmbUJsSnVUNFBLN2pnMWJ2d2VIa3hySzVrQk9XY2ozVnByY1pXNVNRekxtSXZpaWRvYUNJRkpz?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -1188,8 +1331,8 @@
       "title": "인천, ‘IQT KOREA 2026’ 송도컨벤시아서 개최…양자 기술·산업 트렌드 한자리에",
       "summary": "인천시는 세계적인 양자 전시·컨퍼런스 브랜드 IQT의 아시아 첫 행사 'IQT KOREA 2026'을 송도컨벤시아에서 개최한다고 밝혔다.\n행사에는 양자 컴퓨팅과 통신 분야의 국내외 기업 및 연구기관이 참여하여 기술 경쟁과 산업화 방향을 논의하는 컨퍼런스가 열린다.\n이번 행사는 11월 25일부터 27일까지 3일간 개최될 예정입니다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 2,
-      "publisher_count": 2,
+      "article_count": 4,
+      "publisher_count": 4,
       "last_published_at": "2026-10-21T08:49:09+09:00",
       "sources": [
         {
@@ -1197,6 +1340,18 @@
           "publisher": "메트로신문",
           "published_at": "2026-10-21T08:49:09+09:00",
           "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE9HcFg5bnlWVm1hNkdYVjczTXhOUmFEMHlYamFUTFJfRV9RVktsbmw4Z3VzUkNoaFlVRW1DN19lckR2eFpoNzlOYU5pTmJPYXRpYkhkRFpaUVBnaFZMaVZCVg?oc=5"
+        },
+        {
+          "title": "인천, 아시아 최초 양자산업 글로벌 행사 ‘IQT KOREA 2026’ 송도컨벤시아서 개최",
+          "publisher": "서울일보",
+          "published_at": "2026-10-20T12:06:53+09:00",
+          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE1oQ1d6ZWd1VkxyM0JtUmhpNm5oMENpRmtMSTZOTHdMTHFBejdSeDNaSU9yVUJVazk5LU5CbVRacGVadkZfRkNCRkhrVFZseDh0X2hnaXZoNHBrclhoS1dkV2RabEdTU181cEd3OE1Ub9IBb0FVX3lxTE1oQ1d6ZWd1VkxyM0JtUmhpNm5oMENpRmtMSTZOTHdMTHFBejdSeDNaSU9yVUJVazk5LU5CbVRacGVadkZfRkNCRkhrVFZseDh0X2hnaXZoNHBrclhoS1dkV2RabEdTU181cEd3OE1Ubw?oc=5"
+        },
+        {
+          "title": "인천, 아시아 최초 양자산업 글로벌 행사 ‘IQT KOREA 2026’ 송도컨벤시아서 개최",
+          "publisher": "인디포커스",
+          "published_at": "2026-10-20T11:10:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxOMmNJRVd0a0w1UlJBRG5YeG5GVVd2V2lzTVY1UHlqQVYzaXdFTGl4Nk10TnBiVFlrVWp3LW9LRXM0WWhsYUpHODZEaEJLVjA1VWd0cHBUSkJtNHh3czVvcWlZa05DUFZGZlh4NGdUV29abFVhSXRTei16bGlmME9MWW1fZTJXVEVybDZBcXJTN08?oc=5"
         },
         {
           "title": "양자기술 전시 ‘IQT KOREA’ 25일 송도컨벤시아서 개최",
@@ -1208,28 +1363,6 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.metroseoul.co.kr/article/20261021500015",
-      "summary_version": 3
-    },
-    {
-      "id": "d171313977ed7f",
-      "category": "세금·대출",
-      "title": "대기업 사내 주택대출 6370억 '4년만 2배'…일부 계열사 '무이자' 혜택",
-      "summary": "주요 대기업들의 사내 주택구입자금 대출 금액이 매년 증가한 것으로 나타났다.\n올해 8월 말 기준 사내 대출은 6370억7000만원으로 2022년의 2배로 늘었다.\n현대자동차가 2697억9000만원으로 가장 많았고 SK 등 일부 계열사는 무이자 혜택을 제공했다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-21T08:26:01+09:00",
-      "sources": [
-        {
-          "title": "대기업 사내 주택대출 6370억 '4년만 2배'…일부 계열사 '무이자' 혜택",
-          "publisher": "전남일보",
-          "published_at": "2026-10-21T08:26:01+09:00",
-          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE0wSTI3dWJGMzdkZWRYd21STWVxOXhrWGpSZlpxOFp6MFl5VTY5d2xQZmJSTTlwOUVsemFTUFJlbGViNHdicHBtSURZLXFFcGo4SHg1ZEZBTy1zWl9RUm90UXk1WG45U2t2VFkyblNSMA?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.jnilbo.com/news/articleView.html?idxno=90000075256",
       "summary_version": 3
     },
     {
@@ -1294,29 +1427,6 @@
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.newstown.co.kr/news/articleView.html?idxno=719196",
       "summary_version": 3
-    },
-    {
-      "id": "51927f0d57e757",
-      "category": "세금·대출",
-      "title": "9억 아파트 손녀에게 세금없이 물려주기 위해 강남 자산가가 한 일",
-      "summary": "저가 양도 시 시가와 거래액 차액은 2억6400만원이며, 이는 증여세 과표 대상이 0원이다.\n손녀는 증여세를 내지 않고 2,900만원의 취득세만 부담한다.\n저가 양도 가격은 시가의 70%인 6억1600만원으로 설정되었다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-21T06:50:03+09:00",
-      "sources": [
-        {
-          "title": "9억 아파트 손녀에게 세금없이 물려주기 위해 강남 자산가가 한 일",
-          "publisher": "Daum",
-          "published_at": "2026-10-21T06:50:03+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE45U25MUHA0c2dZbkN1d0hGNk1xcUNqV3ZHTV82Y0pJanpEaTdEWmJIMlIzcTNXdW8xRHlmdnI2MHNtWHM5VVc2Z3RxNA?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://v.daum.net/v/UXjwPMYCU0?f=p",
-      "summary_version": 3,
-      "groq_reviewed": true
     },
     {
       "id": "ec89b0f3f59ee5",
@@ -1403,6 +1513,25 @@
       "summary_version": 3
     },
     {
+      "id": "6c1dde544ce189",
+      "category": "송도 종합",
+      "title": "무신사, 인천 최초 오프라인 편집숍 트리플스트리트 송도점 개점",
+      "summary": "",
+      "verification": "기사 본문 요약 대기",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-10-20T23:53:04+09:00",
+      "sources": [
+        {
+          "title": "무신사, 인천 최초 오프라인 편집숍 트리플스트리트 송도점 개점",
+          "publisher": "패션포스트",
+          "published_at": "2026-10-20T23:53:04+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiekFVX3lxTFBabzVLYUJWWnR2d3AwU3R1QVEyWi1LU3pzRzUteVdLclNvOHMzSWdXMUQ1WTFnTTJUTlUxWmlFUFByWWo1amxoajlmQ3VZeERIQ2U0aHVVU0VPcnZqQTVPZDV3MEZOSlJlbURyd3RaZEI1ZkV6cHctMzdB?oc=5"
+        }
+      ],
+      "summary_method": "headline_only"
+    },
+    {
       "id": "d038745642116d",
       "category": "송도 종합",
       "title": "세계 양자기술 기업들 송도로 향한다…인천, 아시아 첫 국제산업전 유치",
@@ -1425,34 +1554,6 @@
       "summary_version": 3
     },
     {
-      "id": "0dd8bf1d27c22a",
-      "category": "송도 종합",
-      "title": "인천관광공사, 양자산업 글로벌 행사 송도컨벤시아서 개최",
-      "summary": "인천시와 인천관광공사는 세계적인 양자기술 전시 컨퍼런스인 IQT KOREA 2026을 개최한다.\n이번 행사는 아시아에서 처음 열리며 송도컨벤시아에서 국내외 기업과 연구기관이 참여한다.\n해당 행사는 11월 25일부터 27일까지 3일간 진행될 예정이다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 2,
-      "publisher_count": 2,
-      "last_published_at": "2026-10-20T23:08:52+09:00",
-      "sources": [
-        {
-          "title": "인천관광공사, 양자산업 글로벌 행사 송도컨벤시아서 개최",
-          "publisher": "일간투데이",
-          "published_at": "2026-10-20T23:08:52+09:00",
-          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTFBBTUVHVk5LNXhTMWJIRFA3aEh5ZFBmRDJMWHhNVDFhdlJsWW5za3pWTlFudlNob1hFWnMxN3ZEVEhHcjhoS0NmSVBTV0xLSlNTaW1Ydy1JcVhiNnFoUVo3b0hDSGQza1ZWdmY0?oc=5"
-        },
-        {
-          "title": "인천, 아시아 최초 양자산업 글로벌 행사 ‘IQT KOREA 2026’ 송도컨벤시아서 개최",
-          "publisher": "인디포커스",
-          "published_at": "2026-10-20T11:10:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxOMmNJRVd0a0w1UlJBRG5YeG5GVVd2V2lzTVY1UHlqQVYzaXdFTGl4Nk10TnBiVFlrVWp3LW9LRXM0WWhsYUpHODZEaEJLVjA1VWd0cHBUSkJtNHh3czVvcWlZa05DUFZGZlh4NGdUV29abFVhSXRTei16bGlmME9MWW1fZTJXVEVybDZBcXJTN08?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.dtoday.co.kr/news/articleView.html?idxno=798269",
-      "summary_version": 3
-    },
-    {
       "id": "d74876ce6f4105",
       "category": "송도 종합",
       "title": "BMW·MINI 송도 전시장·서비스센터 새단장",
@@ -1466,7 +1567,7 @@
           "title": "BMW·MINI 송도 전시장·서비스센터 새단장",
           "publisher": "이데일리",
           "published_at": "2026-10-20T23:01:56+09:00",
-          "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxPYU5zUWc1R0diMGVmTElDVVptYy1QbFFqekt3OTRYdEhlVlV3dTItaXVwOUs1dlBXNEowUnZDSWhiSGdjcFhHdGNiNE9jZ1diYzhTaXI2MEVCTVdWb0ZGWVgxYmdPQkNLb2Rxd0ZNS2JfSE1yNHR1RmtQOV82cFJLMw?oc=5"
+          "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE1MQVBIb0pXb3V5aTZVU1hwWDFJVmNhRWhPRTEtd3JLSWhrVnUwUURldHd2TFlrNXl2UklnVmlkdEVnei1SX3dEUFBiWnh2ZEZ6dC03bDMyT1ZTWGp6MktJOGhfd09jVktXNHY2SXNlc0JJN3Ji?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -1748,6 +1849,34 @@
       "summary_method": "headline_only"
     },
     {
+      "id": "c2f4f672c34caa",
+      "category": "송도 종합",
+      "title": "붕괴 조사 중 터진 100세대 침수…송도 럭스오션SK뷰 부실 논란",
+      "summary": "인천 송도국제도시의 신축 아파트 단지에서 100세대 이상이 침수 피해를 겪었다.\n지난 18일 40㎜ 안팎의 비가 내리면서 창틀과 벽체 균열 사이로 누수가 발생했다.\n해당 아파트는 앞서 외벽 테라스 붕괴 사고로 국토교통부와 인천시의 조사를 받고 있다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 2,
+      "publisher_count": 2,
+      "last_published_at": "2026-10-20T16:27:28+09:00",
+      "sources": [
+        {
+          "title": "붕괴 조사 중 터진 100세대 침수…송도 럭스오션SK뷰 부실 논란",
+          "publisher": "경인방송 뉴스",
+          "published_at": "2026-10-20T16:27:28+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5LTEFHdkQxWG5fVnRNdGd1NUdsLTF4bXJoWE5OaGgwQUZaOEtxdENpNEc0RkNONURYcU0zNHVGMS1wS0dQRUI4VFFGMEY4ZVl6aUZGOGkyZ0hQb1dZNDlOSG1BWmlpRUJj0gFoQVVfeXFMTktMQUd2RDFYbl9WdE10Z3U1R2wtMXhtcmhYTk5oaDBBRlo4S3F0Q2k0RzRGQ041RFhxTTM0dUYxLXBLR1BFQjhUUUYwRjhlWXppRkY4aTJnSFBvV1k0OU5IbUFaaWlFQmM?oc=5"
+        },
+        {
+          "title": "“이번엔 100가구 침수”… 송도 럭스오션SK뷰 부실시공 논란 증폭 [영상]",
+          "publisher": "경기일보",
+          "published_at": "2026-10-19T11:13:02+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTFBaV2lWc0tUNHZaVE42dS1ueE5aa0JIMlZuOUtzQVc4cTM3X2U5SDRManExalluRzZlX0VMT2hQM3Jtd3BPTUtnX3lCV1NUcDF0VXVnMS1ISEJhNzA?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://news.ifm.kr/news/articleViewAmp.html?idxno=482081",
+      "summary_version": 3
+    },
+    {
       "id": "a26b3a711664a6",
       "category": "송도 종합",
       "title": "송도 학원·교습소 985곳 = 목동 규모... '제2의 대치동' 아닌 '송도형 교육도시'로",
@@ -1816,8 +1945,8 @@
       "title": "송도 럭스오션SK뷰, 100여 세대 집단 침수 '충격'...창문 다 닫았는데 물바다",
       "summary": "인천 송도국제도시 신축 아파트에서 100가구가 넘는 대규모 침수 피해가 발생해 부실시공 의혹이 제기됐다.\n입주민들은 이중창을 닫았음에도 빗물이 창틀을 넘어 방 안으로 쏟아지는 피해를 입었다고 호소했다.\n국토교통부와 인천시는 시설물사고조사위원회를 꾸려 다음 달 20일까지 테라스 붕괴 사고 원인을 규명할 계획이다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 2,
-      "publisher_count": 2,
+      "article_count": 1,
+      "publisher_count": 1,
       "last_published_at": "2026-10-20T14:58:58+09:00",
       "sources": [
         {
@@ -1825,12 +1954,6 @@
           "publisher": "인천매거진",
           "published_at": "2026-10-20T14:58:58+09:00",
           "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE5fREQwaXlUNXJ6SWluOHZwSnlFRzYyUlAyeVA3WFFPdnNMMGViMFY1ZDFHRE5IVXhzdFZYWVhKZFJSaFczbFI1NWZudXNYTi10N2NIZUtyR3BqN0NKX2FWVEtKemVVNzdZME5z0gFuQVVfeXFMUDEwZ3RGYzY1S1B3bGx2RFl3YkFYOVMxYWlNTm9vMEctZkNHQUI2amF1Q0tFRGRJTENLRlZpYjZPZGtWdjhNSXpXZE9CM2JwN1lJUy01ZUZrX1VPMHJESDFVel9iOVZXOVRCR214U1E?oc=5"
-        },
-        {
-          "title": "\"창 닫아도 물바다\"…송도 럭스오션SK뷰 100여세대 침수 피해",
-          "publisher": "경인방송 뉴스",
-          "published_at": "2026-10-19T15:02:52+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE9tWEs0cXFiMGJqUlhWQmE5S2ZYbEkzSVg3WklEWUdkaE0wQ3BjX25vYWtxMWQ3dVAtVHhlSjZVblN6OW14Z21UOEhGMlFZbXEwWV9aWnZJYkFTVm85TGpwakRHOUc?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -1844,8 +1967,8 @@
       "title": "서송건설 시공 송도국제도서관, 인천시 건축상 우수상",
       "summary": "서송건설이 시공한 송도국제도서관이 '2026 인천광역시 건축상' 우수상을 받았다.\n해당 도서관은 연수구가 발주한 연면적 8천197㎡의 지하 1층·지상 3층 규모 공공건축물이다.\n서송건설은 2023년 5월 착공해 2025년 6월 준공했으며, 도서관은 같은 해 10월 문을 열었다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 4,
-      "publisher_count": 4,
+      "article_count": 5,
+      "publisher_count": 5,
       "last_published_at": "2026-10-20T14:57:04+09:00",
       "sources": [
         {
@@ -1865,6 +1988,12 @@
           "publisher": "중부일보",
           "published_at": "2026-10-16T19:40:00+09:00",
           "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5QSGZrVDVFOGE5OWx2TG92MzduYVpYcHV3XzhEWWlhVlVlZTJRUDNXSEpUbUkteUw4Zi16bTdRSEJhQy12Zmk2ak4zRDlnaFVGaC0wNVZwaTVkWERuQjFXOHUyaGtsUV9HUU5aWkt3UQ?oc=5"
+        },
+        {
+          "title": "송도국제도서관, 인천시 건축상 우수상…서송건설 시공",
+          "publisher": "파이낸셜뉴스",
+          "published_at": "2026-10-16T19:37:56+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE5Uem5Tc0lBTnVvRnAwdGFXYzR2OTYySG9yRnVLZWZUcExtcVM2OUVCdm8yWGU1aEVROHpCRmZVNm9adjRLbDJ6aDd3eXVzd2djYmRJRElabV9Ddw?oc=5"
         },
         {
           "title": "송도국제도서관, 인천시 건축상 우수상…서송건설 시공",
@@ -2024,7 +2153,7 @@
           "title": "아시아 첫 'IQT KOREA 2026' 송도 개최 확정",
           "publisher": "숙박매거진",
           "published_at": "2026-10-20T11:12:10+09:00",
-          "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE9BNWxsUldrbkNJSWN2ZmlhVHFYZDN6MHctdHAtam1XYngxOGprQk5nT0kyYXF6N3g2Ulp5eVVoMVFLWFhIdkZPTUYyUHl4S3ZCZVpYZ1FFcHdIRnRud0JCb3hnVmtrQzBuLU15V0c5VUNsUQ?oc=5"
+          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9vaTFhWS1HMWs5WGdhNDhIWXpWV2JPR0tzWXN4anJiLTJ6YTY2aHlKNjBrV1ZPZW02dzJrX0NEMk85Mkl4ZS1pWXhYUmxzTlY2T3VCbHAwTmJ0czU2SkdOVnp1V01SbFRtYTBoeTR1THc?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -2127,6 +2256,25 @@
       "summary_version": 3
     },
     {
+      "id": "5b55d5e863caf0",
+      "category": "송도 종합",
+      "title": "바바리안모터스, ‘BMW·MINI 송도 통합 전시장’ 리뉴얼 오픈",
+      "summary": "",
+      "verification": "기사 본문 요약 대기",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-10-20T10:26:17+09:00",
+      "sources": [
+        {
+          "title": "바바리안모터스, ‘BMW·MINI 송도 통합 전시장’ 리뉴얼 오픈",
+          "publisher": "고카넷",
+          "published_at": "2026-10-20T10:26:17+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE5vWnVTdzY3MUktblpkTGRZUnZkZjM3eXUzY1doSVdkbndJRnpMY3dMTEpmUEFQOG9SZ29XZWVvbk5RbTZZa3hnb1J2X2UwdXlnMXZwV19DNWxsYmJ3Z255UGR3MVg?oc=5"
+        }
+      ],
+      "summary_method": "headline_only"
+    },
+    {
       "id": "cade8179a5530d",
       "category": "세금·대출",
       "title": "[초점] DSR 비켜간 ‘삼성 대출’…가계부채 규제 형평성 논란",
@@ -2175,6 +2323,25 @@
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.asn24.com/news/articleView.html?idxno=576279",
       "summary_version": 3
+    },
+    {
+      "id": "d44dea2267dabf",
+      "category": "송도 종합",
+      "title": "양자기술 기업·투자자 송도에 모인다…‘IQT KOREA 2026’ 11월 개최",
+      "summary": "",
+      "verification": "기사 본문 요약 대기",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-10-20T09:07:07+09:00",
+      "sources": [
+        {
+          "title": "양자기술 기업·투자자 송도에 모인다…‘IQT KOREA 2026’ 11월 개최",
+          "publisher": "인천게릴라뉴스",
+          "published_at": "2026-10-20T09:07:07+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTFA2cUxLR0xaejFYMllFVEREQ1F5UTJhMXBvd2w2cDRIbzVRa2ZpM0VTV2hVUm12eWswUk1xVzZoUHhzUXJJM1FxZ085ekZkbXh2WG1ldUlfUHJnaGRSWHZLU0tEc0E2UQ?oc=5"
+        }
+      ],
+      "summary_method": "headline_only"
     },
     {
       "id": "3f1cce81e4a8ef",
@@ -2373,8 +2540,8 @@
       "title": "“제주가 왔송도!”…인천 송도에 뜬 제주관광 팝업, 3만명 발길",
       "summary": "제주특별자치도와 제주관광공사는 인천 송도에서 제주관광 팝업 행사를 개최했다.\n이번 행사에는 이틀간 3만여 명이 방문해 다양한 체험과 이벤트를 즐겼다.\n행사는 지난 17일부터 이틀간 인천 현대프리미엄아울렛 송도점 분수광장에서 진행됐다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 9,
-      "publisher_count": 9,
+      "article_count": 8,
+      "publisher_count": 8,
       "last_published_at": "2026-10-19T17:05:00+09:00",
       "sources": [
         {
@@ -2424,12 +2591,6 @@
           "publisher": "헤드라인제주",
           "published_at": "2026-10-19T11:58:07+09:00",
           "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTE5qUGY3REt2WTRiRTJuZFdiSjVFMEFzV0o4SDdZMHozX3BnRU8wbFFXRzY1a2NIbG53SnMzaW5qRXVQNVRNMGNSd2RXMmwtbUJnNmo5M2VzZGhMNHMxUk5HbHd0aDNVUV94alVrSVBQSHRtQWM?oc=5"
-        },
-        {
-          "title": "제주관광공사, 인천 송도서 ‘제주가 왔송도!’ 행사 연다",
-          "publisher": "중앙일보",
-          "published_at": "2026-10-15T14:06:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE1Zd2dvM0VZanYyaUxNVG9keUdtNXgyWEZqRlZsYy01MDVod2RORDNuNEVnNlN0QmxzZzhSbTV1VkhXd0lPX1VaYlFmdUFoSDlJakNNQ01B?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -2464,7 +2625,7 @@
       "category": "송도 종합",
       "title": "골든벨부터 코스튬까지...24일 송도서 '인천 갯벌 보물 축제' 개막",
       "summary": "인천지역 환경단체와 기업이 시민들과 함께 갯벌의 생태적 가치를 나누는 2026 갯벌, 인천이 품은 보물 축제가 열린다.\n행사장은 갯벌, 철새, 해양생물 등 3개 주제의 체험 부스로 꾸며지고 다양한 퀴즈대회와 콘테스트가 진행된다.\n올해로 3회째를 맞는 이번 행사는 오는 24일 송도 해돋이공원 잔디광장에서 개최될 예정이다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-10-19T16:00:00+09:00",
@@ -2509,8 +2670,8 @@
       "title": "인천 송도 럭스오션SK뷰, 테라스 붕괴 이어 대규모 침수 피해",
       "summary": "",
       "verification": "기사 본문 요약 대기",
-      "article_count": 3,
-      "publisher_count": 3,
+      "article_count": 4,
+      "publisher_count": 4,
       "last_published_at": "2026-10-19T15:40:28+09:00",
       "sources": [
         {
@@ -2518,6 +2679,12 @@
           "publisher": "경기일보",
           "published_at": "2026-10-19T15:40:28+09:00",
           "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE55Yy1YT2hKOXdTMFZFYzRmZWxGdnV1d2lHUm5UcGVwYmV0b1pGcEZxblNYMW9WSGVNRUlKNFhWcUVqSElvb0FTcDlCOVdzZndRRGphUGR6Z2dXOWc?oc=5"
+        },
+        {
+          "title": "\"창 닫아도 물바다\"…송도 럭스오션SK뷰 100여세대 침수 피해",
+          "publisher": "경인방송 뉴스",
+          "published_at": "2026-10-19T15:02:52+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE9tWEs0cXFiMGJqUlhWQmE5S2ZYbEkzSVg3WklEWUdkaE0wQ3BjX25vYWtxMWQ3dVAtVHhlSjZVblN6OW14Z21UOEhGMlFZbXEwWV9aWnZJYkFTVm85TGpwakRHOUc?oc=5"
         },
         {
           "title": "송도 럭스오션SK뷰 대규모 가구 침수 피해 속출",
@@ -2704,7 +2871,7 @@
       "title": "\"10억짜리 집, 비 뚝뚝\"...'발코니 붕괴' 송도 아파트, 폭우에 100세대 침수",
       "summary": "인천 송도국제도시의 한 신축 아파트에서 폭우로 인해 약 100세대가 침수 피해를 입었다.\n입주민들은 창틀을 뚫고 빗물이 넘어오거나 원목마루가 침수되는 등의 피해를 겪었다.\n이 단지는 SK에코플랜트가 시공해 2025년 3월 입주를 시작한 1114세대 규모이다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 3,
+      "article_count": 4,
       "publisher_count": 3,
       "last_published_at": "2026-10-19T14:11:31+09:00",
       "sources": [
@@ -2725,6 +2892,12 @@
           "publisher": "뉴시스",
           "published_at": "2026-10-19T10:23:09+09:00",
           "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBfaU1XQmQzY0RJYzZ6VzJwYXpFejZDRzV6bG5zTElzWXhQSzFqUm1OQWVYbUUxQjdSQ210aUVLSVh0SktiYWZaMjFMU096SzlXX1B3WXJhTko4b2wxQXJSSG9YSUhEU01UNWhkNllBdTJ4bFlxNE1aStIBeEFVX3lxTFBfaU1XQmQzY0RJYzZ6VzJwYXpFejZDRzV6bG5zTElzWXhQSzFqUm1OQWVYbUUxQjdSQ210aUVLSVh0SktiYWZaMjFMU096SzlXX1B3WXJhTko4b2wxQXJSSG9YSUhEU01UNWhkNllBdTJ4bFlxNE1aSg?oc=5"
+        },
+        {
+          "title": "송도 발코니 붕괴 아파트, 폭우로 물 새 100여 가구 침수",
+          "publisher": "파이낸셜뉴스",
+          "published_at": "2026-10-19T10:21:40+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE9PNlo1ZHNEUEp5WTJoYlppQVpXVktiTkphc01Qa3FLZzJNQlBqcU1GN0c1MXZMZDhLNXVEdldXZG1PdHo3Rlp6UHZITHFlWERQSFpnRi1rbFhZZw?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -2737,7 +2910,7 @@
       "category": "송도 종합",
       "title": "[창간22주년 특집: 롯데건설, 다음을 짓다]② 롯데건설, 8750억 바이오 EPC 수행…12만L 송도공장서 첨단시공 경쟁력 키운다",
       "summary": "롯데건설이 8750억원 규모의 송도 바이오캠퍼스 제1공장 EPC 계약을 수행했다.\n제1공장은 1만5000리터급 바이오리액터 8기를 갖춰 총 12만 리터 규모로 설계됐다.\n롯데건설은 2024년 8월 계약을 체결하고 올해 6월 건축물 사용승인을 획득했다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-10-19T13:52:59+09:00",
@@ -2840,28 +3013,6 @@
       "summary_version": 3
     },
     {
-      "id": "a448ec0dfbf4fe",
-      "category": "송도 종합",
-      "title": "“이번엔 100가구 침수”… 송도 럭스오션SK뷰 부실시공 논란 증폭 [영상]",
-      "summary": "인천 송도국제도시 럭스오션SK뷰 아파트에서 대규모 침수 피해가 생겼다.\n앞서 테라스 구조물 붕괴가 발생한 데에 이어 100가구 이상의 침수 피해가 발생했다.\n송도 럭스오션SK뷰 입주민 비상대책위원회는 시와 인천경제자유구역청 등에 공문을 보낼 계획이다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-19T11:13:02+09:00",
-      "sources": [
-        {
-          "title": "“이번엔 100가구 침수”… 송도 럭스오션SK뷰 부실시공 논란 증폭 [영상]",
-          "publisher": "경기일보",
-          "published_at": "2026-10-19T11:13:02+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTFBaV2lWc0tUNHZaVE42dS1ueE5aa0JIMlZuOUtzQVc4cTM3X2U5SDRManExalluRzZlX0VMT2hQM3Jtd3BPTUtnX3lCV1NUcDF0VXVnMS1ISEJhNzA?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.kyeonggi.com/article/20261019580111",
-      "summary_version": 3
-    },
-    {
       "id": "bc8d3c21731757",
       "category": "정책·규제",
       "title": "빌라 전월세도 씨가 말랐다…인천 54%·경기 43% 매물 실종",
@@ -2933,8 +3084,8 @@
       "title": "GTX-B 청학역 신설, 중앙투자심사 통과…2034년 개통",
       "summary": "인천시 연수구 청학사거리 일대에 GTX-B 노선 추가 정거장을 건설하는 사업이 행정안전부 중앙투자심사를 통과했다.\n사업비 2694억 원은 인천시가 전액 부담하며 민간사업시행자에게 건설과 운영을 위·수탁하는 방식으로 추진된다.\n인천시는 연내 위·수탁협약을 체결할 방침이며 2034년 초 개통을 목표로 사업을 추진하고 있다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 9,
-      "publisher_count": 9,
+      "article_count": 11,
+      "publisher_count": 11,
       "last_published_at": "2026-10-19T02:42:56+09:00",
       "sources": [
         {
@@ -2968,6 +3119,18 @@
           "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE10bmRiT0hQbkx4Mk9jNWJGbnRtQXY1cGRjY0E5R0hDTXp6LVlUOFVwSWRvUzhfVjNRcmR2dFZuLUphMUczVGNTNEJ6QzNNOVpjcFY3QTN6d3JpV2dHR1VBRzBzS3dVLW_SAWtBVV95cUxQRmw4T1ZVNW5CSUMtZnZQeWRoMG9LSTJocVNNblNNTkFJdzRkRjB2NEs2MGZOc1BJNXNnR0pLWldPYjJSZjVsVjRrNTBXSDFqdmRUV0psT1I5S3dkSTJYbk5uUmlaN282S2Vxcw?oc=5"
         },
         {
+          "title": "GTX-B 청학사거리 추가역 짓는다…2694억원 들여 2034년 개통",
+          "publisher": "뉴스21 통신",
+          "published_at": "2026-10-16T12:32:11+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFA4ck43amYwX0RWdXU2cXVUVFpIWHpaWGVmd1NseDNRelJwaXd3TThxUWh3Um1kMW1SUWwxUzZ1RTZYd0pjMURLaVJUeHZLeVFIUm9tVzN3?oc=5"
+        },
+        {
+          "title": "인천 청학사거리 GTX-B역 신설 확정…2694억원 투입해 2034년 개통 추진",
+          "publisher": "주간한국",
+          "published_at": "2026-10-16T12:21:27+09:00",
+          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5CUmJTQmFBY0txNHdXcjZtTUdVcGhUTWxWamp0U3VESmdBV05aQTVTcDJCN0VpanRnY3pNQ1puNG1DMVRLZTVoZkpSTzBNT3ltZlF1NUdfNDdQZWtQNGNyWEktVEotWkE4cHZJb3pvNFjSAXRBVV95cUxQQVUtNzlFTTMyWDJON29rdFMxV2RaQ2dYeTJJNVp2STNqc1FRcnpud0xQQThOeE9qLVh4Q1V3NWhwTWh6VW5JQXQ5d0JOeE9QYmhzc2V5NUhvaVVDN3cyTGc5d1VvbnU5djl1cml4SG9qcFlKVg?oc=5"
+        },
+        {
           "title": "GTX-B 인천 청학역 신설…행안부, 중투심 통과",
           "publisher": "매일경제",
           "published_at": "2026-10-16T10:56:20+09:00",
@@ -2984,37 +3147,12 @@
           "publisher": "디스커버리뉴스(DISCOVERYNEWS)",
           "published_at": "2026-10-16T09:43:43+09:00",
           "link": "https://news.google.com/rss/articles/CBMickFVX3lxTFB3MFVsOUh2RDViaWttMmNQbmEyRlhzT2pNbWpFQ1BjN1lHdktvWmdaN3R6M1M3Vmc2bGpOM2J5VTJranNaYWtIRWJBQ0dUX3NKNl9ybVJmcDlxQ043NEVCWWFMZG9PbG1EcnNmUmM2NDZsZw?oc=5"
-        },
-        {
-          "title": "인천 GTX-B 청학역 신설 중앙투자심사 통과",
-          "publisher": "일간경기",
-          "published_at": "2026-10-16T09:30:17+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFB1OFBPOFcyOVJkWnVHWlpLTUZoLUc2anJvbmJDbmp5WkJFMWtSREQyd1BBWFBDZnVqN0liMldubTRSN0VLUGRNTDRWdmhxTVBpclNOT0FVd28tNG5WdnN3RXNpU3V4NzNz?oc=5"
         }
       ],
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://ic.newdaily.co.kr/site/data/html/2026/10/19/2026101900008.amp.html",
       "summary_version": 3
-    },
-    {
-      "id": "6c1dde544ce189",
-      "category": "송도 종합",
-      "title": "무신사, 인천 최초 오프라인 편집숍 트리플스트리트 송도점 개점",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-18T21:11:23+09:00",
-      "sources": [
-        {
-          "title": "무신사, 인천 최초 오프라인 편집숍 트리플스트리트 송도점 개점",
-          "publisher": "패션포스트",
-          "published_at": "2026-10-18T21:11:23+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiekFVX3lxTFBabzVLYUJWWnR2d3AwU3R1QVEyWi1LU3pzRzUteVdLclNvOHMzSWdXMUQ1WTFnTTJUTlUxWmlFUFByWWo1amxoajlmQ3VZeERIQ2U0aHVVU0VPcnZqQTVPZDV3MEZOSlJlbURyd3RaZEI1ZkV6cHctMzdB?oc=5"
-        }
-      ],
-      "summary_method": "headline_only"
     },
     {
       "id": "60d89c3e08bdb3",
@@ -3058,28 +3196,6 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.sedaily.com/article/20103003",
-      "summary_version": 3
-    },
-    {
-      "id": "83974db51dfe71",
-      "category": "정책·규제",
-      "title": "추미애 '교통·주택정책·언행' 집중 표적",
-      "summary": "추미애 경기도지사의 핵심 공약인 광역교통망 확충과 주택 공급 정책이 국정감사에서 검증받을 전망이다.\n이번 국토위 국감에서는 도의 재정 압박이 핵심 개별 공약 사업에 미칠 악영향과 재원 조달 방안이 집중 표적이 될 것이다.\n오는 19일 열리는 국회 국토교통위원회 경기도 국정감사에서 관련 현안들이 다뤄질 예정이다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-18T16:39:00+09:00",
-      "sources": [
-        {
-          "title": "추미애 '교통·주택정책·언행' 집중 표적",
-          "publisher": "인천일보",
-          "published_at": "2026-10-18T16:39:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5ldTYyeWtuR3d5OTJnVmVsd0Fld1pWSENLeGJGWXYtVG0tcldfcENVYWJZSXVXN3NtQm1ZN3REQ1F3ZFc1SFBGMlpJejFkV3RsV0pNRTczei00Slotd1ZxZkVGMWJ1Nk9jdkIyTVhHOGU?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.incheonilbo.com/news/articleView.html?idxno=1334386",
       "summary_version": 3
     },
     {
@@ -3149,6 +3265,25 @@
       "summary_version": 3
     },
     {
+      "id": "56bdd7e9cc87b1",
+      "category": "송도 종합",
+      "title": "인천시, AI 자율주행 BRT·송도·영종 셔틀 도입",
+      "summary": "",
+      "verification": "기사 본문 요약 대기",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-10-18T09:45:20+09:00",
+      "sources": [
+        {
+          "title": "인천시, AI 자율주행 BRT·송도·영종 셔틀 도입",
+          "publisher": "인천자치신문",
+          "published_at": "2026-10-18T09:45:20+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1IMmNsWHc4d1pnM2dqVUItNHl4SUNvQ3ZvdU9QY1FWVXVyZEdqbzc4bWRDeFdDZmFPUE5nSUNtcERRT3pWc0dwRkl6V3E5SXNCVllBY28zUVVXdGpqNkFTSmdrOU9PUzQ?oc=5"
+        }
+      ],
+      "summary_method": "headline_only"
+    },
+    {
       "id": "8394900c464ae8",
       "category": "정책·규제",
       "title": "서울 민심 왜 더 흔들렸나…부동산에 겹친 세금·주거비 불만",
@@ -3175,13 +3310,13 @@
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
-      "last_published_at": "2026-10-18T08:51:03+09:00",
+      "last_published_at": "2026-10-18T08:40:00+09:00",
       "sources": [
         {
           "title": "[윤준의 부동산수첩] 3040 첫 매수 급증…서울 진입 경쟁이 다시 시작됐다",
           "publisher": "NBN미디어",
-          "published_at": "2026-10-18T08:51:03+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE41bTMtM1dWai0zWDhQR0Z4LWQ1TlJRZEgtTUdSb2V3dlZ1MVFjRlJxRDdLM0JncFJwcjN4N0JwenYxSkw1aGF6OFpJMTMtc013V3BvNnNscktac0h5cjRjRUJzTzZreHpjUGfSAWpBVV95cUxONW0zLTNXVmotM1g4UEdGeC1kNU5SUWRILU1HUm9ld3ZWdTFRY0ZScUQ3SzNCZ3BScHIzeDdCcHp2MUpMNWhhejhaSTEzLXNNd1dwbzZzbHJLWnNIeXI0Y0VCc082a3h6Y1Bn?oc=5"
+          "published_at": "2026-10-18T08:40:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE95U2pSR3JqQ21SNHZuTThPU2swcldlVFhvOVNfS3F5QlhPUFctSTBlMGZvckR1Y3AyZExrMlVTTGcwbTB0OGw0bkU0c1lIaThZNDJBTldLakpZZkZZQWNJYUp1MGpfQdIBakFVX3lxTE41bTMtM1dWai0zWDhQR0Z4LWQ1TlJRZEgtTUdSb2V3dlZ1MVFjRlJxRDdLM0JncFJwcjN4N0JwenYxSkw1aGF6OFpJMTMtc013V3BvNnNscktac0h5cjRjRUJzTzZreHpjUGc?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -3312,6 +3447,28 @@
       "summary_version": 3
     },
     {
+      "id": "24b1efdc7f7072",
+      "category": "정책·규제",
+      "title": "[수도권 주택공급] 국토부, 강남 주택 가격 일부 안정화 발표…상승폭 축소",
+      "summary": "김이탁 국토교통부 1차관은 추가적인 대출 규제 계획이 없다고 16일 밝혔다.\n서울 주택매매시장 소비심리지수는 8월 132.5에서 9월 130.8로 하락했다.\n정부는 공급과 수요 관리를 통해 강남3구 중심의 가격 안정화 흐름을 전했다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-10-17T10:23:00+09:00",
+      "sources": [
+        {
+          "title": "[수도권 주택공급] 국토부, 강남 주택 가격 일부 안정화 발표…상승폭 축소",
+          "publisher": "CBC뉴스",
+          "published_at": "2026-10-17T10:23:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE51SFYxakM3cmpscnFsZlgzMlZnMU9XTlZLM1ZYYmU5dU8xSHNmTVJ2MUloUjNZSjRmMHZGZmVXMFJGMFJuTE1DRFIxdVlsbkJhaXFDc2pOMWtramtON1ZvM3F5M1FDWktl?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.cbci.co.kr/news/articleView.html?idxno=616572",
+      "summary_version": 3
+    },
+    {
       "id": "80b1c02f073210",
       "category": "정책·규제",
       "title": "내년까지 수도권 공적주택 약 10만호 입주 추진…규제지역 공공주택 무제한 매입 [부동산360]",
@@ -3403,28 +3560,6 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.ikbn.news/news/article.html?no=216114",
-      "summary_version": 3
-    },
-    {
-      "id": "0de531cde4efb3",
-      "category": "송도 종합",
-      "title": "‘생방송투데이’ 한우곱창 맛불 작전, 인천 송도 곱창구이 vs 서울 청담동 곱창전골 맛집 위치는?",
-      "summary": "인천 송도 한우곱창구이와 서울 청담동 한우곱창전골 맛집이 화제다.\nSBS 생방송투데이를 통해 각각의 한우곱창 맛집이 소개되었다.\n해당 방송은 평일 저녁 6시에 방송된다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-16T18:01:00+09:00",
-      "sources": [
-        {
-          "title": "‘생방송투데이’ 한우곱창 맛불 작전, 인천 송도 곱창구이 vs 서울 청담동 곱창전골 맛집 위치는?",
-          "publisher": "톱스타뉴스",
-          "published_at": "2026-10-16T18:01:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMickFVX3lxTFB6ZThxMnZwNG0tME95anA0VmRMS05uNDB0ZWJjYW1xeXphMWVqdUZENmNXbjB3QmZCVGRROTdta3RqTFdmT3U0SUxjSnJDbUVCQ2pPWEQ3MkdnWTBJU2RkUF9Ja1BRV04wSEpWb2RlVWkxUQ?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.topstarnews.net/news/articleView.html?idxno=16249172",
       "summary_version": 3
     },
     {
@@ -3550,6 +3685,34 @@
       "summary_version": 3
     },
     {
+      "id": "da64130031f86e",
+      "category": "개발·교통",
+      "title": "[지역프로젝트점검]인천시 GTX-B 청학 추가정거장 중앙투자심사 통과…2694억원 투입",
+      "summary": "인천시가 추진하는 수도권광역급행철도 B노선 추가정거장 건설사업이 행정안전부 중앙투자심사를 통과했다.\n인천시는 약 2694억원을 전액 부담해 인천대입구역과 인천시청역 사이 청학사거리 일원에 정거장을 신설한다.\n사업기간은 2027년부터 2033년까지이며 2034년 초 개통을 목표로 후속 절차를 진행할 계획이다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 2,
+      "publisher_count": 2,
+      "last_published_at": "2026-10-16T15:51:44+09:00",
+      "sources": [
+        {
+          "title": "[지역프로젝트점검]인천시 GTX-B 청학 추가정거장 중앙투자심사 통과…2694억원 투입",
+          "publisher": "NSP통신",
+          "published_at": "2026-10-16T15:51:44+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE9GbGlnUUVnSUswdm5PeHhqdFMzOFFIZnh0SHRHLTkzNk1meDBMOF85Z1JOU1V0UkJ5V2ItSHN1N3UwMEUtRW5IQnc0MTIyZ0tHTk1rcmpiMkpKcFYzUXRySA?oc=5"
+        },
+        {
+          "title": "GTX-B 청학역 신설 심사 통과… 인천시 2694억 투입",
+          "publisher": "브릿지경제",
+          "published_at": "2026-10-16T09:46:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE11blBvYTJ6S3lmRTlaVy12MzRpSkJfSkJHQlZCVjhLcHhGcHdHOGxhWmw0RkhzXzh4Xy1XSmNNVHNqT2hTVGpKWUZSLVMxVmhKYVVKZEJoNnNHQQ?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.nspna.com/news/?mode=view&newsid=832023",
+      "summary_version": 3
+    },
+    {
       "id": "76ac5268410ef7",
       "category": "정책·규제",
       "title": "하남시, 청년 주거정책 구체화…맞춤형 주택 공급 검토",
@@ -3585,7 +3748,7 @@
           "title": "청학사거리에 GTX-B 정거장 생기나...중투심 통과",
           "publisher": "경인방송 뉴스",
           "published_at": "2026-10-16T14:25:59+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFBZazlINXhGZ2NOUjRXcU5tTHpUQTE2cUVaNS1UMXM3TzhUSGVZa01wejIwYXBsRnpGbDhlTTdyb0lmcTc4WXZZRUVZcmd6S2hadVVxRlVwWmVyS2U4V19OOVRjVWU?oc=5"
+          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFBZazlINXhGZ2NOUjRXcU5tTHpUQTE2cUVaNS1UMXM3TzhUSGVZa01wejIwYXBsRnpGbDhlTTdyb0lmcTc4WXZZRUVZcmd6S2hadVVxRlVwWmVyS2U4V19OOVRjVWXSAWhBVV95cUxPLVlKSnFhckt3R183TW5XSVJQVkU3Y3ZLZVU5OGhfbC1VcDlQTElRa3NIZ3l2ZUhaQUFCTU1EeF9PQ0dWR212MHpuRVR4M0NJLVJLOUhwSUotcWZ4dzJIV0hDZW5keGVweQ?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -3611,56 +3774,6 @@
         }
       ],
       "summary_method": "headline_only"
-    },
-    {
-      "id": "dbca22da90cd42",
-      "category": "개발·교통",
-      "title": "GTX-B 청학사거리 추가역 짓는다…2694억원 들여 2034년 개통",
-      "summary": "인천 연수구 청학사거리에 GTX‑B 추가정거장 건설 사업이 중앙투자심사를 통과했습니다.\n총사업비는 약 2694억원이며 인천시가 전액 부담하고, 사업 기간은 2027년부터 2033년까지입니다.\n인천시는 내년부터 사업을 본격 추진해 2034년 초에 추가정거장을 개통할 계획입니다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 2,
-      "publisher_count": 2,
-      "last_published_at": "2026-10-16T12:32:11+09:00",
-      "sources": [
-        {
-          "title": "GTX-B 청학사거리 추가역 짓는다…2694억원 들여 2034년 개통",
-          "publisher": "뉴스21 통신",
-          "published_at": "2026-10-16T12:32:11+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFA4ck43amYwX0RWdXU2cXVUVFpIWHpaWGVmd1NseDNRelJwaXd3TThxUWh3Um1kMW1SUWwxUzZ1RTZYd0pjMURLaVJUeHZLeVFIUm9tVzN3?oc=5"
-        },
-        {
-          "title": "인천 청학사거리 GTX-B역 신설 확정…2694억원 투입해 2034년 개통 추진",
-          "publisher": "주간한국",
-          "published_at": "2026-10-16T12:21:27+09:00",
-          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5CUmJTQmFBY0txNHdXcjZtTUdVcGhUTWxWamp0U3VESmdBV05aQTVTcDJCN0VpanRnY3pNQ1puNG1DMVRLZTVoZkpSTzBNT3ltZlF1NUdfNDdQZWtQNGNyWEktVEotWkE4cHZJb3pvNFjSAXRBVV95cUxQQVUtNzlFTTMyWDJON29rdFMxV2RaQ2dYeTJJNVp2STNqc1FRcnpud0xQQThOeE9qLVh4Q1V3NWhwTWh6VW5JQXQ5d0JOeE9QYmhzc2V5NUhvaVVDN3cyTGc5d1VvbnU5djl1cml4SG9qcFlKVg?oc=5"
-        }
-      ],
-      "summary_method": "groq_article",
-      "summary_model": "openai/gpt-oss-120b",
-      "summary_source_url": "https://www.news21tongsin.co.kr/news/307683",
-      "summary_version": 3
-    },
-    {
-      "id": "fdf1b41125ac98",
-      "category": "송도 종합",
-      "title": "보드람치킨 송도호수점, 연수구 송도호수에 감성 치킨공간 탄생 [ 신아일보 강동완 기자 ] : 네이버 블로그",
-      "summary": "보드람치킨은 최근 인천 연수구 송도호수 일대에 송도호수점을 정식 오픈했다.\n매장은 평일 오후 4시부터 자정까지, 주말은 오후 3시부터 자정까지 운영된다.\n호수 풍경과 어우러지는 테라스 야외석과 아늑한 공간 구성으로 로컬 맛집 분위기를 완성했다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-16T11:07:52+09:00",
-      "sources": [
-        {
-          "title": "보드람치킨 송도호수점, 연수구 송도호수에 감성 치킨공간 탄생 [ 신아일보 강동완 기자 ] : 네이버 블로그",
-          "publisher": "Naver Blog",
-          "published_at": "2026-10-16T11:07:52+09:00",
-          "link": "https://news.google.com/rss/articles/CBMi-AFBVV95cUxNRjc5dzdGaDNjSFZqZ2U1Mnc4cUpya2djQXROaXkwalFZWmVWSEFSVHBFX01HRUxJZFNnblo1MW5ET1Fod1ZuSzhRcXNzT1hKazk2LVI4cDBmYjBLakhMWTBUVm5XRUFWdzVjdGFEbVhxaGYyUm8xY0NwNXFadUJqc0xVazByMlh3MHNkSEQyMS16Zy1qZ2U4SFQtOE5HZWtqNm9Pd01keGllWk9ZSWFaYzliMVoxRkh0T0lDNVJfb2I3N1lHdGQybGJIb3lBb1VfVWtsYUNDZ0pDS1BHSkhyNlU3VlJCWmRWbjByMVpEaVlNUUM4WmRVdg?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://blog.naver.com/PostView.naver?blogId=adevent&logNo=224092876645&categoryNo=0&parentCategoryNo=0&viewDate=&currentPage=1&postListTopCurrentPage=&from=postList",
-      "summary_version": 3
     },
     {
       "id": "3b56666395885e",
@@ -3738,28 +3851,6 @@
       "summary_version": 3
     },
     {
-      "id": "3bf04d9c91ffcd",
-      "category": "개발·교통",
-      "title": "GTX-B 청학역 신설 심사 통과… 인천시 2694억 투입",
-      "summary": "인천 연수구 청학사거리 GTX‑B 추가정거장 건설 사업이 행정안전부 중앙투자심사를 통과했다.\n인천시가 2694억원을 전액 부담하고 2027년 착수해 2034년 초 개통을 목표로 하고 있다.\n시의회 동의와 예산 확보 후 민간사업시행자와 위·수탁협약을 체결해 추진을 이어갈 예정이다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-16T09:46:00+09:00",
-      "sources": [
-        {
-          "title": "GTX-B 청학역 신설 심사 통과… 인천시 2694억 투입",
-          "publisher": "브릿지경제",
-          "published_at": "2026-10-16T09:46:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE11blBvYTJ6S3lmRTlaVy12MzRpSkJfSkJHQlZCVjhLcHhGcHdHOGxhWmw0RkhzXzh4Xy1XSmNNVHNqT2hTVGpKWUZSLVMxVmhKYVVKZEJoNnNHQQ?oc=5"
-        }
-      ],
-      "summary_method": "groq_article",
-      "summary_model": "openai/gpt-oss-120b",
-      "summary_source_url": "https://www.viva100.com/article/20261016500139",
-      "summary_version": 3
-    },
-    {
       "id": "065ee83869b428",
       "category": "개발·교통",
       "title": "GTX-B 추가정거장 건설사업, 중투심 통과...연내 위·수탁협약 등 급물쌀",
@@ -3802,6 +3893,25 @@
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.dailian.co.kr/news/view/1702254/%EC%9D%B8%EC%B2%9C-%EC%B2%AD%ED%95%99%EC%82%AC%EA%B1%B0%EB%A6%AC-GTX-B-%EC%B6%94%EA%B0%80%EC%97%AD-%EA%B1%B4-2026",
       "summary_version": 3
+    },
+    {
+      "id": "9a450d866fcf17",
+      "category": "개발·교통",
+      "title": "GTX-B 인천 청학사거리 일대에 추가 정거장",
+      "summary": "",
+      "verification": "기사 본문 요약 대기",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-10-16T09:37:00+09:00",
+      "sources": [
+        {
+          "title": "GTX-B 인천 청학사거리 일대에 추가 정거장",
+          "publisher": "SBS Biz",
+          "published_at": "2026-10-16T09:37:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE9rVXdubHRGNC0yd3hDWUdrY3UyMWdfTFkwRmVhaVphenFrSzNGZHhvZF9NZDVkcE15OVNpUTVfV3l6dFhWNDZ3VUlIOVVGSDlkX1hz0gFYQVVfeXFMT1F1UWdhRjFzRFFVQWpfRFg5dXNyWjdPQnhGNmd3dlZOZDRQRGxBSDBoTU9fcEc1NlFMbnkyNFUzdzBNWFFjWHRYLVFqaVViT3hiZWE4bEtuSA?oc=5"
+        }
+      ],
+      "summary_method": "headline_only"
     },
     {
       "id": "3c878a04ff7a93",
@@ -3892,52 +4002,6 @@
       "summary_version": 3
     },
     {
-      "id": "8d23369344a65f",
-      "category": "송도 종합",
-      "title": "[사설] 인천 송도 재외동포청 세종 이전 재검토해야",
-      "summary": "정부가 인천 송도 재외동포청을 내년 상반기 세종으로 이전한다 발표했다.\n인천시는 사전 협의 없이 방침을 내놓아 정책 과정에 문제를 제기했다.\n정부는 이전 계획을 재검토해야 한다는 요구가 제기되고 있다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 5,
-      "publisher_count": 5,
-      "last_published_at": "2026-10-15T20:34:53+09:00",
-      "sources": [
-        {
-          "title": "[사설] 인천 송도 재외동포청 세종 이전 재검토해야",
-          "publisher": "경인일보",
-          "published_at": "2026-10-15T20:34:53+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTFBHZ3dBUWktSVJDRFZkRjZBR3QyUEZWbTNmTlBlWmZZYk1PUjVpa1RjbXprNmlLU3ZTOF9CYnVCcFoyQW1jRjQ2MkxnRWVsRG5Qemc?oc=5"
-        },
-        {
-          "title": "인천 연수구의회 민주당 의원들 “재외동포청 송도 존치…이전 전면 재검토해야”",
-          "publisher": "인천일보",
-          "published_at": "2026-10-15T16:55:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9vN3FibTVTNkFaZnhMZWdEdXRYQzJlTmdTaC1oY3hoSFctOFFkTE42M2ZBNmZzRWEtQ0dZeHgxSUdoRnpQN0FxM1IzRG5tNDBhZGJjMEZrNURkZ0hRTEFodDZxdjBmc1pZZVhRNnNIUkc?oc=5"
-        },
-        {
-          "title": "민주당 연수구의회 의원들, \"재외동포청은 인천 송도에, 세종시 이전 결사 반대\"",
-          "publisher": "인천뉴스",
-          "published_at": "2026-10-15T16:45:30+09:00",
-          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE1XWkI0aHRmaVJ6SGxmcUdxVzQweUZWclpuTzRDSV9PeTBnYlk1QlR0TGVrdHg1a0JtVnZNQmFzV2lCTUhVVmVjbHpEcHlLbXMwNU5ZeWNQOUtpMmdUdWxRTjViTkQyUFJHcmFwVVlHdw?oc=5"
-        },
-        {
-          "title": "민주당 인천 연수구의원들 “재외동포청 세종 이전 반대”…송도 존치 촉구",
-          "publisher": "경기일보",
-          "published_at": "2026-10-15T15:48:10+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE5XbC0zOTAwcTI1SUZTNklRZjVTSU12RkFHcUc0NGhEY2NaWlZORkZaemREVl9qVFBNMUlHSV93dXdSTUllcHZTUEhJOENDMmQtZ1VhWGY5eWxxZnM?oc=5"
-        },
-        {
-          "title": "정일영 \"재외동포청 세종 이전 백지화해야\"..송도 존치 촉구",
-          "publisher": "일간경기",
-          "published_at": "2026-10-15T14:30:06+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFA1YVlzc0tIOERnblhaYTNJNmo2UFg5UXk3b1BXZnlTZzZZTEthS0hoVnExZE5NZHJkZzRQM3UzOXNybXdBb1pKOC00T1dtVlFTQnhUVVZkWlROZVp6OTdCOEhEWWlJYTFQ?oc=5"
-        }
-      ],
-      "summary_method": "groq_article",
-      "summary_model": "openai/gpt-oss-120b",
-      "summary_source_url": "https://www.kyeongin.com/article/1772714",
-      "summary_version": 3
-    },
-    {
       "id": "ee4e4b614274ae",
       "category": "송도 종합",
       "title": "국힘 인천시당 “송도 지명 정비보다 민생 현안이 먼저”",
@@ -3965,7 +4029,7 @@
       "title": "국토위서 '부동산 사찰' 공방…野 \"김현미 불러야\" 與 \"김건희 부를 것\"(종합)",
       "summary": "",
       "verification": "기사 본문 요약 대기",
-      "article_count": 2,
+      "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-10-15T18:42:26+09:00",
       "sources": [
@@ -3974,15 +4038,31 @@
           "publisher": "뉴시스",
           "published_at": "2026-10-15T18:42:26+09:00",
           "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE1JT2tCY2ZNek5hV0w2ZDEyWmNTb3NJY3lDRS0xbmRYT3VXUnpLMkpfQzJMRVhLNnhKNVEyemc3MmdiYjlJbktUN19JUlFhMW5LU3B6WWFYNHNjVng0b3laedIBeEFVX3lxTFBhTVNvVGVjbE5tZ2ZEN0dJR2hiVXo1TXg3TlhOSmJFUTZPWmR5ZmJsaXJDU1d2NnFkZWRkazZva2FrVllRSmNTN2U2dnZhY0dwdVNWZ1p3UndSX3BMWTM4Q1FpZ2lYcDZZQXo2Zi1Lck9LaXJCS1Vzcw?oc=5"
-        },
-        {
-          "title": "국토위 국감서 '부동산 사찰' 공방…野 \"김현미 불러야\" 與 \"김건희 부를 것\"",
-          "publisher": "뉴시스",
-          "published_at": "2026-10-15T12:54:41+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE40aFFwSHNvSlV2clRxQjdFbVZDTVhJRWg1Mm5SSzJwNUMzZkM0MHpGb1ZsQVAtczRpSlpnN0hDbS1CZEU5SGMxQm9ONDVsY0EzZDlvSmtLVFpkVDFyYUt5MNIBeEFVX3lxTE1Rcm41R1F2c1Z5OHBBZmFPRjBOc2FJM2NmaW5lajlwWVNIMnBYSU5yRTV3bUl0bS1FYkgwRWp1VTd6cXpjT0dSQ1BRY0Z6QkNoSnFieUxvb1YwRTNiRU1uZGFiVkJBbVFwakZwdXBpTnBCT0VBRkhrQQ?oc=5"
         }
       ],
       "summary_method": "headline_only"
+    },
+    {
+      "id": "4381eee633bafa",
+      "category": "개발·교통",
+      "title": "송도 대형 상가 매매",
+      "summary": "GTX-B는 인천대입구역에서 여의도와 서울역을 거쳐 남양주 마석으로 연결되는 노선이다.\n인천시의 공식 안내에 따르면 GTX-B의 개통 목표 시기는 2031년이다.\n송도트램은 제2차 인천 도시철도망 구축계획에 포함되었다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-10-15T16:50:47+09:00",
+      "sources": [
+        {
+          "title": "송도 대형 상가 매매",
+          "publisher": "유스연합",
+          "published_at": "2026-10-15T16:50:47+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE91RUdPU0sya0o1cXNkWVVHWDBjd0Z5cDBGQ2NwbWlVM2MwV3ZIbDRORVp2eFdremtDbmh3OHZfQTVncXVmaW5JcTgtUlI3dFF4LWNF?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.youthassembly.kr/news/1013261",
+      "summary_version": 3
     },
     {
       "id": "ea4002b020311c",
@@ -4087,204 +4167,72 @@
         }
       ],
       "summary_method": "headline_only"
-    },
-    {
-      "id": "65055954996d62",
-      "category": "송도 종합",
-      "title": "스타트업·투자자 2000명 송도에 모였다…인천서 투자·글로벌 진출 ‘맞손’",
-      "summary": "인천지역 스타트업과 투자자 등 2000명이 송도에 모여 글로벌 진출 가능성을 모색했다.\n인천시는 지난 14일부터 15일까지 송도컨벤시아에서 2026 인천스타트업위크를 개최했다.\n인천시는 이번 행사를 계기로 스타트업의 투자와 판로 지원 정책을 확대할 방침이다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-15T15:38:49+09:00",
-      "sources": [
-        {
-          "title": "스타트업·투자자 2000명 송도에 모였다…인천서 투자·글로벌 진출 ‘맞손’",
-          "publisher": "뉴스21 통신",
-          "published_at": "2026-10-15T15:38:49+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE43RlpuaGMtWncxeGtielFTTE5zanFOYjBuNmdybTQ3Mm9lUm1LVFZ1djNsc181d3ZiNUpGZmFiWjZsWkFKamFnUU1rX2UwRDhLbUYyeElR?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.news21tongsin.co.kr/news/307600",
-      "summary_version": 3
-    },
-    {
-      "id": "2d1b0d38cd4a38",
-      "category": "송도 종합",
-      "title": "가을·겨울 캠핑족 부른다…‘2026 인천 고카프 시즌2’ 30일 송도 개막",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-15T15:28:42+09:00",
-      "sources": [
-        {
-          "title": "가을·겨울 캠핑족 부른다…‘2026 인천 고카프 시즌2’ 30일 송도 개막",
-          "publisher": "뉴스로드",
-          "published_at": "2026-10-15T15:28:42+09:00",
-          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE9LWXpmNWxRY3l4NWlVU0tsczQ2eGVrYm9YUFJkRmYyOEZhVGtNQUlkSTdMSGZvME8xZVUxRnBjZlg5YklKb0gwQ2tJUnZxSzJUbGJxMXg1czhDd05id1dFWlRJUUNJZi1aMmhz0gFvQVVfeXFMTmZLUEo0VEM5Sng4Yk80Z3NYUTZTZVZudVpjckphdDUxNjlhYkVwY3NfVTdDdnh4RnVIanRsOXdKcU15SDExN25vVWFiM0tNXzB5VVJ3RHRwMUUwTEQtemhuaTZUT1VkT2VmeWhieEcw?oc=5"
-        }
-      ],
-      "summary_method": "headline_only"
-    },
-    {
-      "id": "93b6a7ba4702b0",
-      "category": "송도 종합",
-      "title": "‘2026 인천 고카프 시즌2’, 오는 30일부터 송도컨벤시아서 개최",
-      "summary": "‘2026 인천 고카프 시즌2’가 10월 30일부터 11월 1일까지 인천 송도컨벤시아에서 개최된다.\n행사는 주식회사 메쎄이상이 주최하며, 텐트·캠핑 의자·캠핑 차량 등 다양한 아웃도어 제품을 선보인다.\n관람객은 10월 29일까지 앱으로 사전 결제 시 40% 할인 혜택을 받을 수 있다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-15T15:27:31+09:00",
-      "sources": [
-        {
-          "title": "‘2026 인천 고카프 시즌2’, 오는 30일부터 송도컨벤시아서 개최",
-          "publisher": "파이낸스투데이",
-          "published_at": "2026-10-15T15:27:31+09:00",
-          "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1UczhfWFBwMFkzSU8wZmZ0MnlYaFFYaTdWd041QlZMWExOT25HNlZETERFLVd2cjJpbF9rTGJYWTYxMElaYUNVdzc4UTY4WkwxeUxiWDdheU5FeDNEQXppdzR3LVRpT0IyMTUyRA?oc=5"
-        }
-      ],
-      "summary_method": "groq_article",
-      "summary_model": "openai/gpt-oss-120b",
-      "summary_source_url": "https://www.fntoday.co.kr/news/articleView.html?idxno=395380",
-      "summary_version": 3
-    },
-    {
-      "id": "26f6ded32d197b",
-      "category": "개발·교통",
-      "title": "송도 11공구 ‘송도 대광로제비앙 모아엘가＇ 11월 선봬",
-      "summary": "㈜대광건영·모아건설산업이 송도 11공구 ‘송도 대광로제비앙 모아엘가’를 11월에 선보인다.\n이 단지는 전용면적 84㎡, 7동·29층, 총 592가구 규모로 조성된다.\n현재는 사업 계획 단계이며, 11월 공개를 앞두고 진행 중이다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-15T15:27:00+09:00",
-      "sources": [
-        {
-          "title": "송도 11공구 ‘송도 대광로제비앙 모아엘가＇ 11월 선봬",
-          "publisher": "한국경제TV",
-          "published_at": "2026-10-15T15:27:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE9ScEtNVHo3b2hYWHBIdFkzNzRRMURvdS0wMEMyRWxWcy1RbjhpUzNMQVdEV3NZWjVEeVJJSEdCdGVnY0pZVkprWkFnMG8yb3BRWDd0RGtxYWFWcnVIMGxJd1Z5eWhZNVkxWVhMeVJCeGU4b0kyTkFV?oc=5"
-        }
-      ],
-      "summary_method": "groq_article",
-      "summary_model": "openai/gpt-oss-120b",
-      "summary_source_url": "https://www.wowtv.co.kr/NewsCenter/News/Read?articleId=A202610150118",
-      "summary_version": 3
-    },
-    {
-      "id": "d6c0445fd0506b",
-      "category": "개발·교통",
-      "title": "인천 연수구의회, 제284회 임시회 개회하고 2027년도 주요업무계획·조례안 심사 착수",
-      "summary": "인천 연수구의회가 15일 제284회 임시회를 개회해 2027년 주요업무계획 심사를 시작했다.\n임시회는 13일간 진행되며 집행부 보고와 함께 송도국제도시·청학역 등 2건 결의안을 채택한다.\n의회는 27일 제2차 본회의에서 안건을 최종 의결하고, 회기는 실시간 생중계될 예정이다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-15T14:29:30+09:00",
-      "sources": [
-        {
-          "title": "인천 연수구의회, 제284회 임시회 개회하고 2027년도 주요업무계획·조례안 심사 착수",
-          "publisher": "경인매일",
-          "published_at": "2026-10-15T14:29:30+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBkOEFSREZKbFdaaGFVMUxKcFkwOEJlUmY1akhSa3JPSkRibkV3aTZNRlg3ekstR1phQlhqaHBFT2NSQzBqdXZsR1JMQ0duY09NMXZ4cElhQnZLSmtjbkJzajFVRmhNWV9O?oc=5"
-        }
-      ],
-      "summary_method": "groq_article",
-      "summary_model": "openai/gpt-oss-120b",
-      "summary_source_url": "https://www.kmaeil.com/news/articleView.html?idxno=654498",
-      "summary_version": 3
-    },
-    {
-      "id": "758844aaef5f65",
-      "category": "세금·대출",
-      "title": "강남은 세금 때문에 집 팔고, 외곽은 전세 때문에 집 산다... '집값 평탄화'의 두 얼굴",
-      "summary": "서울 아파트 전셋값이 2026년 8월까지 벌써 7.59% 상승했다.\n15억원 이하 주택에는 주택담보대출이 최대 6억원까지 가능하다.\n전셋값 급등으로 인해 세입자들은 살 수 있는 곳으로 이동하는 선택을 강제받고 있다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-15T14:00:00+09:00",
-      "sources": [
-        {
-          "title": "강남은 세금 때문에 집 팔고, 외곽은 전세 때문에 집 산다... '집값 평탄화'의 두 얼굴",
-          "publisher": "한국일보",
-          "published_at": "2026-10-15T14:00:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9KZFMyMGhVNkRzbHNnVk1TZEFZRnRYeU5RMEZSZ1RRY19xeGwzc0E0SHJBd25CSUNGcEZoT3ZJUlBiejBsVkhKTHZ4WUNjQm12dndJdW1GaS1FTWxUNzBvVU5FWG5JN0hVRGk2LVhB0gFzQVVfeXFMTkZzMklPS0cxU1c1M2pYTEVaX3BkRUpaYlBSUHBmQjA0a3pldEFuUjZZcDRlMV9zREF0Z3cwUTRfekRnQ3VKbkd1Mi1fQThhWFJlLTVPSVY4SW1nOVIwejV3MzRBakpyci1TTnRiUzRndmljcw?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.hankookilbo.com/news/article/A2026101511210004161",
-      "summary_version": 3
-    },
-    {
-      "id": "8fc4cd1cc85174",
-      "category": "정책·규제",
-      "title": "서울 오피스텔 5개 분기째 상승…인천·경기는 하락 : 부동산",
-      "summary": "서울 오피스텔 매매가격이 15개월 연속 상승했으나 3분기에는 오름폭이 둔화했다.\n서울 오피스텔 매매가격은 3분기 0.07% 올랐고 수도권 전체는 0.26% 하락했다.\n한국부동산원은 15일 3분기 오피스텔 가격동향조사 결과를 공개했다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-15T13:41:00+09:00",
-      "sources": [
-        {
-          "title": "서울 오피스텔 5개 분기째 상승…인천·경기는 하락 : 부동산",
-          "publisher": "재경일보",
-          "published_at": "2026-10-15T13:41:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTFBPV0s0eEg2LWRQenF5YndZcTRNX0FXNWJZWGhCUG5EWHFYbEItV1RrUlZXRUk4cWlOb0p0Z3lZMzQwbEJ3ZXZ4Q1dyVQ?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://news.jkn.co.kr/post/1024716",
-      "summary_version": 3
-    },
-    {
-      "id": "97a3baf9e632b1",
-      "category": "송도 종합",
-      "title": "국민의힘 인천시당 “송도 지명 변경 행정력 낭비…현안부터 해결해야”",
-      "summary": "국민의힘 인천시당은 인천시의 송도 지명 정비 추진이 시정 우선순위가 뒤바뀐 행정력 낭비라고 비판했다.\n인천시는 지난 8월 연수구에 내년까지 일본식 표기 의심 지명인 송도 관련 정비를 마쳐달라고 요청했다.\n연수구는 송도국제도시의 인지도와 파급효과 등을 고려해 지명 변경 여부에 신중한 입장을 보이고 있다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-15T13:38:32+09:00",
-      "sources": [
-        {
-          "title": "국민의힘 인천시당 “송도 지명 변경 행정력 낭비…현안부터 해결해야”",
-          "publisher": "경기일보",
-          "published_at": "2026-10-15T13:38:32+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTFAwM3k0c2poeFMxcEFHQlN4OXRVNTB0SmRqRHFGMGRvQmFCZjIzVHNmdTJiVlQtdHFHV0toYnRNWWpfbjhBOHA3cTNiNW9iaHlxZTFpVFVuTUZfUTg?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.kyeonggi.com/article/20261015580205",
-      "summary_version": 3
-    },
-    {
-      "id": "e0e36ecc6eb27c",
-      "category": "정책·규제",
-      "title": "[단독]尹정부 정책대출 펑펑…서민 '주택기금' 여윳돈 80% 급감했다 - 머니투데이",
-      "summary": "윤석열 정부 시기 정책대출이 급증하면서 주택도시기금 여유자금이 크게 감소했다.\n주택도시기금 정책대출 규모는 2021년 18조9000억원에서 2024년 54조7000억원으로 늘어났다.\n기금 여유자금은 2021년 말 49조원에서 2024년 말 10조원으로 급감했다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-15T13:35:06+09:00",
-      "sources": [
-        {
-          "title": "[단독]尹정부 정책대출 펑펑…서민 '주택기금' 여윳돈 80% 급감했다 - 머니투데이",
-          "publisher": "머니투데이",
-          "published_at": "2026-10-15T13:35:06+09:00",
-          "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE4xbHFkSG9nelRNUU8zT09DeS02c1UtdjJ4SndVaV80dHo3Wk8yUjJkVHpZa0NJWWpXRUhETkhOT0Jqak1JaE1nZWZ5am9TV09FRVRkNl9sMU84R2JXdmNPU01vWUxGWkxBcXNLMtIBckFVX3lxTFB5VWNHSUYwaHpOVjI1R21YYlEwMWVNZWxiNlYyUWFOZmRnOFV4Ylg2TmhxMUs4bUJTY1VHaHIzZXRwZDBOXzl4dWU4LWVxSlhTcFRGbG41dW5BXzBsUExjaUlMc2hZZ3hiUWRjR0tFWVRVZw?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.mt.co.kr/politics/2026/10/15/2026101513094688105",
-      "summary_version": 3
     }
   ],
   "articles": [
+    {
+      "title": "송도 토양정화 무시 부영, 금융이익 수백억 추산 벌금은 ‘쥐꼬리’",
+      "publisher": "인천투데이",
+      "published_at": "2026-10-22T15:19:34+09:00",
+      "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE0tTldseFZaWV9TeDdWSmJCTWc4RS1NRFhPTzRmRV9KNG5zbEpwVUpCeGhmaDh0TDFnaG5lMXhLbFktZnNQYkh6U0FsMzBVeVFaajQ2bTlkcGtUQThndDRjVjU1QTQ0Q0NZWVdHd3RTbG8?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도",
+      "id": "a15b7143a40d77d2e2"
+    },
+    {
+      "title": "KB부동산 \"서울서 강남구만 나홀로 하락…화성시 매매·전세 급등\"",
+      "publisher": "KB Think",
+      "published_at": "2026-10-22T15:19:13+09:00",
+      "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE1ZX2diOS1HZGlGVjljMEN4dHNud1Q3ZmhwbFB6TVhGWFZKZFNISkV3X0VLNjBoRlAweHNacVJGcS1QbzJrTUN0YzVpTTFGUXpxcGpxTEUwa2J5NEliaDZxcldwTnNUSjFHUTU4dVE0eDFpdw?oc=5",
+      "category": "정책·규제",
+      "query": "인천 부동산 규제",
+      "id": "834a49286c873fa8bf"
+    },
+    {
+      "title": "금융당국, 사내대출 DSR 규제 적용 검토…이억원 위원장 \"취지 공감\" [국감]",
+      "publisher": "이투데이",
+      "published_at": "2026-10-22T15:15:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE5fcXVWcmk0b2V3dGxQS1JrOWwzVnFHUlhRRno1V0I1eG01bW1McnBXeHhqWnJmQTVJT3p4bDZLeUhDNnNrSlFxcVNVZWZNbmwwQk1IMzFnM2Iwd0NmQnFxM2FDRHZhWk9tV09kRGQ3bV9HX0xD?oc=5",
+      "category": "세금·대출",
+      "query": "주택담보대출 DSR 정책",
+      "id": "fe2143ede50dd26e41"
+    },
+    {
+      "title": "인천 송도에 재외동포교육문화센터 추진…박찬대 \"글로벌 한인 네트워크 중심\"",
+      "publisher": "뉴스핌",
+      "published_at": "2026-10-22T14:55:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE5xdGxWMjhQRUVLWmVOcnU2aS1YekRFX0d4V2ZBYjdnUVlKeTVmRGpzM3hEdlhFYzlRYURjcFA1SHFseVJhb1haQ2kzQ3IzTnZzeE5jbFpYOFA1WlZt?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도",
+      "id": "d2a48bc952fd622c88"
+    },
+    {
+      "title": "인천 송도국제도시, 캘빈매니토바국제학교 한복 입고 등교… 한복의 날 행사 3년째",
+      "publisher": "기호일보",
+      "published_at": "2026-10-22T13:49:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE13NDVNZmcwTWVCc1hsNUJvbzc4aUprX2duY0lQVlQ3UDdKUUxLNHJVdFlMc3ZkVmt5Wll3UVB0aHl4UkktemVTSDdadEdXTmRmRTU2alRUbmhWYm50NFZrWmZlb3dJYm83RVdvSFNNVQ?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도",
+      "id": "0412a56354089a852a"
+    },
+    {
+      "title": "이억원 금융위원장 “사내대출 규제 취지 공감”…대기업 주택대출도 DSR 묶이나",
+      "publisher": "코리아데일리",
+      "published_at": "2026-10-22T13:41:10+09:00",
+      "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE1Oa3NDWU90S041ZmhEWmt5T2pYY25wQ2dnZFg2OFBqTnFVdDJQd0pXYjIxTHJveGVueDktQmkycU1nY0JLWElNZ3dYRGMwSHB4Y0tPT2MzSnc4cWotV08wYk9VOEw1OUw2TDdRT2tZYk4?oc=5",
+      "category": "세금·대출",
+      "query": "주택담보대출 DSR 정책",
+      "id": "044292193d3081352e"
+    },
+    {
+      "title": "재외동포청 세종 이전에 인천시, 송도에 ‘재외동포교육문화센터’ 조성",
+      "publisher": "경향신문",
+      "published_at": "2026-10-22T13:17:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFBWUVIzRTFVOWlfaFhWT05GdkxQZC1UeDl6Z2hfRnRwVF9KUC1od29HZGV3ZzNocXQxVDN4d24zSEJIVW5iYkVRVU1BUlVKdEN6NkJITVpMdGtQUdIBX0FVX3lxTE9qS01hdDU4cDdfUU5uWHpXZk1UbnBJQmFyQ0E4YmtTdi0tTFNNY2h6akc2NUdXUnhnLVJzUTBzQ0kxUThFQ1dZd2MzbHNOdVBpU2FCc2pDaXU3YlFDNzBR?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도",
+      "id": "9724e324a1e38003a7"
+    },
     {
       "title": "당국, 사내대출 DSR 규제 적용 검토…이억원 \"방법론적 고민 필요\"",
       "publisher": "뉴시스",
@@ -4324,11 +4272,11 @@
     {
       "title": "K-바이오 품은 송도 11공구, 592가구 신규 공급",
       "publisher": "리버티코리아포스트",
-      "published_at": "2026-10-22T10:42:21+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE5pYVN5YjNUVVk5aTRzcU5id1l2bG1Zd0RIRkxTOFlSQjNEeVgzbGVQTWg2RVhvT2I1eWx1NTRiTWp6cnhyNTYtR0hoZko5Tm9LMjIydkh2emxzS0lTOURGdkw2NVV6MEnSAWdBVV95cUxOaWFTeWIzVFVZOWk0c3FOYndZdmxtWXdESEZMUzhZUkIzRHlYM2xlUE1oNkVYb09iNXlsdTU0Yk1qenJ4cjU2LUdIaGZKOU5vSzIyMnZIdnpsc0tJUzlERnZMNjVVejBJ?oc=5",
+      "published_at": "2026-10-22T10:38:09+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBJSWQxX0o3ZHE2bm9uVlVOdmctLXcxclBScDkyeWhSZWdDVDAwb25rRWJnR2RMOGNGXzFiOXZVZXBHTGIxYkR0OXVIS0FDUjlZd0h0a25ZQ2MycUNQLUN6c2REQdIBZ0FVX3lxTE5pYVN5YjNUVVk5aTRzcU5id1l2bG1Zd0RIRkxTOFlSQjNEeVgzbGVQTWg2RVhvT2I1eWx1NTRiTWp6cnhyNTYtR0hoZko5Tm9LMjIydkh2emxzS0lTOURGdkw2NVV6MEk?oc=5",
       "category": "개발·교통",
       "query": "송도 11공구",
-      "id": "013b837951996f1427"
+      "id": "8b086a373156ff438b"
     },
     {
       "title": "AI·로봇 치안기술 한자리에 '국제치안산업대전' 송도컨벤시아에서 개막",
@@ -4349,6 +4297,15 @@
       "id": "efe707c4349c4efc80"
     },
     {
+      "title": "인천 아파트값 두 달째 내림세..전세 0.50% 급등",
+      "publisher": "일간경기",
+      "published_at": "2026-10-22T09:21:48+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1iaVRWdEs0bmV5bTd1ZWpRdFdVb2t4LU1qZTF5R3JVRHJfQUdUc1FxMDB0a1g0T2IxX05Celd1Uy1nRXkyRGg2cDFSWFVZVmxQS3RpY2F3S1BCY2ZvaXVrUXFta1g5anN2?oc=5",
+      "category": "정책·규제",
+      "query": "인천 부동산 규제",
+      "id": "dbc46dee2b109994fd"
+    },
+    {
       "title": "대미투자·부동산 세제…경제 상임위 종합감사 쟁점 부상",
       "publisher": "한스경제",
       "published_at": "2026-10-22T08:28:38+09:00",
@@ -4367,6 +4324,15 @@
       "id": "5459f509c088bd4ffa"
     },
     {
+      "title": "“갯벌, 인천이 품은 보물” 축제 24일 송도 해돋이공원 개최",
+      "publisher": "저널25방송",
+      "published_at": "2026-10-22T05:56:11+09:00",
+      "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE53MXlZZWxQYzAyay1NcUtOdnAyRl9kckhacnpOUHdYUFY0R2ZUQkoyMk5PTGIybE0zMlAtaXliM3NSdFR1M212eXA1YTZJT1RCTnpNWTVsME93OGZCa0lWUE5NczhYZjFsU2x6bw?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도동",
+      "id": "29eddbbca7fbf9a1bb"
+    },
+    {
       "title": "대기업판 ‘복지 찬스’가 집값 상승 자극했나…규제 밖 주택대출 논란",
       "publisher": "서울경제",
       "published_at": "2026-10-22T05:00:00+09:00",
@@ -4374,15 +4340,6 @@
       "category": "세금·대출",
       "query": "주택담보대출 DSR 정책",
       "id": "2f7fc603c12d220af3"
-    },
-    {
-      "title": "‘K-치안’ 송도서 선보인다…2026 국제치안산업대전 개막",
-      "publisher": "기호일보",
-      "published_at": "2026-10-22T04:06:47+09:00",
-      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE03UkJCMk4xcEVnWDBIeDRuaVdQSHRlUzdqQk52YUh5ME1wc1VaSzlDLUFTUkVVRjB2bjNMbWdsNGhINUNteVF2d2U2Y3lXWFktaXZvc2g1NVNONjg0UHA3X0NJckdSa3Bnc0ZfMldXdw?oc=5",
-      "category": "송도 종합",
-      "query": "인천 연수구 송도",
-      "id": "66ae2e751e838c7a38"
     },
     {
       "title": "송도국제도시의 핵심 현안 해결과 공영주차장 방치차량 대책 조례 발의 - 인천시의회 산업경제위원회 이강구 부위원장",
@@ -4430,15 +4387,6 @@
       "id": "6b996a94d76753baed"
     },
     {
-      "title": "AI·로봇이 만드는 더 안전한 대한민국,『2026 국제치안산업대전』 21일 송도컨벤시아서 개막",
-      "publisher": "내외일보",
-      "published_at": "2026-10-21T18:03:09+09:00",
-      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE9scHRaczNneVNfaHByZEYzbjRTeEJxaDFpMlE1S2VQZXJSZk1lZU95OThwbEpQWDJXRGQ0dFlyTXlSQklOS3k5Z1pSZ1dlRkh0SHc0cVNpSGtzczhVeE92MElCV0UyQUZ5cFEzN25wQQ?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도동",
-      "id": "df1c6d2ff7d6deece3"
-    },
-    {
       "title": "“인권 짓밟는 무기수출 중단”... 국내외 인권 활동가들 송도 모여",
       "publisher": "인천in 시민의 손으로 만드는 인터넷신문",
       "published_at": "2026-10-21T17:59:29+09:00",
@@ -4478,7 +4426,7 @@
       "title": "인천글로벌캠퍼스, '초기 진화부터 응급구조까지' 송도소방서와 실전합동훈련",
       "publisher": "중도일보",
       "published_at": "2026-10-21T16:48:59+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE95YnV1VUk0cVZRaE5DWm5aenJYNndwMW56ZlJXcWpueU8wT2JVQmZ0S0h2LVBWTVpndVgxT1lzbE1QVDVZYm43bG9QLXQ3eG9taGNXeWV6bm1CZC1tMkIxbFVIejk?oc=5",
+      "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE81bHZKQ18wT0xNN040VmVpRk0yekZaY3F3eERGV1NxU3hiNFNsMHBEbEtUVHBwY0NvY1dTelBXcGxUTjdHTlRRd1ZJU1BlNUJYNU42RE92b0ZFa3BjbkdEejdfYTFYVTl3UWR1Xw?oc=5",
       "category": "송도 종합",
       "query": "인천 송도동",
       "id": "d8ee131809edd693e6"
@@ -4486,11 +4434,20 @@
     {
       "title": "인천 송도 바이오기업 3분기 영업이익 공개...삼성바이오 6401억·셀트리온 5100억",
       "publisher": "중부일보",
-      "published_at": "2026-10-21T16:46:04+09:00",
-      "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE5pa3BjeDNSdFlnUGZ1dzF3SUk0NU9OUGItSVZIdU1uN1VwM1JHbFFEU19KYnVMQjlrM0g5SDNJRXVaSWlQVXZjb3ZuNmpJNkU5N0ZzMFZZbWpOdTFRamdEUDJEOWJ0eEwwMVVSQ0hR?oc=5",
+      "published_at": "2026-10-21T16:46:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE9QZXpIUk5qa0xWM0tvbWVlajRUYzUtVUtsM0pWOG14NllqdjRrOHp3eC1YTXpvYWdLTWd0eFdlOXQtbWNyR3VxNHloREZKRmhvaDNsU0RuS0xJc3F0eFQ0UE9BZUt4QTJlbUdnbmV1QQ?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도 기업 바이오",
-      "id": "93c74545158d3609cf"
+      "query": "인천 송도",
+      "id": "a322a11c98ee867fab"
+    },
+    {
+      "title": "‘국제치안산업대전’ 21일 송도컨벤시아서 개막",
+      "publisher": "중부일보",
+      "published_at": "2026-10-21T16:46:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5jcnJjbzF3Yk53RUROODJzaEdfdUVWc3NoblJNb1hmZm9VY2tLeE1tVUlGNXVTTWdFNTliVEFMUjVUVXFXLXhWMWtDaXE1djdnRXNwREE4X0loMnVUYXlYOEY0dzBVY2Y0R0JOaWp2QQ?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도",
+      "id": "22558fa252fafb00e5"
     },
     {
       "title": "2026 국제치안산업대전 21일 송도컨벤시아서 개막",
@@ -4552,7 +4509,7 @@
       "published_at": "2026-10-21T15:46:20+09:00",
       "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE95T0ZRVEdpR0dxdHVNeXdyWHpLUXZha3dkZGE4dWJoaWhpbTVUVEIwZXduNFJjS1hXcUtTTFVYVVBKOHEwLW9QbmljMUQ0Q3I5MnNMWVBOemdCOTVzaDlKZkNYaFdvZGlVV2tsNDNuRQ?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도동",
+      "query": "인천 송도 학교 교육",
       "id": "9ce9f7abd41d2ddadf"
     },
     {
@@ -4581,15 +4538,6 @@
       "category": "정책·규제",
       "query": "국토교통부 주택 정책",
       "id": "6f886beec1c34c151c"
-    },
-    {
-      "title": "7대 대기업 사내 주택대출 6370억원…현대차 2698억원 최다",
-      "publisher": "서울이코노미뉴스",
-      "published_at": "2026-10-21T14:39:55+09:00",
-      "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTFBBUHNLZWYwOHZTcVJUeEpiTVQ0QmZHWnZVaVhObW4yei1yNnVtTnBmSjBGZnJWd085WU41eXFseExQbHlyemVRQVoyZWhCelJ2UG1fdjhibkJoOERhTFRVS2tXVUV3cUNRTWVnR19n?oc=5",
-      "category": "세금·대출",
-      "query": "주택담보대출 DSR 정책",
-      "id": "d1362730415888d9ed"
     },
     {
       "title": "직장이 가른 내 집 마련 기회, 국힘 의원도 ‘사내 대출’ 규제 목소리",
@@ -4637,15 +4585,6 @@
       "id": "609f87c20d729d6ce5"
     },
     {
-      "title": "송도, 세계 바이오 인재 키운다…글로벌 실습교육장 개소",
-      "publisher": "데일리안",
-      "published_at": "2026-10-21T14:20:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMilwJBVV95cUxQSHNyUzdHbllQem9YZ2R4aThWXzJjaDQzWjJxbG5id2tfWFJMS0tzVFZWb3dqckM1YmhsZDZhZGVLMmFOcEJ6LXlVRlYtQ19DcWxXWVlPa0YtX2NVVDZDNFV2SzNUX2VXOU1VTGdVcGY4Wl84b2F3bHdIR1JyUVB1X0RHTnQ4dDQxTzBkRFhjZVBhWklGZUtXVWk5SXpVcXBUWm5XRm5PY3Y1UjlpSTB4YTQxUVo1dndmeTRVVV9sMUROVWVlUUhuTlVndG5FY1pOdm01VVlKWU9ndmUydFFhRDh2Y055LXQwWC1YSEI0dW1QbmZiWkRIcVdsbUdUX2FyU19XQmR4YlNBekVzRmNhcnBCbnhSS1k?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도동",
-      "id": "61b344251575a345cf"
-    },
-    {
       "title": "송도건강센터, ‘허리통증 예방과 운동법’ 강좌 개최",
       "publisher": "인천자치신문",
       "published_at": "2026-10-21T14:17:03+09:00",
@@ -4653,15 +4592,6 @@
       "category": "송도 종합",
       "query": "인천 송도 문화 축제",
       "id": "c71698fc09d2668abf"
-    },
-    {
-      "title": "송도3동 지역사회보장협의체, 취약계층 30가구에 가정용 구급함 지원",
-      "publisher": "세정포커스",
-      "published_at": "2026-10-21T12:21:29+09:00",
-      "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE5oczN1Wm40VWs3YXlESG9Sa3YzNFg0N3NaOGt6cWZsZmZvOXhvOTFhS3JCQ0FlTE1QSXlrcDQxajZKUnZ0N25YZjBfVWdENldMRmV5UDA2V1llalNjWG9qN1NvbnQ3SkNWSnB3Nzh3?oc=5",
-      "category": "송도 종합",
-      "query": "인천 연수구 송도",
-      "id": "3d1bb33b0246f91cf5"
     },
     {
       "title": "연수구 송도3동 취약계층 30가구에 구급함 지원",
@@ -4689,15 +4619,6 @@
       "category": "송도 종합",
       "query": "인천 송도",
       "id": "c06b1d777487ef9231"
-    },
-    {
-      "title": "갯벌, 인천이 품은 보물 축제 24일 송도 해돋이공원 개최",
-      "publisher": "인천뉴스",
-      "published_at": "2026-10-21T11:08:38+09:00",
-      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE11cnpRN0pzTWNpa1ZNSVFtQkJCVTJSYmk3c2lyVXpraWxEWFNxUmpnWnBHQzI3MmI0VFBaZEJHTlpLWWNFak9mM0dmS0RYYnRoekZtT3g2UDNTVndTaTBIWi1lVDNQdFNXcGtzMHNLUQ?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도",
-      "id": "812066610bcbd0aa94"
     },
     {
       "title": "주요 대기업 사내 주택대출 4년간 2배↑...올해 8월말 6370억원",
@@ -4743,6 +4664,15 @@
       "category": "세금·대출",
       "query": "주택담보대출 DSR 정책",
       "id": "d932f7dade571cdb63"
+    },
+    {
+      "title": "송도건강생활지원센터, ‘허리통증 예방과 운동법’ 건강강좌 참가자 모집",
+      "publisher": "미디어생활",
+      "published_at": "2026-10-21T10:30:42+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE9WLVd2OF84NzBrMnhDMFFEMFVHV3dHQ0xDUHM4dTVQbzU5Q1JkSW43TnpKUmlYODlvU3FhMThyOHZMajk2bHZWdVZrYU1TUUtoaGdIYWxBX080UUZxdXd0X0NLTHBDZjBWbkE?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도 주민 생활",
+      "id": "a806c2c19328bca65e"
     },
     {
       "title": "인천경제청, IFEZ 송도에 글로벌 바이오 캠퍼스 실습교육장 오픈… 국제 바이오 인력양성 거점 강화",
@@ -4862,15 +4792,6 @@
       "id": "de1bbd72dea9e5eb99"
     },
     {
-      "title": "대기업 사내 주택대출 6370억 '4년만 2배'…일부 계열사 '무이자' 혜택",
-      "publisher": "전남일보",
-      "published_at": "2026-10-21T08:26:01+09:00",
-      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE0wSTI3dWJGMzdkZWRYd21STWVxOXhrWGpSZlpxOFp6MFl5VTY5d2xQZmJSTTlwOUVsemFTUFJlbGViNHdicHBtSURZLXFFcGo4SHg1ZEZBTy1zWl9RUm90UXk1WG45U2t2VFkyblNSMA?oc=5",
-      "category": "세금·대출",
-      "query": "주택담보대출 DSR 정책",
-      "id": "05028c9d1b32594bb9"
-    },
-    {
       "title": "\"성북·동대문에 투기하려 집살까요?\" 전문가, 전월세난 해법은 토허제 해제",
       "publisher": "YTN",
       "published_at": "2026-10-21T08:22:00+09:00",
@@ -4905,15 +4826,6 @@
       "category": "송도 종합",
       "query": "인천 송도동",
       "id": "77c43d92aaa022a407"
-    },
-    {
-      "title": "9억 아파트 손녀에게 세금없이 물려주기 위해 강남 자산가가 한 일",
-      "publisher": "Daum",
-      "published_at": "2026-10-21T06:50:03+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE45U25MUHA0c2dZbkN1d0hGNk1xcUNqV3ZHTV82Y0pJanpEaTdEWmJIMlIzcTNXdW8xRHlmdnI2MHNtWHM5VVc2Z3RxNA?oc=5",
-      "category": "세금·대출",
-      "query": "부동산 취득세 양도소득세",
-      "id": "0bdd5b22c77745b1f9"
     },
     {
       "title": "[오늘 부동산] 李 대통령 \"2030년까지 3기 신도시 공공주택 90% 착공\"",
@@ -4952,6 +4864,15 @@
       "id": "f1adffc887c54b36a8"
     },
     {
+      "title": "무신사, 인천 최초 오프라인 편집숍 트리플스트리트 송도점 개점",
+      "publisher": "패션포스트",
+      "published_at": "2026-10-20T23:53:04+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiekFVX3lxTFBabzVLYUJWWnR2d3AwU3R1QVEyWi1LU3pzRzUteVdLclNvOHMzSWdXMUQ1WTFnTTJUTlUxWmlFUFByWWo1amxoajlmQ3VZeERIQ2U0aHVVU0VPcnZqQTVPZDV3MEZOSlJlbURyd3RaZEI1ZkV6cHctMzdB?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도",
+      "id": "49e647c7543472245d"
+    },
+    {
       "title": "세계 양자기술 기업들 송도로 향한다…인천, 아시아 첫 국제산업전 유치",
       "publisher": "주간한국",
       "published_at": "2026-10-20T23:30:56+09:00",
@@ -4961,21 +4882,12 @@
       "id": "38deeab0548c179a36"
     },
     {
-      "title": "인천관광공사, 양자산업 글로벌 행사 송도컨벤시아서 개최",
-      "publisher": "일간투데이",
-      "published_at": "2026-10-20T23:08:52+09:00",
-      "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTFBBTUVHVk5LNXhTMWJIRFA3aEh5ZFBmRDJMWHhNVDFhdlJsWW5za3pWTlFudlNob1hFWnMxN3ZEVEhHcjhoS0NmSVBTV0xLSlNTaW1Ydy1JcVhiNnFoUVo3b0hDSGQza1ZWdmY0?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도 관광 행사",
-      "id": "db6c89c2cc4249b689"
-    },
-    {
       "title": "BMW·MINI 송도 전시장·서비스센터 새단장",
       "publisher": "이데일리",
       "published_at": "2026-10-20T23:01:56+09:00",
-      "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxPYU5zUWc1R0diMGVmTElDVVptYy1QbFFqekt3OTRYdEhlVlV3dTItaXVwOUs1dlBXNEowUnZDSWhiSGdjcFhHdGNiNE9jZ1diYzhTaXI2MEVCTVdWb0ZGWVgxYmdPQkNLb2Rxd0ZNS2JfSE1yNHR1RmtQOV82cFJLMw?oc=5",
+      "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE1MQVBIb0pXb3V5aTZVU1hwWDFJVmNhRWhPRTEtd3JLSWhrVnUwUURldHd2TFlrNXl2UklnVmlkdEVnei1SX3dEUFBiWnh2ZEZ6dC03bDMyT1ZTWGp6MktJOGhfd09jVktXNHY2SXNlc0JJN3Ji?oc=5",
       "category": "송도 종합",
-      "query": "인천 연수구 송도",
+      "query": "인천 송도동",
       "id": "b8b2ea042e1dc6c050"
     },
     {
@@ -5007,20 +4919,11 @@
     },
     {
       "title": "송도에 글로벌 바이오 캠퍼스 실습교육장 문 열어…국제 바이오 인력양성 거점 강화",
-      "publisher": "한국시사경제",
-      "published_at": "2026-10-20T22:10:07+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE5UU3hfVE1WVGJ4UjhIV3BtSFJvRjgtZUVGcFBPSGVOZlVwNWNJT3J6RTUxaDBkV2JuekdoRkE0YloxOTRsTGZ3V1hZNDBUQjZGYmNrdjFxNGtBTlo1RzZfOVYxdlJPSlBYM2c?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도 문화 축제",
-      "id": "0df35a194dc37a865c"
-    },
-    {
-      "title": "송도에 글로벌 바이오 캠퍼스 실습교육장 문 열어…국제 바이오 인력양성 거점 강화",
       "publisher": "문화매일신문",
       "published_at": "2026-10-20T21:59:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBPT08wWXRRRndjTlMwbTJGZXBUQ0EyTy1ieTdKRzRMa1NBUkZNQjZldkU2UktzLVA3NnNRdXFaUHVrQUR1blNLTVVIVzAwTzFLLURWeEJWUEZpNjVvYVlsTFhVVQ?oc=5",
+      "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE5NdG9VYjh2SFAta1UwMHJoTVc4ZmFXMUVfRlpCNngwSnREclpKdzZyb0hZUDZ1SXZqN2JZM1Q1ZzRjWU9TVWJtdTZsNWxYVmJ6bEFRR0h3?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도 학교 교육",
+      "query": "인천 송도 문화 축제",
       "id": "838b96b43e772992d6"
     },
     {
@@ -5085,15 +4988,6 @@
       "category": "정책·규제",
       "query": "인천 부동산 규제",
       "id": "bab6bf1992a93a1ab5"
-    },
-    {
-      "title": "송도에 글로벌 바이오 실습교육장 개소…WHO 협력 강화 : 건강",
-      "publisher": "재경일보",
-      "published_at": "2026-10-20T18:20:55+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE9sS3pYS044T0JHZVo4a2lpcjVqQjN4UnowN280NTQ2VU9mRGRBUlRhVmNBT0RIMHJjSDF6ckZxTXd5NW53MXJHMWlKSQ?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도동",
-      "id": "33580dfb25525226b2"
     },
     {
       "title": "李대통령, 인천 계양 찾아 “3기 신도시 공급 속도가 부동산 정책 성패 가른다” - 조선비즈",
@@ -5209,7 +5103,7 @@
       "published_at": "2026-10-20T17:12:53+09:00",
       "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQdkpsWlh4cEx1Ul95Ul96MExDS1pDWm5XenFoNWtnRnlpNnNhVGlwVnFDTVpSSFh3OV9ZcFRtb0tlaVlUTUp6eHR0Vl80cXJoc3lORjVxTjF3NHN0X21LZTg2a1pWOEFOWDd2NEVublZuLXJWc19JamhPTVRkb0JOem1LT0FTUQ?oc=5",
       "category": "송도 종합",
-      "query": "인천 연수구 송도",
+      "query": "인천 송도 문화 축제",
       "id": "adb1b20d6c651e303a"
     },
     {
@@ -5274,6 +5168,15 @@
       "category": "송도 종합",
       "query": "인천 송도",
       "id": "fe6da680361f10afb7"
+    },
+    {
+      "title": "붕괴 조사 중 터진 100세대 침수…송도 럭스오션SK뷰 부실 논란",
+      "publisher": "경인방송 뉴스",
+      "published_at": "2026-10-20T16:27:28+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5LTEFHdkQxWG5fVnRNdGd1NUdsLTF4bXJoWE5OaGgwQUZaOEtxdENpNEc0RkNONURYcU0zNHVGMS1wS0dQRUI4VFFGMEY4ZVl6aUZGOGkyZ0hQb1dZNDlOSG1BWmlpRUJj0gFoQVVfeXFMTktMQUd2RDFYbl9WdE10Z3U1R2wtMXhtcmhYTk5oaDBBRlo4S3F0Q2k0RzRGQ041RFhxTTM0dUYxLXBLR1BFQjhUUUYwRjhlWXppRkY4aTJnSFBvV1k0OU5IbUFaaWlFQmM?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도동",
+      "id": "2998cbf39d5f7f4d31"
     },
     {
       "title": "송도 학원·교습소 985곳 = 목동 규모... '제2의 대치동' 아닌 '송도형 교육도시'로",
@@ -5353,8 +5256,17 @@
       "published_at": "2026-10-20T13:05:53+09:00",
       "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTFBlQUxZUGl0Z0N2Vzh3b3RuRng5bF9yRlNsODVleFBDX1ZOXzBQOWpWWU92Q1RvX2Rwbm5LcnNXNlRqT1Rxb201Q2RybDRMTXdtNnlfam1BNFo3Wk5EWXdQVDVTTmR4T2NHbUFscUhBQTJYTEJNZGZB0gF3QVVfeXFMUGVBTFlQaXRnQ3ZXOHdvdG5GeDlsX3JGU2w4NWV4UENfVk5fMFA5alZZT3ZDVG9fZHBubktyc1c2VGpPVHFvbTVDZHJsNExNd202eV9qbUE0WjdaTkRZd1BUNVNOZHhPY0dtQWxxSEFBMlhMQk1kZkE?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도",
+      "query": "인천 송도 관광 행사",
       "id": "9d70dd62b703a7cd40"
+    },
+    {
+      "title": "인천, 아시아 최초 양자산업 글로벌 행사 ‘IQT KOREA 2026’ 송도컨벤시아서 개최",
+      "publisher": "서울일보",
+      "published_at": "2026-10-20T12:06:53+09:00",
+      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE1oQ1d6ZWd1VkxyM0JtUmhpNm5oMENpRmtMSTZOTHdMTHFBejdSeDNaSU9yVUJVazk5LU5CbVRacGVadkZfRkNCRkhrVFZseDh0X2hnaXZoNHBrclhoS1dkV2RabEdTU181cEd3OE1Ub9IBb0FVX3lxTE1oQ1d6ZWd1VkxyM0JtUmhpNm5oMENpRmtMSTZOTHdMTHFBejdSeDNaSU9yVUJVazk5LU5CbVRacGVadkZfRkNCRkhrVFZseDh0X2hnaXZoNHBrclhoS1dkV2RabEdTU181cEd3OE1Ubw?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도 관광 행사",
+      "id": "2f98a2f4219a6c4571"
     },
     {
       "title": "\"국비 투입이냐, 원인자 부담이냐\"… GTX-B 춘천 연장 운명은",
@@ -5378,7 +5290,7 @@
       "title": "아시아 첫 'IQT KOREA 2026' 송도 개최 확정",
       "publisher": "숙박매거진",
       "published_at": "2026-10-20T11:12:10+09:00",
-      "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE9BNWxsUldrbkNJSWN2ZmlhVHFYZDN6MHctdHAtam1XYngxOGprQk5nT0kyYXF6N3g2Ulp5eVVoMVFLWFhIdkZPTUYyUHl4S3ZCZVpYZ1FFcHdIRnRud0JCb3hnVmtrQzBuLU15V0c5VUNsUQ?oc=5",
+      "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9vaTFhWS1HMWs5WGdhNDhIWXpWV2JPR0tzWXN4anJiLTJ6YTY2aHlKNjBrV1ZPZW02dzJrX0NEMk85Mkl4ZS1pWXhYUmxzTlY2T3VCbHAwTmJ0czU2SkdOVnp1V01SbFRtYTBoeTR1THc?oc=5",
       "category": "송도 종합",
       "query": "인천 송도 관광 행사",
       "id": "bfb1a25532b846b063"
@@ -5429,6 +5341,15 @@
       "id": "54d977dc6e3fc17ef9"
     },
     {
+      "title": "바바리안모터스, ‘BMW·MINI 송도 통합 전시장’ 리뉴얼 오픈",
+      "publisher": "고카넷",
+      "published_at": "2026-10-20T10:26:17+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE5vWnVTdzY3MUktblpkTGRZUnZkZjM3eXUzY1doSVdkbndJRnpMY3dMTEpmUEFQOG9SZ29XZWVvbk5RbTZZa3hnb1J2X2UwdXlnMXZwV19DNWxsYmJ3Z255UGR3MVg?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도동",
+      "id": "29d814fe205aa267b1"
+    },
+    {
       "title": "[초점] DSR 비켜간 ‘삼성 대출’…가계부채 규제 형평성 논란",
       "publisher": "경인방송 뉴스",
       "published_at": "2026-10-20T10:09:54+09:00",
@@ -5443,7 +5364,7 @@
       "published_at": "2026-10-20T10:00:00+09:00",
       "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5TcWs4SHl0d0pTSmpWSHVvQkJGZEhlTjUwMW5mY3hPa1dpUnpNTklWcVZldk82YzhTNWhFdlN1bTIzMHBhRGtMR2VlejRrVkN5Z1ZXYlhKN2NWOE9NR2pYc0ZQbWszLWM5Tkw4R091RQ?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도",
+      "query": "인천 송도동",
       "id": "0ee43daab4889820c5"
     },
     {
@@ -5463,6 +5384,15 @@
       "category": "정책·규제",
       "query": "인천 부동산 규제",
       "id": "4a04f052ef54159680"
+    },
+    {
+      "title": "양자기술 기업·투자자 송도에 모인다…‘IQT KOREA 2026’ 11월 개최",
+      "publisher": "인천게릴라뉴스",
+      "published_at": "2026-10-20T09:07:07+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTFA2cUxLR0xaejFYMllFVEREQ1F5UTJhMXBvd2w2cDRIbzVRa2ZpM0VTV2hVUm12eWswUk1xVzZoUHhzUXJJM1FxZ085ekZkbXh2WG1ldUlfUHJnaGRSWHZLU0tEc0E2UQ?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도",
+      "id": "a8e06ad12344326335"
     },
     {
       "title": "제주가 송도로 갔더니 3만 명 발길… 쇼핑몰에서 시작된 ‘제주행 유치전’",
@@ -5497,7 +5427,7 @@
       "published_at": "2026-10-20T00:59:00+09:00",
       "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE4xY2VJUmNkcWNhM0RLVWJQbFVmQkU1Ny00bWVNenFpWjdVa1JWQUlLc1R1azZIYUtwU1RWeEd1S1JtTml0Z2Q2OU9WRUJsQTBNUkFDN3R6TVNRbmhtcG1nTw?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도동",
+      "query": "인천 송도 학교 교육",
       "id": "d2c6a9372d04c44ec6"
     },
     {
@@ -5614,7 +5544,7 @@
       "published_at": "2026-10-19T16:00:00+09:00",
       "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE5xaE1lcC1xZkNlckVGd25qdDI1WUxPWmJ6ZUk4YW55NVZHSTF2Rm1CSTE2TnJUM3pmMnY2NXNlWDR4LUIzQTVTNUxneGo4Y21GbWkyRWl5T3dRX2FtQ1NNeEZTTHJGdFRqOTlV?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도동",
+      "query": "인천 송도 문화 축제",
       "id": "5e51f40d549657732f"
     },
     {
@@ -5758,7 +5688,7 @@
       "published_at": "2026-10-19T13:24:02+09:00",
       "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1JRGNsNnFRenpXdm5wcXd5NVMxSk1YSkc4NXJuVlFtbDluQmFEZ1BQRWl2cWVJSWJEWWtYY3Z6WGNIYjlxNGZ6eHJtNUEyV1lNY0lnazVDSnU5LXV5ZGY2MlluWW0?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도동",
+      "query": "인천 송도",
       "id": "9348728e66f9a6d154"
     },
     {
@@ -5870,6 +5800,15 @@
       "id": "c37a0770e81c2a48a6"
     },
     {
+      "title": "송도 발코니 붕괴 아파트, 폭우로 물 새 100여 가구 침수",
+      "publisher": "파이낸셜뉴스",
+      "published_at": "2026-10-19T10:21:40+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE9PNlo1ZHNEUEp5WTJoYlppQVpXVktiTkphc01Qa3FLZzJNQlBqcU1GN0c1MXZMZDhLNXVEdldXZG1PdHo3Rlp6UHZITHFlWERQSFpnRi1rbFhZZw?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도동",
+      "id": "4c7bdd35597d4313ae"
+    },
+    {
       "title": "“내 집 어디에, 언제 공급되나”… 주택공급 정례브리핑 신설",
       "publisher": "한국주택경제신문",
       "published_at": "2026-10-19T10:15:23+09:00",
@@ -5888,15 +5827,6 @@
       "id": "7d3e3928cce43ce843"
     },
     {
-      "title": "무신사, 인천 최초 오프라인 편집숍 트리플스트리트 송도점 개점",
-      "publisher": "패션포스트",
-      "published_at": "2026-10-18T21:11:23+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiekFVX3lxTFBabzVLYUJWWnR2d3AwU3R1QVEyWi1LU3pzRzUteVdLclNvOHMzSWdXMUQ1WTFnTTJUTlUxWmlFUFByWWo1amxoajlmQ3VZeERIQ2U0aHVVU0VPcnZqQTVPZDV3MEZOSlJlbURyd3RaZEI1ZkV6cHctMzdB?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도",
-      "id": "f05b7d9f790727e6b3"
-    },
-    {
       "title": "송도글로벌타운 3단계 시공사 선정은 제자리…미국선 홍보 계속",
       "publisher": "인천일보",
       "published_at": "2026-10-18T18:14:00+09:00",
@@ -5913,15 +5843,6 @@
       "category": "송도 종합",
       "query": "인천 송도 기업 바이오",
       "id": "8125e68a762eadb969"
-    },
-    {
-      "title": "추미애 '교통·주택정책·언행' 집중 표적",
-      "publisher": "인천일보",
-      "published_at": "2026-10-18T16:39:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5ldTYyeWtuR3d5OTJnVmVsd0Fld1pWSENLeGJGWXYtVG0tcldfcENVYWJZSXVXN3NtQm1ZN3REQ1F3ZFc1SFBGMlpJejFkV3RsV0pNRTczei00Slotd1ZxZkVGMWJ1Nk9jdkIyTVhHOGU?oc=5",
-      "category": "정책·규제",
-      "query": "인천 부동산 규제",
-      "id": "963df632b60837fef8"
     },
     {
       "title": "국토교통부, 강남 3구 중심 서울 집값 상승률 둔화, 공급 확대 등 시장안정 기반 강화에 총력",
@@ -5969,6 +5890,15 @@
       "id": "cf91ed73cf457c6d16"
     },
     {
+      "title": "인천시, AI 자율주행 BRT·송도·영종 셔틀 도입",
+      "publisher": "인천자치신문",
+      "published_at": "2026-10-18T09:45:20+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1IMmNsWHc4d1pnM2dqVUItNHl4SUNvQ3ZvdU9QY1FWVXVyZEdqbzc4bWRDeFdDZmFPUE5nSUNtcERRT3pWc0dwRkl6V3E5SXNCVllBY28zUVVXdGpqNkFTSmdrOU9PUzQ?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도",
+      "id": "8057c1753f5baa4d51"
+    },
+    {
       "title": "서울 민심 왜 더 흔들렸나…부동산에 겹친 세금·주거비 불만",
       "publisher": "쿠키뉴스",
       "published_at": "2026-10-18T09:06:41+09:00",
@@ -5980,11 +5910,11 @@
     {
       "title": "[윤준의 부동산수첩] 3040 첫 매수 급증…서울 진입 경쟁이 다시 시작됐다",
       "publisher": "NBN미디어",
-      "published_at": "2026-10-18T08:51:03+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE41bTMtM1dWai0zWDhQR0Z4LWQ1TlJRZEgtTUdSb2V3dlZ1MVFjRlJxRDdLM0JncFJwcjN4N0JwenYxSkw1aGF6OFpJMTMtc013V3BvNnNscktac0h5cjRjRUJzTzZreHpjUGfSAWpBVV95cUxONW0zLTNXVmotM1g4UEdGeC1kNU5SUWRILU1HUm9ld3ZWdTFRY0ZScUQ3SzNCZ3BScHIzeDdCcHp2MUpMNWhhejhaSTEzLXNNd1dwbzZzbHJLWnNIeXI0Y0VCc082a3h6Y1Bn?oc=5",
+      "published_at": "2026-10-18T08:40:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE95U2pSR3JqQ21SNHZuTThPU2swcldlVFhvOVNfS3F5QlhPUFctSTBlMGZvckR1Y3AyZExrMlVTTGcwbTB0OGw0bkU0c1lIaThZNDJBTldLakpZZkZZQWNJYUp1MGpfQdIBakFVX3lxTE41bTMtM1dWai0zWDhQR0Z4LWQ1TlJRZEgtTUdSb2V3dlZ1MVFjRlJxRDdLM0JncFJwcjN4N0JwenYxSkw1aGF6OFpJMTMtc013V3BvNnNscktac0h5cjRjRUJzTzZreHpjUGc?oc=5",
       "category": "세금·대출",
       "query": "주택담보대출 DSR 정책",
-      "id": "62258c82470baade8b"
+      "id": "48b05e7a57c0a1cde4"
     },
     {
       "title": "GTX-B 인천 청학역 신설, 중앙투자심사 통과",
@@ -6001,7 +5931,7 @@
       "published_at": "2026-10-17T21:33:55+09:00",
       "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE5XVHZfWWRGZi00cXBMY1NmRFhwZHZLeFFNdmctY196ejFsSkdzTEJrbTBzeWFTTnhpRmRaYlMwUVE4eTNCMU5UbTVueEt4QVQ0WFU3SmJEcTlQYVk?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도동",
+      "query": "인천 송도 문화 축제",
       "id": "1281ab07d8e5cf11e7"
     },
     {
@@ -6048,6 +5978,15 @@
       "category": "개발·교통",
       "query": "송도 GTX-B",
       "id": "1d12b0d559a5d62fbb"
+    },
+    {
+      "title": "[수도권 주택공급] 국토부, 강남 주택 가격 일부 안정화 발표…상승폭 축소",
+      "publisher": "CBC뉴스",
+      "published_at": "2026-10-17T10:23:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE51SFYxakM3cmpscnFsZlgzMlZnMU9XTlZLM1ZYYmU5dU8xSHNmTVJ2MUloUjNZSjRmMHZGZmVXMFJGMFJuTE1DRFIxdVlsbkJhaXFDc2pOMWtramtON1ZvM3F5M1FDWktl?oc=5",
+      "category": "정책·규제",
+      "query": "국토교통부 주택 정책",
+      "id": "d907c4ef7f3fb9e19f"
     },
     {
       "title": "내년까지 수도권 공적주택 약 10만호 입주 추진…규제지역 공공주택 무제한 매입 [부동산360]",
@@ -6105,11 +6044,20 @@
     },
     {
       "title": "송도국제도서관, 인천시 건축상 우수상…서송건설 시공",
+      "publisher": "파이낸셜뉴스",
+      "published_at": "2026-10-16T19:37:56+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE5Uem5Tc0lBTnVvRnAwdGFXYzR2OTYySG9yRnVLZWZUcExtcVM2OUVCdm8yWGU1aEVROHpCRmZVNm9adjRLbDJ6aDd3eXVzd2djYmRJRElabV9Ddw?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도동",
+      "id": "b8fff7aa8844be41d8"
+    },
+    {
+      "title": "송도국제도서관, 인천시 건축상 우수상…서송건설 시공",
       "publisher": "뉴시스",
       "published_at": "2026-10-16T19:37:23+09:00",
       "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE9pSXAyYjJNWXVrQlRlaFVpbTl2RHJoakowN3ZYdXF5NzktWnFTTjFmSWlPOUxPMHh1cHVUUXRYWGdCS0hBYzZuNWlkTDVTOURWSWlSdEVLUDFHSDVibzRTNNIBeEFVX3lxTE9lMXRKaWdVWnhyYWRGdW92LWU2dnlnSEZLV1hSWmc2clVCVWhYVVVtSkRRbUEwUHJqVzM3RjBOUnZQSndqaVg5TkgzdTlYQWl2ZnVGaV9UVWxMQlpNU2RNR0xEeHQ4aGJOLTF2YlVjMkxJTkZEb09sZw?oc=5",
       "category": "송도 종합",
-      "query": "인천 연수구 송도",
+      "query": "인천 송도동",
       "id": "bfc2c4aaa9deb9e93b"
     },
     {
@@ -6129,15 +6077,6 @@
       "category": "정책·규제",
       "query": "국토교통부 주택 정책",
       "id": "90a898198c3587eb0e"
-    },
-    {
-      "title": "‘생방송투데이’ 한우곱창 맛불 작전, 인천 송도 곱창구이 vs 서울 청담동 곱창전골 맛집 위치는?",
-      "publisher": "톱스타뉴스",
-      "published_at": "2026-10-16T18:01:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMickFVX3lxTFB6ZThxMnZwNG0tME95anA0VmRMS05uNDB0ZWJjYW1xeXphMWVqdUZENmNXbjB3QmZCVGRROTdta3RqTFdmT3U0SUxjSnJDbUVCQ2pPWEQ3MkdnWTBJU2RkUF9Ja1BRV04wSEpWb2RlVWkxUQ?oc=5",
-      "category": "송도 종합",
-      "query": "인천 연수구 송도",
-      "id": "18526ca76a341146fd"
     },
     {
       "title": "GTX-B 청학사거리 추가정거장 행안부 중투심 통과…2034년 개통 목표",
@@ -6203,6 +6142,15 @@
       "id": "ddfb84233b4c405529"
     },
     {
+      "title": "[지역프로젝트점검]인천시 GTX-B 청학 추가정거장 중앙투자심사 통과…2694억원 투입",
+      "publisher": "NSP통신",
+      "published_at": "2026-10-16T15:51:44+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE9GbGlnUUVnSUswdm5PeHhqdFMzOFFIZnh0SHRHLTkzNk1meDBMOF85Z1JOU1V0UkJ5V2ItSHN1N3UwMEUtRW5IQnc0MTIyZ0tHTk1rcmpiMkpKcFYzUXRySA?oc=5",
+      "category": "개발·교통",
+      "query": "송도 GTX-B",
+      "id": "f672bd90af3d916173"
+    },
+    {
       "title": "하남시, 청년 주거정책 구체화…맞춤형 주택 공급 검토",
       "publisher": "디스커버리뉴스(DISCOVERYNEWS)",
       "published_at": "2026-10-16T14:34:31+09:00",
@@ -6215,7 +6163,7 @@
       "title": "청학사거리에 GTX-B 정거장 생기나...중투심 통과",
       "publisher": "경인방송 뉴스",
       "published_at": "2026-10-16T14:25:59+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFBZazlINXhGZ2NOUjRXcU5tTHpUQTE2cUVaNS1UMXM3TzhUSGVZa01wejIwYXBsRnpGbDhlTTdyb0lmcTc4WXZZRUVZcmd6S2hadVVxRlVwWmVyS2U4V19OOVRjVWU?oc=5",
+      "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFBZazlINXhGZ2NOUjRXcU5tTHpUQTE2cUVaNS1UMXM3TzhUSGVZa01wejIwYXBsRnpGbDhlTTdyb0lmcTc4WXZZRUVZcmd6S2hadVVxRlVwWmVyS2U4V19OOVRjVWXSAWhBVV95cUxPLVlKSnFhckt3R183TW5XSVJQVkU3Y3ZLZVU5OGhfbC1VcDlQTElRa3NIZ3l2ZUhaQUFCTU1EeF9PQ0dWR212MHpuRVR4M0NJLVJLOUhwSUotcWZ4dzJIV0hDZW5keGVweQ?oc=5",
       "category": "개발·교통",
       "query": "송도 GTX-B",
       "id": "e8b215a4f6135ed4ed"
@@ -6347,15 +6295,6 @@
       "id": "ce0a490049711de514"
     },
     {
-      "title": "보드람치킨 송도호수점, 연수구 송도호수에 감성 치킨공간 탄생 [ 신아일보 강동완 기자 ] : 네이버 블로그",
-      "publisher": "Naver Blog",
-      "published_at": "2026-10-16T11:07:52+09:00",
-      "link": "https://news.google.com/rss/articles/CBMi-AFBVV95cUxNRjc5dzdGaDNjSFZqZ2U1Mnc4cUpya2djQXROaXkwalFZWmVWSEFSVHBFX01HRUxJZFNnblo1MW5ET1Fod1ZuSzhRcXNzT1hKazk2LVI4cDBmYjBLakhMWTBUVm5XRUFWdzVjdGFEbVhxaGYyUm8xY0NwNXFadUJqc0xVazByMlh3MHNkSEQyMS16Zy1qZ2U4SFQtOE5HZWtqNm9Pd01keGllWk9ZSWFaYzliMVoxRkh0T0lDNVJfb2I3N1lHdGQybGJIb3lBb1VfVWtsYUNDZ0pDS1BHSkhyNlU3VlJCWmRWbjByMVpEaVlNUUM4WmRVdg?oc=5",
-      "category": "송도 종합",
-      "query": "인천 연수구 송도",
-      "id": "1e4e1fbbbfdfd9b0a2"
-    },
-    {
       "title": "인천시, GTX-B 노선 추가 정거장 건설 행안부 지방재정 투자심사 통과",
       "publisher": "더팩트",
       "published_at": "2026-10-16T11:05:40+09:00",
@@ -6482,6 +6421,15 @@
       "id": "34a927e96cd89c1498"
     },
     {
+      "title": "GTX-B 인천 청학사거리 일대에 추가 정거장",
+      "publisher": "SBS Biz",
+      "published_at": "2026-10-16T09:37:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE9rVXdubHRGNC0yd3hDWUdrY3UyMWdfTFkwRmVhaVphenFrSzNGZHhvZF9NZDVkcE15OVNpUTVfV3l6dFhWNDZ3VUlIOVVGSDlkX1hz0gFYQVVfeXFMT1F1UWdhRjFzRFFVQWpfRFg5dXNyWjdPQnhGNmd3dlZOZDRQRGxBSDBoTU9fcEc1NlFMbnkyNFUzdzBNWFFjWHRYLVFqaVViT3hiZWE4bEtuSA?oc=5",
+      "category": "개발·교통",
+      "query": "송도 GTX-B",
+      "id": "2ed3b888b5d6aa6b93"
+    },
+    {
       "title": "인천시, GTX B노선 추가정거장 사업 행정안전부 중앙투자심사 통과",
       "publisher": "경기도민일보 미디어",
       "published_at": "2026-10-16T09:30:51+09:00",
@@ -6590,6 +6538,15 @@
       "id": "eb82fe7359d5e0035c"
     },
     {
+      "title": "송도 대형 상가 매매",
+      "publisher": "유스연합",
+      "published_at": "2026-10-15T16:50:47+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE91RUdPU0sya0o1cXNkWVVHWDBjd0Z5cDBGQ2NwbWlVM2MwV3ZIbDRORVp2eFdremtDbmh3OHZfQTVncXVmaW5JcTgtUlI3dFF4LWNF?oc=5",
+      "category": "개발·교통",
+      "query": "송도 GTX-B",
+      "id": "44c0d9f24ac85cb8b4"
+    },
+    {
       "title": "민주당 연수구의회 의원들, \"재외동포청은 인천 송도에, 세종시 이전 결사 반대\"",
       "publisher": "인천뉴스",
       "published_at": "2026-10-15T16:45:30+09:00",
@@ -6651,132 +6608,24 @@
       "category": "송도 종합",
       "query": "인천 송도",
       "id": "722342f3a6ca4f28ca"
-    },
-    {
-      "title": "스타트업·투자자 2000명 송도에 모였다…인천서 투자·글로벌 진출 ‘맞손’",
-      "publisher": "뉴스21 통신",
-      "published_at": "2026-10-15T15:38:49+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE43RlpuaGMtWncxeGtielFTTE5zanFOYjBuNmdybTQ3Mm9lUm1LVFZ1djNsc181d3ZiNUpGZmFiWjZsWkFKamFnUU1rX2UwRDhLbUYyeElR?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도",
-      "id": "eef921f18f6b95afd4"
-    },
-    {
-      "title": "가을·겨울 캠핑족 부른다…‘2026 인천 고카프 시즌2’ 30일 송도 개막",
-      "publisher": "뉴스로드",
-      "published_at": "2026-10-15T15:28:42+09:00",
-      "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE9LWXpmNWxRY3l4NWlVU0tsczQ2eGVrYm9YUFJkRmYyOEZhVGtNQUlkSTdMSGZvME8xZVUxRnBjZlg5YklKb0gwQ2tJUnZxSzJUbGJxMXg1czhDd05id1dFWlRJUUNJZi1aMmhz0gFvQVVfeXFMTmZLUEo0VEM5Sng4Yk80Z3NYUTZTZVZudVpjckphdDUxNjlhYkVwY3NfVTdDdnh4RnVIanRsOXdKcU15SDExN25vVWFiM0tNXzB5VVJ3RHRwMUUwTEQtemhuaTZUT1VkT2VmeWhieEcw?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도",
-      "id": "4fe1d5a6003399755c"
-    },
-    {
-      "title": "‘2026 인천 고카프 시즌2’, 오는 30일부터 송도컨벤시아서 개최",
-      "publisher": "파이낸스투데이",
-      "published_at": "2026-10-15T15:27:31+09:00",
-      "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1UczhfWFBwMFkzSU8wZmZ0MnlYaFFYaTdWd041QlZMWExOT25HNlZETERFLVd2cjJpbF9rTGJYWTYxMElaYUNVdzc4UTY4WkwxeUxiWDdheU5FeDNEQXppdzR3LVRpT0IyMTUyRA?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도",
-      "id": "797f7e77947fc4e9e8"
-    },
-    {
-      "title": "송도 11공구 ‘송도 대광로제비앙 모아엘가＇ 11월 선봬",
-      "publisher": "한국경제TV",
-      "published_at": "2026-10-15T15:27:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE9ScEtNVHo3b2hYWHBIdFkzNzRRMURvdS0wMEMyRWxWcy1RbjhpUzNMQVdEV3NZWjVEeVJJSEdCdGVnY0pZVkprWkFnMG8yb3BRWDd0RGtxYWFWcnVIMGxJd1Z5eWhZNVkxWVhMeVJCeGU4b0kyTkFV?oc=5",
-      "category": "개발·교통",
-      "query": "송도 11공구",
-      "id": "45f09747404e804f37"
-    },
-    {
-      "title": "정일영 \"재외동포청 세종 이전 백지화해야\"..송도 존치 촉구",
-      "publisher": "일간경기",
-      "published_at": "2026-10-15T14:30:06+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFA1YVlzc0tIOERnblhaYTNJNmo2UFg5UXk3b1BXZnlTZzZZTEthS0hoVnExZE5NZHJkZzRQM3UzOXNybXdBb1pKOC00T1dtVlFTQnhUVVZkWlROZVp6OTdCOEhEWWlJYTFQ?oc=5",
-      "category": "송도 종합",
-      "query": "\"송도국제도시\"",
-      "id": "d0984fca830386ad39"
-    },
-    {
-      "title": "인천 연수구의회, 제284회 임시회 개회하고 2027년도 주요업무계획·조례안 심사 착수",
-      "publisher": "경인매일",
-      "published_at": "2026-10-15T14:29:30+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBkOEFSREZKbFdaaGFVMUxKcFkwOEJlUmY1akhSa3JPSkRibkV3aTZNRlg3ekstR1phQlhqaHBFT2NSQzBqdXZsR1JMQ0duY09NMXZ4cElhQnZLSmtjbkJzajFVRmhNWV9O?oc=5",
-      "category": "개발·교통",
-      "query": "송도 GTX-B",
-      "id": "cec82633624522db2c"
-    },
-    {
-      "title": "제주관광공사, 인천 송도서 ‘제주가 왔송도!’ 행사 연다",
-      "publisher": "중앙일보",
-      "published_at": "2026-10-15T14:06:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE1Zd2dvM0VZanYyaUxNVG9keUdtNXgyWEZqRlZsYy01MDVod2RORDNuNEVnNlN0QmxzZzhSbTV1VkhXd0lPX1VaYlFmdUFoSDlJakNNQ01B?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도",
-      "id": "76229d737988ab4dcc"
-    },
-    {
-      "title": "강남은 세금 때문에 집 팔고, 외곽은 전세 때문에 집 산다... '집값 평탄화'의 두 얼굴",
-      "publisher": "한국일보",
-      "published_at": "2026-10-15T14:00:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9KZFMyMGhVNkRzbHNnVk1TZEFZRnRYeU5RMEZSZ1RRY19xeGwzc0E0SHJBd25CSUNGcEZoT3ZJUlBiejBsVkhKTHZ4WUNjQm12dndJdW1GaS1FTWxUNzBvVU5FWG5JN0hVRGk2LVhB0gFzQVVfeXFMTkZzMklPS0cxU1c1M2pYTEVaX3BkRUpaYlBSUHBmQjA0a3pldEFuUjZZcDRlMV9zREF0Z3cwUTRfekRnQ3VKbkd1Mi1fQThhWFJlLTVPSVY4SW1nOVIwejV3MzRBakpyci1TTnRiUzRndmljcw?oc=5",
-      "category": "세금·대출",
-      "query": "주택담보대출 DSR 정책",
-      "id": "13ebbd7b622f3ba3cb"
-    },
-    {
-      "title": "서울 오피스텔 5개 분기째 상승…인천·경기는 하락 : 부동산",
-      "publisher": "재경일보",
-      "published_at": "2026-10-15T13:41:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTFBPV0s0eEg2LWRQenF5YndZcTRNX0FXNWJZWGhCUG5EWHFYbEItV1RrUlZXRUk4cWlOb0p0Z3lZMzQwbEJ3ZXZ4Q1dyVQ?oc=5",
-      "category": "정책·규제",
-      "query": "인천 부동산 규제",
-      "id": "97053ba6a8fb40b4c2"
-    },
-    {
-      "title": "국민의힘 인천시당 “송도 지명 변경 행정력 낭비…현안부터 해결해야”",
-      "publisher": "경기일보",
-      "published_at": "2026-10-15T13:38:32+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTFAwM3k0c2poeFMxcEFHQlN4OXRVNTB0SmRqRHFGMGRvQmFCZjIzVHNmdTJiVlQtdHFHV0toYnRNWWpfbjhBOHA3cTNiNW9iaHlxZTFpVFVuTUZfUTg?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도",
-      "id": "ec1e68ddd19f8e1233"
-    },
-    {
-      "title": "[단독]尹정부 정책대출 펑펑…서민 '주택기금' 여윳돈 80% 급감했다 - 머니투데이",
-      "publisher": "머니투데이",
-      "published_at": "2026-10-15T13:35:06+09:00",
-      "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE4xbHFkSG9nelRNUU8zT09DeS02c1UtdjJ4SndVaV80dHo3Wk8yUjJkVHpZa0NJWWpXRUhETkhOT0Jqak1JaE1nZWZ5am9TV09FRVRkNl9sMU84R2JXdmNPU01vWUxGWkxBcXNLMtIBckFVX3lxTFB5VWNHSUYwaHpOVjI1R21YYlEwMWVNZWxiNlYyUWFOZmRnOFV4Ylg2TmhxMUs4bUJTY1VHaHIzZXRwZDBOXzl4dWU4LWVxSlhTcFRGbG41dW5BXzBsUExjaUlMc2hZZ3hiUWRjR0tFWVRVZw?oc=5",
-      "category": "정책·규제",
-      "query": "국토교통부 주택 정책",
-      "id": "2d149c01c3df9eeaf7"
-    },
-    {
-      "title": "국토위 국감서 '부동산 사찰' 공방…野 \"김현미 불러야\" 與 \"김건희 부를 것\"",
-      "publisher": "뉴시스",
-      "published_at": "2026-10-15T12:54:41+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE40aFFwSHNvSlV2clRxQjdFbVZDTVhJRWg1Mm5SSzJwNUMzZkM0MHpGb1ZsQVAtczRpSlpnN0hDbS1CZEU5SGMxQm9ONDVsY0EzZDlvSmtLVFpkVDFyYUt5MNIBeEFVX3lxTE1Rcm41R1F2c1Z5OHBBZmFPRjBOc2FJM2NmaW5lajlwWVNIMnBYSU5yRTV3bUl0bS1FYkgwRWp1VTd6cXpjT0dSQ1BRY0Z6QkNoSnFieUxvb1YwRTNiRU1uZGFiVkJBbVFwakZwdXBpTnBCT0VBRkhrQQ?oc=5",
-      "category": "정책·규제",
-      "query": "국토교통부 주택 정책",
-      "id": "3b25a773d2afad6d2b"
     }
   ],
   "counts": {
-    "briefs": 173,
-    "articles": 275
+    "briefs": 166,
+    "articles": 271
   },
   "ai_summary_stats": {
-    "created": 6,
-    "reused": 144,
-    "article_fetches": 29,
-    "source_links_resolved": 29,
-    "body_readable": 17,
-    "gemini_requests": 11,
-    "retry_requests": 9,
-    "candidate_articles": 10,
+    "created": 14,
+    "reused": 145,
+    "article_fetches": 46,
+    "source_links_resolved": 46,
+    "body_readable": 33,
+    "gemini_requests": 17,
+    "retry_requests": 13,
+    "candidate_articles": 16,
     "groq_created": 0,
-    "groq_requests": 3,
+    "groq_requests": 2,
     "groq_reviewed": 1,
-    "awaiting_body": 28
+    "awaiting_body": 27
   }
 }
