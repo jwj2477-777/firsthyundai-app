@@ -29,6 +29,7 @@ assert(addressed.includes('지도에서 주소 확인')&&addressed.includes('컨
 assert(missing.includes('평형별 실제 월 관리비는 아직 확보되지 않았습니다.'), 'Missing fee is clearly labeled unknown, not zero');
 assert(run('renderSchoolPublicInfo()').includes('배정학교가 아닙니다'));
 assert(run('renderSchoolPublicInfo()').includes('schoolzone.emac.kr'));
+assert(!run('renderSchoolPublicInfo()').includes('NEIS_EDU_KEY를 등록'),'Absent verified data must not falsely claim the stored NEIS key is missing');
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('활용승인'));
 run('renderPublicSubscriptions()');assert(nodes.publicSubscriptions.innerHTML.includes('첫 수집'));
 // News always comes first and subscriptions are a separate, reachable pane.
