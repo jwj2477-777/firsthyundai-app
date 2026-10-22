@@ -294,3 +294,67 @@ body[data-office-role="admin"] .familySimpleNote{display:none!important}
  #complexes .complexAreaContract{width:100%;min-height:51px}
  #complexes .complexAreaFacts strong{font-size:17px}
 }
+
+
+/* v2.0.2 · Contract screen: one family warning + red review highlights.
+   Rich visual preview is READ ONLY. The ordinary textarea remains the only
+   edited and shared source of truth (SMS/Kakao cannot transmit red typography). */
+#contracts .contractPreviewHeader{
+ display:flex;justify-content:space-between;align-items:center;gap:10px;
+ flex-wrap:wrap;margin:13px 0 9px;
+}
+#contracts .contractPreviewHeader>.inputLabel{
+ margin:0;color:#193D4A;font-size:17px;font-weight:850;
+}
+#contracts .contractPreviewToggle{
+ background:#fff8f0;border:2px solid #CFA68D;color:#81452B;
+ min-height:50px;font-size:14px;font-weight:850;padding:10px 14px;
+ border-radius:12px;
+}
+#contracts .contractPreviewHint{
+ font-size:14px;font-weight:700;color:#754930;margin:4px 0 13px;
+}
+#contracts .contractPreviewHighlight{
+ white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;
+ background:#fffaf1;border:2px solid #C8B09A;border-radius:15px;
+ min-height:250px;padding:19px 17px;color:#273C52;
+ font-size:17px;line-height:1.85;letter-spacing:-.15px;
+ box-shadow:0 3px 12px #4739210d;
+}
+#contracts .contractNeedsCheck{
+ display:inline;color:#A91D26;font-weight:900;
+ background:#FFE3E3;text-decoration:underline;
+ text-decoration-thickness:2px;text-underline-offset:3px;
+ padding:1px 3px;border-radius:4px;
+ box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+#contracts .contractMissingSummary{
+ background:#FFF2EB;border:2px solid #DBB095;
+ border-left:6px solid #AC492A;border-radius:13px;
+ font-size:16px;line-height:1.7;font-weight:850;color:#854021;
+ padding:15px 17px;margin:13px 0;
+}
+#contracts .contractMissingSummary.ok{
+ background:#E9F5EE;border-color:#AAD1BA;border-left-color:#16825C;color:#1F634B;
+}
+body:not([data-office-role="admin"]) #ct_reviewDetails,
+body:not([data-office-role="admin"]) #ct_termDiff,
+body:not([data-office-role="admin"]) #ct_oneTapSummary{display:none!important}
+body:not([data-office-role="admin"]) #ct_status.bad{display:none!important}
+body[data-office-role="admin"] #ct_previewHighlight,
+body[data-office-role="admin"] #ct_togglePreviewEdit,
+body[data-office-role="admin"] .contractPreviewHint{display:none!important}
+body:not([data-office-role="admin"]) #ct_preview:not(.contractEditing){display:none!important}
+body:not([data-office-role="admin"]) #ct_preview.contractEditing{
+ display:block!important;min-height:340px;
+ border:2px solid #A97C61;border-radius:15px;
+ font-size:17px;line-height:1.8;padding:18px;
+}
+body:not([data-office-role="admin"]) #ct_preview.contractEditing ~ .contractPreviewHint{display:none}
+body:not([data-office-role="admin"]):has(#ct_preview.contractEditing) #ct_previewHighlight{
+ display:none!important;
+}
+@media(max-width:540px){
+ #contracts .contractPreviewHighlight{padding:16px 14px;font-size:16px;line-height:1.8}
+ #contracts .contractPreviewToggle{width:100%}
+}
