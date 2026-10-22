@@ -171,7 +171,7 @@ function apartmentCandidates(text){
  }
  return [...scored.values()].sort((a,b)=>b.score-a.score||a.row.label.localeCompare(b.row.label,'ko'));
 }
-const FIELDS=['property','unit','price','contractDeposit','advance','interim','monthlyRent','contractDate','balanceDate','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms'];
+const FIELDS=['property','unit','exclusiveArea','supplyInfo','price','contractDeposit','advance','interim','monthlyRent','contractDate','balanceDate','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms'];
 function apply(id,newValue,found,source){
  if(newValue==null||newValue==='')return false;
  const e=E(id);if(!e||val(id))return false;
@@ -367,6 +367,15 @@ function recognize(raw){
    review.push('입력한 소재지와 등록 단지의 도로명주소가 다릅니다. 직접 입력한 소재지를 확인하세요.');
   }
  }
+ // Apartment shortcut gives source-backed exclusive square meters, never a
+ // derived supply/market-pyeong approximation. This also supports typed notes.
+ const areaLine=String(raw||'').match(/(?:^|\n)\s*(?:전용면적|전용㎡)\s*[:：]?\s*(\d{1,3}(?:\.\d{1,2})?)\s*(?:㎡|m²|m2)?\s*(?=\n|$)/im);
+ if(areaLine){
+  const n=Number(areaLine[1]);
+  if(Number.isFinite(n)&&n>=10&&n<=400)apply('exclusiveArea',String(n),found);
+ }
+ const supplyLine=String(raw||'').match(/(?:^|\n)\s*공급타입\s*[:：]\s*(\d{2,3}(?:\.\d{1,2})?[A-Za-z0-9-]{0,8}타입\s*·\s*공급\s*\d{2,3}(?:\.\d{1,3})?㎡)\s*(?=\n|$)/m);
+ if(supplyLine)apply('supplyInfo',supplyLine[1],found);
  // Account: a bank-name + plausible account-number + Korean payee name is high-confidence, even without an "account" label.
  const bankName='(?:KB\\s*)?(?:국민|신한|우리|하나|농협|기업|카카오|토스|새마을|우체국|수협|SC|부산|대구|경남|전북|광주|제주|케이뱅크)(?:은행)?';
  const bankAccountRx=new RegExp('('+bankName+')\\s*[:：(]?\\s*([0-9]{2,8}(?:[- ]?[0-9]{2,8}){2,5})(?:\\s+([가-힣]{2,4}))?','i');
