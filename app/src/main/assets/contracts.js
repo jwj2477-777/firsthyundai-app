@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 const E=id=>document.getElementById(id);
-const FIELDS=['dealType','property','address','unit','owner','buyer','price','monthlyRent','contractDeposit','advance','interim','interimDate','contractDate','balanceDate','balanceTime','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms','cancellation','brokerFee','rough'];
+const FIELDS=['dealType','property','address','unit','owner','buyer','price','monthlyRent','contractDeposit','advance','interim','interimDate','contractDate','balanceDate','balanceTime','exclusiveArea','supplyInfo','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms','cancellation','brokerFee','rough'];
 let created=false, approved=false;
 function field(id){return String(E('ct_'+id)?.value||'').trim();}
 function setField(id,value,force){const e=E('ct_'+id);if(e&&(force||!e.value.trim()))e.value=String(value||'');}
@@ -143,6 +143,12 @@ function makePreview(){
  const out=['안녕하세요. 퍼스트현대부동산입니다.','',typeLine,''];
  out.push('▶ 소재지 : '+(field('address')||'[주소 확인 필요]'));
  out.push('▶ 아파트명 : '+(field('property')||'[단지 확인 필요]')+(field('unit')?' '+field('unit'):' [동·호수 확인 필요]'));
+ if(field('exclusiveArea')){
+  const area=Number(field('exclusiveArea'));
+  if(Number.isFinite(area)&&area>0&&area<400){
+   out.push('▶ 전용면적 : '+String(area)+'㎡'+(field('supplyInfo')?' · '+field('supplyInfo'):''));
+  }
+ }
  if(field('owner'))out.push('▶ '+who+' : '+field('owner'));
  if(field('buyer'))out.push('▶ '+paying+' : '+field('buyer'));
  out.push('','▶ '+totalName+' : '+moneyOr(d.price));
@@ -219,17 +225,45 @@ async function share(){
  if(navigator.share){try{await navigator.share({text:t});}catch(e){}}
  else alert('공유 기능이 없는 환경입니다. 복사 버튼을 이용해 주세요.');
 }
-function fromSelectedComplex(){
- try{
-  const record=catalogRows().find(x=>x.id===complexSelected);
-  if(!record)return;
-  setField('property',record.label,true);
-  if(record.address)setField('address',record.address,true);
-  switchPage('contracts');
-  E('ct_unit').focus();
-  window.FirstHyundaiSmart?.select(record.id);
-  updateSummary();
- }catch(e){switchPage('contracts');}
+// Apartment -> contract must populate the VISIBLE memo, not hidden advanced
+// fields alone. No customer data persists; replacing an unfinished memo requires
+// explicit consent and resets the previous customer's payment/account details.
+function fromSelectedComplex(exclusiveM2=null,supplyLabel=''){
+ const record=typeof catalogRows==='function'?catalogRows().find(x=>x.id===complexSelected):null;
+ if(!record)return false;
+ const oldHasData=FIELDS.some(id=>id!=='rough'&&field(id))||field('rough')||E('ct_preview')?.value.trim();
+ if(oldHasData&&!confirm('기존에 작성 중인 계약 내용이 있습니다. 다른 계약으로 새로 시작할까요?'))return false;
+ const area=Number(exclusiveM2),validArea=exclusiveM2!==null&&exclusiveM2!==''&&
+  Number.isFinite(area)&&area>=10&&area<=400;
+ const pairs=typeof verifiedSupplyPairs==='function'?verifiedSupplyPairs(record):[];
+ const selected=validArea&&/^[0-9]{2,3}(?:\.[0-9]{1,2})?[A-Za-z0-9-]{0,8}$/.test(String(supplyLabel||''))?
+  pairs.find(p=>p.supply_label===supplyLabel&&Math.abs(p.exclusive_m2-area)<=0.011):null;
+ // A code is included only if the pair exists in the verified catalog.
+ const supply=selected?selected.supply_label+'타입 · 공급 '+String(selected.supply_m2)+'㎡':'';
+ const parts=['아파트명: '+record.label];
+ if(typeof record.address==='string'&&record.address.trim())parts.push('소재지: '+record.address.trim());
+ if(validArea)parts.push('전용면적: '+String(Math.round(area*100)/100)+'㎡');
+ if(supply)parts.push('공급타입: '+supply);
+ clearForNewMemo();
+ window.FirstHyundaiEasy?.reset?.();
+ E('ct_rough').value=parts.join('\n')+'\n';
+ setField('property',record.label,true);
+ if(record.address)setField('address',record.address,true);
+ if(validArea)setField('exclusiveArea',String(Math.round(area*100)/100),true);
+ if(supply)setField('supplyInfo',supply,true);
+ switchPage('contracts');
+ window.FirstHyundaiSmart?.select(record.id);
+ const context=E('ct_selectedComplexContext');
+ if(context){
+  context.textContent='✓ '+record.label+' 자동 입력 완료'+
+   (validArea?' · 전용 '+String(Math.round(area*100)/100)+'㎡':'')+
+   (supply?' · '+supply:'')+
+   ' · 동·호수와 계약조건을 추가해 주세요.';
+  context.classList?.remove?.('hidden');
+ }
+ E('ct_rough')?.focus?.();
+ updateSummary();
+ return true;
 }
 function clearForNewMemo(){
  const memo=field('rough');
@@ -238,6 +272,7 @@ function clearForNewMemo(){
  if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false;
  E('ct_preview').value='';
  E('ct_rough').value=memo;
+ E('ct_selectedComplexContext')?.classList?.add?.('hidden');
  E('ct_status').textContent='메모에서 새 계약조건을 분석합니다.';
  E('ct_status').className='contractReview';
  created=false;approved=false;
@@ -248,6 +283,7 @@ function reset(){
  if(!confirm('현재 작성 중인 계약 내용을 모두 지우시겠습니까? 저장된 사본은 없습니다.'))return;
  FIELDS.forEach(id=>{const el=E('ct_'+id);if(el)el.value='';});
  E('ct_dealType').value='전세';E('ct_preview').value='';
+ E('ct_selectedComplexContext')?.classList?.add?.('hidden');
  if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false;
  E('ct_status').textContent='조건을 입력하면 초안을 생성할 수 있습니다.';
  E('ct_status').className='contractReview';
@@ -268,7 +304,10 @@ window.FirstHyundaiContracts={
  onOpen(){window.FirstHyundaiSmart?.onOpen();updateSummary();},canShare:assertReady,updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,
  fromComplex(id){
   const r=catalogRows().find(x=>x.id===id);
-  if(r){setField('property',r.label,true);setField('address',r.address||'',true);switchPage('contracts');window.FirstHyundaiSmart?.select(r.id);updateSummary();}
+  if(!r)return false;
+  const before=typeof complexSelected==='string'?complexSelected:null;
+  try{complexSelected=r.id;return fromSelectedComplex();}
+  finally{if(before!==null)complexSelected=before;}
  },
  _test:{contractValue,normalizeDate,collect,clearForNewMemo,previewSpecialTerms,DEFAULT_DETAIL_TERM}
 };
