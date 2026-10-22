@@ -934,6 +934,22 @@ function canonicalAreaTypes(apt){
  return [...map.values()].sort((a,b)=>a.exclusive_m2-b.exclusive_m2||
     a.supply_m2-b.supply_m2||a.supply_label.localeCompare(b.supply_label,'ko'));
 }
+// Full apartment-area census. Official transactions establish EXCLUSIVE m² only.
+// Verified external supply/exclusive pairings remain authoritative for supply m²
+// and market pyeong; unmatched transaction areas never get a made-up supply size.
+function observedExclusiveTypes(apt){
+ const values=new Set();
+ const add=value=>{
+  const n=Number(value);
+  if(!Number.isFinite(n)||n<10||n>400)return;
+  values.add((Math.round(n*100)/100).toFixed(2));
+ };
+ for(const n of Array.isArray(apt?.area_types_m2)?apt.area_types_m2:[])add(n);
+ for(const row of complexAreaStats(apt))add(row.area);
+ const matched=canonicalAreaTypes(apt);
+ return [...values].map(v=>Number(v)).filter(area=>
+  !matched.some(pair=>Math.abs(pair.exclusive_m2-area)<=0.011)).sort((a,b)=>a-b);
+}
 function supplyForExclusive(apt,exclusiveM2){
  const area=Number(exclusiveM2);
  if(!Number.isFinite(area)||area<=0)return null;
@@ -1117,25 +1133,36 @@ function renderComplexes(){
     (ev!==null&&p.kapt_code?' · 전기차 충전 수치는 2026-09-09 K-apt 공개자료 기준':'')+'</p>'+
    (p.detail_note?'<details class="details"><summary>자료 차이·확인사항 보기</summary><p class="complexSectionNote">'+escapeHtml(p.detail_note)+'</p></details>':'');
   const matchedTypes=canonicalAreaTypes(p);
-  // Never render the source's raw exclusive list and the supply-type list as
-  // separate housing types. Those two lists often represent the SAME homes.
-  const areaTypes=matchedTypes.length?'<div class="complexTypeList">'+matchedTypes.map(t=>{
-   const label='전용 '+number(t.exclusive_m2)+'㎡ (약 '+
-    supplyPyeong(t.supply_m2,t.market_pyeong)+'평형)';
-   const secondary=' · '+t.supply_label+'타입 · 공급 '+number(t.supply_m2)+'㎡';
-   return '<span><strong>'+escapeHtml(label)+'</strong>'+
-     '<small class="tiny">'+escapeHtml(secondary)+'</small></span>';
+  const observedOnly=observedExclusiveTypes(p);
+  // The two groups display one genuine home type per row, without duplicating
+  // exclusive areas already present in a verified supply/exclusive type.
+  // Passing a verified type code selects THAT pair; an observed-only row passes
+  // exclusively its recorded area without inventing a supply/pyeong figure.
+  const rows=[
+   ...matchedTypes.map(t=>({area:t.exclusive_m2,pair:t,label:t.supply_label})),
+   ...observedOnly.map(area=>({area,pair:null,label:''}))
+  ].sort((a,b)=>a.area-b.area||(a.label||'').localeCompare(b.label||'','ko'));
+  const typeRows=rows.length?'<div class="complexTypeRows">'+rows.map(t=>{
+   const area='전용 '+number(Math.round(t.area*100)/100)+'㎡';
+   const code=t.pair?' · '+t.pair.supply_label+'타입 · 공급 '+number(t.pair.supply_m2)+'㎡':'';
+   const py=t.pair?supplyPyeong(t.pair.supply_m2,t.pair.market_pyeong):null;
+   const title=area+(py?' (약 '+py+'평형)':'');
+   const subtitle=t.pair?'공급·전용 확인'+code:'실거래 전용면적 확인 · 공급·평형은 대조 중';
+   const chosen=Number(t.area.toFixed(2));
+   const selectLabel=t.pair?t.label:'';
+   return '<div class="complexAreaItem'+(t.pair?' verified':' observed')+'">'+
+    '<div class="complexAreaFacts"><strong>'+escapeHtml(title)+'</strong>'+
+    '<small>'+escapeHtml(subtitle)+'</small></div>'+
+    '<button type="button" class="complexAreaContract" onclick="FirstHyundaiContracts.fromSelectedComplex('+chosen+',\''+escapeHtml(selectLabel)+'\')">이 면적으로 계약 작성 →</button>'+
+    '</div>';
   }).join('')+'</div>':
-   '<div class="empty">전용·공급면적 대응이 확인된 주택형을 추가 대조하고 있습니다.</div>';
+   '<div class="empty">공개 실거래에서 확인된 전용면적이 없습니다.</div>';
   const sources=[...new Set(matchedTypes.map(x=>x.source_url).filter(Boolean))];
-  const typeSources=sources.slice(0,4).map((url,i)=>sourceLink(url,'주택형 대조 출처 '+(i+1))).join('')+
-    (p.supply_type_source_url?sourceLink(p.supply_type_source_url,'KB부동산 타입 목록'):'');
-  const missing=(Array.isArray(p.supply_type_labels)?p.supply_type_labels:[])
-    .filter(label=>!matchedTypes.some(x=>x.supply_label===label)).length;
-  const areaView='<p class="tiny">한 주택형을 한 번만 표시합니다. ㎡는 전용면적, 약 ○평형은 해당 주택형의 공급면적을 기준으로 합니다.</p>'+
-   '<p class="tiny">공급·전용 확인 완료 '+matchedTypes.length+'개 주택형'+
-   (missing?' · 추가 대조 대상 '+missing+'개':'')+'</p>'+
-   areaTypes+typeSources;
+  const typeSources=sources.slice(0,4).map((url,i)=>sourceLink(url,'공급·전용 대응 출처 '+(i+1))).join('')+
+    (p.supply_type_source_url?sourceLink(p.supply_type_source_url,'단지 공급타입 목록'):'');
+  const areaView='<p class="complexAreaGuide">확인된 면적을 한 번씩 보여드립니다. <strong>평형은 공급면적이 확인된 경우에만</strong> 표시합니다.</p>'+
+   '<p class="complexAreaCounts">공급·전용 확인 '+matchedTypes.length+'종 · 실거래 전용 추가 '+observedOnly.length+'종</p>'+
+   typeRows+typeSources;
   const stats=complexAreaStats(p),active=complexDealType;
   const dealButtons=[['','전체'],['매매','매매'],['전세','전세'],['월세','월세']]
    .map(([v,label])=>'<button type="button" class="'+(active===v?'active':'')+'" onclick="setComplexDealType(\''+v+'\')">'+label+'</button>').join('');
