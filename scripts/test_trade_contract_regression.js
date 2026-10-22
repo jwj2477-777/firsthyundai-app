@@ -42,14 +42,25 @@ for(const type of ['전세','월세']){
 }
 assert.equal(renewal({type:'매매',contract_type_raw:'갱신'}),'','Sales never have rent renewal details');
 for(const type of ['전세','월세']){
- assert(badges({type,contract_type_raw:'갱신'}).includes('(갱신계약)'),type+' renewal');
- assert(badges({type,contract_type_raw:'갱신계약'}).includes('(갱신계약)'),type+' explicitly renewed');
- assert(badges({type,contract_type_raw:'신규'}).includes('(신규계약)'),type+' new');
- assert(badges({type,contract_type_raw:'신규계약'}).includes('(신규계약)'),type+' new signed');
- assert(badges({type,contract_type_raw:''}).includes('(계약구분 미기재)'),type+' unknown');
+ assert(badges({type,contract_type_raw:'갱신'}).includes('갱신계약'),type+' renewal');
+ assert(badges({type,contract_type_raw:'갱신계약'}).includes('갱신계약'),type+' explicitly renewed');
+ assert(badges({type,contract_type_raw:'신규'}).includes('신규계약'),type+' new');
+ assert(badges({type,contract_type_raw:'신규계약'}).includes('신규계약'),type+' new signed');
+ assert.equal(badges({type,contract_type_raw:''}),'',type+' missing contract type should not create a clutter tag');
  assert(!badges({type,contract_type_raw:'',renewal_raw:'사용'}).includes('갱신계약'),'Request-right use alone is NOT the contract class');
  assert.equal(broker({type,dealing_type:'중개거래',broker_region_raw:'인천 연수구'}),'','Broker location must never be shown for a lease');
 }
+
+// The card's three tags have distinct roles. No decorative parentheses.
+function statusBadge(row){return vm.runInContext('tradeStatusBadge('+JSON.stringify(row)+')',ctx);}
+for(const type of ['전세','월세']){
+ assert(statusBadge({type,status:'신고'}).includes('임대차 신고'),'Rental report is readable');
+ assert(!badges({type,contract_type_raw:'신규'}).includes('(신규계약)'),'No pointless parentheses around new contract');
+ assert(!badges({type,contract_type_raw:'갱신'}).includes('(갱신계약)'),'No pointless parentheses around renewed contract');
+}
+assert(statusBadge({type:'매매',status:'신고'}).includes('신고'),'Sale reported state remains');
+assert(statusBadge({type:'매매',status:'해제'}).includes('tradeCancelledBadge'),'Cancelled record must visibly retain its status');
+assert(!statusBadge({type:'매매',status:'신고'}).includes('임대차 신고'));
 assert(badges({type:'매매',dealing_type:'중개거래'}).includes('중개거래'));
 assert(badges({type:'매매',dealing_type:'직거래'}).includes('직거래'));
 assert.equal(broker({type:'매매',dealing_type:'직거래',broker_region_raw:'인천 연수구'}),'');
