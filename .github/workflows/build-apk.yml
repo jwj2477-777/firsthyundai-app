@@ -144,6 +144,7 @@ jobs:
           node scripts/test_trade_contract_date_filter.js
           node scripts/test_trade_confirmation_states.js
           node scripts/test_app_version.js
+          node scripts/test_updates_welcome.js
           node scripts/test_apartment_detail_navigation.js
           node scripts/test_area_contract_bridge.js
           node scripts/test_refresh_feedback.js
@@ -168,31 +169,71 @@ jobs:
         run: python3 scripts/generate_launcher_icon.py
       - name: Assert launcher safe zone and branded text not cropped
         run: python3 scripts/test_launcher_safezone.py
+      - name: Prepare immutable release signing key (release builds only)
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        env:
+          FHD_SIGNING_BUNDLE_B64: ${{ secrets.FHD_SIGNING_BUNDLE_B64 }}
+        run: |
+          python3 - <<'PY'
+          import os,sys,base64,io,zipfile
+          from pathlib import Path
+          bundle=os.environ.get('FHD_SIGNING_BUNDLE_B64','').strip()
+          if not bundle:
+              raise SystemExit('Production signing secret FHD_SIGNING_BUNDLE_B64 is missing. Refusing rotating debug-signature APK release.')
+          try:
+              archive=zipfile.ZipFile(io.BytesIO(base64.b64decode(bundle,validate=True)))
+              if set(archive.namelist())!={'firsthyundai-upload-keystore.p12','signing.properties'}:
+                  raise ValueError('Unrecognized signing bundle format')
+              keystore=Path(os.environ['RUNNER_TEMP'])/'firsthyundai-upload-keystore.p12'
+              keystore.write_bytes(archive.read('firsthyundai-upload-keystore.p12'))
+              os.chmod(keystore,0o600)
+              lines=archive.read('signing.properties').decode().splitlines()
+              secrets=dict(line.split('=',1) for line in lines if '=' in line)
+              required=('FHD_SIGNING_STORE_PASSWORD','FHD_SIGNING_KEY_ALIAS','FHD_SIGNING_KEY_PASSWORD')
+              if any(not secrets.get(x) for x in required):raise ValueError('Signing bundle credentials missing')
+              with open(os.environ['GITHUB_ENV'],'a',encoding='utf8') as stream:
+                  stream.write('FHD_SIGNING_KEYSTORE='+str(keystore)+'\n')
+                  for key in required:stream.write(key+'='+secrets[key]+'\n')
+              print('Persistent release keystore loaded from encrypted GitHub Secret')
+          except Exception as exc:
+              raise SystemExit('Signing bundle invalid; update release blocked') from None
+          PY
       - name: Build APK
-        run: gradle --no-daemon assembleDebug
-      - name: Verify actual APK version matches Gradle and release
-        run: python3 scripts/check_apk_version.py app/build/outputs/apk/debug/app-debug.apk
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            gradle --no-daemon assembleDebug
+          else
+            gradle --no-daemon assembleRelease
+          fi
+      - name: Verify APK version and immutable release signing identity
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            python3 scripts/check_apk_version.py app/build/outputs/apk/debug/app-debug.apk
+          else
+            python3 scripts/check_apk_version.py app/build/outputs/apk/release/app-release.apk
+            python3 scripts/check_release_signature.py app/build/outputs/apk/release/app-release.apk
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: FirstHyundai-Free-Auto-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.13 floating scroll-to-top APK
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Publish successful v2.0.14 welcome and signed updater APK
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v2.0.13.apk
-          unzip -t FirstHyundai-v2.0.13.apk | grep 'No errors detected'
-          if gh release view v2.0.13 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.14.apk
+          unzip -t FirstHyundai-v2.0.14.apk | grep 'No errors detected'
+          if gh release view v2.0.14 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.13 FirstHyundai-v2.0.13.apk \
+            gh release create v2.0.14 FirstHyundai-v2.0.14.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.13 · 모든 탭 맨 위로 바로가기' \
-              --notes '모든 메인 탭과 아파트 상세·관심단지 상세 화면에서 아래로 스크롤했을 때 우측 하단에 작고 단순한 원형 맨 위로(↑) 버튼이 표시됩니다. 버튼은 화면에 고정되고 현재 화면 스크롤만 최상단으로 부드럽게 이동시킵니다. 상단에서는 자동으로 숨겨지며 Android 화면 안전영역을 고려하고 마지막 본문이 버튼에 가려지지 않도록 하단 여백을 확보했습니다. 화면 전환/상세화면 열고 닫을 때 상태가 정확히 갱신되며 줄어든 동작 설정을 존중합니다. 기존 v2.0.12 계약 이미지 및 v2.0.11 학교 목록 등 기능은 그대로 보존합니다.'
+              --title '퍼스트현대 v2.0.14 · 웰컴스크린·디자인·앱 내 업데이트 확인' \
+              --notes '원본 FHD FIRST 로고 도형을 바꾸지 않고 색만 앱의 딥틸 청록으로 맞췄으며, 메인 제목의 고정 2.0 배지를 없애고 퍼스트현대/영문 브랜딩을 간결하게 정리했습니다. 앱 시작 시 스킵 가능한 짧은 네이티브 로고 웰컴 애니메이션이 표시되고 가족 보안인증은 그대로 유지됩니다. 앱 하단에서 GitHub 최신 정식 APK를 검증해 새 버전을 확인하고 설치 버튼으로 안전한 다운로드 페이지를 열 수 있습니다. Android는 설치 시 사용자 승인 절차가 필요합니다. v2.0.14부터는 비공개로 보관되는 고정된 릴리스 서명키로 APK를 서명하고 공개 인증서 지문을 검사합니다. 기존 v2.0.13 이전 디버그 서명 앱은 새 서명과 다를 수 있어 최초 1회 백업/재설치가 필요하며, 이후에는 서명이 같으면 덮어쓰기 업데이트 가능합니다. 기존 계약문자·실거래·송도 31개 학교·알림·맨 위로 버튼 등 모든 기능을 유지합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.13 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.14 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
