@@ -32,6 +32,7 @@ function togglePreviewEdit(){
  if(!source)return;
  const editing=!!source.classList?.contains?.('contractEditing');
  source.classList?.toggle?.('contractEditing',!editing);
+ E('ct_previewHighlight')?.classList?.toggle?.('hidden',!editing);
  if(button){
   button.textContent=editing?'✎ 문자 직접 수정':'✓ 수정 내용 미리보기';
   button.setAttribute?.('aria-expanded',String(!editing));
@@ -219,6 +220,11 @@ function makePreview(){
   out.push('위 계약조건과 송금 계좌, 계약 성립·해제 조건을 당사자 모두 확인해 주시기 바랍니다.');
  }
  E('ct_preview').value=out.join('\n');
+ // Newly composed messages always begin in readable, red-marked review mode.
+ E('ct_preview')?.classList?.remove?.('contractEditing');
+ E('ct_previewHighlight')?.classList?.remove?.('hidden');
+ const editToggle=E('ct_togglePreviewEdit');
+ if(editToggle){editToggle.textContent='✎ 문자 직접 수정';editToggle.setAttribute?.('aria-expanded','false');}
  refreshHighlightedNotice();
  created=false;approved=false;
  updateSummary();
