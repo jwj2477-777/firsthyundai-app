@@ -29,6 +29,7 @@ assert(addressed.includes('지도에서 주소 확인')&&addressed.includes('컨
 assert(missing.includes('평형별 실제 월 관리비는 아직 확보되지 않았습니다.'), 'Missing fee is clearly labeled unknown, not zero');
 assert(run('renderSchoolPublicInfo()').includes('배정학교가 아닙니다'));
 assert(run('renderSchoolPublicInfo()').includes('schoolzone.emac.kr'));
+assert(!run('renderSchoolPublicInfo()').includes('NEIS_EDU_KEY를 등록'),'Absent verified data must not falsely claim the stored NEIS key is missing');
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('활용승인'));
 run('renderPublicSubscriptions()');assert(nodes.publicSubscriptions.innerHTML.includes('첫 수집'));
 // News always comes first and subscriptions are a separate, reachable pane.
@@ -43,6 +44,24 @@ const sample={
 run('publicServices='+JSON.stringify(sample));
 const schools=run('renderSchoolPublicInfo()');
 assert(schools.includes('송도초등학교')&&!schools.includes('배정학교 확인'));
+run("publicServices="+JSON.stringify({
+ schools:{state:'awaiting_key',records:[]},
+ school_locations:{state:'verified',updated_at:'2026-10-01T00:00:00+0900',records:[
+ {code:'B000022222',name:'송도모의초등학교',level:'초등학교',address:'인천광역시 연수구 송도테스트로 10',lat:37.4,lng:126.66},
+ {code:'B000022223',name:'송도모의중학교',level:'중학교',address:'인천광역시 연수구 송도테스트로 20',lat:37.41,lng:126.67}
+ ]},
+ office_rents:{state:'awaiting_approval',records:[]},subscriptions:{state:'awaiting_approval',records:[]}
+}));
+const fallback=run('renderSchoolPublicInfo()');
+assert(fallback.includes('송도모의초등학교')&&fallback.includes('송도모의중학교'),'Show verified official fallback when NEIS fails');
+assert(fallback.includes('교육부 학교위치 표준데이터')&&fallback.includes('지도에서 학교 위치 보기'),'Display actual source and map action');
+assert(!fallback.includes('배정학교 확인'),'Location alone cannot verify catchment');
+run("selectNeisSchoolLevel('중학교')");
+const secondary=run('renderSchoolPublicInfo()');
+assert(secondary.includes('송도모의중학교')&&!secondary.includes('송도모의초등학교'),'Grade filter applies to fallback');
+run("selectNeisSchoolLevel('all')");
+run('publicServices='+JSON.stringify(sample));
+
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('송도 오피스텔'));
 run('renderPublicSubscriptions()');assert(nodes.publicSubscriptions.innerHTML.includes('첫 수집'));
 run("publicServices.subscriptions={state:'verified',updated_at:'2026-10-20T09:30:00+0900',window_start:'2025-09-01',records:[{kind:'아파트',name:'송도 새아파트',address:'인천 연수구 송도동',notice_date:'2026-10-19',apply_start:'2026-10-23',apply_end:'2026-10-25',households:123,notice_url:'https://www.applyhome.co.kr/ai/aia/test.do'}]}");

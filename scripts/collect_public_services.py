@@ -16,6 +16,7 @@ from urllib.parse import urlencode,unquote,urlparse
 from urllib.request import urlopen,Request
 from xml.etree import ElementTree as ET
 from collect_registry_maintenance import collect_registry,collect_maintenance,resolve_missing_kapt_codes
+from collect_school_locations import collect as collect_school_locations
 
 ROOT=Path(__file__).resolve().parents[1]
 TARGET=ROOT/'data'/'public_services.json'
@@ -303,10 +304,11 @@ def collect_subscriptions(key,opener=None,today=None,days_back=420):
         note='한국부동산원 청약홈 공식 모집공고일 기준 인천광역시 전체 소재 공고. 접수일 미기재는 별도 확인 필요. 접수 마감 공고도 지난 공고 탭에서 조회 가능.',
         window_start=start,window_end=end,records=records)
 
-def update_snapshot(path,school=None,office=None,subscriptions=None,registry=None,maintenance=None):
+def update_snapshot(path,school=None,office=None,subscriptions=None,registry=None,maintenance=None,school_locations=None):
     current=json.loads(path.read_text(encoding='utf-8'))
     if current.get('schema_version')!=1:raise RuntimeError('Snapshot schema mismatch')
     if school is not None:current['schools']=school
+    if school_locations is not None:current['school_locations']=school_locations
     if office is not None:current['office_rents']=office
     if subscriptions is not None:current['subscriptions']=subscriptions
     if registry is not None:current['building_registry']=registry
@@ -322,11 +324,24 @@ def main():
     a.add_argument('--months',type=int,default=6)
     args=a.parse_args()
     if not 1<=args.months<=12:raise ValueError('months must be 1..12')
-    school=office=subscriptions=registry=maintenance=None
-    if args.mode in ('schools','all') and os.environ.get('NEIS_EDU_KEY'):
-        school=collect_schools(os.environ['NEIS_EDU_KEY'])
-        print('NEIS 송도 학교 기본정보',len(school['records']),'곳')
-    elif args.mode in ('schools','all'):print('NEIS 인증키 미설정: 기존 상태 유지')
+    school=office=subscriptions=registry=maintenance=school_locations=None
+    if args.mode in ('schools','all'):
+        neis_key=os.environ.get('NEIS_EDU_KEY','')
+        if neis_key:
+            try:
+                school=collect_schools(neis_key)
+                print('NEIS 송도 학교 기본정보',len(school['records']),'곳')
+            except RuntimeError as exc:
+                print('NEIS 학교정보 연결 실패 · 등록키 변경 필요 여부 미확정 · 기존 자료 보존: '+str(exc)[:160])
+        else:print('NEIS 인증키 미설정 · 기존 자료 보존')
+        data_key=os.environ.get('DATA_GO_KR_SERVICE_KEY','')
+        if data_key:
+            try:
+                school_locations=collect_school_locations(data_key)
+                print('공식 전국 학교위치 표준데이터 중 송도 운영 학교',len(school_locations['records']),'곳')
+            except RuntimeError as exc:
+                print('대체 공식 학교위치 데이터 연결 실패 · 기존 자료 보존: '+str(exc)[:160])
+        else:print('공공데이터 인증키 미설정 · 학교위치 표준API 활용승인 확인 필요')
     if args.mode in ('offices','all') and os.environ.get('DATA_GO_KR_SERVICE_KEY'):
         # This service requires separate approval despite sharing service key.
         office=collect_offices(os.environ['DATA_GO_KR_SERVICE_KEY'],months=args.months)
@@ -355,10 +370,10 @@ def main():
                     print('K-apt 공용관리비 항목 확인 단지',len(maintenance['records']),'건; 대상',maintenance['scanned'])
                 except RuntimeError as e:print('공동주택 관리비 별도 수집 실패 · 기존 자료 유지: '+str(e)[:90])
         else:print('공공데이터 API 인증키 미설정: 기존 자료 유지')
-    if all(x is None for x in (school,office,subscriptions,registry,maintenance)):
+    if all(x is None for x in (school,office,subscriptions,registry,maintenance,school_locations)):
         print('실행 가능한 신규 서비스 없음: 파일 변경 안 함')
         return
-    update_snapshot(TARGET,school,office,subscriptions,registry,maintenance)
+    update_snapshot(TARGET,school,office,subscriptions,registry,maintenance,school_locations)
     print('기존 미승인 서비스·검증값 보존; 새 인증키는 출력하지 않음')
 
 if __name__=='__main__':

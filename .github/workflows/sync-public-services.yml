@@ -12,6 +12,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/collect_public_services.py'
+      - 'scripts/collect_school_locations.py'
       - 'scripts/collect_registry_maintenance.py'
       - 'tests/test_public_services.py'
       - '.github/workflows/sync-public-services.yml'
@@ -51,7 +52,7 @@ jobs:
               python scripts/collect_public_services.py --mode subscriptions
             fi
           elif [ "${{ github.event_name }}" = "push" ]; then
-            # When this collector changes, immediately recheck newly configured NEIS
+            # When this collector changes, immediately recheck both official sources
             # with its secret (never expose the key or publish partial results).
             if ! python scripts/collect_public_services.py --mode schools; then
               echo "School refresh unavailable; preserving prior schools and continuing independent building/fee refresh."
