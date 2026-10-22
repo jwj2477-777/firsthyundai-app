@@ -3,7 +3,15 @@
 >
 > **이 문서를 받은 ChatGPT, Gemini, Claude 또는 개발자는 이전 채팅을 모른다고 가정**한다. 반드시 [AGENTS.md](../AGENTS.md) → 이 문서 → [요구사항](PRODUCT_REQUIREMENTS.md) → [이력](PROJECT_HISTORY.md) → [복구·운영](RECOVERY_PLAYBOOK.md)을 읽고, 최신 소스와 실제 배포본을 대조한 뒤 작업한다. 이 문서는 사람의 모든 대화 내용을 한 글자도 빠짐없이 저장하는 원문 아카이브가 아니라 **합의된 요구와 구현의 구조화된 복원본**이다.
 
-## 최신 작업 · v2.0.13 (2026-10-22) 모든 탭 작은 고정 맨 위로 버튼
+## 최신 작업 · v2.0.14 (2026-10-22) 고정 서명·업데이트 확인·헤더·오프닝
+- 기존 매번 달라지는 Debug APK 서명 대신, 비공개 GitHub Secret `FHD_SIGNING_BUNDLE_B64` 안의 하나의 PKCS12 키를 release APK 빌드마다 복원. `scripts/check_release_signature.py`가 `docs/RELEASE_SIGNING_CERT_SHA256.txt`에 고정된 공개 SHA-256 지문과 비교하고 다르면 배포 실패. Secret 누락 시 정식 릴리스 중단.
+- 최초 GitHub Secret 설정은 반드시 사용자에게 필요한 수동 단계. 제공한 개인 백업 ZIP을 안전하게 보존할 것. v2.0.13 이하 debug APK와 새 release APK가 다른 서명이면 기존 로컬 자료 백업 후 최초 1회 재설치 필요. 이후에는 같은 release 키/증가하는 versionCode로 덮어쓰기 가능.
+- `AppUpdate.java`: 고정된 GitHub Release 주소 및 tag/asset APK 파일명/URL 엄격 검증; `MainActivity`에서 버전 확인과 사용자 승인 브라우저 다운로드. `app-updates.js`에서 새 버전 안내 배너 및 수동 확인. 자동/무음 설치는 하지 않음.
+- `LockActivity`: 원본 FHD 마크 네이티브 1초 인트로, 터치하면 건너뛰기 및 시스템 모션 감소 지원, 기존 보안 코드 검사 우회하지 않음.
+- 앱 헤더는 원본 SVG path 그대로 색만 teal `#116A71`, 고정된 '2.0' 배지를 제거하고 짧은 영문 서브타이틀. 런처 로고도 같은 톤.
+- 정식 서명키는 공개 repo, 소스, 테스트, 로그에 절대 남기지 않음. 사용자 GitHub Secret 등록 및 서명된 릴리스 성공을 확인하기 전 완료로 간주하지 말 것.
+
+## 직전 작업 · v2.0.13 (2026-10-22) 모든 탭 작은 고정 맨 위로 버튼
 - 본문 맨 아래 다른 버튼과 겹치지 않도록 `main` 및 `.apartmentSheet.panel` 하단 여백을 늘리고 오른쪽 아래 44px 청록 원형 `↑` 버튼(`id=scrollToTop`, `ui-v2.css`) 추가. Android safe-area inset에 따른 오른쪽/아래 여백 확보. 240px보다 더 내려갔을 때만 표시.
 - 외부 별도 `scroll-top.js`에서 **현재 보이는** 스크롤 루트만 조작: 메인 탭은 `window`, 단지·관심 상세 전체화면은 해당 요소 자체. 상세 화면이 열려 있을 때 메인 화면 스크롤 위치는 보존. 열기/닫기/탭 변경 시 표시를 갱신하고 부드러운 스크롤(접근성 reduced-motion 예외) 지원.
 - `scripts/test_scroll_to_top.js` 신규: 상단 자동숨김, 메인/상세 루트 분리, 모든 탭 공통 버튼 한 개, 터치 크기, 본문 여백, 접근성, 동작 간소화 검증. 기존 모든 데이터·계약·뉴스 로직 불변.

@@ -2,8 +2,25 @@ plugins { id 'com.android.application' }
 android {
  namespace 'kr.co.firsthyundai.app'
  compileSdk 35
- defaultConfig { applicationId 'kr.co.firsthyundai.app'; minSdk 26; targetSdk 35; versionCode 64; versionName '2.0.13' }
+ defaultConfig { applicationId 'kr.co.firsthyundai.app'; minSdk 26; targetSdk 35; versionCode 65; versionName '2.0.14' }
  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }
 
 dependencies { implementation 'androidx.core:core:1.13.1' }
+
+/* Release signing requires a stable private key supplied through encrypted CI secrets. */
+def fhdStore=System.getenv('FHD_SIGNING_KEYSTORE')
+def fhdStorePass=System.getenv('FHD_SIGNING_STORE_PASSWORD')
+def fhdAlias=System.getenv('FHD_SIGNING_KEY_ALIAS')
+def fhdKeyPass=System.getenv('FHD_SIGNING_KEY_PASSWORD')
+if([fhdStore,fhdStorePass,fhdAlias,fhdKeyPass].every{it}) {
+ android.signingConfigs {
+  fhdProduction {
+   storeFile file(fhdStore)
+   storePassword fhdStorePass
+   keyAlias fhdAlias
+   keyPassword fhdKeyPass
+  }
+ }
+ android.buildTypes.release.signingConfig=android.signingConfigs.fhdProduction
+}

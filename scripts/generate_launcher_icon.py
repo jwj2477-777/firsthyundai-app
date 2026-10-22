@@ -20,7 +20,7 @@ def vector_xml(adaptive=False):
         '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n'
         ' android:width="108dp" android:height="108dp" android:viewportWidth="512" android:viewportHeight="512">\n'
         + open_group + '\n'
-        + '<path android:fillColor="#FF0000" android:pathData="' + RED_OUTLINE + '"/>\n'
+        + '<path android:fillColor="#116A71" android:pathData="' + RED_OUTLINE + '"/>\n'
         + '<path android:fillColor="#FFFFFF" android:fillType="evenOdd" android:pathData="' + WHITE_LOGO + '"/>\n'
         + close_group + '\n</vector>\n'
     )
@@ -33,7 +33,7 @@ def write_asset(path, source):
 # Soft light-blue background helps the red/white emblem stay legible.
 write_asset("values/ic_launcher_colors.xml",
     '<?xml version="1.0" encoding="utf-8"?>\n'
-    '<resources><color name="ic_launcher_background">#EDF5FC</color></resources>\n')
+    '<resources><color name="ic_launcher_background">#EAF5F3</color></resources>\n')
 write_asset("drawable/ic_launcher_badge.xml", vector_xml())
 write_asset("drawable/ic_launcher_foreground.xml", vector_xml(adaptive=True))
 adaptive_xml = (

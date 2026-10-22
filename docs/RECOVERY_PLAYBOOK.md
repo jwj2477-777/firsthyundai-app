@@ -35,6 +35,11 @@ git bundle verify ../firsthyundai-full-history.bundle
 ```
 **GitHub ZIP은 기본 브랜치의 현재 파일만 담고 커밋 이력을 보존하지 않는다.** 전체 기록은 `git bundle`이나 `git clone --mirror`를 따로 보관.
 
+## C-2. 업데이트/서명 이전의 개인 자료 보호
+- v2.0.14부터 릴리스는 비공개 GitHub Secret `FHD_SIGNING_BUNDLE_B64`가 필수이며, 기존 Debug와 첫 Release의 서명이 다르면 기존 앱 위 설치는 불가능하다.
+- 제거 전 '내 자료'에서 JSON 백업 파일 저장과 정상 열림을 확인하고, 최초 고정 서명 설치 후 복원한다. 이후 동일 서명키 사용 및 versionCode 증가로 삭제 없이 업데이트 가능.
+- 앱 내 확인은 검증된 GitHub 릴리스 버전/자산만 사용하며 Android 사용자 승인 없이 설치되지 않는다. 자세한 설정 절차는 `docs/SIGNING_SETUP.md`.
+
 ## D. 현재 상태 검사 순서
 1. `app/build.gradle`에서 `versionName`/`versionCode` 확인. Android 서명·`applicationId` 변경이 있으면 설치/데이터 유지에 영향.
 2. GitHub Releases의 **최신 '성공한' 태그와 실제 APK 첨부 파일** 확인. GitHub Actions 빌드 로그에서 `Test ...`, `Build APK`, `Verify actual APK version`, `Publish successful...`이 모두 초록인지 확인.

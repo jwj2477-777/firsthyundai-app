@@ -11,7 +11,8 @@ const lock=read('app/src/main/java/kr/co/firsthyundai/app/LockActivity.java');
 const script=html.split('<script>')[1]?.split('</script>')[0];
 assert(script);new vm.Script(script);
 assert(html.indexOf('href="ui-v2.css"')>html.indexOf('href="theme.css"'),'2.0 overrides must load last');
-assert(html.includes('class="brandEdition">2.0</span>'),'Branded version mark');
+assert(!html.includes('class="brandEdition">2.0</span>'),'Stale fixed-version badge must be removed');
+assert(html.includes('class="brandSubtitle"'),'Brand label remains as a compact English subtitle');
 assert(html.includes('data-section="nearby"'),'Safe initial design scope');
 assert(script.includes("document.body?.setAttribute?.('data-section',id)"),'Screen changes recolor navigation');
 const luminance=h=>h.slice(1).match(/../g).map(v=>parseInt(v,16)/255).map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4)).reduce((a,v,i)=>a+v*[.2126,.7152,.0722][i],0);
@@ -51,7 +52,8 @@ assert(theme.includes('body:not([data-office-role="admin"]) .adminExplain'),'Fam
 for(const hook of ["FirstHyundaiEasy.compose()","FirstHyundaiContracts.voice()","FirstHyundaiContracts.approve()","FirstHyundaiContractImage.open()","refreshOne('trades',true)","switchNewsPane('subscriptions')","setTradeType('매매')"]){
  assert(html.includes(hook),'Core workflow missing '+hook);
 }
-assert(native.includes('<item name="android:statusBarColor">#182C46</item>'));
-assert(lock.includes('Color.rgb(36, 86, 170)'));
+assert(native.includes('<item name="android:statusBarColor">#133E48</item>'));
+assert(lock.includes('Color.rgb(17, 106, 113)'));
+assert(native.includes('<item name="android:colorAccent">#116A71</item>'));
 assert(html.includes('aria-current=')&&html.includes('aria-selected="true"'));
 console.log('v2.0.0 UI regression passed: independent selection hues, 4.5+ contrast, native branding, screen state and existing actions.');

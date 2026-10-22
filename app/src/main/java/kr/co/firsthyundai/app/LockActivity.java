@@ -8,6 +8,12 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -33,6 +39,11 @@ public class LockActivity extends Activity {
     private Button unlockButton;
     private Button retryButton;
     private static final String PREFS = "firsthyundai_access_attempts";
+    private FrameLayout welcomeOverlay;
+    private final Handler welcomeHandler = new Handler(Looper.getMainLooper());
+    private Runnable dismissWelcome;
+    private boolean welcomeDone = false;
+    private boolean openAfterWelcome = false;
 
     private int dp(int v) { return (int) (getResources().getDisplayMetrics().density * v + 0.5f); }
 
@@ -41,7 +52,7 @@ public class LockActivity extends Activity {
 
         ScrollView scroll = new ScrollView(this);
         scroll.setFillViewport(true);
-        scroll.setBackgroundColor(Color.rgb(244, 246, 250));
+        scroll.setBackgroundColor(Color.rgb(240, 248, 246));
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setGravity(Gravity.CENTER_VERTICAL);
@@ -51,7 +62,7 @@ public class LockActivity extends Activity {
         TextView title = new TextView(this);
         title.setText("퍼스트현대");
         title.setTextSize(30);
-        title.setTextColor(Color.rgb(32, 52, 78));
+        title.setTextColor(Color.rgb(24, 69, 76));
         title.setGravity(Gravity.CENTER);
         title.setTypeface(null, 1);
         root.addView(title);
@@ -77,7 +88,7 @@ public class LockActivity extends Activity {
         Button unlock = new Button(this);
         unlockButton = unlock;
         unlock.setAllCaps(false);
-        unlock.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(36, 86, 170)));
+        unlock.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(17, 106, 113)));
         unlock.setTextColor(Color.WHITE);
         unlock.setText("인증하고 앱 열기");
         LinearLayout.LayoutParams buttonParams =
@@ -126,11 +137,83 @@ public class LockActivity extends Activity {
         status.setText("최신 가족 보안 정책을 확인하는 중...");
         unlock.setOnClickListener(v -> unlock());
         retryButton.setOnClickListener(v -> loadLatestPolicy());
-        setContentView(scroll);
+        FrameLayout stage = new FrameLayout(this);
+        stage.addView(scroll,new FrameLayout.LayoutParams(-1,-1));
+        setContentView(stage);
+        showWelcome(stage);
         loadLatestPolicy();
     }
 
+    /** Native cold-start welcome; never bypasses access policy or authentication. */
+    private void showWelcome(FrameLayout stage) {
+        welcomeOverlay = new FrameLayout(this);
+        GradientDrawable background = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+                new int[]{Color.rgb(13,52,62),Color.rgb(19,103,110)});
+        welcomeOverlay.setBackground(background);
+        welcomeOverlay.setClickable(true);
+        welcomeOverlay.setContentDescription("퍼스트현대 시작 화면. 누르면 건너뛰기");
+        LinearLayout identity=new LinearLayout(this);
+        identity.setOrientation(LinearLayout.VERTICAL);
+        identity.setGravity(Gravity.CENTER);
+        ImageView emblem=new ImageView(this);
+        emblem.setImageResource(R.drawable.ic_launcher_badge);
+        emblem.setContentDescription("원본 FHD FIRST 로고");
+        identity.addView(emblem,new LinearLayout.LayoutParams(dp(128),dp(128)));
+        TextView title=new TextView(this);
+        title.setText("퍼스트현대");
+        title.setTextColor(Color.WHITE);
+        title.setTextSize(30);
+        title.setTypeface(null,1);
+        title.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams titleParams=new LinearLayout.LayoutParams(-2,-2);
+        titleParams.topMargin=dp(12);
+        identity.addView(title,titleParams);
+        TextView subtitle=new TextView(this);
+        subtitle.setText("FIRST HYUNDAI  ·  REAL ESTATE");
+        subtitle.setTextColor(Color.rgb(189,220,220));
+        subtitle.setTextSize(11);
+        subtitle.setGravity(Gravity.CENTER);
+        subtitle.setLetterSpacing(.1f);
+        LinearLayout.LayoutParams subtitleParams=new LinearLayout.LayoutParams(-2,-2);
+        subtitleParams.topMargin=dp(5);
+        identity.addView(subtitle,subtitleParams);
+        welcomeOverlay.addView(identity,new FrameLayout.LayoutParams(-1,-2,Gravity.CENTER));
+        stage.addView(welcomeOverlay,new FrameLayout.LayoutParams(-1,-1));
+        boolean reducedMotion=false;
+        try{reducedMotion=Settings.Global.getFloat(getContentResolver(),
+                Settings.Global.ANIMATOR_DURATION_SCALE,1f)==0f;}
+        catch(Exception ignored){}
+        if(!reducedMotion){
+            emblem.setAlpha(0f);
+            emblem.setScaleX(.84f);emblem.setScaleY(.84f);
+            title.setAlpha(0f);subtitle.setAlpha(0f);
+            emblem.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(480).start();
+            title.animate().alpha(1f).setStartDelay(320).setDuration(350).start();
+            subtitle.animate().alpha(1f).setStartDelay(500).setDuration(350).start();
+        }
+        dismissWelcome=this::finishWelcome;
+        welcomeHandler.postDelayed(dismissWelcome,reducedMotion?180:1100);
+        welcomeOverlay.setOnClickListener(v->finishWelcome());
+    }
+
+    private void finishWelcome() {
+        if(welcomeDone)return;
+        welcomeDone=true;
+        if(dismissWelcome!=null)welcomeHandler.removeCallbacks(dismissWelcome);
+        FrameLayout overlay=welcomeOverlay;
+        welcomeOverlay=null;
+        if(overlay!=null){
+            overlay.animate().cancel();
+            overlay.animate().alpha(0f).setDuration(180).withEndAction(()->{
+                if(overlay.getParent() instanceof ViewGroup)
+                    ((ViewGroup)overlay.getParent()).removeView(overlay);
+            }).start();
+        }
+        if(openAfterWelcome)openMain();
+    }
+
     private void openMain() {
+        if(!welcomeDone){openAfterWelcome=true;return;}
         if(isFinishing() || isDestroyed()) return;
         startActivity(new Intent(this, MainActivity.class));
         finish();
@@ -168,6 +251,11 @@ public class LockActivity extends Activity {
                 });
             }
         }, "family-policy-load").start();
+    }
+
+    @Override protected void onDestroy(){
+        welcomeHandler.removeCallbacksAndMessages(null);
+        super.onDestroy();
     }
 
     private void unlock() {

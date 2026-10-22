@@ -4,7 +4,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const root=path.resolve(__dirname,'..'),html=fs.readFileSync(path.join(root,'app/src/main/assets/index.html'),'utf8');
 const js=html.split('<script>')[1].split('</script>')[0];
 new vm.Script(js);
-assert(html.includes('class="officeMarkSvg"')&&html.includes('fill="#FF0000"')&&html.includes('fill="#FFFFFF"'));
+assert(html.includes('class="officeMarkSvg"')&&html.includes('fill="#116A71"')&&html.includes('fill="#FFFFFF"'),'Original FHD mark must preserve vector paths while matching teal brand tone');
 assert(html.includes('<h1>퍼스트현대</h1>')&&html.includes('class="brandHeader"'));
 assert(!html.includes('자료 이용 안내 · 눌러서 보기'));
 assert(!html.includes('프라임뷰 20블럭과 25블럭은 별개 단지로 표시합니다.'));
