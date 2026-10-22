@@ -194,6 +194,7 @@ function updateSummary(){
   (data.interim>0?' (중도금 '+money(data.interim)+' 별도)':'');
  if(created&&E('ct_preview').value){
   created=false;approved=false; // Invalidate stale preview after any upstream condition changed.
+  if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false;
   E('ct_status').textContent='조건이 변경되었습니다. 문자를 다시 생성해 검토해 주세요.';
   E('ct_status').className='contractReview bad';
  }
@@ -250,6 +251,7 @@ function makePreview(){
   out.push('위 계약조건과 송금 계좌, 계약 성립·해제 조건을 당사자 모두 확인해 주시기 바랍니다.');
  }
  E('ct_preview').value=out.join('\n');
+ if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false; // Every newly drafted notice needs fresh consent.
  // Newly composed messages always begin in readable, red-marked review mode.
  E('ct_preview')?.classList?.remove?.('contractEditing');
  E('ct_previewHighlight')?.classList?.remove?.('hidden');
@@ -266,7 +268,8 @@ function makePreview(){
 }
 function edited(){
  refreshHighlightedNotice();
- approved=false;E('ct_status').className='contractReview bad';
+ approved=false;
+ if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false;E('ct_status').className='contractReview bad';
  E('ct_status').textContent='미리보기를 직접 수정했습니다. 복사·공유하려면 ‘내용 확인 완료’ 버튼으로 다시 검토해 주세요.';
  syncReviewButton();
 }
