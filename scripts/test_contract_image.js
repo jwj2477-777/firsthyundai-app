@@ -6,10 +6,11 @@ const css=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/contracts.
 const html=fs.readFileSync(path.join(__dirname,'../app/src/main/assets/index.html'),'utf8');
 const java=fs.readFileSync(path.join(__dirname,'../app/src/main/java/kr/co/firsthyundai/app/ContractImageShare.java'),'utf8');
 const manifest=fs.readFileSync(path.join(__dirname,'../app/src/main/AndroidManifest.xml'),'utf8');
+const drawnLabels=[];
 const ctx={
  font:'',measureText(s){return {width:Array.from(s).length*21}},
  fillRect(){},beginPath(){},moveTo(){},lineTo(){},quadraticCurveTo(){},closePath(){},
- fill(){},stroke(){},fillText(){},set textAlign(x){},set fillStyle(x){},set strokeStyle(x){},set lineWidth(x){}
+ fill(){},stroke(){},fillText(s){drawnLabels.push(String(s))},set textAlign(x){},set fillStyle(x){},set strokeStyle(x){},set lineWidth(x){}
 };
 const nodes={ct_preview:{value:'안녕하세요. 퍼스트현대부동산입니다.\n\n● 아파트 전세계약 ●\n▶ 전세보증금 : 39,000만원\n▶ 특약사항\n→ 기타 상세한 특약사항은 본계약서 작성 시 협의하여 기재한다.\n※ 당사자 합의에 따른 안내\n실제 협의한 해제 조건을 확인해 주세요.'}};
 let approved=false, alerts=[];
@@ -75,7 +76,17 @@ const typical=[
  '당사자들은 위 금액의 이체와 동시에 본계약이 체결된 것으로 보기로 하며, 일방의 변심으로 계약을 해제하는 경우 매도인은 실제 수령한 금액의 배액을 상환하고 매수인은 실제 송금한 금액을 포기하는 조건으로 합의합니다.',
  '또한 위 사유로 계약이 해제되더라도 그 사실만으로 중개보수 지급의무가 없어지는 것은 아니라는 점을 확인합니다.'
 ].join('\n');
+const remittance=api._test.parseTransfer(typical);
+assert(remittance,'Verified bank/remittance from final plaintext must be present');
+assert.strictEqual(remittance.amount,'700만원');
+assert.strictEqual(remittance.bank,'하나은행');
+assert.strictEqual(remittance.account,'123-45678-01');
+assert.strictEqual(remittance.payee,'김가람');
+const realFormat=api._test.parseTransfer('금일 위 계약조건에 따라 계약금 중 일부인 500만원을 매도인 계좌(하나은행 110-33345-04 (예금주 김진욱))로 송금하기로 합니다.');
+assert.deepStrictEqual([realFormat.amount,realFormat.bank,realFormat.account,realFormat.payee],['500만원','하나은행','110-33345-04','김진욱'],'Never use the full contract deposit as today\'s transfer');
+assert.strictEqual(api._test.parseTransfer('금일 위 계약금은 15,000만원입니다.'),null,'Never invent a transfer from the contract deposit');
 const premium=api._test.plan(typical);
+assert.strictEqual(premium[0].items.filter(x=>x.kind==='transfer').length,1,'Display the actual today remittance and bank details once as a distinct callout');
 assert.strictEqual(premium.length,1,'Normal complete customer notice must be a single image');
 assert(premium[0].bottom<3100,'No content should be clipped under footer');
 assert(premium[0].heading.includes('매매계약 안내'));
@@ -85,5 +96,10 @@ assert.strictEqual(api._test.clean('▶ 잔금 : 85,000만원','row'),'잔금 : 
 assert.strictEqual(api._test.clean('→ 수리해준다.','term'),'수리해준다.');
 nodes.ct_preview.value=typical;
 api.open();assert(nodes.ct_imageDialog.open,'Premium sheet preview opens');
+for(const literal of ['오늘 송금액','700만원','하나은행','123-45678-01','예금주  김가람','계약내용과 입금 계좌를 확인하시고'])assert(drawnLabels.some(s=>s.includes(literal)),'Image must visibly show verified '+literal);
+assert(!drawnLabels.some(s=>s.includes('발송 전에 확인해 주세요')),'Recipient must not see internal sending instructions');
+assert(source.includes('document.querySelector?.(\'.officeMarkSvg\')'),'Render genuine brand SVG from the app header');
+assert(source.includes('new Path2D(d)'),'Use the original paths instead of redrawing the logo');
+
 api.share();assert(env.sent&&env.sent.pages.length===1,'Only one PNG must be handed to native share for an ordinary contract');
 console.log('Premium single-sheet layout and legal text preservation passed.');
