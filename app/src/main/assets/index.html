@@ -1224,6 +1224,7 @@ function renderComplexes(){
 let publicServices=null;
 const PUBLIC_SRC={
  school:'https://open.neis.go.kr/portal/data/service/selectServicePage.do?infId=OPEN17020190531110010104913&infSeq=2',
+ schoolLocation:'https://www.data.go.kr/data/15021148/standard.do',
  zone:'https://schoolzone.emac.kr/',
  registry:'https://www.data.go.kr/data/15134735/openapi.do',
  fee:'https://www.data.go.kr/data/15057937/openapi.do',
@@ -1242,28 +1243,41 @@ function selectNeisSchoolLevel(level){
  renderComplexes();
 }
 function renderSchoolPublicInfo(){
- const schools=verifiedRecords('schools');
+ const neis=verifiedRecords('schools');
+ const alternative=verifiedRecords('school_locations');
+ const schools=neis?.length?neis:alternative?.length?alternative:null;
+ const officialSource=neis?.length?'나이스 학교기본정보':alternative?.length?'교육부 학교위치 표준데이터':'수집 대기';
  const levels=[['all','전체'],['초등학교','초등'],['중학교','중등'],['고등학교','고등']];
  const buttons=levels.map(([value,label])=>'<button type="button" class="'+(neisSchoolLevel===value?'active':'')+
    '" aria-pressed="'+(neisSchoolLevel===value?'true':'false')+'" onclick="selectNeisSchoolLevel(\''+value+'\')">'+label+
    (schools?' '+(value==='all'?schools.length:schools.filter(x=>x.level===value).length):'')+'</button>').join('');
  const filtered=schools?schools.filter(x=>neisSchoolLevel==='all'||x.level===neisSchoolLevel).slice().sort((a,b)=>
   String(a.name||'').localeCompare(String(b.name||''),'ko')):[];
- const when=publicServices?.schools?.updated_at?prettyTime(publicServices.schools.updated_at):'아직 확인되지 않음';
- const rows=filtered.length?'<div class="apiSchools">'+filtered.map(x=>'<div><strong>'+escapeHtml(x.level)+' · '+escapeHtml(x.name)+'</strong>'+
-  '<span class="tiny">'+escapeHtml(x.address||'주소 확인 중')+'</span>'+
-  (x.phone?'<span class="tiny">연락처 '+escapeHtml(x.phone)+'</span>':'')+
-  (safeLink(x.homepage)?sourceLink(x.homepage,'학교 홈페이지'):'')+'</div>').join('')+'</div>':
-  '<div class="apiNotice">'+(schools===null?'나이스 연동 대기 · GitHub Secrets에서 NEIS_EDU_KEY를 등록하고 학교정보 수집을 실행해 주세요.':
-   '해당 학교급의 확인된 학교정보가 없습니다.')+'</div>';
- return '<div class="apiSmallCard"><h3>나이스 송도 학교 기본정보</h3>'+
-  '<p class="complexSectionNote">송도 지역 학교 정보이며 현재 선택한 아파트의 배정학교가 아닙니다. 실제 통학구역·배정은 교육청 공식 학구도와 최신 공고로 확인해야 합니다.</p>'+
-  '<p class="tiny">데이터 확인: '+escapeHtml(when)+'</p>'+
+ const origin=neis?.length?'schools':alternative?.length?'school_locations':'';
+ const updated=origin&&publicServices?.[origin]?.updated_at?prettyTime(publicServices[origin].updated_at):'수집 확인 전';
+ const refs=alternative?.length?new Map(alternative.map(x=>[x.name,x])):new Map();
+ const rows=filtered.length?'<div class="apiSchools">'+filtered.map(x=>{
+  const coord=x.lat&&x.lng?x:refs.get(x.name);
+  const location=coord?.lat&&coord?.lng?
+   'https://map.kakao.com/?q='+encodeURIComponent(x.name+' '+(x.address||coord.address||'')):'';
+  return '<div><strong>'+escapeHtml(x.level)+' · '+escapeHtml(x.name)+'</strong>'+
+    '<span class="tiny">'+escapeHtml(x.address||'주소 확인 중')+'</span>'+
+    (x.phone?'<span class="tiny">연락처 '+escapeHtml(x.phone)+'</span>':'')+
+    (location?sourceLink(location,'지도에서 학교 위치 보기'):'')+
+    (safeLink(x.homepage)?sourceLink(x.homepage,'학교 홈페이지'):'')+'</div>';
+ }).join('')+'</div>':
+  '<div class="apiNotice">'+(schools===null?
+   '학교 기본정보 수집을 확인 중입니다. 나이스 API가 실패하면 교육부 학교위치 표준데이터로 대체하며, 두 원천이 모두 실패하면 임의 학교목록을 표시하지 않습니다.':
+   '선택한 학교급의 확인된 학교정보가 없습니다.')+'</div>';
+ return '<div class="apiSmallCard"><h3>송도 학교 정보</h3>'+
+  '<p class="complexSectionNote">이 목록은 송도 소재 학교의 기본정보입니다. 현재 선택한 아파트의 배정학교가 아닙니다. 실제 통학구역·배정은 교육청 공식 학구도 및 고시로 확인해 주세요.</p>'+
+  '<p class="tiny">정보 출처: '+escapeHtml(officialSource)+' · 확인: '+escapeHtml(updated)+'</p>'+
   (schools?'<div class="neisLevelButtons">'+buttons+'</div>':'')+
   rows+
-  '<div class="contractActions"><button type="button" class="btn alt" onclick="refreshPublicServices(true)">공개 학교자료 새로 확인</button></div>'+
-  sourceLink(PUBLIC_SRC.zone,'공식 학구도에서 해당 주소 검색')+
-  sourceLink(PUBLIC_SRC.school,'나이스 학교정보')+'</div>';
+  '<div class="contractActions"><button type="button" class="btn alt" onclick="refreshPublicServices(true)">학교 자료 다시 확인</button></div>'+
+  sourceLink(PUBLIC_SRC.zone,'공식 학구도에서 주소 검색')+
+  sourceLink(PUBLIC_SRC.schoolLocation,'교육부 학교위치 표준데이터')+
+  (neis?.length?sourceLink(PUBLIC_SRC.school,'나이스 학교기본정보'):'')+'</div>';
 }
 function renderPublicComplexInfo(p){
  const find=key=>verifiedRecords(key)?.find(x=>x.complex_id===p.id);
