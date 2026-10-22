@@ -6,6 +6,40 @@ const E=id=>document.getElementById(id);
 const FIELDS=['dealType','property','address','unit','owner','buyer','price','monthlyRent','contractDeposit','advance','interim','interimDate','contractDate','balanceDate','balanceTime','exclusiveArea','supplyInfo','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms','cancellation','brokerFee','rough'];
 let created=false, approved=false;
 function field(id){return String(E('ct_'+id)?.value||'').trim();}
+// Textarea cannot color individual substrings. Show a safe, noneditable color
+// preview to family members; tap "직접 수정" to edit the original plain text.
+// Never inject user-supplied contract text as HTML without escaping it first.
+function escapeNotice(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));}
+const PLACEHOLDER=/\[[^\]\n]{0,90}확인 필요[^\]\n]{0,40}\]/g;
+function previewContainsMissing(){PLACEHOLDER.lastIndex=0;return PLACEHOLDER.test(E('ct_preview')?.value||'');}
+function highlightedNoticeHtml(raw){
+ const value=String(raw||'');let last=0,html='',match;
+ PLACEHOLDER.lastIndex=0;
+ while((match=PLACEHOLDER.exec(value))!==null){
+  html+=escapeNotice(value.slice(last,match.index));
+  html+='<strong class="contractNeedsCheck">'+escapeNotice(match[0])+'</strong>';
+  last=match.index+match[0].length;
+ }
+ return html+escapeNotice(value.slice(last));
+}
+function refreshHighlightedNotice(){
+ const highlight=E('ct_previewHighlight');
+ if(!highlight)return;
+ highlight.innerHTML=highlightedNoticeHtml(E('ct_preview')?.value||'');
+}
+function togglePreviewEdit(){
+ const source=E('ct_preview'),button=E('ct_togglePreviewEdit');
+ if(!source)return;
+ const editing=!!source.classList?.contains?.('contractEditing');
+ source.classList?.toggle?.('contractEditing',!editing);
+ if(button){
+  button.textContent=editing?'✎ 문자 직접 수정':'✓ 수정 내용 미리보기';
+  button.setAttribute?.('aria-expanded',String(!editing));
+ }
+ if(editing)refreshHighlightedNotice();
+ else source.focus?.();
+}
+
 function setField(id,value,force){const e=E('ct_'+id);if(e&&(force||!e.value.trim()))e.value=String(value||'');}
 function contractValue(text){
  const v=String(text||'').replace(/[,，\s]/g,'').replace(/원/g,'').replace(/(천|백)만$/,'$1');
@@ -185,6 +219,7 @@ function makePreview(){
   out.push('위 계약조건과 송금 계좌, 계약 성립·해제 조건을 당사자 모두 확인해 주시기 바랍니다.');
  }
  E('ct_preview').value=out.join('\n');
+ refreshHighlightedNotice();
  created=false;approved=false;
  updateSummary();
  created=true; // A newly generated preview remains approvable; only later form edits invalidate it.
@@ -193,11 +228,17 @@ function makePreview(){
   '계약내용·금액·계좌·당사자 합의를 대조한 뒤 ‘내용 확인 완료’를 누르세요.';
 }
 function edited(){
+ refreshHighlightedNotice();
  approved=false;E('ct_status').className='contractReview bad';
  E('ct_status').textContent='미리보기를 직접 수정했습니다. 복사·공유하려면 ‘내용 확인 완료’ 버튼으로 다시 검토해 주세요.';
 }
 function approve(){
  const d=collect();
+ if(previewContainsMissing()){
+  E('ct_status').textContent='⚠ 계약문자에 빨간 확인 필요 항목이 남아 있습니다. 먼저 내용을 보완해 주세요.';
+  E('ct_status').className='contractReview bad';
+  return;
+ }
  if(d.errors.length){E('ct_status').textContent='다음 필수 항목을 먼저 보완하세요: '+d.errors.join(' · ');E('ct_status').className='contractReview bad';return;}
  if(!created||!field('property')||!E('ct_preview').value.trim()){alert('먼저 문자 초안을 생성해 주세요.');return;}
  if(E('ct_includeNotice')?.checked&&!E('ct_noticeConfirmed')?.checked){
@@ -209,7 +250,7 @@ function approve(){
  E('ct_status').className='contractReview ok';E('ct_status').textContent='직접 확인 완료 · 복사 또는 공유할 수 있습니다.';
 }
 function assertReady(){
- if(!created||!approved||collect().errors.length||(E('ct_includeNotice')?.checked&&!E('ct_noticeConfirmed')?.checked)){alert('계약 조건·하단 합의문을 확인한 뒤 내용 확인 완료를 눌러주세요.');return false;}
+ if(!created||!approved||collect().errors.length||previewContainsMissing()||(E('ct_includeNotice')?.checked&&!E('ct_noticeConfirmed')?.checked)){alert('계약 조건·하단 합의문을 확인한 뒤 내용 확인 완료를 눌러주세요.');return false;}
  return true;
 }
 async function copy(){
@@ -271,6 +312,7 @@ function clearForNewMemo(){
  E('ct_dealType').value='전세';
  if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false;
  E('ct_preview').value='';
+ refreshHighlightedNotice();
  E('ct_rough').value=memo;
  E('ct_selectedComplexContext')?.classList?.add?.('hidden');
  E('ct_status').textContent='메모에서 새 계약조건을 분석합니다.';
@@ -282,7 +324,7 @@ function clearForNewMemo(){
 function reset(){
  if(!confirm('현재 작성 중인 계약 내용을 모두 지우시겠습니까? 저장된 사본은 없습니다.'))return;
  FIELDS.forEach(id=>{const el=E('ct_'+id);if(el)el.value='';});
- E('ct_dealType').value='전세';E('ct_preview').value='';
+ E('ct_dealType').value='전세';E('ct_preview').value='';refreshHighlightedNotice();
  E('ct_selectedComplexContext')?.classList?.add?.('hidden');
  if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false;
  E('ct_status').textContent='조건을 입력하면 초안을 생성할 수 있습니다.';
@@ -301,7 +343,7 @@ window.firstHyundaiContractSpeech=function(result){
  }else if(result&&!result.cancelled)alert('음성입력에 실패했습니다. 직접 입력을 이용해 주세요.');
 };
 window.FirstHyundaiContracts={
- onOpen(){window.FirstHyundaiSmart?.onOpen();updateSummary();},canShare:assertReady,updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,
+ onOpen(){window.FirstHyundaiSmart?.onOpen();updateSummary();refreshHighlightedNotice();},canShare:assertReady,updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,togglePreviewEdit,refreshHighlightedNotice,
  fromComplex(id){
   const r=catalogRows().find(x=>x.id===id);
   if(!r)return false;
@@ -309,6 +351,6 @@ window.FirstHyundaiContracts={
   try{complexSelected=r.id;return fromSelectedComplex();}
   finally{if(before!==null)complexSelected=before;}
  },
- _test:{contractValue,normalizeDate,collect,clearForNewMemo,previewSpecialTerms,DEFAULT_DETAIL_TERM}
+ _test:{contractValue,normalizeDate,collect,clearForNewMemo,previewSpecialTerms,DEFAULT_DETAIL_TERM,highlightedNoticeHtml,previewContainsMissing}
 };
 })();
