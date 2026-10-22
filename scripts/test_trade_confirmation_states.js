@@ -67,7 +67,7 @@ assert.equal(button.disabled,true);
 assert.equal(button.textContent,'내용 확인 필요');
 assert.equal(button.attributes['aria-pressed'],'false');
 const fields={dealType:'전세',property:'가상단지',address:'가상주소 1',unit:'101동 101호',
- price:'39000',contractDeposit:'3900',advance:'500',balanceDate:'2027-01-05',
+ price:'39000',contractDeposit:'3900',advance:'500',contractDate:'2026-10-22',balanceDate:'2027-01-05',
  leaseDuration:'2년',bank:'테스트은행',account:'111-222-333333',accountHolder:'홍길동'};
 for(const [key,value] of Object.entries(fields))E('ct_'+key).value=value;
 contract.makePreview();

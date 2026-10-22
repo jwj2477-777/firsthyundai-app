@@ -88,6 +88,8 @@ assert.strictEqual(api._test.parseTransfer('금일 위 계약금은 15,000만원
 const premium=api._test.plan(typical);
 assert.strictEqual(premium[0].items.filter(x=>x.kind==='transfer').length,0,'Do not duplicate the legal remittance clause as a separate card');
 assert(premium[0].items.some(x=>x.runs?.some(r=>r.emphasis&&r.text==='123-45678-01')),'The original account number must receive inline emphasis');
+assert(premium[0].items.some(x=>x.runs?.some(r=>r.kind==='amount'&&r.text==='700만원')),'Actual remittance must receive inline emphasis');
+assert(!premium[0].items.some(x=>x.runs?.some(r=>r.kind==='amount'&&r.text==='15,000만원')),'Never use total deposit in place of partial remittance');
 assert.strictEqual(premium.length,1,'Normal complete customer notice must be a single image');
 assert(premium[0].bottom<3100,'No original contract contents can be clipped');
 assert(premium[0].heading.includes('매매계약 안내'));
@@ -104,6 +106,7 @@ assert(!drawnLabels.some(s=>s.includes('계약내용과 입금 계좌를 확인�
 assert(!drawnLabels.some(s=>s.includes('발송 전에 확인해 주세요')),'Recipient must not see internal sending instructions');
 assert(source.includes('document.querySelector?.(\'.officeMarkSvg\')'),'Render genuine brand SVG from the app header');
 assert(source.includes('new Path2D(d)'),'Use the original paths instead of redrawing the logo');
+assert(source.includes("run.kind==='amount'?'#AC3930'"),'Partial remittance has restrained red highlight');
 assert(!source.includes('FHD 임시'),'Do not add a placeholder logo');
 assert(!source.includes('const footer='),'No bottom footer in the exported contract PNG');
 assert(source.includes("fill==='#FF0000'?'#155a66'"),'Recolor only the original company logo');

@@ -71,6 +71,8 @@ assert(!E('ct_previewHighlight').innerHTML.includes('contractNeedsCheck'));
 smart.refreshMissing();
 assert(E('ct_missing').textContent.startsWith('⚠ 확인할 정보'));
 assert(E('ct_missing').textContent.includes('동·호수'));
+assert(E('ct_missing').textContent.includes('계약일'),'Missing contract date appears in the existing warning');
+assert(css.includes('border:3px solid #D94D24'),'Warning emphasis must be visible');
 assert(!E('ct_missing').textContent.includes('property')&&!E('ct_missing').textContent.includes('exclusiveArea'));
 assert(E('ct_fixMissing').classList.contains('hidden')===false);
 assert(E('ct_preview').value==='검토 완료 문구','Highlighted preview must NEVER modify SMS plaintext');

@@ -146,6 +146,7 @@ function collect(){
  if(price!==null&&deposit!==null&&deposit>price)errors.push('계약금이 총금액을 초과함');
  if(deposit!==null&&advance!==null&&advance>deposit)errors.push('이번 송금액이 계약금보다 큼');
  if(price!==null&&deposit!==null&&interim!==null&&price-deposit-interim<0)errors.push('잔금 계산이 음수');
+ if(!field('contractDate')||/\[[^\]]*확인 필요[^\]]*\]/.test(field('contractDate')))errors.push('계약일');
  if(!field('balanceDate'))errors.push('잔금 예정일');
  if(field('interimDate')&&!(interim>0))errors.push('중도금 일정은 있는데 금액이 없음');
  if(interim>0&&!field('interimDate')&&/중도금[^\n]{0,70}\b\d{1,2}\s*년\s*\d{1,2}\s*일/.test(field('rough')))errors.push('중도금 지급일 오타 확인');
@@ -209,7 +210,7 @@ function makePreview(){
  out.push('','▶ '+totalName+' : '+moneyOr(d.price));
  if(d.type==='월세')out.push('▶ 월세 : '+moneyOr(amount('monthlyRent')));
  if(d.type!=='매매')out.push('▶ 임대차 기간 : '+(field('leaseDuration')||(field('leaseStart')&&field('leaseEnd')?dateLabel(field('leaseStart'))+' ~ '+dateLabel(field('leaseEnd')):'[확인 필요]')));
- if(field('contractDate'))out.push('▶ 계약일 : '+dateLabel(field('contractDate')));
+ out.push('▶ 계약일 : '+(field('contractDate')&&!/\[[^\]]*확인 필요[^\]]*\]/.test(field('contractDate'))?dateLabel(field('contractDate')):'[계약일 확인 필요]'));
  const ratio=d.price>0&&d.deposit!==null?d.deposit/d.price*100:null;
  out.push('▶ 계약금 : '+moneyOr(d.deposit)+(ratio!==null&&Math.abs(ratio-10)<0.00001?' (매매대금의 10%)'.replace('매매대금',totalName):''));
  if(d.interim>0){

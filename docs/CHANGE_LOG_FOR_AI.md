@@ -1,5 +1,7 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-22 / v2.0.9**: Contract date/explicit signing window now mandatory in all contract types and shown in existing parent missing-items banner, invalidates approval, marks red pending preview until supplied. Make one banner more conspicuous. Inline emphasize actual remittance amount alongside already emphasized bank/account/payee; no redundant card. Correct an earlier regex escape bug in the renderer and introduce targeted CI coverage.
+
 - **2026-10-22 / v2.0.8**: Customer contract PNG keeps exact original FHD FIRST SVG paths (recolor only), removes oversized duplicate transfer/account box, highlights bank/account/payee subtly INLINE within their original legal paragraph, removes bottom footer entirely. No contract wording or transfer amount modified; the same approved plaintext is rendered. Regression tests now assert inline runs, no second card and no footer. v2.0.7 Kakao fix retained.
 
 - **2026-10-22 / v2.0.7**: After rotating leaked Kakao REST key, GitHub actions successfully deployed workers/kakao-nearby to firsthyundai-nearby.jwj2477.workers.dev. App code and public config still pointed to nonexistent firsthyundai-kakao.jwj2477.workers.dev, resulting in HTTP 403. Corrected both URL sources; added Wrangler-vs-app-vs-config regression assertion and live verify trigger on config changes. Secret remains private; prior APK needs replacement.
