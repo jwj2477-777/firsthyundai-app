@@ -33,11 +33,11 @@ const html=fs.readFileSync(path.join(root,'app/src/main/assets/index.html'),'utf
 const script=html.split('<script>',2)[1].split('</script>',1)[0];
 new vm.Script(script);
 assert(script.includes('const matchedTypes=canonicalAreaTypes(p)'),'Every building type list must use the deduplicated canonical paired types');
-assert(!script.includes('const exclusiveAreas='),'Never separately list trade-exclusive observations as additional housing types');
+assert(script.includes('function observedExclusiveTypes(apt)'),'Display trusted unmatched government transaction exclusive m² rather than hiding it');
 assert(!script.includes('const supplyOnly='),'Never separately list the very same supply housing types');
-assert(script.includes('한 주택형을 한 번만 표시합니다.'),'Clearly explain one record per home type');
-assert(script.includes('추가 대조 대상'),'Unmatched inventories are counted, not represented as false extra types');
-assert(script.includes('한 주택형을 한 번만 표시합니다.'),'Housing types must not be duplicated from separate area inventories');
+assert(script.includes('확인된 면적을 한 번씩 보여드립니다.'),'Clearly explain deduplicated homes to customers');
+assert(script.includes('실거래 전용 추가'),'Show how many verified exclusive m² areas lack a supply pairing');
+assert(script.includes('공급·평형은 대조 중'),'Label unmatched government transaction areas without assigning imaginary supply m²');
 assert(!script.includes('Math.round(g.area/3.305785)'),'Exclusive-to-pyeong shortcut forbidden');
 const normalization=script.slice(script.indexOf('function normalizeAptName('),script.indexOf('const FAVORITE_MATCH='));
 const funcs=script.slice(script.indexOf('function verifiedSupplyPairs('),script.indexOf('function displayComplexValue('));
