@@ -41,6 +41,7 @@ public class MainActivity extends Activity {
     private static final int SAVE_CATALOG = 1023;
     private static final int DICTATE_CONTRACT = 1024;
     private static final int LIMIT = 8 * 1024 * 1024;
+    private volatile String verifiedUpdateUrl = "";
     private WebView web;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private String pendingBackup = "";
@@ -264,6 +265,24 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public int getInstalledAppBuildNumber() {
             return AppVersion.buildNumber(MainActivity.this);
+        }
+        @JavascriptInterface public void checkForAppUpdate() {
+            io.execute(()->{
+                JSONObject check=AppUpdate.check(MainActivity.this);
+                verifiedUpdateUrl=check.optBoolean("available",false)
+                    ?check.optString("downloadUrl",""):"";
+                deliver("onFirstHyundaiAppUpdate",check);
+            });
+        }
+        @JavascriptInterface public void openVerifiedAppUpdate() {
+            String url=verifiedUpdateUrl;
+            if(!AppUpdate.allowedDownload(url))return;
+            runOnUiThread(()->{
+                try {startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)));}
+                catch(Exception ignored){
+                    Toast.makeText(MainActivity.this,"업데이트 다운로드 페이지를 열지 못했습니다.",Toast.LENGTH_LONG).show();
+                }
+            });
         }
         @JavascriptInterface public String getMode() {
             return isAdminDeviceMode() ? "admin" : "family";
