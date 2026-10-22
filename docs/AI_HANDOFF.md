@@ -3,7 +3,13 @@
 >
 > **이 문서를 받은 ChatGPT, Gemini, Claude 또는 개발자는 이전 채팅을 모른다고 가정**한다. 반드시 [AGENTS.md](../AGENTS.md) → 이 문서 → [요구사항](PRODUCT_REQUIREMENTS.md) → [이력](PROJECT_HISTORY.md) → [복구·운영](RECOVERY_PLAYBOOK.md)을 읽고, 최신 소스와 실제 배포본을 대조한 뒤 작업한다. 이 문서는 사람의 모든 대화 내용을 한 글자도 빠짐없이 저장하는 원문 아카이브가 아니라 **합의된 요구와 구현의 구조화된 복원본**이다.
 
-## 최신 작업 · v2.0.10 (2026-10-22) 나이스 서버장애 대응 공식 학교위치 대체 원천
+## 최신 작업 · v2.0.11 (2026-10-22) 공식 학교위치 CSV 31곳 게시
+- 사용자 제공 전국 12,004개 학교의 `한국교육시설안전원_초중등학교위치.csv` 원본에서 '인천광역시 연수구 송도동' 소재 및 운영 상태인 초등 16·중등 9·고등 6, 총 **31개 학교**를 학교ID·도로명주소·위도경도·학교급·2026-10-01 데이터기준일자로 점검하고 `data/public_services.json`의 `school_locations.state=verified`, `import_method=official_csv`로 게시. **전국 CSV 원본 파일은 공개 repo에 올리지 않고 송도 31개 학교의 공개 기본정보만 배포.**
+- `scripts/import_school_locations_csv.py` 안전 재수입기: 필수 열/중복/좌표/주소 범위/운영/통일된 기준일·최소 건수를 확인하고 완료 시에만 스냅샷 갱신. API 승인·NEIS 요청 없이도 공식 파일로 정보 확보. 이후 자동 API 연동 정상화되면 최신 자료로 대체 가능.
+- 앱 `renderSchoolPublicInfo`에서 공식 CSV 출처와 자료 기준일, 초·중·고 필터, 개별 지도 링크 표시. 배정학교나 실제 도보 거리 추정하지 않음. `tests/test_school_csv_snapshot.py`에서 실존 31곳/학교급 인원/출처/재가져오기 원자성 회귀 검증.
+- 나이스/공식위치 표준 API 장애는 여전히 미해결(NEIS HTTP 500, 전국 위치 API 403). **학교목록 31곳 게시와 외부 API 정상화는 구분**할 것.
+
+## 직전 작업 · v2.0.10 (2026-10-22) 나이스 서버장애 대응 공식 학교위치 대체 원천
 - `scripts/collect_school_locations.py`는 교육부/한국교육시설안전원 `전국초중등학교위치표준데이터`의 **별도 자동승인 API**를 GitHub Actions의 `DATA_GO_KR_SERVICE_KEY`로 수집. 등록키 원문, 응답 전체, 요청 URL 로그 금지. 전 페이지·운영상태·학교급·송도동 소재 주소·공식 좌표를 검증하고 **단 한 페이지 실패 시 기존 자료 유지**. 별도 서비스 활용승인 필요할 수 있음.
 - `collect_public_services.py`의 schools/all은 NEIS 실패를 별도 처리해도 위 학교위치 수집을 계속 시도. `public_services.json`에 `school_locations` 상태 분리. 성공 때만 `verified`로 갱신. 학교 배정학교 자동 판정 금지.
 - 앱 `renderSchoolPublicInfo()`는 NEIS `schools`가 verified면 우선, 아니면 **공식 위치 표준데이터의 verified 레코드만 사용**하여 초/중/고 필터, 지도 검색 링크, 정확한 출처/갱신시점 표시. 키 재등록을 요구하는 오진 상태 메시지 제거. 공식 배정학군은 교육청 고시와 학구도 원문 링크로만 안내.
