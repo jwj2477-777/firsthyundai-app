@@ -23,7 +23,7 @@ class LauncherSafeZoneTest(unittest.TestCase):
         self.assertEqual(group.get(A+'pivotY'),'256')
         paths=group.findall('path')
         self.assertEqual(len(paths),2,'Preserve branded white lettering and red office logo')
-        self.assertEqual(paths[0].get(A+'fillColor'),'#FF0000')
+        self.assertEqual(paths[0].get(A+'fillColor'),'#116A71')
         self.assertEqual(paths[1].get(A+'fillColor'),'#FFFFFF')
     def test_background_and_round_adaptive_icon(self):
         background=ET.parse(RES/'values'/'ic_launcher_colors.xml').getroot()
