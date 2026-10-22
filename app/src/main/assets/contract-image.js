@@ -52,6 +52,37 @@ function round(c,x,y,w,h,r){
  c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);
  c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();
 }
+function parseTransfer(text){
+ // Today's actual remittance, bank and payee are extracted only from the
+ // reviewed contract message. Never substitute the full contract deposit.
+ const line=String(text||'').split('\n').find(x=>
+  /(?:금일|오늘|이번)/.test(x)&&/송금/.test(x)&&/계좌\(/.test(x));
+ if(!line)return null;
+ const amount=line.match(/계약금\s*중\s*일부인\s*([0-9,]+\s*(?:억(?:\s*[0-9,]+\s*만?원?)?|만원|원))\s*을/);
+ const begin=line.indexOf('계좌('),end=line.lastIndexOf(')로 송금');
+ if(!amount||begin<0||end<=begin)return null;
+ const detail=line.slice(begin+3,end).trim();
+ const acct=detail.match(/\b(?:\d{2,6}[- ]?){2,5}\d{2,6}\b/);
+ if(!acct)return null;
+ const bank=detail.match(/(?:[가-힣A-Za-z0-9·]+은행|농협|우체국|신협|새마을금고)/);
+ const payee=detail.match(/예금주\s*([^()]+)/);
+ return {amount:amount[1].replace(/\s+/g,' ').trim(),bank:bank?bank[0]:'',
+  account:acct[0].trim(),payee:payee?payee[1].trim():'',raw:line};
+}
+function drawOriginalBrandMark(c){
+ // Exact paths from the header's original company SVG; recolor only.
+ const svg=document.querySelector?.('.officeMarkSvg');
+ const paths=svg?.querySelectorAll?.('path');
+ if(!paths?.length||typeof Path2D!=='function')return false;
+ c.save();c.translate(LEFT,72);c.scale(94/512,94/512);
+ for(const el of paths){
+  const d=el.getAttribute('d');if(!d)continue;
+  const fill=String(el.getAttribute('fill')||'').toUpperCase();
+  c.fillStyle=fill==='#FF0000'?'#155a66':fill==='#FFFFFF'?'#ffffff':'#155a66';
+  c.fill(new Path2D(d),el.getAttribute('fill-rule')||'nonzero');
+ }
+ c.restore();return true;
+}
 function layout(text,profile,allowPages){
  const c=document.createElement('canvas').getContext('2d');
  if(!c)throw Error('휴대폰에서 계약 이미지를 생성할 수 없습니다.');
@@ -62,6 +93,8 @@ function layout(text,profile,allowPages){
   const p={items:[],bottom:TOP,heading,profile:profile.name};pages.push(p);return p;
  };
  let page=pages[0],inNotice=false;
+ const transfer=parseTransfer(text);
+ let transferAdded=false;
  const blank=Math.round(13*profile.gap);
  for(const rawLine of text.split('\n')){
   if(!rawLine.trim()){
@@ -70,6 +103,14 @@ function layout(text,profile,allowPages){
   }
   const initial=kindFor(rawLine);
   if(initial==='title')continue; // The heading is rendered as the hero title instead.
+  if(initial==='notice'&&transfer&&!transferAdded){
+   const height=Math.round(246*profile.scale);
+   const before=Math.round(14*profile.gap),after=Math.round(20*profile.gap);
+   if(allowPages&&page.items.length&&page.bottom+height+before+after>LIMIT)page=newPage();
+   page.bottom+=before;
+   page.items.push({kind:'transfer',transfer,y:page.bottom,height,line:height,size:Math.round(30*profile.scale)});
+   page.bottom+=height+after;transferAdded=true;
+  }
   if(initial==='notice')inNotice=true;
   const kind=inNotice&&initial==='body'?'notice-body':initial;
   const style=specs[kind],size=Math.max(21,Math.round(style.size*profile.scale));
@@ -117,10 +158,9 @@ function draw(page,index,total){
  c.fillStyle='#e8f3f2';c.fillRect(0,0,WIDTH,canvas.height);
  c.fillStyle='#ffffff';round(c,32,30,WIDTH-64,canvas.height-60,30);c.fill();
  c.strokeStyle='#ccdedf';c.lineWidth=2;c.stroke();
- c.fillStyle='#155a66';round(c,LEFT,76,92,53,11);c.fill();
- c.fillStyle='#fff';c.font='700 28px sans-serif';c.fillText('FHD',LEFT+17,113);
- c.fillStyle='#155a66';c.font='700 24px sans-serif';c.fillText('FIRST HYUNDAI',LEFT+110,108);
- c.fillStyle='#5b7480';c.font='400 20px sans-serif';c.fillText('REAL ESTATE',LEFT+112,136);
+ const hasBrand=drawOriginalBrandMark(c);
+ c.fillStyle='#155a66';c.font='700 24px sans-serif';c.fillText('FIRST HYUNDAI',LEFT+(hasBrand?111:0),108);
+ c.fillStyle='#5b7480';c.font='400 20px sans-serif';c.fillText('REAL ESTATE',LEFT+(hasBrand?113:2),136);
  c.fillStyle='#213f49';c.font='700 46px sans-serif';c.fillText(page.heading,LEFT,215);
  c.fillStyle='#58727a';c.font='400 23px sans-serif';c.textAlign='right';c.fillText('퍼스트현대부동산',RIGHT,214);c.textAlign='left';
  c.fillStyle='#be9371';round(c,LEFT,244,78,5,2);c.fill();
@@ -138,8 +178,37 @@ function draw(page,index,total){
  }
  for(const item of items){
   const y=item.y+item.line-11;
+  if(item.kind==='transfer'){
+   const t=item.transfer,x=LEFT-15,y0=item.y,h=item.height;
+   c.fillStyle='#eef8f6';round(c,x,y0,RIGHT-LEFT+30,h,18);c.fill();
+   c.strokeStyle='#8dbfba';c.lineWidth=2;c.stroke();
+   c.fillStyle='#0e555a';c.font='700 '+Math.round(27*h/246)+'px sans-serif';
+   c.fillText('오늘 송금액',LEFT+14,y0+Math.round(48*h/246));
+   c.fillStyle='#a12c23';c.font='800 '+Math.round(41*h/246)+'px sans-serif';
+   c.fillText(t.amount,LEFT+233,y0+Math.round(50*h/246));
+   c.fillStyle='#bad3d0';c.fillRect(LEFT+14,y0+Math.round(72*h/246),RIGHT-LEFT-28,2);
+   c.fillStyle='#4c6970';c.font='600 '+Math.round(24*h/246)+'px sans-serif';
+   c.fillText('입금 은행',LEFT+14,y0+Math.round(111*h/246));
+   c.fillStyle='#174c58';c.font='700 '+Math.round(29*h/246)+'px sans-serif';
+   c.fillText(t.bank||'계좌 안내',LEFT+232,y0+Math.round(111*h/246));
+   c.fillStyle='#174c58';c.font='700 '+Math.round(24*h/246)+'px sans-serif';
+   c.fillText('계좌번호',LEFT+14,y0+Math.round(166*h/246));
+   let accountFont=Math.round(37*h/246);
+   c.font='800 '+accountFont+'px sans-serif';
+   while(accountFont>22&&c.measureText(t.account).width>RIGHT-LEFT-250){
+    accountFont-=2;c.font='800 '+accountFont+'px sans-serif';
+   }
+   c.fillText(t.account,LEFT+232,y0+Math.round(167*h/246));
+   const u=Math.min(RIGHT-LEFT-250,c.measureText(t.account).width);
+   c.fillStyle='#17818c';c.fillRect(LEFT+232,y0+Math.round(175*h/246),u,3);
+   if(t.payee){
+    c.fillStyle='#314a52';c.font='650 '+Math.round(24*h/246)+'px sans-serif';
+    c.fillText('예금주  '+t.payee,LEFT+232,y0+Math.round(217*h/246));
+   }
+   continue;
+  }
   if(item.kind==='row'){
-   const prominent=/^(?:매매대금|전세보증금|보증금|잔금|이번 송금액|계약금)$/.test(item.label);
+   const prominent=/^(?:매매대금|전세보증금|임대차보증금|보증금|월세|월 차임|계약금|중도금|잔금|이번 송금액|오늘 송금액)$/.test(item.label);
    if(prominent&&!item.continuation){
     c.fillStyle='#e8f3f2';round(c,LEFT-10,item.y-5,RIGHT-LEFT+20,item.line+8,9);c.fill();
    }
@@ -164,7 +233,7 @@ function draw(page,index,total){
  }
  const foot=canvas.height-87;
  c.fillStyle='#cadcda';c.fillRect(LEFT,foot-25,RIGHT-LEFT,2);
- c.fillStyle='#647b80';c.font='400 22px sans-serif';c.fillText('계약조건·계좌정보·합의사항을 발송 전에 확인해 주세요.',LEFT,foot+11);
+ c.fillStyle='#647b80';c.font='400 22px sans-serif';c.fillText('계약내용과 입금 계좌를 확인하시고, 문의 사항은 퍼스트현대부동산으로 연락해 주세요.',LEFT,foot+11);
  if(total>1){c.textAlign='right';c.font='600 22px sans-serif';c.fillText(index+1+' / '+total,RIGHT,foot+11);c.textAlign='left';}
  return canvas;
 }
@@ -233,5 +302,5 @@ async function share(){
   status.textContent='공유 실패: '+(e.message||'다시 시도해 주세요.');
  }
 }
-window.FirstHyundaiContractImage={open,close,share,_test:{plan,kindFor,clean}};
+window.FirstHyundaiContractImage={open,close,share,_test:{plan,kindFor,clean,parseTransfer,drawOriginalBrandMark}};
 })();
