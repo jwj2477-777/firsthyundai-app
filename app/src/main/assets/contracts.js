@@ -231,7 +231,7 @@ async function share(){
 function fromSelectedComplex(exclusiveM2=null,supplyLabel=''){
  const record=typeof catalogRows==='function'?catalogRows().find(x=>x.id===complexSelected):null;
  if(!record)return false;
- const oldHasData=FIELDS.some(id=>id!=='rough'&&field(id))||field('rough')||E('ct_preview')?.value.trim();
+ const oldHasData=FIELDS.some(id=>!['rough','dealType'].includes(id)&&field(id))||field('rough')||E('ct_preview')?.value.trim();
  if(oldHasData&&!confirm('기존에 작성 중인 계약 내용이 있습니다. 다른 계약으로 새로 시작할까요?'))return false;
  const area=Number(exclusiveM2),validArea=exclusiveM2!==null&&exclusiveM2!==''&&
   Number.isFinite(area)&&area>=10&&area<=400;
