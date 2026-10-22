@@ -3,7 +3,15 @@
 >
 > **이 문서를 받은 ChatGPT, Gemini, Claude 또는 개발자는 이전 채팅을 모른다고 가정**한다. 반드시 [AGENTS.md](../AGENTS.md) → 이 문서 → [요구사항](PRODUCT_REQUIREMENTS.md) → [이력](PROJECT_HISTORY.md) → [복구·운영](RECOVERY_PLAYBOOK.md)을 읽고, 최신 소스와 실제 배포본을 대조한 뒤 작업한다. 이 문서는 사람의 모든 대화 내용을 한 글자도 빠짐없이 저장하는 원문 아카이브가 아니라 **합의된 요구와 구현의 구조화된 복원본**이다.
 
-## 최신 작업 · v2.0.16 (2026-10-22) 계약안내 중도금 지급일 날짜 형식 일치
+## 최신 작업 · v2.0.17 (2026-10-23) 앱 내 업데이트 + 상단 관리자/접이식 알림 설정
+- AppUpdateInstaller.java: 검증된 GitHub Release URL의 HTTPS APK만 최대 80MB로 앱 전용 캐시에 다운로드, 크기 및 완료 여부를 확인. 동일 패키지/동일 서명 인증서/더 높은 빌드인 APK만 FileProvider로 Android 설치 확인창에 전달.
+- MainActivity: 앱 자체 다운로드 및 진행률·검증 실패 상태 메시지, Android 최초 출처 설치 허용 안내. 자동 무음 설치 불가능하며 최종 확인은 사용자가 수행.
+- app-updates.js: 자동/수동 최신 버전 확인, 앱 내 다운로드 진행률, APK 검증, 설치 안내 및 실패 재시도; 중복 다운로드 차단. AppUpdate.java에서는 GitHub 버전과 파일명 동일성 검사.
+- index.html/ui-v2.css: 관리자 전환 버튼은 상단 헤더 우측의 작은 버튼만 사용. 기존 별도 가족 모드 박스 제거하되 가족/관리자 정책 검증은 불변.
+- 관심단지 알림 설정을 기본 한 줄 접기/펼치기로 압축. 기존 팝업·알림센터 토글, 미리보기, 권한 상태는 펼치면 표시. 반복 설명은 삭제하되 필수 계약 안내와 법적 안내는 보존.
+- scripts/test_direct_updater.js 및 기존 UI 테스트 업데이트. v2.0.17, versionCode 68, 고정된 기존 release 서명키 사용.
+
+## 직전 작업 · v2.0.16 (2026-10-22) 계약안내 중도금 지급일 날짜 형식 일치
 - `contracts.js`의 `makePreview()`: 중도금 지급일만 `field('interimDate')` 원문으로 출력해 YYYY-MM-DD가 노출되는 버그를 `dateLabel(field('interimDate'))`로 수정. 계약일/잔금일의 **YYYY.MM.DD.** 포맷과 동일해짐. 입력값/저장된 날짜/추정/협의 일정은 그대로 유지. 고객용 이미지 입력 텍스트도 통일된 문자를 사용.
 - `scripts/test_contracts.js`, `scripts/test_contract_transfer.js`: 메모 교정 및 실제 계약 초안 예시에서 점 구분/마침표 확인, '12월 중 상호 협의' 문구 보존, 입력 필드 변경 금지 확인. 기타 계약 내용·서명키·브랜드 전부 보존.
 - v2.0.16(versionCode 67) 동일 릴리스 서명으로 정식 GitHub APK 배포.
