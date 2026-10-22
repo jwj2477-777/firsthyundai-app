@@ -233,7 +233,14 @@ function draw(page,index,total){
  }
  const foot=canvas.height-87;
  c.fillStyle='#cadcda';c.fillRect(LEFT,foot-25,RIGHT-LEFT,2);
- c.fillStyle='#647b80';c.font='400 22px sans-serif';c.fillText('계약내용과 입금 계좌를 확인하시고, 문의 사항은 퍼스트현대부동산으로 연락해 주세요.',LEFT,foot+11);
+ c.fillStyle='#647b80';
+ const footer='계약내용과 입금 계좌를 확인하시고, 문의 사항은 퍼스트현대부동산으로 연락해 주세요.';
+ let footSize=22;
+ c.font='400 '+footSize+'px sans-serif';
+ while(footSize>15&&c.measureText(footer).width>RIGHT-LEFT-6){
+  footSize--;c.font='400 '+footSize+'px sans-serif';
+ }
+ c.fillText(footer,LEFT,foot+11);
  if(total>1){c.textAlign='right';c.font='600 22px sans-serif';c.fillText(index+1+' / '+total,RIGHT,foot+11);c.textAlign='left';}
  return canvas;
 }
