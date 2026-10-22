@@ -25,7 +25,7 @@ function makeContext(initialMode){
  const storage = new Map([['firsthyundai-public-repo','different/public-repository']]);
  const native = {getMode:()=>initialMode};
  const ctx=vm.createContext({
-  document:{getElementById:get},
+  document:{getElementById:get,body:{attributes:{},setAttribute(k,v){this.attributes[k]=v;}}},
   localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},
   window:{FirstHyundaiNative:native},
   alert(){},
@@ -35,6 +35,8 @@ function makeContext(initialMode){
 }
 const family=makeContext('family');
 assert.equal(vm.runInContext('role',family.ctx),'family');
+vm.runInContext('updateRoleBar()',family.ctx);
+assert.equal(family.ctx.document.body.attributes['data-office-role'],'family','Family display must hide admin explanations');
 assert.equal(vm.runInContext('repository',family.ctx),'jwj2477-777/firsthyundai-app');
 assert.equal(vm.runInContext('activePages().length',family.ctx),7);
 vm.runInContext("switchPage('complexes')",family.ctx);
@@ -48,10 +50,12 @@ assert.equal(vm.runInContext('currentPage',family.ctx),'contracts','family can d
 vm.runInContext("switchPage('notes')",family.ctx);
 assert.equal(vm.runInContext('currentPage',family.ctx),'nearby','notes should be admin only');
 vm.runInContext("window.onRoleChanged('admin')",family.ctx);
+assert.equal(family.ctx.document.body.attributes['data-office-role'],'admin','Admin explanations restored when changing roles');
 assert.equal(vm.runInContext('activePages().length',family.ctx),11);
 vm.runInContext("switchPage('settings')",family.ctx);
 assert.equal(vm.runInContext('currentPage',family.ctx),'settings','admin may view settings');
 vm.runInContext("window.onRoleChanged('family')",family.ctx);
+assert.equal(family.ctx.document.body.attributes['data-office-role'],'family','Return to family hides technical explanations without restart');
 assert.equal(vm.runInContext('repository',family.ctx),'jwj2477-777/firsthyundai-app');
 assert.equal(vm.runInContext('activePages().length',family.ctx),7);
 assert.equal(vm.runInContext('currentPage',family.ctx),'nearby');
