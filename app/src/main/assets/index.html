@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#765543"><title>퍼스트현대 | 송도 정보센터</title>
+<meta name="theme-color" content="#163b46"><title>퍼스트현대 | 송도 정보센터</title>
 <style>
 :root{color-scheme:light;--navy:#563a21;--blue:#906137;--light:#f7f2ed;--slate:#877464;--border:#efe6df;--ink:#3e2917;--orange:#d77828}
 *{box-sizing:border-box}body{margin:0;background:#f8f5f3;color:var(--ink);font-family:system-ui,-apple-system,'Noto Sans KR',sans-serif;font-size:15px}
@@ -666,8 +666,8 @@ function renderMainNavigation(id){
   '<div class="adminQuickLinks">'+[['notes','내 자료'],['settings','설정'],['security','보안']].map(([page,label])=>
   '<button type="button" onclick="switchPage(\''+page+'\')">'+label+'</button>').join('')+'</div></details>':'';
  const tools='<div class="utilityNav"><button class="'+(id==='overview'?'active':'')+
-  '" type="button" onclick="switchPage(\'overview\')">▦ 오늘 요약</button>'+
-  '<button class="'+(id==='contracts'?'active':'')+'" type="button" onclick="switchPage(\'contracts\')">✎ 계약문자</button>'+
+  '" type="button" aria-current="'+(id==='overview'?'page':'false')+'" onclick="switchPage(\'overview\')">▦ 오늘 요약</button>'+
+  '<button class="'+(id==='contracts'?'active':'')+'" type="button" aria-current="'+(id==='contracts'?'page':'false')+'" onclick="switchPage(\'contracts\')">✎ 계약문자</button>'+
   admin+'</div>';
  $('nav').innerHTML=primary+secondary+tools;
 }
@@ -727,6 +727,10 @@ function switchNewsPane(pane){
 function switchPage(id){
  closeApartmentSheet(false);
  if(!activePages().some(([key])=>key===id))id='nearby';
+ const pageNames={overview:'오늘 요약',nearby:'관심 단지',new:'새로 확인한 거래',
+  trades:'전체 실거래',complexes:'아파트정보',news:'뉴스',contracts:'계약문자',
+  notes:'내 자료',settings:'설정',security:'보안',apiGuide:'API 연결 안내'};
+ if(pageNames[id])document.title='퍼스트현대 · '+pageNames[id];
  currentPage=id;
  PAGES.forEach(p=>$(p[0]).classList.toggle('hidden',p[0]!==id));
  renderMainNavigation(id);
@@ -1475,6 +1479,7 @@ function renderNearby(){
  }
  $('nearbyAllCount').textContent=hasData?number(rows.length)+'건':'—';
  $('nearbyAll').classList.toggle('selected',nearbySelected==='all');
+ $('nearbyAll')?.setAttribute?.('aria-pressed',nearbySelected==='all'?'true':'false');
  $('nearbyCards').innerHTML=FAVORITE_APTS.map((g,i)=>{
   const matches=grouped[g.id], latest=matches.reduce((a,x)=>!a||x.contract_date>a.contract_date?x:a,null);
   const part=g.group;
@@ -1540,6 +1545,12 @@ function renderNearbyDetails(resetLimit){
 function renderOverview(){let list=remote.trades?.records||[];$('totalDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.length):'—';$('saleDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.filter(x=>x.type==='매매').length):'—';$('rentDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.filter(x=>x.type==='전세'||x.type==='월세').length):'—';$('newsGroups').textContent=remote.news&&remote.news.state!=='not_started'?number(remote.news.briefs?.length):'—';$('newDeals').textContent=remote.new_trades&&remote.new_trades.state!=='not_started'?number((remote.new_trades.records||[]).filter(x=>x.first_seen_date===new Date(Date.now()+9*3600000).toISOString().slice(0,10)).length):'—';$('overviewStatus').innerHTML=`<div>${escapeHtml(textState(remote.trades,'실거래가'))}</div><div>${escapeHtml(textState(remote.news,'뉴스'))}</div>${issues.trades?`<div class="flash bad">실거래가 연결 오류: ${escapeHtml(issues.trades)}</div>`:''}${issues.news?`<div class="flash bad">뉴스 연결 오류: ${escapeHtml(issues.news)}</div>`:''}`;}
 function renderTrades(){
  const payload=remote.trades;
+ // Active state has both a visible border and an accessible pressed label.
+ for(const [buttonId,chosen] of [
+  ['tradeModeLatest',tradeMode==='latest'],
+  ['tradeModeFavorites',false],
+  ['tradeModeSearch',tradeMode==='search']
+ ])$(''+buttonId)?.setAttribute?.('aria-pressed',chosen?'true':'false');
  $('tradeModeLatest').classList.toggle('active',tradeMode==='latest');
  $('tradeModeFavorites').classList.toggle('active',false);
  $('tradeModeSearch').classList.toggle('active',tradeMode==='search');
