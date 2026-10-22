@@ -27,10 +27,10 @@ public final class AppUpdate {
     }
     static boolean allowedDownload(String url){
         if(url==null||url.length()>210)return false;
-        java.util.regex.Matcher matcher=java.util.regex.Pattern.compile(
-            "^https://github\\\\.com/jwj2477-777/firsthyundai-app/releases/download/v([0-9]{1,3}\\\\.[0-9]{1,3}\\\\.[0-9]{1,3})/FirstHyundai-v([0-9]{1,3}\\\\.[0-9]{1,3}\\\\.[0-9]{1,3})\\\\.apk$"
-        ).matcher(url);
-        return matcher.matches()&&matcher.group(1).equals(matcher.group(2));
+        if(!url.matches("^https://github[.]com/jwj2477-777/firsthyundai-app/releases/download/v([0-9]{1,3}[.]){2}[0-9]{1,3}/FirstHyundai-v([0-9]{1,3}[.]){2}[0-9]{1,3}[.]apk$"))return false;
+        String version=url.substring(url.indexOf("/download/v")+11,url.indexOf("/FirstHyundai-v"));
+        String fileVersion=url.substring(url.indexOf("/FirstHyundai-v")+15,url.length()-4);
+        return version.equals(fileVersion);
     }
 
     static JSONObject readRelease(String payload,String installed){
