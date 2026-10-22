@@ -1,0 +1,67 @@
+/* v1.19.18: no duplicate/no-op menu rows; functional destination tests. */
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const assets=path.join(__dirname,'../app/src/main/assets');
+const html=fs.readFileSync(path.join(assets,'index.html'),'utf8');
+const css=fs.readFileSync(path.join(assets,'theme.css'),'utf8');
+const js=html.split('<script>')[1]?.split('</script>')[0];
+assert(js);new vm.Script(js);
+const begin=js.indexOf('const NAV_CATEGORIES=[');
+const end=js.indexOf('// A detail sheet is its own full-screen view',begin);
+assert(begin>=0&&end>begin,'Main navigation exists');
+let focused=0,scrolled=0,nav='';
+const search={focus(){focused++},scrollIntoView(){scrolled++}};
+const ctx=vm.createContext({
+ role:'family',currentPage:'nearby',newsPane:'subscriptions',
+ $:id=>id==='nav'?{set innerHTML(v){nav=v},get innerHTML(){return nav}}:id==='complexSearch'?search:null
+});
+vm.runInContext(js.slice(begin,end),ctx);
+function render(page){vm.runInContext('renderMainNavigation('+JSON.stringify(page)+')',ctx);return nav;}
+let n=render('complexes');
+assert(n.includes('아파트정보')&&n.includes('✎ 계약문자 만들기'),'Main destinations visible');
+assert(n.includes('openComplexHome()'),'Apartment button must jump to search');
+assert(!n.includes('secondaryNav'),'Never display a redundant only-child apartment button');
+assert(!n.includes('송도 단지 검색'),'Duplicate apartment search button removed');
+assert.equal((n.match(/>아파트정보<\/span><\/button>/g)||[]).length,1);
+n=render('news');
+assert(n.includes('openNewsHome()'),'News button must open a real home destination');
+assert(!n.includes('secondaryNav'),'Never display single redundant news subsection');
+assert(!n.includes('부동산·송도 뉴스'),'Duplicate news row removed');
+n=render('nearby');
+assert(n.includes('secondaryNav'),'Only trade group has multiple distinct subpages');
+assert(n.includes('전체 최신 거래')&&n.includes('관심 14개')&&n.includes('새 거래'));
+assert(n.includes('switchPage(\'nearby\')'));
+assert(n.includes('switchPage(\'new\')'));
+assert(n.includes('openTradeLatest()'));
+const funcs=js.slice(js.indexOf('function openComplexHome(){'),js.indexOf('function switchNewsPane(',js.indexOf('function openComplexHome(){')));
+assert(funcs.includes('function openNewsHome(){'));
+vm.runInContext('function switchPage(id){currentPage=id;}',ctx);
+vm.runInContext(funcs,ctx);
+ctx.currentPage='complexes';
+vm.runInContext('openComplexHome()',ctx);
+assert.equal(focused,1,'Selected apartment menu focuses actual search, not no-op');
+assert.equal(scrolled,1,'Selected apartment menu scrolls to search field');
+ctx.currentPage='nearby';
+vm.runInContext('openComplexHome()',ctx);
+assert.equal(ctx.currentPage,'complexes','Apartment menu from another page navigates');
+assert.equal(focused,1,'Changing pages should not forcibly open the keyboard');
+ctx.newsPane='subscriptions';
+vm.runInContext('openNewsHome()',ctx);
+assert.equal(ctx.newsPane,'articles','Top news resets to actual news briefing');
+assert.equal(ctx.currentPage,'news');
+const complex=html.slice(html.indexOf('<div id="complexes"'),html.indexOf('<dialog id="complexEditor"'));
+assert(complex.includes('class="complexSearchFields"'),'Search and scope are grouped');
+assert(complex.includes('<label class="inputLabel" for="complexSearch">아파트 이름 입력</label>'));
+assert(complex.includes('<label class="inputLabel" for="complexScope">어디에서 찾을까요?</label>'));
+assert(complex.includes('oninput="resetComplexLimit();renderComplexes()"'));
+assert(complex.includes('onchange="resetComplexLimit();renderComplexes()"'));
+assert(complex.includes('<option value="all">송도 전체 아파트</option>'));
+assert(complex.includes('<option value="favorites">★ 관심 14개 단지만</option>'));
+const news=html.slice(html.indexOf('<div id="news"'),html.indexOf('<div id="contracts"'));
+assert.equal((news.match(/id="newsTabArticles"/g)||[]).length,1);
+assert.equal((news.match(/id="newsTabSubscriptions"/g)||[]).length,1);
+assert(news.includes("switchNewsPane('articles')")&&news.includes("switchNewsPane('subscriptions')"));
+assert(css.includes('.newsCategoryTabs>button[aria-selected="true"]'),'Active news tab visibly labeled by shape');
+assert(css.includes('#complexes #complexSearch,#complexes #complexScope{'),'Apartment search and scope visibly full-width');
+assert(css.includes('#nav .utilityNav{'),'Utility buttons grouped consistently');
+console.log('Navigation and search regression passed: no dead duplicate submenus; search focus, news home and real 2-tab news switch.');

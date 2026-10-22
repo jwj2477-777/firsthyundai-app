@@ -106,6 +106,7 @@ jobs:
           node scripts/test_family_accessibility.js
           node scripts/test_family_plain_ui.js
           node scripts/test_color_input_roles.js
+          node scripts/test_navigation_clarity.js
           node scripts/test_contract_broker.js
           node --check app/src/main/assets/contracts-transfer.js
           node scripts/test_contract_transfer.js
@@ -146,21 +147,21 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v1.19.17 color-coded-family-memo-entry APK
+      - name: Publish successful v1.19.18 single-path-navigation-and-search APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.17.apk
-          unzip -t FirstHyundai-v1.19.17.apk | grep 'No errors detected'
-          if gh release view v1.19.17 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v1.19.18.apk
+          unzip -t FirstHyundai-v1.19.18.apk | grep 'No errors detected'
+          if gh release view v1.19.18 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v1.19.17 FirstHyundai-v1.19.17.apk \
+            gh release create v1.19.18 FirstHyundai-v1.19.18.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v1.19.17 · 색상으로 더 직관적인 계약 메모 및 업무 화면' \
-              --notes '부모님이 메모를 입력할 곳을 즉시 알아보도록 계약 메모 입력 영역을 부드러운 살구·크림색으로 구별했습니다. 흰 카드 안의 하얀 입력칸 대신 별도의 작성 영역, 명확한 연필 라벨과 예시, 입력 후 상태를 보여주는 테두리를 적용합니다. 앱 전체에서도 문자 입력은 따뜻한 크림색, 조회·필터는 민트색, 주요 실행은 청록색, 확인 완료는 연녹색, 확인 필요는 살구색으로 일관되게 구분합니다. 각 항목은 큰 글씨와 테두리·라벨을 함께 사용하며 계약 작성·실거래·알림·가족/관리자 기능은 유지합니다.'
+              --title '퍼스트현대 v1.19.18 · 부모님용 중복 버튼 제거·동선 통일' \
+              --notes '가족 화면에서 목적지가 하나뿐인 중복 하위 메뉴(송도 단지 검색, 부동산·송도 뉴스)를 제거했습니다. 실거래에서만 최신 거래·관심 14개·새 거래 세 화면을 전환하고, 뉴스는 뉴스 브리핑/인천 청약·분양 두 개의 실제 탭만 둡니다. 상단 뉴스 메뉴는 항상 뉴스 브리핑으로 이동하고, 이미 열린 아파트정보 메뉴를 누르면 실제 검색칸으로 이동해 입력할 수 있습니다. 아파트 이름 검색과 범위 선택을 한 영역에 명확하게 배치하고 휴대폰에서 크게 눌리도록 했습니다. 오늘 요약/계약문자 만들기 버튼도 같은 너비로 통일하며 기존 실거래·뉴스·계약·가족관리자 기능을 유지합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v1.19.17 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v1.19.18 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"

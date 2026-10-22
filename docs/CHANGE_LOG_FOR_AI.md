@@ -1,5 +1,7 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-22 / v1.19.18**: Consolidated navigation to remove duplicate dead-end submenu buttons on apartments and news; retained three distinct trade pages, two real news/lottery tabs, and prominent apartment search/scope controls. Pressing selected apartments focuses search, primary news resets to briefing. Added navigation behavior tests and kept existing family/admin authorization and contract actions.
+
 - **2026-10-22 / v1.19.17**: Color-code writable contract memo (apricot/cream) versus lookup/filter (mint) and confirm/attention statuses (green/amber) without relying solely on hue. Keep strong text labels, focus/selection outlines, primary teal action, and all existing contract workflows. New static contrast and role tests.
 
 - **2026-10-22 / v1.19.16**: Split family vs admin density for static explanation paragraphs and live news metadata; preserve compact family safety notes and actionable controls, required legal/financial confirmations and Android notification warnings. Refresh button no longer wraps vertically; role switches update without reload.
