@@ -256,3 +256,6 @@ body[data-office-role="admin"] .familySimpleNote{display:none!important}
  #nav .secondaryNav button:not(.active):hover{background:#EFF4FC}
  #nav .utilityNav>button:not(.active):hover{background:#F7F9FD}
 }
+
+/* Small labels in an active tab stay legible without crowding the 3-column grid. */
+#nav .primaryNav button.active::after{max-width:100%;white-space:nowrap}

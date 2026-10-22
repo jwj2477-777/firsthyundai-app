@@ -8,7 +8,7 @@ const css=fs.readFileSync(path.join(dir,'theme.css'),'utf8');
 const contract=html.slice(html.indexOf('<div id="contracts"'),html.indexOf('<div id="notes"'));
 const favorites=html.slice(html.indexOf('<div id="nearby"'),html.indexOf('<div id="apiGuide"'));
 const news=html.slice(html.indexOf('<div id="news"'),html.indexOf('<div id="contracts"'));
-assert(html.includes('<body data-office-role="family">'),'Default role prevents explanation flash');
+assert(/<body\s+data-office-role="family"(?:\s+[^>]*)?>/.test(html),'Default role prevents explanation flash even with v2 screen markers');
 assert(html.includes("document.body?.setAttribute?.('data-office-role',role)"),'Mode changes must update visibility');
 assert(css.includes('body:not([data-office-role="admin"]) .adminExplain{display:none!important}'),'Hide admin explanations in family mode');
 assert(css.includes('body[data-office-role="admin"] .familySimpleNote{display:none!important}'),'Avoid duplicate notes for admin');
