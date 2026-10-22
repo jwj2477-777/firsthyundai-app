@@ -396,3 +396,92 @@ body[data-office-role="admin"] .familySimpleNote{display:none!important}
  .sectionTitle{gap:8px}
  .sectionTitle>.refreshAction{min-width:68px;padding:8px 9px;font-size:14px}
 }
+
+
+
+/* v1.19.17 · Clear color roles: writing=soft apricot, looking up=cool mint,
+ * acting=deep teal, reviewed/confirmed=soft green, needs attention=amber.
+ * Distinct borders, labels, and focus states communicate even without color. */
+:root{
+ --fhd-write-bg:#fff5e8;--fhd-write-border:#a46a33;
+ --fhd-search-bg:#edf7f6;--fhd-search-border:#9bc5c7;
+ --fhd-confirm-bg:#e8f5eb;--fhd-confirm-border:#91c7a3;
+ --fhd-caution-bg:#fff1de;
+}
+/* Controls where people type are visually warmer than filters and readonly cards. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]),
+textarea{background:var(--fhd-write-bg);border-color:#c8b39b;color:#26343c}
+select,input[type="search"]{
+ background:var(--fhd-search-bg)!important;border-color:var(--fhd-search-border);
+ color:#244d58;
+}
+input:read-only,textarea:read-only{background:#f1f5f4;border-color:#c9d7d7}
+input:focus,select:focus,textarea:focus{
+ outline:3px solid #78b7bd;outline-offset:2px;border-color:#155a66;
+}
+#contracts .contractMemoCard{background:#fff;border-color:#1b606b}
+#contracts .contractMemoInputArea{
+ border:1.5px solid #e0bd93;border-radius:18px;
+ background:#fff0dc;padding:15px;
+ box-shadow:0 2px 10px #985c2c12;
+}
+#contracts .contractMemoLabel{
+ color:#664222;font-size:18px;line-height:1.5;margin-bottom:11px;
+ font-weight:900;
+}
+#contracts .contractMemoStart{
+ background:#925725;color:#fff;border:2px solid #925725;
+ font-size:13px;font-weight:850;padding:5px 10px;
+}
+#contracts .contractMemoCard #ct_rough{
+ border:3px solid var(--fhd-write-border);
+ border-radius:14px;background:var(--fhd-write-bg);
+ color:#27383e;line-height:1.75;
+ box-shadow:inset 0 2px 5px #7c4d2410;
+ caret-color:#155a66;
+}
+#contracts .contractMemoCard #ct_rough::placeholder{
+ color:#71573f;opacity:1;font-weight:500;
+}
+#contracts .contractMemoCard #ct_rough:focus{
+ background:#fff9f1;border-color:#165e6b;
+ outline:4px solid #92c9ce;outline-offset:3px;
+ box-shadow:0 0 0 2px #fff;
+}
+#contracts .contractMemoCard #ct_rough:not(:placeholder-shown):not(:focus){
+ background:#fffaf2;border-color:#19707a;
+}
+#contracts .contractMemoCard .contractOneTap{
+ background:#155a66;color:#fff;border-color:#0c414b;
+ box-shadow:0 5px 0 #0c414b;
+}
+#contracts #ct_resultPanel #ct_preview{
+ background:#fffaf1;border:2px solid #bba184;
+}
+#contracts .contractNoticeConfirm{
+ background:var(--fhd-confirm-bg);border:1.5px solid var(--fhd-confirm-border);
+ color:#20563b;
+}
+#contracts .contractNoticeConfirm input{accent-color:#176849}
+/* Confirmation and warning are meaningful statuses, not generic decoration. */
+.contractReview.ok,.refreshFeedback.success{
+ background:var(--fhd-confirm-bg);border-color:var(--fhd-confirm-border);
+}
+.contractReview.bad,.refreshFeedback.warning{
+ background:var(--fhd-caution-bg);border-color:#dbb684;
+}
+/* Lookup filters are cool-toned, while selectable deal types retain their
+ * labeled sale (blue) / lease (green) / monthly (amber) identities. */
+.tradeSearchOptions,.complexTools,#complexScope{accent-color:#155a66}
+#contracts .contractFieldGrid input:not([type="checkbox"]),
+#contracts .contractFieldGrid textarea{background:var(--fhd-write-bg)}
+@media(max-width:540px){
+ #contracts .contractMemoInputArea{padding:12px;border-radius:15px}
+ #contracts .contractMemoLabel{font-size:17px}
+ #contracts .contractMemoCard #ct_rough{font-size:18px;min-height:295px;padding:17px}
+}
+@media(prefers-contrast:more){
+ #contracts .contractMemoInputArea{border-width:2px}
+ #contracts .contractMemoCard #ct_rough{border-width:4px}
+ #contracts .contractMemoStart{border-width:3px}
+}

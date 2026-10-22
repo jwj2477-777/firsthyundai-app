@@ -1,5 +1,7 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-22 / v1.19.17**: Color-code writable contract memo (apricot/cream) versus lookup/filter (mint) and confirm/attention statuses (green/amber) without relying solely on hue. Keep strong text labels, focus/selection outlines, primary teal action, and all existing contract workflows. New static contrast and role tests.
+
 - **2026-10-22 / v1.19.16**: Split family vs admin density for static explanation paragraphs and live news metadata; preserve compact family safety notes and actionable controls, required legal/financial confirmations and Android notification warnings. Refresh button no longer wraps vertically; role switches update without reload.
 
 - **2026-10-22 / v1.19.15**: Family-first accessible redesign: consistent high-contrast lagoon teal, porcelain mint and warm peach across app screens, larger touch/text, visible active outlines and semantic state attributes. Native security gate colors and one-sheet contract PNG branding aligned without changing business logic; static color contrast/touch/regression checks.
