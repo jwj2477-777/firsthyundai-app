@@ -6,7 +6,7 @@ const files=['contracts.js','contracts-smart.js','contracts-language.js','contra
 const elements=new Map();
 const el=id=>{
  if(!elements.has(id)){
-  const c=new Set();elements.set(id,{id,value:'',textContent:'',innerHTML:'',className:'',checked:['ct_autoDeposit','ct_polishTerms','ct_includeNotice'].includes(id),open:false,
+  const c=new Set();elements.set(id,{id,value:'',textContent:'',innerHTML:'',className:'',checked:['ct_autoDeposit','ct_polishTerms'].includes(id),open:false,
    classList:{add:k=>c.add(k),remove:k=>c.delete(k),toggle:(k,v)=>v?c.add(k):c.delete(k),contains:k=>c.has(k)},
    focus(){},scrollIntoView(){},select(){},closest(){return null}});
  }
@@ -53,10 +53,8 @@ assert(!el('ct_preview').value.includes('선송금 예정액'),'Do not show awkw
 assert(!el('ct_preview').value.includes('[확인 필요]'));
 assert.equal(app._test.collect().errors.length,0);
 app.approve();
-assert(el('ct_status').textContent.includes('하단의 계약 성립'));
-el('ct_noticeConfirmed').checked=true;
-app.approve();
-assert(el('ct_status').textContent.includes('직접 확인 완료'));
+assert(el('ct_status').textContent.includes('직접 확인 완료'),
+ 'Pre-agreed cancellation terms require no redundant checkbox, only final approval');
 put('아파트명 : 퍼스트파크 1304동 3703호(84A)\n소재지 : 인천 연수구 송도동 100.\n매매대금 : 10억 2000만원\n계약일 : 2023년 9월 14일.\n계약금 : 1억 200만원\n중도금지급일 : 2023년 10월중 협의\n중도금 : 2억원\n잔금일 : 2023년 12월 11일.\n특약사항\n→상기 중도금지급일과 잔금일은 상호합의하에 앞당길수 있다.\n→매도인은 잔금수령과 동시에 현재 설정된 근저당권을 전액상환 후 말소한다.\n→기타사항은 계약시 협의.\n※ 금일 위 내용을 바탕으로 계약금의 일부(1,000만원)가 매도인계좌(국민은행 1234567-01-987654 김철수)로 송금되며.');
 assert.equal(el('ct_address').value,'인천 연수구 송도동 100');
 assert.equal(el('ct_unit').value,'1304동 3703호(84A)');
