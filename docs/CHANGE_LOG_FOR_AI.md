@@ -1,5 +1,7 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-22 / v2.0.3**: Simplify sale/lease/monthly transaction cards using primary type and quiet supporting status/dealing/lease-contract labels; remove brackets around renewed/new agreement chips and hide unknown classification. Three-state parent-facing confirmation button (pending disabled, ready, confirmed) now reacts to consent revocation, edits, and changing contract conditions; preserve share validation and red missing-field preview.
+
 - **2026-10-22 / v2.0.2**: Family contract review UX: replace noisy parser diagnostics and duplicated required-field instructions with one prominent plain-Korean missing-info warning; safe HTML-escaped read-only red-underlined pending placeholders, direct edit toggle over existing plaintext textarea, admin retains diagnostics; no sharing of unfinished placeholders. Existing contract data and native SMS remain unchanged.
 
 - **2026-10-22 / v2.0.1**: Full source-catalog exclusive-area audit (93 individual Songdo complexes, 576 verified pairs, 185 previously hidden exclusive-only areas across 41 sites); live + stored official trade area fallback without made-up supply or pyeong; visible apartment-to-contract memo/property/address/type prefill with explicit draft overwrite confirmation and prior client data reset; type cards link directly to contract; dedicated regression tests.
