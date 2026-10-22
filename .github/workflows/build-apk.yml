@@ -214,7 +214,7 @@ jobs:
           export FHD_SIGNING_KEY_ALIAS="disposable-ci-only"
           export FHD_SIGNING_KEY_PASSWORD="DISPOSABLE_CI_ONLY_2026"
           gradle --no-daemon assembleRelease
-          apksigner verify app/build/outputs/apk/release/app-release.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify app/build/outputs/apk/release/app-release.apk
           rm -rf app/build/outputs/apk/release "$RUNNER_TEMP/disposable-ci-only.p12"
       - name: Verify APK version and immutable release signing identity
         run: |
