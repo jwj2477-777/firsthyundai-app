@@ -259,11 +259,22 @@ body.apartmentSheetActive{overflow:hidden}
 <div id="complexes" class="page hidden">
  <div class="sectionTitle"><div><h2>단지정보 · 송도 아파트</h2><p class="tiny">관심 단지 14곳 + 송도 아파트 정보 조회</p></div><button class="btn alt refreshAction" type="button" data-refresh="complexes" onclick="refreshOne('complexes',true)">갱신</button></div>
  
- <div class="panel">
-  <label class="inputLabel" for="complexSearch">아파트명 검색</label>
-  <input id="complexSearch" type="search" placeholder="단지 검색: 더샵, 롯데캐슬, 힐스테이트 등" oninput="resetComplexLimit();renderComplexes()" aria-label="단지정보 아파트명 검색">
-   <div class="complexTools"><div><label class="inputLabel" for="complexScope">표시 범위</label><select id="complexScope" onchange="resetComplexLimit();renderComplexes()"><option value="all">전체 송도 실거래 단지</option><option value="favorites">관심 단지 14곳만</option></select></div></div>
-  <p class="tiny" id="complexMeta">기본 단지 목록을 준비했습니다.</p>
+ <div class="panel complexSearchPanel">
+  <h3 class="complexSearchHeading">아파트 찾기</h3>
+  <div class="complexSearchFields">
+   <div class="complexSearchInput">
+    <label class="inputLabel" for="complexSearch">아파트 이름 입력</label>
+    <input id="complexSearch" type="search" placeholder="예: 퍼스트파크, 더샵, 힐스테이트" oninput="resetComplexLimit();renderComplexes()" aria-label="단지정보 아파트명 검색" autocomplete="off">
+   </div>
+   <div class="complexTools">
+    <label class="inputLabel" for="complexScope">어디에서 찾을까요?</label>
+    <select id="complexScope" onchange="resetComplexLimit();renderComplexes()" aria-label="검색할 아파트 범위">
+     <option value="all">송도 전체 아파트</option>
+     <option value="favorites">★ 관심 14개 단지만</option>
+    </select>
+   </div>
+  </div>
+  <p class="tiny complexResultsMeta" id="complexMeta" role="status" aria-live="polite">기본 단지 목록을 준비했습니다.</p>
   <div class="nearbyGrid" id="complexCards"></div><button type="button" id="complexShowMore" class="btn alt hidden" onclick="showMoreComplexes()">단지 더 보기</button>
  </div>
  <section class="panel apartmentSheet" id="complexSheet" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="complexSheetTitle">
@@ -375,7 +386,7 @@ body.apartmentSheetActive{overflow:hidden}
 </div>
 <div id="news" class="page hidden">
  <div class="sectionTitle"><div><h2>뉴스 · 청약/분양</h2><p class="tiny adminExplain">뉴스와 인천 분양공고를 탭으로 빠르게 전환</p></div></div>
- <div class="controls" role="tablist" aria-label="뉴스와 청약 정보">
+ <div class="controls newsCategoryTabs" role="tablist" aria-label="뉴스와 청약 화면 전환">
    <button id="newsTabArticles" type="button" class="btn" role="tab" aria-selected="true" aria-controls="newsArticlesPane" onclick="switchNewsPane('articles')">뉴스 브리핑</button>
    <button id="newsTabSubscriptions" type="button" class="btn alt" role="tab" aria-selected="false" aria-controls="newsSubscriptionsPane" onclick="switchNewsPane('subscriptions')">인천 청약·분양</button>
  </div>
@@ -645,7 +656,7 @@ window.onRoleChanged=function(next){
 };
 const NAV_CATEGORIES=[
  {id:'trades',label:'실거래',icon:'↗',main:'trades',
-  children:[['trades','전체 최신순'],['nearby','★ 관심 14개'],['new','새로 확인']]},
+  children:[['trades','전체 최신 거래'],['nearby','★ 관심 14개'],['new','새 거래']]},
  {id:'complexes',label:'아파트정보',icon:'⌂',main:'complexes',
   children:[['complexes','송도 단지 검색']]},
  {id:'news',label:'뉴스',icon:'▤',main:'news',
@@ -658,9 +669,10 @@ function renderMainNavigation(id){
  const chosen=navGroupForPage(id);
  const primary='<div class="primaryNav">'+NAV_CATEGORIES.map(g=>
   '<button type="button" class="'+(chosen?.id===g.id?'active':'')+
-  '" onclick="'+(g.id==='trades'?'openTradeLatest()':"switchPage('"+g.main+"')")+'" aria-current="'+(chosen?.id===g.id?'page':'false')+'">'+
+  '" onclick="'+(g.id==='trades'?'openTradeLatest()':g.id==='news'?'openNewsHome()':"switchPage('"+g.main+"')")+'" aria-current="'+(chosen?.id===g.id?'page':'false')+'">'+
   '<span class="navIcon" aria-hidden="true">'+g.icon+'</span><span>'+g.label+'</span></button>').join('')+'</div>';
- const secondary=chosen?'<div class="secondaryNav'+(chosen.children.length===1?' single':'')+'">'+
+ // Only show a second level when it actually switches between separate screens.
+ const secondary=chosen&&chosen.children.length>1?'<div class="secondaryNav" aria-label="실거래 화면 선택">'+
   chosen.children.map(([page,label])=>'<button type="button" class="'+(id===page?'active':'')+
   '" onclick="'+(page==='trades'?'openTradeLatest()':"switchPage('"+page+"')")+'" aria-current="'+(id===page?'page':'false')+'">'+label+'</button>').join('')+
   '</div>':'';
@@ -669,7 +681,7 @@ function renderMainNavigation(id){
   '<button type="button" onclick="switchPage(\''+page+'\')">'+label+'</button>').join('')+'</div></details>':'';
  const tools='<div class="utilityNav"><button class="'+(id==='overview'?'active':'')+
   '" type="button" aria-current="'+(id==='overview'?'page':'false')+'" onclick="switchPage(\'overview\')">▦ 오늘 요약</button>'+
-  '<button class="'+(id==='contracts'?'active':'')+'" type="button" aria-current="'+(id==='contracts'?'page':'false')+'" onclick="switchPage(\'contracts\')">✎ 계약문자</button>'+
+  '<button class="'+(id==='contracts'?'active':'')+'" type="button" aria-current="'+(id==='contracts'?'page':'false')+'" onclick="switchPage(\'contracts\')">✎ 계약문자 만들기</button>'+
   admin+'</div>';
  $('nav').innerHTML=primary+secondary+tools;
 }
@@ -715,6 +727,10 @@ function openFavoriteBasicInfo(){
  selectComplex(id);
 }
 let newsPane='articles';
+function openNewsHome(){
+ newsPane='articles';
+ switchPage('news');
+}
 function switchNewsPane(pane){
  if(!['articles','subscriptions'].includes(pane))return;
  newsPane=pane;
