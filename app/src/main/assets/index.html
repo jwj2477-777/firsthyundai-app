@@ -669,7 +669,7 @@ function renderMainNavigation(id){
  const chosen=navGroupForPage(id);
  const primary='<div class="primaryNav">'+NAV_CATEGORIES.map(g=>
   '<button type="button" class="'+(chosen?.id===g.id?'active':'')+
-  '" onclick="'+(g.id==='trades'?'openTradeLatest()':g.id==='news'?'openNewsHome()':"switchPage('"+g.main+"')")+'" aria-current="'+(chosen?.id===g.id?'page':'false')+'">'+
+  '" onclick="'+(g.id==='trades'?'openTradeLatest()':g.id==='complexes'?'openComplexHome()':g.id==='news'?'openNewsHome()':"switchPage('"+g.main+"')")+'" aria-current="'+(chosen?.id===g.id?'page':'false')+'">'+
   '<span class="navIcon" aria-hidden="true">'+g.icon+'</span><span>'+g.label+'</span></button>').join('')+'</div>';
  // Only show a second level when it actually switches between separate screens.
  const secondary=chosen&&chosen.children.length>1?'<div class="secondaryNav" aria-label="실거래 화면 선택">'+
@@ -727,6 +727,14 @@ function openFavoriteBasicInfo(){
  selectComplex(id);
 }
 let newsPane='articles';
+// Tapping an already selected apartment menu now jumps into the real search
+// field instead of behaving like a nonworking duplicate button.
+function openComplexHome(){
+ if(currentPage!=='complexes'){switchPage('complexes');return;}
+ const search=$('complexSearch');
+ search?.scrollIntoView?.({block:'center'});
+ search?.focus?.();
+}
 function openNewsHome(){
  newsPane='articles';
  switchPage('news');
