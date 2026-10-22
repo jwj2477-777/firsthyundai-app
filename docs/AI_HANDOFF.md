@@ -3,7 +3,12 @@
 >
 > **이 문서를 받은 ChatGPT, Gemini, Claude 또는 개발자는 이전 채팅을 모른다고 가정**한다. 반드시 [AGENTS.md](../AGENTS.md) → 이 문서 → [요구사항](PRODUCT_REQUIREMENTS.md) → [이력](PROJECT_HISTORY.md) → [복구·운영](RECOVERY_PLAYBOOK.md)을 읽고, 최신 소스와 실제 배포본을 대조한 뒤 작업한다. 이 문서는 사람의 모든 대화 내용을 한 글자도 빠짐없이 저장하는 원문 아카이브가 아니라 **합의된 요구와 구현의 구조화된 복원본**이다.
 
-## 최신 작업 · v2.0.7 (2026-10-22) 카카오 실시간 주변시설 Worker 주소 불일치 복구
+## 최신 작업 · v2.0.8 (2026-10-22) 계약 안내 PNG 원본 로고/계좌 인라인 강조
+- `contract-image.js`: v2.0.6의 원본 `.officeMarkSvg`의 Path2D 데이터/형태/비율과 색만 바꾸는 방식 유지. 큰 별도 오늘 송금액 및 입금계좌 카드 제거(고객용 법률 송금조항에 같은 금액/계좌가 있으므로 중복 방지). 실제 승인 문장 속 은행, 계좌번호, 예금주만 작은 크기 차이·굵기·청록 톤으로 강조, 계좌번호에만 밑줄.
+- 최하단 안내문 및 구분선 제거, 하단 여백 축소. 모든 계약 금액/법률 조항은 승인된 원문과 동일하고 이미지 페이지당 한 장 원칙 유지. 클라이언트 PNG 생성 외 문자 생성기·보안·카카오·실거래 변경 없음.
+- `scripts/test_contract_image.js`: 별도 송금 카드 없음, 은행·계좌·이름 원본 표시, 푸터 없음, 원본 SVG 경로 사용, 단일 PNG/승인 공유 회귀.
+
+## 직전 작업 · v2.0.7 (2026-10-22) 카카오 실시간 주변시설 Worker 주소 불일치 복구
 - 사고원인: 키 교체 후 배포 워크플로 `Deploy Kakao Live Nearby Worker`가 `firsthyundai-nearby.jwj2477.workers.dev`로 배포/Secret 등록 성공했음에도, 앱 내 허용 Worker URL 및 공개 `data/nearby_config.json`은 더 이상 사용하지 않는 `firsthyundai-kakao.jwj2477.workers.dev`를 가리켜 403 응답 발생. 새 키 자체는 GitHub Actions 직접 Kakao 호출 HTTP 200.
 - `index.html`의 `validNearbyWorker()` 허용 주소와 `data/nearby_config.json`의 `backend_url`을 **실제 배포 주소** `https://firsthyundai-nearby.jwj2477.workers.dev`로 정확히 통일. 이 주소는 공개 엔드포인트이고 Kakao Secret은 Cloudflare 런타임 Secret로만 저장.
 - `scripts/test_kakao_nearby.mjs`는 Wrangler Worker name, 공개 구성 주소, 앱 URL allowlist 세 값이 동일한지 검증하여 재발 차단.

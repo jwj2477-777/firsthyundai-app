@@ -156,21 +156,21 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.7 kakao-live-nearby-endpoint-recovery APK
+      - name: Publish successful v2.0.8 client-contract-image refinement APK
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v2.0.7.apk
-          unzip -t FirstHyundai-v2.0.7.apk | grep 'No errors detected'
-          if gh release view v2.0.7 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/debug/app-debug.apk FirstHyundai-v2.0.8.apk
+          unzip -t FirstHyundai-v2.0.8.apk | grep 'No errors detected'
+          if gh release view v2.0.8 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.7 FirstHyundai-v2.0.7.apk \
+            gh release create v2.0.8 FirstHyundai-v2.0.8.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.7 · 카카오 주변시설 실시간 연결 복구' \
-              --notes 'Cloudflare Worker 배포 자체는 정상 성공했으나 Android 앱 내 안전 허용 주소와 공개 nearby_config.json에 배포 전 잘못된 Worker 이름(firsthyundai-kakao)이 남아 라이브 조회가 403으로 실패하던 문제를 수정했습니다. 실제 Wrangler 배포명 firsthyundai-nearby 및 Cloudflare workers.dev 계정 주소로 통일했습니다. 새 Kakao REST API 키는 Cloudflare 비공개 Secret에만 저장하며 APK 또는 소스/공개 데이터에는 절대로 기록되지 않습니다. 실제 호출은 해당 Worker를 통해 수행하고 기존 단지/카테고리 필터와 결과 비저장 및 이용 제한을 유지합니다. 배포 주소 불일치를 방지하기 위해 검증 테스트와 GitHub Actions 자동 상태 확인도 추가했습니다. 기존 계약문자·안내이미지·실거래·뉴스 등 다른 기능은 변경하지 않았습니다.'
+              --title '퍼스트현대 v2.0.8 · 계약 안내 이미지 정리' \
+              --notes '계약 이미지에서 오늘 송금액·계좌 중복 카드와 최하단 안내문을 제거했습니다. 실제 최종 승인된 법률 송금조항의 은행·계좌번호·예금주 부분만 원래 자리에서 약간 더 굵고 청록색으로 강조하고 계좌번호를 밑줄 표시합니다. 원본 FHD FIRST 브랜드 SVG 경로/비율을 그대로 Canvas에 렌더링하며 색상만 문서 팔레트에 맞췄습니다. 기존 계약내용, 금액, 보안 검증, 실거래·뉴스·가족/관리자 모드, v2.0.7의 카카오 Workers 주소 수정은 그대로 유지합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.7 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.8 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"

@@ -83,6 +83,52 @@ function drawOriginalBrandMark(c){
  }
  c.restore();return true;
 }
+
+function wrapAccountLine(c,text,width,size,transfer){
+ // Only the actual bank, account and payee in the approved SMS are highlighted.
+ // Keep them in the legal sentence, not in a second payment panel.
+ const fields=[
+  {text:transfer.account,kind:'account'},
+  {text:transfer.bank,kind:'bank'},
+  {text:transfer.payee,kind:'payee'}
+ ].filter(x=>x.text);
+ const escaped=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\function layout(text,profile,allowPages){');
+ const pattern=new RegExp(fields.map(x=>escaped(x.text)).join('|'),'g');
+ const lines=[],runs=[];let length=0;
+ function flush(){
+  if(runs.length){lines.push({value:runs.map(x=>x.text).join(''),runs:runs.splice(0)});length=0;}
+ }
+ function append(text,kind){
+  const chunks=kind?[text]:(text.match(/\s+|[^\s]+/g)||[]);
+  for(const chunk of chunks){
+   if(!chunk)continue;
+   c.font=(kind?'700 '+(size+2):'400 '+size)+'px sans-serif';
+   const w=c.measureText(chunk).width;
+   if(length&&length+w>width)flush();
+   if(!length&&/^\s+$/.test(chunk))continue;
+   if(w>width){
+    for(const char of Array.from(chunk)){
+     const cw=c.measureText(char).width;
+     if(length&&length+cw>width)flush();
+     runs.push({text:char,emphasis:!!kind,underline:kind==='account'});
+     length+=cw;
+    }
+   }else{
+    runs.push({text:chunk,emphasis:!!kind,underline:kind==='account'});
+    length+=w;
+   }
+  }
+ }
+ let at=0,found;
+ while((found=pattern.exec(text))!==null){
+  append(text.slice(at,found.index),'');
+  append(found[0],fields.find(x=>x.text===found[0]).kind);
+  at=pattern.lastIndex;
+ }
+ append(text.slice(at),'');
+ flush();
+ return lines.length?lines:[{value:text,runs:[]}];
+}
 function layout(text,profile,allowPages){
  const c=document.createElement('canvas').getContext('2d');
  if(!c)throw Error('휴대폰에서 계약 이미지를 생성할 수 없습니다.');
@@ -94,7 +140,6 @@ function layout(text,profile,allowPages){
  };
  let page=pages[0],inNotice=false;
  const transfer=parseTransfer(text);
- let transferAdded=false;
  const blank=Math.round(13*profile.gap);
  for(const rawLine of text.split('\n')){
   if(!rawLine.trim()){
@@ -103,16 +148,6 @@ function layout(text,profile,allowPages){
   }
   const initial=kindFor(rawLine);
   if(initial==='title')continue; // The heading is rendered as the hero title instead.
-  // Show transfer details immediately after payment rows (before special terms),
-  // with a fallback above the legal notice when the user omits special terms.
-  if((initial==='notice'||(initial==='section'&&/^특약사항/.test(clean(rawLine,initial))))&&transfer&&!transferAdded){
-   const height=Math.round(246*profile.scale);
-   const before=Math.round(14*profile.gap),after=Math.round(20*profile.gap);
-   if(allowPages&&page.items.length&&page.bottom+height+before+after>LIMIT)page=newPage();
-   page.bottom+=before;
-   page.items.push({kind:'transfer',transfer,y:page.bottom,height,line:height,size:Math.round(30*profile.scale)});
-   page.bottom+=height+after;transferAdded=true;
-  }
   if(initial==='notice')inNotice=true;
   const kind=inNotice&&initial==='body'?'notice-body':initial;
   const style=specs[kind],size=Math.max(21,Math.round(style.size*profile.scale));
@@ -126,14 +161,16 @@ function layout(text,profile,allowPages){
   }
   c.font=(kind==='row'?'600 ':'400 ')+size+'px sans-serif';
   const usable=label?RIGHT-LEFT-300:RIGHT-LEFT-20;
-  const pieces=wrapText(c,value,usable);
+  const inlineAccount=kind==='notice-body'&&transfer&&data===transfer.raw.trim();
+  const pieces=inlineAccount?wrapAccountLine(c,value,usable,size,transfer):wrapText(c,value,usable).map(value=>({value,runs:null}));
   const total=before+pieces.length*lineHeight+after;
   if(allowPages&&page.items.length&&page.bottom+total>LIMIT&&total<LIMIT-TOP)page=newPage();
   page.bottom+=before;
   for(let i=0;i<pieces.length;i++){
    if(allowPages&&page.bottom+lineHeight+16>LIMIT&&page.items.length)page=newPage();
-   const full=label&&i===0?label+' : '+pieces[i]:pieces[i];
-   page.items.push({kind,text:full,label:i===0?label:'',value:pieces[i],continuation:i>0,y:page.bottom,line:lineHeight,size});
+   const piece=pieces[i];
+   const full=label&&i===0?label+' : '+piece.value:piece.value;
+   page.items.push({kind,text:full,label:i===0?label:'',value:piece.value,runs:piece.runs,continuation:i>0,y:page.bottom,line:lineHeight,size});
    page.bottom+=lineHeight;
   }
   page.bottom+=after;
@@ -155,7 +192,7 @@ function plan(raw){
 }
 function draw(page,index,total){
  const canvas=document.createElement('canvas');canvas.width=WIDTH;
- canvas.height=Math.max(1000,Math.min(3330,Math.ceil(page.bottom+150)));
+ canvas.height=Math.max(1000,Math.min(3330,Math.ceil(page.bottom+85)));
  const c=canvas.getContext('2d');if(!c)throw Error('계약 이미지 화면을 그릴 수 없습니다.');
  c.fillStyle='#e8f3f2';c.fillRect(0,0,WIDTH,canvas.height);
  c.fillStyle='#ffffff';round(c,32,30,WIDTH-64,canvas.height-60,30);c.fill();
@@ -180,35 +217,6 @@ function draw(page,index,total){
  }
  for(const item of items){
   const y=item.y+item.line-11;
-  if(item.kind==='transfer'){
-   const t=item.transfer,x=LEFT-15,y0=item.y,h=item.height;
-   c.fillStyle='#eef8f6';round(c,x,y0,RIGHT-LEFT+30,h,18);c.fill();
-   c.strokeStyle='#8dbfba';c.lineWidth=2;c.stroke();
-   c.fillStyle='#0e555a';c.font='700 '+Math.round(27*h/246)+'px sans-serif';
-   c.fillText('오늘 송금액',LEFT+14,y0+Math.round(48*h/246));
-   c.fillStyle='#a12c23';c.font='800 '+Math.round(41*h/246)+'px sans-serif';
-   c.fillText(t.amount,LEFT+233,y0+Math.round(50*h/246));
-   c.fillStyle='#bad3d0';c.fillRect(LEFT+14,y0+Math.round(72*h/246),RIGHT-LEFT-28,2);
-   c.fillStyle='#4c6970';c.font='600 '+Math.round(24*h/246)+'px sans-serif';
-   c.fillText('입금 은행',LEFT+14,y0+Math.round(111*h/246));
-   c.fillStyle='#174c58';c.font='700 '+Math.round(29*h/246)+'px sans-serif';
-   c.fillText(t.bank||'계좌 안내',LEFT+232,y0+Math.round(111*h/246));
-   c.fillStyle='#174c58';c.font='700 '+Math.round(24*h/246)+'px sans-serif';
-   c.fillText('계좌번호',LEFT+14,y0+Math.round(166*h/246));
-   let accountFont=Math.round(37*h/246);
-   c.font='800 '+accountFont+'px sans-serif';
-   while(accountFont>22&&c.measureText(t.account).width>RIGHT-LEFT-250){
-    accountFont-=2;c.font='800 '+accountFont+'px sans-serif';
-   }
-   c.fillText(t.account,LEFT+232,y0+Math.round(167*h/246));
-   const u=Math.min(RIGHT-LEFT-250,c.measureText(t.account).width);
-   c.fillStyle='#17818c';c.fillRect(LEFT+232,y0+Math.round(175*h/246),u,3);
-   if(t.payee){
-    c.fillStyle='#314a52';c.font='650 '+Math.round(24*h/246)+'px sans-serif';
-    c.fillText('예금주  '+t.payee,LEFT+232,y0+Math.round(217*h/246));
-   }
-   continue;
-  }
   if(item.kind==='row'){
    const prominent=/^(?:매매대금|전세보증금|임대차보증금|보증금|월세|월 차임|계약금|중도금|잔금|이번 송금액|오늘 송금액)$/.test(item.label);
    if(prominent&&!item.continuation){
@@ -228,22 +236,21 @@ function draw(page,index,total){
    c.fillStyle='#2b4149';c.font='400 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+25,y);
   }else if(item.kind==='notice'){
    c.fillStyle='#1a5460';c.font='700 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+11,y);
+  }else if(item.kind==='notice-body'&&item.runs?.length){
+   let x=LEFT+10;
+   for(const run of item.runs){
+    c.font=(run.emphasis?'700 '+(item.size+2):'400 '+item.size)+'px sans-serif';
+    c.fillStyle=run.emphasis?'#0c6269':'#50646b';
+    c.fillText(run.text,x,y);
+    const measured=c.measureText(run.text).width;
+    if(run.underline){c.fillStyle='#0c6269';c.fillRect(x,y+5,measured,2);}
+    x+=measured;
+   }
   }else{
    c.fillStyle=item.kind==='notice-body'?'#50646b':'#50646b';
    c.font='400 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+(item.kind==='notice-body'?10:0),y);
   }
  }
- const foot=canvas.height-87;
- c.fillStyle='#cadcda';c.fillRect(LEFT,foot-25,RIGHT-LEFT,2);
- c.fillStyle='#647b80';
- const footer='계약내용과 입금 계좌를 확인하시고, 문의 사항은 퍼스트현대부동산으로 연락해 주세요.';
- let footSize=22;
- c.font='400 '+footSize+'px sans-serif';
- while(footSize>15&&c.measureText(footer).width>RIGHT-LEFT-6){
-  footSize--;c.font='400 '+footSize+'px sans-serif';
- }
- c.fillText(footer,LEFT,foot+11);
- if(total>1){c.textAlign='right';c.font='600 22px sans-serif';c.fillText(index+1+' / '+total,RIGHT,foot+11);c.textAlign='left';}
  return canvas;
 }
 function ready(){
