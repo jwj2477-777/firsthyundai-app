@@ -84,7 +84,8 @@ def collect(key, opener=None, page_size=1000):
         rows,n=parse_page(raw)
         if total is None:total=n
         if n!=total:raise RuntimeError('학교위치 API 페이지 간 총건수 불일치')
-        if not rows:raise RuntimeError('학교위치 API 수집 페이지 누락')
+        if len(rows)!=min(page_size,total-(page-1)*page_size):
+            raise RuntimeError('학교위치 API 페이지 건수 불일치 · 부분 자료 게시 중지')
         pages+=1
         for record in normalize(rows):found[record['code']]=record
         if page*page_size>=total:break
