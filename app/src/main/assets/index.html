@@ -179,7 +179,7 @@ body.apartmentSheetActive{overflow:hidden}
 <link rel="stylesheet" href="contracts.css">
 <link rel="stylesheet" href="theme.css">
 </head>
-<body>
+<body data-office-role="family">
 <header><div class="brandHeader"><span class="officeMark"><svg class="officeMarkSvg" viewBox="0 0 512 512" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><path fill="#FF0000" d="M256,2 C396,2 510,116 510,256 C510,396 396,510 256,510 C116,510 2,396 2,256 C2,116 116,2 256,2 Z"/><path fill="#FFFFFF" fill-rule="evenodd" d="M244,23 L243,24 L232,24 L218,26 L192,32 L157,45 L143,52 L122,65 L104,79 L86,96 L72,112 L59,130 L46,152 L35,177 L28,199 L24,218 L23,232 L22,233 L22,247 L21,248 L21,265 L22,266 L22,281 L26,306 L32,328 L39,346 L49,366 L67,393 L88,417 L103,431 L130,451 L140,457 L168,470 L187,476 L212,481 L232,482 L233,483 L257,483 L258,482 L279,481 L301,477 L316,473 L346,462 L371,449 L391,436 L416,416 L434,398 L447,382 L459,364 L475,331 L481,313 L487,284 L488,239 L487,238 L485,216 L480,195 L470,167 L459,145 L437,112 L427,100 L407,80 L378,58 L368,52 L336,37 L321,32 L288,25 L269,24 L268,23Z M196,393 L211,393 L212,394 L212,450 L211,451 L196,451 L195,450 L195,394Z M188,393 L189,394 L189,404 L187,406 L186,405 L184,406 L180,405 L176,406 L165,405 L164,406 L163,405 L163,416 L184,416 L185,417 L185,428 L184,429 L163,429 L163,450 L162,451 L147,451 L146,450 L146,394 L147,393Z M319,392 L364,392 L365,393 L365,404 L363,406 L348,406 L348,450 L347,451 L332,451 L331,450 L331,406 L319,406 L317,404 L317,394Z M221,392 L249,392 L257,394 L264,400 L266,404 L265,417 L258,424 L255,425 L263,433 L270,450 L269,451 L252,451 L246,436 L242,430 L236,430 L236,450 L235,451 L220,451 L219,450 L219,394Z M236,404 L236,418 L244,418 L248,416 L249,414 L248,406 L243,404Z M310,393 L312,395 L312,399 L309,407 L304,405 L291,405 L289,407 L289,410 L292,413 L303,418 L312,425 L315,431 L315,436 L312,443 L305,449 L296,452 L282,452 L274,450 L272,448 L272,442 L274,436 L283,439 L293,439 L297,436 L297,434 L294,431 L280,424 L274,418 L272,413 L273,402 L278,396 L286,392 L299,391Z M68,132 L86,109 L107,88 L126,73 L147,60 L166,51 L182,45 L208,38 L242,33 L271,33 L272,34 L289,35 L305,38 L330,45 L354,55 L367,62 L388,76 L399,85 L424,110 L433,121 L452,150 L463,172 L472,197 L477,218 L479,231 L479,241 L480,242 L479,282 L476,299 L469,323 L462,340 L452,359 L435,383 L71,383 L59,366 L44,336 L34,304 L30,278 L30,236 L33,215 L37,198 L44,177 L51,161Z M311,168 L311,372 L372,372 L385,367 L394,359 L399,351 L401,344 L401,258 L400,253 L395,241 L389,234Z M343,237 L355,244 L365,254 L369,263 L369,338 L363,345 L355,348 L343,348 L342,347 L342,238Z M195,168 L149,205 L119,227 L119,372 L150,372 L150,316 L192,293 L192,259 L152,281 L150,279 L150,269 L151,268 L151,242 L195,210Z M264,128 L265,238 L263,240 L244,240 L243,239 L243,129 L239,131 L210,155 L210,372 L243,372 L243,274 L244,273 L264,273 L265,274 L265,372 L296,372 L296,155Z M444,237 L368,169 L368,77 L347,77 L343,83 L336,89 L329,93 L319,96 L319,108 L320,109 L319,110 L320,111 L342,111 L343,112 L343,145 L341,146 L254,71 L127,177 L57,233 L93,233 L254,102 L409,237Z"/></svg></span><div class="brandHeaderText"><div class="eyebrow">FIRST HYUNDAI · SONGDO</div><h1>퍼스트현대</h1></div></div></header>
 <main>
 
@@ -204,15 +204,15 @@ body.apartmentSheetActive{overflow:hidden}
   
 </div>
 <div id="nearby" class="page hidden">
- <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2><p class="tiny">송도 3공구 퍼스트파크 15블럭 사무실 중심 · 자주 중개하는 14개 단지</p></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
+ <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2><p class="tiny adminExplain">송도 3공구 퍼스트파크 15블럭 사무실 중심 · 자주 중개하는 14개 단지</p></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
  <div class="panel">
   <h3 style="margin:0 0 8px">즐겨찾기 14개 단지</h3>
   <label class="favoriteTradeAlertSwitch"><input type="checkbox" id="favoriteTradeAlertEnabled" checked onchange="FirstHyundaiTradeAlerts.setEnabled(this.checked)"> <span>🔔 관심 단지 새 실거래 팝업 알림</span></label>
-  <p class="tiny favoriteTradeAlertHint">앱을 열거나 새 거래 자료를 갱신할 때 새로 확인된 매매·전세·월세를 한 번만 알려드립니다. 최초 연결 시에는 기존 거래를 알리지 않습니다.</p>
+  <p class="tiny favoriteTradeAlertHint adminExplain">앱을 열거나 새 거래 자료를 갱신할 때 새로 확인된 매매·전세·월세를 한 번만 알려드립니다. 최초 연결 시에는 기존 거래를 알리지 않습니다.</p>
   <button type="button" class="btn alt alertPreviewButton" onclick="FirstHyundaiTradeAlerts.preview()">알림 화면 미리보기</button>
   <label class="favoriteTradeAlertSwitch"><input type="checkbox" id="favoriteTradeNativeEnabled" onchange="FirstHyundaiTradeAlerts.setNativeEnabled(this.checked)"> <span>휴대폰 알림센터에서도 받기</span></label>
   <p class="tiny favoriteTradeAlertHint" id="favoriteTradeNativeStatus" role="status">휴대폰 알림 권한 확인 중…</p>
-  <p class="tiny favoriteTradeAlertHint">휴대폰 알림은 앱 실행·새 거래 자료 갱신 시에만 생성됩니다. 앱을 종료한 상태의 실시간 푸시 알림은 별도의 연동이 필요합니다.</p>
+  <p class="tiny favoriteTradeAlertHint adminExplain">휴대폰 알림은 앱 실행·새 거래 자료 갱신 시에만 생성됩니다. 앱을 종료한 상태의 실시간 푸시 알림은 별도의 연동이 필요합니다.</p>
   
   <button id="nearbyAll" class="btn alt nearbyTotal" type="button" onclick="chooseNearby('all')"><span>★ 관심 14개 단지 전체 보기</span><strong id="nearbyAllCount">—</strong></button>
   <div id="nearbyCards" class="nearbyGrid"></div>
@@ -237,7 +237,7 @@ body.apartmentSheetActive{overflow:hidden}
   <div id="nearbyTrades"><div class="empty">데이터를 불러오면 거래가 표시됩니다.</div></div>
   <button id="nearbyMore" class="btn alt hidden" type="button" onclick="showMoreNearby()">거래 더 보기</button>
   <button class="btn alt" type="button" onclick="closeApartmentSheet()">← 다른 관심 아파트 선택</button>
-  <p class="tiny">계약일 기준 정렬 · 신고 지연·정정·해제 가능 · 국토교통부 아파트 매매·전월세 공개 자료</p>
+  <p class="tiny adminExplain">계약일 기준 정렬 · 신고 지연·정정·해제 가능 · 국토교통부 아파트 매매·전월세 공개 자료</p>
  </section>
 </div>
 
@@ -374,14 +374,14 @@ body.apartmentSheetActive{overflow:hidden}
  </div>
 </div>
 <div id="news" class="page hidden">
- <div class="sectionTitle"><div><h2>뉴스 · 청약/분양</h2><p class="tiny">뉴스와 인천 분양공고를 탭으로 빠르게 전환</p></div></div>
+ <div class="sectionTitle"><div><h2>뉴스 · 청약/분양</h2><p class="tiny adminExplain">뉴스와 인천 분양공고를 탭으로 빠르게 전환</p></div></div>
  <div class="controls" role="tablist" aria-label="뉴스와 청약 정보">
    <button id="newsTabArticles" type="button" class="btn" role="tab" aria-selected="true" aria-controls="newsArticlesPane" onclick="switchNewsPane('articles')">뉴스 브리핑</button>
    <button id="newsTabSubscriptions" type="button" class="btn alt" role="tab" aria-selected="false" aria-controls="newsSubscriptionsPane" onclick="switchNewsPane('subscriptions')">인천 청약·분양</button>
  </div>
  <section id="newsArticlesPane" role="tabpanel" aria-labelledby="newsTabArticles">
-  <div class="sectionTitle"><div><h3>송도·부동산 뉴스 브리핑</h3><p class="tiny" id="newsMeta">AI 기사 본문 요약 현황을 확인 중입니다.</p></div><button class="btn alt refreshAction" type="button" data-refresh="news" onclick="refreshOne('news',true)">갱신</button></div>
-  <div class="notice">기사를 제목별로 묶은 뒤 <b>원문 본문을 읽을 수 있는 경우에만 Gemini·Groq가 핵심 내용을 요약</b>합니다. 본문 확인이 불가능한 기사는 AI 요약을 표시하지 않습니다. AI 요약은 사실검증이 아니므로 세금·대출·개발 일정은 원문과 공식 발표를 확인하세요.</div>
+  <div class="sectionTitle"><div><h3>송도·부동산 뉴스 브리핑</h3><p class="tiny adminExplain" id="newsMeta">AI 기사 본문 요약 현황을 확인 중입니다.</p><p class="tiny familySimpleNote" id="newsFamilyMeta" role="status">뉴스를 불러오는 중입니다.</p></div><button class="btn alt refreshAction" type="button" data-refresh="news" onclick="refreshOne('news',true)">갱신</button></div>
+  <div class="notice adminExplain">기사를 제목별로 묶은 뒤 <b>원문 본문을 읽을 수 있는 경우에만 Gemini·Groq가 핵심 내용을 요약</b>합니다. 본문 확인이 불가능한 기사는 AI 요약을 표시하지 않습니다. AI 요약은 사실검증이 아니므로 세금·대출·개발 일정은 원문과 공식 발표를 확인하세요.</div><p class="familySimpleNote familyBriefCaution">뉴스 요약은 참고용입니다. 중요한 정보는 원문에서 확인하세요.</p>
   <div class="panel"><select id="newsCategory" onchange="renderNews()"><option value="">모든 주제</option><option>개발·교통</option><option>분양·입주</option><option>세금·대출</option><option>정책·규제</option></select><div id="newsContent"><div class="empty">데이터 저장소를 연결한 후 표시됩니다.</div></div></div>
  </section>
  <section id="newsSubscriptionsPane" class="hidden" role="tabpanel" aria-labelledby="newsTabSubscriptions">
@@ -411,7 +411,7 @@ body.apartmentSheetActive{overflow:hidden}
   <div class="contractMemoInputArea">
    <label class="contractMemoLabel" for="ct_rough">계약 메모 입력칸 <span class="contractMemoStart">여기부터 시작</span></label>
    <textarea id="ct_rough" rows="10" maxlength="12000" aria-describedby="ct_memoHelp ct_memoWriteTip" placeholder="예시처럼 적어 보세요.&#10;&#10;퍼팍 1502동 3004호&#10;매매 16억&#10;계약금 6천&#10;중도금 4억 12월4일&#10;잔금 1월5일&#10;계약은 10월중 협의&#10;화장실은 매도인이 수리해주기로"></textarea>
-   <p id="ct_memoWriteTip" class="contractMemoWriteTip">한 줄씩 적어도 되고, 말하듯이 이어 적어도 됩니다.</p>
+   <p id="ct_memoWriteTip" class="contractMemoWriteTip adminExplain">한 줄씩 적어도 되고, 말하듯이 이어 적어도 됩니다.</p>
   </div>
   <div class="contractEasyActions">
    <button type="button" class="btn contractOneTap" onclick="FirstHyundaiEasy.compose()">메모 입력 완료 → 계약문자 만들기</button>
@@ -424,13 +424,13 @@ body.apartmentSheetActive{overflow:hidden}
     <div id="ct_languageWarnings" class="contractReview" role="status" aria-live="polite">금액과 날짜는 발송 전에 확인해 주세요.</div>
   </details>
   <details id="ct_termDiff" class="contractCompactDetails hidden"><summary>특약 원문과 정리된 문장 비교</summary>
-    <p class="contractHint">특약 문구는 맞춤법·표현 중심으로 정리하며 새로운 의무를 추가하지 않습니다. 법적 의미는 반드시 직접 확인하세요.</p>
+    <p class="contractHint adminExplain">특약 문구는 맞춤법·표현 중심으로 정리하며 새로운 의무를 추가하지 않습니다. 법적 의미는 반드시 직접 확인하세요.</p>
     <label class="inputLabel">메모의 특약 원문</label><div id="ct_termOriginal" class="contractCompareText"></div>
     <label class="inputLabel">정리된 특약 문장</label><div id="ct_termPolished" class="contractCompareText"></div>
     <div class="contractActions"><button type="button" class="btn alt" onclick="FirstHyundaiEasy.useOriginalTerms()">원문 사용</button><button type="button" class="btn alt" onclick="FirstHyundaiEasy.usePolishedTerms()">정리 문구 사용</button></div>
     <p id="ct_termNotice" class="contractHint"></p>
   </details>
-  <p class="contractHint">입력한 내용은 외부 AI 서버로 보내지 않고 휴대폰 안에서 정리합니다. '오늘 500', '금일 천만원', '퍼팍 13블럭', '마뷰 21블럭' 같은 현장 표현도 인식합니다. 빠진 정보는 아래에서 확인할 수 있습니다.</p>
+  <p class="contractHint adminExplain">입력한 내용은 외부 AI 서버로 보내지 않고 휴대폰 안에서 정리합니다. '오늘 500', '금일 천만원', '퍼팍 13블럭', '마뷰 21블럭' 같은 현장 표현도 인식합니다. 빠진 정보는 아래에서 확인할 수 있습니다.</p>
  </div>
  <div class="contractManualWrap"><details id="ct_manualPanel" class="contractManual"><summary>✎ 직접 입력·수정하기 <small>필요할 때만 펼치기</small></summary>
  <div class="panel">
@@ -470,7 +470,7 @@ body.apartmentSheetActive{overflow:hidden}
     <div class="wide"><label class="inputLabel" for="ct_account">계좌번호</label><input id="ct_account" maxlength="70" inputmode="text" autocomplete="off" placeholder="계좌번호를 정확히 확인"></div>
    </div>
    <h3 class="contractSection">4. 특약 및 합의사항</h3>
-   <p class="contractHint">각 특약은 한 줄에 하나씩 입력합니다. 계약 해제·위약금 및 중개보수 조건은 자동으로 만들어 넣지 않습니다. 실제로 합의한 경우에만 아래에 작성하세요.</p>
+   <p class="contractHint adminExplain">각 특약은 한 줄에 하나씩 입력합니다. 계약 해제·위약금 및 중개보수 조건은 자동으로 만들어 넣지 않습니다. 실제로 합의한 경우에만 아래에 작성하세요.</p><p class="familySimpleNote familyShortSafety">특약·해제 조건은 실제 합의한 내용만 입력하세요.</p>
    <label class="inputLabel" for="ct_terms">특약 (한 줄에 하나)</label><textarea id="ct_terms" maxlength="8000" placeholder="현 상태로 인도하기로 한다.&#10;잔금일까지 권리관계에 변동이 없도록 한다."></textarea>
    <label class="inputLabel" for="ct_cancellation">계약 해제·위약 관련 합의 (선택)</label><textarea id="ct_cancellation" maxlength="2500" placeholder="실제로 합의한 해제 조건과 위약 관련 내용을 정확히 기재"></textarea>
    <label class="inputLabel" for="ct_brokerFee">중개보수 관련 합의 (선택)</label><textarea id="ct_brokerFee" maxlength="1600" placeholder="실제로 합의한 경우에만 기재"></textarea>
@@ -481,11 +481,11 @@ body.apartmentSheetActive{overflow:hidden}
   <h3 class="contractSection">3. 완성된 문자 확인·공유</h3>
   <div class="contractNoticeControls">
     <label class="contractPolishToggle"><input type="checkbox" id="ct_includeNotice" checked onchange="FirstHyundaiEasy.afterManualEdit()"> 계약 성립·해제·중개보수 관련 합의 안내문 포함</label>
-    <p class="contractHint">사전에 협의한 계약 성립 시점, 일방 변심에 따른 해제 조건, 매도인의 수령액 배액상환, 매수인의 송금액 포기 및 중개보수 관련 조건을 명시합니다. 계약 당사자와 실제 합의한 내용인지 확인하고 다르면 수정하거나 안내문을 제외하세요.</p>
+    <p class="contractHint adminExplain">사전에 협의한 계약 성립 시점, 일방 변심에 따른 해제 조건, 매도인의 수령액 배액상환, 매수인의 송금액 포기 및 중개보수 관련 조건을 명시합니다. 계약 당사자와 실제 합의한 내용인지 확인하고 다르면 수정하거나 안내문을 제외하세요.</p><p class="familySimpleNote familyShortSafety">당사자와 합의한 경우에만 포함하세요. 다르면 안내문을 끄거나 수정하세요.</p>
   </div>
   <div id="ct_missing" class="contractReview" role="status" aria-live="polite">필수 내용이 채워지면 복사·공유할 수 있습니다.</div>
   <button id="ct_fixMissing" type="button" class="btn alt contractFix hidden" onclick="FirstHyundaiEasy.openManual()">부족하거나 잘못 인식된 부분 수정</button>
-  <p class="contractHint">생성된 문구를 직접 수정할 수 있습니다. 금액·날짜·계좌·특약을 당사자와 재확인한 다음 공유하세요.</p>
+  <p class="contractHint adminExplain">생성된 문구를 직접 수정할 수 있습니다. 금액·날짜·계좌·특약을 당사자와 재확인한 다음 공유하세요.</p>
   <div id="ct_status" class="contractReview" role="status" aria-live="polite">조건을 입력하면 초안을 생성할 수 있습니다.</div>
   <label class="inputLabel" for="ct_preview">최종 계약 안내 문자 (직접 수정 가능)</label>
   <textarea id="ct_preview" class="contractPreview" maxlength="20000" oninput="FirstHyundaiContracts.edited()" placeholder="먼저 ‘계약문자 초안 생성’을 눌러주세요."></textarea>
@@ -497,12 +497,12 @@ body.apartmentSheetActive{overflow:hidden}
    <button type="button" class="btn contractImageButton" onclick="FirstHyundaiContractImage.open()">▣ 고급 이미지 만들기</button>
    <button type="button" class="btn alt" onclick="FirstHyundaiContracts.reset()">입력 초기화</button>
   </div>
-  <p class="contractInfo">이 기능은 계약서 자체가 아니라 당사자 간 사전 합의 내용을 정리하는 도구입니다. 일부 송금만으로 계약의 효력·해제 조건이 일률적으로 결정되는 것은 아닙니다. 필수 조건과 당사자 의사 확인이 중요합니다. 작성 내용은 공개 GitHub에 업로드하거나 앱의 온라인 데이터로 전송하지 않으며, 별도로 저장하지 않습니다. 복사·공유 후에는 휴대폰 클립보드나 선택한 앱에 내용이 남을 수 있습니다.</p>
+  <p class="contractInfo adminExplain">이 기능은 계약서 자체가 아니라 당사자 간 사전 합의 내용을 정리하는 도구입니다. 일부 송금만으로 계약의 효력·해제 조건이 일률적으로 결정되는 것은 아닙니다. 필수 조건과 당사자 의사 확인이 중요합니다. 작성 내용은 공개 GitHub에 업로드하거나 앱의 온라인 데이터로 전송하지 않으며, 별도로 저장하지 않습니다. 복사·공유 후에는 휴대폰 클립보드나 선택한 앱에 내용이 남을 수 있습니다.</p><p class="familySimpleNote familyShortSafety">계약 안내문은 계약서가 아닙니다. 실제 합의한 조건인지 확인해 주세요.</p>
  </div>
 </div>
 <dialog id="ct_imageDialog" class="contractImageDialog" aria-label="계약 안내 이미지 미리보기">
  <div class="contractImageHeader"><h3>계약 안내 이미지</h3><button class="btn alt" type="button" onclick="FirstHyundaiContractImage.close()">닫기</button></div>
- <p class="contractHint">내용 확인을 마친 계약 안내를 PNG로 만들었습니다. 모든 장의 금액·계좌·특약을 확인한 뒤 공유해 주세요.</p>
+ <p class="contractHint adminExplain">내용 확인을 마친 계약 안내를 PNG로 만들었습니다. 모든 장의 금액·계좌·특약을 확인한 뒤 공유해 주세요.</p><p class="familySimpleNote familyShortSafety">금액·계좌·특약을 확인하고 공유해 주세요.</p>
  <div id="ct_imagePages" class="contractImagePages"></div>
  <div id="ct_imageStatus" class="contractReview" role="status" aria-live="polite"></div>
  <div class="contractActions"><button class="btn contractImageButton" type="button" onclick="FirstHyundaiContractImage.share()">이미지로 카톡·문자 공유</button></div>
@@ -616,6 +616,8 @@ function updateRoleBar(){
  $('roleLabel').textContent=role==='admin'?'관리자 모드 · 설정·내 자료 사용 가능':'가족 조회 모드 · 설정 보호';
  $('roleButton').textContent=role==='admin'?'가족 모드로 전환':'관리자 전환';
  $('modeBar').className='modeBar '+(role==='admin'?'modeAdmin':'modeFamily');
+ // Hide nonessential operational explanations in family mode, not validation or warnings.
+ document.body?.setAttribute?.('data-office-role',role);
 }
 function toggleAdminMode(){
  if(role==='admin'){
@@ -1614,11 +1616,13 @@ function renderNews(){
  const payload=remote.news;
  if(!payload){
   $('newsMeta').textContent='AI 기사 요약 자료 확인 전';
+  if($('newsFamilyMeta'))$('newsFamilyMeta').textContent='뉴스 자료를 준비하는 중입니다.';
   $('newsContent').innerHTML='<div class="empty">‘설정’에서 공개 GitHub 저장소를 연결하세요.</div>';
   return;
  }
  if(payload.state==='not_started'){
   $('newsMeta').textContent='아직 첫 뉴스 수집 전';
+  if($('newsFamilyMeta'))$('newsFamilyMeta').textContent='뉴스 수집 전입니다.';
   $('newsContent').innerHTML='<div class="empty">아직 첫 뉴스 수집을 실행하지 않았습니다.</div>';
   return;
  }
@@ -1629,6 +1633,7 @@ function renderNews(){
  const waiting=briefs.length-aiCount;
  $('newsMeta').textContent='마지막 수집 '+prettyTime(payload.checked_at)+' · AI 본문요약 '+aiCount+'/'+briefs.length+
   '건'+(waiting?' · '+waiting+'건 원문 확인 대기':'')+' · 공식 사실검증 별도';
+ if($('newsFamilyMeta'))$('newsFamilyMeta').textContent='최근 뉴스 '+briefs.length+'건 · 업데이트 '+prettyTime(payload.checked_at);
  const cat=$('newsCategory').value;
  const filtered=briefs.filter(x=>!cat||x.category===cat);
  const scopedAI=filtered.filter(isAI).length;
