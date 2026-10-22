@@ -351,9 +351,7 @@ body:not([data-office-role="admin"]) #ct_preview.contractEditing{
  font-size:17px;line-height:1.8;padding:18px;
 }
 body:not([data-office-role="admin"]) #ct_preview.contractEditing ~ .contractPreviewHint{display:none}
-body:not([data-office-role="admin"]):has(#ct_preview.contractEditing) #ct_previewHighlight{
- display:none!important;
-}
+#contracts #ct_previewHighlight.hidden{display:none!important}
 @media(max-width:540px){
  #contracts .contractPreviewHighlight{padding:16px 14px;font-size:16px;line-height:1.8}
  #contracts .contractPreviewToggle{width:100%}
