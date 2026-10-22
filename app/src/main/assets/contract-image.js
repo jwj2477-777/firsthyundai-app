@@ -103,7 +103,9 @@ function layout(text,profile,allowPages){
   }
   const initial=kindFor(rawLine);
   if(initial==='title')continue; // The heading is rendered as the hero title instead.
-  if(initial==='notice'&&transfer&&!transferAdded){
+  // Show transfer details immediately after payment rows (before special terms),
+  // with a fallback above the legal notice when the user omits special terms.
+  if((initial==='notice'||(initial==='section'&&/^특약사항/.test(clean(rawLine,initial))))&&transfer&&!transferAdded){
    const height=Math.round(246*profile.scale);
    const before=Math.round(14*profile.gap),after=Math.round(20*profile.gap);
    if(allowPages&&page.items.length&&page.bottom+height+before+after>LIMIT)page=newPage();
