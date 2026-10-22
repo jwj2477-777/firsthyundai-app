@@ -451,3 +451,7 @@ body:not([data-office-role="admin"]) #contracts .contractNoticeControls{
 #contracts #ct_confirmButton[data-review-state="ready"]{
  background:#087153!important;
 }
+
+/* v2.0.9: one conspicuous actionable warning, no flashing effects. */
+#contracts #ct_missing.bad{display:block!important;background:linear-gradient(135deg,#FFF1D5,#FFF8E9);border:3px solid #D94D24;border-left:9px solid #D43222;border-radius:16px;color:#80220F;font-size:19px;font-weight:900;line-height:1.65;letter-spacing:-.22px;padding:19px 20px;margin:15px 0 20px;box-shadow:0 4px 0 #DB6A3540,0 8px 19px #6D250B18;overflow-wrap:anywhere}
+@media(max-width:380px){#contracts #ct_missing.bad{font-size:17px;padding:16px 15px}}

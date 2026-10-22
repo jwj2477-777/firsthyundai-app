@@ -61,6 +61,7 @@ assert.equal(el('ct_contractDeposit').value,'3900','Missing deposit is 10% by de
 assert(el('ct_depositHelp').textContent.includes('10%'));
 el('ct_advance').value='500';
 el('ct_balanceDate').value='2026-12-30';
+el('ct_contractDate').value='2026-11-12';
 el('ct_leaseDuration').value='2년';
 el('ct_bank').value='테스트은행';
 el('ct_account').value='123-45-67890';

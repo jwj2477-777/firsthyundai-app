@@ -137,7 +137,7 @@ function simpleMissing(errors){
  const friendly={
   '소재지 도로명주소':'주소','아파트 단지 선택 확인':'단지 선택',
   '매매대금 또는 보증금':'거래금액','약정 계약금':'계약금',
-  '이번 송금액':'이번 송금액','잔금 예정일':'잔금일',
+  '이번 송금액':'이번 송금액','계약일':'계약일','잔금 예정일':'잔금일',
   '송금 은행·계좌·예금주':'입금 은행·계좌·예금주',
   '동·호수':'동·호수','임대차 기간':'임대차 기간',
   '중도금 숫자':'중도금 금액','월세 금액':'월세 금액'
@@ -186,7 +186,7 @@ function afterManualEdit(){
 }
 function openManual(){
  const d=E('manualPanel');if(d){d.open=true;if(d.scrollIntoView)d.scrollIntoView({behavior:'smooth',block:'start'});}
- const first=app._test.collect().errors[0],lookup={'소재지 도로명주소':'address','아파트 단지 선택 확인':'property','동·호수':'unit','이번 송금액':'advance','잔금 예정일':'balanceDate','송금 은행·계좌·예금주':'bank','임대차 기간':'leaseDuration'};
+ const first=app._test.collect().errors[0],lookup={'소재지 도로명주소':'address','아파트 단지 선택 확인':'property','동·호수':'unit','계약일':'contractDate','이번 송금액':'advance','잔금 예정일':'balanceDate','송금 은행·계좌·예금주':'bank','임대차 기간':'leaseDuration'};
  const id=Object.keys(lookup).find(k=>first?.includes(k));
  if(id)E(lookup[id])?.focus?.();
 }
