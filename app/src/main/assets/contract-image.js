@@ -114,17 +114,17 @@ function draw(page,index,total){
  const canvas=document.createElement('canvas');canvas.width=WIDTH;
  canvas.height=Math.max(1000,Math.min(3330,Math.ceil(page.bottom+150)));
  const c=canvas.getContext('2d');if(!c)throw Error('계약 이미지 화면을 그릴 수 없습니다.');
- c.fillStyle='#f5f0e9';c.fillRect(0,0,WIDTH,canvas.height);
- c.fillStyle='#fffdfa';round(c,32,30,WIDTH-64,canvas.height-60,30);c.fill();
- c.strokeStyle='#e4d9ce';c.lineWidth=2;c.stroke();
- c.fillStyle='#805c43';round(c,LEFT,76,92,53,11);c.fill();
+ c.fillStyle='#e8f3f2';c.fillRect(0,0,WIDTH,canvas.height);
+ c.fillStyle='#ffffff';round(c,32,30,WIDTH-64,canvas.height-60,30);c.fill();
+ c.strokeStyle='#ccdedf';c.lineWidth=2;c.stroke();
+ c.fillStyle='#155a66';round(c,LEFT,76,92,53,11);c.fill();
  c.fillStyle='#fff';c.font='700 28px sans-serif';c.fillText('FHD',LEFT+17,113);
- c.fillStyle='#5c4534';c.font='700 24px sans-serif';c.fillText('FIRST HYUNDAI',LEFT+110,108);
- c.fillStyle='#a18e7c';c.font='400 20px sans-serif';c.fillText('REAL ESTATE',LEFT+112,136);
- c.fillStyle='#3d312a';c.font='700 46px sans-serif';c.fillText(page.heading,LEFT,215);
- c.fillStyle='#9b826d';c.font='400 23px sans-serif';c.textAlign='right';c.fillText('퍼스트현대부동산',RIGHT,214);c.textAlign='left';
+ c.fillStyle='#155a66';c.font='700 24px sans-serif';c.fillText('FIRST HYUNDAI',LEFT+110,108);
+ c.fillStyle='#5b7480';c.font='400 20px sans-serif';c.fillText('REAL ESTATE',LEFT+112,136);
+ c.fillStyle='#213f49';c.font='700 46px sans-serif';c.fillText(page.heading,LEFT,215);
+ c.fillStyle='#58727a';c.font='400 23px sans-serif';c.textAlign='right';c.fillText('퍼스트현대부동산',RIGHT,214);c.textAlign='left';
  c.fillStyle='#be9371';round(c,LEFT,244,78,5,2);c.fill();
- c.fillStyle='#e7e0d7';c.fillRect(LEFT+93,246,RIGHT-LEFT-93,2);
+ c.fillStyle='#c9d9d9';c.fillRect(LEFT+93,246,RIGHT-LEFT-93,2);
  const items=page.items;
  // Background grouping: restrained warm-taupe areas for terms and notices, not SMS glyphs.
  for(let i=0;i<items.length;i++){
@@ -132,7 +132,7 @@ function draw(page,index,total){
   if(item.kind==='notice'&&(i===0||prev?.kind!=='notice')){
    const end=items.slice(i).filter(x=>x.kind==='notice'||x.kind==='notice-body').at(-1);
    if(end){
-    c.fillStyle='#f8f2ea';round(c,LEFT-17,item.y-9,RIGHT-LEFT+34,end.y+end.line-item.y+17,16);c.fill();
+    c.fillStyle='#edf5f4';round(c,LEFT-17,item.y-9,RIGHT-LEFT+34,end.y+end.line-item.y+17,16);c.fill();
    }
   }
  }
@@ -141,30 +141,30 @@ function draw(page,index,total){
   if(item.kind==='row'){
    const prominent=/^(?:매매대금|전세보증금|보증금|잔금|이번 송금액|계약금)$/.test(item.label);
    if(prominent&&!item.continuation){
-    c.fillStyle='#f5f0e9';round(c,LEFT-10,item.y-5,RIGHT-LEFT+20,item.line+8,9);c.fill();
+    c.fillStyle='#e8f3f2';round(c,LEFT-10,item.y-5,RIGHT-LEFT+20,item.line+8,9);c.fill();
    }
    if(item.label){
-    c.font='500 '+Math.max(22,item.size-3)+'px sans-serif';c.fillStyle='#897260';
+    c.font='500 '+Math.max(22,item.size-3)+'px sans-serif';c.fillStyle='#506a71';
     c.fillText(item.label,LEFT+10,y);
    }
-   c.font='600 '+item.size+'px sans-serif';c.fillStyle=prominent?'#5a3d2b':'#40352d';
+   c.font='600 '+item.size+'px sans-serif';c.fillStyle=prominent?'#155a66':'#263b43';
    c.fillText(item.value,item.label?LEFT+300:LEFT+300,y);
   }else if(item.kind==='section'){
-   c.fillStyle='#ad805d';round(c,LEFT,item.y+6,5,item.line-9,2);c.fill();
-   c.fillStyle='#5b4332';c.font='700 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+17,y);
+   c.fillStyle='#18808a';round(c,LEFT,item.y+6,5,item.line-9,2);c.fill();
+   c.fillStyle='#234750';c.font='700 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+17,y);
   }else if(item.kind==='term'){
-   c.fillStyle='#a58368';round(c,LEFT+6,item.y+Math.round(item.line/2),7,7,3);c.fill();
-   c.fillStyle='#453a33';c.font='400 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+25,y);
+   c.fillStyle='#16818b';round(c,LEFT+6,item.y+Math.round(item.line/2),7,7,3);c.fill();
+   c.fillStyle='#2b4149';c.font='400 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+25,y);
   }else if(item.kind==='notice'){
-   c.fillStyle='#654630';c.font='700 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+11,y);
+   c.fillStyle='#1a5460';c.font='700 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+11,y);
   }else{
-   c.fillStyle=item.kind==='notice-body'?'#665547':'#5d5045';
+   c.fillStyle=item.kind==='notice-body'?'#50646b':'#50646b';
    c.font='400 '+item.size+'px sans-serif';c.fillText(item.text,LEFT+(item.kind==='notice-body'?10:0),y);
   }
  }
  const foot=canvas.height-87;
- c.fillStyle='#ded5ca';c.fillRect(LEFT,foot-25,RIGHT-LEFT,2);
- c.fillStyle='#998577';c.font='400 22px sans-serif';c.fillText('계약조건·계좌정보·합의사항을 발송 전에 확인해 주세요.',LEFT,foot+11);
+ c.fillStyle='#cadcda';c.fillRect(LEFT,foot-25,RIGHT-LEFT,2);
+ c.fillStyle='#647b80';c.font='400 22px sans-serif';c.fillText('계약조건·계좌정보·합의사항을 발송 전에 확인해 주세요.',LEFT,foot+11);
  if(total>1){c.textAlign='right';c.font='600 22px sans-serif';c.fillText(index+1+' / '+total,RIGHT,foot+11);c.textAlign='left';}
  return canvas;
 }
