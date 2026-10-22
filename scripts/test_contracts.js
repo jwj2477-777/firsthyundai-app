@@ -80,7 +80,7 @@ assert(!el('ct_preview').value.includes('계약금 포기'));
 /* A confirmed intermediary schedule should render identically to contract/balance dates.
    Draft fields continue to store ISO dates; flexible negotiation wording stays untouched. */
 el('ct_dealType').value='매매';
-el('ct_interim').value='40000';
+el('ct_interim').value='5000';
 el('ct_interimDate').value='2026-12-04';
 api.makePreview();
 assert(el('ct_preview').value.includes('▶ 중도금 지급일 : 2026.12.04.'),
