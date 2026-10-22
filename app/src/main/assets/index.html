@@ -599,6 +599,9 @@ body.apartmentSheetActive{overflow:hidden}
  <div class="tiny">퍼스트현대 · 실거래 / 아파트정보 / 뉴스 · 관심 14개 단지</div>
 </footer>
 </main>
+<!-- Small fixed scroll-top control. Current page or current full-screen apartment sheet only. -->
+<button id="scrollToTop" class="scrollToTopFab" type="button" title="맨 위로"
+  aria-label="현재 화면 맨 위로 이동" aria-hidden="true" hidden>↑</button>
 <dialog id="favoriteTradeAlertDialog" class="favoriteTradeAlertDialog" aria-labelledby="favoriteTradeAlertTitle" aria-describedby="favoriteTradeAlertCaption">
  <div class="alertDialogHeader"><span class="alertBell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg></span><div><span class="alertEyebrow">퍼스트현대 · 관심 단지 소식</span><h2 id="favoriteTradeAlertTitle">새 실거래</h2></div><button type="button" class="favoriteTradeAlertDismiss" onclick="FirstHyundaiTradeAlerts.later()" aria-label="알림 상세 닫기" autofocus>×</button></div>
  <p id="favoriteTradeAlertCaption" class="alertCaption"></p><div id="favoriteTradeAlertSummary" class="alertSummary"></div>
@@ -714,6 +717,7 @@ function openApartmentSheet(id){
  if(el.setAttribute)el.setAttribute('aria-hidden','false');
  if(document.body?.classList)document.body.classList.add('apartmentSheetActive');
  el.scrollTop=0;
+ window.FirstHyundaiScrollTop?.update?.();
  if(el.querySelector){
   const back=el.querySelector('.detailBackButton');
   if(back?.focus)back.focus({preventScroll:true});
@@ -729,6 +733,7 @@ function closeApartmentSheet(restoreFocus=true){
  if(document.body?.classList)document.body.classList.remove('apartmentSheetActive');
  if(restoreFocus&&apartmentReturnFocus?.focus)apartmentReturnFocus.focus({preventScroll:true});
  apartmentReturnFocus=null;
+ window.FirstHyundaiScrollTop?.update?.();
  return true;
 }
 window.firstHyundaiGoBack=function(){
@@ -790,6 +795,7 @@ function switchPage(id){
   const v=window.FirstHyundaiNative?.getPolicyVersion?.()||0;
   $('securityVersion').textContent='이 휴대폰의 보안 정책 버전: '+(v?v:'확인 전');
  }
+ window.FirstHyundaiScrollTop?.update?.();
 }
 // Read the version of THIS installed APK, never the GitHub latest release or a hard-coded label.
 function installedAppVersionLabel(nativeBridge){
@@ -2212,4 +2218,4 @@ function exportComplexCatalog(){
 }
 window.onCatalogSaved=r=>alert(r.ok?'단지정보 JSON을 저장했습니다. GitHub에 올려야 가족에게 반영됩니다.':'단지정보 파일 저장 실패');
 
-</script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-image.js"></script></body></html>
+</script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-image.js"></script><script src="scroll-top.js"></script></body></html>

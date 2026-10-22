@@ -455,3 +455,23 @@ body:not([data-office-role="admin"]) #contracts .contractNoticeControls{
 /* v2.0.9: one conspicuous actionable warning, no flashing effects. */
 #contracts #ct_missing.bad{display:block!important;background:linear-gradient(135deg,#FFF1D5,#FFF8E9);border:3px solid #D94D24;border-left:9px solid #D43222;border-radius:16px;color:#80220F;font-size:19px;font-weight:900;line-height:1.65;letter-spacing:-.22px;padding:19px 20px;margin:15px 0 20px;box-shadow:0 4px 0 #DB6A3540,0 8px 19px #6D250B18;overflow-wrap:anywhere}
 @media(max-width:380px){#contracts #ct_missing.bad{font-size:17px;padding:16px 15px}}
+
+/* v2.0.13: small unobtrusive fixed scroll-to-top, with end-of-page clearance. */
+.scrollToTopFab{
+ position:fixed;z-index:165;
+ right:calc(13px + env(safe-area-inset-right,0px));
+ bottom:calc(19px + env(safe-area-inset-bottom,0px));
+ display:grid;place-items:center;
+ width:44px;height:44px;padding:0;
+ border:1px solid #BDD3D4;border-radius:50%;
+ background:#1C6269;color:#fff;font-size:23px;font-weight:700;
+ line-height:1;box-shadow:0 2px 10px #183C4040;
+ cursor:pointer;touch-action:manipulation;
+ -webkit-tap-highlight-color:transparent;
+}
+.scrollToTopFab[hidden]{display:none!important}
+.scrollToTopFab:active{background:#10474D}
+.scrollToTopFab:focus-visible{outline:3px solid #D4ECEB;outline-offset:3px}
+main{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
+.apartmentSheet.panel{padding-bottom:calc(102px + env(safe-area-inset-bottom,0px))}
+@media(prefers-reduced-motion:reduce){.scrollToTopFab{transition:none}}

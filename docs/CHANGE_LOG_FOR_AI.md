@@ -1,5 +1,7 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-22 / v2.0.13**: Add one small fixed 44px ↑ scroll-to-top FAB used across all tabs and both apartment fullscreen details. Visible only beyond 240px; smooth scroll with reduced-motion support; correct active scroll root; Android insets and bottom content spacing avoid obstruction. Tests assert main/sheet navigation, background scroll preservation, and user-friendly placement.
+
 - **2026-10-22 / v2.0.12**: Customer contract PNG actual partial remittance amount (e.g. 500만원) now exactly matches bank/account/payee teal `#0c6269` instead of terracotta `#AC3930`. Font emphasis and content unchanged. Tests assert both amount and bank canvas fill colors; preserve all v2.0.11 functionality.
 
 - **2026-10-22 / v2.0.11**: Publish 31 real Songdo-dong running schools (16 elementary, 9 middle, 6 high) directly from an owner-provided official 2026-10-01 Korea Education Facilities school-location CSV. School-ID/address/coordinates/date validated; no nationwide raw file or private data committed. App shows verified CSV source/date and school map link without NEIS/standard API connectivity. Re-import safeguards and tests added. No unverified school assignments.
