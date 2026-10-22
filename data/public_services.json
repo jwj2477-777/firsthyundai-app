@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "state": "awaiting_approval",
-  "updated_at": "2026-10-22T08:32:41+0900",
+  "updated_at": "2026-10-22T09:22:48.174Z",
   "note": "신청·인증 전에는 빈 배열을 실제 조회 0건으로 해석하지 않습니다. 학구도와 가까운 학교를 배정학교로 자동 판단하지 않습니다. 키는 GitHub Secrets에만 보관.",
   "schools": {
     "state": "awaiting_key",
@@ -7636,10 +7636,323 @@
     ]
   },
   "school_locations": {
-    "state": "awaiting_approval",
-    "updated_at": null,
+    "state": "verified",
+    "updated_at": "2026-10-22T09:22:48.168Z",
     "source_url": "https://www.data.go.kr/data/15021148/standard.do",
-    "records": [],
-    "note": "교육부 공식 학교위치 표준데이터 별도 활용승인·수집 검증 대기. 나이스 API와 독립. 배정학교 아님."
+    "reference_date": "2026-10-01",
+    "import_method": "official_csv",
+    "note": "사용자가 제공한 한국교육시설안전원 전국 초중등학교 위치 표준데이터 원본 CSV에서 송도동 소재, 운영 중인 초·중·고 31개 학교를 학교ID·주소·좌표 기준으로 검증·추출. 배정학교·통학구역 판정 자료가 아님. 나이스/표준데이터 API 오류와 독립적으로 이용.",
+    "records": [
+      {
+        "code": "B000025229",
+        "name": "박문여자고등학교",
+        "level": "고등학교",
+        "address": "인천광역시 연수구 송도과학로51번길 16",
+        "lat": 37.38273264,
+        "lng": 126.6660698,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000012247",
+        "name": "신송고등학교",
+        "level": "고등학교",
+        "address": "인천광역시 연수구 신송로6번길 56",
+        "lat": 37.39163756,
+        "lng": 126.6594778,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025234",
+        "name": "인천과학예술영재학교",
+        "level": "고등학교",
+        "address": "인천광역시 연수구 아카데미로 192",
+        "lat": 37.38155366,
+        "lng": 126.6303666,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025211",
+        "name": "인천연송고등학교",
+        "level": "고등학교",
+        "address": "인천광역시 연수구 컨벤시아대로42번길 72",
+        "lat": 37.40290575,
+        "lng": 126.6466029,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025212",
+        "name": "인천포스코고등학교",
+        "level": "고등학교",
+        "address": "인천광역시 연수구 컨벤시아대로42번길 50",
+        "lat": 37.40156373,
+        "lng": 126.6485219,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000012246",
+        "name": "인천해송고등학교",
+        "level": "고등학교",
+        "address": "인천광역시 연수구 해송로 20",
+        "lat": 37.38256719,
+        "lng": 126.6460025,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025237",
+        "name": "능허대중학교",
+        "level": "중학교",
+        "address": "인천광역시 연수구 송도교육로 31",
+        "lat": 37.37328969,
+        "lng": 126.6576639,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025230",
+        "name": "박문중학교",
+        "level": "중학교",
+        "address": "인천광역시 연수구 송도과학로51번길 102",
+        "lat": 37.38557138,
+        "lng": 126.6723729,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000008816",
+        "name": "신송중학교",
+        "level": "중학교",
+        "address": "인천광역시 연수구 해돋이로56번길 12",
+        "lat": 37.38949533,
+        "lng": 126.6564769,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025245",
+        "name": "인천미송중학교",
+        "level": "중학교",
+        "address": "인천광역시 연수구 아카데미로 679",
+        "lat": 37.41586026,
+        "lng": 126.6132969,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000008823",
+        "name": "인천신정중학교",
+        "level": "중학교",
+        "address": "인천광역시 연수구 컨벤시아대로42번길 80",
+        "lat": 37.40346957,
+        "lng": 126.6458528,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025231",
+        "name": "인천예송중학교",
+        "level": "중학교",
+        "address": "인천광역시 연수구 아카데미로 212",
+        "lat": 37.38323319,
+        "lng": 126.6277678,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000030812",
+        "name": "인천은송중학교",
+        "level": "중학교",
+        "address": "인천광역시 연수구 센트럴로 464",
+        "lat": 37.41539877,
+        "lng": 126.6296864,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000008822",
+        "name": "인천해송중학교",
+        "level": "중학교",
+        "address": "인천광역시 연수구 해송로 148",
+        "lat": 37.37987202,
+        "lng": 126.6482753,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025223",
+        "name": "인천현송중학교",
+        "level": "중학교",
+        "address": "인천광역시 연수구 아카데미로312번길 84",
+        "lat": 37.39296312,
+        "lng": 126.6197175,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000003068",
+        "name": "인천먼우금초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 해돋이로84번길 33",
+        "lat": 37.39320563,
+        "lng": 126.6544854,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000003048",
+        "name": "인천명선초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 컨벤시아대로42번길 64",
+        "lat": 37.40238954,
+        "lng": 126.6474045,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025246",
+        "name": "인천미송초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 아카데미로 667",
+        "lat": 37.41451789,
+        "lng": 126.6133042,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000026504",
+        "name": "인천송담초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 아카데미로 627",
+        "lat": 37.41010107,
+        "lng": 126.614909,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025189",
+        "name": "인천송명초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 송도교육로 19",
+        "lat": 37.37423698,
+        "lng": 126.6560771,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025225",
+        "name": "인천송빛초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 아카데미로343번길 27",
+        "lat": 37.38567542,
+        "lng": 126.6128027,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025256",
+        "name": "인천송원초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 송도과학로51번길 60",
+        "lat": 37.38581594,
+        "lng": 126.6690125,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025226",
+        "name": "인천송일초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 컨벤시아대로252번길 15",
+        "lat": 37.38397294,
+        "lng": 126.6353633,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000003067",
+        "name": "인천신송초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 해돋이로56번길 28",
+        "lat": 37.39045435,
+        "lng": 126.6574564,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000003065",
+        "name": "인천신정초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 아트센터대로97번길 72",
+        "lat": 37.39711453,
+        "lng": 126.6445402,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025210",
+        "name": "인천연송초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 해돋이로 248",
+        "lat": 37.40012162,
+        "lng": 126.6394043,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025228",
+        "name": "인천예송초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 컨벤시아대로252번길 75",
+        "lat": 37.38728482,
+        "lng": 126.63013,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025248",
+        "name": "인천은송초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 센트럴로 460",
+        "lat": 37.41382415,
+        "lng": 126.6296587,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025236",
+        "name": "인천첨단초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 송도교육로 20",
+        "lat": 37.37285495,
+        "lng": 126.6547551,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000003066",
+        "name": "인천해송초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 인천타워대로54번길 46",
+        "lat": 37.38079142,
+        "lng": 126.6491116,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      },
+      {
+        "code": "B000025222",
+        "name": "인천현송초등학교",
+        "level": "초등학교",
+        "address": "인천광역시 연수구 아카데미로312번길 96",
+        "lat": 37.39379976,
+        "lng": 126.6203574,
+        "reference_date": "2026-10-01",
+        "source_url": "https://www.data.go.kr/data/15021148/standard.do"
+      }
+    ]
   }
 }
