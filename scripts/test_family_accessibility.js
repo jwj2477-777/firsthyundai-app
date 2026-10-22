@@ -49,7 +49,7 @@ assert(/input,select,textarea\s*\{[^}]*min-height:50px/.test(css),'Input touch t
 assert(/\.nearbyCard strong\s*\{[^}]*font-size:16px/.test(css),'Apartment names legible');
 assert(/\.tiny,\.smaller,\.item \.meta,\.complexMeta,\.complexDetailAddress,\.muted\s*\{[^}]*font-size:14px/.test(css),'Secondary text not micro-sized');
 assert(/\.sectionTitle h2\s*\{[^}]*font-size:21px/.test(css),'Readable section headings');
-gr(html,'<meta name="theme-color" content="#182C46">');
+gr(html,'<meta name="theme-color" content="#133E48">');
 gr(html,'aria-current="\'+(id===\'overview\'?\'page\':\'false\')');
 gr(html,'aria-current="\'+(id===\'contracts\'?\'page\':\'false\')');
 gr(html,"document.title='퍼스트현대 · '+pageNames[id]");
@@ -61,9 +61,9 @@ for(const workflow of ['FirstHyundaiEasy.compose()','FirstHyundaiContracts.voice
  gr(html,workflow);
 }
 gr(contractCSS,'#contracts .contractMemoCard #ct_rough');
-gr(native,'<item name="android:statusBarColor">#182C46</item>');
-gr(native,'<item name="android:navigationBarColor">#F4F6FA</item>');
-gr(lock,'Color.rgb(36, 86, 170)');
+gr(native,'<item name="android:statusBarColor">#133E48</item>');
+gr(native,'<item name="android:navigationBarColor">#F0F8F6</item>');
+gr(lock,'Color.rgb(17, 106, 113)');
 gr(lock,'codeField.setContentDescription("가족 보안코드 입력칸")');
 gr(lock,'foot.setTextSize(14)');
 gr(lock,'ViewGroup.LayoutParams.MATCH_PARENT, dp(60)');
