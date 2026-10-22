@@ -41,7 +41,7 @@ public class LockActivity extends Activity {
 
         ScrollView scroll = new ScrollView(this);
         scroll.setFillViewport(true);
-        scroll.setBackgroundColor(Color.rgb(247, 237, 223));
+        scroll.setBackgroundColor(Color.rgb(242, 246, 246));
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setGravity(Gravity.CENTER_VERTICAL);
@@ -50,16 +50,16 @@ public class LockActivity extends Activity {
 
         TextView title = new TextView(this);
         title.setText("퍼스트현대");
-        title.setTextSize(29);
-        title.setTextColor(Color.rgb(128, 80, 51));
+        title.setTextSize(30);
+        title.setTextColor(Color.rgb(22, 69, 79));
         title.setGravity(Gravity.CENTER);
         title.setTypeface(null, 1);
         root.addView(title);
 
         TextView detail = new TextView(this);
         detail.setText("가족 전용 부동산 정보센터\n접근 보안코드를 입력해 주세요.");
-        detail.setTextSize(15);
-        detail.setTextColor(Color.rgb(112, 88, 65));
+        detail.setTextSize(17);
+        detail.setTextColor(Color.rgb(67, 92, 101));
         detail.setGravity(Gravity.CENTER);
         detail.setPadding(0, dp(18), 0, dp(26));
         root.addView(detail);
@@ -67,16 +67,17 @@ public class LockActivity extends Activity {
         codeField = new EditText(this);
         codeField.setSingleLine(true);
         codeField.setHint("가족 보안코드");
-        codeField.setTextSize(17);
+        codeField.setTextSize(18);
+        codeField.setContentDescription("가족 보안코드 입력칸");
         codeField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         LinearLayout.LayoutParams inputParams =
-                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(54));
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(60));
         root.addView(codeField, inputParams);
 
         Button unlock = new Button(this);
         unlockButton = unlock;
         unlock.setAllCaps(false);
-        unlock.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(137, 87, 55)));
+        unlock.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(21, 90, 102)));
         unlock.setTextColor(Color.WHITE);
         unlock.setText("인증하고 앱 열기");
         LinearLayout.LayoutParams buttonParams =
@@ -85,14 +86,16 @@ public class LockActivity extends Activity {
         root.addView(unlock, buttonParams);
 
         status = new TextView(this);
-        status.setTextSize(13);
-        status.setTextColor(Color.rgb(165, 54, 54));
+        status.setTextSize(15);
+        status.setTextColor(Color.rgb(142, 53, 45));
         status.setGravity(Gravity.CENTER);
         status.setPadding(0, dp(14), 0, 0);
         root.addView(status);
 
         retryButton = new Button(this);
         retryButton.setAllCaps(false);
+        retryButton.setTextSize(16);
+        retryButton.setMinHeight(dp(52));
         retryButton.setText("연결 다시 확인");
         retryButton.setVisibility(android.view.View.GONE);
         root.addView(retryButton);
@@ -101,9 +104,9 @@ public class LockActivity extends Activity {
         foot.setText("처음 한 번 인증하면 이후에는 자동으로 열립니다.\n"
                 + "관리자가 보안코드를 변경하면 다시 인증해야 합니다.\n"
                 + "보안 확인에 인터넷이 필요하며 최근 확인한 정책은 24시간 동안 오프라인 이용 가능합니다.");
-        foot.setTextSize(12);
+        foot.setTextSize(14);
         foot.setGravity(Gravity.CENTER);
-        foot.setTextColor(Color.rgb(99, 115, 129));
+        foot.setTextColor(Color.rgb(77, 99, 108));
         foot.setPadding(0, dp(32), 0, 0);
         root.addView(foot);
 
@@ -112,9 +115,9 @@ public class LockActivity extends Activity {
         int installedBuild = AppVersion.buildNumber(this);
         installedVersion.setText(installedName.isEmpty() ? "설치된 앱 버전 확인 불가" :
                 "설치된 앱 v" + installedName + (installedBuild > 0 ? " · 빌드 " + installedBuild : ""));
-        installedVersion.setTextSize(12);
+        installedVersion.setTextSize(13);
         installedVersion.setGravity(Gravity.CENTER);
-        installedVersion.setTextColor(Color.rgb(120, 105, 92));
+        installedVersion.setTextColor(Color.rgb(79, 99, 107));
         installedVersion.setPadding(0, dp(14), 0, 0);
         root.addView(installedVersion);
 
