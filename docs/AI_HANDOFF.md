@@ -3,7 +3,12 @@
 >
 > **이 문서를 받은 ChatGPT, Gemini, Claude 또는 개발자는 이전 채팅을 모른다고 가정**한다. 반드시 [AGENTS.md](../AGENTS.md) → 이 문서 → [요구사항](PRODUCT_REQUIREMENTS.md) → [이력](PROJECT_HISTORY.md) → [복구·운영](RECOVERY_PLAYBOOK.md)을 읽고, 최신 소스와 실제 배포본을 대조한 뒤 작업한다. 이 문서는 사람의 모든 대화 내용을 한 글자도 빠짐없이 저장하는 원문 아카이브가 아니라 **합의된 요구와 구현의 구조화된 복원본**이다.
 
-## 최신 작업 · v2.0.14 (2026-10-22) 고정 서명·업데이트 확인·헤더·오프닝
+## 최신 작업 · v2.0.15 (2026-10-22) 원본 FHD FIRST 프리미엄 고해상도 아이콘
+- 사용자가 선택한 에메랄드·골드 렌더링을 참고해 원본 회사 마크 **기존 `RED_OUTLINE`, `WHITE_LOGO` 경로를 손상 없이 유지**, `scripts/generate_launcher_icon.py`에서 금속 금색 7-stop Android VectorDrawable gradient, 어두운 청록 레이어와 금빛 윤곽 및 얇은 광선으로 레이어 구현. 픽셀 기반 무손실 확대의 한계가 없음. `ic_launcher_badge`, `ic_launcher_foreground`, `ic_launcher_background_art`, 일반/원형 adaptive launcher 자동 생성. Android safe zone 0.60 유지.
+- 가족 로그인 전 웰컴 애니메이션은 이 새로운 전체 벡터 배지를 144dp로 사용, 배경 딥 틸/자막 골드 통일. 메인 상단 인라인 SVG 역시 원본 paths 유지하면서 SVG gold/teal gradients 표시. **`fill` 속성은 그대로 둬서 `contract-image.js`의 Canvas Path2D 원본 회사 로고는 승인된 청록/흰색으로 유지**.
+- 새 테스트로 원본 PATH 보존·메탈릭 다단계 그라데이션·Android 리소스·adaptive safe zone·계약 이미지 영향 없음 검증. v2.0.14 동일 고정 배포 서명 Secret 사용, v2.0.15 versionCode 66, 기존 설치 유지 업데이트.
+
+## 직전 작업 · v2.0.14 (2026-10-22) 고정 서명·업데이트 확인·헤더·오프닝
 - 기존 매번 달라지는 Debug APK 서명 대신, 비공개 GitHub Secret `FHD_SIGNING_BUNDLE_B64` 안의 하나의 PKCS12 키를 release APK 빌드마다 복원. `scripts/check_release_signature.py`가 `docs/RELEASE_SIGNING_CERT_SHA256.txt`에 고정된 공개 SHA-256 지문과 비교하고 다르면 배포 실패. Secret 누락 시 정식 릴리스 중단.
 - 최초 GitHub Secret 설정은 반드시 사용자에게 필요한 수동 단계. 제공한 개인 백업 ZIP을 안전하게 보존할 것. v2.0.13 이하 debug APK와 새 release APK가 다른 서명이면 기존 로컬 자료 백업 후 최초 1회 재설치 필요. 이후에는 같은 release 키/증가하는 versionCode로 덮어쓰기 가능.
 - `AppUpdate.java`: 고정된 GitHub Release 주소 및 tag/asset APK 파일명/URL 엄격 검증; `MainActivity`에서 버전 확인과 사용자 승인 브라우저 다운로드. `app-updates.js`에서 새 버전 안내 배너 및 수동 확인. 자동/무음 설치는 하지 않음.

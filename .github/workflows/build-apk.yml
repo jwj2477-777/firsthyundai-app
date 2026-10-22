@@ -230,21 +230,21 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.14 welcome and signed updater APK
+      - name: Publish successful v2.0.15 premium original FHD mark APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.14.apk
-          unzip -t FirstHyundai-v2.0.14.apk | grep 'No errors detected'
-          if gh release view v2.0.14 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.15.apk
+          unzip -t FirstHyundai-v2.0.15.apk | grep 'No errors detected'
+          if gh release view v2.0.15 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.14 FirstHyundai-v2.0.14.apk \
+            gh release create v2.0.15 FirstHyundai-v2.0.15.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.14 · 웰컴스크린·디자인·앱 내 업데이트 확인' \
-              --notes '원본 FHD FIRST 로고 도형을 바꾸지 않고 색만 앱의 딥틸 청록으로 맞췄으며, 메인 제목의 고정 2.0 배지를 없애고 퍼스트현대/영문 브랜딩을 간결하게 정리했습니다. 앱 시작 시 스킵 가능한 짧은 네이티브 로고 웰컴 애니메이션이 표시되고 가족 보안인증은 그대로 유지됩니다. 앱 하단에서 GitHub 최신 정식 APK를 검증해 새 버전을 확인하고 설치 버튼으로 안전한 다운로드 페이지를 열 수 있습니다. Android는 설치 시 사용자 승인 절차가 필요합니다. v2.0.14부터는 비공개로 보관되는 고정된 릴리스 서명키로 APK를 서명하고 공개 인증서 지문을 검사합니다. 기존 v2.0.13 이전 디버그 서명 앱은 새 서명과 다를 수 있어 최초 1회 백업/재설치가 필요하며, 이후에는 서명이 같으면 덮어쓰기 업데이트 가능합니다. 기존 계약문자·실거래·송도 31개 학교·알림·맨 위로 버튼 등 모든 기능을 유지합니다.'
+              --title '퍼스트현대 v2.0.15 · 프리미엄 골드 FHD 앱 아이콘' \
+              --notes '사용자가 승인한 고급 금색·에메랄드 FHD FIRST 아이콘 분위기를 원본 건물 지붕·FHD·FIRST 벡터 경로 그대로 재현했습니다. 안드로이드 앱 런처·원형 런처·최초 실행 웰컴스크린에는 픽셀이 깨지지 않는 실제 Android VectorDrawable 골드 메탈릭 다단계 그라데이션과 짙은 청록 바탕, 섬세한 광택을 적용했습니다. 메인 헤더 FHD 마크에도 동일한 골드 색조를 적용했습니다. 계약 안내 PNG의 이전 청록·흰색 원본 로고 색상과 법률문구는 유지했습니다. 기존 v2.0.14 고정 서명과 앱 내 업데이트, 계약문자, 실거래, 학교정보, 알림 등 전체 기능을 보존합니다. 동일한 고정 서명으로 기존 v2.0.14 위에 설치할 수 있습니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.14 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.15 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
