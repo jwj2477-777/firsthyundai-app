@@ -42,7 +42,9 @@ on:
       - 'scripts/test_kakao_nearby.mjs'
       - 'data/nearby_config.json'
       - 'scripts/collect_public_services.py'
+      - 'scripts/collect_school_locations.py'
       - 'tests/test_public_services.py'
+      - 'tests/test_school_locations.py'
       - 'data/public_services.json'
       - 'scripts/generate_launcher_icon.py'
       - 'scripts/test_launcher_safezone.py'
@@ -73,6 +75,21 @@ jobs:
           gradle-version: '8.9'
       - name: Test K-apt API parsing, authorization and Songdo-only source matching
         run: python -m unittest discover -s tests -v
+      - name: Verify official school-location API access (optional, no credentials in logs)
+        if: github.event_name == 'pull_request'
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os,sys
+          sys.path.insert(0,'scripts')
+          from collect_school_locations import collect
+          try:
+              data=collect(os.environ.get('DATA_GO_KR_SERVICE_KEY',''),page_size=1000)
+              print('OFFICIAL_SCHOOL_FALLBACK_VERIFIED:',len(data['records']))
+          except RuntimeError as e:
+              print('OFFICIAL_SCHOOL_FALLBACK_PENDING:',str(e)[:150])
+          PY
       - name: Validate published Songdo K-apt catalog and source identities
         run: |
           python3 - <<'PY'
