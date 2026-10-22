@@ -80,7 +80,7 @@ const beforeApproval=E('ct_preview').value;
 for(const paragraph of [
  '※ 계약금 일부 송금 및 계약 성립·해제 조건 확인',
  '당사자들은 위 금액의 이체와 동시에 본계약이 체결된 것으로 보기로 하며',
- '매수인은 실제 송금한 금액을 포기하는 조건으로 합의합니다.',
+ '임차인은 실제 송금한 금액을 포기하는 조건으로 합의합니다.',
  '중개보수 지급의무가 없어지는 것은 아니라는 점을 확인합니다.'
 ])assert(beforeApproval.includes(paragraph),'Agreed terms always included: '+paragraph);
 assert.equal(contract.canShare(),false,'Review approval button is still mandatory');
