@@ -1,5 +1,7 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-22 / v2.0.10**: Add independently verified official nationwide school-location API fallback for NEIS HTTP 500: separate `school_locations` source and strict full-page validation/operating schools/Songdo lot address/coordinates. Snapshot retained on API denial/failure. NEIS source takes precedence when verified. School directory shows school level, official source/updated time, safe map link, never asserts school assignment; hides misleading "register key" message. Regression tests for provider failures and UI; API endpoint has separate automatic usage approval, not assumed working without live verification.
+
 - **2026-10-22 / v2.0.9**: Contract date/explicit signing window now mandatory in all contract types and shown in existing parent missing-items banner, invalidates approval, marks red pending preview until supplied. Make one banner more conspicuous. Inline emphasize actual remittance amount alongside already emphasized bank/account/payee; no redundant card. Correct an earlier regex escape bug in the renderer and introduce targeted CI coverage.
 
 - **2026-10-22 / v2.0.8**: Customer contract PNG keeps exact original FHD FIRST SVG paths (recolor only), removes oversized duplicate transfer/account box, highlights bank/account/payee subtly INLINE within their original legal paragraph, removes bottom footer entirely. No contract wording or transfer amount modified; the same approved plaintext is rendered. Regression tests now assert inline runs, no second card and no footer. v2.0.7 Kakao fix retained.
