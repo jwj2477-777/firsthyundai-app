@@ -126,7 +126,7 @@ assert(el('ct_preview').value.includes('잔금일은 상호 합의하에 앞당�
 assert(el('ct_status').textContent.includes('중도금 지급일 오타 확인'),'Cannot approve unclear date');
 el('ct_interimDate').value='2026-12-20'; // deliberate human correction
 easy.afterManualEdit();
-assert(el('ct_preview').value.includes('▶ 중도금 지급일 : 2026-12-20'));
+assert(el('ct_preview').value.includes('▶ 중도금 지급일 : 2026.12.20.'), 'Interim date must match contract and balance date format');
 assert(!ctx.window.FirstHyundaiContracts._test.collect().errors.includes('중도금 지급일 오타 확인'));
 console.log('User-pattern memo regression passed: interim, corrected balance, implicit clauses and date review.');
 

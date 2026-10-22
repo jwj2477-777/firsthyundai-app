@@ -214,7 +214,7 @@ function makePreview(){
  const ratio=d.price>0&&d.deposit!==null?d.deposit/d.price*100:null;
  out.push('▶ 계약금 : '+moneyOr(d.deposit)+(ratio!==null&&Math.abs(ratio-10)<0.00001?' (매매대금의 10%)'.replace('매매대금',totalName):''));
  if(d.interim>0){
-  if(field('interimDate'))out.push('▶ 중도금 지급일 : '+field('interimDate'));
+  if(field('interimDate'))out.push('▶ 중도금 지급일 : '+dateLabel(field('interimDate')));
   else if(/중도금[^\n]{0,70}\b\d{1,2}\s*년\s*\d{1,2}\s*일/.test(field('rough')))out.push('▶ 중도금 지급일 : [메모 날짜 확인 필요]');
   out.push('▶ 중도금 : '+money(d.interim));
  }

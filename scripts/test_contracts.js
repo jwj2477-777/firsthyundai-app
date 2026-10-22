@@ -77,6 +77,27 @@ assert(!el('ct_preview').value.includes('계약금 잔여액'),'Avoid misleading
 assert(el('ct_preview').value.includes('▶ 잔금 : 35,100만원'));
 assert(!el('ct_preview').value.includes('▶ 중도금 :'),'Absent interim must not render a row');
 assert(!el('ct_preview').value.includes('계약금 포기'));
+/* A confirmed intermediary schedule should render identically to contract/balance dates.
+   Draft fields continue to store ISO dates; flexible negotiation wording stays untouched. */
+el('ct_dealType').value='매매';
+el('ct_interim').value='5000';
+el('ct_interimDate').value='2026-12-04';
+api.makePreview();
+assert(el('ct_preview').value.includes('▶ 중도금 지급일 : 2026.12.04.'),
+  'Interim date should match other dates with dot separators and trailing dot');
+assert(!el('ct_preview').value.includes('▶ 중도금 지급일 : 2026-12-04'),
+  'Do not expose raw ISO date in customer SMS');
+assert(el('ct_preview').value.includes('▶ 계약일 : 2026.11.12.'));
+assert(el('ct_preview').value.includes('▶ 잔금일 : 2026.12.30.'));
+assert.equal(el('ct_interimDate').value,'2026-12-04','Do not mutate an editable field');
+el('ct_interimDate').value='12월 중 상호 협의';
+api.makePreview();
+assert(el('ct_preview').value.includes('▶ 중도금 지급일 : 12월 중 상호 협의'),
+  'Keep flexible schedule wording exactly as agreed');
+el('ct_interimDate').value='';
+el('ct_interim').value='';
+el('ct_dealType').value='전세';
+
 el('ct_price').value='40000';
 assistant.changed({target:el('ct_price')});api.updateSummary();
 assert.equal(el('ct_contractDeposit').value,'4000','Automatic 10% changes with total price');
