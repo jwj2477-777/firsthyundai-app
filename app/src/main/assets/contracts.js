@@ -163,9 +163,8 @@ function syncReviewButton(){
  const button=E('ct_confirmButton');if(!button)return;
  const hasDraft=created&&!!E('ct_preview')?.value?.trim();
  const valid=hasDraft&&!collect().errors.length&&!previewContainsMissing();
- const consent=!E('ct_includeNotice')?.checked||!!E('ct_noticeConfirmed')?.checked;
- if(approved&&(!valid||!consent))approved=false;
- const state=approved?'done':valid&&consent?'ready':'pending';
+ if(approved&&!valid)approved=false;
+ const state=approved?'done':valid?'ready':'pending';
  button.disabled=state==='pending';
  button.textContent=state==='done'?'✓ 확인 완료됨':state==='ready'?'✓ 내용 확인 완료하기':'내용 확인 필요';
  button.setAttribute?.('data-review-state',state);
@@ -174,16 +173,7 @@ function syncReviewButton(){
  if(help)help.textContent=state==='done'?'확인을 마쳤습니다. 문자 복사 또는 공유할 수 있습니다.':
   state==='ready'?'확인 버튼을 눌러 공유를 준비해 주세요.':
   !hasDraft?'계약문자를 먼저 만들어 주세요.':
-  !valid?'확인이 필요한 계약정보를 먼저 보완해 주세요.':
-  '위 계약내용을 확인한 뒤 체크박스를 선택해 주세요.';
-}
-function onConsentChange(){
- if(approved&&!E('ct_noticeConfirmed')?.checked&&E('ct_includeNotice')?.checked){
-  approved=false;
-  E('ct_status').className='contractReview bad';
-  E('ct_status').textContent='내용 확인이 해제되었습니다. 합의 내용을 다시 확인해 주세요.';
- }
- syncReviewButton();
+  '확인이 필요한 계약정보를 먼저 보완해 주세요.';
 }
 function updateSummary(){
  const data=collect();
@@ -194,7 +184,6 @@ function updateSummary(){
   (data.interim>0?' (중도금 '+money(data.interim)+' 별도)':'');
  if(created&&E('ct_preview').value){
   created=false;approved=false; // Invalidate stale preview after any upstream condition changed.
-  if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false;
   E('ct_status').textContent='조건이 변경되었습니다. 문자를 다시 생성해 검토해 주세요.';
   E('ct_status').className='contractReview bad';
  }
@@ -241,17 +230,13 @@ function makePreview(){
  const account=field('bank')&&field('account')&&field('accountHolder')?
   field('bank')+' '+field('account')+' (예금주 '+field('accountHolder')+')':
   '[은행·계좌번호·예금주 확인 필요]';
- if(E('ct_includeNotice')?.checked){
-  out.push('','※ 계약금 일부 송금 및 계약 성립·해제 조건 확인');
-  out.push('금일 위 계약조건에 따라 계약금 중 일부인 '+moneyOr(d.advance)+'을 '+who+' 계좌('+account+')로 송금하기로 합니다.');
-  out.push('당사자들은 위 금액의 이체와 동시에 본계약이 체결된 것으로 보기로 하며, 일방의 변심으로 계약을 해제하는 경우 '+who+'은 실제 수령한 금액의 배액을 상환하고 '+paying+'은 실제 송금한 금액을 포기하는 조건으로 합의합니다.');
-  out.push('또한 위 사유로 계약이 해제되더라도 그 사실만으로 중개보수 지급의무가 없어지는 것은 아니라는 점을 확인합니다.');
- }else{
-  out.push('','※ 계약금 중 일부 '+moneyOr(d.advance)+'를 '+who+' 계좌('+account+')로 송금할 예정입니다.');
-  out.push('위 계약조건과 송금 계좌, 계약 성립·해제 조건을 당사자 모두 확인해 주시기 바랍니다.');
- }
+ // Office workflow: terms below are agreed before preparing the notice.
+ // Always show them; the final human review button remains mandatory.
+ out.push('','※ 계약금 일부 송금 및 계약 성립·해제 조건 확인');
+ out.push('금일 위 계약조건에 따라 계약금 중 일부인 '+moneyOr(d.advance)+'을 '+who+' 계좌('+account+')로 송금하기로 합니다.');
+ out.push('당사자들은 위 금액의 이체와 동시에 본계약이 체결된 것으로 보기로 하며, 일방의 변심으로 계약을 해제하는 경우 '+who+'은 실제 수령한 금액의 배액을 상환하고 '+paying+'은 실제 송금한 금액을 포기하는 조건으로 합의합니다.');
+ out.push('또한 위 사유로 계약이 해제되더라도 그 사실만으로 중개보수 지급의무가 없어지는 것은 아니라는 점을 확인합니다.');
  E('ct_preview').value=out.join('\n');
- if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false; // Every newly drafted notice needs fresh consent.
  // Newly composed messages always begin in readable, red-marked review mode.
  E('ct_preview')?.classList?.remove?.('contractEditing');
  E('ct_previewHighlight')?.classList?.remove?.('hidden');
@@ -269,7 +254,7 @@ function makePreview(){
 function edited(){
  refreshHighlightedNotice();
  approved=false;
- if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false;E('ct_status').className='contractReview bad';
+ E('ct_status').className='contractReview bad';
  E('ct_status').textContent='미리보기를 직접 수정했습니다. 복사·공유하려면 ‘내용 확인 완료’ 버튼으로 다시 검토해 주세요.';
  syncReviewButton();
 }
@@ -283,17 +268,12 @@ function approve(){
  }
  if(d.errors.length){E('ct_status').textContent='다음 필수 항목을 먼저 보완하세요: '+d.errors.join(' · ');E('ct_status').className='contractReview bad';return;}
  if(!created||!field('property')||!E('ct_preview').value.trim()){alert('먼저 문자 초안을 생성해 주세요.');return;}
- if(E('ct_includeNotice')?.checked&&!E('ct_noticeConfirmed')?.checked){
-  E('ct_status').className='contractReview bad';
-  E('ct_status').textContent='하단의 계약 성립·해제·중개보수 조건은 법률상 자동 적용되는 내용이 아닙니다. 당사자 간 실제 합의를 확인했다면 ‘하단 합의 내용 확인’에 체크해 주세요.';
-  return;
- }
  approved=true;
  E('ct_status').className='contractReview ok';E('ct_status').textContent='직접 확인 완료 · 복사 또는 공유할 수 있습니다.';
  syncReviewButton();
 }
 function assertReady(){
- if(!created||!approved||collect().errors.length||previewContainsMissing()||(E('ct_includeNotice')?.checked&&!E('ct_noticeConfirmed')?.checked)){alert('계약 조건·하단 합의문을 확인한 뒤 내용 확인 완료를 눌러주세요.');return false;}
+ if(!created||!approved||collect().errors.length||previewContainsMissing()){alert('계약 조건·하단 합의문을 확인한 뒤 내용 확인 완료를 눌러주세요.');return false;}
  return true;
 }
 async function copy(){
@@ -353,7 +333,6 @@ function clearForNewMemo(){
  const memo=field('rough');
  FIELDS.forEach(id=>{if(id!=='rough'&&E('ct_'+id))E('ct_'+id).value='';});
  E('ct_dealType').value='전세';
- if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false;
  E('ct_preview').value='';
  refreshHighlightedNotice();
  E('ct_rough').value=memo;
@@ -369,7 +348,6 @@ function reset(){
  FIELDS.forEach(id=>{const el=E('ct_'+id);if(el)el.value='';});
  E('ct_dealType').value='전세';E('ct_preview').value='';refreshHighlightedNotice();
  E('ct_selectedComplexContext')?.classList?.add?.('hidden');
- if(E('ct_noticeConfirmed'))E('ct_noticeConfirmed').checked=false;
  E('ct_status').textContent='조건을 입력하면 초안을 생성할 수 있습니다.';
  E('ct_status').className='contractReview';
  created=false;approved=false;updateSummary();
@@ -387,7 +365,7 @@ window.firstHyundaiContractSpeech=function(result){
  }else if(result&&!result.cancelled)alert('음성입력에 실패했습니다. 직접 입력을 이용해 주세요.');
 };
 window.FirstHyundaiContracts={
- onOpen(){window.FirstHyundaiSmart?.onOpen();updateSummary();refreshHighlightedNotice();syncReviewButton();},canShare:assertReady,updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,togglePreviewEdit,refreshHighlightedNotice,syncReviewButton,onConsentChange,
+ onOpen(){window.FirstHyundaiSmart?.onOpen();updateSummary();refreshHighlightedNotice();syncReviewButton();},canShare:assertReady,updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,togglePreviewEdit,refreshHighlightedNotice,syncReviewButton,
  fromComplex(id){
   const r=catalogRows().find(x=>x.id===id);
   if(!r)return false;

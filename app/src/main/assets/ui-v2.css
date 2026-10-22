@@ -436,3 +436,18 @@ body:not([data-office-role="admin"]) #ct_preview.contractEditing ~ .contractPrev
 #trades .tradeDateActions button{min-height:43px;padding:8px 12px;border:1px solid #CCD8E5;border-radius:9px;background:#fff;color:#294D70;font-size:13px;font-weight:750}
 #trades .tradeDateError{margin:8px 0 2px;color:#A33535;font-weight:750;font-size:13px}
 @media(max-width:370px){#trades .tradeDateRange{grid-template-columns:1fr}}
+
+
+/* v2.0.4 — parent mode shows only actionable missing-field warnings.
+   Successful parsing, repeated review status and explanatory banners are not
+   useful on the family screen. Admin retains diagnostics. */
+body:not([data-office-role="admin"]) #ct_missing.ok,
+body:not([data-office-role="admin"]) #ct_status,
+body:not([data-office-role="admin"]) #ct_confirmHelp,
+body:not([data-office-role="admin"]) #contracts .contractNoticeControls{
+ display:none!important;
+}
+#contracts #ct_missing.bad{margin:12px 0 16px}
+#contracts #ct_confirmButton[data-review-state="ready"]{
+ background:#087153!important;
+}
