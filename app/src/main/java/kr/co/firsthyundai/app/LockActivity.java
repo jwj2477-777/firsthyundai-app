@@ -148,7 +148,7 @@ public class LockActivity extends Activity {
     private void showWelcome(FrameLayout stage) {
         welcomeOverlay = new FrameLayout(this);
         GradientDrawable background = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
-                new int[]{Color.rgb(13,52,62),Color.rgb(19,103,110)});
+                new int[]{Color.rgb(3,33,42),Color.rgb(9,91,94)});
         welcomeOverlay.setBackground(background);
         welcomeOverlay.setClickable(true);
         welcomeOverlay.setContentDescription("퍼스트현대 시작 화면. 누르면 건너뛰기");
@@ -158,7 +158,7 @@ public class LockActivity extends Activity {
         ImageView emblem=new ImageView(this);
         emblem.setImageResource(R.drawable.ic_launcher_badge);
         emblem.setContentDescription("원본 FHD FIRST 로고");
-        identity.addView(emblem,new LinearLayout.LayoutParams(dp(128),dp(128)));
+        identity.addView(emblem,new LinearLayout.LayoutParams(dp(144),dp(144)));
         TextView title=new TextView(this);
         title.setText("퍼스트현대");
         title.setTextColor(Color.WHITE);
@@ -170,7 +170,7 @@ public class LockActivity extends Activity {
         identity.addView(title,titleParams);
         TextView subtitle=new TextView(this);
         subtitle.setText("FIRST HYUNDAI  ·  REAL ESTATE");
-        subtitle.setTextColor(Color.rgb(189,220,220));
+        subtitle.setTextColor(Color.rgb(246,215,145));
         subtitle.setTextSize(11);
         subtitle.setGravity(Gravity.CENTER);
         subtitle.setLetterSpacing(.1f);
