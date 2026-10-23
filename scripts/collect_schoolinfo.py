@@ -112,6 +112,7 @@ def collect_kakao_coordinates(catalog,key,opener=None):
                     except (KeyError,TypeError,ValueError):continue
                     if 126.5<x<126.8 and 37.3<y<37.5:
                         lot=str((d.get('address') or {}).get('address_name') or '').strip()
+                        if lot.startswith('인천 '):lot='인천광역시 '+lot[len('인천 '):]
                         if not re.fullmatch(r'인천광역시 연수구 송도동 [0-9]{1,4}(?:-[0-9]{1,4})?',lot):lot=''
                         matches.append((x,y,lot))
                 # More than one distinct exact-address coordinate is ambiguous.
