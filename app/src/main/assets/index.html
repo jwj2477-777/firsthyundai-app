@@ -1278,6 +1278,8 @@ function selectNeisSchoolLevel(level){
  renderComplexes();
 }
 function renderSchoolPublicInfo(){
+ const schoolinfo=schoolDistrictData?.schoolinfo?.state==='verified' &&
+   Array.isArray(schoolDistrictData.schoolinfo.records)?schoolDistrictData.schoolinfo.records:null;
  const neis=verifiedRecords('schools');
  const alternative=verifiedRecords('school_locations');
  const schools=neis?.length?neis:alternative?.length?alternative:null;
@@ -1286,6 +1288,8 @@ function renderSchoolPublicInfo(){
  const buttons=levels.map(([value,label])=>'<button type="button" class="'+(neisSchoolLevel===value?'active':'')+
    '" aria-pressed="'+(neisSchoolLevel===value?'true':'false')+'" onclick="selectNeisSchoolLevel(\''+value+'\')">'+label+
    (schools?' '+(value==='all'?schools.length:schools.filter(x=>x.level===value).length):'')+'</button>').join('');
+ const normalizeSchool=n=>String(n||'').replace(/^인천/,'').replace(/초등학교$|중학교$|고등학교$/,'');
+ const schoolinfoMap=new Map((schoolinfo||[]).map(x=>[normalizeSchool(x.name),x]));
  const filtered=schools?schools.filter(x=>neisSchoolLevel==='all'||x.level===neisSchoolLevel).slice().sort((a,b)=>
   String(a.name||'').localeCompare(String(b.name||''),'ko')):[];
  const origin=neis?.length?'schools':alternative?.length?'school_locations':'';
@@ -1299,13 +1303,19 @@ function renderSchoolPublicInfo(){
     '<span class="tiny">'+escapeHtml(x.address||'주소 확인 중')+'</span>'+
     (x.phone?'<span class="tiny">연락처 '+escapeHtml(x.phone)+'</span>':'')+
     (location?sourceLink(location,'지도에서 학교 위치 보기'):'')+
-    (safeLink(x.homepage)?sourceLink(x.homepage,'학교 홈페이지'):'')+'</div>';
+    (safeLink(x.homepage)?sourceLink(x.homepage,'학교 홈페이지'):'')+
+    (schoolinfoMap.has(normalizeSchool(x.name))?
+      sourceLink('https://www.schoolinfo.go.kr/ng/go/pnnggo_a01_l0.do?schulCode='+
+        encodeURIComponent(schoolinfoMap.get(normalizeSchool(x.name)).code),'학교알리미 기본정보'):'')+
+    '</div>';
  }).join('')+'</div>':
   '<div class="apiNotice">'+(schools===null?
    '학교 기본정보 수집을 확인 중입니다. 나이스 API가 실패하면 교육부 학교위치 표준데이터로 대체하며, 두 원천이 모두 실패하면 임의 학교목록을 표시하지 않습니다.':
    '선택한 학교급의 확인된 학교정보가 없습니다.')+'</div>';
  return '<div class="apiSmallCard"><h3>송도 학교 정보</h3>'+
-  '<p class="complexSectionNote">이 목록은 송도 소재 학교의 기본정보입니다. 현재 선택한 아파트의 배정학교가 아닙니다. 실제 통학구역·배정은 교육청 공식 학구도 및 고시로 확인해 주세요.</p>'+
+  '<p class="complexSectionNote">송도 운영 학교의 공식 위치와 기본정보입니다. 초등 통학구역은 위 단지별 검증 결과에서 확인하며, 중학교 학교군/실제 배정은 별도 확인이 필요합니다.</p>'+
+  '<p class="tiny">공식 초등 통학구역: 인천 연수구 34개 경계 (2026-09-20) · 학교알리미: '+
+   (schoolinfo?'연수구 학교 '+schoolinfo.length+'곳 연결':'연동 확인 대기')+'</p>'+
   '<p class="tiny">정보 출처: '+escapeHtml(officialSource)+' · 자료 기준: '+escapeHtml(publicServices?.[origin]?.reference_date||'미기재')+' · 확인: '+escapeHtml(updated)+'</p>'+
   (schools?'<div class="neisLevelButtons">'+buttons+'</div>':'')+
   rows+
