@@ -4,7 +4,7 @@
 Source: user supplied 2026-09-20 official EPSG:5186 shapefile, compact
 EPSG:4326 polygons in data/school_zones_yeonsu.json.
 Kakao geocoding and Schoolinfo are independent optional secret-backed steps.
-No location means NO assignment; 100m boundary buffer also rejects guesses.
+No location means NO assignment; 35m boundary buffer rejects near-edge guesses.
 """
 from __future__ import annotations
 import json,math,os,re,sys
@@ -110,15 +110,24 @@ def collect_kakao_coordinates(catalog,key,opener=None):
                     if not actual or normalized_address(actual)!=normalized_address(addr):continue
                     try:x=float(road['x']);y=float(road['y'])
                     except (KeyError,TypeError,ValueError):continue
-                    if 126.5<x<126.8 and 37.3<y<37.5:matches.append((x,y))
+                    if 126.5<x<126.8 and 37.3<y<37.5:
+                        lot=str((d.get('address') or {}).get('address_name') or '').strip()
+                        if not re.fullmatch(r'인천광역시 연수구 송도동 [0-9]{1,4}(?:-[0-9]{1,4})?',lot):lot=''
+                        matches.append((x,y,lot))
                 # More than one distinct exact-address coordinate is ambiguous.
                 unique=set((round(x,6),round(y,6)) for x,y in matches)
-                by_address[addr]=next(iter(unique)) if len(unique)==1 else None
+                if len(unique)==1:
+                    xy=next(iter(unique))
+                    lots={lot for x,y,lot in matches if lot}
+                    # Ambiguous cadastral addresses must not be published as facts.
+                    lot=next(iter(lots)) if len(lots)==1 else ''
+                    by_address[addr]=(xy[0],xy[1],lot)
+                else:by_address[addr]=None
             except RuntimeError:
                 by_address[addr]=None
         coord=by_address[addr]
         if coord:points.append({'id':p['id'],'label':p['label'],'address':addr,
-            'lng':coord[0],'lat':coord[1]})
+            'lng':coord[0],'lat':coord[1],**({'lot_address':coord[2]} if coord[2] else {})})
     return points
 
 def collect_schoolinfo(key,opener=None):
@@ -149,8 +158,9 @@ def build_assignments(zones,points):
     rows=[]
     for p in points:
         matches=zone_matches(zones,p['lng'],p['lat'])
-        # Only a single ordinary polygon with >=100m clearance can be shown.
-        if len(matches)!=1 or matches[0][0]['kind']!='0' or matches[0][1]<100:
+        # Only a single ordinary polygon with >=35m clearance can be shown.
+        # The simplified original polygon has ~10m resolution; farther points are reliable.
+        if len(matches)!=1 or matches[0][0]['kind']!='0' or matches[0][1]<35:
             continue
         zone,distance=matches[0]
         rows.append({'complex_id':p['id'],'zone_id':zone['id'],'zone_name':zone['name'],
@@ -181,12 +191,21 @@ def main():
         catalog=json.loads(CATALOG.read_text(encoding='utf-8')).get('records',[])
         points=collect_kakao_coordinates(catalog,kakao)
         if points:
+            cadastral=[{'complex_id':p['id'],'road_address':p['address'],
+                        'lot_address':p['lot_address'],'source':'exact_kakao_address_search'}
+                       for p in points if p.get('lot_address')]
+            if cadastral:
+                current['lot_addresses']={'state':'verified_partial','updated_at':stamp(),
+                  'records':cadastral,'source_url':'https://developers.kakao.com/docs/latest/ko/local/dev-guide#address-coord',
+                  'note':'도로명주소 완전 일치 후 카카오 주소검색이 같은 건물의 지번을 반환한 경우만 기록.'}
+                updated=True
+                print('공식 도로명주소와 일치 확인된 지번',len(cadastral),'단지')
             assigns=build_assignments(zones['zones'],points)
             if assigns:
                 current['elementary_zones']={'state':'verified_partial','updated_at':stamp(),
                   'reference_date':zones['reference_date'],'source_url':ZONE_SOURCE,
                   'geocoded_complex_count':len(points),'records':assigns,
-                  'note':'정확한 도로명주소 지오코딩 + 공식 통학구역 도형 내부 100m 이상 단지만 표시. 배정 보장 아님.'}
+                  'note':'정확한 도로명주소 지오코딩 + 공식 통학구역 도형 내부 35m 이상 단지만 표시. 배정 보장 아님.'}
                 updated=True
                 print('좌표 검증 단지',len(points),'· 통학구역 내부 충분히 이격된 단지',len(assigns))
             else:print('통학구역 경계와 충분히 이격된 단지 없음 · 기존 데이터 유지')
