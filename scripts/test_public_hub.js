@@ -17,17 +17,17 @@ const nodes={};
 const ctx=vm.createContext({
  safeLink:v=>String(v||'').startsWith('https://')?v:'',
  escapeHtml:v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),
- $:id=>(nodes[id]??={innerHTML:'',value:''}),
+ $:id=>(nodes[id]??={innerHTML:'',value:'',classList:{toggle(){},add(){},remove(){}}}),
  number:n=>String(n),prettyTime:v=>v,
  value10k:n=>String(n)+'만원', URL,
- dealArticleClass:v=>'dealRow',dealBadge:v=>v.type,fetchRemote:async()=>{throw Error('missing optional')},
+ dealArticleClass:v=>'dealRow',dealBadge:v=>v.type,tradeStatusBadge:()=>'',tradeExtraBadges:()=>'',renderTypeButtons:()=>{},areaKey:v=>String(v),fetchRemote:async()=>{throw Error('missing optional')},
  currentPage:'nearby',renderComplexes(){},showRefreshFeedback(){},console
 });
 vm.runInContext(snippet,ctx);
 const run=q=>vm.runInContext(q,ctx);
 const missing=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13'})");
 assert(missing.includes('평형별 월 관리비'));
-assert(missing.includes('실제 세대 관리비 자료가 없습니다.'));
+assert(missing.includes('평형·타입 정보 확인 전입니다.'));
 assert(!missing.includes('건축물대장')&&!missing.includes('단지 전체 공개 비용'),
   'Redundant apartment-wide costs and building facts must be removed');
 assert(!missing.includes('공식 자료·신청'), 'Family users never see API signup prompts');
