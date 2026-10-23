@@ -5,9 +5,11 @@ on:
     branches: [main]
     paths:
       - 'scripts/collect_maintenance_averages.py'
+      - 'scripts/collect_maintenance_official.py'
       - 'scripts/probe_maintenance_three_apis.py'
       - 'data/maintenance_estimates.json'
       - 'tests/test_maintenance_averages.py'
+      - 'tests/test_maintenance_official.py'
       - '.github/workflows/sync-maintenance-averages.yml'
   schedule:
     - cron: '43 0 18 * *' # 09:43 KST on the 18th monthly
@@ -31,10 +33,12 @@ jobs:
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
         run: python scripts/probe_maintenance_three_apis.py
-      - name: Fetch published K-apt monthly data
+      - name: Check official 26-endpoint cost aggregation safeguards
+        run: python -m unittest discover -s tests -p test_maintenance_official.py -v
+      - name: Collect official complete common/individual subtotal (repair reserve excluded)
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
-        run: python scripts/collect_maintenance_averages.py
+        run: python scripts/collect_maintenance_official.py
       - name: Publish source-validated public estimates only
         run: |
           git config user.name 'github-actions[bot]'
