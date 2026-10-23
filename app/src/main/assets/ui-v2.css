@@ -1004,3 +1004,225 @@ header #roleButton:focus-visible{outline:2px solid #FBE9BB;outline-offset:3px}
 #nearbyCards .favoriteCardMeta .summaryMetaLabel{
  font-size:inherit;font-weight:inherit;color:inherit;
 }
+
+
+/* v2.0.40 / PREMIUM VISUAL REFINEMENT
+   Presentation only: preserve all tabs, DOM, control dimensions, grid placements,
+   focus semantics, trade information, contracts and app behaviors.
+   Keep semantic hues for transaction types and the primary destinations. */
+:root{
+ --ui2-bg:#F7F8F5;--ui2-card:#FFFFFF;
+ --ui2-ink:#223741;--ui2-muted:#536874;--ui2-line:#E0E8E6;
+ --ui2-navy:#153E48;--ui2-trades:#255CA5;--ui2-homes:#116F68;
+ --ui2-news:#64529B;--ui2-summary:#4B5895;--ui2-contracts:#9C5737;
+ --ui2-shadow:0 2px 7px #193B430A,0 12px 26px #193B430B;
+ --ui2-soft-shadow:0 2px 7px #2039420A;
+ --ui2-teal-soft:#EFF7F4;--ui2-gold:#CEA66C;
+}
+body{background:linear-gradient(180deg,#F1F5F2 0,#F8F9F6 345px,#F7F8F5 100%);color:var(--ui2-ink)}
+header{
+ background:linear-gradient(121deg,#102D38 0%,#183E49 57%,#23575D 100%);
+ border-bottom:2px solid #C8A56C;
+ box-shadow:0 5px 22px #132F3824;
+}
+header .brandSubtitle,.brandHeaderText .eyebrow{color:#D8E7E4}
+.brandWordmark h1{letter-spacing:-.9px;text-shadow:0 1px 1px #081D2429}
+header .officeMark{background:#FDFBF6;border-color:#D9C8A9;box-shadow:0 2px 11px #071F2630}
+header #roleButton{border-color:#C8DCD9;background:#F4FAF8;color:#1D5558}
+header .modeAdmin #roleButton{background:#FFF5EB;color:#7B472C;border-color:#E9C9AD}
+/* Calm surfaces — depth from light, not heavy outlines. */
+.panel,.item,.nearbyCard,.apiInfoCards article,dialog,.nearbyFacilityItem{
+ background:var(--ui2-card);border-color:var(--ui2-line);
+ box-shadow:var(--ui2-shadow);
+}
+.panel{background:linear-gradient(168deg,#FFFFFF 0%,#FEFEFD 100%)}
+.sectionTitle h2,.sectionTitle h3{color:#263C45}
+.page>.sectionTitle:first-child:before{background:linear-gradient(180deg,#C9A46A,#167474)}
+.tiny,.muted,.item .meta,.complexMeta,.complexDetailAddress{color:var(--ui2-muted)}
+.foot,.compactAppFooter{color:#63747B}
+a{color:#156A71}
+.btn,button.btn{
+ background:#225A65;border-color:#225A65;
+ box-shadow:0 2px 6px #173A451A;
+}
+.btn.alt,button.btn.alt{
+ background:#F9FBFA;border-color:#D3E0DE;color:#27515B;
+ box-shadow:var(--ui2-soft-shadow);
+}
+.refreshAction{
+ background:#FFFFFF!important;color:#285A62!important;
+ border-color:#C5DAD8!important;
+ box-shadow:var(--ui2-soft-shadow)!important;
+}
+button:disabled,.btn:disabled{box-shadow:none}
+input,select,textarea{border-color:#BDCEC9;color:#243D46}
+select,input[type="search"]{background:#F1F8F6!important;border-color:#B9D7D1}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]):not([type="search"]),textarea{
+ background:#FFFBF5;border-color:#D8C7B6;
+}
+input:focus,select:focus,textarea:focus{
+ border-color:#176B70;outline-color:#8AC7C5;
+}
+:where(button,a,input,select,textarea,summary):focus-visible{
+ outline:3px solid #D5A159;outline-offset:3px;
+}
+/* Main destinations retain blue/teal/purple cues, with quieter finish. */
+#nav .primaryNav button{
+ background:linear-gradient(175deg,#FFFFFF,#F9FBFA);
+ border-color:#D7E3E0;color:#364D56;
+ box-shadow:0 2px 7px #153D4712,0 8px 16px #153D4708;
+}
+#nav .primaryNav button.active,#nav .primaryNav button[aria-current="page"]{
+ border-color:#F7F7F5;box-shadow:0 4px 15px #112F4235,0 0 0 1px #183D4833;
+}
+#nav .primaryNav button:nth-child(1).active{
+ background:linear-gradient(148deg,#3167B0,#204C90);border-color:#1B4987;
+}
+#nav .primaryNav button:nth-child(2).active{
+ background:linear-gradient(148deg,#1A8077,#0C615B);border-color:#0E5653;
+}
+#nav .primaryNav button:nth-child(3).active{
+ background:linear-gradient(148deg,#7764AC,#5E4C97);border-color:#564184;
+}
+#nav .primaryNav button.active::after{
+ background:#FFFFFFF2;color:#2D4B53;border-radius:8px;
+}
+#nav .secondaryNav button,#nav .utilityNav>button{
+ background:linear-gradient(180deg,#FFFFFF,#FAFCFB);
+ border-color:#D5E2E0;box-shadow:var(--ui2-soft-shadow);color:#38515B;
+}
+#nav .secondaryNav button.active,#nav .secondaryNav button[aria-current="page"]{
+ background:#255CA5;color:white;border-color:#204A80;
+}
+#nav .utilityNav>button:nth-child(1).active{background:#4B5895;border-color:#354377}
+#nav .utilityNav>button:nth-child(2).active{background:#9C5737;border-color:#7F432C}
+/* The established unified segmented control, merely surface-polished. */
+.page .sectionModeSwitch[data-tone="teal"]{
+ --segment-bg:#E7F1EE;--segment-border:#CFDFDB;
+ --segment-ink:#41646A;--segment-idle:#F9FCFA;
+ --segment-active:#116F68;--segment-active-border:#0A5653;
+}
+.page .sectionModeSwitch[data-tone="purple"]{
+ --segment-bg:#F0ECF7;--segment-border:#DED6EA;
+ --segment-ink:#5C5275;--segment-idle:#FCFBFE;
+ --segment-active:#64529B;--segment-active-border:#504080;
+}
+#trades .propertyTypeSwitch.sectionModeSwitch,
+#nearby .propertyTypeSwitch.sectionModeSwitch,
+#new .propertyTypeSwitch.sectionModeSwitch,
+#officetel .propertyTypeSwitch.sectionModeSwitch,
+#news .newsCategoryTabs.sectionModeSwitch{box-shadow:inset 0 1px 2px #2039420B}
+.propertyTypeSwitch.sectionModeSwitch>button,
+#news .newsCategoryTabs.sectionModeSwitch>button{box-shadow:var(--ui2-soft-shadow)}
+.propertyTypeSwitch.sectionModeSwitch>button.selected,
+#news .newsCategoryTabs.sectionModeSwitch>button[aria-selected="true"]{
+ box-shadow:0 3px 9px #193C4625,inset 0 1px 0 #FFFFFF24;
+}
+/* Compact apartment lists are intentionally NOT resized or reflowed. */
+#nearby #nearbyCards .nearbyCard.favoriteSummaryCard,
+#complexes #complexCards .nearbyCard.complexSummaryCard{
+ background:#FFFFFF;border-color:#D9E7E3;
+ box-shadow:0 2px 7px #133C420D;
+}
+#nearby #nearbyCards .nearbyCard.favoriteSummaryCard.selected,
+#nearby #nearbyCards .nearbyCard.favoriteSummaryCard[aria-pressed="true"],
+#complexes #complexCards .nearbyCard.complexSummaryCard.selected,
+#complexes #complexCards .nearbyCard.complexSummaryCard[aria-pressed="true"]{
+ background:#F0F8F5;border-color:#15736A;
+ box-shadow:0 3px 11px #176B601B;
+}
+#nearbyCards .compactCardHeading strong,#complexCards .compactCardHeading strong{color:#24454D}
+#nearbyCards .compactCardArrow,#complexCards .compactCardArrow{color:#779397}
+#nearby #nearbyCards .favoriteCardMeta,#complexCards .complexSummaryAddress{color:#536D73}
+#complexCards .complexSummaryHouseholds{background:#EAF5F1;color:#206B60}
+#nearby .favoriteCollectionScope{color:#60757A}
+/* Transaction amount and renewal content: preserve order and line wrapping. */
+.dealRow,.item.dealRow{
+ background:#FFFFFF;border-color:#DEE7E5;
+ box-shadow:0 2px 8px #153B420E;
+}
+.dealRow.sale{background:#FBFCFF;border-left-color:#255CA5}
+.dealRow.lease{background:#FBFEFC;border-left-color:#147457}
+.dealRow.monthly{background:#FFFEFA;border-left-color:#966020}
+.dealRow h3{color:#233E48}
+.dealRow .money{color:#243D47}
+.dealRow .meta{color:#597079}
+.dealRow .tradeRenewalDetail{
+ background:#FBF7EE;border-left-color:#C5A16F;
+ box-shadow:inset 0 0 0 1px #EEE4D7;
+}
+.dealRow .tradeRenewalRow+.tradeRenewalRow{border-top-color:#EAE2D7}
+.dealRow .tradeRenewalRow dt{color:#72624F}
+.dealRow .tradeRenewalRow dd{color:#30454D}
+/* Keep all active controls visibly selected without adding extra copy. */
+#trades .apartmentTradeNav>button,#nearby .apartmentTradeNav>button,
+#new .apartmentTradeNav>button,#officetel .tradeStarter button,
+#nearbyDetails #nearbyTypeBar>button,
+.tradeTypeBar button,#new .newTypeChips>button{
+ background:linear-gradient(180deg,#FFFFFF,#F8FAF9);
+ border-color:#D3E1DE;box-shadow:var(--ui2-soft-shadow);color:#3C5660;
+}
+#trades .apartmentTradeNav>button.active,#nearby .apartmentTradeNav>button.active,
+#new .apartmentTradeNav>button.active,#officetel .tradeStarter button.active{
+ background:linear-gradient(145deg,#326CB0,#25559D);
+ color:#FFFFFF;border-color:#1A4887;box-shadow:0 3px 9px #2456AA24;
+}
+#nearbyDetails #nearbyTypeBar>button.active,
+#new .newTypeChips>button.active,.tradeTypeBar button.active{
+ background:#2B556A;color:#FFFFFF;border-color:#1E4558;
+}
+#nearbyDetails #nearbyTypeBar>button.active.sale,.tradeTypeBar button.active.sale{background:#255CA5;border-color:#173F80}
+#nearbyDetails #nearbyTypeBar>button.active.lease,.tradeTypeBar button.active.lease{background:#146A50;border-color:#0B4D38}
+#nearbyDetails #nearbyTypeBar>button.active.monthly,.tradeTypeBar button.active.monthly{background:#875007;border-color:#643B06}
+#nearbyDetails #nearbyTypeBar>button.active .typeCount{color:#FFFFFF}
+#new .newSimpleCounts{background:#F2F8F5;border-color:#D4E5DF;box-shadow:var(--ui2-soft-shadow)}
+#new .newResultNumber{color:#116C70}
+#trades .tradeSearchOptions,#officetel .tradeSearchOptions{background:#F4F8F7;border-color:#DFE9E6}
+#complexes .complexSearchPanel{background:#FFFFFF;border-color:#D8E7E2}
+#complexes #complexSearch{background:#F1F8F5!important;border-color:#ADD2CB;color:#28534F}
+#complexes .complexAreaItem,.complexFact,.complexSchoolRow{
+ background:#FFFEFC;border-color:#DDE8E3;box-shadow:var(--ui2-soft-shadow);
+}
+.complexDetailAddress{background:#F3F9F6;border-color:#D8E7E2}
+.detailSheetTop{background:#FFFFFF;border-bottom-color:#DDE7E4}
+.detailBackButton,.detailSwitchButton{background:#F7FAF8;border-color:#D5E3DF;color:#265960}
+#overview .metric{background:#F3F6F8;border-color:#DFE7E9;box-shadow:var(--ui2-soft-shadow)}
+#overview .metric strong{color:#315A73}
+#news .newsCard,.item.newsCard{background:#FFFFFF;border-color:#E5E0EA}
+#news .newsCard .newsAiBody{background:#F9F7FD}
+#news .newsCard .newsAiSentence:before{background:#ECE5F9;color:#564586}
+#contracts .contractHero{background:linear-gradient(130deg,#FFF5EA,#FFFDFC);border-color:#E9D6C4}
+#contracts .contractMemoCard{background:#FFFFFF;border-color:#C28B69;box-shadow:var(--ui2-shadow)}
+#contracts .contractMemoInputArea{background:#FFF5E9;border-color:#E0C6A9}
+#contracts .contractMemoCard #ct_rough{background:#FFFAF2;border-color:#BB8D64}
+#contracts .contractMemoCard .contractOneTap{background:#155F66;border-color:#0B4850;box-shadow:0 5px 0 #0B4850}
+#contracts .contractMemoCard .contractOneTap:active{box-shadow:0 2px 0 #0B4850}
+#contracts .contractMemoCard .contractVoice{background:#FBF8F3;border-color:#DFCCB7;color:#70523D}
+#contracts .contractCompactDetails>summary,#contracts .contractManual>summary{background:#FBF6EF}
+#contracts #ct_resultPanel .contractActions .btn:nth-child(3){background:#9C5737;border-color:#7F432C}
+/* Feedback keeps green/amber/red meaning, including text, not color alone. */
+.refreshFeedback.success,.contractReview.ok{background:#ECF7EE;border-color:#A7CBB6;color:#205C46}
+.refreshFeedback.warning,.contractReview.bad{background:#FFF5E5;border-color:#E0BD85;color:#754C18}
+.refreshFeedback.error{background:#FCEFED;border-color:#DBABAC;color:#892F2B}
+.feeTrendSummary{background:linear-gradient(145deg,#F1F9F7,#FFFEFA);border-color:#D7E8E4}
+.feeTrendStats>div{background:#FFFFFF;border-color:#E0E9E5}
+.compactAppFooter{border-top-color:#DCE5E1}
+@media(hover:hover){
+ #nav .primaryNav button:not(.active):hover,
+ #nav .secondaryNav button:not(.active):hover,
+ #nav .utilityNav>button:not(.active):hover,
+ #nearbyCards .favoriteSummaryCard:not(.selected):hover,
+ #complexCards .complexSummaryCard:not(.selected):hover{
+  background:#F4F9F7;border-color:#A8C9C1;
+  box-shadow:0 4px 13px #193B4318;
+ }
+}
+@media(prefers-contrast:more){
+ .panel,.nearbyCard,.dealRow{border-color:#8BA7A4}
+ #nav .primaryNav button:not(.active){border-color:#668581}
+ #nearbyCards .compactCardHeading strong,#complexCards .compactCardHeading strong{color:#132E35}
+}
+@media(prefers-reduced-motion:reduce){
+ #nav .primaryNav button,.dealRow,.nearbyCard{transition:none!important}
+}
+/* END v2.0.40 PREMIUM VISUAL REFINEMENT */
