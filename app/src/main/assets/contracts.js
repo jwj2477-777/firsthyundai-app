@@ -306,14 +306,18 @@ function fromSelectedComplex(exclusiveM2=null,supplyLabel=''){
  // A code is included only if the pair exists in the verified catalog.
  const supply=selected?selected.supply_label+'타입 · 공급 '+String(selected.supply_m2)+'㎡':'';
  const parts=['아파트명: '+record.label];
- if(typeof record.address==='string'&&record.address.trim())parts.push('소재지: '+record.address.trim());
+ const lot=typeof verifiedLotAddress==='function'?verifiedLotAddress(record):String(record.lot_address||'');
+ // Legal lot is the primary contract address; street address is reference only.
+ if(lot)parts.push('소재지: '+lot);
+ else if(typeof record.address==='string'&&record.address.trim())parts.push('소재지: '+record.address.trim());
+ if(lot&&record.address)parts.push('도로명주소(참고): '+record.address.trim());
  if(validArea)parts.push('전용면적: '+String(Math.round(area*100)/100)+'㎡');
  if(supply)parts.push('공급타입: '+supply);
  clearForNewMemo();
  window.FirstHyundaiEasy?.reset?.();
  E('ct_rough').value=parts.join('\n')+'\n';
  setField('property',record.label,true);
- if(record.address)setField('address',record.address,true);
+ if(lot||record.address)setField('address',lot||record.address,true);
  if(validArea)setField('exclusiveArea',String(Math.round(area*100)/100),true);
  if(supply)setField('supplyInfo',supply,true);
  switchPage('contracts');
