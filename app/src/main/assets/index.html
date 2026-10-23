@@ -2181,12 +2181,12 @@ function updateNewQuickFilters(){
                          ['newTypeLease','전세'],['newTypeMonthly','월세']]){
   const button=$(id),active=selected===type;
   button.classList.toggle('active',active);
-  button.setAttribute('aria-pressed',active?'true':'false');
+  button.setAttribute?.('aria-pressed',active?'true':'false');
  }
  const favorite=$('newFavoriteFilter').value==='favorites';
  const button=$('newFavoriteToggle');
  button.classList.toggle('active',favorite);
- button.setAttribute('aria-pressed',favorite?'true':'false');
+ button.setAttribute?.('aria-pressed',favorite?'true':'false');
  button.textContent=favorite?'★ 관심 14개만':'☆ 관심 14개만';
 }
 function renderNew(){
