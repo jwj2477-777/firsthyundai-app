@@ -1876,7 +1876,7 @@ function renderNearby(){
   return '<button type="button" class="nearbyCard favoriteSummaryCard'+(nearbySelected===g.id?' selected':'')+
    '" onclick="chooseNearby(&quot;'+g.id+'&quot;)" aria-pressed="'+(nearbySelected===g.id?'true':'false')+'">'+
    '<span class="compactCardHeading"><span class="favoriteCardStar" aria-hidden="true">★</span><strong>'+escapeHtml(g.label)+'</strong><span class="compactCardArrow" aria-hidden="true">›</span></span>'+
-   '<span class="favoriteCardMeta"><span class="favoriteCardCount"><span class="summaryMetaLabel">거래</span> <b>'+escapeHtml(count)+'</b></span>'+
+   '<span class="favoriteCardMeta"><span class="favoriteCardCount"><span class="summaryMetaLabel">거래</span> <span class="favoriteCardCountValue">'+escapeHtml(count)+'</span></span>'+
    '<span class="favoriteCardDate"><span class="summaryMetaLabel">최근 계약</span> <time'+(latest?' datetime="'+escapeHtml(latest.contract_date)+'"':'')+'>'+escapeHtml(date||'확인 전')+'</time></span></span></button>';
  }).join('');
  renderNearbyDetails(false);

@@ -20,6 +20,15 @@ for(const selector of [
  '.complexSummaryAddress',
  '.favoriteCardDate'
 ])assert(css.includes(selector),'Compact card style missing: '+selector);
+assert(!script.slice(script.indexOf('function renderNearby(){'),script.indexOf('function renderNearbyDetails(')).includes('<b>'),'Counts must not get bold markup');
+const gridRule=css.match(/#nearby #nearbyCards\.nearbyGrid\{([^}]+)\}/)[1];
+assert(gridRule.includes('grid-template-columns:minmax(0,1fr)'), 'Phone cards need full width for long apartment names');
+const headingRule=css.match(/#nearbyCards \.compactCardHeading strong\{([^}]+)\}/)[1];
+assert(headingRule.includes('white-space:nowrap')&&headingRule.includes('font-size:16px'), 'Names stay readable on one line');
+for(const selector of ['favoriteCardCountValue','favoriteCardDate time']){
+ const rule=css.match(new RegExp('#nearby #nearbyCards \.'+selector.replace('.', '\\.')+'\\{([^}]+)\\}'))?.[1];
+ assert(rule&&rule.includes('font-size:inherit')&&rule.includes('font-weight:inherit')&&rule.includes('color:inherit'), 'Metadata must share quiet size, weight and color: '+selector);
+}
 const mapping=script.slice(script.indexOf('/* FAVORITES_MAPPING_START:'),script.indexOf('/* FAVORITES_MAPPING_END */')+'/* FAVORITES_MAPPING_END */'.length);
 const display=script.slice(script.indexOf('function favoriteCollectionScope('),script.indexOf('function renderNearbyDetails('));
 const ctx={
@@ -51,7 +60,7 @@ assert.equal((ctx.$('nearbyCards').innerHTML.match(/class="nearbyCard favoriteSu
 assert(!ctx.$('nearbyCards').innerHTML.includes('주변 핵심단지'),'Redundant category text must not appear on cards');
 assert(ctx.$('nearbyCards').innerHTML.includes('퍼스트파크 13블럭'));
 assert(ctx.$('nearbyCards').innerHTML.includes('2026.10.20'),'Most recent contract date must show full year');
-assert(ctx.$('nearbyCards').innerHTML.includes('거래</span> <b>2건</b>'));
+assert(ctx.$('nearbyCards').innerHTML.includes('거래</span> <span class="favoriteCardCountValue">2건</span>'));
 assert(ctx.$('nearbyPeriod').textContent.includes('2025.11–2026.10'));
 assert(ctx.$('nearbyPeriod').textContent.includes('매매·전월세 합산'));
 ctx.remote.trades.state='partial';ctx.remote.trades.missing_buckets=['202607:임대'];
@@ -61,7 +70,7 @@ ctx.remote.trades=null;
 ctx.nearbyAllRows=()=>[];
 vm.runInContext('renderNearby()',ctx);
 assert(ctx.$('nearbyCards').innerHTML.includes('확인 전'));
-assert(!ctx.$('nearbyCards').innerHTML.includes('거래</span> <b>0건</b>'),'No 0 without data');
+assert(!ctx.$('nearbyCards').innerHTML.includes('거래</span> <span class="favoriteCardCountValue">0건</span>'),'No 0 without data');
 const addressFn=script.slice(script.indexOf('function compactComplexAddress('),script.indexOf('function renderComplexes('));
 vm.runInContext(addressFn,ctx);
 assert.equal(vm.runInContext("compactComplexAddress('인천광역시 연수구 송도동 102')",ctx),'송도동 102');

@@ -1,5 +1,11 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-24 · v2.0.37 · 관심단지 단지명·건수 가독성
+- 긴 단지명이 애매하게 두 줄로 꺾이지 않도록 휴대폰 관심단지 목록을 한 열의 짧은 가로 카드로 변경. 700px 이상은 두 열. 16px 단지명과 별표·화살표를 보존하며 카드 고정 높이 없음.
+- 거래 건수의 굵은 청록색 강조와 b 마크업을 제거하고 최근 계약일과 동일한 13px 보조 글자·색상·굵기로 통일. 집계기간·14개 ID·상세 전환·최근 계약일 계산 및 아파트정보 카드는 유지.
+- 회귀 테스트 및 320/360/390/430/700px 화면 점검 후 고정 서명 v2.0.37(88) 릴리스 검증. 실제 배포 상태는 Actions/Release 확인.
+
+
 ## v2.0.36 · 2026-10-24 · Precise contract coverage status
 - `favoriteCollectionScope()`: show '일부 월 미수집' only when `missing_buckets` is nonempty; when `state='partial'` but monthly snapshots exist, show '일부 자료 갱신 오류' instead. Preserve v2.0.35 compact card UI and existing IDs. Bump Android `versionName` to 2.0.36, code 87, with matching immutable-release GitHub workflow tag; verify published release before claiming installed availability.
 
