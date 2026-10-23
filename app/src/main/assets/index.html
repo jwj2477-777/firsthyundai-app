@@ -127,8 +127,6 @@ main{max-width:980px;margin:0 auto;padding:14px 14px 34px}.notice{padding:13px;b
 #complexEditor{border:1px solid #e8d8ca;border-radius:15px;max-width:min(580px,94vw);width:94vw;max-height:85vh;overflow-y:auto;padding:20px}
 #complexEditor input,#complexEditor textarea{margin-bottom:9px}
 #complexEditor textarea{min-height:65px}
-.complexTools{display:flex;flex-wrap:wrap;align-items:end;gap:10px}
-.complexTools select{max-width:220px}
 .complexLinksExternal{display:flex;flex-wrap:wrap;gap:9px;margin:10px 0}
 .complexLinksExternal a{font-size:13px}
 .tradeFocusBanner{background:#faf5f1;border:1px solid #e9d9cb;border-radius:10px;padding:12px;margin:9px 0}
@@ -271,19 +269,8 @@ body.apartmentSheetActive{overflow:hidden}
  
  <div class="panel complexSearchPanel">
   <h3 class="complexSearchHeading">아파트 찾기</h3>
-  <div class="complexSearchFields">
-   <div class="complexSearchInput">
-    <label class="inputLabel" for="complexSearch">아파트 이름 입력</label>
-    <input id="complexSearch" type="search" placeholder="예: 퍼스트파크, 더샵, 힐스테이트" oninput="resetComplexLimit();renderComplexes()" aria-label="단지정보 아파트명 검색" autocomplete="off">
-   </div>
-   <div class="complexTools">
-    <label class="inputLabel" for="complexScope">어디에서 찾을까요?</label>
-    <select id="complexScope" onchange="resetComplexLimit();renderComplexes()" aria-label="검색할 아파트 범위">
-     <option value="all">송도 전체 아파트</option>
-     <option value="favorites">★ 관심 14개 단지만</option>
-    </select>
-   </div>
-  </div>
+  <label class="inputLabel" for="complexSearch">아파트 이름 입력</label>
+  <input id="complexSearch" type="search" placeholder="예: 퍼스트파크, 더샵, 힐스테이트" oninput="resetComplexLimit();renderComplexes()" aria-label="단지정보 아파트명 검색" autocomplete="off">
   <p class="tiny complexResultsMeta" id="complexMeta" role="status" aria-live="polite">기본 단지 목록을 준비했습니다.</p>
   <div class="nearbyGrid" id="complexCards"></div><button type="button" id="complexShowMore" class="btn alt hidden" onclick="showMoreComplexes()">단지 더 보기</button>
  </div>
@@ -775,7 +762,7 @@ function openFavoriteBasicInfo(){
  const id=nearbySelected;
  if(id==='all'||!catalogRows().some(x=>x.id===id))return;
  $('complexSearch').value='';
- $('complexScope').value='all';
+ 
  switchPage('complexes');
  selectComplex(id);
 }
@@ -1140,9 +1127,8 @@ function setComplexDealType(type){
 }
 function renderComplexes(){
  const all=catalogRows(),q=($('complexSearch').value||'').trim().normalize('NFKC').toLowerCase();
- const onlyFavorites=$('complexScope').value==='favorites',favoriteIds=new Set(baseComplexes().map(x=>x.id));
- const visible=all.filter(x=>(!onlyFavorites||favoriteIds.has(x.id))&&
-  (!q||[x.label,...(Array.isArray(x.aliases)?x.aliases:[])].join(' ').normalize('NFKC').toLowerCase().includes(q)));
+ const visible=all.filter(x=>!q||[x.label,...(Array.isArray(x.aliases)?x.aliases:[])]
+  .join(' ').normalize('NFKC').toLowerCase().includes(q));
  $('complexMeta').textContent='조회 '+visible.length+'곳 · 등록된 단지 기본정보 '+(remote.complexes?.records||[]).length+'곳'+
   (issues.trades?' · 실거래 갱신 오류':'')+(issues.complexes?' · 단지정보 갱신 오류':'');
  const shown=visible.slice(0,complexDisplayLimit);
@@ -1620,9 +1606,9 @@ function selectComplex(id){
  if(!match)return;
  complexSelected=id;complexDetailTab='basic';complexDealType='';nearbyLiveResult=null;nearbyError='';nearbySerial++;nearbyLoading=false;
  renderComplexes();
- // Favorites can launch from a previous search/scope without losing the target.
+ // Favorites can launch from a previous search without losing the target.
  if(complexSelected!==id){
-  $('complexSearch').value='';$('complexScope').value='all';complexSelected=id;
+  $('complexSearch').value='';complexSelected=id;
   renderComplexes();
  }
  $('complexSheetTitle').textContent=match.label;
