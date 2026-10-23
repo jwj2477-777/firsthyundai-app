@@ -21,6 +21,7 @@ on:
       - 'scripts/test_extended_complex_catalog.js'
       - 'scripts/test_naver_basic_facts.js'
       - 'scripts/test_nearby.js'
+      - 'scripts/test_compact_complex_cards.js'
       - 'scripts/test_favorite_trade_count_buttons.js'
       - 'scripts/test_favorite_trade_alerts.js'
       - 'scripts/test_android_trade_notifications.js'
@@ -128,6 +129,7 @@ jobs:
           python3 -c "from pathlib import Path; x=Path('app/src/main/assets/index.html').read_text(encoding='utf-8'); Path('/tmp/firsthyundai-ui.js').write_text(x.split('<script>',1)[1].split('</script>',1)[0],encoding='utf-8')"
           node --check /tmp/firsthyundai-ui.js
           node scripts/test_nearby.js
+          node scripts/test_compact_complex_cards.js
           node scripts/test_favorite_trade_count_buttons.js
           node --check app/src/main/assets/trade-alerts.js
           node scripts/test_favorite_trade_alerts.js
@@ -251,22 +253,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.34 unified contextual segmented switches APK
+      - name: Publish v2.0.35 compact favorite and apartment information cards APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.34.apk
-          unzip -t FirstHyundai-v2.0.34.apk | grep 'No errors detected'
-          if gh release view v2.0.34 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.35.apk
+          unzip -t FirstHyundai-v2.0.35.apk | grep 'No errors detected'
+          if gh release view v2.0.35 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.34 FirstHyundai-v2.0.34.apk \
+            gh release create v2.0.35 FirstHyundai-v2.0.35.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.34 · 실거래·뉴스 하위 전환 버튼 디자인 통일' \
-              --notes '실거래 아파트·오피스텔과 뉴스 브리핑·인천 청약분양을 같은 프레임의 2분할 세그먼트 스위치로 통일했습니다. 버튼 크기·간격·라운드·선택 상태는 동일하고 실거래 청록색과 뉴스 보라색은 유지합니다. 기존 전환과 갱신 기능을 그대로 보존합니다. 3개 대표 메뉴 아래 오늘 요약·계약문자 빠른 업무를 유지하면서 실거래 상단 중복 하위메뉴 없이 전체 최신순·관심 14개·새 거래 단일 메뉴를 유지하고, 새 거래의 간편 검색은 그대로 유지하면서 실거래·단지정보·뉴스 모두 대표 메뉴/공통 바로가기/페이지 제목과 갱신/해당 화면 전용 전환 메뉴 순서로 통일했습니다. 뉴스 브리핑·인천 청약분양 제목의 크기를 동일하게 유지하고 관심 14개 전체 및 개별 아파트 실거래 상세에서 전체·매매·전세·월세 버튼 내부에 해당 건수를 직접 표시합니다. 아래 별도 건수 뱃지 줄을 삭제해 중복을 줄였습니다. 중복 아파트 선택 버튼은 삭제하고 아래 상세 검색의 아파트명 검색을 유지합니다. 기존 평형별 관리비 참고액 기능을 유지합니다. 최신 공개월과 최근 12개월 중 실제 확인된 월의 평균·범위·변동만 표시합니다. 수집 미완료 시 이전 검증자료 보존 및 자료 기준월을 안내합니다. 공용관리비/개별사용료/장기수선충당금 수집은 공식 데이터 연동 상태에 따라 달라지며 전체 단지 수집완료를 보장하지 않습니다. 기존 계약·실거래·주소·학교·가족/관리자·고정 서명 앱 업데이트를 유지합니다.'
+              --title '퍼스트현대 v2.0.35 · 관심단지·아파트정보 카드 간소화' \
+              --notes '관심 14개 실거래 카드의 중복된 분류명 제거, 별표·단지명 중심의 컴팩트 2열 카드로 정리, 거래 건수와 최근 계약일을 구분해 표시했습니다. 카드 위에 매매·전월세 합산 집계 대상기간(최근 12개월)을 표시하며 일부 월의 API 자료가 누락되면 해당 사실을 표시합니다. 아파트정보 단지 목록은 간결한 가로형 카드로 바꾸고 검증된 지번주소(없을 때 도로명주소) 및 세대수를 읽기 쉽게 정리했습니다. 기존 목록 선택·상세 화면·실거래 필터·알림·가족/관리자 모드·관리비·계약문자·학교 정보는 유지합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.34 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.34 --apk FirstHyundai-v2.0.34.apk
+          gh release upload v2.0.35 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.35 --apk FirstHyundai-v2.0.35.apk
