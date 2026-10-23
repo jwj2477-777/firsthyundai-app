@@ -35,7 +35,7 @@ assert(missing.includes('평형별 실제 월 관리비는 아직 확보되지 �
 assert(run('renderSchoolPublicInfo()').includes('배정학교가 아닙니다'));
 assert(run('renderSchoolPublicInfo()').includes('schoolzone.emac.kr'));
 assert(!run('renderSchoolPublicInfo()').includes('NEIS_EDU_KEY를 등록'),'Absent verified data must not falsely claim the stored NEIS key is missing');
-run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('연결 확인 중')&&!nodes.officeRentContent.innerHTML.includes('조회 0건'),'Pending access is not an empty official result');
+run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('공식 자료 확인 중')&&!nodes.officeRentContent.innerHTML.includes('조회 0건'),'Pending access is not an empty official result');
 run('publicServices.office_sales={state:"awaiting_approval",records:[]}');
 run('renderOfficeRentals()');
 assert(nodes.officeRentContent.innerHTML.includes('매매 API 활용승인'),'Unapproved sale API is not confirmed zero');
@@ -86,7 +86,7 @@ run("selectNeisSchoolLevel('all')");
 run('publicServices='+JSON.stringify(sample));
 
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('송도 오피스텔'));
-assert(nodes.officeRentContent.innerHTML.includes('조회 1건'),'Results are separate from apartment transactions');
+assert(nodes.officeRentContent.innerHTML.includes('확인된 거래 1건'),'Results are separate from apartment transactions');
 run('toggleOfficeDetailed(true)');
 assert(nodes.officeDetailToggle.checked===true);
 assert(nodes.officeRentContent.innerHTML.includes('오피스텔'));
