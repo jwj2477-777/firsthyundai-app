@@ -328,7 +328,6 @@ body.apartmentSheetActive{overflow:hidden}
 </div></form></dialog>
 <div id="new" class="page hidden">
  <div class="sectionTitle"><div><h2>새소식 · 신규 공개 실거래</h2><p class="tiny" id="newMeta">송도동 아파트 매매·전세·월세 · 일자별 공개 확인</p></div><button class="btn alt refreshAction" type="button" data-refresh="new_trades" onclick="refreshOne('new_trades',true)">갱신</button></div>
- <div class="notice">계약일이 아니라 <b>이전 수집에 없었고 새로 확인된 날짜</b>로 묶습니다. 국토부 API에 정확한 공개일이 없으므로 실제 공개일과 차이가 날 수 있고 정정 거래도 신규로 분류될 수 있습니다. 기록은 기능 활성화 이후부터 쌓입니다.</div>
  <div class="panel">
   <label class="inputLabel" for="newDate">신규 공개 확인일 (한국시간)</label><button id="newAlertFocusReset" type="button" class="btn alt hidden" onclick="clearNewAlertFocus()">알림 거래만 보는 중 · 날짜별로 보기</button><select id="newDate" onchange="clearNewAlertFocus()"></select>
   <div class="controls"><select id="newType" aria-label="실거래 유형" onchange="renderNew()"><option value="">매매·전세·월세 전체</option><option>매매</option><option>전세</option><option>월세</option></select><input id="newAptFilter" placeholder="단지명 검색" aria-label="단지명 검색" oninput="renderNew()"></div>
@@ -634,10 +633,12 @@ body.apartmentSheetActive{overflow:hidden}
   <p class="tiny">두 비밀번호의 원문은 GitHub 비공개 Secret에만 존재하고, 공개 저장소에는 각 비밀번호의 PBKDF2 검증 정보만 게시됩니다. 공개 검증 정보는 오프라인 추측 공격 대상이므로 특히 관리자 비밀번호는 16자 이상 무작위 문자열을 권장합니다.</p>
  </div>
 </div>
-<footer class="foot">
- <div id="installedAppVersion" aria-live="polite">설치된 앱 버전 확인 중…</div>
- <div class="appUpdateActions"><button type="button" id="appUpdateCheck" class="btn alt">새 버전 확인</button><span id="appUpdateStatus" role="status" aria-live="polite"></span></div>
- <div class="tiny">퍼스트현대 · 실거래 / 아파트정보 / 뉴스 · 관심 14개 단지</div>
+<footer class="foot compactAppFooter" aria-label="앱 버전과 업데이트">
+ <div class="appFooterRow">
+  <div class="appFooterVersion"><small>퍼스트현대</small><strong id="installedAppVersion" aria-live="polite">설치 버전 확인 중…</strong></div>
+  <button type="button" id="appUpdateCheck" class="btn alt">업데이트 확인</button>
+ </div>
+ <div class="appUpdateActions"><span id="appUpdateStatus" role="status" aria-live="polite"></span></div>
 </footer>
 </main>
 <!-- Small fixed scroll-top control. Current page or current full-screen apartment sheet only. -->
