@@ -210,6 +210,10 @@ body.apartmentSheetActive{overflow:hidden}
 </div>
 <div id="nearby" class="page hidden">
  <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
+ <div class="propertyTypeSwitch sectionSubnav" role="group" aria-label="실거래 부동산 종류 선택">
+  <button type="button" class="selected" aria-pressed="true" onclick="openTradeLatest()">아파트</button>
+  <button type="button" class="" aria-pressed="false" onclick="switchPage('officetel')">오피스텔</button>
+ </div>
  <div class="panel">
   <div class="tradeStarter apartmentTradeNav" role="group" aria-label="아파트 실거래 화면 선택">
    <button type="button" class="" aria-current="false" onclick="openTradeLatest()"><span class="starterIcon">◷</span>전체 최신순</button>
@@ -333,6 +337,10 @@ body.apartmentSheetActive{overflow:hidden}
 </div></form></dialog>
 <div id="new" class="page hidden">
  <div class="sectionTitle"><div><h2>새소식 · 신규 공개 실거래</h2><p class="tiny" id="newMeta">송도동 아파트 매매·전세·월세 · 일자별 공개 확인</p></div><button class="btn alt refreshAction" type="button" data-refresh="new_trades" onclick="refreshOne('new_trades',true)">갱신</button></div>
+ <div class="propertyTypeSwitch sectionSubnav" role="group" aria-label="실거래 부동산 종류 선택">
+  <button type="button" class="selected" aria-pressed="true" onclick="openTradeLatest()">아파트</button>
+  <button type="button" class="" aria-pressed="false" onclick="switchPage('officetel')">오피스텔</button>
+ </div>
  <div class="panel">
   <div class="tradeStarter apartmentTradeNav" role="group" aria-label="아파트 실거래 화면 선택">
    <button type="button" class="" aria-current="false" onclick="openTradeLatest()"><span class="starterIcon">◷</span>전체 최신순</button>
@@ -363,6 +371,10 @@ body.apartmentSheetActive{overflow:hidden}
 </div>
 <div id="trades" class="page hidden">
  <div class="sectionTitle"><div><h2>송도동 아파트 실거래가</h2><p class="tiny" id="tradesMeta">국토교통부 공개 API 연동 대기</p></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
+ <div class="propertyTypeSwitch sectionSubnav" role="group" aria-label="실거래 부동산 종류 선택">
+  <button type="button" class="selected" aria-pressed="true" onclick="openTradeLatest()">아파트</button>
+  <button type="button" class="" aria-pressed="false" onclick="switchPage('officetel')">오피스텔</button>
+ </div>
  <div class="panel">
   <div class="tradeStarter apartmentTradeNav" role="group" aria-label="아파트 실거래 화면 선택">
    <button type="button" class="active" aria-current="page" onclick="openTradeLatest()"><span class="starterIcon">◷</span>전체 최신순</button>
@@ -411,6 +423,10 @@ body.apartmentSheetActive{overflow:hidden}
 <div id="officetel" class="page hidden">
  <div class="sectionTitle"><div><h2>송도동 오피스텔 실거래가</h2><p class="tiny">아파트와 동일한 검색 방식 · 오피스텔 자료만 별도 조회</p></div>
    <button type="button" class="btn alt refreshAction" onclick="refreshPublicServices(true)">갱신</button></div>
+ <div class="propertyTypeSwitch sectionSubnav" role="group" aria-label="실거래 부동산 종류 선택">
+  <button type="button" class="" aria-pressed="false" onclick="openTradeLatest()">아파트</button>
+  <button type="button" class="selected" aria-pressed="true" onclick="switchPage('officetel')">오피스텔</button>
+ </div>
  <div class="panel" id="officetelPanel">
   <div class="tradeStarter" aria-label="오피스텔 실거래 보기 방식">
    <button id="officeModeLatest" type="button" onclick="openOfficeLatest()"><span class="starterIcon">◷</span>전체 최신순</button>
@@ -459,18 +475,24 @@ body.apartmentSheetActive{overflow:hidden}
  </div>
 </div>
 <div id="news" class="page hidden">
- <div class="sectionTitle"><div><h2>뉴스 · 청약/분양</h2><p class="tiny adminExplain">뉴스와 인천 분양공고를 탭으로 빠르게 전환</p></div></div>
+ <div class="sectionTitle newsUnifiedHeading">
+  <div><h2 id="newsSectionTitle">송도·부동산 뉴스 브리핑</h2>
+   <p class="tiny adminExplain" id="newsMeta">AI 기사 본문 요약 현황을 확인 중입니다.</p>
+   <p class="tiny familySimpleNote" id="newsFamilyMeta" role="status">뉴스를 불러오는 중입니다.</p>
+  </div>
+  <button id="newsRefreshArticles" class="btn alt refreshAction" type="button" data-refresh="news" onclick="refreshOne('news',true)">갱신</button>
+  <button id="newsRefreshSubscriptions" class="btn alt refreshAction hidden" type="button" onclick="refreshPublicServices(true)">갱신</button>
+ </div>
  <div class="controls newsCategoryTabs" role="tablist" aria-label="뉴스와 청약 화면 전환">
    <button id="newsTabArticles" type="button" class="btn" role="tab" aria-selected="true" aria-controls="newsArticlesPane" onclick="switchNewsPane('articles')">뉴스 브리핑</button>
    <button id="newsTabSubscriptions" type="button" class="btn alt" role="tab" aria-selected="false" aria-controls="newsSubscriptionsPane" onclick="switchNewsPane('subscriptions')">인천 청약·분양</button>
  </div>
  <section id="newsArticlesPane" role="tabpanel" aria-labelledby="newsTabArticles">
-  <div class="sectionTitle"><div><h3>송도·부동산 뉴스 브리핑</h3><p class="tiny adminExplain" id="newsMeta">AI 기사 본문 요약 현황을 확인 중입니다.</p><p class="tiny familySimpleNote" id="newsFamilyMeta" role="status">뉴스를 불러오는 중입니다.</p></div><button class="btn alt refreshAction" type="button" data-refresh="news" onclick="refreshOne('news',true)">갱신</button></div>
   <div class="notice adminExplain">기사를 제목별로 묶은 뒤 <b>원문 본문을 읽을 수 있는 경우에만 Gemini·Groq가 핵심 내용을 요약</b>합니다. 본문 확인이 불가능한 기사는 AI 요약을 표시하지 않습니다. AI 요약은 사실검증이 아니므로 세금·대출·개발 일정은 원문과 공식 발표를 확인하세요.</div><p class="familySimpleNote familyBriefCaution">뉴스 요약은 참고용입니다. 중요한 정보는 원문에서 확인하세요.</p>
   <div class="panel"><select id="newsCategory" onchange="renderNews()"><option value="">모든 주제</option><option>개발·교통</option><option>분양·입주</option><option>세금·대출</option><option>정책·규제</option></select><div id="newsContent"><div class="empty">데이터 저장소를 연결한 후 표시됩니다.</div></div></div>
  </section>
  <section id="newsSubscriptionsPane" class="hidden" role="tabpanel" aria-labelledby="newsTabSubscriptions">
-  <div class="panel apiSmallCard"><h3>인천광역시 청약·분양</h3>
+  <div class="panel apiSmallCard">
    <div class="controls"><select id="subscriptionStatusFilter" aria-label="접수 상태" onchange="renderPublicSubscriptions()">
      <option value="valid">유효 공고 · 접수 예정/진행 중</option><option value="past">지난 공고 · 접수 마감</option><option value="unknown">일정 확인 필요</option>
      <option value="all">전체 보기</option></select>
@@ -760,10 +782,7 @@ function renderMainNavigation(id){
   '" onclick="'+(g.id==='trades'?'openTradeLatest()':g.id==='complexes'?'openComplexHome()':g.id==='news'?'openNewsHome()':"switchPage('"+g.main+"')")+'" aria-current="'+(chosen?.id===g.id?'page':'false')+'">'+
   '<span class="navIcon" aria-hidden="true">'+g.icon+'</span><span>'+g.label+'</span></button>').join('')+'</div>';
 
- // Toggle property category at the TOP of real transaction navigation. Apartments are always default.
- const propertySwitch=chosen?.id==='trades'?'<div class="propertyTypeSwitch" role="group" aria-label="실거래 부동산 종류 선택">'+
-  '<button type="button" class="'+(id!=='officetel'?'selected':'')+'" aria-pressed="'+(id!=='officetel')+'" onclick="openTradeLatest()">아파트</button>'+
-  '<button type="button" class="'+(id==='officetel'?'selected':'')+'" aria-pressed="'+(id==='officetel')+'" onclick="switchPage(\'officetel\')">오피스텔</button></div>':'';
+ // Page-only context switches live under each page title, not between the quick actions and its title.
  // Apartment trade destination buttons are in their respective page panels.
  const admin=role==='admin'?'<details class="adminQuick"><summary>관리자 도구 ▾</summary>'+
   '<div class="adminQuickLinks">'+[['notes','내 자료'],['settings','설정'],['security','보안']].map(([page,label])=>
@@ -774,7 +793,7 @@ function renderMainNavigation(id){
   admin+'</div>';
  // Today Summary and Contract sit immediately below the three main tabs on every screen.
  // Trade-only apartment/officetel and detail filters follow them.
- $('nav').innerHTML=primary+tools+propertySwitch;
+ $('nav').innerHTML=primary+tools;
 }
 // A detail sheet is its own full-screen view; the scrollable list stays intact.
 let activeApartmentSheet=null, apartmentReturnFocus=null;
@@ -841,6 +860,12 @@ function switchNewsPane(pane){
  $('newsTabSubscriptions').className=pane==='subscriptions'?'btn':'btn alt';
  $('newsTabArticles').setAttribute('aria-selected',pane==='articles'?'true':'false');
  $('newsTabSubscriptions').setAttribute('aria-selected',pane==='subscriptions'?'true':'false');
+ // One common news heading controls the same visual hierarchy and refresh location.
+ $('newsSectionTitle').textContent=pane==='articles'?'송도·부동산 뉴스 브리핑':'인천광역시 청약·분양';
+ $('newsRefreshArticles').classList.toggle('hidden',pane!=='articles');
+ $('newsRefreshSubscriptions').classList.toggle('hidden',pane!=='subscriptions');
+ $('newsMeta').classList.toggle('hidden',pane!=='articles');
+ $('newsFamilyMeta').classList.toggle('hidden',pane!=='articles');
  if(pane==='subscriptions')renderPublicSubscriptions();
 }
 function switchPage(id){
