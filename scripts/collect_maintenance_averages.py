@@ -151,6 +151,14 @@ def diagnose():
       matches=re.findall(pattern,html,flags=re.I)
       print('KAPT_ATTACHMENT_MARKERS',pattern[:25],len(matches),
             [re.sub(r'(?i)(token|secret|password|key)=([^&\\s]+)',r'\\1=REDACTED',x)[:160] for x in matches[:4]])
+     for marker in ('manager.fileDownload(\'BOARD_FILE\',\'CHECKED\'', 'BOARD_FILE', 'boardFileList', 'fileList'):
+      k=html.find(marker)
+      if k>=0:
+       segment=re.sub(r'<script[^>]*>[\\s\\S]*?</script>','',html[max(0,k-250):k+650])
+       print('KAPT_DOM_REGION',marker,segment[:500].replace('\\n',' ')[:500])
+     for q in re.findall(r'<(?:input|button|a|span|div|li)[^>]{0,500}>[^<]{0,100}',html,flags=re.I):
+      if 'fileDownload' in q or ('file' in q.lower() and ('board' in q.lower() or 'download' in q.lower())):
+       print('KAPT_DOM_ATTACHMENT',q[:450])
   except HTTPError as e:print('KAPT_PROBE',n,'HTTP',e.code)
   except (URLError,TimeoutError,OSError) as e:print('KAPT_PROBE',n,'CONNECT_ERROR',type(e).__name__)
 if __name__=='__main__':
