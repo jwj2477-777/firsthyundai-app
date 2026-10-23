@@ -472,7 +472,7 @@ input:focus,select:focus,textarea:focus{
 }
 /* Lookup filters are cool-toned, while selectable deal types retain their
  * labeled sale (blue) / lease (green) / monthly (amber) identities. */
-.tradeSearchOptions,.complexTools,#complexScope{accent-color:#155a66}
+.tradeSearchOptions{accent-color:#155a66}
 #contracts .contractFieldGrid input:not([type="checkbox"]),
 #contracts .contractFieldGrid textarea{background:var(--fhd-write-bg)}
 @media(max-width:540px){
@@ -513,22 +513,17 @@ input:focus,select:focus,textarea:focus{
 #complexes .complexSearchHeading{
  margin:0 0 6px;color:#1b505d;font-size:19px;line-height:1.5;
 }
-#complexes .complexSearchFields{display:grid;grid-template-columns:1fr;gap:8px 14px}
-#complexes .complexSearchInput,#complexes .complexTools{min-width:0;width:100%}
-#complexes .complexTools{
- display:flex;flex-direction:column;align-items:stretch;gap:0;
-}
-#complexes .complexSearchFields .inputLabel{
+#complexes .complexSearchPanel .inputLabel{
  display:block;margin:8px 0 7px;color:#254b58;font-size:15px;
 }
-#complexes #complexSearch,#complexes #complexScope{
+#complexes #complexSearch{
  width:100%;max-width:none;min-height:58px;font-size:16px;
  border:2px solid #9bbfc4;border-radius:12px;
  background:#edf7f6;color:#254851;
  padding:12px 13px;
 }
 #complexes #complexSearch::placeholder{color:#526b73;opacity:1}
-#complexes #complexSearch:focus,#complexes #complexScope:focus{
+#complexes #complexSearch:focus{
  outline:3px solid #7fbec4;outline-offset:2px;border-color:#155a66;
 }
 #complexes .complexResultsMeta{
@@ -550,9 +545,6 @@ input:focus,select:focus,textarea:focus{
 }
 .newsCategoryTabs>button[aria-selected="false"]{
  background:#edf4f4;color:#16434f;border:2px solid #accbd0;
-}
-@media(min-width:740px){
- #complexes .complexSearchFields{grid-template-columns:minmax(0,1.65fr) minmax(0,1fr)}
 }
 @media(max-width:400px){
  #nav .secondaryNav button{font-size:13px;min-height:57px}
