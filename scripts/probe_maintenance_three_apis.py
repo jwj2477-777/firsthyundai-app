@@ -12,11 +12,22 @@ from collect_registry_maintenance import fetch_basic,normalize_cost_response,FIE
 
 SERVICES=[
  ("common","https://apis.data.go.kr/1613000/AptCmnuseManageCostServiceV3/",
-  ["getHsmpLaborCostInfoV3","getHsmpGuardCostInfoV3","getHsmpCleaningCostInfoV3"]),
+  ["getHsmpLaborCostInfoV3","getHsmpGuardCostInfoV3","getHsmpCleaningCostInfoV3",
+   "getHsmpEtcCostInfoV3","getHsmpDisinfectionCostInfoV3","getHsmpRepairsCostInfoV3",
+   "getHsmpElevatorMntncCostInfoV3","getHsmpFacilityMntncCostInfoV3",
+   "getHsmpSafetyCheckUpCostInfoV3","getHsmpConsignManageFeeInfoV3",
+   "getHsmpDisasterPreventionCostInfoV3","getHsmpOfcrkCostInfoV3",
+   "getHsmpTaxdueInfoV3","getHsmpHomeNetworkMntncCostInfoV3",
+   "getHsmpVhcleMntncCostInfoV3","getHsmpClothingCostInfoV3"]),
  ("individual","https://apis.data.go.kr/1613000/AptIndvdlzManageCostServiceV3/",
-  ["getHsmpHeatCostInfoV3","getHsmpWaterCostInfoV3","getHsmpElectricCostInfoV3"]),
+  ["getHsmpHeatCostInfoV3","getHsmpWaterCostInfoV3","getHsmpElectricityCostInfoV3",
+   "getHsmpHotWaterCostInfoV3","getHsmpGasRentalFeeInfoV3",
+   "getHsmpWaterPurifierTankFeeInfoV3","getHsmpDomesticWasteFeeInfoV3",
+   "getHsmpMovingInRepresentationMtgInfoV3","getHsmpBuildingInsuranceFeeInfoV3",
+   "getHsmpElectionOrpnsInfoV3"]),
  ("reserve","https://apis.data.go.kr/1613000/AptRepairsCostServiceV3/",
-  ["getHsmpMonthRetalFeeInfoV3"])
+  ["getHsmpMonthRetalFeeInfoV3","getHsmpMonthChargeAmtInfoV3",
+   "getHsmpMonthChargeCostInfoV3","getHsmpMonthImposeAmtInfoV3"])
 ]
 SAMPLE='A10026679'
 def run(key):
@@ -26,11 +37,12 @@ def run(key):
   basic=fetch_basic(key,SAMPLE)
   print('KAPT_BASE_IDENTITY',int(str(basic.get('kaptCode'))==SAMPLE),
     'doroJuso',int(bool(basic.get('doroJuso'))),
+    'privArea',str(basic.get('privArea')),'kaptMarea',str(basic.get('kaptMarea')),'kaptTarea',str(basic.get('kaptTarea')),
     'fields',','.join(sorted(basic.keys())[:75]))
  except (PublicApiError,RuntimeError) as e:
   print('KAPT_BASE_STATUS',re.sub(r'[^a-zA-Z0-9가-힣 _-]','',str(e))[:95])
   return 2
- for month in ('202608','202607'):
+ for month in ('202607',):
   for kind,base,ops in SERVICES:
    for op in ops:
     try:
