@@ -40,7 +40,7 @@ assert(installSrc.includes('newBuild<=oldBuild')&&installSrc.includes('getSignin
 assert(java.includes('https://api.github.com/repos/jwj2477-777/firsthyundai-app/releases/latest')===false);
 assert(java.includes('releases/latest')&&java.includes('allowedDownload'));
 assert(java.includes('compareVersion(version,installed)<=0'),'Reject downgrade and same version');
-assert(gradle.includes("versionName '2.0.28'"));
+assert(gradle.includes("versionName '2.0.29'"));
 assert(gradle.includes('FHD_SIGNING_KEYSTORE'),'Release signing must use persistent private key');
 const objects={};
 function E(id){if(!objects[id])objects[id]={hidden:id==='appUpdateBanner',textContent:'',
