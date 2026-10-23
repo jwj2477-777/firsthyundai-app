@@ -232,21 +232,21 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.21 official school districts APK
+      - name: Publish successful v2.0.22 verified F15 school zone and cadastral-first usability APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.21.apk
-          unzip -t FirstHyundai-v2.0.21.apk | grep 'No errors detected'
-          if gh release view v2.0.21 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.22.apk
+          unzip -t FirstHyundai-v2.0.22.apk | grep 'No errors detected'
+          if gh release view v2.0.22 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.21 FirstHyundai-v2.0.21.apk \
+            gh release create v2.0.22 FirstHyundai-v2.0.22.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.21 · 공식 초등 통학구역·학교알리미 연동' \
-              --notes '공식 초등학교 통학구역 2026-09-20 SHP 자료 중 인천 연수구 34개 경계를 앱 연동용으로 준비했습니다. 학교알리미 API는 보안 GitHub Secret을 사용해 주기적으로 수집합니다. 단지별 초등 통학구역은 정확한 도로명주소 좌표 및 경계 100m 이상 내부가 검증된 경우에만 참고로 표시하고 배정을 보장하지 않습니다. 검증되지 않은 정보는 추측하지 않습니다. 기존 계약 및 실거래, 관리자/가족, 원본 로고, 고정 서명 업데이트 기능을 유지합니다.'
+              --title '퍼스트현대 v2.0.22 · 송일초 통학구역 보정·지번주소 우선·평형별 관리비' \
+              --notes '퍼스트파크 15블럭의 송일초 공식 통학구역 누락을 수정했습니다. 경계 내부의 정확한 주소 좌표는 35m 이상 안전거리로 확인하고 공동통학구역 및 불명확한 좌표는 여전히 확정 표시하지 않습니다. 도로명주소 정확 일치로 확인된 지번주소를 우선 안내하고 건축물 관련 계약문자에도 지번을 우선 활용합니다. 중복 건축물/단지 전체 비용 카드를 제거하고 평형별 월 관리비 조회 화면으로 정리했습니다. 타입별 실제 고지액이 없는 경우에는 임의 계산 없이 확인 전으로 표시합니다. 기존 가족/관리자, 실거래, 고정 서명 인앱 업데이트를 유지합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.21 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.22 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
