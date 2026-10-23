@@ -44,7 +44,7 @@ const ctx=vm.createContext({
  number:x=>String(x),escapeHtml:s=>String(s),favoriteIdForBuilding:x=>x==='송도 B'?null:'favorite',
  value10k:n=>n+'만원',
  dealArticleClass:()=> 'dealRow',dealBadge:x=>x,tradeStatusBadge:()=>'',tradeExtraBadges:()=>'',displayExclusiveArea:()=> '84㎡',
- catalogForTradeName:()=>null,tradeRenewalDetails:()=>'',tradeBrokerLocation:()=>''
+ catalogForTradeName:()=>null,tradeRenewalDetails:()=>'',tradeBrokerLocation:()=>'',tradeAmount:()=>'',tradeCardFacts:()=>''
 });
 vm.runInContext(js.slice(i,j),ctx);
 const run=stmt=>vm.runInContext(stmt,ctx);

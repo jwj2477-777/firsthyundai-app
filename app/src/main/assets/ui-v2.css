@@ -386,9 +386,27 @@ body:not([data-office-role="admin"]) #ct_preview.contractEditing ~ .contractPrev
 .dealRow h3{font-size:19px;line-height:1.5;letter-spacing:-.35px;margin:0 0 12px;color:#25384A}
 .dealRow .money{font-size:23px;line-height:1.4;font-weight:900;letter-spacing:-.35px;margin:0 0 12px}
 .dealRow .meta{font-size:14px;line-height:1.7;color:#536579}
+.dealRow h3{word-break:keep-all;overflow-wrap:anywhere}
+.dealRow .tradeAmount{display:flex;flex-wrap:wrap;gap:2px 14px}
+.dealRow .tradePricePart{display:inline-block;white-space:nowrap}
+.dealRow .tradeCardFacts{display:grid;gap:3px;font-variant-numeric:tabular-nums}
+.dealRow .tradeDateFloor{display:flex;align-items:baseline;justify-content:space-between;gap:5px 12px;flex-wrap:wrap}
+.dealRow .tradeContractDate,.dealRow .tradeFloor{white-space:nowrap}
+.dealRow .tradeArea{word-break:keep-all;overflow-wrap:anywhere}
+.dealRow .tradeObservedDate{font-size:12px;color:#536579}
 .dealRow .tradeRenewalDetail{
- margin-top:13px;border-left:3px solid #D5B995;background:#FCF8F2;
- border-radius:0 10px 10px 0;padding:11px 12px;font-size:13px;line-height:1.65;
+ display:block;margin:12px 0 0;border-left:3px solid #D5B995;background:#FCF8F2;
+ border-radius:0 10px 10px 0;padding:8px 11px;font-size:13px;line-height:1.5;
+}
+.dealRow .tradeRenewalRow{display:grid;grid-template-columns:76px minmax(0,1fr);align-items:baseline;gap:8px;padding:4px 0}
+.dealRow .tradeRenewalRow+.tradeRenewalRow{border-top:1px solid #ECE5DB}
+.dealRow .tradeRenewalRow dt{margin:0;white-space:nowrap;color:#706458;font-weight:500}
+.dealRow .tradeRenewalRow dd{margin:0;min-width:0;color:#454D52;font-size:14px;font-weight:650;word-break:keep-all;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.dealRow .tradeRenewalRow dd.tradeValueMissing{color:#766F65;font-weight:400}
+@media(max-width:365px){
+ .dealRow .money{font-size:20px}
+ .dealRow .tradeRenewalRow{grid-template-columns:68px minmax(0,1fr);gap:6px}
+ .dealRow .tradeRenewalRow dd{font-size:13px}
 }
 /* Contract confirmation is a true three-state control, not a permanently green CTA. */
 #contracts #ct_resultPanel #ct_confirmButton{

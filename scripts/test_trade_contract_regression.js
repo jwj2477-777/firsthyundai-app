@@ -10,7 +10,7 @@ new vm.Script(cjs);
 const a=script.indexOf('function tradeClass(type)'),b=script.indexOf('function renderTypeButtons(',a);
 assert(a>=0&&b>a,'Shared trade badge formatting helpers must be present');
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,k=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[k]));
-const ctx=vm.createContext({escapeHtml});
+const ctx=vm.createContext({escapeHtml,displayExclusiveArea:n=>'전용 '+n+'㎡ (약 34평형)',catalogForTradeName:()=>null});
 const moneyStart=script.indexOf('function number(n)'),moneyEnd=script.indexOf('function textState(',moneyStart);
 assert(moneyStart>=0&&moneyEnd>moneyStart,'Real value10k helper is required');
 vm.runInContext(script.slice(moneyStart,moneyEnd),ctx);
@@ -21,17 +21,17 @@ function renewal(row){return vm.runInContext('tradeRenewalDetails('+JSON.stringi
 for(const type of ['전세','월세']){
  const filled=renewal({type,contract_type_raw:'갱신계약',renewal_raw:'사용',
   contract_term_raw:'2025.11~2027.11',previous_deposit_raw:'35,000',previous_monthly_raw:'0'});
- assert(filled.includes('갱신요구권 · 사용'),type+' renewal right');
- assert(filled.includes('계약기간 · 2025.11~2027.11'),type+' contract term');
- assert(filled.includes('종전 보증금 · 3억 5,000만원'),type+' previous deposit');
- assert(filled.includes('종전 월세 · 0만원'),type+' prior zero rent is not missing');
+ assert(filled.includes('갱신요구권</dt><dd>사용'),type+' renewal right');
+ assert(filled.includes('계약기간</dt><dd>2025.11~2027.11'),type+' contract term');
+ assert(filled.includes('종전 보증금</dt><dd>3억 5,000만원'),type+' previous deposit');
+ assert(filled.includes('종전 월세</dt><dd>0만원'),type+' prior zero rent is not missing');
  const missing=renewal({type,contract_type_raw:'갱신'});
  assert.equal((missing.match(/미기재/g)||[]).length,4,'Unknown fields must be marked 미기재');
  const unused=renewal({type,contract_type_raw:'갱신',renewal_raw:'미사용',
   previous_deposit_raw:'8,000',previous_monthly_raw:'105',contract_term_raw:'2년'});
- assert(unused.includes('갱신요구권 · 미사용'));
- assert(unused.includes('종전 보증금 · 8,000만원'));
- assert(unused.includes('종전 월세 · 105만원'));
+ assert(unused.includes('갱신요구권</dt><dd>미사용'));
+ assert(unused.includes('종전 보증금</dt><dd>8,000만원'));
+ assert(unused.includes('종전 월세</dt><dd>105만원'));
  assert.equal(renewal({type,contract_type_raw:'신규계약',renewal_raw:'사용'}),'',
   'New rental must not show the renewal information even if right is present');
  assert.equal(renewal({type,contract_type_raw:'',renewal_raw:'사용'}),'',
@@ -68,6 +68,25 @@ assert.equal(broker({type:'매매',dealing_type:'직거래',broker_region_raw:'�
 assert.equal(broker({type:'매매',dealing_type:'중개거래',broker_region_raw:''}),'');
 assert(broker({type:'매매',dealing_type:'중개거래',broker_region_raw:'인천 연수구'}).includes('중개사 소재지 · 인천 연수구'));
 assert(broker({type:'매매',dealing_type:'중개거래',broker_region_raw:'<danger>'}).includes('&lt;danger&gt;'));
+// All four views use the same real helpers; keep amounts and metadata groups intact.
+function facts(row,office=false,observed=false){return vm.runInContext('tradeCardFacts('+JSON.stringify(row)+','+office+','+observed+')',ctx);}
+const sample=facts({building:'가상 테스트 단지',area_m2:84.73,floor:10,contract_date:'2026-10-21'});
+assert(sample.includes('class="tradeDateFloor"')&&sample.includes('class="tradeArea"'));
+assert(sample.includes('2026.10.21')&&sample.includes('datetime="2026-10-21"'));
+assert(sample.includes('10층')&&sample.includes('약 34평형'));
+assert(facts({area_m2:29.92,floor:'6층'},true).includes('6층</span>'));
+assert(!facts({area_m2:29.92,floor:6},true).includes('평형'), 'Office area must not borrow apartment pyeong');
+assert(facts({floor:0}).includes('0층'),'Explicit zero floor is not missing');
+assert(facts({}).includes('층 미기재')&&facts({}).includes('전용면적 미기재'));
+assert(!facts({}).includes('미기재층'));
+const observed=facts({contract_date:'2026-10-21',first_seen_date:'2026-10-23'},false,true);
+assert(observed.includes('신규 공개 확인')&&observed.includes('2026-10-23')&&observed.includes('실제 계약일')&&observed.includes('2026.10.21'));
+const monthly=vm.runInContext('tradeAmount({type:"월세",deposit_10k:10000,monthly_10k:280})',ctx);
+assert(monthly.includes('<span class="tradePricePart">보증금 1억</span>')&&monthly.includes('<span class="tradePricePart">월세 280만</span>'));
+const officeSection=script.slice(script.indexOf('function renderOfficeRentals(){'),script.indexOf('function officialSubscriptionUrl('));
+assert(!officeSection.includes('거래 상세정보 보기')&&!officeSection.includes('lot_number'));
+assert(officeSection.includes('tradeExtraBadges(x)')&&officeSection.includes('cancellation_date'));
+assert(officeSection.includes('tradeCardFacts(x,true)')&&officeSection.includes('tradeRenewalDetails(x)'));
 const views=[
  ['관심단지','function renderNearbyDetails(','function renderOverview(){'],
  ['전체 최신순','function renderTrades(){','function renderNews(){'],
@@ -83,7 +102,7 @@ for(const [name,start,end] of views){
  assert(!section.includes('출처: 국토교통부'),name+' must not repeat the source on every card');
  assert(!section.includes('조회 계약연월'),name+' must not repeat contract month on every card');
  assert(!section.includes("x.source_month"),name+' must not show source month redundantly');
- assert(section.includes('계약일')||section.includes('실제 계약일'),name+' must retain the deal date');
+ assert(section.includes('tradeCardFacts(x'),name+' must retain the structured deal date, floor and area');
 }
 const elements=new Map();
 function E(id){

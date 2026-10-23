@@ -41,7 +41,7 @@ const ctx=vm.createContext({
  number:x=>Number(x).toLocaleString('en-US'),escapeHtml:x=>String(x),
  areaKey:x=>String(Number(x)),tradeClass:t=>t==='매매'?'sale':t==='전세'?'lease':t==='월세'?'monthly':'',
  value10k:x=>String(x)+'만원',dealArticleClass:()=> 'dealRow',dealBadge:()=>'',tradeStatusBadge:()=>'',tradeExtraBadges:()=>'',displayExclusiveArea:x=>String(x),
- catalogForTradeName:()=>null,tradeRenewalDetails:()=>'',tradeBrokerLocation:()=>''
+ catalogForTradeName:()=>null,tradeRenewalDetails:()=>'',tradeBrokerLocation:()=>'',tradeAmount:()=>'',tradeCardFacts:()=>''
 });
 const start=script.indexOf('function renderTypeButtons('),end=script.indexOf('function areaKey(',start);
 const rStart=script.indexOf('function renderNearbyDetails('),rEnd=script.indexOf('function renderOverview(',rStart);

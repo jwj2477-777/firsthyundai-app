@@ -26,6 +26,7 @@ const ctx=vm.createContext({
  currentPage:'nearby',renderComplexes(){},showRefreshFeedback(){},console
 });
 vm.runInContext(snippet,ctx);
+vm.runInContext(javascript.slice(javascript.indexOf('function tradeClass(type)'),javascript.indexOf('function renderTypeButtons(')),ctx);
 const run=q=>vm.runInContext(q,ctx);
 const missing=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13'})");
 assert(missing.includes('평형별 월 관리비'));

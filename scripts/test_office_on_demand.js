@@ -38,6 +38,7 @@ const ctx=vm.createContext({
  sourceLink:()=>'',safeLink:()=>'',fetchRemote:async()=>{},console
 });
 vm.runInContext(js,ctx);
+vm.runInContext(script.slice(script.indexOf('function tradeClass(type)'),script.indexOf('function renderTypeButtons(')),ctx);
 const run=q=>vm.runInContext(q,ctx);
 run("publicServices={office_rents:{state:'awaiting_approval',records:[]},office_sales:{state:'awaiting_approval',records:[]}};renderOfficeRentals()");
 assert(nodes.officeRentContent.innerHTML.includes('공식 자료 확인 중'));
@@ -53,7 +54,10 @@ run('publicServices='+JSON.stringify({office_rents:{state:'verified',records:ren
 assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>5건</b>'));
 assert(nodes.officeRentContent.innerHTML.includes('dealRow'),'Same apartment deal card base class');
 assert(nodes.officeRentContent.innerHTML.includes('9층'),'Office floors visible like apartment cards');
-assert(nodes.officeRentContent.innerHTML.includes('거래 상세정보 보기'));
+assert(!nodes.officeRentContent.innerHTML.includes('거래 상세정보 보기'));
+assert(!nodes.officeRentContent.innerHTML.includes('지번 123'));
+assert(nodes.officeRentContent.innerHTML.includes('tradeDateFloor'));
+assert(nodes.officeRentContent.innerHTML.includes('tradeArea'));
 run("setOfficeType('전세')");
 assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>2건</b>'));
 assert.equal(nodes._lastType,'전세');
