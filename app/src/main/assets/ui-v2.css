@@ -1678,3 +1678,9 @@ header #roleButton{border-radius:11px;box-shadow:none;min-height:40px;padding:8p
  #contracts .contractMemoCard{border-color:#8E482B}
  #contracts .contractMemoCard #ct_rough{border-color:#7B4B2F}
 }
+
+/* v2.0.44 · 오피스텔 제목 강조선: 기존 실거래 카테고리 단색과 통일.
+   길이·두께·위치·간격은 변경하지 않는다. */
+body[data-section="officetel"] .page#officetel>.sectionTitle:before{
+ background:var(--ui2-trades);
+}
