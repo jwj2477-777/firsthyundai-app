@@ -808,3 +808,82 @@ header #roleButton:focus-visible{outline:2px solid #FBE9BB;outline-offset:3px}
 }
 .compactAppFooter .appUpdateManual.hidden{display:none!important}
 .compactAppFooter .appUpdateManual:focus-visible{outline:3px solid #85aeca;outline-offset:3px}
+
+/* v2.0.34: one segmented-switch design language; only accent colors vary.
+   Both switch groups share geometry, typography, selected/unselected treatment.
+   Their existing onClick and aria semantics remain unchanged. */
+.page .sectionModeSwitch[data-tone="teal"]{
+ --segment-bg:#E4F0EE;--segment-border:#C6DCDA;
+ --segment-ink:#44636A;--segment-idle:#F7FBFA;
+ --segment-active:#006A6B;--segment-active-border:#005459;
+ --segment-focus:#8EBFB7;
+}
+.page .sectionModeSwitch[data-tone="purple"]{
+ --segment-bg:#F0ECF9;--segment-border:#D9CFEA;
+ --segment-ink:#574976;--segment-idle:#FBFAFE;
+ --segment-active:#6547A5;--segment-active-border:#4C338A;
+ --segment-focus:#BAA3E6;
+}
+#trades .propertyTypeSwitch.sectionModeSwitch,
+#nearby .propertyTypeSwitch.sectionModeSwitch,
+#new .propertyTypeSwitch.sectionModeSwitch,
+#officetel .propertyTypeSwitch.sectionModeSwitch,
+#news .newsCategoryTabs.sectionModeSwitch{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:5px;padding:6px;margin:0 0 14px;width:100%;max-width:100%;
+ border:1px solid var(--segment-border);
+ border-radius:18px;background:var(--segment-bg);
+ box-shadow:0 1px 3px #23354A0C;
+}
+.propertyTypeSwitch.sectionModeSwitch>button,
+#news .newsCategoryTabs.sectionModeSwitch>button{
+ display:flex;align-items:center;justify-content:center;
+ appearance:none;min-width:0;width:100%;min-height:62px;
+ margin:0;padding:10px 7px;
+ border:2px solid transparent;border-radius:13px;
+ background:var(--segment-idle);color:var(--segment-ink);
+ font-family:inherit;font-size:16px;font-weight:850;
+ line-height:1.35;letter-spacing:-.3px;
+ text-align:center;word-break:keep-all;white-space:normal;
+ box-shadow:none;text-shadow:none;
+ cursor:pointer;
+ transition:background-color .16s ease,color .16s ease,box-shadow .16s ease;
+}
+.propertyTypeSwitch.sectionModeSwitch>button.selected,
+#news .newsCategoryTabs.sectionModeSwitch>button[aria-selected="true"]{
+ background:var(--segment-active);color:#FFFFFF;
+ border:2px solid var(--segment-active-border);
+ box-shadow:inset 0 -3px 0 #0F193024,0 2px 6px #2C2A4730;
+}
+.propertyTypeSwitch.sectionModeSwitch>button:not(.selected),
+#news .newsCategoryTabs.sectionModeSwitch>button[aria-selected="false"]{
+ background:var(--segment-idle);color:var(--segment-ink);
+ border:2px solid transparent;box-shadow:none;
+}
+#news .newsCategoryTabs.sectionModeSwitch>button[aria-selected="true"]::before{
+ content:none;display:none;
+}
+.propertyTypeSwitch.sectionModeSwitch>button:focus-visible,
+#news .newsCategoryTabs.sectionModeSwitch>button:focus-visible{
+ outline:3px solid var(--segment-focus);outline-offset:2px;
+}
+@media(hover:hover){
+ .propertyTypeSwitch.sectionModeSwitch>button:not(.selected):hover,
+ #news .newsCategoryTabs.sectionModeSwitch>button[aria-selected="false"]:hover{
+  background:#FFFFFF;box-shadow:0 1px 5px #26395017;
+ }
+}
+@media(max-width:410px){
+ .propertyTypeSwitch.sectionModeSwitch>button,
+ #news .newsCategoryTabs.sectionModeSwitch>button{
+  min-height:59px;font-size:15px;padding:9px 5px;letter-spacing:-.4px;
+ }
+}
+@media(max-width:350px){
+ .propertyTypeSwitch.sectionModeSwitch>button,
+ #news .newsCategoryTabs.sectionModeSwitch>button{font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){
+ .propertyTypeSwitch.sectionModeSwitch>button,
+ #news .newsCategoryTabs.sectionModeSwitch>button{transition:none}
+}
