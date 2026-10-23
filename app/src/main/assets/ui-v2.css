@@ -1289,3 +1289,119 @@ header #roleButton{border-radius:11px;box-shadow:none;min-height:40px;padding:8p
  #nav .primaryNav button.active{border-width:3px}
  #trades .tradeTypeBar button.active{border-width:2.5px}
 }
+
+
+/* v2.0.42 · SCREENSHOT-DRIVEN CONSISTENCY
+   The established page routes, grids, controls, touch sizes and transaction cards
+   remain unchanged. Improve only type hierarchy, soft surfaces and visual rhythm. */
+#trades.page>.sectionTitle:first-child h2,
+#complexes.page>.sectionTitle:first-child h2,
+#news.page>.sectionTitle:first-child h2,
+#nearby.page>.sectionTitle:first-child h2,
+#new.page>.sectionTitle:first-child h2,
+#officetel.page>.sectionTitle:first-child h2{
+ font-size:20px;line-height:1.4;font-weight:820;
+ letter-spacing:-.5px;color:#243B44;
+ word-break:keep-all;
+}
+#trades.page>.sectionTitle:first-child,
+#complexes.page>.sectionTitle:first-child,
+#news.page>.sectionTitle:first-child,
+#nearby.page>.sectionTitle:first-child,
+#new.page>.sectionTitle:first-child{
+ margin-top:16px;margin-bottom:12px;gap:9px;
+}
+#trades.page>.sectionTitle:first-child .tiny,
+#complexes.page>.sectionTitle:first-child .tiny,
+#news.page>.sectionTitle:first-child .tiny,
+#nearby.page>.sectionTitle:first-child .tiny,
+#new.page>.sectionTitle:first-child .tiny{
+ margin-top:6px;font-size:13px;line-height:1.5;
+ color:#536A71;letter-spacing:-.12px;
+}
+#news .familySimpleNote{font-weight:600}
+#news .familyBriefCaution{
+ font-size:13px;font-weight:680;line-height:1.55;
+ background:#F8F5FD;border-left:3px solid #7663A8;
+ color:#594679;border-radius:0 11px 11px 0;
+ padding:9px 12px;margin:0 0 12px;
+}
+#news .newsCategoryTabs.sectionModeSwitch{
+ background:#F0ECF7;border-color:#DFD9E9;
+ box-shadow:none;
+}
+#news .newsCategoryTabs.sectionModeSwitch>button{
+ border-radius:12px;
+ box-shadow:none;
+}
+#news .newsCategoryTabs.sectionModeSwitch>button[aria-selected="true"]{
+ box-shadow:0 2px 5px #42336E22;
+}
+#news .newsCard,.item.newsCard{
+ border:1px solid #E5E3EB;
+ box-shadow:0 2px 9px #2835480B;
+}
+#news .newsCard h3{
+ font-size:18px;line-height:1.52;
+ letter-spacing:-.36px;word-break:keep-all;
+}
+#news .newsCard .newsAiBody{
+ background:#F9F7FD;border-radius:12px;
+}
+#complexes .complexSearchPanel{
+ border-color:#DCE8E4;
+ box-shadow:0 2px 12px #174C4A0B;
+ padding:17px;
+}
+#complexes .complexSearchHeading{
+ font-size:18px;font-weight:820;line-height:1.4;
+ letter-spacing:-.4px;margin-bottom:5px;
+}
+#complexes .complexSearchPanel .inputLabel{
+ font-size:14px;font-weight:750;color:#365660;
+ margin-top:8px;margin-bottom:7px;
+}
+#complexes #complexSearch{
+ min-height:55px;
+ border:1.5px solid #B9D4CD;
+ background:#F5FAF8!important;
+ border-radius:13px;font-size:16px;
+ box-shadow:inset 0 1px 2px #1B50480A;
+}
+#complexes #complexSearch:focus{
+ border-color:#1A766E;
+ outline:3px solid #B1D9D1;
+ outline-offset:2px;
+}
+#complexes .complexResultsMeta{
+ font-size:13px;color:#587078;line-height:1.5;
+ margin:12px 0 11px;
+}
+#complexes #complexCards .nearbyCard.complexSummaryCard{
+ border-color:#DBE7E3;
+ box-shadow:0 2px 7px #123B3B0C;
+}
+#complexes #complexCards .nearbyCard.complexSummaryCard.selected,
+#complexes #complexCards .nearbyCard.complexSummaryCard[aria-pressed="true"]{
+ border-color:#18756B;
+ box-shadow:0 2px 8px #17695E17;
+}
+#trades .tradeAdvanced{
+ border-radius:13px;background:#F9FBFA;
+ border-color:#DCE7E3;
+}
+#trades .tradeAdvanced summary{
+ color:#28565F;font-weight:750;
+}
+@media(max-width:380px){
+ #trades.page>.sectionTitle:first-child h2,
+ #complexes.page>.sectionTitle:first-child h2,
+ #news.page>.sectionTitle:first-child h2{
+  font-size:19px;letter-spacing:-.55px;
+ }
+ #complexes .complexSearchPanel{padding:15px}
+}
+@media(prefers-contrast:more){
+ #news .familyBriefCaution{border-left-width:5px;color:#392B5B}
+ #news .newsCard,#complexes .complexSearchPanel{border-width:2px}
+}
