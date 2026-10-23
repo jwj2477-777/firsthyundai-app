@@ -339,11 +339,25 @@ body.apartmentSheetActive{overflow:hidden}
    <button type="button" class="" aria-current="false" onclick="switchPage('nearby')"><span class="starterIcon">★</span>관심 14개</button>
    <button type="button" class="active" aria-current="page" onclick="switchPage('new')"><span class="starterIcon">✦</span>새 거래</button>
   </div>
-  <label class="inputLabel" for="newDate">신규 공개 확인일 (한국시간)</label><button id="newAlertFocusReset" type="button" class="btn alt hidden" onclick="clearNewAlertFocus()">알림 거래만 보는 중 · 날짜별로 보기</button><select id="newDate" onchange="clearNewAlertFocus()"></select>
-  <div class="controls"><select id="newType" aria-label="실거래 유형" onchange="renderNew()"><option value="">매매·전세·월세 전체</option><option>매매</option><option>전세</option><option>월세</option></select><input id="newAptFilter" placeholder="단지명 검색" aria-label="단지명 검색" oninput="renderNew()"></div>
-  <select id="newFavoriteFilter" aria-label="주변단지 한정" onchange="renderNew()"><option value="">송도동 전체 단지</option><option value="favorites">★ 관심 14개 단지만</option></select>
-  <div id="newCounts" class="newCounts"></div>
-  <p class="tiny" id="newStatus">일별 수집 결과를 불러오는 중입니다.</p>
+  <div class="newSimpleFilters">
+   <label class="newDateLabel" for="newDate">새 거래 확인일</label>
+   <select id="newDate" aria-label="신규 공개 거래 확인 날짜" onchange="clearNewAlertFocus()"></select>
+   <button id="newAlertFocusReset" type="button" class="btn alt hidden" onclick="clearNewAlertFocus()">알림에서 본 거래 · 날짜별 목록으로</button>
+   <div class="newTypeChips" role="group" aria-label="새 거래 유형 선택">
+    <button id="newTypeAll" type="button" aria-pressed="true" onclick="chooseNewType('')">전체</button>
+    <button id="newTypeSale" type="button" aria-pressed="false" onclick="chooseNewType('매매')">매매</button>
+    <button id="newTypeLease" type="button" aria-pressed="false" onclick="chooseNewType('전세')">전세</button>
+    <button id="newTypeMonthly" type="button" aria-pressed="false" onclick="chooseNewType('월세')">월세</button>
+   </div>
+   <div class="newQuickSearch">
+    <input id="newAptFilter" placeholder="⌕ 아파트 이름 검색" aria-label="신규 거래 아파트 이름 검색" oninput="renderNew()">
+    <button id="newFavoriteToggle" type="button" aria-pressed="false" onclick="toggleNewFavorites()">☆ 관심 14개만</button>
+   </div>
+   <select id="newType" class="hidden" aria-label="내부 신규 거래 유형"><option value="">전체</option><option>매매</option><option>전세</option><option>월세</option></select>
+   <select id="newFavoriteFilter" class="hidden" aria-label="내부 신규 거래 관심단지"><option value="">송도동 전체</option><option value="favorites">관심 14개</option></select>
+  </div>
+  <div id="newCounts" class="newCounts newSimpleCounts" role="status" aria-live="polite"></div>
+  <p class="tiny newCollectionStatus hidden" id="newStatus" role="status"></p>
   <div id="newContent"><div class="empty">설정에서 공개 GitHub 저장소를 연결하면 날짜별 새 거래가 표시됩니다.</div></div>
  </div>
 </div>
@@ -2152,6 +2166,29 @@ function kstDateOffset(daysAgo){
 }
 let newAlertFocusIds=null;
 function clearNewAlertFocus(){newAlertFocusIds=null;renderNew();}
+function chooseNewType(type){
+ if(!['','매매','전세','월세'].includes(type))return;
+ $('newType').value=type;
+ renderNew();
+}
+function toggleNewFavorites(){
+ $('newFavoriteFilter').value=$('newFavoriteFilter').value==='favorites'?'':'favorites';
+ renderNew();
+}
+function updateNewQuickFilters(){
+ const selected=$('newType').value;
+ for(const [id,type] of [['newTypeAll',''],['newTypeSale','매매'],
+                         ['newTypeLease','전세'],['newTypeMonthly','월세']]){
+  const button=$(id),active=selected===type;
+  button.classList.toggle('active',active);
+  button.setAttribute('aria-pressed',active?'true':'false');
+ }
+ const favorite=$('newFavoriteFilter').value==='favorites';
+ const button=$('newFavoriteToggle');
+ button.classList.toggle('active',favorite);
+ button.setAttribute('aria-pressed',favorite?'true':'false');
+ button.textContent=favorite?'★ 관심 14개만':'☆ 관심 14개만';
+}
 function renderNew(){
  const select=$('newDate');
  if(!select.options.length){
@@ -2163,48 +2200,51 @@ function renderNew(){
  }
  const day=select.value||kstDateOffset(0);
  const data=remote.new_trades;
+ updateNewQuickFilters();
+ const status=$('newStatus');
  if(!data){
-  $('newStatus').textContent='실제 수집 결과를 아직 불러오지 못했습니다.';
+  status.classList.toggle('hidden',false);
+  status.textContent='최신 자료를 아직 불러오지 못했습니다.';
   $('newCounts').innerHTML='';
-  $('newContent').innerHTML='<div class="empty">앱의 설정에서 GitHub 저장소 주소를 저장하고 데이터를 불러와 주세요.</div>';
+  $('newContent').innerHTML='<div class="empty">새 거래 자료를 불러오는 중입니다. 갱신 버튼을 눌러보세요.</div>';
   return;
  }
- $('newMeta').textContent='송도동 신규 공개 확인 · 최종 수집 '+prettyTime(data.checked_at);
+ $('newMeta').textContent='송도동 새 거래 · 마지막 확인 '+prettyTime(data.checked_at);
  if(data.state==='not_started'){
-  $('newStatus').textContent='첫 신규 공개 확인 수집 전입니다. 기존 거래 전체를 신규로 계산하지 않습니다.';
+  status.classList.toggle('hidden',true);
+  status.textContent='';
   $('newCounts').innerHTML='';
-  $('newContent').innerHTML='<div class="empty">첫 신규 공개 확인 기록을 기다리고 있습니다.</div>';
+  $('newContent').innerHTML='<div class="empty">새 거래 수집 전입니다.</div>';
   return;
  }
  const onlyFavorites=$('newFavoriteFilter').value==='favorites';
  $('newAlertFocusReset').classList.toggle('hidden',!newAlertFocusIds);
  const dayRows=(data.records||[]).filter(x=>(newAlertFocusIds?newAlertFocusIds.has(window.FirstHyundaiTradeAlerts.stableId(x)):x.first_seen_date===day)&&
   (!onlyFavorites||favoriteIdForBuilding(x.building)));
- const sale=dayRows.filter(x=>x.type==='매매').length;
- const lease=dayRows.filter(x=>x.type==='전세').length;
- const monthly=dayRows.filter(x=>x.type==='월세').length;
- const total=sale+lease+monthly;
- $('newCounts').innerHTML='<span class="pill">신규 확인 총 '+number(total)+'건</span>'+
-  '<span class="pill">매매 '+number(sale)+'건</span>'+
-  '<span class="pill">전세 '+number(lease)+'건</span>'+
-  '<span class="pill">월세 '+number(monthly)+'건</span>';
- $('newStatus').textContent=(newAlertFocusIds?'알림으로 받은 거래':'선택일 '+day)+' · 새로 발견한 공개 거래 ('+
-  (data.state==='partial'?'일부 수집 실패':'수집 정상')+') · 마지막 확인 '+prettyTime(data.checked_at);
- const type=$('newType').value, q=$('newAptFilter').value.trim().toLowerCase();
+ const type=$('newType').value,q=$('newAptFilter').value.trim().toLowerCase();
  const rows=dayRows.filter(x=>(!type||x.type===type)&&
   (!q||(x.building||'').toLowerCase().includes(q)));
+ const sale=rows.filter(x=>x.type==='매매').length;
+ const lease=rows.filter(x=>x.type==='전세').length;
+ const monthly=rows.filter(x=>x.type==='월세').length;
+ const tally=[['매매',sale],['전세',lease],['월세',monthly]]
+  .filter(([,count])=>count>0).map(([name,count])=>name+' '+number(count)).join(' · ');
+ $('newCounts').innerHTML='<span class="newResultNumber">'+number(rows.length)+'<small>건</small></span>'+
+  '<span class="newResultCopy"><strong>'+(newAlertFocusIds?'알림 새 거래':'새로 확인된 거래')+'</strong>'+
+  '<small>'+escapeHtml(tally||'조건에 맞는 거래가 없습니다')+'</small></span>';
+ status.classList.toggle('hidden',data.state!=='partial');
+ status.textContent=data.state==='partial'?'일부 수집에 실패해 새 거래가 누락됐을 수 있습니다.':'';
  if(!rows.length){
-  $('newContent').innerHTML='<div class="empty">선택한 날짜와 조건에 새로 확인된 거래가 없습니다.<br>이는 실제로 그날 공개된 거래가 없었다는 뜻은 아닙니다.</div>';
+  $('newContent').innerHTML='<div class="empty">선택한 날짜·조건의 새 거래가 없습니다.<p class="tiny">다른 날짜나 조건으로 확인해 주세요.</p></div>';
   return;
  }
- $('newContent').innerHTML='<p class="tiny">조건에 맞는 신규 공개 확인 거래 <b>'+number(rows.length)+
-  '건</b> · 최대 120건 표시</p>'+rows.slice(0,120).map(x=>{
+ $('newContent').innerHTML=(rows.length>120?'<p class="tiny">최근 120건까지 표시</p>':'')+
+  rows.slice(0,120).map(x=>{
    const value=x.type==='매매'?value10k(x.amount_10k):
       x.type==='전세'?'보증금 '+value10k(x.deposit_10k):
       '보증금 '+value10k(x.deposit_10k)+' / 월세 '+value10k(x.monthly_10k);
    return '<article class="'+dealArticleClass(x,'newTop')+'"><div class="tagbox">'+
-    dealBadge(x.type)+
-    tradeStatusBadge(x)+tradeExtraBadges(x)+
+    dealBadge(x.type)+tradeStatusBadge(x)+tradeExtraBadges(x)+
     '</div><h3>'+escapeHtml(x.building)+'</h3>'+
     '<div class="money">'+escapeHtml(value)+'</div>'+
     '<div class="meta"><b>신규 공개 확인 '+escapeHtml(x.first_seen_date)+'</b>'+
