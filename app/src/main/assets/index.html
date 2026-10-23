@@ -1355,11 +1355,11 @@ function renderOfficeRentals(){
  const el=$('officeRentContent');if(!el)return;
  const chk=$('officeDetailToggle'),advanced=$('officeAdvancedFilters'),more=$('officeMore');
  if(chk)chk.checked=officeDetailedMode;
- if(advanced)advanced.classList.toggle('hidden',!officeDetailedMode);
+ if(advanced)advanced.classList?.toggle?.('hidden',!officeDetailedMode);
  const records=verifiedRecords('office_rents');
  if(!records){
   el.innerHTML='<div class="apiNotice">오피스텔 전월세 공식 자료 연결 확인 중입니다. 처음 수집되기 전에는 거래가 0건이라는 뜻이 아닙니다.</div>';
-  if(more)more.classList.add('hidden');
+  if(more)more.classList?.add?.('hidden');
   return;
  }
  const q=String($('officeNameSearch')?.value||'').trim().toLowerCase(),type=$('officeTypeSearch')?.value||'';
@@ -1370,7 +1370,7 @@ function renderOfficeRentals(){
  (maxArea!==null&&(!Number.isFinite(maxArea)||maxArea<0))||(minArea!==null&&maxArea!==null&&minArea>maxArea);
  if(invalid){
   el.innerHTML='<div class="empty">검색 기간과 면적 범위를 확인해 주세요.</div>';
-  if(more)more.classList.add('hidden');return;
+  if(more)more.classList?.add?.('hidden');return;
  }
  const visible=records.filter(x=>(!type||x.type===type)&&(!q||String(x.building||'').toLowerCase().includes(q))&&
   (!dayFrom||String(x.contract_date||'')>=dayFrom)&&(!dayTo||String(x.contract_date||'')<=dayTo)&&
@@ -1387,7 +1387,7 @@ function renderOfficeRentals(){
   (officeDetailedMode&&x.lot_number?'<p class="officeMeta">지번 '+escapeHtml(x.lot_number)+'</p>':'')+'</article>').join('');
  el.innerHTML=summary+(rows||'<div class="empty">선택한 조건의 오피스텔 거래가 없습니다.</div>')+
  '<p class="tiny officeSourceNote">오피스텔 전월세 신고·확정일자 자료입니다. 아파트 실거래와 합산하지 않습니다.</p>';
- if(more){more.classList.toggle('hidden',visible.length<=officeVisibleLimit);
+ if(more){more.classList?.toggle?.('hidden',visible.length<=officeVisibleLimit);
   more.textContent='거래 더 보기 ('+number(Math.max(0,visible.length-officeVisibleLimit))+'건 남음)';}
 }
 function officialSubscriptionUrl(value){
