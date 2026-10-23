@@ -1397,7 +1397,7 @@ function renderPublicComplexInfo(p){
      escapeHtml(label)+'</button>';
  }).join('')+'</div>':'<p class="practiceNote">평형·타입 정보 확인 전입니다.</p>';
  const bill=picked?rate!==null?
-   '<p class="practiceNote"><strong>약 '+escapeHtml(Math.round(rate*picked.exclusive_m2/100)*100).toLocaleString('ko-KR')+'원</strong> · 전용 '+escapeHtml(picked.exclusive_m2)+'㎡</p>'+
+   '<p class="practiceNote"><strong>약 '+escapeHtml((Math.round(rate*picked.exclusive_m2/100)*100).toLocaleString('ko-KR'))+'원</strong> · 전용 '+escapeHtml(picked.exclusive_m2)+'㎡</p>'+
    '<p class="tiny">K-apt 공개 월별 ㎡당 단가 '+escapeHtml(rate.toLocaleString('ko-KR'))+'원 × 전용면적 · '+escapeHtml(average.month.slice(0,4)+'년 '+Number(average.month.slice(4))+'월')+'분 상담 참고액</p>'+
    sourceLink(average.source_url,'K-apt 기반 공개 원문 확인'):
    item?
