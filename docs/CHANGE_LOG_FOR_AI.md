@@ -1,5 +1,8 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-23 / v2.0.23**: Fixed Android `MainActivity.JavaScriptBridge.fetchNearby()` host allowlist silently rejecting every live Kakao Nearby request with '주변시설 서비스 주소 또는 요청 형식이 잘못되었습니다.'; native previously hardcoded defunct `firsthyundai-kakao.jwj2477.workers.dev`, but `data/nearby_config.json`, WebView URL allowlist and deployed `workers/kakao-nearby/wrangler.toml` all use `firsthyundai-nearby.jwj2477.workers.dev`. Strictly match the latter (no broad untrusted hosts), add cross-layer regression in `scripts/test_kakao_nearby.mjs` checking native, WebView, config and Worker deployment, and trigger safe live Kakao key/Worker health checks in GitHub Actions when this code changes. Increment versionCode 74 / versionName 2.0.23, retain fixed release signature; no client-side secret, original features unaffected. Validate successful live diagnostics and release separately.
+
+
 - **2026-10-23 / v2.0.22**: F15BL was truly within official Songil elementary-zone polygon; removed 100m overconservative cutoff, now require unique normal polygon and >=35m clearance (real F15 reference coordinate ~85m). Added regression. Kakao exact matching returns verified legal lot addresses into public `school_districts.lot_addresses` without publishing key. F15 lot 주소 verified 송도동 102. Cadastral lot displayed as main, road address as secondary in apartment detail; auto contract memo and address field prioritize lot. Removed duplicative building/contract and whole-complex partial management-fee cards. Renamed public tab `관리비` with per-verified-area selector. No fabricated area-level bill from K-apt complex-wide costs; only verified exact monthly invoice entries may display. All security/contract and native update logic unchanged.
 
 
