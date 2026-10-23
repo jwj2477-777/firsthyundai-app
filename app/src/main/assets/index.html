@@ -1265,7 +1265,7 @@ function renderComplexes(){
  if(role==='admin'&&window.firstHyundaiDraftCount)$('catalogDraftNotice').textContent='이 기기의 미게시 수정: '+number(window.firstHyundaiDraftCount())+'개 단지';
 }
 // Source-backed optional integrations. Never treat an unapproved service as 0 records.
-let publicServices=null,schoolDistrictData=null;
+let publicServices=null,schoolDistrictData=null,maintenanceEstimates=null;
 const PUBLIC_SRC={
  school:'https://open.neis.go.kr/portal/data/service/selectServicePage.do?infId=OPEN17020190531110010104913&infSeq=2',
  schoolLocation:'https://www.data.go.kr/data/15021148/standard.do',
@@ -1351,6 +1351,12 @@ function renderPublicComplexInfo(p){
    x.status==='verified_invoice'&&Number.isSafeInteger(x.monthly_won)&&
    x.monthly_won>0&&x.monthly_won<=2000000&&/^20[0-9]{2}-[0-9]{2}$/.test(x.month||'')&&
    safeLink(x.source_url)):null;
+ const average=maintenanceEstimates?.state==='verified_partial'&&Array.isArray(maintenanceEstimates.records)?
+   maintenanceEstimates.records.find(x=>x.complex_id===p.id&&x.kapt_code===p.kapt_code):null;
+ const rate=average&&Number.isInteger(average.won_per_exclusive_m2)&&
+   average.won_per_exclusive_m2>=300&&average.won_per_exclusive_m2<=20000&&
+   /^20[0-9]{4}$/.test(average.month||'')&&safeLink(average.source_url)?
+   average.won_per_exclusive_m2:null;
  const phone=String(p.management_phone||'').replace(/[^0-9+]/g,'');
  const options=types.length?'<div class="neisLevelButtons">'+types.map((t,i)=>{
    const py=typeof supplyPyeong==='function'?supplyPyeong(t.supply_m2,t.market_pyeong):null;
@@ -1359,15 +1365,18 @@ function renderPublicComplexInfo(p){
      '" aria-pressed="'+(i===idx?'true':'false')+'" onclick="chooseMaintenanceType(\''+escapeHtml(p.id)+'\','+i+')">'+
      escapeHtml(label)+'</button>';
  }).join('')+'</div>':'<p class="practiceNote">평형·타입 정보 확인 전입니다.</p>';
- const bill=picked?item?
-   '<p class="practiceNote"><strong>'+escapeHtml(item.monthly_won.toLocaleString('ko-KR'))+'원</strong> · '+
-   escapeHtml(item.month)+'월 확인 고지액</p>'+sourceLink(item.source_url,'고지액 근거 확인'):
-   '<p class="practiceNote">'+escapeHtml(picked.supply_label)+'타입의 실제 월 관리비는 아직 확인되지 않았습니다.</p>':
-   '<p class="practiceNote">실제 세대 관리비 자료가 없습니다.</p>';
+ const bill=picked?rate!==null?
+   '<p class="practiceNote"><strong>약 '+escapeHtml(Math.round(rate*picked.exclusive_m2/100)*100).toLocaleString('ko-KR')+'원</strong> · 전용 '+escapeHtml(picked.exclusive_m2)+'㎡</p>'+
+   '<p class="tiny">K-apt 공개 월별 ㎡당 단가 '+escapeHtml(rate.toLocaleString('ko-KR'))+'원 × 전용면적 · '+escapeHtml(average.month.slice(0,4)+'년 '+Number(average.month.slice(4))+'월')+'분 상담 참고액</p>'+
+   sourceLink(average.source_url,'K-apt 기반 공개 원문 확인'):
+   item?
+   '<p class="practiceNote"><strong>'+escapeHtml(item.monthly_won.toLocaleString('ko-KR'))+'원</strong> · '+escapeHtml(item.month)+'월 직접 확인 고지액</p>'+sourceLink(item.source_url,'고지액 근거 확인'):
+   '<p class="practiceNote">'+escapeHtml(picked.supply_label)+'타입의 월평균 관리비 단가 수집·검증 중입니다.</p>':
+   '<p class="practiceNote">평형·타입 정보 확인 전입니다.</p>';
  return '<div class="apiInfoCards"><article><strong>평형별 월 관리비</strong>'+
-  '<p class="tiny">평형을 선택해 실제 확인된 고지액을 조회합니다.</p>'+options+bill+
+  '<p class="tiny">평형을 선택하면 공식 관리비 공개 단가로 월 참고액을 계산합니다.</p>'+options+bill+
   (phone?'<a class="btn" href="tel:'+escapeHtml(phone)+'">관리사무소 문의 '+escapeHtml(p.management_phone||'')+'</a>':'')+
-  '<p class="tiny">공용관리비 일부 항목 합계를 세대별 관리비처럼 환산하지 않습니다. 실제 금액은 동·호수, 계절, 개별 사용량에 따라 다릅니다.</p></article></div>';
+  '<p class="tiny">공개 단지 전체 관리비 합계의 전용㎡당 평균 단가를 해당 평형 전용면적에 적용합니다. 해당 평형 세대들의 실제 평균 고지서가 아니며 계절·사용량·부과면적 기준에 따라 달라집니다.</p></article></div>';
 }
 // An optional secondary view, always isolated from official apartment results.
 const OFFICE_DETAIL_KEY='firsthyundai_officetel_detailed_v1';
@@ -1484,10 +1493,12 @@ function renderPublicSubscriptions(){
 }
 async function refreshPublicServices(manual=false){
  try{
-  const [district,doc]=await Promise.all([
+  const [district,averages,doc]=await Promise.all([
     fetchRemote('school_districts').catch(()=>null),
+    fetchRemote('maintenance_estimates').catch(()=>null),
     fetchRemote('public_services')
   ]);
+  if(averages?.schema_version===1&&['verified_partial','awaiting_verified_source'].includes(averages.state)&&Array.isArray(averages.records))maintenanceEstimates=averages;
   if(district?.schema_version===1 && district.elementary_zones && district.schoolinfo)
     schoolDistrictData=district;
   if(doc?.schema_version!==1||!doc.schools||!doc.office_rents)throw Error('자료 형식 오류');
