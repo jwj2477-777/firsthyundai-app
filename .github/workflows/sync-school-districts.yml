@@ -1,0 +1,53 @@
+name: Sync Verified Schoolinfo and Elementary Zones
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/collect_schoolinfo.py'
+      - 'data/school_zones_yeonsu.json'
+      - 'data/school_districts.json'
+      - 'data/complexes.json'
+      - 'tests/test_school_districts.py'
+      - '.github/workflows/sync-school-districts.yml'
+  schedule:
+    - cron: '25 22 * * 1' # Every Tuesday 07:25 KST
+permissions:
+  contents: write
+concurrency:
+  group: firsthyundai-school-districts
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Confirm shapefile-derived zone polygons and provider safeguards
+        run: python -m unittest discover -s tests -p test_school_districts.py -v
+      - name: Retrieve approved Schoolinfo and verify exact address geocoding
+        env:
+          SCHOOLINFO_API_KEY: ${{ secrets.SCHOOLINFO_API_KEY }}
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+        run: python scripts/collect_schoolinfo.py
+      - name: Publish only verified public fields (no secrets)
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/school_districts.json
+          if git diff --staged --quiet; then
+            echo 'No newly verified school information; original snapshot preserved'; exit 0
+          fi
+          git commit -m 'data: refresh official schoolinfo and geometry matched elementary zones'
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 3
+          done
+          exit 1
