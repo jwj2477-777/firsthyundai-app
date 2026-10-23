@@ -33,7 +33,7 @@ run("maintenanceEstimates="+JSON.stringify({schema_version:1,state:'verified_par
  source_url:'https://apt.koreacharts.com/apt/A10020000/contents.html'}]}));
 const feePreview=run("renderPublicComplexInfo("+JSON.stringify({id:'f13',kapt_code:'A10020000',
  area_type_pairs:[{exclusive_m2:59.89,supply_m2:88.08,supply_label:'88A'}]})+")");
-assert(feePreview.includes('약 229,400원'),'Verified published K-apt unit must multiply correct exclusive area');
+assert(feePreview.includes('약 23만원'),'Estimated K-apt management fee should be rounded to 10,000 KRW');
 assert(feePreview.includes('2026년 7월')&&feePreview.includes('상담 참고액'),
  'Published month and non-invoice estimate label must be present');
 assert(!feePreview.includes('전체 공개 비용'),'Never re-introduce whole-complex partial line items');
