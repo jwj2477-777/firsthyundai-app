@@ -1408,6 +1408,7 @@ function renderPublicComplexInfo(p){
  return '<div class="apiInfoCards"><article><strong>평형별 월 관리비</strong>'+
   '<p class="tiny">평형을 선택하면 공식 관리비 공개 단가로 월 참고액을 계산합니다.</p>'+options+bill+
   (phone?'<a class="btn" href="tel:'+escapeHtml(phone)+'">관리사무소 문의 '+escapeHtml(p.management_phone||'')+'</a>':'')+
+  (rate===null?'<p class="tiny">'+sourceLink('https://www.k-apt.go.kr/','K-apt에서 단지명으로 관리비 조회')+'</p>':'')+
   '<p class="tiny">공개 단지 전체 관리비 합계의 전용㎡당 평균 단가를 해당 평형 전용면적에 적용합니다. 해당 평형 세대들의 실제 평균 고지서가 아니며 계절·사용량·부과면적 기준에 따라 달라집니다.</p></article></div>';
 }
 // Officetel is separate from apartment transactions, but has matching controls.
