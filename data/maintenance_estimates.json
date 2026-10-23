@@ -1,1 +1,22 @@
-{"schema_version":1,"state":"awaiting_verified_source","records":[],"note":"공식 총액·전용면적당 월별 단가 확인 전; 임의 관리비 표시 금지"}
+{
+  "schema_version": 1,
+  "state": "verified_partial",
+  "source": "공동주택관리정보시스템 K-apt 공개데이터 재게시 자료",
+  "updated_at": "2026-10-23T22:16:00+09:00",
+  "checked_codes": 1,
+  "success_count": 1,
+  "failed_codes": 0,
+  "records": [
+    {
+      "complex_id": "f15",
+      "kapt_code": "A10026679",
+      "month": "202607",
+      "won_per_exclusive_m2": 3831,
+      "monthly_total_won": 270762294,
+      "source_url": "https://apt.koreacharts.com/apt/A10026679/contents.html",
+      "method": "kapt_published_total_per_residential_exclusive_m2",
+      "basis": "2026년 7월 공개 합계(공용관리비 115,610,190원 + 개별사용료 145,310,174원 + 장기수선충당금 9,841,930원) / 주거전용면적 합계 70,685.27㎡; ㎡당 공개 반올림 단가 3,831원. 실제 세대 청구액과 다름."
+    }
+  ],
+  "note": "2026년 7월 K-apt 공개자료를 재게시한 단지별 합계 단가(3831원/㎡)를 개별 실사 검증. 다른 단지는 공식 금액 검증 전이므로 수치를 만들지 않음."
+}

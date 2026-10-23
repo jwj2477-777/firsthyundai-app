@@ -11,6 +11,16 @@ const gradle=read('app/build.gradle');
 new vm.Script(source);
 assert(html.includes('src="app-updates.js"'));
 assert(html.includes('id="appUpdateBanner"')&&html.includes('id="appUpdateCheck"'));
+assert(html.includes('class="foot compactAppFooter"'),'Compact update and installed version section should be present');
+const actualFooter=html.match(/<footer[^>]*>[\s\S]*?<\/footer>/)?.[0]||'';
+assert(actualFooter.includes('appFooterRow')&&actualFooter.includes('installedAppVersion')&&actualFooter.includes('appUpdateStatus'));
+assert(!actualFooter.includes('관심 14개 단지'),'Remove redundant repeated app description');
+assert(!html.includes('이전 수집에 없었고 새로 확인된 날짜'),'Remove unnecessary public trades intro paragraph');
+const estimates=JSON.parse(read('data/maintenance_estimates.json'));
+const f15Fee=estimates.records.find(x=>x.complex_id==='f15');
+assert(f15Fee&&f15Fee.kapt_code==='A10026679'&&f15Fee.month==='202607'&&f15Fee.won_per_exclusive_m2===3831,
+ 'Only real sourced F15 K-apt monthly fee rate should be loaded as an initial record');
+assert(f15Fee.monthly_total_won===270762294&&f15Fee.source_url==='https://apt.koreacharts.com/apt/A10026679/contents.html');
 assert(!html.includes('class="brandEdition"'),'Stale 2.0 badge removed');
 assert(html.includes('<h1>퍼스트현대</h1>'));
 assert(html.includes('brandSubtitle'));
@@ -30,7 +40,7 @@ assert(installSrc.includes('newBuild<=oldBuild')&&installSrc.includes('getSignin
 assert(java.includes('https://api.github.com/repos/jwj2477-777/firsthyundai-app/releases/latest')===false);
 assert(java.includes('releases/latest')&&java.includes('allowedDownload'));
 assert(java.includes('compareVersion(version,installed)<=0'),'Reject downgrade and same version');
-assert(gradle.includes("versionName '2.0.24'"));
+assert(gradle.includes("versionName '2.0.25'"));
 assert(gradle.includes('FHD_SIGNING_KEYSTORE'),'Release signing must use persistent private key');
 const objects={};
 function E(id){if(!objects[id])objects[id]={hidden:id==='appUpdateBanner',textContent:'',

@@ -232,21 +232,21 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.24 per-area average management fees and unified office deals APK
+      - name: Publish successful v2.0.25 clean news and footer, verified F15 monthly fees APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.24.apk
-          unzip -t FirstHyundai-v2.0.24.apk | grep 'No errors detected'
-          if gh release view v2.0.24 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.25.apk
+          unzip -t FirstHyundai-v2.0.25.apk | grep 'No errors detected'
+          if gh release view v2.0.25 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.24 FirstHyundai-v2.0.24.apk \
+            gh release create v2.0.25 FirstHyundai-v2.0.25.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.24 · 평형별 평균관리비·오피스텔 실거래 UI 통일' \
-              --notes '아파트 관리비 탭에서 검증된 K-apt 월별 총관리비/전용면적 단가로 실제 공급·전용 매칭 타입별 월 참고액을 표시합니다. 공식 월별 평균 단가와 기준월·원문 출처를 명시하며 세대 실제 고지액은 아님을 안내합니다. 자료 수집에 실패한 단지는 금액을 임의 생성하지 않습니다. 오피스텔 매매·전월세 화면은 아파트와 동일하게 전체 최신순/오피스텔 선택/전용면적 선택/거래유형/상세 조건 계약일·해제·이름·면적 검색·동일 거래카드 UI를 적용했습니다. 아파트와 오피스텔 자료는 합치지 않고, 카카오 및 학군·주소·계약문자, 고정서명 업데이트 기능을 유지했습니다.'
+              --title '퍼스트현대 v2.0.25 · 신규거래 설명 제거·하단 UI 간소화·관리비 자료 연결 보완' \
+              --notes '새소식·신규 공개 실거래의 길고 중복된 설명문을 제거했습니다. 화면 최하단 설치 버전과 업데이트 확인을 한 줄 중심의 간결한 레이아웃으로 정리하고 중복 앱 설명을 삭제했습니다. K-apt 공식 자료실 공개와 달리 기존 외부 미러 수집이 Github에서 차단되는 원인을 확인했고, 직접 검증된 퍼스트파크15블럭 2026년 7월 관리비 합계 단가 3831원/전용㎡를 평형별 참고액에 반영했습니다. 다른 단지는 근거 없는 금액을 만들지 않고 K-apt 공식 조회 링크를 제공합니다. 기존 신규 실거래 발견일 기능·오피스텔 분리·학군·계약·업데이트 서명을 보존합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.24 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.25 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"

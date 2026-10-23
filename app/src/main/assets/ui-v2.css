@@ -581,3 +581,24 @@ header #roleButton:focus-visible{outline:2px solid #FBE9BB;outline-offset:3px}
 #officetel .officeUnifiedDeal{margin:10px 0;padding:15px 15px 12px}
 #officetel .officeUnifiedDeal .money{overflow-wrap:anywhere}
 #officetel .officeSourceNote{margin-top:16px}
+
+/* v2.0.25: unobtrusive, useful app-version footer, no duplicate marketing copy. */
+.compactAppFooter{margin:24px 0 10px;padding:14px 12px;border-top:1px solid #d8e1e7;
+ background:transparent;text-align:left;color:#526a76;display:flex;flex-direction:column;gap:4px}
+.compactAppFooter .appFooterRow{display:flex;align-items:center;justify-content:space-between;
+ gap:12px;min-width:0}
+.compactAppFooter .appFooterVersion{display:flex;flex-direction:column;gap:3px;min-width:0}
+.compactAppFooter .appFooterVersion small{font-size:12px;color:#667c85;font-weight:700}
+.compactAppFooter .appFooterVersion strong{font-size:14px;line-height:1.4;
+ color:#385563;overflow-wrap:anywhere;font-weight:750}
+.compactAppFooter #appUpdateCheck{flex-shrink:0;padding:9px 12px;min-height:44px;
+ border-radius:11px;font-size:13px;font-weight:750}
+.compactAppFooter .appUpdateActions{margin:0;padding:0;min-height:0;
+ display:block!important;font-size:12px;line-height:1.5}
+.compactAppFooter #appUpdateStatus:empty{display:none}
+.compactAppFooter #appUpdateStatus{display:block;color:#547079}
+@media(max-width:365px){
+ .compactAppFooter .appFooterRow{gap:7px}
+ .compactAppFooter #appUpdateCheck{padding:8px 9px;font-size:12px}
+ .compactAppFooter .appFooterVersion strong{font-size:12px}
+}
