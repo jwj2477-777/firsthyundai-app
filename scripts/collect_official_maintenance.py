@@ -145,7 +145,9 @@ def available_months(now=None):
  today = now or datetime.now(ZoneInfo('Asia/Seoul'))
  # K-apt publications often lag by roughly two months.
  y = today.year * 12 + today.month - 1
- return [f'{(y-i)//12:04d}{(y-i)%12+1:02d}' for i in (2, 3)]
+ # One published month per run bounds the public-key call budget: ~27 APIs
+ # per complex, well below the standard 5,000-call daily developer quota.
+ return [f'{(y-2)//12:04d}{(y-2)%12+1:02d}']
 
 def collect(catalog, prior, key, *, get_groups=fetch_groups, get_basic=fetch_basic, months=None, pause=0):
  prior_records = {x['complex_id']: x for x in prior.get('records', [])
