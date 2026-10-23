@@ -210,7 +210,7 @@ body.apartmentSheetActive{overflow:hidden}
 </div>
 <div id="nearby" class="page hidden">
  <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
- <div class="propertyTypeSwitch sectionSubnav" role="group" aria-label="실거래 부동산 종류 선택">
+ <div class="propertyTypeSwitch sectionSubnav sectionModeSwitch" data-tone="teal" role="group" aria-label="실거래 부동산 종류 선택">
   <button type="button" class="selected" aria-pressed="true" onclick="openTradeLatest()">아파트</button>
   <button type="button" class="" aria-pressed="false" onclick="switchPage('officetel')">오피스텔</button>
  </div>
@@ -336,7 +336,7 @@ body.apartmentSheetActive{overflow:hidden}
 </div></form></dialog>
 <div id="new" class="page hidden">
  <div class="sectionTitle"><div><h2>새소식 · 신규 공개 실거래</h2><p class="tiny" id="newMeta">송도동 아파트 매매·전세·월세 · 일자별 공개 확인</p></div><button class="btn alt refreshAction" type="button" data-refresh="new_trades" onclick="refreshOne('new_trades',true)">갱신</button></div>
- <div class="propertyTypeSwitch sectionSubnav" role="group" aria-label="실거래 부동산 종류 선택">
+ <div class="propertyTypeSwitch sectionSubnav sectionModeSwitch" data-tone="teal" role="group" aria-label="실거래 부동산 종류 선택">
   <button type="button" class="selected" aria-pressed="true" onclick="openTradeLatest()">아파트</button>
   <button type="button" class="" aria-pressed="false" onclick="switchPage('officetel')">오피스텔</button>
  </div>
@@ -370,7 +370,7 @@ body.apartmentSheetActive{overflow:hidden}
 </div>
 <div id="trades" class="page hidden">
  <div class="sectionTitle"><div><h2>송도동 아파트 실거래가</h2><p class="tiny" id="tradesMeta">국토교통부 공개 API 연동 대기</p></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
- <div class="propertyTypeSwitch sectionSubnav" role="group" aria-label="실거래 부동산 종류 선택">
+ <div class="propertyTypeSwitch sectionSubnav sectionModeSwitch" data-tone="teal" role="group" aria-label="실거래 부동산 종류 선택">
   <button type="button" class="selected" aria-pressed="true" onclick="openTradeLatest()">아파트</button>
   <button type="button" class="" aria-pressed="false" onclick="switchPage('officetel')">오피스텔</button>
  </div>
@@ -422,7 +422,7 @@ body.apartmentSheetActive{overflow:hidden}
 <div id="officetel" class="page hidden">
  <div class="sectionTitle"><div><h2>송도동 오피스텔 실거래가</h2><p class="tiny">아파트와 동일한 검색 방식 · 오피스텔 자료만 별도 조회</p></div>
    <button type="button" class="btn alt refreshAction" onclick="refreshPublicServices(true)">갱신</button></div>
- <div class="propertyTypeSwitch sectionSubnav" role="group" aria-label="실거래 부동산 종류 선택">
+ <div class="propertyTypeSwitch sectionSubnav sectionModeSwitch" data-tone="teal" role="group" aria-label="실거래 부동산 종류 선택">
   <button type="button" class="" aria-pressed="false" onclick="openTradeLatest()">아파트</button>
   <button type="button" class="selected" aria-pressed="true" onclick="switchPage('officetel')">오피스텔</button>
  </div>
@@ -482,7 +482,7 @@ body.apartmentSheetActive{overflow:hidden}
   <button id="newsRefreshArticles" class="btn alt refreshAction" type="button" data-refresh="news" onclick="refreshOne('news',true)">갱신</button>
   <button id="newsRefreshSubscriptions" class="btn alt refreshAction hidden" type="button" onclick="refreshPublicServices(true)">갱신</button>
  </div>
- <div class="controls newsCategoryTabs" role="tablist" aria-label="뉴스와 청약 화면 전환">
+ <div class="controls newsCategoryTabs sectionModeSwitch" data-tone="purple" role="tablist" aria-label="뉴스와 청약 화면 전환">
    <button id="newsTabArticles" type="button" class="btn" role="tab" aria-selected="true" aria-controls="newsArticlesPane" onclick="switchNewsPane('articles')">뉴스 브리핑</button>
    <button id="newsTabSubscriptions" type="button" class="btn alt" role="tab" aria-selected="false" aria-controls="newsSubscriptionsPane" onclick="switchNewsPane('subscriptions')">인천 청약·분양</button>
  </div>
