@@ -39,7 +39,7 @@ assert(installSrc.includes('verifyPackage(context,temp)')&&installSrc.includes('
 assert(installSrc.includes('newBuild<=oldBuild')&&installSrc.includes('getSigningCertificateHistory'));
 assert(java.includes('https://api.github.com/repos/jwj2477-777/firsthyundai-app/releases/latest')===false);
 assert(java.includes('releases/latest')&&java.includes('allowedDownload'));
-assert(java.includes('compareVersion(version,installed)<=0'),'Reject downgrade and same version');
+assert(java.includes('comparison>0')&&java.includes('comparison==0?"latest":"stale"'),'Offer only higher versions; distinguish stale feed from same installed version');
 assert(/versionName '[0-9]+\.[0-9]+\.[0-9]+'/.test(gradle),'App release must declare a semantic version');
 assert(gradle.includes('FHD_SIGNING_KEYSTORE'),'Release signing must use persistent private key');
 const objects={};

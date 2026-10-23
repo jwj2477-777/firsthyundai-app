@@ -2,11 +2,15 @@ plugins { id 'com.android.application' }
 android {
  namespace 'kr.co.firsthyundai.app'
  compileSdk 35
- defaultConfig { applicationId 'kr.co.firsthyundai.app'; minSdk 26; targetSdk 35; versionCode 89; versionName '2.0.38' }
+ defaultConfig { applicationId 'kr.co.firsthyundai.app'; minSdk 26; targetSdk 35; versionCode 90; versionName '2.0.39' }
  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }
 
-dependencies { implementation 'androidx.core:core:1.13.1' }
+dependencies {
+ implementation 'androidx.core:core:1.13.1'
+ testImplementation 'junit:junit:4.13.2'
+ testImplementation 'org.json:json:20240303'
+}
 
 /* Release signing requires a stable private key supplied through encrypted CI secrets. */
 def fhdStore=System.getenv('FHD_SIGNING_KEYSTORE')

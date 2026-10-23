@@ -192,6 +192,8 @@ jobs:
         run: python3 scripts/generate_launcher_icon.py
       - name: Assert launcher safe zone and branded text not cropped
         run: python3 scripts/test_launcher_safezone.py
+      - name: Test native update parser and stale-feed selection
+        run: gradle --no-daemon testDebugUnitTest
       - name: Prepare immutable release signing key (release builds only)
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
@@ -253,22 +255,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.38 aligned transaction facts and renewal details APK
+      - name: Publish v2.0.39 fresh verified update checks APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.38.apk
-          unzip -t FirstHyundai-v2.0.38.apk | grep 'No errors detected'
-          if gh release view v2.0.38 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.39.apk
+          unzip -t FirstHyundai-v2.0.39.apk | grep 'No errors detected'
+          if gh release view v2.0.39 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.38 FirstHyundai-v2.0.38.apk \
+            gh release create v2.0.39 FirstHyundai-v2.0.39.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.38 · 실거래 정보·갱신계약 배치 정리' \
-              --notes '실거래 카드의 계약일·층과 전용면적·평형을 두 줄의 일정한 위치에 배치했습니다. 갱신요구권·계약기간·종전 보증금·종전 월세는 항목별 한 줄로 정렬해 금액이 중간에서 꺾이지 않도록 했습니다. 월세의 보증금과 월세 금액은 각각 묶어서 표시하며 오피스텔의 불필요한 거래 상세정보 보기 및 지번 숫자·중복 거래방식 표시는 제거했습니다. 거래유형 색상·신규/갱신·해제·중개거래 표시와 공적 원본 데이터는 유지합니다. 전체 실거래·관심단지·새 거래·오피스텔에 공통 적용합니다.'
+              --title '퍼스트현대 v2.0.39 · 업데이트 최신 버전 확인 개선' \
+              --notes '새 버전이 게시돼 있어도 오래된 응답으로 최신 버전이라고 표시할 수 있는 업데이트 확인 방식을 개선했습니다. 매 확인마다 새로운 요청 주소로 GitHub Release와 공개 업데이트 안내를 모두 확인하고 검증된 가장 높은 버전을 선택합니다. 설치본보다 낮은 서버 버전은 최신으로 처리하지 않으며, 확인 중 중복 요청을 막고 확인된 버전 번호를 표시합니다. APK의 동일 패키지·고정 서명·더 높은 빌드 검증은 유지합니다. v2.0.38의 실거래 카드 정리도 포함돼 있습니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.38 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.38 --apk FirstHyundai-v2.0.38.apk
+          gh release upload v2.0.39 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.39 --apk FirstHyundai-v2.0.39.apk

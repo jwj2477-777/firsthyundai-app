@@ -37,6 +37,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainActivity extends Activity {
     private static final int SAVE_BACKUP = 1021;
@@ -46,6 +47,7 @@ public class MainActivity extends Activity {
     private static final int LIMIT = 8 * 1024 * 1024;
     private volatile String verifiedUpdateUrl = "";
     private volatile boolean updateDownloading = false;
+    private final AtomicBoolean updateChecking = new AtomicBoolean(false);
     private WebView web;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private String pendingBackup = "";
@@ -306,11 +308,15 @@ public class MainActivity extends Activity {
             return AppVersion.buildNumber(MainActivity.this);
         }
         @JavascriptInterface public void checkForAppUpdate() {
+            if(updateDownloading||!updateChecking.compareAndSet(false,true))return;
+            verifiedUpdateUrl="";
             io.execute(()->{
+                try{
                 JSONObject check=AppUpdate.check(MainActivity.this);
                 verifiedUpdateUrl=check.optBoolean("available",false)
                     ?check.optString("downloadUrl",""):"";
                 deliver("onFirstHyundaiAppUpdate",check);
+                }finally{updateChecking.set(false);}
             });
         }
         @JavascriptInterface public void downloadAndInstallVerifiedAppUpdate() {

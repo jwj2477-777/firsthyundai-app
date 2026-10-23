@@ -14,8 +14,9 @@ assert(java.includes('raw.githubusercontent.com/'));
 assert(java.includes('/main/data/app_latest.json'));
 assert(java.includes('readRelease(fetch(FALLBACK,16000),installed)'),
  'Both feeds must use the same strict verified release parser');
-assert(java.includes('if("available".equals(primary.optString("state")))return primary;'));
-assert(java.includes('if(!"error".equals(secondary.optString("state")))return secondary;'));
+assert(java.includes('return selectRelease(primary,secondary);'),'Always compare both verified feeds');
+assert(java.includes('new URL(freshUrl(address))')&&java.includes('UUID.randomUUID()'),'Every check bypasses previously cached request URLs');
+assert(java.includes('comparison==0?"latest":"stale"'),'Older feed must not claim latest');
 assert(java.includes('allowedDownload(expectedUrl)'),'Do not trust arbitrary release URLs');
 assert(java.includes('asset.optLong("size",0)>100000L'),'Check published APK exists');
 assert(installer.includes('Arrays.equals(a,b)')&&installer.includes('newBuild<=oldBuild'),
@@ -38,6 +39,8 @@ const window={FirstHyundaiNative:{checkForAppUpdate(){checked++},
  downloadAndInstallVerifiedAppUpdate(){downloaded++}}};
 vm.runInNewContext(script,{window,document:{getElementById:node}});
 assert.equal(checked,1);
+node('appUpdateCheck').attrs.click();assert.equal(checked,1,'Duplicate checks are ignored while pending');
+assert(node('appUpdateCheck').disabled);
 window.onFirstHyundaiAppUpdate({available:false,state:'unavailable'});
 assert(node('appUpdateManual').classList.contains('hidden')===false,
  'Show official release link if both sources fail');
@@ -53,4 +56,11 @@ assert.equal(downloaded,1);
 window.onFirstHyundaiAppUpdate({available:false,state:'latest'});
 assert(node('appUpdateManual').classList.contains('hidden'));
 assert(node('appUpdateStatus').textContent.includes('최신 버전'));
+window.onFirstHyundaiAppUpdate({available:false,state:'stale'});
+assert(!node('appUpdateStatus').textContent.includes('최신 버전'));
+assert(!node('appUpdateManual').classList.contains('hidden'));
+window.onFirstHyundaiAppUpdate({available:false,state:'latest',newVersion:'2.0.39'});
+assert(node('appUpdateStatus').textContent.includes('v2.0.39'));
+node('appUpdateCheck').attrs.click();
+assert(node('appUpdateBanner').hidden&&node('appUpdateCheck').disabled);
 console.log('Two independent verified update feeds, signature guard and direct-link recovery validated.');

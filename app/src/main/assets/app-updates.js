@@ -7,17 +7,21 @@
  const check=$('appUpdateCheck'),install=$('appUpdateInstall'),dismiss=$('appUpdateDismiss');
  const status=$('appUpdateStatus'),manual=$('appUpdateManual');
  if(!banner||!check||!install||!status)return;
- let ready=false,working=false;
+ let ready=false,working=false,checking=false;
  function request(){
-  if(working)return;
+  if(working||checking)return;
   ready=false;
+  banner.hidden=true;
   manual?.classList?.add?.('hidden');
   if(!native?.checkForAppUpdate){status.textContent='안드로이드 앱에서 확인할 수 있습니다.';return;}
+  checking=true;check.disabled=true;install.disabled=true;
   status.textContent='새 버전 확인 중…';
   try{native.checkForAppUpdate();}
-  catch(e){status.textContent='버전 확인에 실패했습니다.';}
+  catch(e){checking=false;check.disabled=false;install.disabled=false;
+   manual?.classList?.toggle?.('hidden',false);status.textContent='버전 확인에 실패했습니다. 공식 다운로드 페이지를 확인해 주세요.';}
  }
  function result(data){
+  checking=false;
   const version=String(data?.newVersion||'');
   const available=data?.available===true&&data?.state==='available'&&
     /^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(version);
@@ -26,7 +30,8 @@
   if(available){
    text.textContent='새 버전 v'+version+'이 나왔습니다.';
    status.textContent='새 버전 v'+version+' 이용 가능';
-  }else if(data?.state==='latest')status.textContent='현재 최신 버전입니다.';
+  }else if(data?.state==='latest')status.textContent='확인된 최신 버전'+(/^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(version)?' v'+version:'')+'입니다.';
+  else if(data?.state==='stale')status.textContent='서버의 버전 정보가 오래되어 다시 확인이 필요합니다. 공식 다운로드 페이지를 확인해 주세요.';
   else status.textContent='자동 업데이트 확인에 실패했습니다. 아래 공식 다운로드 페이지에서 새 버전을 확인할 수 있습니다.';
   install.disabled=false;check.disabled=false;working=false;
  }
