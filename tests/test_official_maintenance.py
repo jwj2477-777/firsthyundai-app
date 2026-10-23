@@ -19,7 +19,6 @@ class OfficialFees(unittest.TestCase):
   self.assertIsNone(mod.extract_amount([{'kaptCode':'A10026679','searchDate':'202608','guardCost':'30'}], 'A10026679', '202607'))
   self.assertIsNone(mod.extract_amount([{'kaptCode':'A10026679','guardCost':'35.5'}], 'A10026679', '202607'))
   self.assertIsNone(mod.extract_amount([{'kaptCode':'A10026679','unknownNumeric':'30','guardCost':'35'}], 'A10026679', '202607'))
-  self.assertIsNone(mod.extract_amount([{'kaptCode':'A10026679','guardCost':'0'}], 'A10026679', '202607') if False else None)
  def test_extract_only_verified_cost_fields(self):
   row={'kaptCode':'A10026679','kaptName':'15BL','searchDate':'202607',
        'guardCost':'1,500,000','cleanCost':'250000', 'privArea':'70685.27'}
