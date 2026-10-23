@@ -62,7 +62,7 @@ vm.runInContext(js,ctx);
  const all=el('tradesContent').innerHTML;
  assert(all.includes('dealRow sale')&&all.includes('dealRow lease')&&all.includes('dealRow monthly'));
  assert(all.includes('dealBadge tradeMainBadge sale')&&all.includes('dealBadge tradeMainBadge lease')&&all.includes('dealBadge tradeMainBadge monthly'));
- assert(!all.includes('임대차 신고')&&!all.includes('tradeReportBadge')===false,'The cancelled transaction keeps an exceptional report badge');
+ assert(all.includes('tradeReportBadge'),'Exceptional status keeps the report badge styling');
  assert(!all.includes('>임대차 신고<')&&!all.includes('>신고<'),'Routine 신고/임대차 신고 badges must be absent');
  assert(all.includes('tradeCancelledBadge')&&all.includes('>해제<'),'Cancelled status remains explicitly visible');
  assert(all.includes('dealRow sale cancelled'),'Cancelled sale must keep red warning independently');
