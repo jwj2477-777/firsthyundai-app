@@ -1228,6 +1228,16 @@ function renderComplexes(){
    (safeLink(p.detail_source_url)?'<a href="'+escapeHtml(safeLink(p.detail_source_url))+'">K-apt 기반 기본정보 ↗</a>':'')+'</div>'+
    '<p class="tiny">원본 사이트로 연결됩니다. 해당 동·블럭을 확인해 주세요. 평면도는 권한이 확인된 자료만 직접 등록합니다.</p>';
   const schools=Array.isArray(p.schools)?p.schools.filter(x=>x&&typeof x.name==='string'&&x.name.length<=80&&['assigned','nearby'].includes(x.classification)&&typeof x.level==='string'): [];
+  const district=schoolDistrictData?.elementary_zones;
+  const match=district?.state==='verified_partial' && Array.isArray(district.records)?
+    district.records.find(x=>x.complex_id===p.id && x.kind==='elementary_zone_reference'):null;
+  const zoneCard=match?
+    '<div class="complexSchoolRow schoolZoneReference"><span>초등학교 · 공식 통학구역 참고</span>'+
+    '<strong>'+escapeHtml(match.zone_name.replace(/통학구역$/,''))+'</strong>'+
+    '<span class="tiny">공식 학구도 '+escapeHtml(match.reference_date||'')+
+    ' 기준 · 단지 도로명주소 좌표와 경계를 대조한 결과입니다. 실제 입학 배정은 교육지원청에 확인해 주세요.</span>'+
+    sourceLink('https://schoolzone.emac.kr/','공식 학구도 원문 확인')+'</div>':
+    '<div class="apiNotice">이 단지의 공식 초등학교 통학구역은 아직 주소 좌표·경계 검증 전입니다. 통학구역은 근처 학교와 다를 수 있습니다.</div>';
   const schoolView=schools.length?'<div class="complexSchoolList">'+schools.slice(0,25).map(x=>
     '<div class="complexSchoolRow"><span>'+escapeHtml(x.level)+' · '+(x.classification==='assigned'?'배정학교 확인':'인근 참고학교 (배정 미확인)')+'</span>'+
     '<strong>'+escapeHtml(x.name)+'</strong>'+
@@ -1236,7 +1246,7 @@ function renderComplexes(){
   const tabs=[['basic','기본정보'],['types','평형·타입'],['schools','학교·학군'],['deals','실거래'],['public','건축·관리비'],['nearby','주변시설'],['sources','평면도·원문']]
    .map(([id,label])=>'<button type="button" class="'+(id===complexDetailTab?'active':'')+
     '" onclick="setComplexDetailTab(\''+id+'\')" aria-pressed="'+(id===complexDetailTab?'true':'false')+'">'+label+'</button>').join('');
-  const tabBody=complexDetailTab==='types'?areaView:complexDetailTab==='schools'?schoolView+renderSchoolPublicInfo():complexDetailTab==='deals'?deals:complexDetailTab==='public'?renderPublicComplexInfo(p):complexDetailTab==='nearby'?renderNearbyComplexInfo(p):complexDetailTab==='sources'?doc:basic;
+  const tabBody=complexDetailTab==='types'?areaView:complexDetailTab==='schools'?zoneCard+schoolView+renderSchoolPublicInfo():complexDetailTab==='deals'?deals:complexDetailTab==='public'?renderPublicComplexInfo(p):complexDetailTab==='nearby'?renderNearbyComplexInfo(p):complexDetailTab==='sources'?doc:basic;
   $('complexDetails').innerHTML='<h3 class="complexDetailTitle">'+escapeHtml(p.label)+'</h3>'+
    (p.address?'<p class="complexDetailAddress">⌖ '+escapeHtml(p.address)+'</p>':'')+
    '<button class="btn alt contractComplexShortcut" type="button" onclick="FirstHyundaiContracts.fromSelectedComplex()">✎ 이 단지로 계약문자 작성 →</button>'+ 
@@ -1246,7 +1256,7 @@ function renderComplexes(){
  if(role==='admin'&&window.firstHyundaiDraftCount)$('catalogDraftNotice').textContent='이 기기의 미게시 수정: '+number(window.firstHyundaiDraftCount())+'개 단지';
 }
 // Source-backed optional integrations. Never treat an unapproved service as 0 records.
-let publicServices=null;
+let publicServices=null,schoolDistrictData=null;
 const PUBLIC_SRC={
  school:'https://open.neis.go.kr/portal/data/service/selectServicePage.do?infId=OPEN17020190531110010104913&infSeq=2',
  schoolLocation:'https://www.data.go.kr/data/15021148/standard.do',
