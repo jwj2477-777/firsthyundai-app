@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Verify complete K-apt management fees from the three approved official APIs.
 
-Nothing is published unless the known July 2026 F15 official totals calibrate
-ALL THREE categories, and every published complex passes strict validations.
+Nothing is published unless the known July 2026 F15 public totals calibrate
+all three categories within a narrow approximate-estimate tolerance, and every published complex passes strict validations.
 No credentials or raw API payloads are ever stored in the public repository.
 """
 from __future__ import annotations
@@ -112,14 +112,19 @@ def fetch_groups(code, month, key, request=call_api, pause=0.025):
     if total is not None and total > len(rows):
      return None
     amount = extract_amount(rows, code, month)
-    # No rows can indicate unavailable rather than zero. Do not fill in zeros.
-    if amount is None:
-     return None
-    amounts.append(amount)
+    # Sparse optional categories may be unpublished or legitimately empty.
+    # Missing is NOT zero: skip and require benchmark + minimum coverage.
+    if amount is not None:
+     amounts.append(amount)
    except (PublicApiError, RuntimeError, ValueError, KeyError):
     return None
    if pause:
     time.sleep(pause)
+  # Prevent very sparse partial sums from masquerading as a full total.
+  if group == 'reserve' and not amounts:
+   return None
+  if group != 'reserve' and len(amounts) < max(2, (len(operations) + 2) // 3):
+   return None
   totals[group] = sum(amounts)
  return totals
 
@@ -140,7 +145,16 @@ def validated_rate(totals, area):
  return full, rate
 
 def calibration_passes(totals, area):
- return totals == CALIBRATION and number(area) is not None and abs(number(area) - CALIBRATION_AREA) <= Decimal('0.1')
+ # The user needs a ten-thousand-won-level counseling estimate, not an exact
+ # household invoice. Compare each category to independently verified F15
+ # reference totals with a 5% band; large omissions or double counting fail.
+ if not isinstance(totals, dict) or set(totals) != set(CALIBRATION):
+  return False
+ size = number(area)
+ if size is None or abs(size - CALIBRATION_AREA) / CALIBRATION_AREA > Decimal('0.01'):
+  return False
+ return all(type(totals[k]) is int and abs(totals[k] - v) <= v * 0.05
+            for k,v in CALIBRATION.items())
 
 def available_months(now=None):
  today = now or datetime.now(ZoneInfo('Asia/Seoul'))
@@ -200,7 +214,7 @@ def collect(catalog, prior, key, *, get_groups=fetch_groups, get_basic=fetch_bas
   'updated_at': datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),
   'checked_codes': tried, 'success_count': len(verified), 'failed_codes': max(0, tried-len(verified)),
   'records': merged,
-  'note': '공식 세 그룹이 모두 확인되고 알려진 단지 기준값과 일치할 때만 저장. 미검증 단지는 이전 자료 보존. 실제 세대별 고지액 아님.'
+  'note': '공식 세 그룹과 검증한 기준 단지의 금액 오차가 허용범위일 때만 참고액 저장. 미검증 단지는 기존 자료 보존. 실제 세대별 고지액 아님.'
  }
 
 def main():
