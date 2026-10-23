@@ -141,6 +141,16 @@ def diagnose():
           'road=',str('컨벤시아대로252번길 30' in html),
           'total=',str('합계' in html),
           'parsed=',str(bool(parsed)))
+    if n==1:
+     # Confirm the attachment metadata without printing cookies or credentials.
+     for pattern in (r'[^<>\\n]{0,100}20261016[^<>\\n]{0,150}',
+                     r'[^<>\\n]{0,100}xlsx[^<>\\n]{0,150}',
+                     r'[^<>\\n]{0,65}fileDownload[^<>\\n]{0,130}',
+                     r'[^<>\\n]{0,65}fileSn[^<>\\n]{0,130}',
+                     r'[^<>\\n]{0,65}downFile[^<>\\n]{0,130}'):
+      matches=re.findall(pattern,html,flags=re.I)
+      print('KAPT_ATTACHMENT_MARKERS',pattern[:25],len(matches),
+            [re.sub(r'(?i)(token|secret|password|key)=([^&\\s]+)',r'\\1=REDACTED',x)[:160] for x in matches[:4]])
   except HTTPError as e:print('KAPT_PROBE',n,'HTTP',e.code)
   except (URLError,TimeoutError,OSError) as e:print('KAPT_PROBE',n,'CONNECT_ERROR',type(e).__name__)
 if __name__=='__main__':
