@@ -1463,7 +1463,12 @@ function renderPublicSubscriptions(){
 }
 async function refreshPublicServices(manual=false){
  try{
-  const doc=await fetchRemote('public_services');
+  const [district,doc]=await Promise.all([
+    fetchRemote('school_districts').catch(()=>null),
+    fetchRemote('public_services')
+  ]);
+  if(district?.schema_version===1 && district.elementary_zones && district.schoolinfo)
+    schoolDistrictData=district;
   if(doc?.schema_version!==1||!doc.schools||!doc.office_rents)throw Error('자료 형식 오류');
   publicServices=doc;
   if(manual)showRefreshFeedback('공공정보 게시자료를 확인했습니다. 미승인 서비스는 연동 대기로 표시합니다.','success');
