@@ -23,8 +23,10 @@ TARGET=ROOT/'data'/'public_services.json'
 KST=timezone(timedelta(hours=9))
 NEIS='https://open.neis.go.kr/hub/schoolInfo'
 OFFICE='https://apis.data.go.kr/1613000/RTMSDataSvcOffiRent/getRTMSDataSvcOffiRent'
+OFFICE_SALE='https://apis.data.go.kr/1613000/RTMSDataSvcOffiTrade/getRTMSDataSvcOffiTrade'
 SCHOOL_SOURCE='https://open.neis.go.kr/portal/data/service/selectServicePage.do?infId=OPEN17020190531110010104913&infSeq=2'
 OFFICE_SOURCE='https://www.data.go.kr/data/15126475/openapi.do'
+OFFICE_SALE_SOURCE=OFFICE_SALE
 
 def fresh_date():
     return datetime.now(KST).strftime('%Y-%m-%dT%H:%M:%S%z')
@@ -187,6 +189,41 @@ def collect_offices(key,opener=None,months=6):
        months=months,records=allrows[:10000])
 
 
+# Officetel sale is independently approval-gated. Existing verified rental data is unaffected.
+def normalize_office_sales(rows,month):
+    result=[]
+    for r in rows:
+        if str(r.get('umdNm') or '').strip()!='송도동' or (r.get('sggNm') and r['sggNm'].strip()!='연수구'):continue
+        y=as_int(r.get('dealYear'));m=as_int(r.get('dealMonth'));d=as_int(r.get('dealDay'))
+        price=as_int(r.get('dealAmount'));name=str(r.get('offiNm') or '').strip()
+        try:date=datetime(y,m,d).strftime('%Y-%m-%d');area=round(float(r.get('excluUseAr','')),2)
+        except (ValueError,TypeError):continue
+        if not name or price is None or price<=0 or not 4<=area<=3000:continue
+        cancelled=str(r.get('cdealType') or '').strip().upper() in ('O','Y','해제')
+        result.append(dict(building=name,contract_date=date,area_m2=area,
+            floor=str(r.get('floor') or '').strip()[:12],lot_number=str(r.get('jibun') or '').strip()[:40],
+            type='매매',price_10k=price,status='해제' if cancelled else '신고',
+            cancellation_date=str(r.get('cdealDay') or '').strip()[:30],
+            dealing_type=str(r.get('dealingGbn') or '').strip()[:24],source_month=month))
+    return result
+
+def collect_office_sales(key,opener=None,months=6):
+    if not key:raise RuntimeError('GitHub secret DATA_GO_KR_SERVICE_KEY 미설정')
+    records=[]
+    for ym in months_back(months):
+        for page in range(1,9):
+            raw=retrieve(OFFICE_SALE,{'serviceKey':unquote(key.strip()),'LAWD_CD':'28185',
+                    'DEAL_YMD':ym,'pageNo':page,'numOfRows':1000},opener)
+            rows,total=office_items(raw)
+            records+=normalize_office_sales(rows,ym)
+            if page*1000>=total:break
+        else:raise RuntimeError('오피스텔 매매 페이지 수집 초과 · 부분 결과 비공개')
+    records.sort(key=lambda x:x['contract_date'],reverse=True)
+    return dict(state='verified',updated_at=fresh_date(),source_url=OFFICE_SALE_SOURCE,
+        note='연수구 송도동의 오피스텔 매매 신고정보. 아파트/전월세 자료와 별개, 호수 미제공.',
+        months=months,records=records[:10000])
+
+
 # 한국부동산원 청약홈 분양정보 OpenAPI. Uses the SAME approved data.go.kr key
 # as the trade collectors, but separate API approval is required.
 # Never publish the service key or unverified partial responses.
@@ -304,12 +341,13 @@ def collect_subscriptions(key,opener=None,today=None,days_back=420):
         note='한국부동산원 청약홈 공식 모집공고일 기준 인천광역시 전체 소재 공고. 접수일 미기재는 별도 확인 필요. 접수 마감 공고도 지난 공고 탭에서 조회 가능.',
         window_start=start,window_end=end,records=records)
 
-def update_snapshot(path,school=None,office=None,subscriptions=None,registry=None,maintenance=None,school_locations=None):
+def update_snapshot(path,school=None,office=None,subscriptions=None,registry=None,maintenance=None,school_locations=None,office_sales=None):
     current=json.loads(path.read_text(encoding='utf-8'))
     if current.get('schema_version')!=1:raise RuntimeError('Snapshot schema mismatch')
     if school is not None:current['schools']=school
     if school_locations is not None:current['school_locations']=school_locations
     if office is not None:current['office_rents']=office
+    if office_sales is not None:current['office_sales']=office_sales
     if subscriptions is not None:current['subscriptions']=subscriptions
     if registry is not None:current['building_registry']=registry
     if maintenance is not None:current['maintenance']=maintenance
@@ -320,11 +358,11 @@ def update_snapshot(path,school=None,office=None,subscriptions=None,registry=Non
 
 def main():
     a=argparse.ArgumentParser()
-    a.add_argument('--mode',choices=['schools','offices','subscriptions','buildings','maintenance','complexinfo','all'],default='all')
+    a.add_argument('--mode',choices=['schools','offices','office_sales','subscriptions','buildings','maintenance','complexinfo','all'],default='all')
     a.add_argument('--months',type=int,default=6)
     args=a.parse_args()
     if not 1<=args.months<=12:raise ValueError('months must be 1..12')
-    school=office=subscriptions=registry=maintenance=school_locations=None
+    school=office=office_sales=subscriptions=registry=maintenance=school_locations=None
     if args.mode in ('schools','all'):
         neis_key=os.environ.get('NEIS_EDU_KEY','')
         if neis_key:
@@ -347,6 +385,11 @@ def main():
         office=collect_offices(os.environ['DATA_GO_KR_SERVICE_KEY'],months=args.months)
         print('송도 오피스텔 전월세',len(office['records']),'건')
     elif args.mode in ('offices','all'):print('오피스텔 API 인증키 미설정: 기존 상태 유지')
+    if args.mode in ('office_sales','all') and os.environ.get('DATA_GO_KR_SERVICE_KEY'):
+        office_sales=collect_office_sales(os.environ['DATA_GO_KR_SERVICE_KEY'],months=args.months)
+        print('송도 오피스텔 매매',len(office_sales['records']),'건')
+    elif args.mode in ('office_sales','all'):
+        print('오피스텔 매매 API 인증키 미설정: 기존 자료 보존')
     if args.mode in ('subscriptions','all') and os.environ.get('DATA_GO_KR_SERVICE_KEY'):
         subscriptions=collect_subscriptions(os.environ['DATA_GO_KR_SERVICE_KEY'])
         print('청약홈 인천 분양공고',len(subscriptions['records']),'건')
@@ -370,10 +413,10 @@ def main():
                     print('K-apt 공용관리비 항목 확인 단지',len(maintenance['records']),'건; 대상',maintenance['scanned'])
                 except RuntimeError as e:print('공동주택 관리비 별도 수집 실패 · 기존 자료 유지: '+str(e)[:90])
         else:print('공공데이터 API 인증키 미설정: 기존 자료 유지')
-    if all(x is None for x in (school,office,subscriptions,registry,maintenance,school_locations)):
+    if all(x is None for x in (school,office,subscriptions,registry,maintenance,school_locations,office_sales)):
         print('실행 가능한 신규 서비스 없음: 파일 변경 안 함')
         return
-    update_snapshot(TARGET,school,office,subscriptions,registry,maintenance,school_locations)
+    update_snapshot(TARGET,school,office,subscriptions,registry,maintenance,school_locations,office_sales)
     print('기존 미승인 서비스·검증값 보존; 새 인증키는 출력하지 않음')
 
 if __name__=='__main__':
