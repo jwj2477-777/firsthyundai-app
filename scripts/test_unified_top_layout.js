@@ -9,7 +9,7 @@ assert(code);new vm.Script(code);
 const page=(id,end)=>html.slice(html.indexOf('<div id="'+id+'" class="page'),html.indexOf(end,html.indexOf('<div id="'+id+'" class="page')));
 for(const id of ['trades','nearby','new','officetel','complexes','news']){
  const section=page(id,id==='nearby'?'<div id="apiGuide"':id==='new'?'<div id="trades"':id==='trades'?'<div id="officetel"':id==='officetel'?'<div id="news"':id==='news'?'<div id="contracts"':'<dialog id="complexEditor"');
- const title=section.indexOf('class="sectionTitle"');
+ const title=section.indexOf('class="sectionTitle');
  const contentStart=section.indexOf('class="panel');
  assert(title>=0 && (contentStart<0||title<contentStart),'Same title-before-content hierarchy: '+id);
  assert(/<h2(?:\s[^>]*)?>/.test(section.slice(title,title+120)),'All page titles are h2: '+id);
