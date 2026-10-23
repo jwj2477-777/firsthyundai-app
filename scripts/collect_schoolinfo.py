@@ -116,7 +116,7 @@ def collect_kakao_coordinates(catalog,key,opener=None):
                         if not re.fullmatch(r'인천광역시 연수구 송도동 [0-9]{1,4}(?:-[0-9]{1,4})?',lot):lot=''
                         matches.append((x,y,lot))
                 # More than one distinct exact-address coordinate is ambiguous.
-                unique=set((round(x,6),round(y,6)) for x,y in matches)
+                unique=set((round(x,6),round(y,6)) for x,y,_ in matches)
                 if len(unique)==1:
                     xy=next(iter(unique))
                     lots={lot for x,y,lot in matches if lot}
