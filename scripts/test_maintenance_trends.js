@@ -21,7 +21,7 @@ assert(renderTrend(one,84.7).includes('3개월 이상'));
 assert(!renderTrend(one,84.7).includes('전월 대비'),'no missing-month change claims');
 const yearHistory=[
  row('202607',3831),row('202608',4100),row('202609',4400),
- row('202510',4100),row('202509',4200),row('202508',4300)];
+ row('202509',4400),row('202508',4300)];
 const full=snapshot({...row('202609',4400),monthly_history:yearHistory});
 const t=summarize(full,'f15','A10026679',84.7,now);
 assert(t&&t.count===3);
