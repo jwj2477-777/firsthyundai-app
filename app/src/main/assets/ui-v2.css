@@ -1405,3 +1405,276 @@ header #roleButton{border-radius:11px;box-shadow:none;min-height:40px;padding:8p
  #news .familyBriefCaution{border-left-width:5px;color:#392B5B}
  #news .newsCard,#complexes .complexSearchPanel{border-width:2px}
 }
+
+
+/* v2.0.43 · ALL-TABS REAL-DEVICE FINISH
+   Only visual hierarchy; preserve page order, transactions, information, tap targets,
+   contract workflow, apartment-detail categories, and refresh/alert actions. */
+:root{
+ --fhd-finish-stroke:#DCE8E4;
+ --fhd-finish-shadow:0 2px 10px #183D4310;
+ --fhd-finish-paper:#FFFEFC;
+}
+/* Apartment detail was still inheriting an old cream sheet. Use the same
+   neutral/mint information palette as the apartment directory. */
+#complexSheet.apartmentSheet.panel,
+#nearbyDetails.apartmentSheet.panel{
+ background:#F9FBF9;
+ color:#283F46;
+}
+#complexSheet .detailSheetTop,
+#nearbyDetails .detailSheetTop{
+ background:#F9FBF9;
+ border-bottom-color:#DCE8E4;
+}
+#complexSheet .detailBackButton,
+#nearbyDetails .detailBackButton{
+ background:#FFFFFF;
+ border-color:#D1E1DB;
+ color:#24525A;
+ box-shadow:0 1px 3px #1640470B;
+}
+#complexSheet .complexDetailTitle{
+ font-size:19px;
+ line-height:1.4;
+ letter-spacing:-.45px;
+ font-weight:820;
+ color:#29434A;
+}
+#complexSheet .complexDetailAddress{
+ background:#F0F7F4;
+ border:1px solid #D8E7E1;
+ border-radius:13px;
+ padding:11px 13px;
+ margin:0 0 12px;
+ color:#49636B;
+}
+#complexSheet .complexDetailAddress strong{color:#23685F;font-weight:800}
+#complexSheet .complexDetailAddress small{color:#63777C;line-height:1.55}
+#complexSheet .contractComplexShortcut{
+ background:#F7FBFA;
+ color:#265F63;
+ border-color:#D4E3DF;
+ box-shadow:0 1px 4px #193E420D;
+}
+#complexSheet .complexTabBar{gap:8px;margin-top:14px;margin-bottom:14px}
+#complexSheet .complexTabBar button{
+ border:1.5px solid #D2E1DE;
+ background:#FFFFFF;
+ border-radius:12px;
+ box-shadow:0 1px 4px #1A43480C;
+ color:#3B5961;
+ font-weight:760;
+}
+#complexSheet .complexTabBar button.active,
+#complexSheet .complexTabBar button[aria-selected="true"]{
+ border-color:#116B61;
+ background:#137167;
+ color:#FFFFFF;
+ box-shadow:0 2px 7px #1569611E;
+}
+#complexSheet .complexFacts{gap:9px;margin-top:14px;margin-bottom:13px}
+#complexSheet .complexFact{
+ background:var(--fhd-finish-paper);
+ border:1px solid #DFE8E4;
+ border-radius:14px;
+ padding:13px;
+ box-shadow:0 1px 5px #183D430A;
+}
+#complexSheet .complexFact small{
+ font-size:13px;
+ line-height:1.4;
+ color:#63737A;
+}
+#complexSheet .complexFact strong{
+ font-size:16px;
+ line-height:1.5;
+ font-weight:770;
+ color:#29434A;
+}
+#complexSheet .complexCallButton{
+ background:#E4F4E9;
+ color:#165D46;
+ border:1px solid #BCDCC6;
+ box-shadow:none;
+}
+#complexSheet .complexMeta,
+#complexSheet .complexSectionNote{
+ color:#62757A;
+ font-size:13px;
+ line-height:1.6;
+}
+#complexSheet .details{
+ background:#EFF7F5;
+ border-color:#DAE7E3;
+ box-shadow:none;
+}
+#complexSheet .details summary{
+ color:#315E64;
+ font-weight:730;
+}
+/* Contract wizard is already easy to understand, but nested thick outlines and
+   three heavy tiles compete with the single important memo box. */
+#contracts .contractHero{
+ padding:15px 16px;
+ background:linear-gradient(145deg,#FFF7ED,#FFFEFC);
+ border:1px solid #EAD9C8;
+ box-shadow:none;
+ margin-bottom:12px;
+}
+#contracts .contractHero h2{
+ margin-bottom:4px;
+ font-size:22px;
+ color:#86482E;
+ letter-spacing:-.45px;
+}
+#contracts .contractHero p{
+ font-size:14px;
+ line-height:1.55;
+ color:#705D50;
+}
+#contracts .contractSteps{gap:6px;margin:12px 0 0}
+#contracts .contractSteps li{
+ background:#FAF1E9;
+ border:1px solid #ECD8C7;
+ border-radius:10px;
+ font-size:12px;
+ font-weight:740;
+ line-height:1.35;
+ color:#815942;
+ padding:8px 3px;
+}
+#contracts .contractMemoCard{
+ border:2px solid #C89C80;
+ border-radius:18px;
+ padding:17px 15px;
+ box-shadow:var(--fhd-finish-shadow);
+}
+#contracts .contractMemoHeading{gap:10px;margin:0 0 13px}
+#contracts .contractMemoStep{
+ border:2px solid #A86D4F;
+ border-radius:13px;
+ background:#FFF0E3;
+ color:#8E4A2D;
+}
+#contracts .contractMemoTitle{
+ font-size:20px;
+ line-height:1.42;
+ letter-spacing:-.4px;
+ font-weight:820;
+ margin-bottom:4px;
+}
+#contracts .contractMemoHelp{
+ color:#6C5A4C;
+ font-size:14px;
+ line-height:1.5;
+}
+#contracts .contractMemoInputArea{
+ border:1px solid #E5CDB7;
+ background:#FFF8F1;
+ border-radius:14px;
+ padding:12px;
+}
+#contracts .contractMemoLabel{font-size:16px;gap:7px;margin-bottom:8px}
+#contracts .contractMemoStart{
+ border:1px solid #A86B49;
+ border-radius:7px;
+ font-size:11px;
+}
+#contracts .contractMemoCard #ct_rough{
+ border:2px solid #B88B67;
+ border-radius:13px;
+ background:#FFFDFC;
+ color:#283C43;
+ font-size:17px;
+ line-height:1.75;
+ box-shadow:inset 0 1px 2px #3E29190B;
+}
+#contracts .contractMemoCard #ct_rough:focus{
+ border-color:#116F68;
+ outline:3px solid #B5DDD2;
+}
+#contracts .contractMemoCard .contractEasyActions{gap:8px;margin-top:13px}
+#contracts .contractMemoCard .contractEasyActions .btn{
+ border-width:1.5px;
+ border-radius:12px;
+ min-height:56px;
+ font-size:16px;
+}
+#contracts .contractMemoCard .contractOneTap{
+ background:#155F66;
+ color:white;
+ border-color:#104C52;
+ box-shadow:0 2px 5px #155F6624;
+}
+#contracts .contractMemoCard .contractOneTap:active{box-shadow:0 1px 3px #155F6620}
+/* Overview metrics: same two-column rhythm, quieter edges and clearer numbers. */
+#overview .metric{
+ background:#F8FAFA;
+ border:1px solid #DFE8E7;
+ box-shadow:0 2px 8px #1739400A;
+}
+#overview .metric strong{color:#315B6D;font-weight:800;font-variant-numeric:tabular-nums}
+#overview .metric small{color:#5B6F78}
+#overview #overviewStatus{font-variant-numeric:tabular-nums;line-height:1.7}
+/* Official subscription listings: legible separation of project, dates and
+   destination link, without changing official fields or filtering. */
+#news #publicSubscriptions .subscriptionListingCard{
+ background:#FFFFFF;
+ border:1px solid #DFE6E5;
+ border-radius:15px;
+ padding:14px;
+ margin:10px 0;
+ box-shadow:0 2px 7px #1937400D;
+}
+#news #publicSubscriptions .subscriptionListingCard>strong{
+ display:block;
+ font-size:16px;
+ line-height:1.5;
+ font-weight:810;
+ letter-spacing:-.3px;
+ color:#283F49;
+ word-break:keep-all;
+}
+#news #publicSubscriptions .subscriptionListingCard .tiny{
+ font-size:13px;
+ line-height:1.6;
+ color:#5D7079;
+ margin:7px 0;
+ overflow-wrap:anywhere;
+}
+#news #publicSubscriptions .subscriptionListingCard .subscriptionDate{
+ color:#365F68;
+ font-weight:710;
+}
+#news #publicSubscriptions .subscriptionListingCard a{
+ display:inline-flex;
+ align-items:center;
+ color:#79532D;
+ font-size:13px;
+ font-weight:760;
+ min-height:42px;
+}
+/* On-demand screens preserve their identity; the card weight stays consistent. */
+#officetel .officeUnifiedDeal,#new .dealRow,#trades .dealRow,
+#nearby .dealRow{
+ border-radius:14px;
+ box-shadow:var(--fhd-finish-shadow);
+}
+#new .newSimpleCounts{box-shadow:none;border-color:#DDE9E6}
+#nearby #nearbyCards .favoriteSummaryCard{
+ box-shadow:0 1px 5px #1939400D;
+}
+@media(max-width:380px){
+ #complexSheet .complexFact{padding:12px 10px}
+ #contracts .contractHero{padding:13px}
+ #contracts .contractMemoCard{padding:14px 12px}
+ #contracts .contractMemoTitle{font-size:19px}
+ #contracts .contractMemoCard .contractEasyActions .btn{font-size:15px}
+}
+@media(prefers-contrast:more){
+ #complexSheet .complexFact,
+ #news #publicSubscriptions .subscriptionListingCard{border:2px solid #7B9993}
+ #contracts .contractMemoCard{border-color:#8E482B}
+ #contracts .contractMemoCard #ct_rough{border-color:#7B4B2F}
+}

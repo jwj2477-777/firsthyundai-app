@@ -10,7 +10,9 @@ const js=html.split('<script>')[1]?.split('</script>')[0];
 assert(js);new vm.Script(js);
 const marker='/* v2.0.42 · SCREENSHOT-DRIVEN CONSISTENCY';
 assert(css.includes(marker));
-const layer=css.slice(css.lastIndexOf(marker));
+const begin=css.lastIndexOf(marker);
+const next=css.indexOf('/* v2.0.43 · ALL-TABS REAL-DEVICE FINISH',begin+marker.length);
+const layer=css.slice(begin,next>=0?next:undefined);
 for(const needle of [
  '#trades.page>.sectionTitle:first-child h2',
  '#complexes.page>.sectionTitle:first-child h2',
