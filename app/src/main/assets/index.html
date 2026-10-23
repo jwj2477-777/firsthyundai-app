@@ -753,7 +753,9 @@ function renderMainNavigation(id){
   '" type="button" aria-current="'+(id==='overview'?'page':'false')+'" onclick="switchPage(\'overview\')">▦ 오늘 요약</button>'+
   '<button class="'+(id==='contracts'?'active':'')+'" type="button" aria-current="'+(id==='contracts'?'page':'false')+'" onclick="switchPage(\'contracts\')">✎ 계약문자 만들기</button>'+
   admin+'</div>';
- $('nav').innerHTML=primary+propertySwitch+secondary+tools;
+ // Today Summary and Contract sit immediately below the three main tabs on every screen.
+ // Trade-only apartment/officetel and detail filters follow them.
+ $('nav').innerHTML=primary+tools+propertySwitch+secondary;
 }
 // A detail sheet is its own full-screen view; the scrollable list stays intact.
 let activeApartmentSheet=null, apartmentReturnFocus=null;
