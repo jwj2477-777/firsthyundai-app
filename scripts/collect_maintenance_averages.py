@@ -122,4 +122,27 @@ def main():
   print('평균 관리비 최신 자료 변동 없음',len(out['records']));return
  DEST.write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
  print('공식 K-apt 자료 재게시 단가 검증',out['success_count'],'/',out['checked_codes'],'누적',len(out['records']))
-if __name__=='__main__':main()
+def diagnose():
+ # Small public-only probe. No authentication or personal data ever logged.
+ from urllib.error import HTTPError, URLError
+ urls=[
+  BASE+'A10026679/contents.html',
+  'https://www.k-apt.go.kr/web/board/webReference/boardView.do?boardSecret=0&boardType=03&pageNo=1&reb=eU1hjW8QKC5j4V3KMvyFEw%3D%3D&scodeT=03&seq=21',
+ ]
+ for n,url in enumerate(urls):
+  try:
+   req=Request(url,headers={'User-Agent':'Mozilla/5.0 (Linux; Android 15; Mobile) AppleWebKit/537.36 Chrome/125.0 Safari/537.36','Accept':'text/html','Accept-Language':'ko-KR,ko;q=0.9'})
+   with urlopen(req,timeout=12) as response:
+    raw=response.read(500001)
+    html=raw.decode('utf-8','replace')
+    status=response.status
+    parsed=parse(html,'A10026679','인천광역시 연수구 컨벤시아대로252번길 30') if n==0 else None
+    print('KAPT_PROBE',n,'HTTP',status,'bytes',len(raw),
+          'road=',str('컨벤시아대로252번길 30' in html),
+          'total=',str('합계' in html),
+          'parsed=',str(bool(parsed)))
+  except HTTPError as e:print('KAPT_PROBE',n,'HTTP',e.code)
+  except (URLError,TimeoutError,OSError) as e:print('KAPT_PROBE',n,'CONNECT_ERROR',type(e).__name__)
+if __name__=='__main__':
+ if '--diagnose' in sys.argv:diagnose()
+ else:main()
