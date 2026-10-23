@@ -15,7 +15,7 @@ for(const id of ['trades','nearby','new','officetel','complexes','news']){
  assert(/<h2(?:\s[^>]*)?>/.test(section.slice(title,title+120)),'All page titles are h2: '+id);
  assert(section.includes('refreshAction'),'Refresh stays available in header: '+id);
  if(['trades','nearby','new','officetel'].includes(id)){
-  const toggle=section.indexOf('class="propertyTypeSwitch sectionSubnav"');
+  const toggle=section.indexOf('class="propertyTypeSwitch sectionSubnav sectionModeSwitch"');
   assert(toggle>title && (contentStart<0||toggle<contentStart),'Property switch after title, before contents: '+id);
   assert(section.includes('onclick="openTradeLatest()"')&&section.includes('onclick="switchPage(\'officetel\')"'),'Retain apartment and office mode: '+id);
  }
@@ -25,7 +25,7 @@ assert(nav.includes("$('nav').innerHTML=primary+tools;"),'Top three categories a
 assert(!nav.includes('primary+tools+propertySwitch'),'No condition-specific nav above page title');
 const news=page('news','<div id="contracts"');
 const head=news.indexOf('class="sectionTitle newsUnifiedHeading"');
-const tabs=news.indexOf('class="controls newsCategoryTabs"');
+const tabs=news.indexOf('class="controls newsCategoryTabs sectionModeSwitch"');
 assert(head>=0&&tabs>head,'News heading above tabs, consistent with other pages');
 assert.equal((news.match(/id="newsMeta"/g)||[]).length,1);
 assert.equal((news.match(/id="newsFamilyMeta"/g)||[]).length,1);
