@@ -66,27 +66,56 @@ public final class AppUpdate {
         }
         return result;
     }
-    public static JSONObject check(Context ctx){
+    private static final String FALLBACK="https://raw.githubusercontent.com/"
+        +OWNER+"/main/data/app_latest.json";
+
+    /** The fallback uses the same strict tag, APK filename, URL and size validation.
+     * A public JSON file is only a release *locator*: actual downloaded APKs still
+     * require package name, higher build number and installed signing certificate.
+     */
+    private static String fetch(String address,int limit) throws Exception {
         HttpURLConnection c=null;
         try{
-            c=(HttpURLConnection)new URL(API).openConnection();
+            c=(HttpURLConnection)new URL(address).openConnection();
             c.setRequestProperty("Accept","application/vnd.github+json");
-            c.setRequestProperty("User-Agent","FirstHyundaiAndroidUpdate/1.0");
+            c.setRequestProperty("User-Agent","FirstHyundaiAndroidUpdate/2.0");
+            c.setRequestProperty("Cache-Control","no-cache");
             c.setConnectTimeout(8000);c.setReadTimeout(9000);c.setUseCaches(false);
-            if(c.getResponseCode()!=200)throw new IllegalStateException("Release service unavailable");
+            if(c.getResponseCode()!=200)
+                throw new IllegalStateException("Unable to reach update origin");
             ByteArrayOutputStream out=new ByteArrayOutputStream();
             try(InputStream in=c.getInputStream()){
                 byte[] buffer=new byte[4096];int n;
                 while((n=in.read(buffer))!=-1){
-                    if(out.size()+n>200000)throw new IllegalArgumentException("Oversized release response");
+                    if(out.size()+n>limit)throw new IllegalArgumentException("Oversized update feed");
                     out.write(buffer,0,n);
                 }
             }
-            return readRelease(out.toString(StandardCharsets.UTF_8.name()),AppVersion.name(ctx));
-        }catch(Exception ex){
-            JSONObject result=new JSONObject();
-            try{result.put("state","offline");result.put("available",false);}catch(Exception ignored){}
-            return result;
+            return out.toString(StandardCharsets.UTF_8.name());
         }finally{if(c!=null)c.disconnect();}
+    }
+
+    public static JSONObject check(Context ctx){
+        String installed=AppVersion.name(ctx);
+        JSONObject primary=null;
+        try {
+            primary=readRelease(fetch(API,200000),installed);
+            if("available".equals(primary.optString("state")))return primary;
+        } catch(Exception ignored) { /* Try the pinned raw release index. */ }
+        // Some phone networks block or rate-limit api.github.com while GitHub
+        // raw snapshot data still works. Also handle temporarily stale API cache.
+        try {
+            JSONObject secondary=readRelease(fetch(FALLBACK,16000),installed);
+            if(!"error".equals(secondary.optString("state")))return secondary;
+        } catch(Exception ignored) { /* Preserve the valid primary result below. */ }
+        if(primary!=null&&"latest".equals(primary.optString("state")))return primary;
+        JSONObject unavailable=new JSONObject();
+        try {
+            unavailable.put("state","unavailable");
+            unavailable.put("available",false);
+            unavailable.put("fallbackUrl",
+                "https://github.com/"+OWNER+"/releases/latest");
+        }catch(Exception ignored){}
+        return unavailable;
     }
 }
