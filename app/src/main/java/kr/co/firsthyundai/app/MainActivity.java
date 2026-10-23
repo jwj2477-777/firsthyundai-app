@@ -386,7 +386,9 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public void fetchNearby(String workerUrl, String complexId, String category, String requestId) {
             // Server-side Kakao API proxy only. Kakao REST key never enters Android.
-            if(workerUrl==null || !"https://firsthyundai-kakao.jwj2477.workers.dev".equals(workerUrl) ||
+            // Keep this exact allowlist in sync with data/nearby_config.json and
+            // workers/kakao-nearby/wrangler.toml (name=firsthyundai-nearby).
+            if(workerUrl==null || !"https://firsthyundai-nearby.jwj2477.workers.dev".equals(workerUrl) ||
                     complexId==null || !complexId.matches("[A-Za-z0-9_-]{1,64}") ||
                     category==null || !category.matches("(SC4|PS3|HP8|PM9|MT1|CS2|SW8|BK9|CE7|AC5)")) {
                 deliverFeed(requestId,false,"주변시설 서비스 주소 또는 요청 형식이 잘못되었습니다.",null);
