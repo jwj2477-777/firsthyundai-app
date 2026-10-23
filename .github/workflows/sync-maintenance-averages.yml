@@ -7,12 +7,14 @@ on:
       - 'scripts/collect_maintenance_averages.py'
       - 'scripts/probe_maintenance_three_apis.py'
       - 'scripts/collect_official_maintenance.py'
+      - 'scripts/maintenance_history.py'
+      - 'tests/test_maintenance_history.py'
       - 'tests/test_official_maintenance.py'
       - 'data/maintenance_estimates.json'
       - 'tests/test_maintenance_averages.py'
       - '.github/workflows/sync-maintenance-averages.yml'
   schedule:
-    - cron: '43 0 18 * *' # 09:43 KST on the 18th monthly
+    - cron: '43 0 5,18,28 * *' # 09:43 KST on the 5th, 18th, 28th; published months lag behind real bills
 permissions:
   contents: write
 concurrency:
@@ -31,6 +33,8 @@ jobs:
         run: python -m unittest discover -s tests -p test_maintenance_averages.py -v
       - name: Test strict official fee aggregation and calibration
         run: python -m unittest discover -s tests -p test_official_maintenance.py -v
+      - name: Protect verified month history and preserve missing-month gaps
+        run: python -m unittest discover -s tests -p test_maintenance_history.py -v
       - name: Verify newly approved official K-apt group APIs (safe diagnostics)
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
