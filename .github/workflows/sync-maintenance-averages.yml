@@ -1,0 +1,46 @@
+name: Sync Monthly Apartment Management Fee Averages
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/collect_maintenance_averages.py'
+      - 'data/maintenance_estimates.json'
+      - 'tests/test_maintenance_averages.py'
+      - '.github/workflows/sync-maintenance-averages.yml'
+  schedule:
+    - cron: '43 0 18 * *' # 09:43 KST on the 18th monthly
+permissions:
+  contents: write
+concurrency:
+  group: firsthyundai-verified-management-average
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check strict total/unit validation and no fabricated bills
+        run: python -m unittest discover -s tests -p test_maintenance_averages.py -v
+      - name: Fetch published K-apt monthly data without client secrets
+        run: python scripts/collect_maintenance_averages.py
+      - name: Publish source-validated public estimates only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/maintenance_estimates.json
+          if git diff --staged --quiet; then
+            echo 'No newly verified total-rate data'; exit 0
+          fi
+          git commit -m 'data: refresh verified monthly apartment management fee units'
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 3
+          done
+          exit 1
