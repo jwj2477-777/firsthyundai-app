@@ -398,10 +398,28 @@ body.apartmentSheetActive{overflow:hidden}
   <div id="tradesContent"><div class="empty">최신 실거래 자료를 불러오고 있습니다.</div></div>
   <div class="tiny">금액 단위: 만 원. 보증금과 월세는 별도 표시합니다. 실거래는 신고 이후 반영되므로 실제 계약일보다 늦게 게시될 수 있습니다. 동일 조건의 별도 계약도 각각 표시할 수 있습니다.</div>
   </div>
-  <div class="panel apiSmallCard" id="officetelPanel"><h3>오피스텔 전월세</h3>
-  <div class="controls"><input id="officeNameSearch" aria-label="오피스텔 검색" placeholder="오피스텔명" oninput="renderOfficeRentals()">
-  <select id="officeTypeSearch" aria-label="오피스텔 계약유형" onchange="renderOfficeRentals()"><option value="">전세·월세 전체</option><option value="전세">전세</option><option value="월세">월세</option></select></div>
-  <div id="officeRentContent">공식 API 활용신청 후 이용 가능합니다.</div>
+ <div class="officeOnDemand">
+  <button class="officeOpenLink" type="button" onclick="switchPage('officetel')">▤ 기타 거래 · 오피스텔 전월세 <span aria-hidden="true">›</span></button>
+ </div>
+</div>
+<div id="officetel" class="page hidden">
+ <div class="sectionTitle"><div><h2>오피스텔 전월세</h2><p class="tiny">송도동 · 아파트와 구분하여 조회</p></div>
+  <button class="btn alt" type="button" onclick="switchPage('trades')">← 실거래</button></div>
+ <div class="panel" id="officetelPanel">
+  <div class="officeHeading"><strong>거래 조회</strong>
+   <label class="officeDetailSwitch" for="officeDetailToggle"><input id="officeDetailToggle" type="checkbox" onchange="toggleOfficeDetailed(this.checked)"> 상세 보기</label></div>
+  <div class="controls officeBasicFilters">
+   <input id="officeNameSearch" aria-label="오피스텔명 검색" placeholder="오피스텔명 검색" oninput="renderOfficeRentals()">
+   <select id="officeTypeSearch" aria-label="오피스텔 계약유형" onchange="renderOfficeRentals()"><option value="">전세·월세 전체</option><option value="전세">전세만</option><option value="월세">월세만</option></select>
+  </div>
+  <div id="officeAdvancedFilters" class="officeAdvancedFilters hidden">
+   <label for="officeDateFrom">계약일 시작<input type="date" id="officeDateFrom" onchange="renderOfficeRentals()"></label>
+   <label for="officeDateTo">계약일 종료<input type="date" id="officeDateTo" onchange="renderOfficeRentals()"></label>
+   <label for="officeMinArea">전용면적 최소(㎡)<input id="officeMinArea" type="number" min="0" step="0.01" inputmode="decimal" placeholder="최소" oninput="renderOfficeRentals()"></label>
+   <label for="officeMaxArea">전용면적 최대(㎡)<input id="officeMaxArea" type="number" min="0" step="0.01" inputmode="decimal" placeholder="최대" oninput="renderOfficeRentals()"></label>
+  </div>
+  <div id="officeRentContent" aria-live="polite">공식 오피스텔 전월세 자료 확인 중…</div>
+  <button type="button" class="btn alt officeMore hidden" id="officeMore" onclick="moreOfficeRentals()">거래 더 보기</button>
  </div>
 </div>
 <div id="news" class="page hidden">
@@ -637,7 +655,7 @@ body.apartmentSheetActive{overflow:hidden}
 const NOTE_KEY='firsthyundai-local-v04', REPO_KEY='firsthyundai-public-repo';
 const DEFAULT_REPOSITORY='jwj2477-777/firsthyundai-app';
 const PRIVATE_PAGES=new Set(['settings','notes','security','apiGuide']);
-const PAGES=[['overview','전체 브리핑'],['nearby','★ 주변단지'],['complexes','단지정보'],['new','새소식'],['trades','실거래가'],['news','뉴스 브리핑'],['contracts','계약문자 작성'],['notes','내 자료'],['apiGuide','API 신청'],['settings','설정'],['security','보안 관리']];
+const PAGES=[['overview','전체 브리핑'],['nearby','★ 주변단지'],['complexes','단지정보'],['new','새소식'],['trades','실거래가'],['officetel','오피스텔 전월세'],['news','뉴스 브리핑'],['contracts','계약문자 작성'],['notes','내 자료'],['apiGuide','API 신청'],['settings','설정'],['security','보안 관리']];
 const $=id=>document.getElementById(id);
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeLink=url=>/^https:\/\/[a-z0-9.-]+(?:[:][0-9]+)?(?:[/?#]|$)/i.test(String(url||''))?String(url):'';
@@ -694,6 +712,7 @@ const NAV_CATEGORIES=[
   children:[['news','부동산·송도 뉴스']]}
 ];
 function navGroupForPage(id){
+ if(id==='officetel')return NAV_CATEGORIES.find(g=>g.id==='trades');
  return NAV_CATEGORIES.find(g=>g.children.some(([page])=>page===id))||null;
 }
 function renderMainNavigation(id){
@@ -787,7 +806,7 @@ function switchPage(id){
  closeApartmentSheet(false);
  if(!activePages().some(([key])=>key===id))id='nearby';
  const pageNames={overview:'오늘 요약',nearby:'관심 단지',new:'새로 확인한 거래',
-  trades:'전체 실거래',complexes:'아파트정보',news:'뉴스',contracts:'계약문자',
+  trades:'전체 실거래',officetel:'오피스텔 전월세',complexes:'아파트정보',news:'뉴스',contracts:'계약문자',
   notes:'내 자료',settings:'설정',security:'보안',apiGuide:'API 연결 안내'};
  if(pageNames[id])document.title='퍼스트현대 · '+pageNames[id];
  currentPage=id;
@@ -799,7 +818,8 @@ function switchPage(id){
  if(id==='complexes')renderComplexes();
  if(id==='contracts'&&window.FirstHyundaiContracts)window.FirstHyundaiContracts.onOpen();
  if(id==='new')renderNew();
- if(id==='trades'){renderTrades();renderOfficeRentals();}
+ if(id==='trades')renderTrades();
+ if(id==='officetel'){renderOfficeRentals();refreshPublicServices(false);}
  if(id==='news'){switchNewsPane(newsPane);renderNews();renderPublicSubscriptions();}
  if(id==='notes'&&role==='admin')renderNotes();
  if(id==='security'&&role==='admin'){
@@ -1321,18 +1341,54 @@ function renderPublicComplexInfo(p){
  const address=p.address?'<article><strong>도로명·지번주소</strong><p>'+escapeHtml(p.address)+'</p>'+sourceLink('https://map.kakao.com/?q='+encodeURIComponent(p.address),'지도에서 주소 확인')+'</article>':'';
  return '<div class="apiInfoCards">'+registry+maintenance+address+'</div>';
 }
+// An optional secondary view, always isolated from official apartment results.
+const OFFICE_DETAIL_KEY='firsthyundai_officetel_detailed_v1';
+let officeDetailedMode=false,officeVisibleLimit=40;
+try{officeDetailedMode=localStorage.getItem(OFFICE_DETAIL_KEY)==='1';}catch(e){}
+function toggleOfficeDetailed(checked){
+ officeDetailedMode=!!checked;
+ try{localStorage.setItem(OFFICE_DETAIL_KEY,officeDetailedMode?'1':'0');}catch(e){}
+ officeVisibleLimit=40;renderOfficeRentals();
+}
+function moreOfficeRentals(){officeVisibleLimit+=40;renderOfficeRentals();}
 function renderOfficeRentals(){
  const el=$('officeRentContent');if(!el)return;
+ const chk=$('officeDetailToggle'),advanced=$('officeAdvancedFilters'),more=$('officeMore');
+ if(chk)chk.checked=officeDetailedMode;
+ if(advanced)advanced.classList?.toggle?.('hidden',!officeDetailedMode);
  const records=verifiedRecords('office_rents');
- if(!records){el.innerHTML='<div class="apiNotice">국토교통부 오피스텔 전월세 API 활용승인 후 자동 수집됩니다.</div>'+sourceLink(PUBLIC_SRC.office,'신청 페이지');return;}
- const q=($('officeNameSearch').value||'').trim().toLowerCase(),type=$('officeTypeSearch').value;
- const visible=records.filter(x=>(!type||x.type===type)&&(!q||String(x.building||'').toLowerCase().includes(q)));
- el.innerHTML='<p class="tiny">송도 오피스텔 전월세 '+number(visible.length)+'건 · 아파트 거래와 별도</p>'+
- (visible.length?visible.slice(0,40).map(x=>'<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+dealBadge(x.type)+
- '</div><h3>'+escapeHtml(x.building)+'</h3><div class="money">보증금 '+escapeHtml(value10k(x.deposit_10k))+
- (x.type==='월세'?' / 월세 '+escapeHtml(value10k(x.monthly_10k)):'')+'</div>'+
- '<div class="meta">계약 '+escapeHtml(x.contract_date)+' · 전용 '+escapeHtml(x.area_m2)+'㎡</div></article>').join(''):
- '<div class="empty">해당 조건의 오피스텔 거래가 없습니다.</div>');
+ if(!records){
+  el.innerHTML='<div class="apiNotice">오피스텔 전월세 공식 자료 연결 확인 중입니다. 처음 수집되기 전에는 거래가 0건이라는 뜻이 아닙니다.</div>';
+  if(more)more.classList?.add?.('hidden');
+  return;
+ }
+ const q=String($('officeNameSearch')?.value||'').trim().toLowerCase(),type=$('officeTypeSearch')?.value||'';
+ const dayFrom=officeDetailedMode?$('officeDateFrom')?.value||'':'',dayTo=officeDetailedMode?$('officeDateTo')?.value||'':'';
+ const minText=officeDetailedMode?$('officeMinArea')?.value||'':'',maxText=officeDetailedMode?$('officeMaxArea')?.value||'':'';
+ const minArea=minText===''?null:Number(minText),maxArea=maxText===''?null:Number(maxText);
+ const invalid=!!(dayFrom&&dayTo&&dayFrom>dayTo)||(minArea!==null&&(!Number.isFinite(minArea)||minArea<0))||
+ (maxArea!==null&&(!Number.isFinite(maxArea)||maxArea<0))||(minArea!==null&&maxArea!==null&&minArea>maxArea);
+ if(invalid){
+  el.innerHTML='<div class="empty">검색 기간과 면적 범위를 확인해 주세요.</div>';
+  if(more)more.classList?.add?.('hidden');return;
+ }
+ const visible=records.filter(x=>(!type||x.type===type)&&(!q||String(x.building||'').toLowerCase().includes(q))&&
+  (!dayFrom||String(x.contract_date||'')>=dayFrom)&&(!dayTo||String(x.contract_date||'')<=dayTo)&&
+  (minArea===null||Number(x.area_m2)>=minArea)&&(maxArea===null||Number(x.area_m2)<=maxArea));
+ const updated=publicServices?.office_rents?.updated_at;
+ const summary='<p class="officeResultCount">조회 '+number(visible.length)+'건 <span>· 국토교통부 공개 자료'+(updated?' · 갱신 '+escapeHtml(prettyTime(updated)):'')+'</span></p>';
+ const rows=visible.slice(0,officeVisibleLimit).map(x=>
+  '<article class="officeDeal '+(x.type==='월세'?'monthly':'lease')+'">'+
+  '<div class="officeDealMain"><strong>'+escapeHtml(x.building||'오피스텔')+'</strong>'+dealBadge(x.type)+'</div>'+
+  '<div class="officeMoney">보증금 '+escapeHtml(value10k(x.deposit_10k))+
+   (x.type==='월세'?' <span>/ 월세 '+escapeHtml(value10k(x.monthly_10k))+'</span>':'')+'</div>'+
+  '<p class="officeMeta">계약 '+escapeHtml(x.contract_date||'미기재')+' · 전용 '+escapeHtml(x.area_m2)+'㎡'+
+    (officeDetailedMode&&x.floor?' · '+escapeHtml(x.floor)+'층':'')+'</p>'+
+  (officeDetailedMode&&x.lot_number?'<p class="officeMeta">지번 '+escapeHtml(x.lot_number)+'</p>':'')+'</article>').join('');
+ el.innerHTML=summary+(rows||'<div class="empty">선택한 조건의 오피스텔 거래가 없습니다.</div>')+
+ '<p class="tiny officeSourceNote">오피스텔 전월세 신고·확정일자 자료입니다. 아파트 실거래와 합산하지 않습니다.</p>';
+ if(more){more.classList?.toggle?.('hidden',visible.length<=officeVisibleLimit);
+  more.textContent='거래 더 보기 ('+number(Math.max(0,visible.length-officeVisibleLimit))+'건 남음)';}
 }
 function officialSubscriptionUrl(value){
  try{

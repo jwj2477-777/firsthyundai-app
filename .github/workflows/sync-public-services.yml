@@ -18,7 +18,7 @@ on:
       - '.github/workflows/sync-public-services.yml'
   schedule:
     - cron: '32 21 2 * *' # monthly school update
-    - cron: '12 23 * * *' # daily Applyhome update, 08:12 KST
+    - cron: '12 23 * * *' # daily Applyhome + officetel updates, 08:12 KST
     - cron: '15 21 15 * *' # monthly approved registry / fee items, 06:15 KST
 permissions:
   contents: write
@@ -50,6 +50,9 @@ jobs:
               python scripts/collect_public_services.py --mode complexinfo
             else
               python scripts/collect_public_services.py --mode subscriptions
+              if ! python scripts/collect_public_services.py --mode offices; then
+                echo "Officetel rent API first collection or approval check pending; prior snapshot preserved."
+              fi
             fi
           elif [ "${{ github.event_name }}" = "push" ]; then
             # When this collector changes, immediately recheck both official sources
@@ -58,6 +61,9 @@ jobs:
               echo "School refresh unavailable; preserving prior schools and continuing independent building/fee refresh."
             fi
             python scripts/collect_public_services.py --mode complexinfo
+            if ! python scripts/collect_public_services.py --mode offices; then
+              echo "Officetel rent API not yet accessible; keeping previously published records."
+            fi
           else
             python scripts/collect_public_services.py --mode "${{ inputs.mode }}"
           fi

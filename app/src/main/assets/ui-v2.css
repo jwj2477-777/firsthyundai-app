@@ -518,3 +518,33 @@ header #roleButton:focus-visible{outline:2px solid #FBE9BB;outline-offset:3px}
 .favoriteAlertCompactInner{padding:2px 13px 11px;border-top:1px solid #DFE9E8}
 .favoriteAlertCompactInner .favoriteTradeAlertSwitch{margin:9px 0}
 .favoriteAlertCompactInner .alertPreviewButton{margin:5px 0}
+
+/* v2.0.18 optional office-rent screen: no new primary menu or initial home UI. */
+.officeOnDemand{margin:14px 0 0}
+.officeOpenLink{display:flex;align-items:center;justify-content:space-between;width:100%;
+ background:#F7FAF9;border:1px solid #D8E4E2;border-radius:12px;
+ font-weight:750;font-size:14px;color:#356069;padding:13px 15px;text-align:left}
+.officeOpenLink span{font-size:22px;line-height:1}
+.officeOpenLink:focus-visible{outline:2px solid #0C7472;outline-offset:3px}
+.officeHeading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.officeHeading strong{font-size:17px;color:#204653}
+.officeDetailSwitch{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:650;
+ padding:7px 10px;border:1px solid #CCDFDD;background:#EFF6F3;border-radius:10px;white-space:nowrap}
+.officeDetailSwitch input{accent-color:#116A71;width:18px;height:18px}
+.officeBasicFilters{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:10px}
+.officeBasicFilters input,.officeBasicFilters select{min-width:0;width:100%}
+.officeAdvancedFilters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:10px 0 14px}
+.officeAdvancedFilters.hidden{display:none!important}
+.officeAdvancedFilters label{font-size:12px;font-weight:650;color:#355661;display:flex;flex-direction:column;gap:5px}
+.officeAdvancedFilters input{width:100%;min-width:0;font-size:14px}
+.officeResultCount{display:flex;flex-wrap:wrap;gap:3px;color:#1C5A60;font-weight:800;font-size:14px}
+.officeResultCount span{font-size:11px;font-weight:500;color:#688085}
+.officeDeal{padding:13px 0;border-bottom:1px solid #E6ECEB}
+.officeDealMain{display:flex;align-items:center;gap:9px;flex-wrap:wrap;color:#1C3D4C}
+.officeDealMain strong{font-size:15px}
+.officeMoney{font-size:17px;font-weight:800;color:#1A4D57;margin:6px 0}
+.officeMoney span{font-weight:650}
+.officeMeta{margin:3px 0;font-size:12px;color:#66818A}
+.officeSourceNote{margin:12px 0!important}
+.officeMore{margin-top:10px;width:100%}
+@media(max-width:360px){.officeBasicFilters{grid-template-columns:1fr}.officeAdvancedFilters{grid-template-columns:1fr 1fr}}
