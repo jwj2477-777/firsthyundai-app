@@ -145,16 +145,22 @@ def validated_rate(totals, area):
  return full, rate
 
 def calibration_passes(totals, area):
- # The user needs a ten-thousand-won-level counseling estimate, not an exact
- # household invoice. Compare each category to independently verified F15
- # reference totals with a 5% band; large omissions or double counting fail.
+ # Sanity check the new parser against F15's independently sourced 2026-07
+ # data. An approximate 84.7m2 fee within 10,000 won is only a *parser
+ # calibration threshold*, NOT a guarantee of household invoice accuracy.
+ # Crucially this does NOT cap month-to-month moves in any other period.
  if not isinstance(totals, dict) or set(totals) != set(CALIBRATION):
   return False
  size = number(area)
  if size is None or abs(size - CALIBRATION_AREA) / CALIBRATION_AREA > Decimal('0.01'):
   return False
- return all(type(totals[k]) is int and abs(totals[k] - v) <= v * 0.05
-            for k,v in CALIBRATION.items())
+ if any(type(totals[k]) is not int or totals[k] <= 0 or
+        abs(totals[k] - v) > Decimal(v) * Decimal('0.10')
+        for k,v in CALIBRATION.items()):
+  return False
+ unit_now = Decimal(sum(totals.values())) / size
+ unit_ref = Decimal(sum(CALIBRATION.values())) / CALIBRATION_AREA
+ return abs(unit_now - unit_ref) * Decimal('84.7') <= Decimal(10000)
 
 def available_months(now=None):
  today = now or datetime.now(ZoneInfo('Asia/Seoul'))
