@@ -232,21 +232,21 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.23 fixed native Kakao Nearby endpoint APK
+      - name: Publish successful v2.0.24 per-area average management fees and unified office deals APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.23.apk
-          unzip -t FirstHyundai-v2.0.23.apk | grep 'No errors detected'
-          if gh release view v2.0.23 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.24.apk
+          unzip -t FirstHyundai-v2.0.24.apk | grep 'No errors detected'
+          if gh release view v2.0.24 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.23 FirstHyundai-v2.0.23.apk \
+            gh release create v2.0.24 FirstHyundai-v2.0.24.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.23 · 주변시설 카카오 API 연결 오류 수정' \
-              --notes '안드로이드 주변 생활시설 실시간 조회가 기존 Cloudflare Worker 호스트 주소를 검증하여 모든 요청을 차단하던 문제를 수정했습니다. 네이티브 URL 허용목록을 현재 설정과 실제 배포 이름인 firsthyundai-nearby.jwj2477.workers.dev로 통일했습니다. 인증키는 앱에 저장하거나 포함하지 않고 서버측 비밀값으로만 보관합니다. 앞으로 회귀 테스트에서 Android 네이티브·WebView·공개 설정·Wrangler 배포 서버 주소의 일치를 검증하고 정식 배포 후 API 상태를 확인합니다. 기존 실거래·계약안내·학군·지번주소·관리비·가족/관리자 모드·고정 서명 업데이트를 유지합니다.'
+              --title '퍼스트현대 v2.0.24 · 평형별 평균관리비·오피스텔 실거래 UI 통일' \
+              --notes '아파트 관리비 탭에서 검증된 K-apt 월별 총관리비/전용면적 단가로 실제 공급·전용 매칭 타입별 월 참고액을 표시합니다. 공식 월별 평균 단가와 기준월·원문 출처를 명시하며 세대 실제 고지액은 아님을 안내합니다. 자료 수집에 실패한 단지는 금액을 임의 생성하지 않습니다. 오피스텔 매매·전월세 화면은 아파트와 동일하게 전체 최신순/오피스텔 선택/전용면적 선택/거래유형/상세 조건 계약일·해제·이름·면적 검색·동일 거래카드 UI를 적용했습니다. 아파트와 오피스텔 자료는 합치지 않고, 카카오 및 학군·주소·계약문자, 고정서명 업데이트 기능을 유지했습니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.23 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.24 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"

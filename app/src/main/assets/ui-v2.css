@@ -569,3 +569,15 @@ header #roleButton:focus-visible{outline:2px solid #FBE9BB;outline-offset:3px}
  color:#59717a;overflow-wrap:anywhere}
 .neisLevelButtons button{min-height:39px}
 .apiInfoCards .practiceNote strong{font-weight:850;color:#13535a;font-size:20px}
+
+/* v2.0.24: officetel and apartment trade searches use the same visual grammar. */
+#officetel .tradeStarter{grid-template-columns:repeat(2,minmax(0,1fr))}
+#officetel .tradeStarter button.active{background:#2456AA;border:3px solid #153E81;color:#fff;
+ box-shadow:inset 0 -4px 0 #153E81}
+#officetel .tradeSearchOptions{background:#EEF4FB;border-color:#D5E2F0}
+#officetel .tradeAdvanced{margin:13px 0}
+#officetel .tradeAdvanced input,#officetel .tradeAdvanced select{width:100%;min-width:0}
+#officetel .tradeAdvanced .tradeDateRange input{min-width:0}
+#officetel .officeUnifiedDeal{margin:10px 0;padding:15px 15px 12px}
+#officetel .officeUnifiedDeal .money{overflow-wrap:anywhere}
+#officetel .officeSourceNote{margin-top:16px}

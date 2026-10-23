@@ -17,17 +17,27 @@ const nodes={};
 const ctx=vm.createContext({
  safeLink:v=>String(v||'').startsWith('https://')?v:'',
  escapeHtml:v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),
- $:id=>(nodes[id]??={innerHTML:'',value:''}),
+ $:id=>(nodes[id]??={innerHTML:'',value:'',classList:{toggle(){},add(){},remove(){}}}),
  number:n=>String(n),prettyTime:v=>v,
  value10k:n=>String(n)+'만원', URL,
- dealArticleClass:v=>'dealRow',dealBadge:v=>v.type,fetchRemote:async()=>{throw Error('missing optional')},
+ dealArticleClass:v=>'dealRow',dealBadge:v=>v.type,tradeStatusBadge:()=>'',tradeExtraBadges:()=>'',renderTypeButtons:()=>{},areaKey:v=>String(v),canonicalAreaTypes:p=>p.area_type_pairs||[],supplyPyeong:()=>null,fetchRemote:async()=>{throw Error('missing optional')},
  currentPage:'nearby',renderComplexes(){},showRefreshFeedback(){},console
 });
 vm.runInContext(snippet,ctx);
 const run=q=>vm.runInContext(q,ctx);
 const missing=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13'})");
 assert(missing.includes('평형별 월 관리비'));
-assert(missing.includes('실제 세대 관리비 자료가 없습니다.'));
+assert(missing.includes('평형·타입 정보 확인 전입니다.'));
+run("maintenanceEstimates="+JSON.stringify({schema_version:1,state:'verified_partial',records:[
+ {complex_id:'f13',kapt_code:'A10020000',month:'202607',won_per_exclusive_m2:3831,
+ source_url:'https://apt.koreacharts.com/apt/A10020000/contents.html'}]}));
+const feePreview=run("renderPublicComplexInfo("+JSON.stringify({id:'f13',kapt_code:'A10020000',
+ area_type_pairs:[{exclusive_m2:59.89,supply_m2:88.08,supply_label:'88A'}]})+")");
+assert(feePreview.includes('약 229,400원'),'Verified published K-apt unit must multiply correct exclusive area');
+assert(feePreview.includes('2026년 7월')&&feePreview.includes('상담 참고액'),
+ 'Published month and non-invoice estimate label must be present');
+assert(!feePreview.includes('전체 공개 비용'),'Never re-introduce whole-complex partial line items');
+run("maintenanceEstimates=null");
 assert(!missing.includes('건축물대장')&&!missing.includes('단지 전체 공개 비용'),
   'Redundant apartment-wide costs and building facts must be removed');
 assert(!missing.includes('공식 자료·신청'), 'Family users never see API signup prompts');
@@ -88,12 +98,11 @@ run("selectNeisSchoolLevel('all')");
 run('publicServices='+JSON.stringify(sample));
 
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('송도 오피스텔'));
-assert(nodes.officeRentContent.innerHTML.includes('확인된 거래 1건'),'Results are separate from apartment transactions');
-run('toggleOfficeDetailed(true)');
-assert(nodes.officeDetailToggle.checked===true);
+assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>1건</b>'),'Results are separate from apartment transactions');
+run('startOfficeSearch()');
+assert(nodes.officeRentContent.innerHTML.includes('송도 오피스텔'));
+run('openOfficeLatest()');
 assert(nodes.officeRentContent.innerHTML.includes('오피스텔'));
-run('toggleOfficeDetailed(false)');
-assert(nodes.officeDetailToggle.checked===false);
 ;
 run('renderPublicSubscriptions()');assert(nodes.publicSubscriptions.innerHTML.includes('첫 수집'));
 run("publicServices.subscriptions={state:'verified',updated_at:'2026-10-20T09:30:00+0900',window_start:'2025-09-01',records:[{kind:'아파트',name:'송도 새아파트',address:'인천 연수구 송도동',notice_date:'2026-10-19',apply_start:'2026-10-23',apply_end:'2026-10-25',households:123,notice_url:'https://www.applyhome.co.kr/ai/aia/test.do'}]}");

@@ -5,54 +5,91 @@ const html=fs.readFileSync(path.join(root,'app/src/main/assets/index.html'),'utf
 const script=html.split('<script>')[1]?.split('</script>')[0];
 assert(script);new vm.Script(script);
 const nav=script.slice(script.indexOf('const NAV_CATEGORIES=['),script.indexOf('function navGroupForPage(',script.indexOf('const NAV_CATEGORIES=[')));
-assert.equal((nav.match(/icon:/g)||[]).length,3,'Preserve exact existing main menu categories');
-assert(!nav.includes('officetel'),'Officetel must not appear as top-level/ordinary trade navigation');
-assert(html.includes('id="officetel" class="page hidden"'),'Separate office-only hidden screen');
-assert(script.includes('propertyTypeSwitch'),'Office entry is in the TOP property type switch');
+assert.equal((nav.match(/icon:/g)||[]).length,3,'Preserve existing three top categories');
+assert(!nav.includes('officetel'),'Officetel is not part of apartment top menu');
+assert(html.includes('id="officetel" class="page hidden"'));
+assert(html.includes('id="propertyTypeSwitch"')||script.includes('propertyTypeSwitch'));
 const trades=html.slice(html.indexOf('<div id="trades"'),html.indexOf('<div id="officetel"'));
-assert(!trades.includes('officeOpenLink'),'Remove the bottom-only entry button');
-assert(!trades.includes('id="officeRentContent"'),'Never combine apartment and office results');
-assert(html.includes('id="officeDetailToggle"')&&html.includes('id="officeAdvancedFilters" class="officeAdvancedFilters hidden"'));
-const rows=script.slice(script.indexOf('// Source-backed optional integrations.'),script.indexOf('function tradeClass(type)'));
-const nodes={};for(const id of ['officeRentContent','officeDetailToggle','officeAdvancedFilters','officeMore','officeNameSearch','officeTypeSearch','officeDateFrom','officeDateTo','officeMinArea','officeMaxArea']){
- nodes[id]={value:'',innerHTML:'',checked:false,classList:{add(){},toggle(){}},textContent:''};
+assert(!trades.includes('id="officeRentContent"'),'Apartment and office trade records must remain separate');
+for(const phrase of ['id="officeModeLatest"','id="officeModeSearch"','id="officeBuildingSelect"',
+  'id="officeAreaSelect"','id="officeTypeBar"','id="officeAdvanced"','id="officeDateFrom"',
+  'id="officeDateTo"','id="officeStatusFilter"','id="officeNameSearch"']){
+ assert(html.includes(phrase),phrase+' is required');
+}
+assert(!html.includes('id="officeDetailToggle"'),'No different officetel compact-mode control');
+const js=script.slice(script.indexOf('// Source-backed optional integrations.'),script.indexOf('function tradeClass(type)'));
+const nodes={};
+function element(id){
+ if(!nodes[id]){
+  const classes=new Set();nodes[id]={value:'',innerHTML:'',checked:false,textContent:'',attributes:{},
+   classList:{add:x=>classes.add(x),remove:x=>classes.delete(x),toggle:(x,val)=>val?classes.add(x):classes.delete(x),contains:x=>classes.has(x)},
+   setAttribute(k,v){this.attributes[k]=v}};
+ }
+ return nodes[id];
 }
 const storage={},localStorage={getItem:k=>storage[k],setItem:(k,v)=>{storage[k]=v}};
+const escape=s=>String(s??'').replace(/[&<>"]/g,'');
 const ctx=vm.createContext({
- localStorage,$:id=>nodes[id],escapeHtml:s=>String(s??'').replace(/[&<>"]/g,''),
- prettyTime:s=>s,number:n=>String(n),value10k:n=>String(n)+'만원',
- dealBadge:t=>t,sourceLink:()=>'',safeLink:()=>'',fetchRemote:async()=>{},console
+ localStorage,$:element,escapeHtml:escape,prettyTime:s=>s,number:n=>String(n),
+ value10k:n=>String(n)+'만원',dealBadge:t=>'<b>'+t+'</b>',
+ dealArticleClass:x=>'dealRow '+x.type,tradeStatusBadge:x=>x.status==='해제'?'해제':'',
+ tradeExtraBadges:x=>x.dealing_type?'거래방식':'',renderTypeButtons:(id,type)=>{nodes._lastType=type},
+ areaKey:n=>Number.isFinite(Number(n))?String(Number(n)):'',
+ sourceLink:()=>'',safeLink:()=>'',fetchRemote:async()=>{},console
 });
-vm.runInContext(rows,ctx);
-const run=source=>vm.runInContext(source,ctx);
-run("publicServices={office_rents:{state:'awaiting_approval',records:[]}};renderOfficeRentals()");
+vm.runInContext(js,ctx);
+const run=q=>vm.runInContext(q,ctx);
+run("publicServices={office_rents:{state:'awaiting_approval',records:[]},office_sales:{state:'awaiting_approval',records:[]}};renderOfficeRentals()");
 assert(nodes.officeRentContent.innerHTML.includes('공식 자료 확인 중'));
-assert(!nodes.officeRentContent.innerHTML.includes('조회 0건'));
-const data=[
+assert(!nodes.officeRentContent.innerHTML.includes('검색 결과 <b>0건</b>'),'Pending must not be counted as zero');
+const rentals=[
  {building:'송도 플러스오피스텔',type:'월세',deposit_10k:3000,monthly_10k:85,area_m2:35.5,contract_date:'2026-10-12',floor:'9',lot_number:'123'},
- {building:'송도 퍼스트오피스텔',type:'전세',deposit_10k:20000,monthly_10k:0,area_m2:62.4,contract_date:'2026-09-15',floor:'14',lot_number:'456'}
+ {building:'송도 퍼스트오피스텔',type:'전세',deposit_10k:20000,monthly_10k:0,area_m2:62.4,contract_date:'2026-09-15',floor:'14',lot_number:'456'},
+ {building:'송도 플러스오피스텔',type:'전세',deposit_10k:22000,monthly_10k:0,area_m2:45.6,contract_date:'2026-10-10',floor:'7',lot_number:'123'}
 ];
-run("publicServices="+JSON.stringify({office_rents:{state:'verified',records:data,updated_at:'2026-10-22T08:00:00+09:00'}})+";renderOfficeRentals()");
-assert(nodes.officeRentContent.innerHTML.includes('확인된 거래 2건'));
-assert(!nodes.officeRentContent.innerHTML.includes('9층'),'Simple mode hides floor');
-nodes.officeTypeSearch.value='전세';run('renderOfficeRentals()');
-assert(nodes.officeRentContent.innerHTML.includes('확인된 거래 1건'));
-assert(!nodes.officeRentContent.innerHTML.includes('송도 플러스오피스텔'));
-nodes.officeTypeSearch.value='';
-run('toggleOfficeDetailed(true)');
-assert(storage.firsthyundai_officetel_detailed_v1==='1');
-assert(nodes.officeRentContent.innerHTML.includes('9층')&&nodes.officeRentContent.innerHTML.includes('지번 123'));
-nodes.officeDateFrom.value='2026-10-01';run('renderOfficeRentals()');
-assert(nodes.officeRentContent.innerHTML.includes('확인된 거래 1건'));
-nodes.officeDateFrom.value='2026-10-23';nodes.officeDateTo.value='2026-10-01';run('renderOfficeRentals()');
-assert(nodes.officeRentContent.innerHTML.includes('기간과 면적 범위'));
-run('toggleOfficeDetailed(false)');
-assert(storage.firsthyundai_officetel_detailed_v1==='0');
-assert(!nodes.officeRentContent.innerHTML.includes('9층'),'Compact mode hides office-only detail');
+const sales=[{building:'송도 센트럴오피스텔',type:'매매',price_10k:33000,area_m2:34,contract_date:'2026-10-21',floor:'22',status:'신고'},
+ {building:'송도 센트럴오피스텔',type:'매매',price_10k:35000,area_m2:36,contract_date:'2026-10-19',floor:'25',status:'해제',cancellation_date:'2026-10-20'}];
+run('publicServices='+JSON.stringify({office_rents:{state:'verified',records:rentals},office_sales:{state:'verified',records:sales}})+';renderOfficeRentals()');
+assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>5건</b>'));
+assert(nodes.officeRentContent.innerHTML.includes('dealRow'),'Same apartment deal card base class');
+assert(nodes.officeRentContent.innerHTML.includes('9층'),'Office floors visible like apartment cards');
+assert(nodes.officeRentContent.innerHTML.includes('거래 상세정보 보기'));
+run("setOfficeType('전세')");
+assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>2건</b>'));
+assert.equal(nodes._lastType,'전세');
+run("setOfficeType('')");
+run("startOfficeSearch()");
+assert(!nodes.officeSearchPanel.classList.contains('hidden'));
+assert(nodes.officeBuildingSelect.innerHTML.includes('송도 플러스오피스텔'));
+nodes.officeBuildingSelect.value='송도 플러스오피스텔';
+run('chooseOfficeBuilding()');
+assert(!nodes.officeAreaPanel.classList.contains('hidden'));
+assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>2건</b>'));
+assert(nodes.officeAreaSelect.innerHTML.includes('35.5'));
+nodes.officeAreaSelect.value='35.5';
+run('chooseOfficeArea()');
+assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>1건</b>'));
+run('openOfficeLatest()');
+assert(nodes.officeSearchPanel.classList.contains('hidden'));
+assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>5건</b>'));
+nodes.officeNameSearch.value='퍼스트오피스텔';run('renderOfficeRentals()');
+assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>1건</b>'));
+nodes.officeNameSearch.value='';
+nodes.officeDateFrom.value='2026-10-19';nodes.officeDateTo.value='2026-10-19';
+run('renderOfficeRentals()');
+assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>1건</b>'));
+nodes.officeStatusFilter.value='cancel';run('renderOfficeRentals()');
+assert(nodes.officeRentContent.innerHTML.includes('해제'));
+nodes.officeDateFrom.value='2026-10-23';nodes.officeDateTo.value='2026-10-01';
+run('renderOfficeRentals()');
+assert(nodes.officeDateError.textContent.includes('범위'));
+assert(nodes.officeRentContent.innerHTML.includes('검색 기간과 면적 범위'));
+run('resetOfficeDateFilter()');nodes.officeStatusFilter.value='';
+nodes.officeMinArea.value='40';run('renderOfficeRentals()');
+assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>2건</b>'));
+nodes.officeMinArea.value='';
 const gradle=fs.readFileSync(path.join(root,'app/build.gradle'),'utf8');
-assert(gradle.includes("versionCode 74; versionName '2.0.23'"));
+assert(gradle.includes("versionCode 75; versionName '2.0.24'"));
 const w=fs.readFileSync(path.join(root,'.github/workflows/sync-public-services.yml'),'utf8');
-assert(w.includes('python scripts/collect_public_services.py --mode offices'),'Automated office-rent polling uses existing secret');
-assert(w.includes('keeping previously published records'),'Network failure must preserve old official data');
-assert(w.includes('--mode office_sales'),'Independent sale API polling exists');
-console.log('On-demand offices isolated, compact-by-default, optionally detailed, safely approved official data');
+assert(w.includes('--mode offices')&&w.includes('--mode office_sales'));
+console.log('Officetel same-as-apartment search and cards passed: latest, selection, area, category, date, status, range, independent records');
