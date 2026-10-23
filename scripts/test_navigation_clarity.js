@@ -27,12 +27,7 @@ function verifyShortcutPlacement(page){
  assert(primary>=0&&shortcuts>primary,'Today/contract row follows the three main tabs on '+page);
  assert(menu.indexOf('오늘 요약',shortcuts)>shortcuts&&menu.indexOf('계약문자 만들기',shortcuts)>shortcuts,
   'Both shortcuts remain available on '+page);
- if(['trades','nearby','new','officetel'].includes(page)){
-  assert(property>shortcuts,'Property switch must sit below quick actions on '+page);
-  assert(menu.includes('오피스텔'),'Apartment/officetel switch remains reachable on '+page);
- }else{
-  assert.equal(property,-1,'No property switch outside trade screens on '+page);
- }
+ assert.equal(property,-1,'All pages use the same global header; property switch follows the local title on '+page);
  assert.equal(secondary,-1,'Do not duplicate trade destinations above the page content on '+page);
 }
 for(const page of ['trades','nearby','new','officetel','complexes','news','overview','contracts'])
