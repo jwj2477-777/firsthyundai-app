@@ -75,7 +75,7 @@ def money(v):
  if v is None or str(v).strip()=='':
   return 0
  raw=str(v).strip().replace(',','')
- if not re.fullmatch(r'[0-9]{1,12}(?:\\.0{1,5})?',raw):
+ if not re.fullmatch(r'[0-9]{1,12}(?:\.0{1,5})?',raw):
   raise ValueError('K-apt 원화 액수 형식이 비정상입니다')
  try:amount=Decimal(raw)
  except InvalidOperation:raise ValueError('K-apt 원화 수치가 비정상입니다') from None
@@ -172,7 +172,7 @@ def collect(records,key,old,*,month=None,pilot=True,delay=0.20,workers=3):
  month=month or fee_month()
  oldrecords={p['complex_id']:p for p in old.get('records',[]) if p.get('complex_id')}
  codes=sorted({p['kapt_code'] for p in records if
-   re.fullmatch(r'A\\d{8}',str(p.get('kapt_code') or '')) and not p.get('aggregate_only')})
+   re.fullmatch(r'A\d{8}',str(p.get('kapt_code') or '')) and not p.get('aggregate_only')})
  if len(codes)>180:raise ValueError('허용 단지수 초과')
  success=0;updated=0
  # Throttle across three workers rather than calling public APIs from devices.
@@ -216,6 +216,6 @@ def main():
   'failed',result['failed_codes'],'total_public_rows',len(result['records']))
  if result['updated_count']<=0:return
  temp=TARGET.with_suffix('.json.tmp')
- temp.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')
+ temp.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
  temp.replace(TARGET)
 if __name__=='__main__':main()
