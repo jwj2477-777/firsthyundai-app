@@ -26,7 +26,7 @@ class SchoolZoneSafeguards(unittest.TestCase):
   self.assertTrue(m.contains(rectangle,126.63,37.39))
   self.assertFalse(m.contains(rectangle,126.65,37.39))
   self.assertLess(m.edge_distance(rectangle,126.62001,37.39),100)
- def test_multiple_and 공동통학구역_not_assigned(self):
+ def test_multiple_and_joint_zone_not_assigned(self):
   self.assertEqual(m.build_assignments([],[]),[])
   self.assertEqual(m.build_assignments([], [{'id':'f13','lat':37.38,'lng':126.64}]),[])
  def test_schoolinfo_api_requires_yeonsu_sgg_and_three_school_levels(self):
