@@ -33,9 +33,7 @@ function verifyShortcutPlacement(page){
  }else{
   assert.equal(property,-1,'No property switch outside trade screens on '+page);
  }
- if(['trades','nearby','new'].includes(page)){
-  assert(secondary>property,'Trade subnavigation stays under the apartment/officetel switch on '+page);
- }else assert.equal(secondary,-1,'No trade subnavigation outside apartment trade pages on '+page);
+ assert.equal(secondary,-1,'Do not duplicate trade destinations above the page content on '+page);
 }
 for(const page of ['trades','nearby','new','officetel','complexes','news','overview','contracts'])
  verifyShortcutPlacement(page);
@@ -54,11 +52,18 @@ assert(n.includes('openNewsHome()'),'News button must open a real home destinati
 assert(!n.includes('secondaryNav'),'Never display single redundant news subsection');
 assert(!n.includes('부동산·송도 뉴스'),'Duplicate news row removed');
 n=render('nearby');
-assert(n.includes('secondaryNav'),'Only trade group has multiple distinct subpages');
-assert(n.includes('전체 최신 거래')&&n.includes('관심 14개')&&n.includes('새 거래'));
-assert(n.includes('switchPage(\'nearby\')'));
-assert(n.includes('switchPage(\'new\')'));
-assert(n.includes('openTradeLatest()'));
+assert(!n.includes('secondaryNav'),'Apartment trade options now appear once inside the selected page');
+for(const [page,id] of [['trades','trades'],['nearby','nearby'],['new','new']]){
+ const start=html.indexOf('<div id="'+id+'"');
+ const next=html.indexOf('class="apartmentTradeNav"',start);
+ assert(start>=0&&next>start,'Page has local trade controls: '+page);
+ const row=html.slice(next,html.indexOf('</div>',next));
+ assert(row.includes('전체 최신순')&&row.includes('관심 14개')&&row.includes('새 거래'),
+   'Three trade destinations in one local row: '+page);
+ assert(!row.includes('아파트 선택'),'Duplicate apartment selection is removed: '+page);
+}
+assert(!html.includes('id="tradeModeSearch"'),'Standalone apartment picker button removed');
+assert(html.includes('id="aptFilter"'),'Direct apartment search is available in advanced filters');
 const funcs=js.slice(js.indexOf('function openComplexHome(){'),js.indexOf('function switchNewsPane(',js.indexOf('function openComplexHome(){')));
 assert(funcs.includes('function openNewsHome(){'));
 vm.runInContext('function switchPage(id){currentPage=id;}',ctx);
