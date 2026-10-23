@@ -211,6 +211,11 @@ body.apartmentSheetActive{overflow:hidden}
 <div id="nearby" class="page hidden">
  <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
  <div class="panel">
+  <div class="tradeStarter apartmentTradeNav" role="group" aria-label="아파트 실거래 화면 선택">
+   <button type="button" class="" aria-current="false" onclick="openTradeLatest()"><span class="starterIcon">◷</span>전체 최신순</button>
+   <button type="button" class="active" aria-current="page" onclick="switchPage('nearby')"><span class="starterIcon">★</span>관심 14개</button>
+   <button type="button" class="" aria-current="false" onclick="switchPage('new')"><span class="starterIcon">✦</span>새 거래</button>
+  </div>
   <h3 style="margin:0 0 8px">즐겨찾기 14개 단지</h3>
   <details class="favoriteAlertCompact" id="favoriteAlertCompact">
    <summary>🔔 관심단지 알림 설정 <span>펼치기</span></summary>
@@ -329,6 +334,11 @@ body.apartmentSheetActive{overflow:hidden}
 <div id="new" class="page hidden">
  <div class="sectionTitle"><div><h2>새소식 · 신규 공개 실거래</h2><p class="tiny" id="newMeta">송도동 아파트 매매·전세·월세 · 일자별 공개 확인</p></div><button class="btn alt refreshAction" type="button" data-refresh="new_trades" onclick="refreshOne('new_trades',true)">갱신</button></div>
  <div class="panel">
+  <div class="tradeStarter apartmentTradeNav" role="group" aria-label="아파트 실거래 화면 선택">
+   <button type="button" class="" aria-current="false" onclick="openTradeLatest()"><span class="starterIcon">◷</span>전체 최신순</button>
+   <button type="button" class="" aria-current="false" onclick="switchPage('nearby')"><span class="starterIcon">★</span>관심 14개</button>
+   <button type="button" class="active" aria-current="page" onclick="switchPage('new')"><span class="starterIcon">✦</span>새 거래</button>
+  </div>
   <label class="inputLabel" for="newDate">신규 공개 확인일 (한국시간)</label><button id="newAlertFocusReset" type="button" class="btn alt hidden" onclick="clearNewAlertFocus()">알림 거래만 보는 중 · 날짜별로 보기</button><select id="newDate" onchange="clearNewAlertFocus()"></select>
   <div class="controls"><select id="newType" aria-label="실거래 유형" onchange="renderNew()"><option value="">매매·전세·월세 전체</option><option>매매</option><option>전세</option><option>월세</option></select><input id="newAptFilter" placeholder="단지명 검색" aria-label="단지명 검색" oninput="renderNew()"></div>
   <select id="newFavoriteFilter" aria-label="주변단지 한정" onchange="renderNew()"><option value="">송도동 전체 단지</option><option value="favorites">★ 관심 14개 단지만</option></select>
@@ -340,13 +350,14 @@ body.apartmentSheetActive{overflow:hidden}
 <div id="trades" class="page hidden">
  <div class="sectionTitle"><div><h2>송도동 아파트 실거래가</h2><p class="tiny" id="tradesMeta">국토교통부 공개 API 연동 대기</p></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
  <div class="panel">
-  <div class="tradeFilterHeading">
-    <span>거래 유형</span>
-    <button id="tradeModeSearch" type="button" aria-controls="tradeSearchPanel"
-      aria-expanded="false" aria-pressed="false" onclick="toggleTradeSearch()">⌕ 아파트 선택</button>
+  <div class="tradeStarter apartmentTradeNav" role="group" aria-label="아파트 실거래 화면 선택">
+   <button type="button" class="active" aria-current="page" onclick="openTradeLatest()"><span class="starterIcon">◷</span>전체 최신순</button>
+   <button type="button" class="" aria-current="false" onclick="switchPage('nearby')"><span class="starterIcon">★</span>관심 14개</button>
+   <button type="button" class="" aria-current="false" onclick="switchPage('new')"><span class="starterIcon">✦</span>새 거래</button>
   </div>
+  <p class="tiny apartmentTradeTypeLabel">거래 유형</p>
   <div id="tradeFocusBanner"></div>
-  <div id="tradeSearchPanel" class="tradeSearchOptions hidden">
+  <div id="tradeSearchPanel" class="tradeSearchOptions hidden" aria-hidden="true">
     <label class="inputLabel" for="tradeBuildingSelect">어느 아파트를 보시겠어요?</label>
     <select id="tradeBuildingSelect" onchange="chooseTradeBuilding()" aria-label="실거래 아파트 선택"><option value="">아파트를 선택하세요</option></select>
     <div id="tradeAreaPanel" class="hidden">
@@ -739,11 +750,7 @@ function renderMainNavigation(id){
  const propertySwitch=chosen?.id==='trades'?'<div class="propertyTypeSwitch" role="group" aria-label="실거래 부동산 종류 선택">'+
   '<button type="button" class="'+(id!=='officetel'?'selected':'')+'" aria-pressed="'+(id!=='officetel')+'" onclick="openTradeLatest()">아파트</button>'+
   '<button type="button" class="'+(id==='officetel'?'selected':'')+'" aria-pressed="'+(id==='officetel')+'" onclick="switchPage(\'officetel\')">오피스텔</button></div>':'';
- // Apartment subnavigation belongs only to apartment mode.
- const secondary=chosen&&id!=='officetel'&&chosen.children.length>1?'<div class="secondaryNav" aria-label="실거래 화면 선택">'+
-  chosen.children.map(([page,label])=>'<button type="button" class="'+(id===page?'active':'')+
-  '" onclick="'+(page==='trades'?'openTradeLatest()':"switchPage('"+page+"')")+'" aria-current="'+(id===page?'page':'false')+'">'+label+'</button>').join('')+
-  '</div>':'';
+ // Apartment trade destination buttons are in their respective page panels.
  const admin=role==='admin'?'<details class="adminQuick"><summary>관리자 도구 ▾</summary>'+
   '<div class="adminQuickLinks">'+[['notes','내 자료'],['settings','설정'],['security','보안']].map(([page,label])=>
   '<button type="button" onclick="switchPage(\''+page+'\')">'+label+'</button>').join('')+'</div></details>':'';
@@ -753,7 +760,7 @@ function renderMainNavigation(id){
   admin+'</div>';
  // Today Summary and Contract sit immediately below the three main tabs on every screen.
  // Trade-only apartment/officetel and detail filters follow them.
- $('nav').innerHTML=primary+tools+propertySwitch+secondary;
+ $('nav').innerHTML=primary+tools+propertySwitch;
 }
 // A detail sheet is its own full-screen view; the scrollable list stays intact.
 let activeApartmentSheet=null, apartmentReturnFocus=null;
@@ -1883,11 +1890,7 @@ function renderTrades(){
  const payload=remote.trades;
  // The top trade navigation already provides Latest and Favorites.
  // Keep just the apartment search affordance here and make its state explicit.
- const searchActive=tradeMode==='search',searchButton=$('tradeModeSearch');
- searchButton.classList.toggle('active',searchActive);
- searchButton.setAttribute('aria-pressed',searchActive?'true':'false');
- searchButton.setAttribute('aria-expanded',searchActive?'true':'false');
- searchButton.textContent=searchActive?'전체 거래 보기':'⌕ 아파트 선택';
+ const searchActive=tradeMode==='search';
  $('tradeSearchPanel').classList.toggle('hidden',!searchActive);
  renderTypeButtons('tradeTypeBar',$('typeFilter').value);
  if(tradeMode==='search'){
