@@ -715,3 +715,60 @@ header #roleButton:focus-visible{outline:2px solid #FBE9BB;outline-offset:3px}
  #new .newSimpleCounts{padding:11px;gap:9px}
  #new .newResultNumber{font-size:30px}
 }
+
+/* v2.0.31 unified page hierarchy: main category > shortcuts > title/refresh > context tabs. */
+#trades.page>.sectionTitle:first-child,
+#nearby.page>.sectionTitle:first-child,
+#new.page>.sectionTitle:first-child,
+#officetel.page>.sectionTitle:first-child,
+#complexes.page>.sectionTitle:first-child,
+#news.page>.sectionTitle:first-child{
+ display:flex;align-items:flex-start;justify-content:space-between;
+ gap:10px;margin:18px 0 14px;min-height:51px;
+}
+#trades.page>.sectionTitle:first-child>div,
+#nearby.page>.sectionTitle:first-child>div,
+#new.page>.sectionTitle:first-child>div,
+#officetel.page>.sectionTitle:first-child>div,
+#complexes.page>.sectionTitle:first-child>div,
+#news.page>.sectionTitle:first-child>div{flex:1 1 auto;min-width:0}
+#trades.page>.sectionTitle:first-child h2,
+#nearby.page>.sectionTitle:first-child h2,
+#new.page>.sectionTitle:first-child h2,
+#officetel.page>.sectionTitle:first-child h2,
+#complexes.page>.sectionTitle:first-child h2,
+#news.page>.sectionTitle:first-child h2{
+ margin:0;font-size:22px;font-weight:850;line-height:1.35;letter-spacing:-.6px;
+ color:var(--ui2-ink);overflow-wrap:break-word;
+}
+#trades.page>.sectionTitle:first-child .tiny,
+#nearby.page>.sectionTitle:first-child .tiny,
+#new.page>.sectionTitle:first-child .tiny,
+#officetel.page>.sectionTitle:first-child .tiny,
+#complexes.page>.sectionTitle:first-child .tiny,
+#news.page>.sectionTitle:first-child .tiny{margin:9px 0 0;line-height:1.55;font-size:14px}
+#trades.page>.sectionTitle:first-child>.refreshAction,
+#nearby.page>.sectionTitle:first-child>.refreshAction,
+#new.page>.sectionTitle:first-child>.refreshAction,
+#officetel.page>.sectionTitle:first-child>.refreshAction,
+#complexes.page>.sectionTitle:first-child>.refreshAction,
+#news.page>.sectionTitle:first-child>.refreshAction{
+ min-width:74px;min-height:49px;flex:0 0 auto;
+}
+#trades .sectionSubnav,#nearby .sectionSubnav,
+#new .sectionSubnav,#officetel .sectionSubnav{
+ margin:0 0 13px;max-width:100%;
+}
+#news .newsCategoryTabs{margin:0 0 14px;gap:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+#news .newsCategoryTabs>button{min-height:60px}
+#news #newsSubscriptionsPane .apiSmallCard{margin-top:0}
+#complexes .complexSearchPanel{margin-top:12px}
+@media(max-width:410px){
+ #trades.page>.sectionTitle:first-child h2,
+ #nearby.page>.sectionTitle:first-child h2,
+ #new.page>.sectionTitle:first-child h2,
+ #officetel.page>.sectionTitle:first-child h2,
+ #complexes.page>.sectionTitle:first-child h2,
+ #news.page>.sectionTitle:first-child h2{font-size:20px;letter-spacing:-.5px}
+ #news .newsCategoryTabs>button{font-size:14px}
+}
