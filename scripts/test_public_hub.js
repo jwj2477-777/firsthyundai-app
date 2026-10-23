@@ -10,7 +10,7 @@ assert.equal((nav[1].match(/icon:/g)||[]).length,3,'Keep three large family menu
 const snippet=javascript.slice(javascript.indexOf('// Source-backed optional integrations.'),javascript.indexOf('function tradeClass(type)'));
 assert(html.includes('class="propertyTypeSwitch sectionSubnav"'),'Property type switch must follow the trade page title');
 assert.equal((html.match(/class="propertyTypeSwitch sectionSubnav"/g)||[]).length,4,'All three apartment and the office trade pages share the same switch position');
-assert(javascript.includes("switchPage('officetel')")&&javascript.includes("openTradeLatest()"),'Keep apartment and office switch actions');
+assert(html.includes('onclick="switchPage(\'officetel\')"')&&html.includes('onclick="openTradeLatest()"'),'Keep apartment and office switch actions');
 assert(!javascript.includes("primary+tools+propertySwitch+secondary"),'No upper apartment-only subnavigation is rendered');
 assert(!html.includes('class="officeOnDemand"'),'Remove bottom-of-page-only office access');
 assert(html.includes('오피스텔 실거래')&&html.includes('<option value="매매">매매</option>'));
