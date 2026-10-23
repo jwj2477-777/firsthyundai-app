@@ -232,21 +232,21 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.25 clean news and footer, verified F15 monthly fees APK
+      - name: Publish successful v2.0.26 official 3-part K-apt management cost API connectivity APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.25.apk
-          unzip -t FirstHyundai-v2.0.25.apk | grep 'No errors detected'
-          if gh release view v2.0.25 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.26.apk
+          unzip -t FirstHyundai-v2.0.26.apk | grep 'No errors detected'
+          if gh release view v2.0.26 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.25 FirstHyundai-v2.0.25.apk \
+            gh release create v2.0.26 FirstHyundai-v2.0.26.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.25 · 신규거래 설명 제거·하단 UI 간소화·관리비 자료 연결 보완' \
-              --notes '새소식·신규 공개 실거래의 길고 중복된 설명문을 제거했습니다. 화면 최하단 설치 버전과 업데이트 확인을 한 줄 중심의 간결한 레이아웃으로 정리하고 중복 앱 설명을 삭제했습니다. K-apt 공식 자료실 공개와 달리 기존 외부 미러 수집이 Github에서 차단되는 원인을 확인했고, 직접 검증된 퍼스트파크15블럭 2026년 7월 관리비 합계 단가 3831원/전용㎡를 평형별 참고액에 반영했습니다. 다른 단지는 근거 없는 금액을 만들지 않고 K-apt 공식 조회 링크를 제공합니다. 기존 신규 실거래 발견일 기능·오피스텔 분리·학군·계약·업데이트 서명을 보존합니다.'
+              --title '퍼스트현대 v2.0.26 · 국토부 관리비 3종 공식 API 수집 연동 진단' \
+              --notes '국토교통부 공동주택관리비 공용관리비·개별사용료·장기수선충당금 3종 공식 K-apt API의 활용신청 승인을 재사용 공공데이터포털 비밀키로 직접 점검하는 수집 파이프라인을 추가했습니다. 세 그룹의 실제 응답과 기준월, 단지코드를 검증한 후 누락·중복·과대계상을 막고 확실한 평균값만 게시할 준비를 합니다. 기존 15블럭의 검증된 관리비와 다른 단지 확인 대기 상태는 보존합니다. 기존 가족/관리자·계약·학군·주소·실거래와 고정 서명 인앱 업데이트 기능을 유지합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.25 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.26 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"

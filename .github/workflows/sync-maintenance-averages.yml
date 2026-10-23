@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/collect_maintenance_averages.py'
+      - 'scripts/probe_maintenance_three_apis.py'
       - 'data/maintenance_estimates.json'
       - 'tests/test_maintenance_averages.py'
       - '.github/workflows/sync-maintenance-averages.yml'
@@ -26,7 +27,13 @@ jobs:
           python-version: '3.11'
       - name: Check strict total/unit validation and no fabricated bills
         run: python -m unittest discover -s tests -p test_maintenance_averages.py -v
-      - name: Fetch published K-apt monthly data without client secrets
+      - name: Verify newly approved official K-apt group APIs (safe diagnostics)
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+        run: python scripts/probe_maintenance_three_apis.py
+      - name: Fetch published K-apt monthly data
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
         run: python scripts/collect_maintenance_averages.py
       - name: Publish source-validated public estimates only
         run: |

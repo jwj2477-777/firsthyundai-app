@@ -89,7 +89,7 @@ nodes.officeMinArea.value='40';run('renderOfficeRentals()');
 assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>2건</b>'));
 nodes.officeMinArea.value='';
 const gradle=fs.readFileSync(path.join(root,'app/build.gradle'),'utf8');
-assert(gradle.includes("versionCode 76; versionName '2.0.25'"));
+assert(gradle.includes("versionCode 77; versionName '2.0.26'"));
 const w=fs.readFileSync(path.join(root,'.github/workflows/sync-public-services.yml'),'utf8');
 assert(w.includes('--mode offices')&&w.includes('--mode office_sales'));
 console.log('Officetel same-as-apartment search and cards passed: latest, selection, area, category, date, status, range, independent records');
