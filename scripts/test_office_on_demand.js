@@ -8,7 +8,7 @@ const nav=script.slice(script.indexOf('const NAV_CATEGORIES=['),script.indexOf('
 assert.equal((nav.match(/icon:/g)||[]).length,3,'Preserve existing three top categories');
 assert(!nav.includes('officetel'),'Officetel is not part of apartment top menu');
 assert(html.includes('id="officetel" class="page hidden"'));
-assert((html.match(/class="propertyTypeSwitch sectionSubnav"/g)||[]).length===4,'Property category switch is placed after all apartment and officetel page titles');
+assert((html.match(/class="propertyTypeSwitch sectionSubnav sectionModeSwitch"/g)||[]).length===4,'Property category switch is placed after all apartment and officetel page titles');
 const trades=html.slice(html.indexOf('<div id="trades"'),html.indexOf('<div id="officetel"'));
 assert(!trades.includes('id="officeRentContent"'),'Apartment and office trade records must remain separate');
 for(const phrase of ['id="officeModeLatest"','id="officeModeSearch"','id="officeBuildingSelect"',
