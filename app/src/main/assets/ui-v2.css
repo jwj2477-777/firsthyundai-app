@@ -645,3 +645,27 @@ header #roleButton:focus-visible{outline:2px solid #FBE9BB;outline-offset:3px}
 #trades #tradeModeSearch:focus-visible{outline:3px solid #8EB8E5;outline-offset:2px}
 #trades #tradeSearchPanel{margin-top:2px}
 @media(max-width:365px){#trades #tradeModeSearch{padding:9px 10px;font-size:13px}}
+
+/* v2.0.29: a single lower transaction navigator, no duplicated upper sub-menu. */
+#trades .apartmentTradeNav,#nearby .apartmentTradeNav,#new .apartmentTradeNav{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;
+ margin:0 0 17px;
+}
+#trades .apartmentTradeNav>button,#nearby .apartmentTradeNav>button,#new .apartmentTradeNav>button{
+ min-width:0;min-height:80px;padding:12px 5px;line-height:1.3;
+ border:1.5px solid #CBD8E7;border-radius:16px;background:#F9FBFE;
+ color:#3B526B;font-size:14px;font-weight:850;
+}
+#trades .apartmentTradeNav>button.active,#nearby .apartmentTradeNav>button.active,#new .apartmentTradeNav>button.active{
+ background:#2456AA;color:#FFFFFF;border:3px solid #153E81;
+ box-shadow:inset 0 -4px 0 #173E80;
+}
+#trades .apartmentTradeNav>button .starterIcon,#nearby .apartmentTradeNav>button .starterIcon,
+#new .apartmentTradeNav>button .starterIcon{display:block;font-size:22px;line-height:1.1;margin-bottom:7px}
+#trades .apartmentTradeNav>button:focus-visible,#nearby .apartmentTradeNav>button:focus-visible,
+#new .apartmentTradeNav>button:focus-visible{outline:3px solid #83ABE1;outline-offset:2px}
+#trades .apartmentTradeTypeLabel{margin:3px 0 4px;font-size:13px}
+@media(max-width:370px){
+ #trades .apartmentTradeNav,#nearby .apartmentTradeNav,#new .apartmentTradeNav{gap:6px}
+ #trades .apartmentTradeNav>button,#nearby .apartmentTradeNav>button,#new .apartmentTradeNav>button{font-size:12px;min-height:74px}
+}
