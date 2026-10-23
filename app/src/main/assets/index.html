@@ -1389,6 +1389,8 @@ function renderPublicComplexInfo(p){
    average.won_per_exclusive_m2>=300&&average.won_per_exclusive_m2<=20000&&
    /^20[0-9]{4}$/.test(average.month||'')&&safeLink(average.source_url)?
    average.won_per_exclusive_m2:null;
+ const trend=picked&&typeof FirstHyundaiMaintenance!=='undefined'?FirstHyundaiMaintenance.summarize(
+   maintenanceEstimates,p.id,p.kapt_code,Number(picked.exclusive_m2)):null;
  const phone=String(p.management_phone||'').replace(/[^0-9+]/g,'');
  const options=types.length?'<div class="neisLevelButtons">'+types.map((t,i)=>{
    const py=typeof supplyPyeong==='function'?supplyPyeong(t.supply_m2,t.market_pyeong):null;
@@ -1397,7 +1399,10 @@ function renderPublicComplexInfo(p){
      '" aria-pressed="'+(i===idx?'true':'false')+'" onclick="chooseMaintenanceType(\''+escapeHtml(p.id)+'\','+i+')">'+
      escapeHtml(label)+'</button>';
  }).join('')+'</div>':'<p class="practiceNote">평형·타입 정보 확인 전입니다.</p>';
- const bill=picked?rate!==null?
+ const bill=picked?trend?
+   FirstHyundaiMaintenance.renderTrend(trend,picked.exclusive_m2)+
+   sourceLink(trend.latestSource,'K-apt 기반 공개 원문 확인'):
+   rate!==null?
    '<p class="practiceNote"><strong>약 '+escapeHtml((Math.round(rate*picked.exclusive_m2/100)*100).toLocaleString('ko-KR'))+'원</strong> · 전용 '+escapeHtml(picked.exclusive_m2)+'㎡</p>'+
    '<p class="tiny">K-apt 공개 월별 ㎡당 단가 '+escapeHtml(rate.toLocaleString('ko-KR'))+'원 × 전용면적 · '+escapeHtml(average.month.slice(0,4)+'년 '+Number(average.month.slice(4))+'월')+'분 상담 참고액</p>'+
    sourceLink(average.source_url,'K-apt 기반 공개 원문 확인'):
@@ -2426,4 +2431,4 @@ function exportComplexCatalog(){
 }
 window.onCatalogSaved=r=>alert(r.ok?'단지정보 JSON을 저장했습니다. GitHub에 올려야 가족에게 반영됩니다.':'단지정보 파일 저장 실패');
 
-</script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-image.js"></script><script src="scroll-top.js"></script><script src="app-updates.js"></script></body></html>
+</script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-image.js"></script><script src="scroll-top.js"></script><script src="app-updates.js"></script></body></html>
