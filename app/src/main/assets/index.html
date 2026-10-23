@@ -1313,7 +1313,7 @@ function renderSchoolPublicInfo(){
    '학교 기본정보 수집을 확인 중입니다. 나이스 API가 실패하면 교육부 학교위치 표준데이터로 대체하며, 두 원천이 모두 실패하면 임의 학교목록을 표시하지 않습니다.':
    '선택한 학교급의 확인된 학교정보가 없습니다.')+'</div>';
  return '<div class="apiSmallCard"><h3>송도 학교 정보</h3>'+
-  '<p class="complexSectionNote">송도 운영 학교의 공식 위치와 기본정보입니다. 초등 통학구역은 위 단지별 검증 결과에서 확인하며, 중학교 학교군/실제 배정은 별도 확인이 필요합니다.</p>'+
+  '<p class="complexSectionNote">송도 운영 학교의 공식 위치와 기본정보이며, 현재 선택한 아파트의 배정학교가 아닙니다. 초등 통학구역은 위 단지별 검증 결과에서 확인하며, 중학교 학교군/실제 배정은 별도 확인이 필요합니다.</p>'+
   '<p class="tiny">공식 초등 통학구역: 인천 연수구 34개 경계 (2026-09-20) · 학교알리미: '+
    (schoolinfo?'연수구 학교 '+schoolinfo.length+'곳 연결':'연동 확인 대기')+'</p>'+
   '<p class="tiny">정보 출처: '+escapeHtml(officialSource)+' · 자료 기준: '+escapeHtml(publicServices?.[origin]?.reference_date||'미기재')+' · 확인: '+escapeHtml(updated)+'</p>'+
