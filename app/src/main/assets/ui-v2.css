@@ -798,3 +798,13 @@ header #roleButton:focus-visible{outline:2px solid #FBE9BB;outline-offset:3px}
  #nearbyDetails #nearbyTypeBar .typeLabel{font-size:13px}
  #nearbyDetails #nearbyTypeBar .typeCount{font-size:11px}
 }
+
+/* v2.0.33: compact official recovery when the phone cannot reach update feeds. */
+.compactAppFooter .appUpdateManual{
+ display:inline-flex;align-items:center;margin:5px 0 2px;
+ min-height:44px;padding:7px 0;
+ font-size:13px;font-weight:800;color:#096c76;text-decoration:underline;
+ text-decoration-thickness:1px;text-underline-offset:3px;
+}
+.compactAppFooter .appUpdateManual.hidden{display:none!important}
+.compactAppFooter .appUpdateManual:focus-visible{outline:3px solid #85aeca;outline-offset:3px}
