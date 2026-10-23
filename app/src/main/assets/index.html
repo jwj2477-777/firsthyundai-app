@@ -231,6 +231,7 @@ body.apartmentSheetActive{overflow:hidden}
    </div>
   </details>
   <button id="nearbyAll" class="btn alt nearbyTotal" type="button" onclick="chooseNearby('all')"><span>★ 관심 14개 단지 전체 보기</span><strong id="nearbyAllCount">—</strong></button>
+  <p id="nearbyPeriod" class="favoriteCollectionScope" aria-live="polite">거래 집계기간 확인 중</p>
   <div id="nearbyCards" class="nearbyGrid"></div>
  </div>
  <section class="panel apartmentSheet" id="nearbyDetails" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="nearbySheetTitle">
@@ -1213,6 +1214,9 @@ function verifiedLotAddress(p){
  const lot=String(p.lot_address||row?.lot_address||'').trim();
  return /^인천광역시 연수구 송도동 [0-9]{1,4}(?:-[0-9]{1,4})?$/.test(lot)?lot:'';
 }
+function compactComplexAddress(address){
+ return String(address||'').replace(/^(?:인천광역시|인천시|인천)\s*연수구\s*/,'').trim();
+}
 function renderComplexes(){
  const all=catalogRows(),q=($('complexSearch').value||'').trim().normalize('NFKC').toLowerCase();
  const visible=all.filter(x=>!q||[x.label,...(Array.isArray(x.aliases)?x.aliases:[])]
@@ -1220,12 +1224,14 @@ function renderComplexes(){
  $('complexMeta').textContent='조회 '+visible.length+'곳 · 등록된 단지 기본정보 '+(remote.complexes?.records||[]).length+'곳'+
   (issues.trades?' · 실거래 갱신 오류':'')+(issues.complexes?' · 단지정보 갱신 오류':'');
  const shown=visible.slice(0,complexDisplayLimit);
- $('complexCards').innerHTML=shown.length?shown.map(x=>
-  '<button type="button" class="nearbyCard'+(x.id===complexSelected?' selected':'')+'" onclick="selectComplex(\''+x.id+'\')" aria-pressed="'+(x.id===complexSelected?'true':'false')+'">'+
-  '<strong>'+escapeHtml(x.label)+'</strong>'+
-  (verifiedLotAddress(x)||x.address?'<span class="complexCardAddress">'+escapeHtml(verifiedLotAddress(x)||x.address)+'</span>':'')+
-  '<small>'+((Number.isInteger(x.households)&&x.households>0)?number(x.households)+'세대':'기초정보 준비 중')+'</small></button>'
- ).join(''):'<div class="empty">검색 결과가 없습니다.</div>';
+ $('complexCards').innerHTML=shown.length?shown.map(x=>{
+  const address=compactComplexAddress(verifiedLotAddress(x)||x.address);
+  const households=Number.isInteger(x.households)&&x.households>0?number(x.households)+'세대':'세대수 확인 전';
+  return '<button type="button" class="nearbyCard complexSummaryCard'+(x.id===complexSelected?' selected':'')+'" onclick="selectComplex(&quot;'+x.id+'&quot;)" aria-pressed="'+(x.id===complexSelected?'true':'false')+'">'+
+   '<span class="compactCardHeading"><strong>'+escapeHtml(x.label)+'</strong><span class="compactCardArrow" aria-hidden="true">›</span></span>'+
+   '<span class="complexSummaryMeta"><span class="complexSummaryHouseholds">'+escapeHtml(households)+'</span>'+
+   '<span class="complexSummaryAddress"><span class="summaryMetaLabel">주소</span> '+escapeHtml(address||'확인 전')+'</span></span></button>';
+ }).join(''):'<div class="empty">검색 결과가 없습니다.</div>';
  $('complexShowMore').classList.toggle('hidden',shown.length>=visible.length);
  $('complexShowMore').textContent='단지 더 보기 ('+number(visible.length-shown.length)+'곳)';
  const p=visible.find(x=>x.id===complexSelected)||visible[0];
@@ -1840,6 +1846,16 @@ function showMoreNearby(){nearbyLimit+=40;renderNearbyDetails(false);}
 function nearbyAllRows(){
  return (remote.trades?.records||[]).filter(rec=>favoriteIdForBuilding(rec.building));
 }
+function favoriteCollectionScope(snapshot){
+ if(!snapshot||snapshot.state==='not_started')return '거래 집계기간 확인 중 · 매매·전월세 합산';
+ const date=String(snapshot.checked_at||'').match(/^(20\d{2})-(0[1-9]|1[0-2])/);
+ if(!date)return '집계기간 확인 중 · 매매·전월세 합산';
+ const endMonth=Number(date[1])*12+Number(date[2])-1;
+ const beginMonth=endMonth-11;
+ const ym=index=>String(Math.floor(index/12))+'.'+String(index%12+1).padStart(2,'0');
+ const incomplete=snapshot.state==='partial'||(Array.isArray(snapshot.missing_buckets)&&snapshot.missing_buckets.length>0);
+ return '집계 대상 '+ym(beginMonth)+'–'+ym(endMonth)+' · 매매·전월세 합산'+(incomplete?' · 일부 월 미수집':'');
+}
 function renderNearby(){
  const rows=nearbyAllRows(), hasData=!!remote.trades&&remote.trades.state!=='not_started';
  const grouped=Object.fromEntries(FAVORITE_APTS.map(g=>[g.id,[]]));
@@ -1847,20 +1863,20 @@ function renderNearby(){
   const id=favoriteIdForBuilding(rec.building);
   if(grouped[id])grouped[id].push(rec);
  }
+ $('nearbyPeriod').textContent=favoriteCollectionScope(remote.trades);
  $('nearbyAllCount').textContent=hasData?number(rows.length)+'건':'—';
  $('nearbyAll').classList.toggle('selected',nearbySelected==='all');
  $('nearbyAll')?.setAttribute?.('aria-pressed',nearbySelected==='all'?'true':'false');
- $('nearbyCards').innerHTML=FAVORITE_APTS.map((g,i)=>{
-  const matches=grouped[g.id], latest=matches.reduce((a,x)=>!a||x.contract_date>a.contract_date?x:a,null);
-  const part=g.group;
+ $('nearbyCards').innerHTML=FAVORITE_APTS.map(g=>{
+  const matches=grouped[g.id];
+  const latest=matches.reduce((a,x)=>x.contract_date&&(!a||x.contract_date>a.contract_date)?x:a,null);
   const count=hasData?number(matches.length)+'건':'—';
-  const latestText=latest?'최근 계약 '+latest.contract_date:'거래 수집 대기';
-  return '<button type="button" class="nearbyCard'+(nearbySelected===g.id?' selected':'')+
-   '" onclick="chooseNearby(\''+g.id+'\')" aria-pressed="'+(nearbySelected===g.id?'true':'false')+'">'+
-   '<span class="star">★ <small>'+escapeHtml(part)+'</small></span>'+
-   '<strong>'+escapeHtml(g.label)+'</strong>'+
-   '<small>'+count+' · '+escapeHtml(latestText)+'</small>'+
-   '</button>';
+  const date=latest?String(latest.contract_date).replace(/-/g,'.'):'';
+  return '<button type="button" class="nearbyCard favoriteSummaryCard'+(nearbySelected===g.id?' selected':'')+
+   '" onclick="chooseNearby(&quot;'+g.id+'&quot;)" aria-pressed="'+(nearbySelected===g.id?'true':'false')+'">'+
+   '<span class="compactCardHeading"><span class="favoriteCardStar" aria-hidden="true">★</span><strong>'+escapeHtml(g.label)+'</strong><span class="compactCardArrow" aria-hidden="true">›</span></span>'+
+   '<span class="favoriteCardMeta"><span class="favoriteCardCount"><span class="summaryMetaLabel">거래</span> <b>'+escapeHtml(count)+'</b></span>'+
+   '<span class="favoriteCardDate"><span class="summaryMetaLabel">최근 계약</span> <time'+(latest?' datetime="'+escapeHtml(latest.contract_date)+'"':'')+'>'+escapeHtml(date||'확인 전')+'</time></span></span></button>';
  }).join('');
  renderNearbyDetails(false);
 }
