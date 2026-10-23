@@ -548,3 +548,15 @@ header #roleButton:focus-visible{outline:2px solid #FBE9BB;outline-offset:3px}
 .officeSourceNote{margin:12px 0!important}
 .officeMore{margin-top:10px;width:100%}
 @media(max-width:360px){.officeBasicFilters{grid-template-columns:1fr}.officeAdvancedFilters{grid-template-columns:1fr 1fr}}
+
+/* v2.0.19: switch apartment and office right beneath the three primary menus. */
+.propertyTypeSwitch{display:flex;gap:3px;margin:9px 0 10px;padding:4px;border-radius:14px;
+ background:#E5EFED;border:1px solid #CCDCD9;max-width:100%}
+.propertyTypeSwitch button{flex:1;appearance:none;border:0;background:transparent;border-radius:10px;
+ font:inherit;font-size:14px;font-weight:800;color:#49656B;padding:12px 8px;min-height:43px;
+ cursor:pointer}
+.propertyTypeSwitch button.selected{background:#07666A;color:#FFFFFF;box-shadow:0 2px 5px #113D4430}
+.propertyTypeSwitch button:focus-visible{outline:2px solid #E8B747;outline-offset:2px}
+.officePending{font-size:13px;line-height:1.65;color:#446569;background:#EDF5F4;border:1px solid #D4E4E1;
+ padding:11px 13px;border-radius:10px;margin:10px 0}
+.officeDeal.sale .officeMoney{color:#135C82}
