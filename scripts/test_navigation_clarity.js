@@ -55,7 +55,7 @@ n=render('nearby');
 assert(!n.includes('secondaryNav'),'Apartment trade options now appear once inside the selected page');
 for(const [page,id] of [['trades','trades'],['nearby','nearby'],['new','new']]){
  const start=html.indexOf('<div id="'+id+'"');
- const next=html.indexOf('class="apartmentTradeNav"',start);
+ const next=html.indexOf('class="tradeStarter apartmentTradeNav"',start);
  assert(start>=0&&next>start,'Page has local trade controls: '+page);
  const row=html.slice(next,html.indexOf('</div>',next));
  assert(row.includes('전체 최신순')&&row.includes('관심 14개')&&row.includes('새 거래'),
