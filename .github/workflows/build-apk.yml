@@ -42,6 +42,9 @@ on:
       - 'scripts/test_trade_contract_date_filter.js'
       - 'scripts/test_trade_confirmation_states.js'
       - 'scripts/test_app_version.js'
+      - 'scripts/test_update_fallback.js'
+      - 'scripts/publish_app_release_index.py'
+      - 'tests/test_release_index.py'
       - 'scripts/check_apk_version.py'
       - 'scripts/test_apartment_detail_navigation.js'
       - 'scripts/test_refresh_feedback.js'
@@ -157,6 +160,7 @@ jobs:
           node scripts/test_app_version.js
           node scripts/test_updates_welcome.js
           node scripts/test_direct_updater.js
+          node scripts/test_update_fallback.js
           node scripts/test_apartment_detail_navigation.js
           node scripts/test_area_contract_bridge.js
           node scripts/test_refresh_feedback.js
@@ -244,21 +248,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.32 favorite transaction type count buttons APK
+      - name: Publish v2.0.33 resilient update checks APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.32.apk
-          unzip -t FirstHyundai-v2.0.32.apk | grep 'No errors detected'
-          if gh release view v2.0.32 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.33.apk
+          unzip -t FirstHyundai-v2.0.33.apk | grep 'No errors detected'
+          if gh release view v2.0.33 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.32 FirstHyundai-v2.0.32.apk \
+            gh release create v2.0.33 FirstHyundai-v2.0.33.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.32 · 관심단지 실거래 버튼과 건수 표시 통합' \
+              --title '퍼스트현대 v2.0.33 · 앱 업데이트 확인 장애 복구' \
               --notes '3개 대표 메뉴 아래 오늘 요약·계약문자 빠른 업무를 유지하면서 실거래 상단 중복 하위메뉴 없이 전체 최신순·관심 14개·새 거래 단일 메뉴를 유지하고, 새 거래의 간편 검색은 그대로 유지하면서 실거래·단지정보·뉴스 모두 대표 메뉴/공통 바로가기/페이지 제목과 갱신/해당 화면 전용 전환 메뉴 순서로 통일했습니다. 뉴스 브리핑·인천 청약분양 제목의 크기를 동일하게 유지하고 관심 14개 전체 및 개별 아파트 실거래 상세에서 전체·매매·전세·월세 버튼 내부에 해당 건수를 직접 표시합니다. 아래 별도 건수 뱃지 줄을 삭제해 중복을 줄였습니다. 중복 아파트 선택 버튼은 삭제하고 아래 상세 검색의 아파트명 검색을 유지합니다. 기존 평형별 관리비 참고액 기능을 유지합니다. 최신 공개월과 최근 12개월 중 실제 확인된 월의 평균·범위·변동만 표시합니다. 수집 미완료 시 이전 검증자료 보존 및 자료 기준월을 안내합니다. 공용관리비/개별사용료/장기수선충당금 수집은 공식 데이터 연동 상태에 따라 달라지며 전체 단지 수집완료를 보장하지 않습니다. 기존 계약·실거래·주소·학교·가족/관리자·고정 서명 앱 업데이트를 유지합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.32 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.33 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.33 --apk FirstHyundai-v2.0.33.apk
