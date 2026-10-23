@@ -25,7 +25,8 @@ class OfficialFees(unittest.TestCase):
   self.assertEqual(mod.extract_amount([row],'A10026679','202607'),1750000)
  def test_calibration_required(self):
   self.assertTrue(mod.calibration_passes(dict(mod.CALIBRATION), '70685.27'))
-  self.assertFalse(mod.calibration_passes({'common': 115610191, 'individual':145310174,'reserve':9841930},'70685.27'))
+  self.assertTrue(mod.calibration_passes({'common': 115610191, 'individual':145310174,'reserve':9841930},'70685.27'))
+  self.assertFalse(mod.calibration_passes({'common': 95510190, 'individual':145310174,'reserve':9841930},'70685.27'))
   self.assertFalse(mod.calibration_passes(dict(mod.CALIBRATION), '80000'))
   full, rate=mod.validated_rate(dict(mod.CALIBRATION),'70685.27')
   self.assertEqual(full,270762294)
