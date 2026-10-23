@@ -33,14 +33,15 @@ for(const row of [
  {type:'월세',status:'신고',contract_type_raw:'갱신계약'}
 ]){
  const markup=card(row);
- assert.equal((markup.match(/class="/g)||[]).length,3,'Exactly three compact badges');
+ assert.equal((markup.match(/class="/g)||[]).length,2,'Only type and meaningful contract/dealing kind badges');
  assert(markup.includes('tradeMainBadge')&&markup.includes('tradeInfoBadge'));
+ assert(!markup.includes('tradeReportBadge'),'Ordinary report is redundant');
  assert(!markup.includes('(갱신계약)')&&!markup.includes('(신규계약)'));
  if(row.type==='매매')assert(markup.includes('직거래'));
- else assert(markup.includes('임대차 신고'));
+ else assert(markup.includes(row.contract_type_raw));
 }
-assert.equal((card({type:'전세',status:'신고',contract_type_raw:''}).match(/class="/g)||[]).length,2,
- 'Do not add redundant contract class if the official field is missing');
+assert.equal((card({type:'전세',status:'신고',contract_type_raw:''}).match(/class="/g)||[]).length,1,
+ 'Missing contract type + routine report should leave only the transaction type');
 for(const fragment of ['tradeStatusBadge(x)+tradeExtraBadges(x)','dealBadge(x.type)']){
  assert(htmlJs.includes(fragment),'All card renderers must use shared badges: '+fragment);
 }
