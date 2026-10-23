@@ -33,7 +33,10 @@ const html=renderTrend(t,84.7);
 assert(html.includes('확인된 3개월 평균'));
 assert(html.includes('전년 같은 달 대비'));
 assert(html.includes('월별 변동 보기'));
-assert(!html.includes('2025년 10월')&&t.count===3,'do not mix older months into rolling 12');
+assert.equal(t.count,3,'only the actual three months belong in the rolling-12-month average');
+assert.deepEqual(t.trend.map(x=>x.month),['202607','202608','202609'],
+ '2025 year-over-year comparison data must never be included in the recent 12-month trend');
+assert(html.includes('2025년 10월'),'rolling window label is allowed to mention its actual boundary month');
 const prior=snapshot(row('202607',3831));
 assert.equal(summarize(prior,'f15','WRONG',84.7,now),null);
 assert.equal(summarize(prior,'f15','A10026679',NaN,now),null);
