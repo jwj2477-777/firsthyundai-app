@@ -81,7 +81,7 @@ public class MainActivity extends Activity {
         s.setAllowUniversalAccessFromFileURLs(false);
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         web.addJavascriptInterface(new Bridge(), "FirstHyundaiNative");
-        setContentView(web);
+        SystemBars.install(this,web);
         web.loadUrl("file:///android_asset/index.html");
     }
 
