@@ -1,5 +1,11 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-24 · v2.0.45 · 모든 실거래 카드의 반복 신고 배지 삭제
+- 사용자 실거래 카드 스크린샷: 매매 신고/전월세 임대차 신고 표시는 공개된 자료에서 정상 신고를 반복해 정보 가치 없음. 매매 거래의 중개거래/직거래, 임대차 신규계약/갱신계약, 갱신권·기존금액 등 유의미한 분류 유지.
+- app/src/main/assets/index.html 공통 tradeStatusBadge(row)에서 신고, 신고(임대차) 및 공백형은 빈 문자열 반환. 해제인 경우 붉은 강조 배지·별도 해제일·취소 스타일·해제만/제외 필터 유지. 기타 비정상/예외 원본 status 보존. 아파트 전체·관심 14개·새 거래·오피스텔 카드 전체에 공유.
+- 상태 배지만 간소화, 실거래 데이터/필터/계약업무/알림·업데이트 변경 없음. scripts/test_trade_confirmation_states.js 및 scripts/test_trade_contract_regression.js에서 간결한 배지와 해제/정정 예외 검증. v2.0.45/build96, 실제 설치 후 시각 QA 별도.
+
+
 ## 2026-10-24 · v2.0.44 · 오피스텔 제목선 그라데이션 색상만 수정
 - 사용자 캡처 2장: 아파트/오피스텔 실거래 제목 왼쪽 세로선. 문제는 길이·위치가 **아니고** 오피스텔만 금→청록 그라데이션이 남은 **색상 불일치**임.
 - 원인: 전역 `.page>.sectionTitle:first-child:before`의 그라데이션 후속 CSS; 다른 탭은 각 목적지 단색 우선순위 규칙으로 덮었으나 `officetel`만 누락. 수정은 `body[data-section="officetel"] .page#officetel>.sectionTitle:before{background:var(--ui2-trades)}` **단 한 개 배경 속성**만 사용.
