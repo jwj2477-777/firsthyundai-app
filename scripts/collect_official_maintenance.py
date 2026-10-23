@@ -54,7 +54,7 @@ def number(value):
  if isinstance(value, bool) or value is None:
   return None
  raw = str(value).strip().replace(',', '')
- if not re.fullmatch(r'(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?', raw):
+ if not re.fullmatch(r'(?:0|[1-9][0-9]*)(?:\.[0-9]+)?', raw):
   return None
  try:
   return Decimal(raw)
@@ -216,7 +216,7 @@ def main():
   print('KAPT_OFFICIAL calibration incomplete/mismatch; old snapshot preserved')
   return 0
  if data['records'] != previous.get('records', []):
-  OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\\n', encoding='utf-8')
+  OUT.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
   print('KAPT_OFFICIAL published verified records', data['success_count'], 'scanned', data['checked_codes'])
  else:
   print('KAPT_OFFICIAL unchanged; verified', data['success_count'], 'scanned', data['checked_codes'])
