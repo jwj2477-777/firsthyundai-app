@@ -249,7 +249,6 @@ body.apartmentSheetActive{overflow:hidden}
     <label class="inputLabel" for="nearbyAreaSelect">전용면적 선택 · 확인된 공급평형 병기</label>
     <select id="nearbyAreaSelect" onchange="renderNearbyDetails(true)" aria-label="관심단지 전용면적"><option value="">모든 전용면적 보기</option></select>
   </div>
-  <div id="nearbyStats" class="nearbyStats"></div>
   <div id="nearbyTrades"><div class="empty">데이터를 불러오면 거래가 표시됩니다.</div></div>
   <button id="nearbyMore" class="btn alt hidden" type="button" onclick="showMoreNearby()">거래 더 보기</button>
   <button class="btn alt" type="button" onclick="closeApartmentSheet()">← 다른 관심 아파트 선택</button>
@@ -1711,13 +1710,19 @@ function tradeBrokerLocation(row){
  return region?'<div class="meta tradeBrokerRegion">중개사 소재지 · '+escapeHtml(region)+'</div>':'';
 }
 
-function renderTypeButtons(id,type){
+function renderTypeButtons(id,type,counts){
  const el=$(id);if(!el)return;
  const buttons=el.querySelectorAll?Array.from(el.querySelectorAll('button')):[];
  buttons.forEach((button,index)=>{
   const t=['','매매','전세','월세'][index],active=t===type;
   button.className=(active?'active ':'')+tradeClass(t);
   if(button.setAttribute)button.setAttribute('aria-pressed',active?'true':'false');
+  if(counts!==undefined){
+   const label=t||'전체';
+   const count=counts&&Number.isSafeInteger(counts[t])?number(counts[t])+'건':'—';
+   button.innerHTML='<span class="typeLabel">'+label+'</span><span class="typeCount">'+count+'</span>';
+   if(button.setAttribute)button.setAttribute('aria-label',label+' '+count);
+  }
  });
 }
 function areaKey(val){const n=Number(val);return Number.isFinite(n)&&n>0?String(Math.round(n*100)/100):'';}
@@ -1865,18 +1870,22 @@ function renderNearbyDetails(resetLimit){
  updateNearbyAreas(g,rows);
  const type=$('nearbyType').value;
  const chosenArea=g?$('nearbyAreaSelect').value:'';
- renderTypeButtons('nearbyTypeBar',type);
- const allTypes={매매:0,전세:0,월세:0};
- for(let row of rows)if(Object.prototype.hasOwnProperty.call(allTypes,row.type))allTypes[row.type]++;
- const total=rows.length;
+ // Show the same backed-by-data counts directly on the four filter buttons.
+ // When a floor-area is selected, all four numbers reflect that area.
+ const scopedRows=chosenArea?rows.filter(x=>areaKey(x.area_m2)===chosenArea):rows;
+ const typeCounts={매매:0,전세:0,월세:0};
+ for(const row of scopedRows){
+  if(Object.prototype.hasOwnProperty.call(typeCounts,row.type))typeCounts[row.type]++;
+ }
+ const verified=!!remote.trades&&remote.trades.state!=='not_started';
+ renderTypeButtons('nearbyTypeBar',type,verified?{
+  '':scopedRows.length,'매매':typeCounts.매매,
+  '전세':typeCounts.전세,'월세':typeCounts.월세
+ }:null);
  $('nearbyTitle').textContent=g?g.label+' 실거래':'★ 관심 14개 단지 실거래';
  $('nearbyMeta').textContent=remote.trades?
   '계약일 최신순 · 최종 수집 '+prettyTime(remote.trades.checked_at):
   '데이터 연결 대기 · 설정에서 GitHub 저장소를 연결하세요.';
- $('nearbyStats').innerHTML='<span class="pill">전체 '+number(total)+'건</span>'+
-  '<span class="pill">매매 '+number(allTypes.매매)+'건</span>'+
-  '<span class="pill">전세 '+number(allTypes.전세)+'건</span>'+
-  '<span class="pill">월세 '+number(allTypes.월세)+'건</span>';
  if(type)rows=rows.filter(x=>x.type===type);
  if(chosenArea)rows=rows.filter(x=>areaKey(x.area_m2)===chosenArea);
  // 거래 스냅샷은 이미 계약일 역순이지만 화면에서도 다시 확인하여 정렬합니다.
