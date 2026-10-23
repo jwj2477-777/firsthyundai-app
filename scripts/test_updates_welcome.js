@@ -67,6 +67,6 @@ assert(E('appUpdateStatus').textContent.includes('검증 실패'));
 E('appUpdateDismiss').handlers.click();assert.equal(E('appUpdateBanner').hidden,true);
 w.onFirstHyundaiAppUpdate({state:'latest',available:false});assert.equal(E('appUpdateBanner').hidden,true);
 assert(E('appUpdateStatus').textContent.includes('최신'));
-w.onFirstHyundaiAppUpdate({state:'offline'});assert(E('appUpdateStatus').textContent.includes('확인하지 못했습니다'));
+w.onFirstHyundaiAppUpdate({state:'unavailable'});assert(E('appUpdateStatus').textContent.includes('공식 다운로드 페이지'));
 E('appUpdateCheck').handlers.click();assert.equal(queries,2);
 console.log('Update UI, welcome branding, version and signing source tests passed');
