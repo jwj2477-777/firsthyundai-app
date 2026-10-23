@@ -265,22 +265,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.44 officetel accent color-only fix APK
+      - name: Publish v2.0.45 remove redundant report badges APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.44.apk
-          unzip -t FirstHyundai-v2.0.44.apk | grep 'No errors detected'
-          if gh release view v2.0.44 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.45.apk
+          unzip -t FirstHyundai-v2.0.45.apk | grep 'No errors detected'
+          if gh release view v2.0.45 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.44 FirstHyundai-v2.0.44.apk \
+            gh release create v2.0.45 FirstHyundai-v2.0.45.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.44 · 오피스텔 제목 강조선 단색 통일' \
-              --notes '오피스텔 실거래가 화면 제목 왼쪽 세로 강조선에만 금색·청록색 그라데이션이 적용되던 색상 불일치를 수정했습니다. 아파트 실거래와 같은 파란색 단색으로만 변경하고, 강조선의 길이·굵기·위치·제목 간격은 완전히 유지했습니다. 다른 화면의 모든 색상, 메뉴, 기능, 실거래 데이터, 업데이트 및 고정 APK 서명도 변경하지 않았습니다.'
+              --title '퍼스트현대 v2.0.45 · 실거래 신고 중복 배지 정리' \
+              --notes '아파트·오피스텔 모든 실거래 카드에 반복되던 신고 및 임대차 신고 배지를 제거했습니다. 거래 공개자료의 일반 신고 상태는 카드 구분에 도움이 되지 않으므로 숨기고, 계약 해제·정정 등 예외적인 상태는 그대로 명확히 표시합니다. 매매·전세·월세, 중개거래·직거래, 신규계약·갱신계약, 갱신권/종전 금액, 해제일 및 해제 필터·오류 경고·기존 데이터는 모두 유지합니다. 정식 APK 서명과 업데이트 방식도 변경하지 않았습니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.44 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.44 --apk FirstHyundai-v2.0.44.apk
+          gh release upload v2.0.45 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.45 --apk FirstHyundai-v2.0.45.apk
