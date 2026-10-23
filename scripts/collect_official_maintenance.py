@@ -17,6 +17,7 @@ from zoneinfo import ZoneInfo
 
 from collect_complexes import call_api, unpack, PublicApiError
 from collect_registry_maintenance import fetch_basic, upsert_complex_targets
+from maintenance_history import merge_records
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'data' / 'maintenance_estimates.json'
@@ -147,11 +148,11 @@ def available_months(now=None):
  y = today.year * 12 + today.month - 1
  # One published month per run bounds the public-key call budget: ~27 APIs
  # per complex, well below the standard 5,000-call daily developer quota.
- return [f'{(y-2)//12:04d}{(y-2)%12+1:02d}']
+ lag = 2 if today.day >= 26 else 3
+ return [f'{(y-lag)//12:04d}{(y-lag)%12+1:02d}']
 
 def collect(catalog, prior, key, *, get_groups=fetch_groups, get_basic=fetch_basic, months=None, pause=0):
- prior_records = {x['complex_id']: x for x in prior.get('records', [])
-                  if isinstance(x, dict) and x.get('complex_id')}
+ prior_records = prior.get('records', [])
  # Verify interpretation of live numeric fields against independent
  # published itemized K-apt totals before using the algorithm on ANY site.
  benchmark = get_groups(F15, CALIBRATION_MONTH, key)
@@ -192,13 +193,13 @@ def collect(catalog, prior, key, *, get_groups=fetch_groups, get_basic=fetch_bas
    break
   if pause:
    time.sleep(pause)
- merged = {**prior_records, **verified}
+ merged = merge_records(prior_records, list(verified.values()))
  return {
   'schema_version': 1, 'state': 'verified_partial' if merged else 'awaiting_verified_source',
   'source': '공식 K-apt 공동주택 공용관리비·개별사용료·장기수선충당금 API',
   'updated_at': datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),
   'checked_codes': tried, 'success_count': len(verified), 'failed_codes': max(0, tried-len(verified)),
-  'records': sorted(merged.values(), key=lambda v: v['complex_id']),
+  'records': merged,
   'note': '공식 세 그룹이 모두 확인되고 알려진 단지 기준값과 일치할 때만 저장. 미검증 단지는 이전 자료 보존. 실제 세대별 고지액 아님.'
  }
 
