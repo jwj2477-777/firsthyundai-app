@@ -10,7 +10,8 @@
   return String(dt.getUTCFullYear())+String(dt.getUTCMonth()+1).padStart(2,'0');
  }
  function currency(won){
-  return (Math.round(won/100)*100).toLocaleString('ko-KR')+'원';
+  if(!Number.isFinite(won)||won<0)return '확인 중';
+  return '약 '+Math.round(won/10000).toLocaleString('ko-KR')+'만원';
  }
  function validRow(r,complexId,code){
   return r&&r.complex_id===complexId&&r.kapt_code===code&&
@@ -90,8 +91,7 @@
     (t.yearOverYear===null?'':' · 전년 같은 달 대비 '+delta(t.yearOverYear))+'</p>'+
    stats+'<p class="tiny">최근 공개월 기준 12개월 중 <b>'+t.count+'개월</b> 확인 · '+
     month(t.windowLabel.slice(0,6))+' ~ '+month(t.latestMonth)+'</p>'+bars+
-   '<p class="tiny">K-apt 공개 월별 ㎡당 단가 '+currency(t.latestUnitRate)+
-   ' × 전용면적 · 실제 세대 청구액 아님</p></div>';
+   '<p class="tiny">공개 관리비 단지 평균을 전용면적으로 환산한 상담용 참고금액입니다. 실제 세대 고지액과 차이가 있을 수 있습니다.</p></div>';
  }
  const api={summarize,currency,shift,renderTrend};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
