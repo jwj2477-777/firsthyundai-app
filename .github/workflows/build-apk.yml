@@ -31,6 +31,7 @@ on:
       - 'scripts/test_unified_top_layout.js'
       - 'scripts/test_segmented_switch_unity.js'
       - 'scripts/test_premium_visual.js'
+      - 'scripts/test_android_insets_presentation.js'
       - 'scripts/test_office_on_demand.js'
       - 'scripts/test_public_hub.js'
       - 'scripts/test_family_accessibility.js'
@@ -155,6 +156,7 @@ jobs:
           node scripts/test_segmented_switch_unity.js
           node scripts/test_ui_v2.js
           node scripts/test_premium_visual.js
+          node scripts/test_android_insets_presentation.js
           node scripts/test_scroll_to_top.js
           node scripts/test_contract_broker.js
           node --check app/src/main/assets/contracts-transfer.js
@@ -257,22 +259,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.40 premium visual-only refinement APK
+      - name: Publish v2.0.41 Android safe area and interface refinement APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.40.apk
-          unzip -t FirstHyundai-v2.0.40.apk | grep 'No errors detected'
-          if gh release view v2.0.40 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.41.apk
+          unzip -t FirstHyundai-v2.0.41.apk | grep 'No errors detected'
+          if gh release view v2.0.41 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.40 FirstHyundai-v2.0.40.apk \
+            gh release create v2.0.41 FirstHyundai-v2.0.41.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.40 · 고급 디자인 정돈' \
-              --notes '기존 v2.0.39의 모든 기능·화면 배치·실거래·계약·업데이트 동작을 유지하며 프리미엄 디자인만 정돈했습니다. 깊은 청록 브랜드 헤더와 금빛 포인트, 밝고 차분한 카드·부드러운 그림자·일관된 버튼 표면, 명확한 선택 상태와 거래 종류 색상을 적용했습니다. 관심 14개와 아파트정보의 목록 크기·정보 순서 및 갱신계약 줄바꿈은 변경하지 않았습니다. 고대비·모션 감소 대응과 새 시각 회귀 테스트를 포함했습니다.'
+              --title '퍼스트현대 v2.0.41 · 상태바 겹침 및 첫 화면 디자인 개선' \
+              --notes '사용자 실제 휴대폰 화면을 기준으로 Android 15 이상 상태표시줄과 앱 로고·제목 겹침을 수정하고 하단 시스템 탐색바·키보드 영역을 보호했습니다. 첫 화면의 메인 메뉴, 오늘 요약·계약문자, 아파트·오피스텔 스위치, 전체/관심/신규 실거래와 거래 유형 필터는 동일한 위치를 유지합니다. 선택표시 중복·강한 그림자와 테두리를 정돈하고 버튼 높이를 터치 가능한 범위 안에서 줄였으며, 수집 시각은 한국시간 기준 26.10.24 04:37처럼 간결하게 표시합니다. 계약·갱신·학군·뉴스·알림·업데이트 및 고정 서명을 유지합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.40 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.40 --apk FirstHyundai-v2.0.40.apk
+          gh release upload v2.0.41 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.41 --apk FirstHyundai-v2.0.41.apk

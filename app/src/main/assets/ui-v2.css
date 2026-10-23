@@ -1226,3 +1226,66 @@ input:focus,select:focus,textarea:focus{
  #nav .primaryNav button,.dealRow,.nearbyCard{transition:none!important}
 }
 /* END v2.0.40 PREMIUM VISUAL REFINEMENT */
+
+/* v2.0.41: real-phone screenshot review — quiet hierarchy, identical navigation.
+   System-bar safe area is fixed natively; do not add CSS safe-area top padding. */
+header{padding:12px 16px 13px}
+header .brandHeader{gap:10px}
+header .brandWordmark h1{font-size:clamp(22px,6.3vw,27px);font-weight:820;letter-spacing:-.9px}
+header .brandSubtitle{font-weight:670;letter-spacing:.72px}
+header #roleButton{border-radius:11px;box-shadow:none;min-height:40px;padding:8px 10px}
+#nav{margin-bottom:13px}
+#nav .primaryNav button{
+ min-height:89px;padding:12px 4px;
+ border:1.5px solid #D5E2DE;border-radius:16px;
+ font-size:15px;font-weight:800;gap:5px;
+ box-shadow:0 2px 7px #173B4311;
+}
+#nav .primaryNav button .navIcon{font-size:25px}
+#nav .primaryNav button.active,#nav .primaryNav button[aria-current="page"]{
+ border:1.5px solid #285A70;box-shadow:0 3px 10px #173B4321;
+}
+#nav .primaryNav button.active::after{content:none;display:none}
+#nav .utilityNav>button{min-height:53px;border-radius:14px;font-weight:750;box-shadow:0 1px 5px #193B430C}
+#trades .apartmentTradeNav,#nearby .apartmentTradeNav,#new .apartmentTradeNav{gap:8px;margin-bottom:14px}
+#trades .apartmentTradeNav>button,#nearby .apartmentTradeNav>button,#new .apartmentTradeNav>button{
+ min-height:71px;padding:10px 4px;
+ border:1.5px solid #D3E1DE;border-radius:13px;
+ font-size:14px;font-weight:780;box-shadow:0 1px 5px #193B430C;
+}
+#trades .apartmentTradeNav>button .starterIcon,
+#nearby .apartmentTradeNav>button .starterIcon,
+#new .apartmentTradeNav>button .starterIcon{font-size:21px;margin-bottom:5px}
+#trades .apartmentTradeNav>button.active,#nearby .apartmentTradeNav>button.active,
+#new .apartmentTradeNav>button.active{
+ border:1.5px solid #24548B;box-shadow:0 2px 7px #1A48721F;
+}
+#trades .tradeTypeBar button,
+#nearbyDetails #nearbyTypeBar>button,
+#new .newTypeChips>button{border-radius:12px;box-shadow:none}
+.tradeTypeBar button.active,.tradeTypeBar button[aria-pressed="true"],
+#nearbyDetails #nearbyTypeBar>button.active{border-width:1.5px;box-shadow:none}
+#trades .tradeTypeBar button.active{background:#285970;color:#fff;border-color:#21485C;box-shadow:none}
+#trades .tradeTypeBar button.active.sale{background:#255CA5;border-color:#1B4E90}
+#trades .tradeTypeBar button.active.lease{background:#146A50;border-color:#0B563E}
+#trades .tradeTypeBar button.active.monthly{background:#875007;border-color:#754105}
+#trades .tradeTypeBar button{min-height:50px}
+#trades .sectionTitle #tradesMeta{font-size:13px;line-height:1.5;letter-spacing:-.15px;color:#5F7478;word-break:keep-all}
+#trades.page>.sectionTitle:first-child{margin-bottom:11px}
+#trades .propertyTypeSwitch.sectionModeSwitch{margin-bottom:12px}
+#trades .tradeAdvanced{border-color:#DDE8E4;background:#FAFCFA}
+#trades .tradeAdvanced summary{color:#285C62;font-weight:750}
+@media(max-width:370px){
+ header{padding:12px 13px}
+ header .brandHeader{gap:8px}
+ header .brandWordmark h1{font-size:22px}
+ header .brandSubtitle{font-size:9px;letter-spacing:.35px}
+ header #roleButton{padding:7px 8px;font-size:12px}
+ #nav .primaryNav button{min-height:85px;font-size:14px}
+ #trades .apartmentTradeNav>button,#nearby .apartmentTradeNav>button,
+ #new .apartmentTradeNav>button{min-height:68px;font-size:13px}
+}
+@media(prefers-contrast:more){
+ #nav .primaryNav button.active{border-width:3px}
+ #trades .tradeTypeBar button.active{border-width:2.5px}
+}
