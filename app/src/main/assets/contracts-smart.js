@@ -103,12 +103,13 @@ function choose(id){
  if(!row||!row.address)return false;
  mute=true;
  el('property').value=row.label;
- el('address').value=row.address;
+ const lot=typeof verifiedLotAddress==='function'?verifiedLotAddress(row):String(row.lot_address||'');
+ el('address').value=lot||row.address;
  acceptedComplex=row.id;
  edited.delete('property');edited.delete('address');
  mute=false;
  const list=el('suggestions');if(list)list.innerHTML='';
- notify('✓ '+row.label+' · 기존 송도 단지정보 주소를 가져왔습니다. 동·호수와 도로명주소가 실제 대상물과 맞는지 확인해 주세요.');
+ notify('✓ '+row.label+' · 검증된 지번주소를 우선 입력했습니다. 지번·도로명 및 동·호수가 실제 계약 대상과 일치하는지 확인해 주세요.');
  window.FirstHyundaiContracts.updateSummary();
  return true;
 }
