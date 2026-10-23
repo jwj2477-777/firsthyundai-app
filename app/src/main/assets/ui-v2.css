@@ -602,3 +602,34 @@ header #roleButton:focus-visible{outline:2px solid #FBE9BB;outline-offset:3px}
  .compactAppFooter #appUpdateCheck{padding:8px 9px;font-size:12px}
  .compactAppFooter .appFooterVersion strong{font-size:12px}
 }
+
+/* v2.0.27: responsive K-apt history, never a household invoice. */
+.feeTrendSummary{margin:12px 0 15px;padding:14px 13px;border:1px solid #d9e9e8;
+ border-radius:16px;background:linear-gradient(145deg,#f4fbf9,#fffdf8)}
+.feeTrendPeriod{font-size:12px;font-weight:800;color:#436c73;line-height:1.5}
+.feeTrendCurrent{font-size:25px;font-weight:900;color:#116469;letter-spacing:-.6px;margin:6px 0}
+.feeTrendSummary .tiny{font-size:12px;line-height:1.5;margin:7px 0}
+.feeTrendChange{font-weight:800;color:#2d6b79}
+.feeTrendStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:7px;margin:14px 0 10px}
+.feeTrendStats>div{padding:9px 6px;background:white;border-radius:11px;
+ border:1px solid #e0eae8;min-width:0;text-align:center}
+.feeTrendStats small{display:block;font-size:11px;color:#60727b;line-height:1.4}
+.feeTrendStats b{display:block;margin-top:5px;color:#1a5960;font-size:14px;
+ overflow-wrap:anywhere;letter-spacing:-.4px}
+.feeTrendShort{margin:11px 0!important;padding:9px 10px;color:#667985;
+ border:1px dashed #c7d8da;background:white;border-radius:10px;
+ font-size:12px!important;line-height:1.5}
+.feeHistory{margin-top:12px;border-top:1px solid #dae7e6;padding-top:10px}
+.feeHistory summary{font-size:13px;font-weight:800;color:#226770;cursor:pointer;
+ min-height:44px;display:flex;align-items:center}
+.feeHistoryRows{display:grid;gap:10px;margin:6px 0 11px}
+.feeHistoryRow{display:grid;grid-template-columns:38px minmax(0,1fr) 90px;
+ align-items:center;gap:6px;font-size:12px}
+.feeHistoryRow span{font-weight:700;color:#506b72}
+.feeHistoryRow strong{font-size:12px;font-weight:800;color:#214d59;text-align:right}
+.feeHistoryTrack{height:9px;border-radius:99px;background:#dfebe7;overflow:hidden}
+.feeHistoryTrack i{display:block;height:100%;border-radius:99px;
+ background:linear-gradient(90deg,#83bdb4,#297f88)}
+@media(max-width:365px){.feeTrendCurrent{font-size:23px}
+.feeTrendStats b{font-size:12px}.feeHistoryRow{grid-template-columns:36px minmax(0,1fr) 85px}}
