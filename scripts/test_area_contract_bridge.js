@@ -107,6 +107,16 @@ for(const file of ['contracts.js','contracts-smart.js','contracts-language.js','
  assert.equal(E('ct_property').value,'프라임뷰 20블럭');
  assert(E('ct_rough').value.startsWith('아파트명: 프라임뷰 20블럭'));
  assert(!E('ct_rough').value.includes('마스터뷰'));
+ // F15 cadastral parcel is primary for building/contract paperwork.
+ run("switchPage('complexes')");run("selectComplex('f15')");
+ const f15=data.records.find(x=>x.id==='f15');
+ const f15View=E('complexDetails').innerHTML;
+ assert(f15View.includes('지번 · '+f15.lot_address));
+ assert(f15View.includes('도로명 · '+f15.address));
+ assert.equal(run("window.FirstHyundaiContracts.fromSelectedComplex()"),true);
+ assert.equal(E('ct_address').value,'인천광역시 연수구 송도동 102');
+ assert(E('ct_rough').value.includes('소재지: 인천광역시 연수구 송도동 102'));
+ assert(E('ct_rough').value.includes('도로명주소(참고): '+f15.address));
  // Official area for prime 25 must never flow into prime 20.
  run("switchPage('complexes')");run("selectComplex('prime20')");run("setComplexDetailTab('types')");
  const twenty=E('complexDetails').innerHTML;
