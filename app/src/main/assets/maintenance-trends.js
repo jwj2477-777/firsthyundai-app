@@ -66,7 +66,34 @@
    maxTrend:Math.max(...values)
   };
  }
- const api={summarize,currency,shift};
+ function renderTrend(t, exclusive){
+  if(!t)return '';
+  const month=m=>m.slice(0,4)+'년 '+Number(m.slice(4))+'월';
+  const delta=v=>v===null?'':('<span class="feeTrendChange">'+(v>0?'+':'')+v+'%</span>');
+  const stats=t.avgWon===null?
+   '<p class="feeTrendShort">월별 자료가 3개월 이상 쌓이면 평균·최저·최고를 비교할 수 있습니다.</p>':
+   '<div class="feeTrendStats"><div><small>확인된 '+t.count+'개월 평균</small><b>'+currency(t.avgWon)+'</b></div>'+
+   '<div><small>최저</small><b>'+currency(t.minWon)+'</b></div>'+
+   '<div><small>최고</small><b>'+currency(t.maxWon)+'</b></div></div>';
+  const bars=t.trend.length<2?'':'<details class="feeHistory"><summary>월별 변동 보기 · '+
+   t.count+'/12개월 확인</summary><div class="feeHistoryRows">'+t.trend.map(x=>
+   '<div class="feeHistoryRow"><span>'+x.month.slice(2,4)+'.'+x.month.slice(4)+'</span>'+
+   '<div class="feeHistoryTrack"><i style="width:'+Math.max(3,Math.round(x.won/t.maxTrend*100))+'%"></i></div>'+
+   '<strong>'+currency(x.won)+'</strong></div>').join('')+
+   '</div><p class="tiny">자료가 없는 달은 평균과 증감률에 포함하지 않습니다.</p></details>';
+  return '<div class="feeTrendSummary">'+
+   '<div class="feeTrendPeriod">'+(t.stale?'과거 공개자료':'최근 확인 공개월')+
+   ' · '+month(t.latestMonth)+(t.stale?' · 이후 월 자료 확인 필요':'')+'</div>'+
+   '<div class="feeTrendCurrent">'+currency(t.latestWon)+'</div>'+
+   '<p class="tiny">전용 '+Number(exclusive)+'㎡ 월 참고액'+
+    (t.monthOverMonth===null?'':' · 전월 대비 '+delta(t.monthOverMonth))+
+    (t.yearOverYear===null?'':' · 전년 같은 달 대비 '+delta(t.yearOverYear))+'</p>'+
+   stats+'<p class="tiny">최근 공개월 기준 12개월 중 <b>'+t.count+'개월</b> 확인 · '+
+    month(t.windowLabel.slice(0,6))+' ~ '+month(t.latestMonth)+'</p>'+bars+
+   '<p class="tiny">K-apt 공개 월별 ㎡당 단가 '+currency(t.latestUnitRate)+
+   ' × 전용면적 · 실제 세대 청구액 아님</p></div>';
+ }
+ const api={summarize,currency,shift,renderTrend};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
  root.FirstHyundaiMaintenance=api;
 })(typeof window!=='undefined'?window:globalThis);
