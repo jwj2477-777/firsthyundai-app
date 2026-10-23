@@ -7,7 +7,7 @@ on:
         required: true
         default: schools
         type: choice
-        options: [schools, offices, subscriptions, buildings, maintenance, complexinfo, all]
+        options: [schools, offices, office_sales, subscriptions, buildings, maintenance, complexinfo, all]
   push:
     branches: [main]
     paths:
@@ -51,7 +51,10 @@ jobs:
             else
               python scripts/collect_public_services.py --mode subscriptions
               if ! python scripts/collect_public_services.py --mode offices; then
-                echo "Officetel rent API first collection or approval check pending; prior snapshot preserved."
+                echo "Officetel rent API unavailable; preserve previous data."
+              fi
+              if ! python scripts/collect_public_services.py --mode office_sales; then
+                echo "Officetel sale API separate approval pending; preserve previous data."
               fi
             fi
           elif [ "${{ github.event_name }}" = "push" ]; then
@@ -62,7 +65,10 @@ jobs:
             fi
             python scripts/collect_public_services.py --mode complexinfo
             if ! python scripts/collect_public_services.py --mode offices; then
-              echo "Officetel rent API not yet accessible; keeping previously published records."
+              echo "Officetel rent API unavailable; keeping previously published records."
+            fi
+            if ! python scripts/collect_public_services.py --mode office_sales; then
+              echo "Officetel sale API approval pending; never overwrite last verified records."
             fi
           else
             python scripts/collect_public_services.py --mode "${{ inputs.mode }}"

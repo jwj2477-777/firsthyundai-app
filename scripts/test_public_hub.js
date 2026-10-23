@@ -8,6 +8,11 @@ for(const m of ['id="officetelPanel"','id="officeRentContent"','id="publicSubscr
 const nav=html.match(/const NAV_CATEGORIES=\[([\s\S]*?)\];/);assert(nav);
 assert.equal((nav[1].match(/icon:/g)||[]).length,3,'Keep three large family menu categories');
 const snippet=javascript.slice(javascript.indexOf('// Source-backed optional integrations.'),javascript.indexOf('function tradeClass(type)'));
+assert(javascript.includes('propertyTypeSwitch'),'Property type switch must be part of TOP navigation');
+assert(javascript.includes("id!=='officetel'&&chosen.children.length>1"),'Hide apartment-only subnavigation in office mode');
+assert(!html.includes('class="officeOnDemand"'),'Remove bottom-of-page-only office access');
+assert(html.includes('오피스텔 실거래')&&html.includes('<option value="매매">매매</option>'));
+
 const nodes={};
 const ctx=vm.createContext({
  safeLink:v=>String(v||'').startsWith('https://')?v:'',
@@ -30,7 +35,15 @@ assert(missing.includes('평형별 실제 월 관리비는 아직 확보되지 �
 assert(run('renderSchoolPublicInfo()').includes('배정학교가 아닙니다'));
 assert(run('renderSchoolPublicInfo()').includes('schoolzone.emac.kr'));
 assert(!run('renderSchoolPublicInfo()').includes('NEIS_EDU_KEY를 등록'),'Absent verified data must not falsely claim the stored NEIS key is missing');
-run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('연결 확인 중')&&!nodes.officeRentContent.innerHTML.includes('조회 0건'),'Pending access is not an empty official result');
+run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('공식 자료 확인 중')&&!nodes.officeRentContent.innerHTML.includes('조회 0건'),'Pending access is not an empty official result');
+run('publicServices={office_rents:{state:"verified",records:[]},office_sales:{state:"awaiting_approval",records:[]}}');
+run('renderOfficeRentals()');
+assert(nodes.officeRentContent.innerHTML.includes('매매 API 활용승인'),'Unapproved sale API is not confirmed zero');
+run('publicServices.office_sales='+JSON.stringify({state:'verified',records:[{type:'매매',building:'송도 매매오피스텔',price_10k:32100,contract_date:'2026-10-20',area_m2:44.5,status:'신고'}]}));
+run('renderOfficeRentals()');
+assert(nodes.officeRentContent.innerHTML.includes('송도 매매오피스텔'),'Sale type included only after verified collection');
+assert(nodes.officeRentContent.innerHTML.includes('32100만원'),'Correct verified sale price shown');
+run('publicServices.office_sales={state:"awaiting_approval",records:[]}');
 run('renderPublicSubscriptions()');assert(nodes.publicSubscriptions.innerHTML.includes('첫 수집'));
 // News always comes first and subscriptions are a separate, reachable pane.
 assert(html.includes('id="newsArticlesPane"')&&html.includes('id="newsSubscriptionsPane"'));
@@ -73,7 +86,7 @@ run("selectNeisSchoolLevel('all')");
 run('publicServices='+JSON.stringify(sample));
 
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('송도 오피스텔'));
-assert(nodes.officeRentContent.innerHTML.includes('조회 1건'),'Results are separate from apartment transactions');
+assert(nodes.officeRentContent.innerHTML.includes('확인된 거래 1건'),'Results are separate from apartment transactions');
 run('toggleOfficeDetailed(true)');
 assert(nodes.officeDetailToggle.checked===true);
 assert(nodes.officeRentContent.innerHTML.includes('오피스텔'));
@@ -92,7 +105,7 @@ assert(!nodes.publicSubscriptions.innerHTML.includes('https://evil.example/'));
 const native=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/MainActivity.java'),'utf8');
 assert(native.includes('"public_services.json".equals(filename)'));
 const snapshot=JSON.parse(fs.readFileSync(path.join(root,'data/public_services.json'),'utf8'));
-for(const name of ['schools','school_zones','office_rents','building_registry','maintenance','addresses','subscriptions'])assert(snapshot[name]);
+for(const name of ['schools','school_zones','office_rents','office_sales','building_registry','maintenance','addresses','subscriptions'])assert(snapshot[name]);
 console.log('Public hub UI passed: school not falsely assigned, separate office rents, API approval statuses, three family menus');
 
 run("publicServices.maintenance={state:'verified',records:[{complex_id:'f13',month:'202608',breakdown_won:{'경비비':100000,'청소비':0}}]}");

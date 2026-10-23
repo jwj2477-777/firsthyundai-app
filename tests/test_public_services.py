@@ -97,6 +97,42 @@ class PublicDataTests(unittest.TestCase):
   self.assertEqual(output[0]['lot_number'],'11-7')
   self.assertEqual(output[0]['area_m2'],38.49)
   self.assertNotIn('households',output[0])
+ def test_office_sale_api_and_cancellation_are_separate(self):
+  raw='''<response><header><resultCode>000</resultCode></header><body><totalCount>3</totalCount><items>
+  <item><offiNm>송도 거래 오피스텔</offiNm><sggNm>연수구</sggNm><umdNm>송도동</umdNm><dealYear>2026</dealYear><dealMonth>10</dealMonth><dealDay>22</dealDay><dealAmount>36,500</dealAmount><excluUseAr>45.22</excluUseAr><floor>11</floor><dealingGbn>중개거래</dealingGbn></item>
+  <item><offiNm>송도 거래 오피스텔</offiNm><sggNm>연수구</sggNm><umdNm>송도동</umdNm><dealYear>2026</dealYear><dealMonth>10</dealMonth><dealDay>21</dealDay><dealAmount>29,900</dealAmount><excluUseAr>39.15</excluUseAr><cdealType>O</cdealType></item>
+  <item><offiNm>지역 외</offiNm><umdNm>구월동</umdNm><dealYear>2026</dealYear><dealMonth>10</dealMonth><dealDay>22</dealDay><dealAmount>10,000</dealAmount><excluUseAr>40</excluUseAr></item>
+  </items></body></response>'''.encode()
+  rows,total=p.office_items(raw)
+  self.assertEqual(total,3)
+  sales=p.normalize_office_sales(rows,'202610')
+  self.assertEqual(len(sales),2)
+  self.assertEqual(sales[0]['price_10k'],36500)
+  self.assertEqual(sales[1]['status'],'해제')
+  self.assertNotIn('deposit_10k',sales[0])
+  def fake(req):
+   self.assertIn('/RTMSDataSvcOffiTrade/',req.full_url)
+   self.assertIn('LAWD_CD=28185',req.full_url)
+   return raw
+  result=p.collect_office_sales('fake',opener=fake,months=1)
+  self.assertEqual(result['state'],'verified')
+  self.assertEqual(len(result['records']),2)
+  self.assertNotIn('fake',json.dumps(result,ensure_ascii=False))
+
+ def test_office_sale_failure_does_not_change_rental_snapshot(self):
+  with tempfile.TemporaryDirectory() as directory:
+   dest=Path(directory)/'public_services.json'
+   original={'schema_version':1,'office_rents':{'state':'verified','records':[{'building':'기존 전월세'}]},
+     'office_sales':{'state':'awaiting_approval','records':[]}}
+   dest.write_text(json.dumps(original,ensure_ascii=False),encoding='utf8')
+   with self.assertRaises(RuntimeError):
+    p.collect_office_sales('fake',opener=lambda req:b'<response><header><resultCode>30</resultCode></header></response>',months=1)
+   self.assertEqual(json.loads(dest.read_text(encoding='utf8')),original)
+   p.update_snapshot(dest,office_sales={'state':'verified','records':[{'building':'신규 매매'}]})
+   verified=json.loads(dest.read_text(encoding='utf8'))
+   self.assertEqual(verified['office_rents']['records'][0]['building'],'기존 전월세')
+   self.assertEqual(verified['office_sales']['records'][0]['building'],'신규 매매')
+
  def test_office_request_and_pagination(self):
   def serve(req):
    self.assertIn('LAWD_CD=28185',req.full_url)
