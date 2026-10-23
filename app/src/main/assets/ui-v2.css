@@ -633,3 +633,15 @@ header #roleButton:focus-visible{outline:2px solid #FBE9BB;outline-offset:3px}
  background:linear-gradient(90deg,#83bdb4,#297f88)}
 @media(max-width:365px){.feeTrendCurrent{font-size:23px}
 .feeTrendStats b{font-size:12px}.feeHistoryRow{grid-template-columns:36px minmax(0,1fr) 85px}}
+
+/* v2.0.29: one trade navigation row; keep the apartment picker inside filters. */
+#trades .tradeFilterHeading{display:flex;align-items:center;justify-content:space-between;
+ gap:10px;margin:2px 0 12px;min-height:46px}
+#trades .tradeFilterHeading>span{font-size:14px;font-weight:780;color:#596B80}
+#trades #tradeModeSearch{min-height:44px;padding:10px 14px;border-radius:11px;
+ border:1.5px solid #AEC7DC;background:#F5F9FD;color:#225C83;
+ font-size:14px;font-weight:800;cursor:pointer}
+#trades #tradeModeSearch.active{background:#2456AA;color:#fff;border-color:#173E80}
+#trades #tradeModeSearch:focus-visible{outline:3px solid #8EB8E5;outline-offset:2px}
+#trades #tradeSearchPanel{margin-top:2px}
+@media(max-width:365px){#trades #tradeModeSearch{padding:9px 10px;font-size:13px}}
