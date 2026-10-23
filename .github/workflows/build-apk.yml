@@ -110,6 +110,9 @@ jobs:
           assert all(str(x.get('kapt_code','')).startswith('A') and x.get('households',0)>0 for x in official)
           print('Verified published apartment data:',len(rows),'total,',len(official),'additional K-apt registered complexes')
           PY
+      - name: Diagnose public K-apt site response (temporary, no secrets)
+        if: github.event_name == 'pull_request'
+        run: python3 scripts/collect_maintenance_averages.py --diagnose
       - name: Validate in-app JavaScript syntax
         run: |
           python3 -c "from pathlib import Path; x=Path('app/src/main/assets/index.html').read_text(encoding='utf-8'); Path('/tmp/firsthyundai-ui.js').write_text(x.split('<script>',1)[1].split('</script>',1)[0],encoding='utf-8')"
