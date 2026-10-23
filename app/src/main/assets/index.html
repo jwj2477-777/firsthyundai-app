@@ -1853,8 +1853,9 @@ function favoriteCollectionScope(snapshot){
  const endMonth=Number(date[1])*12+Number(date[2])-1;
  const beginMonth=endMonth-11;
  const ym=index=>String(Math.floor(index/12))+'.'+String(index%12+1).padStart(2,'0');
- const incomplete=snapshot.state==='partial'||(Array.isArray(snapshot.missing_buckets)&&snapshot.missing_buckets.length>0);
- return '집계 대상 '+ym(beginMonth)+'–'+ym(endMonth)+' · 매매·전월세 합산'+(incomplete?' · 일부 월 미수집':'');
+ const missing=Array.isArray(snapshot.missing_buckets)&&snapshot.missing_buckets.length>0;
+ const warning=missing?' · 일부 월 미수집':snapshot.state==='partial'?' · 일부 자료 갱신 오류':'';
+ return '집계 대상 '+ym(beginMonth)+'–'+ym(endMonth)+' · 매매·전월세 합산'+warning;
 }
 function renderNearby(){
  const rows=nearbyAllRows(), hasData=!!remote.trades&&remote.trades.state!=='not_started';
