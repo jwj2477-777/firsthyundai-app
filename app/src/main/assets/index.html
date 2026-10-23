@@ -1389,6 +1389,8 @@ function renderPublicComplexInfo(p){
    average.won_per_exclusive_m2>=300&&average.won_per_exclusive_m2<=20000&&
    /^20[0-9]{4}$/.test(average.month||'')&&safeLink(average.source_url)?
    average.won_per_exclusive_m2:null;
+ const subtotalOnly=rate!==null&&average?.is_full_monthly_fee===false&&
+   average?.method==='official_common_individual_subtotal_excludes_repair_reserve';
  const phone=String(p.management_phone||'').replace(/[^0-9+]/g,'');
  const options=types.length?'<div class="neisLevelButtons">'+types.map((t,i)=>{
    const py=typeof supplyPyeong==='function'?supplyPyeong(t.supply_m2,t.market_pyeong):null;
@@ -1400,6 +1402,7 @@ function renderPublicComplexInfo(p){
  const bill=picked?rate!==null?
    '<p class="practiceNote"><strong>약 '+escapeHtml((Math.round(rate*picked.exclusive_m2/100)*100).toLocaleString('ko-KR'))+'원</strong> · 전용 '+escapeHtml(picked.exclusive_m2)+'㎡</p>'+
    '<p class="tiny">K-apt 공개 월별 ㎡당 단가 '+escapeHtml(rate.toLocaleString('ko-KR'))+'원 × 전용면적 · '+escapeHtml(average.month.slice(0,4)+'년 '+Number(average.month.slice(4))+'월')+'분 상담 참고액</p>'+
+   (subtotalOnly?'<p class="tiny" style="font-weight:750;color:#9a5b15">공용관리비 + 개별사용료만 포함 · 장기수선충당금 제외</p>':'')+
    sourceLink(average.source_url,'K-apt 기반 공개 원문 확인'):
    item?
    '<p class="practiceNote"><strong>'+escapeHtml(item.monthly_won.toLocaleString('ko-KR'))+'원</strong> · '+escapeHtml(item.month)+'월 직접 확인 고지액</p>'+sourceLink(item.source_url,'고지액 근거 확인'):
@@ -1409,7 +1412,7 @@ function renderPublicComplexInfo(p){
   '<p class="tiny">평형을 선택하면 공식 관리비 공개 단가로 월 참고액을 계산합니다.</p>'+options+bill+
   (phone?'<a class="btn" href="tel:'+escapeHtml(phone)+'">관리사무소 문의 '+escapeHtml(p.management_phone||'')+'</a>':'')+
   (rate===null?'<p class="tiny">'+sourceLink('https://www.k-apt.go.kr/','K-apt에서 단지명으로 관리비 조회')+'</p>':'')+
-  '<p class="tiny">공개 단지 전체 관리비 합계의 전용㎡당 평균 단가를 해당 평형 전용면적에 적용합니다. 해당 평형 세대들의 실제 평균 고지서가 아니며 계절·사용량·부과면적 기준에 따라 달라집니다.</p></article></div>';
+  '<p class="tiny">'+(subtotalOnly?'국토부 공개 공용관리비·개별사용료 합계를 공식 주거전용면적 합계로 나눈 참고 단가입니다. 장기수선충당금 부과액은 포함하지 않습니다.':'공개 단지 전체 관리비 합계의 전용㎡당 평균 단가를 해당 평형 전용면적에 적용합니다.')+' 실제 세대 고지액은 아니며 계절·사용량·부과면적 기준에 따라 달라집니다.</p></article></div>';
 }
 // Officetel is separate from apartment transactions, but has matching controls.
 let officeSearchMode='latest',officeSelectedBuilding='',officeSelectedArea='',officeVisibleLimit=70;
