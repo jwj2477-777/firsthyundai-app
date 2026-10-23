@@ -1684,3 +1684,98 @@ header #roleButton{border-radius:11px;box-shadow:none;min-height:40px;padding:8p
 body[data-section="officetel"] .page#officetel>.sectionTitle:before{
  background:var(--ui2-trades);
 }
+
+
+/* v2.0.46 · Apartment detail tabs (7 screenshot review)
+   Preserve original 7 tabs and 2-column navigation, but unify each tab's
+   controls with the FHD mint design language and clarify visual hierarchy. */
+#complexSheet #complexDetails{color:#2C464C}
+#complexSheet .complexDetailAddress{margin-top:9px;margin-bottom:14px}
+#complexSheet .complexDetailAddress strong{font-size:14px;line-height:1.5}
+#complexSheet .complexDetailAddress small{display:block;margin-top:3px;font-size:12px}
+#complexSheet .complexTabBar{margin-top:16px;margin-bottom:15px}
+#complexSheet .complexTabBar button{min-height:51px;box-shadow:0 1px 3px #16383E0C}
+#complexSheet .complexTabBar button.active{box-shadow:0 2px 7px #175E541A}
+#complexSheet .complexSourceDetails{
+ margin:9px 0 14px;
+ border:1px solid #DBE6E2;
+ border-radius:12px;
+ background:#F7FAF8;
+ padding:10px 13px;
+}
+#complexSheet .complexSourceDetails summary{color:#42616B;font-size:13px;font-weight:740;cursor:pointer}
+#complexSheet .complexSourceDetails p{margin:9px 0 2px}
+#complexSheet .complexTradeFilters button{
+ min-height:47px;
+ border:1px solid #D2E1DE;
+ background:#FFFFFF;
+ color:#3D5B64;
+ border-radius:11px;
+ box-shadow:none;
+ font-size:13px;
+}
+#complexSheet .complexTradeFilters button.active{
+ background:#137167;
+ border-color:#116A61;
+ color:#FFFFFF;
+}
+#complexSheet .complexTap{
+ border:1px solid #D9E6E1;
+ background:#FFFFFF;
+ color:#304D55;
+ border-radius:12px;
+ box-shadow:0 1px 4px #193D430A;
+}
+#complexSheet .complexTap strong{color:#2B444C}
+#complexSheet .complexTap .sub{color:#697F85}
+#complexSheet .complexQuickLinks a{
+ border:1px solid #BDD4CE;
+ background:#E9F3F0;
+ color:#225C61;
+ border-radius:12px;
+ text-decoration:underline;
+ text-underline-offset:3px;
+}
+#complexSheet .complexSchoolRow,
+#complexSheet .apiSmallCard,
+#complexSheet .apiInfoCards article{
+ border-color:#DBE7E2;
+ color:#304A51;
+}
+#complexSheet .complexSchoolRow strong,
+#complexSheet .apiSmallCard h3{color:#28454D}
+#complexSheet .neisLevelButtons button.active,
+#complexSheet .nearbyFacilityButtons button.active{
+ background:#176D65;
+ border-color:#115B53;
+ color:#FFFFFF;
+}
+#complexSheet .nearbyFacilityButtons button{
+ border-color:#D1E0DC;
+ background:#FFFFFF;
+ color:#335660;
+ border-radius:11px;
+ min-height:49px;
+ box-shadow:none;
+}
+#complexSheet .nearbyFacilityButtons button.active{
+ background:#176D65;
+ color:#FFFFFF;
+ border-color:#115B53;
+}
+#complexSheet .apiNotice{
+ border:1px solid #E7D9C3;
+ background:#FFF9F0;
+ border-radius:11px;
+ color:#765A37;
+}
+#complexSheet .apiSourceLink{color:#236267}
+#complexSheet .complexAreaGuide,
+#complexSheet .complexAreaCounts{color:#566F76}
+#complexSheet .complexAreaItem{box-shadow:0 1px 5px #1B47460A}
+#complexSheet .complexAreaContract{box-shadow:none}
+@media(prefers-contrast:more){
+ #complexSheet .complexQuickLinks a,
+ #complexSheet .complexTap,
+ #complexSheet .complexSourceDetails{border-width:2px}
+}
