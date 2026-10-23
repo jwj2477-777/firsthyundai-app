@@ -1678,3 +1678,30 @@ header #roleButton{border-radius:11px;box-shadow:none;min-height:40px;padding:8p
  #contracts .contractMemoCard{border-color:#8E482B}
  #contracts .contractMemoCard #ct_rough{border-color:#7B4B2F}
 }
+
+
+/* v2.0.44 · trade heading: short and aligned section accent.
+   Previously top:4px + bottom:4px stretched the decorative bar to the
+   entire title + wrapped collection note. Apartment and officetel must
+   share the same fixed-length cue, without any text interception. */
+#trades.page>.sectionTitle:first-child,
+#officetel.page>.sectionTitle:first-child{
+ padding-left:17px;
+}
+#trades.page>.sectionTitle:first-child::before,
+#officetel.page>.sectionTitle:first-child::before{
+ content:"";
+ left:0;
+ top:5px;
+ bottom:auto;
+ height:24px;
+ width:4px;
+ border-radius:999px;
+ background:#255CA5;
+ pointer-events:none;
+}
+/* No per-property gradient: both pages are one '실거래' destination. */
+body[data-section="trades"] #trades.page>.sectionTitle:first-child::before,
+body[data-section="officetel"] #officetel.page>.sectionTitle:first-child::before{
+ background:#255CA5;
+}
