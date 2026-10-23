@@ -232,21 +232,21 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish successful v2.0.19 apartment/officetel top switch and sale API APK
+      - name: Publish successful v2.0.20 simplified apartment search APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.19.apk
-          unzip -t FirstHyundai-v2.0.19.apk | grep 'No errors detected'
-          if gh release view v2.0.19 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.20.apk
+          unzip -t FirstHyundai-v2.0.20.apk | grep 'No errors detected'
+          if gh release view v2.0.20 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.19 FirstHyundai-v2.0.19.apk \
+            gh release create v2.0.20 FirstHyundai-v2.0.20.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.19 · 아파트·오피스텔 상단 전환 및 매매 조회' \
-              --notes '기본 실거래 화면은 기존 아파트 그대로 유지하고, 상단의 실거래 메뉴 아래에서 아파트/오피스텔을 한 번에 전환할 수 있게 했습니다. 더 이상 화면 맨 아래로 내려갈 필요가 없으며, 오피스텔 모드에는 아파트 거래를 일절 섞지 않습니다. 오피스텔 화면에서 매매·전세·월세를 모두 선택할 수 있고, 선택형 상세 보기·계약일 및 면적 필터를 유지했습니다. 정식 오피스텔 매매 RTMSDataSvcOffiTrade API를 전월세와 별도 수집하며 활용 승인이 확인되기 전에는 매매 0건이라고 오도하지 않고 승인 대기 안내를 표시합니다. 전월세 검증 자료는 이미 게시되어 정상 조회되며, 매매 API 오류 시 기존 전월세는 그대로 유지합니다. 인증키는 GitHub Secret에만 보관하고 앱/APK에 넣지 않았습니다. 기존 계약문자, FHD 로고, 관리자/가족 보안, 앱 안에서 업데이트 등 기존 기능도 유지했습니다.'
+              --title '퍼스트현대 v2.0.20 · 아파트 단지 검색 간소화' \
+              --notes '아파트정보 화면에서 사용성이 낮은 송도 전체/관심14 범위 선택창을 없앴습니다. 아파트 이름으로 바로 검색하며 전체 단지 목록은 기본 표시합니다. 관심 단지는 기존 관심14개 메뉴에서 그대로 접근할 수 있습니다. 오피스텔 별도 전환, 거래 검색, 계약문자 이미지, 가족/관리자 접근 구분, 고정 서명 및 앱 내 업데이트 기능을 유지합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.19 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          gh release upload v2.0.20 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
