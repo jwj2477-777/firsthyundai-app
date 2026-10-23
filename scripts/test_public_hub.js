@@ -20,7 +20,7 @@ const ctx=vm.createContext({
  $:id=>(nodes[id]??={innerHTML:'',value:'',classList:{toggle(){},add(){},remove(){}}}),
  number:n=>String(n),prettyTime:v=>v,
  value10k:n=>String(n)+'만원', URL,
- dealArticleClass:v=>'dealRow',dealBadge:v=>v.type,tradeStatusBadge:()=>'',tradeExtraBadges:()=>'',renderTypeButtons:()=>{},areaKey:v=>String(v),fetchRemote:async()=>{throw Error('missing optional')},
+ dealArticleClass:v=>'dealRow',dealBadge:v=>v.type,tradeStatusBadge:()=>'',tradeExtraBadges:()=>'',renderTypeButtons:()=>{},areaKey:v=>String(v),canonicalAreaTypes:p=>p.area_type_pairs||[],supplyPyeong:()=>null,fetchRemote:async()=>{throw Error('missing optional')},
  currentPage:'nearby',renderComplexes(){},showRefreshFeedback(){},console
 });
 vm.runInContext(snippet,ctx);
@@ -28,6 +28,16 @@ const run=q=>vm.runInContext(q,ctx);
 const missing=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13'})");
 assert(missing.includes('평형별 월 관리비'));
 assert(missing.includes('평형·타입 정보 확인 전입니다.'));
+run("maintenanceEstimates="+JSON.stringify({schema_version:1,state:'verified_partial',records:[
+ {complex_id:'f13',kapt_code:'A10020000',month:'202607',won_per_exclusive_m2:3831,
+ source_url:'https://apt.koreacharts.com/apt/A10020000/contents.html'}]}));
+const feePreview=run("renderPublicComplexInfo("+JSON.stringify({id:'f13',kapt_code:'A10020000',
+ area_type_pairs:[{exclusive_m2:59.89,supply_m2:88.08,supply_label:'88A'}]})+")");
+assert(feePreview.includes('약 229,400원'),'Verified published K-apt unit must multiply correct exclusive area');
+assert(feePreview.includes('2026년 7월')&&feePreview.includes('상담 참고액'),
+ 'Published month and non-invoice estimate label must be present');
+assert(!feePreview.includes('전체 공개 비용'),'Never re-introduce whole-complex partial line items');
+run("maintenanceEstimates=null");
 assert(!missing.includes('건축물대장')&&!missing.includes('단지 전체 공개 비용'),
   'Redundant apartment-wide costs and building facts must be removed');
 assert(!missing.includes('공식 자료·신청'), 'Family users never see API signup prompts');
