@@ -1232,7 +1232,7 @@ function renderComplexes(){
  const all=catalogRows(),q=($('complexSearch').value||'').trim().normalize('NFKC').toLowerCase();
  const visible=all.filter(x=>!q||[x.label,...(Array.isArray(x.aliases)?x.aliases:[])]
   .join(' ').normalize('NFKC').toLowerCase().includes(q));
- $('complexMeta').textContent='조회 '+visible.length+'곳 · 등록된 단지 기본정보 '+(remote.complexes?.records||[]).length+'곳'+
+ $('complexMeta').textContent='조회 '+visible.length+'곳'+(role==='admin'?' · 원자료 '+(remote.complexes?.records||[]).length+'건':'')+
   (issues.trades?' · 실거래 갱신 오류':'')+(issues.complexes?' · 단지정보 갱신 오류':'');
  const shown=visible.slice(0,complexDisplayLimit);
  $('complexCards').innerHTML=shown.length?shown.map(x=>{
@@ -2053,7 +2053,7 @@ function renderNews(){
  const waiting=briefs.length-aiCount;
  $('newsMeta').textContent='마지막 수집 '+prettyTime(payload.checked_at)+' · AI 본문요약 '+aiCount+'/'+briefs.length+
   '건'+(waiting?' · '+waiting+'건 원문 확인 대기':'')+' · 공식 사실검증 별도';
- if($('newsFamilyMeta'))$('newsFamilyMeta').textContent='최근 뉴스 '+briefs.length+'건 · 업데이트 '+prettyTime(payload.checked_at);
+ if($('newsFamilyMeta'))$('newsFamilyMeta').textContent='최근 뉴스 '+briefs.length+'건 · 갱신 '+compactTradeCollectedAt(payload.checked_at);
  const cat=$('newsCategory').value;
  const filtered=briefs.filter(x=>!cat||x.category===cat);
  const scopedAI=filtered.filter(isAI).length;
