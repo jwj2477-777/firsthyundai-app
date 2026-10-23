@@ -1125,6 +1125,15 @@ function setComplexDealType(type){
  complexDealType=type;
  renderComplexes();
 }
+// The legal-lot address is primary for real-estate brokerage contracts.
+// Use an exact-address verified cadastral match; never infer from street numbers.
+function verifiedLotAddress(p){
+ const pub=schoolDistrictData?.lot_addresses;
+ const row=pub?.state==='verified_partial' && Array.isArray(pub.records)?
+   pub.records.find(x=>x.complex_id===p.id && x.road_address===p.address):null;
+ const lot=String(p.lot_address||row?.lot_address||'').trim();
+ return /^인천광역시 연수구 송도동 [0-9]{1,4}(?:-[0-9]{1,4})?$/.test(lot)?lot:'';
+}
 function renderComplexes(){
  const all=catalogRows(),q=($('complexSearch').value||'').trim().normalize('NFKC').toLowerCase();
  const visible=all.filter(x=>!q||[x.label,...(Array.isArray(x.aliases)?x.aliases:[])]
@@ -1135,7 +1144,7 @@ function renderComplexes(){
  $('complexCards').innerHTML=shown.length?shown.map(x=>
   '<button type="button" class="nearbyCard'+(x.id===complexSelected?' selected':'')+'" onclick="selectComplex(\''+x.id+'\')" aria-pressed="'+(x.id===complexSelected?'true':'false')+'">'+
   '<strong>'+escapeHtml(x.label)+'</strong>'+
-  (x.address?'<span class="complexCardAddress">'+escapeHtml(x.address)+'</span>':'')+
+  (verifiedLotAddress(x)||x.address?'<span class="complexCardAddress">'+escapeHtml(verifiedLotAddress(x)||x.address)+'</span>':'')+
   '<small>'+((Number.isInteger(x.households)&&x.households>0)?number(x.households)+'세대':'기초정보 준비 중')+'</small></button>'
  ).join(''):'<div class="empty">검색 결과가 없습니다.</div>';
  $('complexShowMore').classList.toggle('hidden',shown.length>=visible.length);
@@ -1152,7 +1161,7 @@ function renderComplexes(){
   const tile=(name,v)=>'<div class="complexFact"><small>'+escapeHtml(name)+'</small><strong>'+escapeHtml(v)+'</strong></div>';
   // Keep floor-area/building coverage ratios in source data for provenance,
   // but do not put nonessential planning metrics on the family-facing basic card.
-  const optional=[['도로명주소',p.address],['시공사',p.builder]];
+  const optional=[['시공사',p.builder]];
   const extra=optional.filter(([name,value])=>value!==null&&value!==undefined&&value!=='').map(([name,value,unit])=>
    tile(name,displayComplexValue(value,unit||''))).join('');
   const ev=Number.isInteger(p.ev_chargers)&&p.ev_chargers>=0?p.ev_chargers:null;
@@ -1168,7 +1177,7 @@ function renderComplexes(){
    tile('관리사무소',phone||'확인 전')+
    '</div>'+
    (phone?'<a class="complexCallButton" href="tel:'+escapeHtml(phone.replace(/-/g,''))+'">☎ 관리사무소 전화 걸기</a>':'')+
-   (extra?'<details class="details"><summary>주소·시공사 보기</summary><div class="complexFacts">'+extra+'</div></details>':'')+
+   (extra?'<details class="details"><summary>시공사 보기</summary><div class="complexFacts">'+extra+'</div></details>':'')+
    '<p class="complexMeta">자료 확인일 '+escapeHtml(p.detail_checked_at||p.last_verified||'확인 전')+
     (ev!==null&&p.kapt_code?' · 전기차 충전 수치는 2026-09-09 K-apt 공개자료 기준':'')+'</p>'+
    (p.detail_note?'<details class="details"><summary>자료 차이·확인사항 보기</summary><p class="complexSectionNote">'+escapeHtml(p.detail_note)+'</p></details>':'');
@@ -1243,12 +1252,12 @@ function renderComplexes(){
     '<strong>'+escapeHtml(x.name)+'</strong>'+
     (safeLink(x.source_url)?'<a href="'+escapeHtml(safeLink(x.source_url))+'">근거 확인 ↗</a>':'')+'</div>').join('')+'</div>':
     '<div class="empty">이 단지의 배정학교는 아직 검증되지 않았습니다.</div>';
-  const tabs=[['basic','기본정보'],['types','평형·타입'],['schools','학교·학군'],['deals','실거래'],['public','건축·관리비'],['nearby','주변시설'],['sources','평면도·원문']]
+  const tabs=[['basic','기본정보'],['types','평형·타입'],['schools','학교·학군'],['deals','실거래'],['public','관리비'],['nearby','주변시설'],['sources','평면도·원문']]
    .map(([id,label])=>'<button type="button" class="'+(id===complexDetailTab?'active':'')+
     '" onclick="setComplexDetailTab(\''+id+'\')" aria-pressed="'+(id===complexDetailTab?'true':'false')+'">'+label+'</button>').join('');
   const tabBody=complexDetailTab==='types'?areaView:complexDetailTab==='schools'?zoneCard+schoolView+renderSchoolPublicInfo():complexDetailTab==='deals'?deals:complexDetailTab==='public'?renderPublicComplexInfo(p):complexDetailTab==='nearby'?renderNearbyComplexInfo(p):complexDetailTab==='sources'?doc:basic;
   $('complexDetails').innerHTML='<h3 class="complexDetailTitle">'+escapeHtml(p.label)+'</h3>'+
-   (p.address?'<p class="complexDetailAddress">⌖ '+escapeHtml(p.address)+'</p>':'')+
+   '<div class="complexDetailAddress"><strong>지번 · '+escapeHtml(verifiedLotAddress(p)||'확인 중')+'</strong>'+    (p.address?'<small>도로명 · '+escapeHtml(p.address)+'</small>':'')+'</div>'+
    '<button class="btn alt contractComplexShortcut" type="button" onclick="FirstHyundaiContracts.fromSelectedComplex()">✎ 이 단지로 계약문자 작성 →</button>'+ 
    '<div class="complexTabBar">'+tabs+'</div>'+tabBody;
  }
@@ -1324,29 +1333,41 @@ function renderSchoolPublicInfo(){
   sourceLink(PUBLIC_SRC.schoolLocation,'교육부 학교위치 표준데이터')+
   (neis?.length?sourceLink(PUBLIC_SRC.school,'나이스 학교기본정보'):'')+'</div>';
 }
+// Only per-home-type bill figures are useful to customers. Whole-building
+// partial K-apt expenses are NOT a household bill and are deliberately hidden.
+let chosenMaintenanceTypes={};
+function chooseMaintenanceType(id,index){
+ if(typeof id!=='string'||!Number.isInteger(index)||index<0||index>100)return;
+ chosenMaintenanceTypes[id]=index;renderComplexes();
+}
 function renderPublicComplexInfo(p){
- const find=key=>verifiedRecords(key)?.find(x=>x.complex_id===p.id);
- const reg=find('building_registry'),fee=find('maintenance');
- const fact=(label,value)=>value==null||value===''?'':'<div><dt>'+escapeHtml(label)+'</dt><dd>'+escapeHtml(value)+'</dd></div>';
- const approved=reg?.approval_date||p.approved_date;
- const buildings=Array.isArray(reg?.buildings)?reg.buildings:[];
- const buildingRows=buildings.map(x=>'<tr><td>'+escapeHtml(x.name||'동 명칭 미제공')+'</td><td>'+escapeHtml(x.ground_floors==null?'—':x.ground_floors+'층')+'</td><td>'+escapeHtml(x.approval_date||'—')+'</td></tr>').join('');
- const registry='<article><strong>건물·계약 대상 확인</strong><dl class="practiceFacts">'+
- fact('사용승인일',approved)+fact('층수',reg?.top_ground_floor!=null?'확인 건물 중 최고 '+reg.top_ground_floor+'층':p.floors)+
- fact('용도',reg?.purposes?.join(' · '))+fact('세대수',p.households?p.households.toLocaleString('ko-KR')+'세대':null)+
- fact('주차',p.parking_total?p.parking_total.toLocaleString('ko-KR')+'대'+(p.households?' · 세대당 '+(p.parking_total/p.households).toFixed(2)+'대':''):null)+
- '</dl>'+(buildingRows?'<details class="details"><summary>동별 층수·사용승인일 확인</summary><div class="practiceTable"><table><thead><tr><th>동</th><th>지상층</th><th>사용승인일</th></tr></thead><tbody>'+buildingRows+'</tbody></table></div></details>':'')+
- '<p class="tiny">'+(reg?'건축물대장 확인 건물 기준. 세대수·주차는 단지정보 기준입니다.':'단지정보 기준 · 건축물대장 동별 자료는 아직 없습니다.')+'</p><p class="practiceNote">해당 호의 전용면적·대지권은 개별 서류로 확인하세요. 현재 조회는 전유부·등기부 조회가 아닙니다.</p></article>';
+ const types=typeof canonicalAreaTypes==='function'?canonicalAreaTypes(p):[];
+ const idx=Math.max(0,Math.min(types.length-1,chosenMaintenanceTypes[p.id]||0));
+ const picked=types[idx];
+ // Only source-verified per-unit invoices may be displayed, not complex-wide
+ // component totals or guessed exclusive-area proportional allocations.
+ const entries=Array.isArray(p.maintenance_by_type)?p.maintenance_by_type:[];
+ const item=picked?entries.find(x=>x&&x.supply_label===picked.supply_label&&
+   x.status==='verified_invoice'&&Number.isSafeInteger(x.monthly_won)&&
+   x.monthly_won>0&&x.monthly_won<=2000000&&/^20[0-9]{2}-[0-9]{2}$/.test(x.month||'')&&
+   safeLink(x.source_url)):null;
  const phone=String(p.management_phone||'').replace(/[^0-9+]/g,'');
- const feeMonth=/^\d{6}$/.test(fee?.month||'')?fee.month.slice(0,4)+'년 '+Number(fee.month.slice(4))+'월':'';
- const costs=Object.entries(fee?.breakdown_won||{}).filter(([,v])=>typeof v==='number'&&Number.isFinite(v)&&v>=0);
- const maintenance='<article><strong>관리비·입주 상담</strong><p class="practiceNote">평형별 실제 월 관리비는 아직 확보되지 않았습니다.</p><dl class="practiceFacts">'+
- fact('난방 방식',p.heating_detail||p.heating)+fact('관리사무소',p.management_phone)+
- '</dl>'+(phone?'<a class="btn" href="tel:'+escapeHtml(phone)+'">관리사무소 전화</a>':'')+
- '<p class="tiny">문의할 내용: 해당 평형의 최근 고지액 · 여름/겨울 금액 · 전기·수도·난방 포함 여부 · 주차 추가요금</p>'+
- (costs.length?'<details class="details"><summary>'+escapeHtml(feeMonth)+' 단지 전체 공개 비용 보기</summary><dl class="practiceFacts">'+costs.map(([k,v])=>fact(k,v.toLocaleString('ko-KR')+'원')).join('')+'</dl><p class="tiny">공개된 일부 항목만 표시합니다. 세대별 관리비나 전체 관리비 합계가 아닙니다.</p></details>':'')+'</article>';
- const address=p.address?'<article><strong>도로명·지번주소</strong><p>'+escapeHtml(p.address)+'</p>'+sourceLink('https://map.kakao.com/?q='+encodeURIComponent(p.address),'지도에서 주소 확인')+'</article>':'';
- return '<div class="apiInfoCards">'+registry+maintenance+address+'</div>';
+ const options=types.length?'<div class="neisLevelButtons">'+types.map((t,i)=>{
+   const py=typeof supplyPyeong==='function'?supplyPyeong(t.supply_m2,t.market_pyeong):null;
+   const label=(py?py+'평 · ':'')+t.supply_label;
+   return '<button type="button" class="'+(i===idx?'active':'')+
+     '" aria-pressed="'+(i===idx?'true':'false')+'" onclick="chooseMaintenanceType(\''+escapeHtml(p.id)+'\','+i+')">'+
+     escapeHtml(label)+'</button>';
+ }).join('')+'</div>':'<p class="practiceNote">평형·타입 정보 확인 전입니다.</p>';
+ const bill=picked?item?
+   '<p class="practiceNote"><strong>'+escapeHtml(item.monthly_won.toLocaleString('ko-KR'))+'원</strong> · '+
+   escapeHtml(item.month)+'월 확인 고지액</p>'+sourceLink(item.source_url,'고지액 근거 확인'):
+   '<p class="practiceNote">'+escapeHtml(picked.supply_label)+'타입의 실제 월 관리비는 아직 확인되지 않았습니다.</p>':
+   '<p class="practiceNote">실제 세대 관리비 자료가 없습니다.</p>';
+ return '<div class="apiInfoCards"><article><strong>평형별 월 관리비</strong>'+
+  '<p class="tiny">평형을 선택해 실제 확인된 고지액을 조회합니다.</p>'+options+bill+
+  (phone?'<a class="btn" href="tel:'+escapeHtml(phone)+'">관리사무소 문의 '+escapeHtml(p.management_phone||'')+'</a>':'')+
+  '<p class="tiny">공용관리비 일부 항목 합계를 세대별 관리비처럼 환산하지 않습니다. 실제 금액은 동·호수, 계절, 개별 사용량에 따라 다릅니다.</p></article></div>';
 }
 // An optional secondary view, always isolated from official apartment results.
 const OFFICE_DETAIL_KEY='firsthyundai_officetel_detailed_v1';

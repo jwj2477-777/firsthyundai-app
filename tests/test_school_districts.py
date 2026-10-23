@@ -29,6 +29,26 @@ class SchoolZoneSafeguards(unittest.TestCase):
  def test_multiple_and_joint_zone_not_assigned(self):
   self.assertEqual(m.build_assignments([],[]),[])
   self.assertEqual(m.build_assignments([], [{'id':'f13','lat':37.38,'lng':126.64}]),[])
+ def test_f15_real_point_is_in_songil_zone_not_excluded_by_100m_buffer(self):
+  d=json.loads((R/'data'/'school_zones_yeonsu.json').read_text(encoding='utf8'))
+  # F15BL street address 30: geocoded reference 126.6344321, 37.3856143.
+  point={'id':'f15','lat':37.385614333723,'lng':126.63443211409}
+  matches=m.zone_matches(d['zones'],point['lng'],point['lat'])
+  self.assertEqual(len(matches),1)
+  self.assertEqual(matches[0][0]['name'],'인천송일초통학구역')
+  self.assertGreater(matches[0][1],35)
+  self.assertLess(matches[0][1],100)
+  rows=m.build_assignments(d['zones'],[point])
+  self.assertEqual(len(rows),1)
+  self.assertEqual(rows[0]['complex_id'],'f15')
+  self.assertEqual(rows[0]['zone_name'],'인천송일초통학구역')
+ def test_boundary_buffer_still_rejects_points_within_35m_of_boundary(self):
+  d=json.loads((R/'data'/'school_zones_yeonsu.json').read_text(encoding='utf8'))
+  ref=next(z for z in d['zones'] if z['id']=='Z000101206')
+  ring=m.decode_ring(ref['rings'][0][0])
+  # A boundary vertex is not a safe apartment centroid.
+  point={'id':'edge','lng':ring[0][0]+0.000001,'lat':ring[0][1]+0.000001}
+  self.assertFalse(any(v['complex_id']=='edge' for v in m.build_assignments(d['zones'],[point])))
  def test_schoolinfo_api_requires_yeonsu_sgg_and_three_school_levels(self):
   seen=[]
   def fetch(req):
@@ -63,6 +83,7 @@ class SchoolZoneSafeguards(unittest.TestCase):
              'x':'126.64','y':'37.38'}}]}).encode()
   rows=m.collect_kakao_coordinates([record],'private',opener=verified)
   self.assertEqual(len(rows),1)
+  self.assertFalse(rows[0].get('lot_address'),'Missing lot source must not invent one')
   self.assertEqual(rows[0]['id'],'f13')
   self.assertNotIn('private',json.dumps(rows))
 if __name__=='__main__':unittest.main()

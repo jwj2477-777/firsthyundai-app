@@ -4,7 +4,7 @@ const root=path.resolve(__dirname,'..');
 const html=fs.readFileSync(path.join(root,'app/src/main/assets/index.html'),'utf8');
 const javascript=html.split('<script>')[1].split('</script>')[0];
 new vm.Script(javascript);
-for(const m of ['id="officetelPanel"','id="officeRentContent"','id="publicSubscriptions"','건축·관리비','학교·학군'])assert(html.includes(m),m);
+for(const m of ['id="officetelPanel"','id="officeRentContent"','id="publicSubscriptions"' ,'관리비','학교·학군'])assert(html.includes(m),m);
 const nav=html.match(/const NAV_CATEGORIES=\[([\s\S]*?)\];/);assert(nav);
 assert.equal((nav[1].match(/icon:/g)||[]).length,3,'Keep three large family menu categories');
 const snippet=javascript.slice(javascript.indexOf('// Source-backed optional integrations.'),javascript.indexOf('function tradeClass(type)'));
@@ -26,12 +26,14 @@ const ctx=vm.createContext({
 vm.runInContext(snippet,ctx);
 const run=q=>vm.runInContext(q,ctx);
 const missing=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13'})");
-assert(missing.includes('건축물대장')&&missing.includes('관리비·입주 상담'));
-assert(missing.includes('동별 자료는 아직 없습니다.'), 'Unverified units must be clearly marked unavailable');
-assert(!missing.includes('공식 자료·신청'), 'Family users must never be sent to developer API signup pages');
+assert(missing.includes('평형별 월 관리비'));
+assert(missing.includes('실제 세대 관리비 자료가 없습니다.'));
+assert(!missing.includes('건축물대장')&&!missing.includes('단지 전체 공개 비용'),
+  'Redundant apartment-wide costs and building facts must be removed');
+assert(!missing.includes('공식 자료·신청'), 'Family users never see API signup prompts');
 const addressed=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13',address:'인천광역시 연수구 컨벤시아대로252번길 70'})");
-assert(addressed.includes('지도에서 주소 확인')&&addressed.includes('컨벤시아대로252번길 70'));
-assert(missing.includes('평형별 실제 월 관리비는 아직 확보되지 않았습니다.'), 'Missing fee is clearly labeled unknown, not zero');
+assert(!addressed.includes('도로명·지번주소')&&!addressed.includes('지도에서 주소 확인'),
+ 'Address is in the cadastral-first detail header, not duplicated in fees');
 assert(run('renderSchoolPublicInfo()').includes('배정학교가 아닙니다'));
 assert(run('renderSchoolPublicInfo()').includes('schoolzone.emac.kr'));
 assert(!run('renderSchoolPublicInfo()').includes('NEIS_EDU_KEY를 등록'),'Absent verified data must not falsely claim the stored NEIS key is missing');
@@ -109,9 +111,10 @@ for(const name of ['schools','school_zones','office_rents','office_sales','build
 console.log('Public hub UI passed: school not falsely assigned, separate office rents, API approval statuses, three family menus');
 
 run("publicServices.maintenance={state:'verified',records:[{complex_id:'f13',month:'202608',breakdown_won:{'경비비':100000,'청소비':0}}]}");
-run("publicServices.building_registry={state:'verified',records:[{complex_id:'f13',approval_date:'2017-11-17',top_ground_floor:42,purposes:['공동주택'],buildings:[{name:'1301동',ground_floors:42,approval_date:'2017-11-17'}]}]}");
-const practical=run("renderPublicComplexInfo({id:'f13',households:100,parking_total:150,management_phone:'032-000-0000',heating:'지역난방'})");
-assert(practical.includes('tel:0320000000')&&practical.includes('지역난방'));
-assert(practical.includes('세대당 1.50대')&&practical.includes('1301동'));
-assert(practical.includes('<summary>2026년 8월 단지 전체 공개 비용 보기</summary>'));
-assert(practical.includes('100,000원')&&!practical.includes('1,000원'),'Never divide partial costs into a household invoice');
+const practical=run("renderPublicComplexInfo({id:'f13',management_phone:'032-000-0000',heating:'지역난방'})");
+assert(practical.includes('tel:0320000000'));
+assert(practical.includes('평형별 월 관리비'));
+assert(!practical.includes('100,000원')&&!practical.includes('2026년 8월 단지 전체'),
+  'Never expose whole-building cost breakdown as a per-unit bill');
+const verifiedBill=run("renderPublicComplexInfo({id:'f13',maintenance_by_type:[{supply_label:'117A',status:'verified_invoice',monthly_won:225000,month:'2026-08',source_url:'https://example.org/verified'}]})");
+assert(!verifiedBill.includes('225,000원'), 'No figure unless its matching verified type exists');

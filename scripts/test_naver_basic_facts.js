@@ -22,7 +22,7 @@ assert(byId['verified-extra-07'].detail_note.includes('259대'),'Previous confli
 const html=fs.readFileSync(path.join(root,'app/src/main/assets/index.html'),'utf8');
 new vm.Script(html.split('<script>')[1].split('</script>')[0]);
 const segment=html.slice(html.indexOf('  const optional=[['),html.indexOf('  const ev=Number.isInteger',html.indexOf('  const optional=[[')));
-assert(segment.includes('도로명주소')&&segment.includes('시공사'),'Useful address and builder remain visible');
+assert(segment.includes('시공사')&&html.includes('지번 ·')&&html.includes('도로명 ·'),'Building source preserved; legal lot is displayed primary and road secondary in detail header');
 assert(!segment.includes('용적률')&&!segment.includes('건폐율'),'Nonessential ratios hidden in family basics');
 const collector=fs.readFileSync(path.join(root,'scripts/collect_complexes.py'),'utf8');
 assert(collector.includes('if prior.get("naver_sample_verified"):'),'User-confirmed source facts must survive API refresh');
