@@ -51,17 +51,21 @@ for(const type of ['전세','월세']){
  assert.equal(broker({type,dealing_type:'중개거래',broker_region_raw:'인천 연수구'}),'','Broker location must never be shown for a lease');
 }
 
-// The card's three tags have distinct roles. No decorative parentheses.
+// Routine 신고/임대차 신고 badges add no information. Show only exceptional statuses.
 function statusBadge(row){return vm.runInContext('tradeStatusBadge('+JSON.stringify(row)+')',ctx);}
 for(const type of ['전세','월세']){
- assert(statusBadge({type,status:'신고'}).includes('임대차 신고'),'Rental report is readable');
+ assert.equal(statusBadge({type,status:'신고'}),'','Public rental reporting is implicit in a published transaction');
  assert(!badges({type,contract_type_raw:'신규'}).includes('(신규계약)'),'No pointless parentheses around new contract');
  assert(!badges({type,contract_type_raw:'갱신'}).includes('(갱신계약)'),'No pointless parentheses around renewed contract');
 }
-assert(statusBadge({type:'전세',status:'신고(임대차)'}).includes('임대차 신고'),'Real official rental status is normalized for parents');
-assert(statusBadge({type:'매매',status:'신고'}).includes('신고'),'Sale reported state remains');
+assert.equal(statusBadge({type:'전세',status:'신고(임대차)'}),'','Official rental report status is routine too');
+assert.equal(statusBadge({type:'전세',status:'신고 ( 임대차 )'}),'','Whitespace must not create an extra badge');
+assert.equal(statusBadge({type:'매매',status:'신고'}),'','Sale report is routine');
+assert.equal(statusBadge({type:'매매'}),'','Missing status must not create a badge');
 assert(statusBadge({type:'매매',status:'해제'}).includes('tradeCancelledBadge'),'Cancelled record must visibly retain its status');
-assert(!statusBadge({type:'매매',status:'신고'}).includes('임대차 신고'));
+assert(statusBadge({type:'매매',status:'해제'}).includes('해제'),'Cancellation label retained');
+assert(statusBadge({type:'매매',status:'정정'}).includes('정정'),'Unexpected official statuses should not be silently discarded');
+assert(!statusBadge({type:'매매',status:'해제'}).includes('임대차 신고'));
 assert(badges({type:'매매',dealing_type:'중개거래'}).includes('중개거래'));
 assert(badges({type:'매매',dealing_type:'직거래'}).includes('직거래'));
 assert.equal(broker({type:'매매',dealing_type:'직거래',broker_region_raw:'인천 연수구'}),'');
