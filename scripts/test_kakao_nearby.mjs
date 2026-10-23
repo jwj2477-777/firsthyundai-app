@@ -14,6 +14,16 @@ assert.equal(config.backend_url,"https://"+workerName+".jwj2477.workers.dev",
  "App backend address must match the actual Cloudflare Wrangler deployment");
 assert(src.includes("return url==='"+config.backend_url+"'")||src.includes('return url==='+JSON.stringify(config.backend_url)),
  "Android WebView URL safety allowlist and cloud backend URL must match exactly");
+const native=readFileSync(new URL("../app/src/main/java/kr/co/firsthyundai/app/MainActivity.java",import.meta.url),"utf8");
+// A prior build validated the WebView URL but left a stale hard-coded native
+// allowlist. Both sides MUST point to the deployed Worker.
+const allowlist=native.match(/@JavascriptInterface public void fetchNearby\([\s\S]*?if\(workerUrl==null \|\| !"(https:\/\/[^\"]+)"\.equals\(workerUrl\)/)?.[1];
+assert.equal(allowlist,config.backend_url,
+ "Native Android URL allowlist MUST equal the verified backend URL in nearby_config.json");
+assert(!native.includes("https://firsthyundai-kakao.jwj2477.workers.dev"),
+ "No defunct Cloudflare Worker hostname may remain in Android binary");
+assert(native.includes('"주변시설 서비스 주소 또는 요청 형식이 잘못되었습니다."'),
+ "Fail closed for unrecognized URLs or request parameters");
 assert(!src.includes("https://firsthyundai-kakao.jwj2477.workers.dev"),
  "Remove defunct Worker host from built Android app");
 assert.match(src,/window\.FirstHyundaiNative\.fetchNearby/);
