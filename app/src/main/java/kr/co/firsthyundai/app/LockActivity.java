@@ -139,7 +139,7 @@ public class LockActivity extends Activity {
         retryButton.setOnClickListener(v -> loadLatestPolicy());
         FrameLayout stage = new FrameLayout(this);
         stage.addView(scroll,new FrameLayout.LayoutParams(-1,-1));
-        setContentView(stage);
+        SystemBars.install(this,stage);
         showWelcome(stage);
         loadLatestPolicy();
     }
