@@ -5,12 +5,13 @@
  const native=window.FirstHyundaiNative;
  const banner=$('appUpdateBanner'),text=$('appUpdateBannerText');
  const check=$('appUpdateCheck'),install=$('appUpdateInstall'),dismiss=$('appUpdateDismiss');
- const status=$('appUpdateStatus');
+ const status=$('appUpdateStatus'),manual=$('appUpdateManual');
  if(!banner||!check||!install||!status)return;
  let ready=false,working=false;
  function request(){
   if(working)return;
   ready=false;
+  if(manual)manual.classList.add('hidden');
   if(!native?.checkForAppUpdate){status.textContent='안드로이드 앱에서 확인할 수 있습니다.';return;}
   status.textContent='새 버전 확인 중…';
   try{native.checkForAppUpdate();}
@@ -21,11 +22,12 @@
   const available=data?.available===true&&data?.state==='available'&&
     /^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(version);
   ready=available;banner.hidden=!available;
+  if(manual)manual.classList.toggle('hidden',available||data?.state==='latest');
   if(available){
    text.textContent='새 버전 v'+version+'이 나왔습니다.';
    status.textContent='새 버전 v'+version+' 이용 가능';
   }else if(data?.state==='latest')status.textContent='현재 최신 버전입니다.';
-  else status.textContent='새 버전을 확인하지 못했습니다. 인터넷 연결을 확인해 주세요.';
+  else status.textContent='자동 업데이트 확인에 실패했습니다. 아래 공식 다운로드 페이지에서 새 버전을 확인할 수 있습니다.';
   install.disabled=false;check.disabled=false;working=false;
  }
  function progress(data){
