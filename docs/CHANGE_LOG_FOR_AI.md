@@ -1,5 +1,7 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+- **2026-10-23 / v2.0.18**: On-demand isolated officetel rental page opened by unobtrusive bottom-of-trades link; keep unchanged home and 3 main categories. Compact default view, stored optional expanded detailed filters + 40-result pagination. Reuse already-implemented protected official OffiRent XML collector from Actions and schedule safe daily attempts; only mark verified after successful API response and full data retrieval, retain snapshot on failure. Add regression tests and release bump.
+
 - **2026-10-23 / v2.0.17**: Native direct-download installer using pinned GitHub release URL with strict package/installed signer/higher build validation; FileProvider, scoped cache, progress, and Android system install approval. Compact admin header button; expandable one-row interest-trade notifications and reduced repetitive explanatory prose; regression tests and versionCode 68.
 
 - **2026-10-22 / v2.0.16**: Contract interim payment date in rendered customer notice now uses the existing dateLabel helper (YYYY.MM.DD.) shared by contract/balance dates. Raw ISO form fields and flexible agreed schedules remain unmodified; date formatting regression tests added. APK release version 2.0.16/67, immutable signer reused.
