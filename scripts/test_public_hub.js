@@ -88,12 +88,11 @@ run("selectNeisSchoolLevel('all')");
 run('publicServices='+JSON.stringify(sample));
 
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('송도 오피스텔'));
-assert(nodes.officeRentContent.innerHTML.includes('확인된 거래 1건'),'Results are separate from apartment transactions');
-run('toggleOfficeDetailed(true)');
-assert(nodes.officeDetailToggle.checked===true);
+assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>1건</b>'),'Results are separate from apartment transactions');
+run('startOfficeSearch()');
+assert(nodes.officeRentContent.innerHTML.includes('송도 오피스텔'));
+run('openOfficeLatest()');
 assert(nodes.officeRentContent.innerHTML.includes('오피스텔'));
-run('toggleOfficeDetailed(false)');
-assert(nodes.officeDetailToggle.checked===false);
 ;
 run('renderPublicSubscriptions()');assert(nodes.publicSubscriptions.innerHTML.includes('첫 수집'));
 run("publicServices.subscriptions={state:'verified',updated_at:'2026-10-20T09:30:00+0900',window_start:'2025-09-01',records:[{kind:'아파트',name:'송도 새아파트',address:'인천 연수구 송도동',notice_date:'2026-10-19',apply_start:'2026-10-23',apply_end:'2026-10-25',households:123,notice_url:'https://www.applyhome.co.kr/ai/aia/test.do'}]}");
