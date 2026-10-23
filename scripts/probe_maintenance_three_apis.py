@@ -53,7 +53,7 @@ def run(key):
      safevalues=[]
      for row in rows:
       for k,v in row.items():
-       if any(t in k.lower() for t in ('cost','fee','pay','amount','sum','price','rate','total','area','month')):
+       if k not in ('kaptCode','kaptName'):
         if re.fullmatch(r'[0-9]{1,15}(?:\\.[0-9]{1,6})?',str(v or '')):
          safevalues.append(k+'='+str(v))
      print('KAPT_API',month,kind,op,'rows',len(rows),'keys',keys[:850],
