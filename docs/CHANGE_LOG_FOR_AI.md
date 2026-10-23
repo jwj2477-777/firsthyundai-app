@@ -1,5 +1,9 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## v2.0.36 · 2026-10-24 · Precise contract coverage status
+- `favoriteCollectionScope()`: show '일부 월 미수집' only when `missing_buckets` is nonempty; when `state='partial'` but monthly snapshots exist, show '일부 자료 갱신 오류' instead. Preserve v2.0.35 compact card UI and existing IDs. Bump Android `versionName` to 2.0.36, code 87, with matching immutable-release GitHub workflow tag; verify published release before claiming installed availability.
+
+
 ## v2.0.35 · 2026-10-24 · Compact favorites and apartment catalog cards
 - `app/src/main/assets/index.html`: renderNearby() displays only ★ + full favorite label (no inconsistent '주변 핵심단지' header), separate count and latest full contract date, plus visible 12-month contract collection scope derived from source `checked_at`. Partial snapshots show a coverage warning; uninitialized snapshots do not pretend to have zero deals.
 - `renderComplexes()`: compact rows with full proper names, verified cadastral lot address first (otherwise road address), short form only on summary card, verified household count. Entire detail panel still uses source-backed full address and information.
