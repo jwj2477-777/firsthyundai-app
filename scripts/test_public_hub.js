@@ -36,7 +36,7 @@ assert(run('renderSchoolPublicInfo()').includes('배정학교가 아닙니다'))
 assert(run('renderSchoolPublicInfo()').includes('schoolzone.emac.kr'));
 assert(!run('renderSchoolPublicInfo()').includes('NEIS_EDU_KEY를 등록'),'Absent verified data must not falsely claim the stored NEIS key is missing');
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('공식 자료 확인 중')&&!nodes.officeRentContent.innerHTML.includes('조회 0건'),'Pending access is not an empty official result');
-run('publicServices.office_sales={state:"awaiting_approval",records:[]}');
+run('publicServices={office_rents:{state:"verified",records:[]},office_sales:{state:"awaiting_approval",records:[]}}');
 run('renderOfficeRentals()');
 assert(nodes.officeRentContent.innerHTML.includes('매매 API 활용승인'),'Unapproved sale API is not confirmed zero');
 run('publicServices.office_sales='+JSON.stringify({state:'verified',records:[{type:'매매',building:'송도 매매오피스텔',price_10k:32100,contract_date:'2026-10-20',area_m2:44.5,status:'신고'}]}));
