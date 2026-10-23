@@ -340,11 +340,10 @@ body.apartmentSheetActive{overflow:hidden}
 <div id="trades" class="page hidden">
  <div class="sectionTitle"><div><h2>송도동 아파트 실거래가</h2><p class="tiny" id="tradesMeta">국토교통부 공개 API 연동 대기</p></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
  <div class="panel">
-  
-  <div class="tradeStarter" aria-label="실거래 보기 방식">
-    <button id="tradeModeLatest" type="button" onclick="openTradeLatest()"><span class="starterIcon">◷</span>전체 최신순</button>
-    <button id="tradeModeFavorites" type="button" onclick="switchPage('nearby')"><span class="starterIcon">★</span>관심 14개</button>
-    <button id="tradeModeSearch" type="button" onclick="startTradeSearch()"><span class="starterIcon">⌕</span>아파트 선택</button>
+  <div class="tradeFilterHeading">
+    <span>거래 유형</span>
+    <button id="tradeModeSearch" type="button" aria-controls="tradeSearchPanel"
+      aria-expanded="false" aria-pressed="false" onclick="toggleTradeSearch()">⌕ 아파트 선택</button>
   </div>
   <div id="tradeFocusBanner"></div>
   <div id="tradeSearchPanel" class="tradeSearchOptions hidden">
@@ -355,7 +354,6 @@ body.apartmentSheetActive{overflow:hidden}
       <select id="tradeAreaSelect" onchange="setTradeArea()" aria-label="실거래 전용면적 선택"><option value="">모든 전용면적 보기</option></select>
     </div>
   </div>
-  <p class="tiny" style="margin:12px 0 4px">거래 유형</p>
   <div id="tradeTypeBar" class="tradeTypeBar" aria-label="거래유형">
     <button type="button" onclick="setTradeType('')">전체</button>
     <button type="button" onclick="setTradeType('매매')">매매</button>
@@ -1690,6 +1688,10 @@ function startTradeSearch(){
  selectedTradeBuilding='';selectedTradeArea='';
  switchPage('trades');
 }
+function toggleTradeSearch(){
+ if(tradeMode==='search')openTradeLatest();
+ else startTradeSearch();
+}
 function populateTradeBuildings(){
  const input=$('tradeBuildingSelect');
  const names=[...new Set((remote.trades?.records||[]).map(r=>String(r.building||'').trim()).filter(Boolean))]
@@ -1879,16 +1881,14 @@ function resetTradeDateFilter(){
 }
 function renderTrades(){
  const payload=remote.trades;
- // Active state has both a visible border and an accessible pressed label.
- for(const [buttonId,chosen] of [
-  ['tradeModeLatest',tradeMode==='latest'],
-  ['tradeModeFavorites',false],
-  ['tradeModeSearch',tradeMode==='search']
- ])$(''+buttonId)?.setAttribute?.('aria-pressed',chosen?'true':'false');
- $('tradeModeLatest').classList.toggle('active',tradeMode==='latest');
- $('tradeModeFavorites').classList.toggle('active',false);
- $('tradeModeSearch').classList.toggle('active',tradeMode==='search');
- $('tradeSearchPanel').classList.toggle('hidden',tradeMode!=='search');
+ // The top trade navigation already provides Latest and Favorites.
+ // Keep just the apartment search affordance here and make its state explicit.
+ const searchActive=tradeMode==='search',searchButton=$('tradeModeSearch');
+ searchButton.classList.toggle('active',searchActive);
+ searchButton.setAttribute('aria-pressed',searchActive?'true':'false');
+ searchButton.setAttribute('aria-expanded',searchActive?'true':'false');
+ searchButton.textContent=searchActive?'전체 거래 보기':'⌕ 아파트 선택';
+ $('tradeSearchPanel').classList.toggle('hidden',!searchActive);
  renderTypeButtons('tradeTypeBar',$('typeFilter').value);
  if(tradeMode==='search'){
   if(payload && $('tradeBuildingSelect').options.length<=1)populateTradeBuildings();
