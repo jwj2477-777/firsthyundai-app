@@ -17,6 +17,32 @@ const ctx=vm.createContext({
 });
 vm.runInContext(js.slice(begin,end),ctx);
 function render(page){vm.runInContext('renderMainNavigation('+JSON.stringify(page)+')',ctx);return nav;}
+
+function verifyShortcutPlacement(page){
+ const menu=render(page);
+ const primary=menu.indexOf('class="primaryNav"');
+ const shortcuts=menu.indexOf('class="utilityNav"');
+ const property=menu.indexOf('class="propertyTypeSwitch"');
+ const secondary=menu.indexOf('class="secondaryNav"');
+ assert(primary>=0&&shortcuts>primary,'Today/contract row follows the three main tabs on '+page);
+ assert(menu.indexOf('오늘 요약',shortcuts)>shortcuts&&menu.indexOf('계약문자 만들기',shortcuts)>shortcuts,
+  'Both shortcuts remain available on '+page);
+ if(['trades','nearby','new','officetel'].includes(page)){
+  assert(property>shortcuts,'Property switch must sit below quick actions on '+page);
+  assert(menu.includes('오피스텔'),'Apartment/officetel switch remains reachable on '+page);
+ }else{
+  assert.equal(property,-1,'No property switch outside trade screens on '+page);
+ }
+ if(['trades','nearby','new'].includes(page)){
+  assert(secondary>property,'Trade subnavigation stays under the apartment/officetel switch on '+page);
+ }else assert.equal(secondary,-1,'No trade subnavigation outside apartment trade pages on '+page);
+}
+for(const page of ['trades','nearby','new','officetel','complexes','news','overview','contracts'])
+ verifyShortcutPlacement(page);
+ctx.role='admin';
+verifyShortcutPlacement('trades');
+assert(nav.includes('관리자 도구'),'Administrator shortcuts must remain accessible');
+ctx.role='family';
 let n=render('complexes');
 assert(n.includes('아파트정보')&&n.includes('✎ 계약문자 만들기'),'Main destinations visible');
 assert(n.includes('openComplexHome()'),'Apartment button must jump to search');
