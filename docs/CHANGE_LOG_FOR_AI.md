@@ -1,6 +1,6 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
-- **2026-10-23 / v2.0.20**: Remove the duplicate apartment lookup scope dropdown (`송도 전체 아파트` versus `관심 14개 단지만`) and its associated filter state/CSS. Apartment information continues to show all Songdo complexes by default with a single full-width name search. The separate favorite-14 trading navigation and direct complex-detail links stay unchanged. Updated regression tests, incremented Android build number, and retained fixed signing/update flow.
+- **2026-10-23 / v2.0.20**: Also label only the current `가족 모드`/`관리자 모드` in the small header switch, keeping secure mode transitions and accessible action labels intact. Remove the duplicate apartment lookup scope dropdown (`송도 전체 아파트` versus `관심 14개 단지만`) and its associated filter state/CSS. Apartment information continues to show all Songdo complexes by default with a single full-width name search. The separate favorite-14 trading navigation and direct complex-detail links stay unchanged. Updated regression tests, incremented Android build number, and retained fixed signing/update flow.
 
 - **2026-10-23 / v2.0.19**: Upper property type switch in real-transaction primary menu, apartments default and officetel mode isolated from apartment menus/records. Official independent RTMSDataSvcOffiTrade API collector with cancellation tags, distinct `office_sales` approval-gated snapshot; existing verified rental records preserved. No bottom-only entry, same signer.
 
