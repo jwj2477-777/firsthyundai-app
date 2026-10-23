@@ -11,7 +11,7 @@
  function request(){
   if(working)return;
   ready=false;
-  if(manual)manual.classList.add('hidden');
+  manual?.classList?.add?.('hidden');
   if(!native?.checkForAppUpdate){status.textContent='안드로이드 앱에서 확인할 수 있습니다.';return;}
   status.textContent='새 버전 확인 중…';
   try{native.checkForAppUpdate();}
@@ -22,7 +22,7 @@
   const available=data?.available===true&&data?.state==='available'&&
     /^\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(version);
   ready=available;banner.hidden=!available;
-  if(manual)manual.classList.toggle('hidden',available||data?.state==='latest');
+  manual?.classList?.toggle?.('hidden',available||data?.state==='latest');
   if(available){
    text.textContent='새 버전 v'+version+'이 나왔습니다.';
    status.textContent='새 버전 v'+version+' 이용 가능';
