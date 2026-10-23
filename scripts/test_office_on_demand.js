@@ -50,7 +50,7 @@ run('toggleOfficeDetailed(false)');
 assert(storage.firsthyundai_officetel_detailed_v1==='0');
 assert(!nodes.officeRentContent.innerHTML.includes('9층'),'Compact mode hides office-only detail');
 const gradle=fs.readFileSync(path.join(root,'app/build.gradle'),'utf8');
-assert(gradle.includes("versionCode 73; versionName '2.0.22'"));
+assert(gradle.includes("versionCode 74; versionName '2.0.23'"));
 const w=fs.readFileSync(path.join(root,'.github/workflows/sync-public-services.yml'),'utf8');
 assert(w.includes('python scripts/collect_public_services.py --mode offices'),'Automated office-rent polling uses existing secret');
 assert(w.includes('keeping previously published records'),'Network failure must preserve old official data');
