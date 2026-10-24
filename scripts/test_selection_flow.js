@@ -1,6 +1,5 @@
 'use strict';
-/* v6 regression: no overlays; visible painted background for 5/5 global
- * buttons, including intermediary color pulse and reverse cross-row route. */
+/* v7 regression: ONLY source and target background change, 5 routes remain */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
@@ -78,10 +77,9 @@ const win={innerWidth:415,innerHeight:980,requestAnimationFrame,
 };
 vm.runInNewContext(code,{window:win,document:doc,Math,Number,Object,Array,Map});
 const api=win.FirstHyundaiSelectionFlow;
-assert.equal(api.version,'6.0.0');
+assert.equal(api.version,'7.0.0');
 assert.equal(api._test.buttons(nav,'top-five').length,5);
-assert.equal(typeof api._test.intermediates,'function');
-assert.equal(typeof api._test.passPaint,'function');
+assert(!/intermediates\(|passPaint\(|mids\b/.test(code),'No intermediate tab may be animated');
 const before=buttons.map(b=>({text:b.innerHTML,rect:{...b.rect}}));
 click({target:buttons[2],defaultPrevented:false});selected=2;
 frame(0); // next frame, after inline onclick: install initial two gradients
@@ -91,22 +89,23 @@ assert(buttons[0].style.getPropertyValue('background').includes(colors[0]));
 assert(buttons[2].style.getPropertyValue('background').includes(colors[2]));
 assert.equal(nav.children.length,2,'No DOM/row insertions');
 frame(0);frame(320);
-assert(api._test.stats.lastPath.join(',')==='0,1,2',
- 'The center apartment info tab receives the passing color');
-assert(buttons[1].style.getPropertyValue('background').includes(colors[0]),
- 'Pass-through tile briefly shows actual source color');
-assert.equal(buttons[1].getAttribute('aria-current'),'false',
- 'Intermediate tab never becomes the active destination');
+assert(api._test.stats.lastPath.join(',')==='0,2',
+ 'Only the previous and destination menus may participate');
+for(let i=0;i<buttons.length;i++){
+ if(i!==0&&i!==2)
+  assert.equal(buttons[i].style.getPropertyValue('background'),'',
+   'Unrelated main menu '+i+' must never change');
+}
 assert.deepEqual(buttons.map(b=>({text:b.innerHTML,rect:{...b.rect}})),before,
  'No text, size, geometry, icon or position changed');
-frame(720);
+frame(630);
 assert.equal(buttons[0].style.getPropertyValue('background'),'');
 assert.equal(buttons[1].style.getPropertyValue('background'),'');
 assert.equal(buttons[2].style.getPropertyValue('background'),'');
 assert.equal(api._test.stats.finished,1);
 const nr=callbacks.length;
 click({target:buttons[4],defaultPrevented:false});selected=4;
-frame(900);frame(900);frame(1230);frame(1620);
+frame(900);frame(900);frame(1215);frame(1530);
 assert.equal(api._test.stats.topFive,2,'Cross-row menu selection animates');
 assert.equal(buttons[4].style.getPropertyValue('background'),'');
 const vector=api._test.vector(buttons[4].rect,buttons[0].rect);
@@ -116,4 +115,4 @@ click({target:buttons[3],defaultPrevented:false});
 assert.equal(callbacks.length,0);
 assert.equal(nav.children.length,2);
 assert.equal(nr,0,'No dangling timers from previous selection');
-console.log('V6 pure-color selection passed: five destinations, pass-through middle tab, no DOM overlays, correct reverse vector, no layout shift.');
+console.log('V7 minimal two-button color transfer passed: all 5 destinations, no unrelated tiles, no layout changes.');
