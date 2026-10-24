@@ -34,6 +34,7 @@ on:
       - 'scripts/test_selection_flow.js'
       - 'scripts/test_news_tab_wind_stability.js'
       - 'scripts/test_trade_type_direct_flow.js'
+      - 'scripts/test_native_lower_tab_browser.js'
       - 'scripts/test_premium_visual.js'
       - 'scripts/test_android_insets_presentation.js'
       - 'scripts/test_screenshot_consistency.js'
@@ -145,6 +146,7 @@ jobs:
           node scripts/test_selection_flow.js
           node scripts/test_news_tab_wind_stability.js
           node scripts/test_trade_type_direct_flow.js
+          node scripts/test_native_lower_tab_browser.js
           node scripts/test_shared_brand_handoff.js
           node scripts/test_price_trends.js
           node scripts/test_nearby.js
