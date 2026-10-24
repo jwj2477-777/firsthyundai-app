@@ -2524,3 +2524,24 @@ body.fhd-native-arrived.fhd-first-render header .officeMark,
 body.fhd-native-arrived.fhd-first-render header .brandHeaderText{
  animation:none!important;opacity:1!important;transform:none!important
 }
+
+
+/* v2.0.65 — soften the final 165ms shared-element landing.
+   Native artwork fades while the actual header underneath eases into view.
+   Opacity is compositor-only, keeping all layout and tap positions unchanged. */
+body.fhd-native-handoff header .officeMark,
+body.fhd-native-handoff header .brandHeaderText{
+ visibility:visible!important;opacity:0!important;
+}
+body.fhd-native-handoff.fhd-native-landing header .officeMark,
+body.fhd-native-handoff.fhd-native-landing header .brandHeaderText{
+ visibility:visible!important;opacity:1!important;
+ transition:opacity 155ms cubic-bezier(.22,.5,.25,1)!important;
+}
+@media(prefers-reduced-motion:reduce){
+ body.fhd-native-handoff header .officeMark,
+ body.fhd-native-handoff header .brandHeaderText{
+  visibility:visible!important;opacity:1!important;
+  transition:none!important;
+ }
+}

@@ -38,6 +38,7 @@ assert.equal(typeof handler,'function');
 assert.equal(typeof ctx.window.FirstHyundaiMotion.playEntrance,'function');
 assert.equal(typeof ctx.window.FirstHyundaiMotion.prepareBrandHandoff,'function');
 assert.equal(typeof ctx.window.FirstHyundaiMotion.startBrandHandoff,'function');
+assert.equal(typeof ctx.window.FirstHyundaiMotion.beginNativeHandoffLanding,'function');
 assert(css.includes('body.fhd-brand-handoff header .officeMark')&&css.includes('.fhd-bridge-logo'));
 const event={pointerType:'touch',isPrimary:true,target:{closest:()=>target},clientX:135,clientY:220};
 handler(event);assert.equal(created,1);assert.equal(added,1);

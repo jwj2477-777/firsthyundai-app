@@ -112,8 +112,14 @@
   document.body.classList.add('fhd-native-handoff');
   return [...values,viewport];
  }
+ function beginNativeHandoffLanding(){
+  // Reveal only the *actual* main-header brand during the last frames of the
+  // native move, never a second cloned logo on top of the splash.
+  document.body?.classList?.add('fhd-native-landing');
+ }
  function finishNativeHandoff(){
   document.body?.classList?.remove('fhd-native-handoff');
+  document.body?.classList?.remove('fhd-native-landing');
   document.body?.classList?.add('fhd-native-arrived');
  }
  function touch(event){
@@ -145,7 +151,7 @@
   stats.waves++;
  }
  document.addEventListener('pointerdown',touch,{passive:true});
- window.FirstHyundaiMotion={version:'2.0.64',playEntrance,prepareBrandHandoff,startBrandHandoff,nativeHeaderRects,finishNativeHandoff,_test:{touch,reduced,stats,headerTargets,finishBrandHandoff}};
+ window.FirstHyundaiMotion={version:'2.0.65',playEntrance,prepareBrandHandoff,startBrandHandoff,nativeHeaderRects,beginNativeHandoffLanding,finishNativeHandoff,_test:{touch,reduced,stats,headerTargets,finishBrandHandoff}};
  // Browsers used for UI preview have no Android bridge; keep a single
  // elegant initial reveal there as well, without affecting app navigation.
  if(!window.FirstHyundaiNative)playEntrance();

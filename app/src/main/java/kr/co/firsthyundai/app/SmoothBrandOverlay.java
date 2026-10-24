@@ -1,6 +1,7 @@
 package kr.co.firsthyundai.app;
 
 import android.app.Activity;
+import android.animation.ObjectAnimator;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
@@ -11,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import java.util.ArrayList;
 
 /**
  * Brand handoff on the Android compositor, not a second SVG painted by WebView.
@@ -29,8 +31,11 @@ final class SmoothBrandOverlay extends FrameLayout {
     private final View ring,rule;
     private boolean finished;
     private int layoutAttempts;
-    private static final long DURATION=680L;
-    private final PathInterpolator natural=new PathInterpolator(.22f,1f,.36f,1f);
+    private final ArrayList<ObjectAnimator> arrivalFades=new ArrayList<>();
+    private static final long DURATION=790L;
+    private static final long LANDING_LEAD=165L;
+    // Quieter takeoff than v2.0.64's fast-start curve, with a long soft landing.
+    private final PathInterpolator natural=new PathInterpolator(.34f,.06f,.18f,1f);
 
     private int dp(int x){return (int)(getResources().getDisplayMetrics().density*x+.5f);}
     SmoothBrandOverlay(Activity activity){
@@ -99,7 +104,7 @@ final class SmoothBrandOverlay extends FrameLayout {
      * real native view size. The overlay and WebView share a FrameLayout.
      * Each row: [left,top,width,height]. Input can represent narrow devices.
      */
-    void moveToHeader(float[] rects,float viewportWidth,View web,Runnable done){
+    void moveToHeader(float[] rects,float viewportWidth,View web,Runnable onApproach,Runnable done){
         if(finished)return;
         if(rects==null||rects.length!=12||viewportWidth<=0||web.getWidth()<=0){
             fadeOut(done);
@@ -111,7 +116,7 @@ final class SmoothBrandOverlay extends FrameLayout {
         // exactly matches the original LockActivity welcome center.
         if(emblem.getWidth()==0||title.getWidth()==0){
             if(++layoutAttempts>8){fadeOut(done);return;}
-            postDelayed(()->moveToHeader(rects,viewportWidth,web,done),16);
+            postDelayed(()->moveToHeader(rects,viewportWidth,web,onApproach,done),16);
             return;
         }
         View[] parts={emblem,title,subtitle};
@@ -142,11 +147,23 @@ final class SmoothBrandOverlay extends FrameLayout {
                 .scaleX(scale).scaleY(scale).setDuration(DURATION)
                 .setInterpolator(natural).start();
         }
-        ring.animate().alpha(0f).setDuration(350).start();
-        rule.animate().alpha(0f).setDuration(320).start();
-        // Brand movement starts before the underlying screen appears. It is
-        // mostly revealed only as the elements reach their destination.
-        backdrop.animate().alpha(0f).setStartDelay(140).setDuration(DURATION-95)
+        ring.animate().alpha(0f).setDuration(460).start();
+        rule.animate().alpha(0f).setDuration(420).start();
+        // Reveal the live header just before the native brand arrives, then
+        // cross-dissolve the native and HTML glyphs instead of hard swapping.
+        if(onApproach!=null)
+            postDelayed(()->{if(!finished)onApproach.run();},DURATION-LANDING_LEAD);
+        for(View part:parts){
+            ObjectAnimator fade=ObjectAnimator.ofFloat(part,View.ALPHA,1f,0f);
+            fade.setStartDelay(DURATION-120);
+            fade.setDuration(120);
+            fade.setInterpolator(new android.view.animation.DecelerateInterpolator());
+            arrivalFades.add(fade);
+            fade.start();
+        }
+        // The deep-teal surface recedes before arrival, without a separate
+        // cut or a suddenly exposed white background at the beginning.
+        backdrop.animate().alpha(0f).setStartDelay(95).setDuration(DURATION-145)
                 .setInterpolator(natural).start();
         postDelayed(()->finish(done),DURATION);
     }
@@ -158,6 +175,8 @@ final class SmoothBrandOverlay extends FrameLayout {
     void finish(Runnable done){
         if(finished)return;
         finished=true;
+        for(ObjectAnimator fade:arrivalFades)fade.cancel();
+        arrivalFades.clear();
         emblem.animate().cancel();
         title.animate().cancel();
         subtitle.animate().cancel();

@@ -8,12 +8,17 @@ const lock=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/
 new vm.Script(src);
 assert(css.includes('body.fhd-native-handoff header .officeMark')&&css.includes('body.fhd-native-arrived'));
 const native=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/SmoothBrandOverlay.java'),'utf8');
-assert(native.includes('R.drawable.ic_launcher_badge')&&native.includes('DURATION=680L')&&native.includes('getLocationOnScreen'));
+assert(native.includes('R.drawable.ic_launcher_badge')&&native.includes('DURATION=790L')&&native.includes('getLocationOnScreen'));
 assert(native.includes('scaleX(scale).scaleY(scale)'),'Logo scales uniformly, preserving aspect ratio');
 assert(native.includes('layoutAttempts>8'),'Prevent infinite layout retries on slow devices');
 assert(main.includes('ignored->{')&&main.includes('overlay.detach()'),'Reveal live HTML first, then remove the native brand to prevent a visible blink');
 assert(css.includes('.fhd-bridge-backdrop')&&css.includes('linear-gradient(135deg,#03212A,#095B5E)'));
 assert(main.includes('nativeHeaderRects?.()')&&main.includes('overlay.moveToHeader('));
+assert(native.includes('PathInterpolator(.34f,.06f,.18f,1f)'),'Use gentler takeoff and soft landing');
+assert(native.includes('DURATION-LANDING_LEAD')&&native.includes('ObjectAnimator.ofFloat(part,View.ALPHA,1f,0f)'),'Native brand cross-dissolves during landing instead of snapping');
+assert(main.includes('beginNativeHandoffLanding?.()')&&main.includes('onApproach,done'),'Android informs the WebView before the native shared elements land');
+assert(src.includes('function beginNativeHandoffLanding()'),'Browser can reveal the existing header before native overlay exits');
+assert(css.includes('body.fhd-native-handoff.fhd-native-landing header .officeMark'),'Header arrival CSS blends native and WebView artwork');
 assert(main.includes('view.setAlpha(1f)')&&main.includes('ANIMATOR_DURATION_SCALE'));
 assert(lock.includes('AccessPolicy.authorized(')&&lock.includes('overridePendingTransition(0,0)'));
 function box(left,top,width,height){return {left,top,width,height};}
