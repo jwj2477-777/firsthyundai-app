@@ -1,4 +1,4 @@
-/* FIRST HYUNDAI · minimal two-button color flow v7
+/* FIRST HYUNDAI · minimal two-button color flow v8
  * No overlays, masks, moving shapes, transforms, resized buttons or clones.
  * The ACTUAL button backgrounds are painted in place, behind original text.
  * Other menus and all intermediate buttons remain entirely untouched.
@@ -18,6 +18,8 @@
  ];
  const stats={started:0,finished:0,skipped:0,topFive:0,news:0,lastPath:[]};
  let running=null,sequence=0;
+ const DIRECT_IDS=['newsCategoryTabs','tradeTypeBar','officeTypeBar','nearbyTypeBar'];
+ let pendingDirect=null;
  const reduceMotion=()=>!!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
  const chosen=b=>!!b&&(b.classList.contains('active')||
   b.classList.contains('selected')||b.getAttribute('aria-current')==='page'||
@@ -34,7 +36,12 @@
    parent?.classList?.contains('utilityNav')))return {group:nav,spec:MAIN};
   for(const spec of PEER_GROUPS){
    const group=button.closest(spec.selector);
-   if(group&&button.parentElement===group)return {group,spec};
+   if(group&&button.parentElement===group){
+    // These two-row controls are committed by their own state setters below:
+    // no guessed next-frame selection and no duplicate animation.
+    if(DIRECT_IDS.includes(group.id))return null;
+    return {group,spec};
+   }
   }
   return null;
  }
@@ -138,6 +145,33 @@
   useBackground(target,toPaint(angle,originalIdle.color,newColor,-14),saved);
   raf=window.requestAnimationFrame(paintFrame);
  }
+ function beginDirect(id,next){
+  pendingDirect=null;
+  if(!DIRECT_IDS.includes(id)||reduceMotion())return;
+  const group=document.getElementById?.(id);
+  if(!group)return;
+  const key=id==='newsCategoryTabs'?'news':'trade-types';
+  const peers=buttons(group,key);
+  const previous=peers.findIndex(chosen);
+  if(previous<0||next<0||next>=peers.length||next===previous)return;
+  const a=peers[previous].getBoundingClientRect();
+  const b=peers[next].getBoundingClientRect();
+  if(!visible(a)||!visible(b))return;
+  stop();
+  pendingDirect={id,group,key,previous,next,
+   oldSelected:getPaint(peers[previous]),oldIdle:getPaint(peers[next])};
+ }
+ function endDirect(id,next){
+  const data=pendingDirect;
+  pendingDirect=null;
+  if(!data||data.id!==id||data.next!==next||reduceMotion())return;
+  // A synchronous UI state setter has completed: aria-selected (news) or
+  // active/aria-pressed (trade). Use this exact group, never a generic
+  // querySelector that can accidentally find another trade-type row.
+  if(!chosen(buttons(data.group,data.key)[next])){stats.skipped++;return;}
+  animate(data.group,data.key,data.previous,data.next,
+   data.oldSelected,data.oldIdle);
+ }
  function onClick(event){
   if(reduceMotion()||event.defaultPrevented)return;
   const button=event.target?.closest?.('button');
@@ -157,7 +191,8 @@
   });
  }
  document.addEventListener('click',onClick,{capture:true});
- window.FirstHyundaiSelectionFlow={version:'7.0.0',
+ window.FirstHyundaiSelectionFlow={version:'8.0.0',
+  beginDirect,endDirect,
   _test:{buttons,chosen,findGroup,getPaint,fromPaint,toPaint,
    vector,stop,onClick,stats}};
 })();
