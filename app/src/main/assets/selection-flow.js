@@ -27,7 +27,10 @@
  function paint(b){
   const s=window.getComputedStyle(b);
   const bg=s.backgroundImage&&s.backgroundImage!=='none'?s.backgroundImage:s.backgroundColor;
-  return {background:bg,color:s.color,borderRadius:s.borderRadius};
+  const backgroundColor=s.backgroundColor||'';
+  const tint=backgroundColor&&!/^(?:transparent|rgba\(0,\s*0,\s*0,\s*0\))$/.test(backgroundColor)?
+   backgroundColor:(bg.match(/#[0-9a-fA-F]{3,8}|rgba?\([^)]*\)/)||['#1A6870'])[0];
+  return {background:bg,color:s.color,borderRadius:s.borderRadius,tint};
  }
  const onScreen=r=>r&&r.width>0&&r.height>0&&
    r.bottom>0&&r.top<window.innerHeight&&r.right>0&&r.left<window.innerWidth;
@@ -122,7 +125,7 @@
    const trail=panel(group,'fhd-liquid-trail',
     origin.x+origin.w/2,origin.y+origin.h/2,
     length,Math.max(11,Math.min(21,origin.h*.21)),
-    'linear-gradient(90deg,'+oldSelection.background+','+afterTarget.background+')',
+    'linear-gradient(90deg,'+oldSelection.tint+','+afterTarget.tint+')',
     '999px',1);
    trail.style.transform='translateY(-50%) rotate('+Math.atan2(dy,dx)+'rad)';
    trail.style.transformOrigin='left center';
