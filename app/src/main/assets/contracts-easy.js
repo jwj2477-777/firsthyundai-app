@@ -299,6 +299,8 @@ function showPreview(){
 function compose(){
  const raw=v('rough');
  if(!raw){alert('먼저 메모를 입력하거나 음성으로 말씀해 주세요.');E('rough')?.focus?.();return false;}
+ // Never carry unfinished bank/account answers across a new memo (new client).
+ quickDraft.clear();activeQuick='';
  // Each new composition starts with empty deal data, avoiding old customer's account or terms leaking into new draft.
  app._test.clearForNewMemo();
  sourceClause='';polishedClause='';

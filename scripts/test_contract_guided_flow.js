@@ -96,4 +96,9 @@ assert(E('ct_missingQuickFields').innerHTML.includes('2026.11.02~11.06 협의'),
 assert.equal(easy.applyQuickField('contractDate'),true);
 assert.equal(E('ct_contractDate').value,'2026.11.02~11.06 협의');
 assert.equal(E('ct_manualPanel').open,false,'Missing information is entered inline without opening full form');
-console.log('v2.0.50 guided contract verified: three stages, dedicated specials, proposal terms, inline corrections and image gate.');
+assert.equal(easy.showQuickField('bank'),true);
+E('ct_quick_bank').value='이전고객은행';
+E('ct_rough').value='퍼팍 13블럭 매매 11억 잔금일 2027년 1월 1일';
+assert.equal(easy.compose(),true);
+assert(!E('ct_missingQuickFields').innerHTML.includes('이전고객은행'),'New client memo must clear unfinished payment drafts');
+console.log('v2.0.51 guided contract verified: three stages, dedicated specials, proposal terms, inline corrections and image gate.');
