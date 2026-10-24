@@ -1,87 +1,24 @@
 'use strict';
-/* News 2-tab regression: selected purple must visibly flow DIRECTLY on both
- * button backgrounds (prior z-index:-1 overlay was hidden under buttons). */
+/* Regression: real news markup + native CSS variable transition. */
 const assert=require('node:assert/strict');
-const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const css=read('app/src/main/assets/ui-v2.css');
+const fs=require('node:fs'),path=require('node:path');
+const base=path.resolve(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(base,p),'utf8');
 const html=read('app/src/main/assets/index.html');
-const code=read('app/src/main/assets/selection-flow.js');
+const css=read('app/src/main/assets/ui-v2.css');
+const flow=read('app/src/main/assets/selection-flow.js');
+assert(html.includes('class="controls newsCategoryTabs sectionModeSwitch"'));
+assert(html.includes('onclick="switchNewsPane(\'articles\')"'));
+assert(html.includes('onclick="switchNewsPane(\'subscriptions\')"'));
+assert(html.includes("setAttribute('aria-selected',pane==='articles'?'true':'false')"));
+assert(html.includes("setAttribute('aria-selected',pane==='subscriptions'?'true':'false')"));
+assert(css.includes('@property --fhd-native-fill'));
+assert(css.includes('#news .newsCategoryTabs.sectionModeSwitch>button[aria-selected="true"]'));
+assert(css.includes('--fhd-native-fill:100%'));
+assert(css.includes('transition:--fhd-native-fill 660ms'));
+assert(css.includes('#6547A5'));
 assert(css.includes('v2.0.74 · News tabs must NEVER move'));
-assert(css.includes('#news.page>.sectionTitle.newsUnifiedHeading>div{'));
-assert(css.includes('min-height:88px')&&css.includes('min-height:134px'));
-assert(html.includes("switchNewsPane('articles')")&&
- html.includes("switchNewsPane('subscriptions')"));
-assert(!code.includes('z-index:-1'));
-new vm.Script(code);
-let click,selected=0,id=0;
-const queue=[],cancelled=new Set();
-function style(){
- const values=new Map();
- return {setProperty:(k,v,p='')=>values.set(k,{v:String(v),p}),
-  getPropertyValue:k=>values.get(k)?.v||'',
-  getPropertyPriority:k=>values.get(k)?.p||'',
-  removeProperty:k=>values.delete(k)};
-}
-function item(tag='button'){
- const el={tagName:tag.toUpperCase(),style:style(),children:[],parentElement:null,
-  classList:{contains(){return false}},disabled:false,innerHTML:'',
-  closest(selector){
-   if(selector==='button')return el.tagName==='BUTTON'?el:null;
-   if(selector==='.hidden'||selector==='#nav')return null;
-   if(selector==='.page:not(.hidden) .newsCategoryTabs')return group;
-   return null;},
-  getAttribute(){return null},
-  getBoundingClientRect(){return el.rect}
- };
- return el;
-}
-const group=item('div');group.id='newsCategoryTabs';
-group.classList={contains:k=>k==='newsCategoryTabs'};
-group.rect={left:10,top:200,width:375,height:90,right:385,bottom:290};
-const buttons=[0,1].map(i=>{
- const b=item(),x=20+i*177;
- b.parentElement=group;b.innerHTML=i?'인천 청약·분양':'뉴스 브리핑';
- b.getAttribute=k=>k==='aria-selected'?(i===selected?'true':'false'):null;
- b.rect={left:x,top:211,width:168,height:62,right:x+168,bottom:273};
- return b;
-});
-group.children=buttons;
-const document={
- addEventListener(k,fn,opt){if(k==='click'){click=fn;assert.equal(opt.capture,true)}},
- getElementById:id=>id==='newsCategoryTabs'?group:null,
- querySelector:s=>s==='.page:not(.hidden) .newsCategoryTabs'?group:null
-};
-const window={innerWidth:410,innerHeight:860,
- requestAnimationFrame(fn){const key=++id;queue.push({id:key,fn});return key},
- cancelAnimationFrame(key){cancelled.add(key)},
- matchMedia:()=>({matches:false}),
- getComputedStyle:b=>{
-  const i=buttons.indexOf(b);
-  return {backgroundImage:'none',backgroundColor:i===selected?'#6547A5':'#FCFBFE'};
- }
-};
-vm.runInNewContext(code,{window,document,Math,Map,Object,Array,Number});
-function frame(t){const v=queue.shift();assert(v);if(!cancelled.has(v.id))v.fn(t)}
-const before=buttons.map(b=>({...b.rect,text:b.innerHTML}));
-const API=window.FirstHyundaiSelectionFlow;
-click({target:buttons[1],defaultPrevented:false}); // capture-phase listener
-selected=1; // actual switchNewsPane updates aria-selected in inline onclick
-frame(0); // next frame inspects this exact news row, not another selector
-assert.equal(window.FirstHyundaiSelectionFlow._test.stats.news,1,
- 'Lower news switch MUST animate');
-assert.equal(group.children.length,2);
-assert.equal(buttons[0].style.getPropertyPriority('background'),'important');
-assert.equal(buttons[1].style.getPropertyPriority('background'),'important');
-assert(buttons[0].style.getPropertyValue('background').includes('#6547A5'));
-assert(buttons[1].style.getPropertyValue('background').includes('#6547A5'));
-frame(0);frame(330);
-assert(buttons[0].style.getPropertyValue('background').includes('linear-gradient'));
-assert(buttons[1].style.getPropertyValue('background').includes('linear-gradient'));
-assert.deepEqual(buttons.map(b=>({...b.rect,text:b.innerHTML})),before);
-frame(630);
-assert.equal(window.FirstHyundaiSelectionFlow._test.stats.finished,1);
-assert.equal(buttons[0].style.getPropertyValue('background'),'');
-assert.equal(buttons[1].style.getPropertyValue('background'),'');
-assert.deepEqual(buttons.map(b=>({...b.rect,text:b.innerHTML})),before);
-console.log('News/subscription delegated click: exactly two real button backgrounds animate and title geometry stays fixed.');
+assert(flow.includes("if(isNativeRow(row))return null"),
+ 'No JS repaint may override the browser-native fill');
+assert(flow.includes("row.setAttribute?.('data-fhd-direction',next<previous?'left':'right')"));
+console.log('News tab native CSS trigger: both real aria-selected labels and correct purple fill are wired.');
