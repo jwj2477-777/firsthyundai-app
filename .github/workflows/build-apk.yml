@@ -278,22 +278,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.70 premium liquid background selection APK
+      - name: Publish v2.0.71 quiet fluid background selection APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.70.apk
-          unzip -t FirstHyundai-v2.0.70.apk | grep 'No errors detected'
-          if gh release view v2.0.70 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.71.apk
+          unzip -t FirstHyundai-v2.0.71.apk | grep 'No errors detected'
+          if gh release view v2.0.71 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.70 FirstHyundai-v2.0.70.apk \
+            gh release create v2.0.71 FirstHyundai-v2.0.71.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.70 · 자연스러운 액체형 배경색 전환' \
-              --notes '버튼 전체 복제 이동을 제거하고 실제 버튼의 글자·아이콘과 크기를 고정한 상태에서 그룹 안 배경색 레이어만 물 흐르듯 이동하도록 재구현했습니다. 기존 파랑·청록·보라 테마 유지, 원래 버튼 배경 상태 자동 복원, 움직임 줄이기 지원. 아파트·오피스텔 실거래 제목 아래 설명의 14px 글꼴/두 줄 높이/줄간격을 통일하고 메타정보는 유지했습니다. 전환·타이포그래피 회귀 테스트. v2.0.70/build121.'
+              --title '퍼스트현대 v2.0.71 · 초기 튀는 터치 효과 제거' \
+              --notes '중복되던 기존 터치 원형 물결, 버튼 누름 축소·튀어오름, 페이지 진입 페이드, 메뉴 카드 등장 동작 및 팝업의 튀는 효과를 제거했습니다. 버튼 실제 문자와 아이콘은 고정하고 같은 급 버튼의 색상만 물처럼 흐르는 전환을 유지합니다. 시작화면 FHD 로고의 메인 헤더 이동은 유지합니다. 기존 실거래·계약·알림·업데이트 기능은 변경하지 않았습니다. v2.0.71/build122.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.70 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.70 --apk FirstHyundai-v2.0.70.apk
+          gh release upload v2.0.71 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.71 --apk FirstHyundai-v2.0.71.apk
