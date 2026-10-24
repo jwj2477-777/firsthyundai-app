@@ -27,7 +27,10 @@
   wave.style.left=x+'px';wave.style.top=y+'px';
   // Don't pile up overlays when a parent double-taps or quickly switches tabs.
   target.querySelectorAll?.('.fhd-tap-wave')?.forEach(n=>n.remove?.());
-  wave.addEventListener('animationend',()=>wave.remove(),{once:true});
+  wave.addEventListener('animationend',()=>{
+   wave.remove();
+   if(!target.querySelector?.('.fhd-tap-wave'))target.classList.remove?.('fhd-touch-feedback');
+  },{once:true});
   target.classList.add('fhd-touch-feedback');
   target.appendChild(wave);
   stats.waves++;
