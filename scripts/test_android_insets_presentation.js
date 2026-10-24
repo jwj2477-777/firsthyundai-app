@@ -36,10 +36,13 @@ for(const t of [
  '#trades .tradeTypeBar button.active.sale',
  '#trades .tradeTypeBar button.active.lease',
  '#trades .tradeTypeBar button.active.monthly',
- '#trades .sectionTitle #tradesMeta',
  '@media(prefers-contrast:more)'
 ]) assert(visual.includes(t),'Missing screenshot polish '+t);
 assert(!visual.includes('grid-template-columns:'),'Existing navigation structure and column order stay intact');
+assert(css.includes('v2.0.72 · ONE source of truth for equal-rank page headings.'),
+ 'All page heading metadata should now be controlled by one shared typography scale');
+assert(!css.includes('#trades .sectionTitle #tradesMeta{font-size:13px'),
+ 'Do not reintroduce the old high-specificity trade-only 13px text');
 const script=html.split('<script>')[1]?.split('</script>')[0];
 assert(script&&script.includes("function compactTradeCollectedAt("),'Compact timestamp formatter exists');
 assert(script.includes("' · 수집 '+compactTradeCollectedAt(payload.checked_at)"));
