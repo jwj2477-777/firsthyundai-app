@@ -2218,7 +2218,7 @@ body:not([data-office-role="admin"]) #contracts #ct_preview.contractEditing{disp
 
 
 /* v2.0.57 — small global notification entry beside family/admin mode. */
-header #modeBar{gap:7px}
+header #modeBar{gap:7px;flex-direction:row}
 header #favoriteAlertButton{
  appearance:none;display:inline-flex;align-items:center;justify-content:center;
  position:relative;flex:0 0 43px;width:43px;height:43px;min-width:43px;min-height:43px;
