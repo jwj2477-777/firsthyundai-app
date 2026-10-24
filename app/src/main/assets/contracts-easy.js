@@ -10,7 +10,7 @@ let sourceClause='',polishedClause='';
 const ESCAPE=/[<>&]/g;
 function ending(line){
  let s=String(line||'').trim().replace(/^[①②③④⑤⑥⑦⑧⑨⑩]\s*/,'')
-  .replace(/^\d+[.)]\s*/,'').replace(/\s+/g,' ')
+  .replace(/^\d+[.)]\s*/,'').replace(/^(?:[▶→•*-]\s*)+/,'').replace(/\s+/g,' ')
   .replace(/[，]/g,',').replace(/[。]+$/,'').replace(/[.!?\s]+$/,'');
  if(!s)return '';
  // Standardization only; do not introduce parties, amounts, deadlines or remedies.
