@@ -19,7 +19,7 @@ for(const token of ['--ui2-shadow','--ui2-gold','--segment-active','#nearbyCards
  assert(layer.includes(token),'Visual system missing '+token);
 for(const core of ['id="nearbyCards"','id="complexCards"','id="ct_rough"',
   'class="propertyTypeSwitch sectionSubnav sectionModeSwitch"','onclick="openTradeLatest()"',
-  'onclick="FirstHyundaiEasy.compose()"','onclick="FirstHyundaiTradeAlerts.preview()"'])
+  'onclick="FirstHyundaiEasy.compose()"','onclick="FirstHyundaiTradeAlerts.previewFromSettings()"'])
  assert(html.includes(core),'Do not remove existing layout or actions: '+core);
 const lumi=h=>h.slice(1).match(/../g).map(v=>parseInt(v,16)/255)
  .map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4))
