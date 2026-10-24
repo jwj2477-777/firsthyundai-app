@@ -2564,3 +2564,24 @@ body.fhd-native-arrived.fhd-first-render header .brandHeaderText{
  }
 }
 @media(max-width:400px){header .brandSubtitle{letter-spacing:.075em!important}}
+
+/* v2.0.70 · Apartment/officetel heading rhythm: identical hierarchy.
+   The 13px trades-only override previously caused a visible size mismatch. */
+#trades.page>.sectionTitle:first-child,
+#officetel.page>.sectionTitle:first-child{
+ margin-top:18px;margin-bottom:13px;
+}
+#trades.page>.sectionTitle:first-child h2,
+#officetel.page>.sectionTitle:first-child h2{
+ font-family:inherit;font-size:22px;line-height:1.35;font-weight:850;
+ letter-spacing:-.6px;word-break:keep-all;
+}
+#trades.page>.sectionTitle:first-child #tradesMeta,
+#officetel.page>.sectionTitle:first-child p.tiny{
+ display:block;margin:8px 0 0;
+ font-family:inherit;font-size:14px;line-height:1.5;font-weight:500;
+ letter-spacing:-.15px;color:#5F7478;
+ min-height:42px;word-break:keep-all;overflow-wrap:break-word;
+}
+#trades .propertyTypeSwitch.sectionModeSwitch,
+#officetel .propertyTypeSwitch.sectionModeSwitch{margin-bottom:12px}
