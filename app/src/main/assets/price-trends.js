@@ -108,7 +108,7 @@ function chart(series,key,label,unit){
 }
 function volume(series){
  const max=Math.max(1,...series.map(x=>x.missing?0:x.count));
- return '<div class="priceTrendVolume" role="img" aria-label="월별 거래건수 막대그래프">'+
+ return '<div class="priceTrendVolume" role="img" aria-label="월별 거래건수 막대그래프" style="grid-template-columns:repeat('+series.length+',minmax(0,1fr))">'+
   series.map(x=>'<div class="priceTrendVolumeCol" title="'+esc(x.month)+' · '+(x.missing?'수집 누락':x.count+'건')+'">'+
    '<span style="height:'+(x.missing?0:Math.max(x.count?5:0,x.count/max*100)).toFixed(1)+'%"'+(x.count&&!x.missing?' class="hasVolume"':'')+'></span></div>').join('')+
   '</div><p class="priceTrendVolumeCaption">월별 거래건수 · 막대는 해당 면적·유형의 계약 건수</p>';
