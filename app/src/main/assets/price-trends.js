@@ -46,7 +46,7 @@ function prepare({rows=[],type='매매',area='',months=12,snapshot={},includeRen
  const choices=new Map();
  for(const r of rows){
   const a=areaKey(r?.area_m2);
-  if(!a||r?.type!==type||isCancelled(r)||(!includeRenewals&&type!=='매매'&&isRenewal(r)))continue;
+  if(!a||r?.type!==type||!keys.includes(monthOf(r.contract_date))||isCancelled(r)||(!includeRenewals&&type!=='매매'&&isRenewal(r)))continue;
   const v=type==='매매'?Number(r.amount_10k):Number(r.deposit_10k);
   if(!Number.isFinite(v)||v<=0||(type==='월세'&&!(Number(r.monthly_10k)>0)))continue;
   choices.set(a,(choices.get(a)||0)+1);
@@ -67,7 +67,7 @@ function prepare({rows=[],type='매매',area='',months=12,snapshot={},includeRen
  const first=readable[0],last=readable[readable.length-1];
  const validChange=readable.length>=3&&selection.length>=6&&first.count>=2&&last.count>=2&&
   Number.isFinite(first.price)&&first.price>0&&Number.isFinite(last.price);
- const pct=validChange?(last.price-first.price)/first.price*100:null;
+ const pct=validChange?(last.price-first.price)/first.price:null;
  return {type,months,keys,area:picked,areas:sorted,series,latest,count:selection.length,
   observedMonths:readable.length,change:pct,changeFrom:first?.month||'',changeTo:last?.month||'',
   state:String(snapshot?.state||''),checkedAt:String(snapshot?.checked_at||''),
@@ -86,7 +86,7 @@ function chart(series,key,label,unit){
  const grid=[0,0.5,1].map(k=>{
   const val=low+(high-low)*(1-k),yy=top+plotHeight*k;
   return '<line x1="'+left+'" y1="'+yy.toFixed(2)+'" x2="'+(width-right)+'" y2="'+yy.toFixed(2)+'" stroke="#E2E9E7" stroke-width="1"/>'+
-  '<text x="'+(left-7)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="#677D80">'+esc(unit==='만원'?num(val):num(val))+'</text>';
+  '<text x="'+(left-7)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="#677D80">'+esc(val>=10000?num(val/10000)+'억':num(val)+'만')+'</text>';
  }).join('');
  // Build separate paths per consecutive observed months; do not join missing months or zero-volume gaps.
  const groups=[];let group=[];
