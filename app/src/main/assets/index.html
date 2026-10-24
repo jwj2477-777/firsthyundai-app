@@ -436,7 +436,7 @@ body.apartmentSheetActive{overflow:hidden}
   </div>
 </div>
 <div id="officetel" class="page hidden">
- <div class="sectionTitle"><div><h2>송도동 오피스텔 실거래가</h2><p class="tiny">아파트와 동일한 검색 방식 · 오피스텔 자료만 별도 조회</p></div>
+ <div class="sectionTitle"><div><h2>송도동 오피스텔 실거래가</h2><p class="tiny" id="officeMeta">인천 연수구 송도동 · 수집 시각 확인 중</p></div>
    <button type="button" class="btn alt refreshAction" onclick="refreshPublicServices(true)">갱신</button></div>
  <div class="propertyTypeSwitch sectionSubnav sectionModeSwitch" data-tone="teal" role="group" aria-label="실거래 부동산 종류 선택">
   <button type="button" class="" aria-pressed="false" onclick="openTradeLatest()">아파트</button>
@@ -1603,11 +1603,21 @@ function officeVerifiedRows(){
  const rent=verifiedRecords('office_rents'),sales=verifiedRecords('office_sales');
  return [...(sales||[]),...(rent||[])];
 }
+function officeCollectionLabel(type){
+ const keys=type==='매매'?['office_sales']:type?['office_rents']:['office_sales','office_rents'];
+ const sources=keys.map(key=>publicServices?.[key]).filter(p=>p?.state==='verified'&&Array.isArray(p.records));
+ if(!sources.length)return publicServices?'아직 수집 전':'수집 시각 확인 중';
+ const times=sources.map(p=>Date.parse(p.updated_at||''));
+ if(times.some(t=>!Number.isFinite(t)))return '수집 시각 확인 필요';
+ // All types: report the older included snapshot, never a school refresh time.
+ return '수집 '+compactTradeCollectedAt(new Date(Math.min(...times)).toISOString());
+}
 function renderOfficeRentals(){
  const el=$('officeRentContent');if(!el)return;
  const rental=verifiedRecords('office_rents'),sales=verifiedRecords('office_sales');
  const all=officeVerifiedRows();
  const chosenType=$('officeTypeSearch').value||'';
+ if($('officeMeta'))$('officeMeta').textContent='인천 연수구 송도동 · '+officeCollectionLabel(chosenType);
  const needsSale=!chosenType||chosenType==='매매',needsRent=!chosenType||chosenType!=='매매';
  const salePending=needsSale&&!sales,rentPending=needsRent&&!rental;
  $('officeModeLatest')?.classList?.toggle?.('active',officeSearchMode==='latest');

@@ -37,6 +37,7 @@ const ctx=vm.createContext({
  areaKey:n=>Number.isFinite(Number(n))?String(Number(n)):'',
  sourceLink:()=>'',safeLink:()=>'',fetchRemote:async()=>{},console
 });
+vm.runInContext(script.slice(script.indexOf('function compactTradeCollectedAt('),script.indexOf('function number(')),ctx);
 vm.runInContext(js,ctx);
 vm.runInContext(script.slice(script.indexOf('function tradeClass(type)'),script.indexOf('function renderTypeButtons(')),ctx);
 const run=q=>vm.runInContext(q,ctx);
@@ -92,6 +93,22 @@ run('resetOfficeDateFilter()');nodes.officeStatusFilter.value='';
 nodes.officeMinArea.value='40';run('renderOfficeRentals()');
 assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>2건</b>'));
 nodes.officeMinArea.value='';
+// Header uses the actual included office snapshots, independently of apartments/schools.
+assert(!html.includes('아파트와 동일한 검색 방식 · 오피스텔 자료만 별도 조회'));
+assert(html.includes('id="officeMeta"'));
+run("publicServices={updated_at:'2026-10-26T12:00:00+09:00',office_sales:{state:'verified',updated_at:'2026-10-25T10:20:00+09:00',records:[]},office_rents:{state:'verified',updated_at:'2026-10-24T08:31:00+09:00',records:[]}}");
+assert.equal(run("officeCollectionLabel('')"),'수집 26.10.24 08:31');
+assert.equal(run("officeCollectionLabel('매매')"),'수집 26.10.25 10:20');
+assert.equal(run("officeCollectionLabel('전세')"),'수집 26.10.24 08:31');
+assert.equal(run("officeCollectionLabel('월세')"),'수집 26.10.24 08:31');
+run("setOfficeType('매매')");
+assert.equal(nodes.officeMeta.textContent,'인천 연수구 송도동 · 수집 26.10.25 10:20');
+run("publicServices.office_sales.updated_at='invalid'");
+assert.equal(run("officeCollectionLabel('매매')"),'수집 시각 확인 필요');
+run("publicServices.office_sales.state='awaiting_approval'");
+assert.equal(run("officeCollectionLabel('매매')"),'아직 수집 전');
+run('publicServices=null');
+assert.equal(run("officeCollectionLabel('')"),'수집 시각 확인 중');
 const gradle=fs.readFileSync(path.join(root,'app/build.gradle'),'utf8');
 assert(/versionCode [0-9]+; versionName '[0-9]+\.[0-9]+\.[0-9]+'/.test(gradle),'Build must expose an updatable semantic APK version');
 const w=fs.readFileSync(path.join(root,'.github/workflows/sync-public-services.yml'),'utf8');

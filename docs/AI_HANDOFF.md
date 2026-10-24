@@ -1,5 +1,11 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-25 · v2.0.87 · 오피스텔 제목 아래 실제 수집 시각
+- 사용자 캡처: 오피스텔 제목 아래 검색 방식 설명을 제거하고 아파트처럼 수집 시각 표시 요청.
+- officeMeta를 아파트와 같은 지역·짧은 한국시각(YY.MM.DD HH:mm) 형식으로 표시. publicServices.office_sales/office_rents의 실제 updated_at만 사용; 공공정보 전체/학교 또는 아파트 시각을 대신 쓰지 않음. 매매·전세/월세는 해당 유형, 전체는 확인된 자료 중 오래된 시각을 사용. 자료 없음·미승인·시각 누락은 최신 시각을 꾸며내지 않고 구분. 기존 수집 대기/오류 표시 유지.
+- test_office_on_demand.js에 실제 시각 선택·유형 전환·미수집/잘못된 시각·아파트/학교 시각과 독립 검증 추가. 다른 UI/브랜드 전환/데이터/업무 기능 무변경. 빌드·서명·Release는 별도 확인.
+
+
 ## 2026-10-25 · v2.0.86 · 영문 FIRST 줄의 마지막 자간·길이 미세 불일치
 - 사용자: 한글/로고보다 하단 영어 FIRST~만 마지막에 살짝 어긋나 보임. 한글 제목·로고의 이동 및 착지 방식 유지, 영문만 보완.
 - 동일 폰트라도 TextView/HTML inline span의 tracking·글자폭 처리와 반올림이 달라질 수 있어 영문 줄을 한 개의 공통 윤곽으로 고정. bundled FHD Brand regular를 generate_brand_subtitle.py로 변환한 동일 path/금색/viewport의 SVG와 Android VectorDrawable 사용. 한글은 이전 live TTF text 그대로. 영문 alt/contentDescription 유지.
