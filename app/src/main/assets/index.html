@@ -749,7 +749,7 @@ body.apartmentSheetActive{overflow:hidden}
   <label class="favoriteTradeAlertSwitch"><input type="checkbox" id="favoriteTradeAlertEnabled" checked onchange="FirstHyundaiTradeAlerts.setEnabled(this.checked)"> <span>새 실거래 팝업 알림</span></label>
   <label class="favoriteTradeAlertSwitch"><input type="checkbox" id="favoriteTradeNativeEnabled" onchange="FirstHyundaiTradeAlerts.setNativeEnabled(this.checked)"> <span>휴대폰 알림센터에서도 받기</span></label>
   <p class="favoriteTradeAlertHint" id="favoriteTradeNativeStatus" role="status">휴대폰 알림 권한 확인 중…</p>
-  <button type="button" class="btn alt alertPreviewButton" onclick="FirstHyundaiTradeAlerts.previewFromSettings()">알림 화면 미리보기</button>
+  <button type="button" class="btn alt alertPreviewButton" onclick="FirstHyundaiTradeAlerts.preview()">알림 화면 미리보기</button>
  </div>
 </dialog>
 <dialog id="favoriteTradeAlertDialog" class="favoriteTradeAlertDialog" aria-labelledby="favoriteTradeAlertTitle" aria-describedby="favoriteTradeAlertCaption">

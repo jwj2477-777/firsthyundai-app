@@ -13,7 +13,7 @@ assert(html.includes('favoriteTradeAlertEnabled'));
 assert(html.includes('FirstHyundaiTradeAlerts.view()'));
 assert(html.includes('id="favoriteTradeAlertDialog"'));
 assert(html.includes('id="favoriteAlertSettingsDialog"')&&html.includes('id="favoriteAlertButton"'));
-assert(html.includes('FirstHyundaiTradeAlerts.previewFromSettings()'));
+assert(html.includes('FirstHyundaiTradeAlerts.preview()'));
 assert(html.includes("filename==='new_trades'"),'Check the official new_trades feed, not contract_date of trades.json');
 const mapping=tradeUi.slice(tradeUi.indexOf('/* FAVORITES_MAPPING_START:'),tradeUi.indexOf('/* FAVORITES_MAPPING_END */')+'/* FAVORITES_MAPPING_END */'.length);
 const {groups,lookup}=vm.runInNewContext(mapping+'\n({groups:FAVORITE_APTS,lookup:favoriteIdForBuilding})');

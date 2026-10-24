@@ -192,6 +192,8 @@ function closeSettings(){
 }
 function previewFromSettings(){closeSettings();preview();}
 function preview(){
+ // Preserve the existing preview action while moving its button into the header settings dialog.
+ if(get('favoriteAlertSettingsDialog')?.open)closeSettings();
  if(['noteDialog','complexEditor'].some(id=>get(id)?.open))return;
  previewing=true;
  renderDialog([
