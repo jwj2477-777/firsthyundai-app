@@ -30,6 +30,7 @@ on:
       - 'scripts/test_navigation_clarity.js'
       - 'scripts/test_unified_top_layout.js'
       - 'scripts/test_segmented_switch_unity.js'
+      - 'scripts/test_selection_flow.js'
       - 'scripts/test_premium_visual.js'
       - 'scripts/test_android_insets_presentation.js'
       - 'scripts/test_screenshot_consistency.js'
@@ -138,6 +139,7 @@ jobs:
           python3 -c "from pathlib import Path; x=Path('app/src/main/assets/index.html').read_text(encoding='utf-8'); Path('/tmp/firsthyundai-ui.js').write_text(x.split('<script>',1)[1].split('</script>',1)[0],encoding='utf-8')"
           node --check /tmp/firsthyundai-ui.js
           node scripts/test_premium_motion.js
+          node scripts/test_selection_flow.js
           node scripts/test_shared_brand_handoff.js
           node scripts/test_price_trends.js
           node scripts/test_nearby.js
@@ -276,22 +278,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.68 liquid-selection motion APK
+      - name: Publish v2.0.69 fluid-color handoff APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.68.apk
-          unzip -t FirstHyundai-v2.0.68.apk | grep 'No errors detected'
-          if gh release view v2.0.68 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.69.apk
+          unzip -t FirstHyundai-v2.0.69.apk | grep 'No errors detected'
+          if gh release view v2.0.69 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.68 FirstHyundai-v2.0.68.apk \
+            gh release create v2.0.69 FirstHyundai-v2.0.69.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.68 · 버튼 선택 색상 이동 효과' \
-              --notes '동급 버튼 사이에서 선택 색상이 부드럽게 흘러가며 도착 지점의 기존 색상으로 자연스럽게 전환됩니다. 실거래·아파트정보·뉴스 주 메뉴, 오늘 요약·계약문자, 아파트·오피스텔, 실거래 목록, 거래유형, 뉴스·청약 버튼에 적용했습니다. 기존 파랑·청록·보라 색상과 기능은 유지하고 움직임 줄이기 접근성을 지원합니다. v2.0.68/build119.'
+              --title '퍼스트현대 v2.0.69 · 물 흐르듯 선택색상 이동' \
+              --notes 'v2.0.68 색상 이동 효과가 일부 클릭에서 나타나지 않던 타이밍 문제를 수정했습니다. 클릭 후 실제 활성 버튼이 바뀐 다음 화면 프레임에서 애니메이션을 적용합니다. 이전 버튼은 물이 빠지듯 원래 색에서 흰색으로, 도착 버튼은 원래 색을 유지하며 선택색이 차오르듯 이어집니다. 흐름 0.82초, 곡선형 컬러 스트림, 각 버튼 테마 색상 보존, 동작 최소화 설정 지원. 관련 회귀 테스트를 추가했습니다. v2.0.69/build120.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.68 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.68 --apk FirstHyundai-v2.0.68.apk
+          gh release upload v2.0.69 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.69 --apk FirstHyundai-v2.0.69.apk
