@@ -11,8 +11,8 @@ assert(html.includes('<script src="selection-flow.js"></script>'));
 assert(!script.includes('cloneNode'),'Never clone text or icon button faces');
 assert(css.includes('v2.0.72 · ONE source of truth for equal-rank page headings.'));
 assert(css.includes(':is(#trades,#nearby,#new,#officetel,#complexes,#news).page>.sectionTitle:first-child h2{'));
-assert(css.includes('#officetel.page>.sectionTitle:first-child p.tiny'));
-assert(css.includes('#trades.page>.sectionTitle:first-child #tradesMeta'));
+assert(css.includes(':is(#trades,#nearby,#new,#officetel,#complexes,#news).page>.sectionTitle:first-child p.tiny{'));
+assert(!css.includes('#trades .sectionTitle #tradesMeta{font-size:13px'));
 let capture,raf,activeIndex=0,reduce=false;
 const created=[],motions=[];
 function style(){
