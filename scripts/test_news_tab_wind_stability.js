@@ -7,7 +7,7 @@ const root=path.resolve(__dirname,'..');
 const css=fs.readFileSync(path.join(root,'app/src/main/assets/ui-v2.css'),'utf8');
 const html=fs.readFileSync(path.join(root,'app/src/main/assets/index.html'),'utf8');
 const src=fs.readFileSync(path.join(root,'app/src/main/assets/selection-flow.js'),'utf8');
-assert(css.includes('v2.0.74 · News top block') &&
+assert(css.includes('v2.0.74 · News tabs must NEVER move') &&
  css.includes('#news.page>.sectionTitle.newsUnifiedHeading>div{'),
  'Article and subscriptions headings must reserve the same space');
 assert(css.includes('min-height:88px')&&css.includes('min-height:134px'),
