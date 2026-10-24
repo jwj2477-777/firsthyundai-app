@@ -87,6 +87,71 @@ async function checkLayouts(){
   check('source coverage retained without expanded filler',source&&!source.open&&source.textContent.includes('2025-08-30'));
   document.getElementById('newsTabArticles').click();await tick();scrollTo(0,0);
   close('return to news retains anchor',box(document.querySelector('.newsCategoryTabs')),news);
+  // Real non-empty sibling feeds share their filters, context row, count and list anchors.
+  const categories=['개발·교통','분양·입주','세금·대출','정책·규제'];
+  remote.news.briefs=categories.map((category,i)=>({id:'fixture-'+i,title:'검사용 뉴스 '+i,category,
+   summary_method:i%2?'headline_only':'gemini_article',article_count:1,sources:[],last_published_at:time,
+   summary:i%2?'':'첫 번째 검사용 사실입니다.\n두 번째 검사용 사실입니다.\n세 번째 검사용 사실입니다.'}));
+  const sampleNotice=(kind,name,start,end)=>({kind,name,notice_date:kstDateOffset(0),apply_start:start,apply_end:end,
+   address:'검사용 공급위치',households:100,notice_url:'https://www.applyhome.co.kr/ai/aia/test.do'});
+  providerSnapshot.subscriptions.records=[
+   ...['아파트','무순위·잔여세대','오피스텔·도시형 등'].map((kind,i)=>sampleNotice(kind,'검사용 예정 공고 '+i,kstDateOffset(-1),kstDateOffset(-2))),
+   sampleNotice('아파트','검사용 마감 공고',kstDateOffset(2),kstDateOffset(1)),
+   sampleNotice('아파트','검사용 미확인 공고','','')];
+  publicServices=structuredClone(providerSnapshot);
+  function feedGeometry(){
+   const pane=document.querySelector('#news>section:not(.hidden)'),panel=pane.querySelector('.newsFeedPanel');
+   const details=panel.querySelector('details'),count=panel.querySelector('.feedResultCount');
+   const first=panel.querySelector('.newsCard,.subscriptionListingCard');
+   return {panel:box(panel).slice(0,3),filters:box(panel.querySelector('.newsFilterRow')),
+    summary:box(details.querySelector('summary')),count:box(count),first:first&&box(first)[1]};
+  }
+  function labelsFit(){
+   const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+   for(const select of document.querySelectorAll('#news>section:not(.hidden) .newsFilterRow>select')){
+    const style=getComputedStyle(select);ctx.font=style.font;
+    check('selected filter wording fits without clipping '+select.id,
+     ctx.measureText(select.selectedOptions[0].textContent).width<=select.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight)+1);
+    check('all filter touch targets retain at least 50px',select.offsetHeight>=50);
+    check('filter keeps a visible dropdown affordance',style.backgroundImage.includes('data:image/svg+xml'));
+   }
+  }
+  for(const mode of ['family','admin']){
+   document.body.dataset.officeRole=mode;
+   switchNewsPane('articles');document.getElementById('newsCategory').value='';renderNews();await tick();scrollTo(0,0);
+   const base=feedGeometry();labelsFit();
+   check('feed context starts collapsed',!document.querySelector('#newsArticlesPane details').open);
+   for(const category of categories){
+    document.getElementById('newsCategory').value=category;renderNews();await tick();
+    const g=feedGeometry();close('news topic does not move filters',g.filters,base.filters);
+    close('news topic does not move count',g.count,base.count);check('news topic does not move first result',Math.abs(g.first-base.first)<.6);labelsFit();
+   }
+   document.querySelector('#newsArticlesPane details').open=true;await tick();
+   check('full original caution remains accessible',document.querySelector('#newsArticlesPane details').textContent.includes('중요한 정보는 원문에서 확인하세요.'));
+   close('opening news guidance leaves filters fixed',feedGeometry().filters,base.filters);
+   document.querySelector('#newsArticlesPane details').open=false;
+   switchNewsPane('subscriptions');await tick();
+   let g=feedGeometry();labelsFit();
+   close('sibling feed panels start together',g.panel,base.panel);
+   close('sibling filter rows share position and height',g.filters,base.filters);
+   close('sibling context summaries share position and height',g.summary,base.summary);
+   close('sibling result counts share position and height',g.count,base.count);
+   check('sibling first result cards start together',Math.abs(g.first-base.first)<.6);
+   for(const status of ['valid','past','unknown','all'])for(const kind of ['','아파트','무순위·잔여세대','오피스텔·도시형 등']){
+    document.getElementById('subscriptionStatusFilter').value=status;document.getElementById('subscriptionKindFilter').value=kind;
+    renderPublicSubscriptions();await tick();g=feedGeometry();labelsFit();
+    close('status/type filtering keeps controls anchored',g.filters,base.filters);
+    close('status/type filtering keeps result count anchored',g.count,base.count);
+    const expectedStages=kind==='아파트'?[1,1,1]:kind?[1,0,0]:[3,1,1];
+    const expectedCount=status==='all'?expectedStages.reduce((a,b)=>a+b,0):expectedStages[{valid:0,past:1,unknown:2}[status]];
+    const countText=document.querySelector('#publicSubscriptions>.feedResultCount').textContent;
+    check('count describes exact selected result and status',countText.startsWith('공고 '+expectedCount+'건 · ')&&countText.includes({valid:'예정·진행',past:'접수 마감',unknown:'일정 미확인',all:'전체 상태'}[status]));
+    check('full stage counts and source coverage preserved',document.querySelector('.subscriptionSourceDetails').textContent.includes('접수 예정/진행')&&document.querySelector('.subscriptionSourceDetails').textContent.includes('일정 미확인')&&document.querySelector('.subscriptionSourceDetails').textContent.includes('2025-08-30'));
+    if(g.first)check('filtered first result retains list anchor',Math.abs(g.first-base.first)<.6);
+   }
+   document.querySelector('.subscriptionSourceDetails').open=true;await tick();
+   close('opening source context leaves filters fixed',feedGeometry().filters,base.filters);
+  }
   // The eight apartment-detail siblings keep their shared address, shortcut and tab grid.
   switchPage('complexes');await tick();selectComplex('f13');await tick();
   const tabBoxes=()=>[...document.querySelectorAll('#complexSheet .complexTabBar>button')].map(box);
@@ -110,7 +175,7 @@ try{
  const file=path.join(dir,'index.html');fs.writeFileSync(file,html);
  for(const width of [320,360,380,393,430,600]){
   const r=child.spawnSync(binary,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--hide-scrollbars',
-   '--window-size='+width+',1100','--virtual-time-budget=100000','--dump-dom','file://'+file],{encoding:'utf8',timeout:45000,maxBuffer:8*1024*1024});
+   '--window-size='+width+',1100','--virtual-time-budget=180000','--dump-dom','file://'+file],{encoding:'utf8',timeout:45000,maxBuffer:8*1024*1024});
   assert.equal(r.status,0,r.stderr.slice(-1200));
   const m=r.stdout.match(/<pre id="layout-test">([\s\S]*?)<\/pre>/);
   assert(m,'Layout browser did not finish: '+r.stdout.slice(-600));

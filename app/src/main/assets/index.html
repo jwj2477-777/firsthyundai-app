@@ -504,18 +504,24 @@ body.apartmentSheetActive{overflow:hidden}
    <button id="newsTabSubscriptions" type="button" class="btn alt" role="tab" aria-selected="false" aria-controls="newsSubscriptionsPane" onclick="switchNewsPane('subscriptions')">인천 청약·분양</button>
  </div>
  <section id="newsArticlesPane" role="tabpanel" aria-labelledby="newsTabArticles">
-  <div class="notice adminExplain">기사를 제목별로 묶은 뒤 <b>원문 본문을 읽을 수 있는 경우에만 Gemini·Groq가 핵심 내용을 요약</b>합니다. 본문 확인이 불가능한 기사는 AI 요약을 표시하지 않습니다. AI 요약은 사실검증이 아니므로 세금·대출·개발 일정은 원문과 공식 발표를 확인하세요.</div><p class="familySimpleNote familyBriefCaution">뉴스 요약은 참고용입니다. 중요한 정보는 원문에서 확인하세요.</p>
-  <details class="adminExplain newsSourceDetails"><summary>AI 요약 현황 보기</summary><p class="tiny" id="newsMeta">AI 기사 본문 요약 현황을 확인 중입니다.</p></details>
-  <div class="panel"><select id="newsCategory" onchange="renderNews()"><option value="">모든 주제</option><option>개발·교통</option><option>분양·입주</option><option>세금·대출</option><option>정책·규제</option></select><div id="newsContent"><div class="empty">데이터 저장소를 연결한 후 표시됩니다.</div></div></div>
+  <div class="panel newsFeedPanel">
+   <div class="newsFilterRow"><select id="newsCategory" aria-label="뉴스 주제" onchange="renderNews()"><option value="">모든 주제</option><option>개발·교통</option><option>분양·입주</option><option>세금·대출</option><option>정책·규제</option></select></div>
+   <details class="newsSourceDetails newsFeedDetails"><summary>요약·원문 안내</summary>
+    <p class="familySimpleNote familyBriefCaution">뉴스 요약은 참고용입니다. 중요한 정보는 원문에서 확인하세요.</p>
+    <div class="notice adminExplain">기사를 제목별로 묶은 뒤 <b>원문 본문을 읽을 수 있는 경우에만 Gemini·Groq가 핵심 내용을 요약</b>합니다. 본문 확인이 불가능한 기사는 AI 요약을 표시하지 않습니다. AI 요약은 사실검증이 아니므로 세금·대출·개발 일정은 원문과 공식 발표를 확인하세요.</div>
+    <p class="tiny adminExplain" id="newsMeta">AI 기사 본문 요약 현황을 확인 중입니다.</p>
+   </details>
+   <div id="newsContent"><div class="empty">데이터 저장소를 연결한 후 표시됩니다.</div></div>
+  </div>
  </section>
  <section id="newsSubscriptionsPane" class="hidden" role="tabpanel" aria-labelledby="newsTabSubscriptions">
-  <div class="panel apiSmallCard">
-   <div class="controls"><select id="subscriptionStatusFilter" aria-label="접수 상태" onchange="renderPublicSubscriptions()">
-     <option value="valid">유효 공고 · 접수 예정/진행 중</option><option value="past">지난 공고 · 접수 마감</option><option value="unknown">일정 확인 필요</option>
-     <option value="all">전체 보기</option></select>
+  <div class="panel apiSmallCard newsFeedPanel">
+   <div class="controls newsFilterRow"><select id="subscriptionStatusFilter" aria-label="접수 상태" onchange="renderPublicSubscriptions()">
+     <option value="valid">예정·진행</option><option value="past">접수 마감</option><option value="unknown">일정 미확인</option>
+     <option value="all">전체 상태</option></select>
     <select id="subscriptionKindFilter" aria-label="청약공고 종류" onchange="renderPublicSubscriptions()">
-     <option value="">인천 전체 분양</option><option value="아파트">아파트</option>
-     <option value="무순위·잔여세대">무순위·잔여세대</option><option value="오피스텔·도시형 등">오피스텔·도시형 등</option>
+     <option value="">전체 유형</option><option value="아파트">아파트</option>
+     <option value="무순위·잔여세대">무순위·잔여</option><option value="오피스텔·도시형 등">오피스텔 등</option>
     </select></div>
    <div id="publicSubscriptions">청약홈 공식 자료 확인 중…</div>
   </div>
@@ -1730,10 +1736,12 @@ function renderPublicSubscriptions(){
   .sort((a,b)=>subscriptionStage(a,today)[2]-subscriptionStage(b,today)[2]||
     String(b.notice_date||'').localeCompare(String(a.notice_date||'')));
  const stamp=section?.updated_at?compactTradeCollectedAt(section.updated_at):'시각 미표시';
- const context='<details class="subscriptionSourceDetails"><summary>자료 출처·조회범위</summary><p class="tiny">한국부동산원 청약홈 · 인천광역시 소재 모집공고 · 확인 '+escapeHtml(stamp)+
-  ' · 조회범위 시작 '+escapeHtml(section?.window_start||'미표시')+'</p></details>'+
+ const selectedStatus={valid:'예정·진행',past:'접수 마감',unknown:'일정 미확인',all:'전체 상태'}[status]||'예정·진행';
+ const context='<details class="subscriptionSourceDetails"><summary>자료 출처·집계</summary><p class="tiny">한국부동산원 청약홈 · 인천광역시 소재 모집공고 · 확인 '+escapeHtml(stamp)+
+  ' · 조회범위 시작 '+escapeHtml(section?.window_start||'미표시')+'</p>'+
   '<p class="tiny">접수 예정/진행 '+number(counts.valid)+'건 · 마감 '+number(counts.past)+
-  '건 · 일정 미확인 '+number(counts.unknown)+'건</p>';
+  '건 · 일정 미확인 '+number(counts.unknown)+'건</p></details>'+
+  '<p class="tiny feedResultCount">공고 '+number(rows.length)+'건 · '+escapeHtml(selectedStatus)+'</p>';
  const shown=rows.slice(0,40).map(p=>{
   const stage=subscriptionStage(p,today)[0];
   const dates=p.apply_start&&p.apply_end?
@@ -2215,7 +2223,7 @@ function renderNews(){
  const cat=$('newsCategory').value;
  const filtered=briefs.filter(x=>!cat||x.category===cat);
  const scopedAI=filtered.filter(isAI).length;
- $('newsContent').innerHTML='<p class="tiny">뉴스 묶음 '+filtered.length+'개 · AI 요약 '+scopedAI+'개'+
+ $('newsContent').innerHTML='<p class="tiny feedResultCount">뉴스 묶음 '+filtered.length+'개 · AI 요약 '+scopedAI+'개'+
    (payload.state==='partial'?' · 일부 RSS 요청 실패':'')+'</p>'+
  (filtered.length?filtered.slice(0,55).map(x=>{
   const ai=isAI(x);
