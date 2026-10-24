@@ -2547,3 +2547,22 @@ body.fhd-first-render #nav .primaryNav>button{
   letter-spacing:-.55px;
  }
 }
+
+/* v2.0.74 · News tabs must NEVER move when the article metadata is
+   hidden on the subscription view. Reserve the same visual row in both
+   panes; all text and status information remains intact and searchable. */
+#news.page>.sectionTitle.newsUnifiedHeading,
+#news.page>.sectionTitle.newsUnifiedHeading>div{
+ min-height:88px;
+ box-sizing:border-box;
+}
+body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading,
+body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading>div{
+ min-height:134px;
+}
+@media(max-width:380px){
+ #news.page>.sectionTitle.newsUnifiedHeading,
+ #news.page>.sectionTitle.newsUnifiedHeading>div{min-height:114px}
+ body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading,
+ body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading>div{min-height:150px}
+}
