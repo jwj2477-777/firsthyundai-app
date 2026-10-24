@@ -17,7 +17,7 @@ for(const section of [favorites,news,contract])
 for(const phrase of [
  'Gemini·Groq가 핵심 내용을 요약',
  '금일 천만원',
- '이 안내는 거래당사자에게 계약 조건을 제안하고',
+ '이 안내는 거래당사자에게 계약조건을 전달하고',
  '이 기능은 계약서 자체가 아니라'
 ]){
  const idx=html.indexOf(phrase);

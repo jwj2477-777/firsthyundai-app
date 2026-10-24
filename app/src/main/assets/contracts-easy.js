@@ -238,6 +238,33 @@ function showQuickField(rawName){
  E('quick_'+first)?.focus?.();
  return true;
 }
+// Quick corrections use the SAME on-device parsers as the free-form memo.
+// Keep flexible signing windows verbatim; never convert a proposed range
+// to a fictitious one-day appointment.
+const QUICK_MONEY=new Set(['price','contractDeposit','advance','interim','monthlyRent']);
+const QUICK_DATES=new Set(['contractDate','balanceDate','interimDate','leaseStart']);
+function normalizeQuickField(part,raw){
+ const text=String(raw||'').normalize('NFKC').trim();
+ if(QUICK_MONEY.has(part)){
+  const n=window.FirstHyundaiLanguage?._test?.moneyPart?.(text);
+  if(n===null||n===undefined||!Number.isFinite(n)||n<0||(part!=='interim'&&n===0))return null;
+  return String(Math.round(n*100)/100); // All editable price fields store units of 만원.
+ }
+ if(QUICK_DATES.has(part)){
+  // No date-only interpretation of ranges, relative instructions or uncertainty.
+  if(/(?:~|～|〜|부터|까지|전후|사이|협의|조율|미정|말일|말경|초순|중순|하순|예정|경에)/.test(text))return text;
+  const parsed=window.FirstHyundaiLanguage?._test?.dateIn?.(text);
+  if(parsed?.value)return parsed.value; // ISO internally; 2026.12.03. in SMS/PNG.
+  // A date-shaped but impossible or incomplete value must not appear as a valid date.
+  if(/\d{1,4}\s*(?:년|월|[./-])\s*\d{1,2}/.test(text))return null;
+  return part==='contractDate'&&/^(?:추후|상호|별도)\s*(?:협의|결정)$/.test(text)?text:null;
+ }
+ if(part==='unit'){
+  const m=text.match(/^(\d{1,4})\s*동\s*(\d{1,4})\s*호$/);
+  if(m)return m[1]+'동 '+m[2]+'호';
+ }
+ return text;
+}
 function applyQuickField(rawName){
  const name=String(rawName||'');
  if(!QUICK_NAMES.has(name))return false;
@@ -249,7 +276,12 @@ function applyQuickField(rawName){
   if(!target)return false;
   const typed=input?String(input.value||''):String(quickDraft.get(part)||'');
   if(!typed.trim()){alert('입력할 내용을 확인해 주세요.');input?.focus?.();return false;}
-  updated.set(part,typed.trim());
+  const normalized=normalizeQuickField(part,typed);
+  if(normalized===null){
+   alert(QUICK_DATES.has(part)?'날짜가 정확한지 확인해 주세요. 예: 12월 3일 또는 2026.12.03.':'금액을 확인해 주세요. 예: 1억 2천만원');
+   input?.focus?.();return false;
+  }
+  updated.set(part,normalized);
  }
  for(const [part,value] of updated){
   const target=E(part);
@@ -357,5 +389,5 @@ window.firstHyundaiContractSpeech=function(result){
  }else oldSpeech(result);
 };
 window.FirstHyundaiEasy={refreshMissing,compose,afterManualEdit,openManual,focusMissing,showQuickField,applyQuickField,updateSpecials,useOriginalTerms,usePolishedTerms,reset,
- _test:{extractSpecial,polishTerms,ending}};
+ _test:{extractSpecial,polishTerms,ending,normalizeQuickField}};
 })();
