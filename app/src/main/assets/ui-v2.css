@@ -2481,6 +2481,11 @@ body.fhd-first-render #nav .primaryNav>button:nth-child(3){animation-delay:180ms
 
 
 /* v2.0.62 — central FHD identity travels to measured live header elements. */
+/* Keep the three flying brand layers on the GPU; no heavy backdrop filters. */
+.fhd-bridge-logo,.fhd-bridge-title,.fhd-bridge-subtitle{
+ will-change:transform;backface-visibility:hidden;
+}
+.fhd-bridge-backdrop{will-change:opacity}
 body.fhd-brand-handoff header .officeMark,
 body.fhd-brand-handoff header .brandHeaderText{opacity:0!important}
 .fhd-brand-bridge{position:fixed;inset:0;z-index:200000;overflow:hidden;isolation:isolate;pointer-events:auto}
