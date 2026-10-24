@@ -547,22 +547,22 @@ body.apartmentSheetActive{overflow:hidden}
    <p id="ct_memoWriteTip" class="contractMemoWriteTip adminExplain">한 줄씩 적어도 되고, 말하듯이 이어 적어도 됩니다.</p>
   </div>
   <div class="contractSpecialMemoArea">
-   <label for="ct_specialMemo">✎ 특약사항 <small>작성한 문장이 그대로 안내문에 들어갑니다</small></label>
+   <label for="ct_specialMemo">✎ 특약사항 <small>작성한 내용을 특약으로 인식해 문장별로 정리합니다</small></label>
    <textarea id="ct_specialMemo" rows="4" maxlength="6000" placeholder="예) 잔금일까지 권리관계 변동 없이 유지합니다.&#10;현 시설물 상태로 인도합니다." oninput="FirstHyundaiContracts.updateSummary()" onchange="FirstHyundaiEasy.updateSpecials()"></textarea>
   </div>
   <div class="contractEasyActions">
    <button type="button" class="btn contractOneTap" onclick="FirstHyundaiEasy.compose()">메모 정리하고 다음 단계 →</button>
    <button type="button" class="btn alt contractVoice" onclick="FirstHyundaiContracts.voice()">🎙 음성으로 메모 입력</button>
   </div>
-  <label class="contractPolishToggle"><input id="ct_polishTerms" type="checkbox" checked> 특약 문구도 읽기 좋게 정리</label>
+  <label class="contractPolishToggle"><input id="ct_polishTerms" type="checkbox" checked> 특약 문장 자동 정리</label>
   <div id="ct_oneTapSummary" class="contractOneTapStatus" role="status" aria-live="polite">메모 한 번으로 계약문자를 만들어 보세요.</div>
   <details id="ct_reviewDetails" class="contractCompactDetails"><summary>인식한 정보와 추가 확인 내용</summary>
     <div id="ct_recognized" class="contractReview" role="status" aria-live="polite">인식한 항목이 여기에 표시됩니다.</div>
     <div id="ct_languageWarnings" class="contractReview" role="status" aria-live="polite">금액과 날짜는 발송 전에 확인해 주세요.</div>
   </details>
   <details id="ct_termDiff" class="contractCompactDetails hidden"><summary>특약 원문과 정리된 문장 비교</summary>
-    <p class="contractHint adminExplain">특약 문구는 맞춤법·표현 중심으로 정리하며 새로운 의무를 추가하지 않습니다. 법적 의미는 반드시 직접 확인하세요.</p>
-    <label class="inputLabel">메모의 특약 원문</label><div id="ct_termOriginal" class="contractCompareText"></div>
+    <p class="contractHint adminExplain">특약은 입력된 항목을 빠짐없이 모아 문장 형태를 정리하며 새로운 의무를 추가하지 않습니다. 법적 의미는 반드시 직접 확인하세요.</p>
+    <label class="inputLabel">입력한 특약 원문</label><div id="ct_termOriginal" class="contractCompareText"></div>
     <label class="inputLabel">정리된 특약 문장</label><div id="ct_termPolished" class="contractCompareText"></div>
     <div class="contractActions"><button type="button" class="btn alt" onclick="FirstHyundaiEasy.useOriginalTerms()">원문 사용</button><button type="button" class="btn alt" onclick="FirstHyundaiEasy.usePolishedTerms()">정리 문구 사용</button></div>
     <p id="ct_termNotice" class="contractHint"></p>
