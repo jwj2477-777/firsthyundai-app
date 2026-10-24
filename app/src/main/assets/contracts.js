@@ -308,8 +308,8 @@ function makePreview(){
   out.push('','▶ 특약사항');
   terms.forEach(t=>out.push('→ '+t.replace(/^\d+[.)]\s*/,'')));
  }
- if(field('cancellation'))out.push('','▶ 별도 해제·위약 합의',field('cancellation'));
- if(field('brokerFee'))out.push('','▶ 별도 중개보수 합의',field('brokerFee'));
+ if(field('cancellation'))out.push('','▶ 제안하는 해제·위약 조건',field('cancellation'));
+ if(field('brokerFee'))out.push('','▶ 제안하는 중개보수 조건',field('brokerFee'));
  const account=field('bank')&&field('account')&&field('accountHolder')?
   field('bank')+' '+field('account')+' (예금주 '+field('accountHolder')+')':
   '[은행·계좌번호·예금주 확인 필요]';
@@ -377,7 +377,7 @@ async function share(){
 function fromSelectedComplex(exclusiveM2=null,supplyLabel=''){
  const record=typeof catalogRows==='function'?catalogRows().find(x=>x.id===complexSelected):null;
  if(!record)return false;
- const oldHasData=FIELDS.some(id=>!['rough','dealType'].includes(id)&&field(id))||field('rough')||E('ct_preview')?.value.trim();
+ const oldHasData=FIELDS.some(id=>!['rough','dealType'].includes(id)&&field(id))||field('rough')||field('specialMemo')||E('ct_preview')?.value.trim();
  if(oldHasData&&!confirm('기존에 작성 중인 계약 내용이 있습니다. 다른 계약으로 새로 시작할까요?'))return false;
  const area=Number(exclusiveM2),validArea=exclusiveM2!==null&&exclusiveM2!==''&&
   Number.isFinite(area)&&area>=10&&area<=400;
@@ -396,6 +396,7 @@ function fromSelectedComplex(exclusiveM2=null,supplyLabel=''){
  if(supply)parts.push('공급타입: '+supply);
  clearForNewMemo();
  window.FirstHyundaiEasy?.reset?.();
+ if(E('ct_specialMemo'))E('ct_specialMemo').value='';
  E('ct_rough').value=parts.join('\n')+'\n';
  setField('property',record.label,true);
  if(lot||record.address)setField('address',lot||record.address,true);
@@ -452,7 +453,7 @@ window.firstHyundaiContractSpeech=function(result){
  }else if(result&&!result.cancelled)alert('음성입력에 실패했습니다. 직접 입력을 이용해 주세요.');
 };
 window.FirstHyundaiContracts={
- onOpen(){window.FirstHyundaiSmart?.onOpen();showTemplateEditor();updateSummary();refreshHighlightedNotice();syncReviewButton();},canShare:assertReady,updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,togglePreviewEdit,refreshHighlightedNotice,syncReviewButton,saveTemplate,resetTemplate,
+ onOpen(){window.FirstHyundaiSmart?.onOpen();showTemplateEditor();if(!templateAdminAllowed()){E('ct_preview')?.classList?.remove?.('contractEditing');E('ct_previewHighlight')?.classList?.remove?.('hidden');}updateSummary();refreshHighlightedNotice();syncReviewButton();},canShare:assertReady,updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,togglePreviewEdit,refreshHighlightedNotice,syncReviewButton,saveTemplate,resetTemplate,
  fromComplex(id){
   const r=catalogRows().find(x=>x.id===id);
   if(!r)return false;
