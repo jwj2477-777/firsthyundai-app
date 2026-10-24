@@ -618,7 +618,7 @@ body.apartmentSheetActive{overflow:hidden}
  </div></details></div>
  <div id="ct_resultPanel" class="panel hidden">
   <h3 class="contractSection">계약 안내문 확인</h3>
-  <p class="contractHint adminExplain">이 안내는 거래당사자에게 계약 조건을 제안하고 동의 여부를 확인받기 위한 문서입니다. 송금액·계좌와 제안 내용을 발송 전에 확인하세요.</p>
+  <p class="contractHint adminExplain">이 안내는 거래당사자에게 계약조건을 전달하고 동의 여부를 확인받기 위한 문서입니다. 송금액·계좌와 제안 내용을 발송 전에 확인하세요.</p>
   <div id="ct_missing" class="contractReview" role="status" aria-live="polite">확인할 계약정보를 정리합니다.</div>
   <section id="ct_missingQuickFields" class="contractMissingQuick hidden" aria-label="누락된 내용을 이 자리에서 입력"></section>
   <section class="contractCoreFacts" id="ct_keyFacts" aria-label="계약 핵심정보">
@@ -649,15 +649,15 @@ body.apartmentSheetActive{overflow:hidden}
    <button type="button" class="btn" onclick="FirstHyundaiContracts.share()">문자 / 카톡 공유</button>
    <button type="button" class="btn alt" onclick="FirstHyundaiContracts.reset()">새 계약 시작</button>
   </div>
-  <p class="contractInfo adminExplain">이 기능은 계약서 자체가 아니라 당사자 간 사전 합의 내용을 정리하는 도구입니다. 일부 송금만으로 계약의 효력·해제 조건이 일률적으로 결정되는 것은 아닙니다. 필수 조건과 당사자 의사 확인이 중요합니다. 작성 내용은 공개 GitHub에 업로드하거나 앱의 온라인 데이터로 전송하지 않으며, 별도로 저장하지 않습니다. 복사·공유 후에는 휴대폰 클립보드나 선택한 앱에 내용이 남을 수 있습니다.</p><p class="familySimpleNote familyShortSafety">상대방에게 계약조건을 제안하는 안내문입니다. 전송 후 동의 여부를 확인하세요.</p>
+  <p class="contractInfo adminExplain">이 기능은 계약서 자체가 아니라 당사자 간 사전 합의 내용을 정리하는 도구입니다. 일부 송금만으로 계약의 효력·해제 조건이 일률적으로 결정되는 것은 아닙니다. 필수 조건과 당사자 의사 확인이 중요합니다. 작성 내용은 공개 GitHub에 업로드하거나 앱의 온라인 데이터로 전송하지 않으며, 별도로 저장하지 않습니다. 복사·공유 후에는 휴대폰 클립보드나 선택한 앱에 내용이 남을 수 있습니다.</p><p class="familySimpleNote familyShortSafety">상대방에게 계약조건을 전달하는 안내문입니다. 전송 후 동의 여부를 확인하세요.</p>
   <details id="ct_templateEditor" class="contractAdminTemplate adminOnly">
-   <summary>⚙ 관리자 · 공통 계약 제안문구 수정</summary>
-   <p>이 기기에 저장한 문구는 관리자·가족모드에서 함께 적용됩니다. 다른 휴대폰에는 별도의 배포가 필요합니다.</p>
+   <summary>⚙ 관리자 · 공통 계약 안내문구 수정</summary>
+   <p>이 기기에 저장한 공통 문구는 가족모드에도 적용됩니다. 송금 안내의 {이번송금액}·{입금계좌}는 자동 입력 위치이므로 삭제하지 마세요. 다른 휴대폰에는 별도 적용이 필요합니다.</p>
    <label for="ct_tpl_intro">인사말</label><textarea id="ct_tpl_intro" maxlength="240" rows="2"></textarea>
-   <label for="ct_tpl_invitation">동의 요청</label><textarea id="ct_tpl_invitation" maxlength="500" rows="3"></textarea>
-   <label for="ct_tpl_effective">계약 성립 제안</label><textarea id="ct_tpl_effective" maxlength="700" rows="3"></textarea>
-   <label for="ct_tpl_cancellation">해제·계약금 처리 제안</label><textarea id="ct_tpl_cancellation" maxlength="700" rows="3"></textarea>
-   <label for="ct_tpl_broker">중개보수 제안</label><textarea id="ct_tpl_broker" maxlength="700" rows="3"></textarea>
+   <label for="ct_tpl_invitation">하단 안내 제목</label><textarea id="ct_tpl_invitation" maxlength="500" rows="3"></textarea>
+   <label for="ct_tpl_effective">송금 안내 문장</label><textarea id="ct_tpl_effective" maxlength="700" rows="3"></textarea>
+   <label for="ct_tpl_cancellation">계약 성립·해제 문장</label><textarea id="ct_tpl_cancellation" maxlength="700" rows="3"></textarea>
+   <label for="ct_tpl_broker">중개보수 안내 문장</label><textarea id="ct_tpl_broker" maxlength="700" rows="3"></textarea>
    <div class="contractActions"><button type="button" class="btn contractPrimary" onclick="FirstHyundaiContracts.saveTemplate()">공통문구 저장</button><button type="button" class="btn alt" onclick="FirstHyundaiContracts.resetTemplate()">기본문구로 복원</button></div>
    <p id="ct_templateStatus" role="status" aria-live="polite"></p>
   </details>

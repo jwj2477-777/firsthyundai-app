@@ -42,12 +42,12 @@ const app=ctx.window.FirstHyundaiContracts,easy=ctx.window.FirstHyundaiEasy;
 E('ct_rough').value='퍼팍 13블럭 1304동 3703호 매매 10억 2000만원 계약금 1억200만원 금일 천만원 국민은행 1234567-01-987654 김철수 계약일 2023년 9월 14일 잔금일 2023년 12월 11일';
 assert.equal(easy.compose(),true);
 const notice=()=>E('ct_preview').value;
-assert(notice().includes('▶ 이번 송금 예정액 : 1,000만원'));
-assert(notice().includes('▶ 입금 계좌 : 국민은행 1234567-01-987654'));
-for(const word of ['제안 1.','제안 2.','제안 3.']){
- assert(notice().includes(word),'Parties receive offer wording, not a completed-agreement claim');
-}
-assert(!notice().includes('보기로 합의합니다'));
+assert(notice().includes('금일 위 계약조건에 따라 계약금 중 일부인 1,000만원을 매도인 계좌(국민은행 1234567-01-987654 (예금주 김철수))로 송금하기로 합니다.'));
+assert(notice().includes('※ 계약금 일부 송금 및 계약 성립·해제 조건 확인'));
+assert(notice().includes('본계약이 체결된 것으로 보기로 하며'));
+assert(notice().includes('실제 수령한 금액의 배액을 상환하고'));
+assert(notice().includes('중개보수 지급의무가 없어지는 것은 아니라는 점'));
+assert(!notice().includes('제안 1.')&&!notice().includes('제안드립니다'),'Keep restored office wording without proposal copy');
 assert.equal(E('ct_factProperty').textContent,(E('ct_property').value+' '+E('ct_unit').value).trim()||'확인 필요','Summary must reflect the same locally recognized property fields as the notice');
 assert.equal(E('ct_factAdvance').textContent,'1,000만원');
 assert(E('ct_factAccount').textContent.includes('김철수'));
@@ -101,4 +101,4 @@ E('ct_quick_bank').value='이전고객은행';
 E('ct_rough').value='퍼팍 13블럭 매매 11억 잔금일 2027년 1월 1일';
 assert.equal(easy.compose(),true);
 assert(!E('ct_missingQuickFields').innerHTML.includes('이전고객은행'),'New client memo must clear unfinished payment drafts');
-console.log('v2.0.51 guided contract verified: three stages, dedicated specials, proposal terms, inline corrections and image gate.');
+console.log('v2.0.52 guided contract verified: original notice footer, three stages, dedicated specials, inline corrections and image gate.');

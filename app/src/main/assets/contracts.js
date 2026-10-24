@@ -187,25 +187,31 @@ function updateContractFlow(){
  if(imageButton)imageButton.disabled=!approved||!created||!!collect().errors.length||previewContainsMissing();
 }
 
-const PROPOSAL_TEMPLATE_KEY='fhd_contract_proposal_template_v1';
-const DEFAULT_PROPOSAL_TEMPLATE=Object.freeze({
+// v2: return to the exact pre-v2.0.48 office notice wording.
+// The prior proposal-only v1 key is deliberately NOT read: upgrading must
+// not reintroduce the unwanted '제안 1/2/3' footer from an old local template.
+const NOTICE_TEMPLATE_KEY='fhd_contract_notice_template_v2';
+const DEFAULT_NOTICE_TEMPLATE=Object.freeze({
  intro:'안녕하세요. 퍼스트현대부동산입니다.',
- invitation:'아래 내용은 계약 진행을 위한 제안 조건입니다. 확인 후 동의 여부를 회신해 주세요. 동의 확인 전에는 확정된 계약조건으로 안내하지 않습니다.',
- effective:'제안 1. 계약 내용에 동의한 경우 계약금 일부 송금 및 수령 확인을 기준으로 계약을 진행하는 조건을 제안드립니다.',
- cancellation:'제안 2. 동의 후 일방 변심으로 계약을 해제하는 경우 매도인·임대인은 수령액의 배액을 상환하고 매수인·임차인은 송금액을 포기하는 조건을 제안드립니다.',
- broker:'제안 3. 계약 해제 시 중개보수는 관련 법령 및 별도 합의에 따라 처리하는 조건을 제안드립니다.'
+ invitation:'※ 계약금 일부 송금 및 계약 성립·해제 조건 확인',
+ effective:'금일 위 계약조건에 따라 계약금 중 일부인 {이번송금액}을 {수취인} 계좌({입금계좌})로 송금하기로 합니다.',
+ cancellation:'당사자들은 위 금액의 이체와 동시에 본계약이 체결된 것으로 보기로 하며, 일방의 변심으로 계약을 해제하는 경우 {수취인}은 실제 수령한 금액의 배액을 상환하고 {송금인}은 실제 송금한 금액을 포기하는 조건으로 합의합니다.',
+ broker:'또한 위 사유로 계약이 해제되더라도 그 사실만으로 중개보수 지급의무가 없어지는 것은 아니라는 점을 확인합니다.'
 });
-const TEMPLATE_FIELDS=Object.keys(DEFAULT_PROPOSAL_TEMPLATE);
+const TEMPLATE_FIELDS=Object.keys(DEFAULT_NOTICE_TEMPLATE);
+function formatOfficeNotice(text,values){
+ return String(text||'').replace(/\{(이번송금액|수취인|입금계좌|송금인)\}/g,(_,key)=>values[key]||'[확인 필요]');
+}
 function contractTemplate(){
  try{
-  const obj=JSON.parse(localStorage.getItem(PROPOSAL_TEMPLATE_KEY)||'{}');
+  const obj=JSON.parse(localStorage.getItem(NOTICE_TEMPLATE_KEY)||'{}');
   const cleaned={};
   for(const key of TEMPLATE_FIELDS){
    const value=obj&&typeof obj[key]==='string'?obj[key].trim():'';
-   cleaned[key]=value&&value.length<=700?value:DEFAULT_PROPOSAL_TEMPLATE[key];
+   cleaned[key]=value&&value.length<=700?value:DEFAULT_NOTICE_TEMPLATE[key];
   }
   return cleaned;
- }catch(e){return {...DEFAULT_PROPOSAL_TEMPLATE};}
+ }catch(e){return {...DEFAULT_NOTICE_TEMPLATE};}
 }
 function showTemplateEditor(){
  const values=contractTemplate();
@@ -222,7 +228,10 @@ function saveTemplate(){
   if(!raw||raw.length>700){alert('공통문구의 내용을 확인해 주세요. 각 항목은 비워둘 수 없습니다.');return false;}
   next[key]=raw;
  }
- try{localStorage.setItem(PROPOSAL_TEMPLATE_KEY,JSON.stringify(next));}
+ if(!next.effective.includes('{이번송금액}')||!next.effective.includes('{입금계좌}')){
+  alert('송금액과 계좌가 빠지지 않도록 {이번송금액}, {입금계좌} 표시를 그대로 남겨 주세요.');return false;
+ }
+ try{localStorage.setItem(NOTICE_TEMPLATE_KEY,JSON.stringify(next));}
  catch(e){alert('이 기기에 공통문구를 저장하지 못했습니다.');return false;}
  if(E('ct_templateStatus'))E('ct_templateStatus').textContent='이 기기에 공통문구를 저장했습니다. 가족모드에도 적용됩니다.';
  if(created)makePreview();
@@ -230,8 +239,8 @@ function saveTemplate(){
 }
 function resetTemplate(){
  if(!templateAdminAllowed())return false;
- if(!confirm('공통 제안문구를 기본값으로 복원하시겠습니까?'))return false;
- try{localStorage.removeItem(PROPOSAL_TEMPLATE_KEY);}
+ if(!confirm('공통 안내문구를 기본값으로 복원하시겠습니까?'))return false;
+ try{localStorage.removeItem(NOTICE_TEMPLATE_KEY);}
  catch(e){alert('문구 복원에 실패했습니다.');return false;}
  showTemplateEditor();
  if(created)makePreview();
@@ -308,16 +317,19 @@ function makePreview(){
   out.push('','▶ 특약사항');
   terms.forEach(t=>out.push('→ '+t.replace(/^\d+[.)]\s*/,'')));
  }
- if(field('cancellation'))out.push('','▶ 제안하는 해제·위약 조건',field('cancellation'));
- if(field('brokerFee'))out.push('','▶ 제안하는 중개보수 조건',field('brokerFee'));
+ if(field('cancellation'))out.push('','▶ 별도 해제·위약 합의',field('cancellation'));
+ if(field('brokerFee'))out.push('','▶ 별도 중개보수 합의',field('brokerFee'));
  const account=field('bank')&&field('account')&&field('accountHolder')?
   field('bank')+' '+field('account')+' (예금주 '+field('accountHolder')+')':
   '[은행·계좌번호·예금주 확인 필요]';
- // Offer terms to the parties for acceptance, not a declaration of prior agreement.
- out.push('','▶ 이번 송금 예정액 : '+moneyOr(d.advance));
- out.push('▶ 입금 계좌 : '+account);
- out.push('','※ 아래 조건에 대한 동의를 요청드립니다.');
- out.push(template.invitation,template.effective,template.cancellation,template.broker);
+ // Original office wording (v2.0.47): one precise remittance sentence, then
+ // contract formation/cancellation/brokerage wording. Avoid duplicate payment rows.
+ // Human review and confirmation before sharing remain mandatory.
+ const noticeValues={'이번송금액':moneyOr(d.advance),'입금계좌':account,'수취인':who,'송금인':paying};
+ out.push('',template.invitation);
+ out.push(formatOfficeNotice(template.effective,noticeValues));
+ out.push(formatOfficeNotice(template.cancellation,noticeValues));
+ out.push(formatOfficeNotice(template.broker,noticeValues));
  E('ct_preview').value=out.join('\n');
  // Newly composed messages always begin in readable, red-marked review mode.
  E('ct_preview')?.classList?.remove?.('contractEditing');
@@ -355,7 +367,7 @@ function approve(){
  syncReviewButton();
 }
 function assertReady(){
- if(!created||!approved||collect().errors.length||previewContainsMissing()){alert('계약 조건과 안내문 제안 내용을 확인한 뒤 완료 버튼을 눌러주세요.');return false;}
+ if(!created||!approved||collect().errors.length||previewContainsMissing()){alert('계약 조건과 안내문 내용을 확인한 뒤 완료 버튼을 눌러주세요.');return false;}
  return true;
 }
 async function copy(){

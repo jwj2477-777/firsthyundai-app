@@ -1,5 +1,5 @@
 'use strict';
-/* v2.0.49: admin edits shared local proposal template; family stays read-only. */
+/* v2.0.52: restore original office notice wording with admin template and family read-only. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const html=fs.readFileSync(path.join(root,'app/src/main/assets/index.html'),'utf8');
@@ -35,22 +35,30 @@ const complete={dealType:'매매',property:'가상 퍼스트파크',address:'가
 for(const [id,value] of Object.entries(complete))E('ct_'+id).value=value;
 app.onOpen();
 assert(E('ct_tpl_intro').value.includes('퍼스트현대'));
-E('ct_tpl_invitation').value='반드시 아래 제안내용을 검토하시고 동의할지 회신 바랍니다.';
+assert(E('ct_tpl_invitation').value.includes('계약금 일부 송금 및 계약 성립·해제 조건 확인'));
+assert(E('ct_tpl_effective').value.includes('{이번송금액}')&&E('ct_tpl_effective').value.includes('{입금계좌}'));
+app.makePreview();
+assert(E('ct_preview').value.includes('금일 위 계약조건에 따라 계약금 중 일부인 500만원을 매도인 계좌(하나은행 110-33345-04 (예금주 김진욱))로 송금하기로 합니다.'));
+assert(E('ct_preview').value.includes('실제 수령한 금액의 배액을 상환하고'));
+assert(E('ct_preview').value.includes('중개보수 지급의무가 없어지는 것은 아니라는 점'));
+assert(!E('ct_preview').value.includes('제안 1.'));
+E('ct_tpl_broker').value='계약 해제와 관련한 중개보수는 별도 합의에 따릅니다.';
 assert.equal(app.saveTemplate(),true);
 app.makePreview();
-assert(E('ct_preview').value.includes('반드시 아래 제안내용을 검토하시고'));
+assert(E('ct_preview').value.includes('중개보수는 별도 합의에 따릅니다.'));
 assert.equal(app._test.collect().errors.length,0);
 app.approve();assert.equal(E('ct_imagePrimary').disabled,false);
 role='family';
 assert.equal(app.saveTemplate(),false,'Family cannot alter proposal text');
 app.onOpen();
 app.makePreview();
-assert(E('ct_preview').value.includes('반드시 아래 제안내용을 검토하시고'),'Admin settings persist into family mode on same device');
+assert(E('ct_preview').value.includes('중개보수는 별도 합의에 따릅니다.'),'Admin settings persist into family mode on same device');
 app.togglePreviewEdit();
 assert(!E('ct_preview').classList.contains('contractEditing'),'Family cannot alter raw notice');
 role='admin';
 assert.equal(app.resetTemplate(),true);
 app.makePreview();
-assert(E('ct_preview').value.includes('아래 내용은 계약 진행을 위한 제안 조건입니다.'));
+assert(E('ct_preview').value.includes('※ 계약금 일부 송금 및 계약 성립·해제 조건 확인'));
+assert(!E('ct_preview').value.includes('제안드립니다'));
 assert.equal(store.size,0,'Only template setting is stored, no private contract data');
-console.log('v2.0.49 shared on-device template, admin permission and family read-only protection passed.');
+console.log('v2.0.52 restored office notice template, admin permission and family read-only protection passed.');
