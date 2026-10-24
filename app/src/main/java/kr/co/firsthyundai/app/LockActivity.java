@@ -164,6 +164,10 @@ public class LockActivity extends Activity {
         FrameLayout emblemFrame=new FrameLayout(this);
         emblemFrame.setClipChildren(false);
         emblemFrame.setClipToPadding(false);
+        View circleBacking=new View(this);
+        circleBacking.setBackground(BrandIdentityStyle.logoBacking());
+        emblemFrame.addView(circleBacking,new FrameLayout.LayoutParams(
+                dp(154),dp(154),Gravity.CENTER));
         View haloRing=new View(this);
         GradientDrawable ringDrawable=new GradientDrawable();
         ringDrawable.setShape(GradientDrawable.OVAL);
@@ -180,11 +184,7 @@ public class LockActivity extends Activity {
                 dp(144),dp(144),Gravity.CENTER));
         identity.addView(emblemFrame,new LinearLayout.LayoutParams(dp(190),dp(190)));
         TextView title=new TextView(this);
-        title.setText("퍼스트현대");
-        title.setTextColor(Color.WHITE);
-        title.setTextSize(30);
-        title.setTypeface(null,1);
-        title.setGravity(Gravity.CENTER);
+        BrandIdentityStyle.title(title);
         LinearLayout.LayoutParams titleParams=new LinearLayout.LayoutParams(-2,-2);
         titleParams.topMargin=dp(12);
         identity.addView(title,titleParams);
@@ -199,11 +199,7 @@ public class LockActivity extends Activity {
         ruleParams.topMargin=dp(14);
         identity.addView(goldRule,ruleParams);
         TextView subtitle=new TextView(this);
-        subtitle.setText("FIRST HYUNDAI  ·  REAL ESTATE");
-        subtitle.setTextColor(Color.rgb(246,215,145));
-        subtitle.setTextSize(11);
-        subtitle.setGravity(Gravity.CENTER);
-        subtitle.setLetterSpacing(.1f);
+        BrandIdentityStyle.subtitle(subtitle);
         LinearLayout.LayoutParams subtitleParams=new LinearLayout.LayoutParams(-2,-2);
         subtitleParams.topMargin=dp(13);
         identity.addView(subtitle,subtitleParams);

@@ -8,6 +8,7 @@ const lock=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/
 new vm.Script(src);
 assert(css.includes('body.fhd-native-handoff header .officeMark')&&css.includes('body.fhd-native-arrived'));
 const native=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/SmoothBrandOverlay.java'),'utf8');
+const identity=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/BrandIdentityStyle.java'),'utf8');
 assert(native.includes('R.drawable.ic_launcher_badge')&&native.includes('DURATION=790L')&&native.includes('getLocationOnScreen'));
 assert(native.includes('scaleX(scale).scaleY(scale)'),'Logo scales uniformly, preserving aspect ratio');
 assert(native.includes('layoutAttempts>8'),'Prevent infinite layout retries on slow devices');
@@ -18,7 +19,14 @@ assert(native.includes('PathInterpolator(.34f,.06f,.18f,1f)'),'Use gentler takeo
 assert(native.includes('DURATION-LANDING_LEAD')&&native.includes('ObjectAnimator.ofFloat(part,View.ALPHA,1f,0f)'),'Native brand cross-dissolves during landing instead of snapping');
 assert(native.includes('LANDING_LEAD=255L')&&native.includes('fade.setDuration(205)'),'Allow enough overlap to hide font-weight and size change');
 assert(native.includes('ring.animate().translationX(')&&native.includes('.scaleX(ringScale).scaleY(ringScale)'),'Gold circular halo must travel and shrink with the logo');
-assert(native.includes('ValueAnimator.ofArgb(Color.rgb(246,215,145)')&&native.includes('Color.rgb(216,231,228)'),'Native English subtitle gradually turns gold into header teal before landing');
+assert(!native.includes('ValueAnimator.ofArgb('),'No native text color change during the flight: both ends must start at final colors');
+assert(identity.includes('SUBTITLE_COLOR=Color.rgb(216,231,228)')&&identity.includes('TITLE_COLOR=Color.rgb(249,255,255)'),'Start, flight and header use the exact same text colors');
+assert(identity.includes('SUBTITLE="FIRST HYUNDAI · REAL ESTATE"'),'Native brand text has the exact header spacing');
+assert(lock.includes('BrandIdentityStyle.title(title)')&&lock.includes('BrandIdentityStyle.subtitle(subtitle)'),'Native cold start uses shared typography');
+assert(native.includes('BrandIdentityStyle.title(title)')&&native.includes('BrandIdentityStyle.subtitle(subtitle)'),'Native flying text uses the very same typography as cold start');
+assert(css.includes('header .brandSubtitle{font-family:Roboto,"Noto Sans KR",sans-serif}'),'WebView matches the native font family fallbacks');
+assert(lock.includes('BrandIdentityStyle.logoBacking()')&&native.includes('BrandIdentityStyle.logoBacking()'),'Same logo surround appears on the intro and flying emblem');
+assert(native.includes('backing.animate().translationX(')&&native.includes('scaleX(backingScale).scaleY(backingScale)'),'The logo backing travels and shrinks instead of appearing abruptly');
 assert(css.includes('background-color:#FDFBF6!important')&&css.includes('background-color 235ms ease-out'),'Main circular cream backing must appear gradually rather than pop');
 assert(main.includes('beginNativeHandoffLanding?.()')&&main.includes('onApproach,done'),'Android informs the WebView before the native shared elements land');
 assert(src.includes('function beginNativeHandoffLanding()'),'Browser can reveal the existing header before native overlay exits');

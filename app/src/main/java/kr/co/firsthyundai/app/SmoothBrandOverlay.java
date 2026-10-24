@@ -2,7 +2,6 @@ package kr.co.firsthyundai.app;
 
 import android.app.Activity;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
@@ -29,11 +28,10 @@ final class SmoothBrandOverlay extends FrameLayout {
     private final ImageView emblem;
     private final TextView title;
     private final TextView subtitle;
-    private final View ring,rule;
+    private final View ring,rule,backing;
     private boolean finished;
     private int layoutAttempts;
     private final ArrayList<ObjectAnimator> arrivalFades=new ArrayList<>();
-    private final ArrayList<ValueAnimator> colorMorphs=new ArrayList<>();
     private static final long DURATION=790L;
     private static final long LANDING_LEAD=255L;
     // Quieter takeoff than v2.0.64's fast-start curve, with a long soft landing.
@@ -58,6 +56,9 @@ final class SmoothBrandOverlay extends FrameLayout {
         emblemFrame=new FrameLayout(activity);
         emblemFrame.setClipChildren(false);
         emblemFrame.setClipToPadding(false);
+        backing=new View(activity);
+        backing.setBackground(BrandIdentityStyle.logoBacking());
+        emblemFrame.addView(backing,new LayoutParams(dp(154),dp(154),Gravity.CENTER));
         ring=new View(activity);
         GradientDrawable oval=new GradientDrawable();
         oval.setShape(GradientDrawable.OVAL);
@@ -73,11 +74,7 @@ final class SmoothBrandOverlay extends FrameLayout {
         identity.addView(emblemFrame,new LinearLayout.LayoutParams(dp(190),dp(190)));
 
         title=new TextView(activity);
-        title.setText("퍼스트현대");
-        title.setTextSize(30);
-        title.setTextColor(Color.WHITE);
-        title.setTypeface(null,1);
-        title.setGravity(Gravity.CENTER);
+        BrandIdentityStyle.title(title);
         LinearLayout.LayoutParams tl=new LinearLayout.LayoutParams(-2,-2);
         tl.topMargin=dp(12);
         identity.addView(title,tl);
@@ -90,11 +87,7 @@ final class SmoothBrandOverlay extends FrameLayout {
         line.topMargin=dp(14);
         identity.addView(rule,line);
         subtitle=new TextView(activity);
-        subtitle.setText("FIRST HYUNDAI  ·  REAL ESTATE");
-        subtitle.setTextColor(Color.rgb(246,215,145));
-        subtitle.setTextSize(11);
-        subtitle.setGravity(Gravity.CENTER);
-        subtitle.setLetterSpacing(.1f);
+        BrandIdentityStyle.subtitle(subtitle);
         LinearLayout.LayoutParams sub=new LinearLayout.LayoutParams(-2,-2);
         sub.topMargin=dp(13);
         identity.addView(subtitle,sub);
@@ -172,18 +165,25 @@ final class SmoothBrandOverlay extends FrameLayout {
                 .translationY(badgeShiftY+centerOffsetY)
                 .scaleX(ringScale).scaleY(ringScale)
                 .setDuration(DURATION).setInterpolator(natural).start();
+        ring.animate().alpha(0f).setStartDelay(DURATION-250L)
+                .setDuration(250L).start();
+        // The cream disk is the very same final header logo surround. Move it
+        // continuously with the emblem instead of creating a new circle at
+        // the very last frame.
+        int[] backAt=new int[2];
+        backing.getLocationOnScreen(backAt);
+        float backingOffsetX=badgeAt[0]+badgePart.getWidth()/2f-backAt[0]-backing.getWidth()/2f;
+        float backingOffsetY=badgeAt[1]+badgePart.getHeight()/2f-backAt[1]-backing.getHeight()/2f;
+        float backingScale=Math.min(rects[2]*pxPerCss/backing.getWidth(),
+                                    rects[3]*pxPerCss/backing.getHeight());
+        backing.animate().translationX(badgeShiftX+backingOffsetX)
+                .translationY(badgeShiftY+backingOffsetY)
+                .scaleX(backingScale).scaleY(backingScale)
+                .setDuration(DURATION).setInterpolator(natural).start();
         rule.animate().alpha(0f).setStartDelay(245).setDuration(390).start();
-        // First adjust the travelling letters towards the *final* HTML color:
-        // gold-to-pale-teal subtitle no longer swaps color on the last frame.
-        ValueAnimator titleColor=ValueAnimator.ofArgb(Color.WHITE,Color.rgb(249,255,255));
-        titleColor.addUpdateListener(a->title.setTextColor((Integer)a.getAnimatedValue()));
-        titleColor.setStartDelay(220);titleColor.setDuration(460);titleColor.start();
-        colorMorphs.add(titleColor);
-        ValueAnimator subtitleColor=ValueAnimator.ofArgb(Color.rgb(246,215,145),
-                Color.rgb(216,231,228));
-        subtitleColor.addUpdateListener(a->subtitle.setTextColor((Integer)a.getAnimatedValue()));
-        subtitleColor.setStartDelay(200);subtitleColor.setDuration(510);subtitleColor.start();
-        colorMorphs.add(subtitleColor);
+        // The native logo and the header already share the exact brand
+        // typography and colors. No last-second gold-to-teal color morph:
+        // only position, proportional size and final opacity change.
         // Reveal the live header just before the native brand arrives, then
         // cross-dissolve the native and HTML glyphs instead of hard swapping.
         if(onApproach!=null)
@@ -212,14 +212,13 @@ final class SmoothBrandOverlay extends FrameLayout {
         finished=true;
         for(ObjectAnimator fade:arrivalFades)fade.cancel();
         arrivalFades.clear();
-        for(ValueAnimator animator:colorMorphs)animator.cancel();
-        colorMorphs.clear();
         emblem.animate().cancel();
         title.animate().cancel();
         subtitle.animate().cancel();
         backdrop.animate().cancel();
         rule.animate().cancel();
         ring.animate().cancel();
+        backing.animate().cancel();
         animate().cancel();
         if(done!=null)done.run();
         else detach();

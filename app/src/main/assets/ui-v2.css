@@ -2570,3 +2570,10 @@ body.fhd-native-handoff.fhd-native-landing header .brandHeaderText{
   transition:none!important;
  }
 }
+
+/* v2.0.66 · Consistent typography across the native intro/transition and live header.
+   Android native uses sans-serif (Roboto + Noto fallback), 820/670 weight,
+   same tracking and exact RGB. Main heading size remains responsive and the
+   larger intro lettering scales toward these final measured dimensions. */
+header .brandWordmark h1,
+header .brandSubtitle{font-family:Roboto,"Noto Sans KR",sans-serif}
