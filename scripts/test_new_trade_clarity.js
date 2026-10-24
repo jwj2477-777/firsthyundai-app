@@ -39,7 +39,7 @@ const ctx=vm.createContext({
  $:el,
  remote:{new_trades:{state:'ok',checked_at:'2026-10-23T01:00:00Z',records}},
  window:{FirstHyundaiTradeAlerts:{stableId:x=>x.id}},
- prettyTime:()=> '2026. 10. 23. 10시',
+ compactTradeCollectedAt:()=> '26.10.23 10:00',
  kstDateOffset:()=> '2026-10-23',
  number:x=>String(x),escapeHtml:s=>String(s),favoriteIdForBuilding:x=>x==='송도 B'?null:'favorite',
  value10k:n=>n+'만원',
@@ -49,6 +49,7 @@ const ctx=vm.createContext({
 vm.runInContext(js.slice(i,j),ctx);
 const run=stmt=>vm.runInContext(stmt,ctx);
 run('renderNew()');
+assert.equal(el('newMeta').textContent,'송도동 · 확인 26.10.23 10:00');
 assert(el('newCounts').innerHTML.includes('3<small>건</small>'));
 assert(el('newCounts').innerHTML.includes('매매 1 · 전세 1 · 월세 1'));
 assert(!el('newContent').innerHTML.includes('최대 120건 표시'));

@@ -39,11 +39,11 @@ for(const preserved of [
  "onclick=\"FirstHyundaiEasy.compose()\"",
  "id=\"complexCards\"","id=\"tradesContent\""
 ])assert(html.includes(preserved),'Must preserve existing UI and behavior: '+preserved);
-assert(js.includes("$('newsFamilyMeta').textContent='최근 뉴스 '+briefs.length+'건 · 갱신 '+compactTradeCollectedAt(payload.checked_at)"),
+assert(js.includes("$('newsFamilyMeta').textContent='갱신 '+compactTradeCollectedAt(payload.checked_at)"),
  'Use verified KST timestamp with no seconds on family news page');
 assert(js.includes(" $('complexMeta').textContent='조회 '+visible.length+'곳'+(role==='admin'?' · 원자료 '+(remote.complexes?.records||[]).length+'건':'')+"),
  'Family list should show count of search-selectable complexes, admin can still inspect full records');
-for(const warning of ["issues.trades?' · 실거래 갱신 오류'","issues.complexes?' · 단지정보 갱신 오류'","payload.state==='partial'?' · 일부 수집 실패'"])
+for(const warning of ["issues.trades?' · 실거래 갱신 오류'","issues.complexes?' · 단지정보 갱신 오류'","일부 수집 실패: 최신성 주의"])
  assert(js.includes(warning),'Never hide collection/data warnings');
 const snippet=js.slice(js.indexOf('function compactTradeCollectedAt('),js.indexOf('function number('));
 const ctx=vm.createContext({Date,Intl});vm.runInContext(snippet,ctx);

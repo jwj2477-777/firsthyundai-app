@@ -102,7 +102,7 @@ assert.equal(run("officeCollectionLabel('매매')"),'수집 26.10.25 10:20');
 assert.equal(run("officeCollectionLabel('전세')"),'수집 26.10.24 08:31');
 assert.equal(run("officeCollectionLabel('월세')"),'수집 26.10.24 08:31');
 run("setOfficeType('매매')");
-assert.equal(nodes.officeMeta.textContent,'인천 연수구 송도동 · 수집 26.10.25 10:20');
+assert.equal(nodes.officeMeta.textContent,'송도동 · 수집 26.10.25 10:20');
 run("publicServices.office_sales.updated_at='invalid'");
 assert.equal(run("officeCollectionLabel('매매')"),'수집 시각 확인 필요');
 run("publicServices.office_sales.state='awaiting_approval'");

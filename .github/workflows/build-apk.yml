@@ -36,6 +36,7 @@ on:
       - 'scripts/test_trade_type_direct_flow.js'
       - 'scripts/test_native_lower_tab_browser.js'
       - 'scripts/test_brand_landing_browser.js'
+      - 'scripts/test_trade_layout_browser.js'
       - 'scripts/test_brand_subtitle.py'
       - 'scripts/test_premium_visual.js'
       - 'scripts/test_android_insets_presentation.js'
@@ -151,6 +152,7 @@ jobs:
           node scripts/test_native_lower_tab_browser.js
           node scripts/test_shared_brand_handoff.js
           node scripts/test_brand_landing_browser.js
+          node scripts/test_trade_layout_browser.js
           python scripts/test_brand_subtitle.py
           node scripts/test_price_trends.js
           node scripts/test_nearby.js
@@ -290,22 +292,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.87 officetel actual collection timestamp APK
+      - name: Publish v2.0.88 stable shared submenu layout APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.87.apk
-          unzip -t FirstHyundai-v2.0.87.apk | grep 'No errors detected'
-          if gh release view v2.0.87 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.88.apk
+          unzip -t FirstHyundai-v2.0.88.apk | grep 'No errors detected'
+          if gh release view v2.0.88 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.87 FirstHyundai-v2.0.87.apk \
+            gh release create v2.0.88 FirstHyundai-v2.0.88.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.87 · 오피스텔 수집 시각 표시 통일' \
-              --notes '오피스텔 제목 아래의 검색 방식 설명을 아파트와 같은 지역·수집 시각 표시로 바꿨습니다. 실제 오피스텔 매매·전월세 스냅샷의 updated_at을 한국 시각으로 표시하고, 거래유형별로 해당 자료의 수집 시각을 사용합니다. 전체 보기에서는 포함된 자료 중 오래된 수집 시각을 사용하며 수집 전이나 시각 미확인은 그대로 구분합니다. 다른 화면과 기능은 유지합니다. v2.0.87/build138.'
+              --title '퍼스트현대 v2.0.88 · 공통 메뉴 위치·크기·정보 정리' \
+              --notes '아파트·오피스텔의 공통 하위 메뉴와 거래유형·상세 검색 버튼의 높이·간격·위치를 통일했습니다. 전체·관심·새 거래를 전환하거나 오피스텔 선택란을 열어도 공통 메뉴가 밀리지 않도록 정리했습니다. 제목 아래는 실제 수집·확인 시각 또는 자료 기준일을 짧게 표시하고, 뉴스·청약의 빈 여백과 반복 건수 설명을 줄였습니다. 출처·조회범위와 AI 현황은 접어서 확인할 수 있고 수집 실패·일정 미확인·원문 안내는 유지합니다. v2.0.88/build139.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.87 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.87 --apk FirstHyundai-v2.0.87.apk
+          gh release upload v2.0.88 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.88 --apk FirstHyundai-v2.0.88.apk

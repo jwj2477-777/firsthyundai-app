@@ -25,6 +25,7 @@ const ctx=vm.createContext({
  dealArticleClass:v=>'dealRow',dealBadge:v=>v.type,tradeStatusBadge:()=>'',tradeExtraBadges:()=>'',renderTypeButtons:()=>{},areaKey:v=>String(v),canonicalAreaTypes:p=>p.area_type_pairs||[],supplyPyeong:()=>null,fetchRemote:async()=>{throw Error('missing optional')},
  currentPage:'nearby',renderComplexes(){},showRefreshFeedback(){},console
 });
+vm.runInContext(javascript.slice(javascript.indexOf('function compactTradeCollectedAt('),javascript.indexOf('function number(')),ctx);
 vm.runInContext(snippet,ctx);
 vm.runInContext(javascript.slice(javascript.indexOf('function tradeClass(type)'),javascript.indexOf('function renderTypeButtons(')),ctx);
 const run=q=>vm.runInContext(q,ctx);
@@ -111,6 +112,9 @@ run('renderPublicSubscriptions()');assert(nodes.publicSubscriptions.innerHTML.in
 run("publicServices.subscriptions={state:'verified',updated_at:'2026-10-20T09:30:00+0900',window_start:'2025-09-01',records:[{kind:'아파트',name:'송도 새아파트',address:'인천 연수구 송도동',notice_date:'2026-10-19',apply_start:'2026-10-23',apply_end:'2026-10-25',households:123,notice_url:'https://www.applyhome.co.kr/ai/aia/test.do'}]}");
 run('renderPublicSubscriptions()');
 assert(nodes.publicSubscriptions.innerHTML.includes('송도 새아파트'));
+assert.equal(nodes.subscriptionsMeta.textContent,'청약홈 · 확인 26.10.20 09:30');
+assert(nodes.publicSubscriptions.innerHTML.includes('<details class="subscriptionSourceDetails">'));
+assert(nodes.publicSubscriptions.innerHTML.includes('2025-09-01'),'Source coverage is preserved in expandable details');
 assert(nodes.publicSubscriptions.innerHTML.includes('청약홈 공고 원문'));
 assert(nodes.publicSubscriptions.innerHTML.includes('공급 123세대'));
 run("publicServices.subscriptions.records[0].notice_url='https://evil.example/'");

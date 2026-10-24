@@ -2617,3 +2617,76 @@ body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading>div{
    1.3em line box, responsive size, gold hue and intentional narrow hiding. */
 header .brandSubtitle{line-height:1.3}
 header .brandSubtitleMark{display:block;width:auto;height:1.3em;max-width:none}
+
+
+/* v2.0.88 · Shared transaction navigation geometry. Content changes below
+   these anchors; no transforms, clipping, or blank chooser placeholders. */
+:is(#trades,#nearby,#new,#officetel).page>.sectionTitle:first-child,
+:is(#trades,#nearby,#new,#officetel).page>.sectionTitle:first-child>div{
+ min-height:55px;box-sizing:border-box;
+}
+:is(#trades,#nearby,#new,#officetel).page>.sectionTitle:first-child{margin:16px 0 12px}
+:is(#trades,#nearby,#new,#officetel)>.propertyTypeSwitch.sectionModeSwitch{margin:9px 0 12px}
+:is(#trades,#nearby,#new,#officetel).page>.panel:not(.apartmentSheet){padding:16px;margin:12px 0}
+:is(#trades,#nearby,#new,#officetel).page>.panel>.tradeStarter{gap:8px;margin:0 0 14px}
+:is(#trades,#nearby,#new,#officetel).page>.panel>.tradeStarter>button{
+ display:flex;flex-direction:column;justify-content:center;align-items:center;
+ min-width:0;min-height:71px;padding:10px 4px;line-height:1.3;
+ font-size:14px;font-weight:780;border-radius:13px;
+}
+:is(#trades,#nearby,#new,#officetel).page>.panel>.tradeStarter>button .starterIcon{
+ display:block;font-size:21px;line-height:1.1;margin:0 0 5px;
+}
+:is(#trades,#new,#officetel).page>.panel>.apartmentTradeTypeLabel{
+ margin:3px 0 4px;font-size:13px;line-height:1.6;
+}
+:is(#trades,#officetel).page>.panel>.tradeTypeBar,
+#new.page>.panel>.newTypeChips{
+ display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:12px 0;
+}
+:is(#trades,#officetel).page>.panel>.tradeTypeBar>button,
+#new.page>.panel>.newTypeChips>button{
+ min-width:0;min-height:50px;padding:9px 4px;font-size:14px;line-height:1.35;border-radius:12px;
+}
+:is(#trades,#officetel).page>.panel>.tradeAdvanced{margin:13px 0;padding:12px}
+:is(#trades,#officetel).page>.panel>.tradeSearchOptions{margin:12px 0}
+@media(max-width:380px){
+ :is(#trades,#nearby,#new,#officetel).page>.sectionTitle:first-child,
+ :is(#trades,#nearby,#new,#officetel).page>.sectionTitle:first-child>div{min-height:81px}
+}
+@media(max-width:370px){
+ :is(#trades,#nearby,#new,#officetel).page>.panel>.tradeStarter>button{min-height:68px;font-size:13px}
+ :is(#trades,#officetel).page>.panel>.tradeTypeBar>button,
+ #new.page>.panel>.newTypeChips>button{font-size:13px}
+}
+
+/* Compact real metadata in both news panes replaces empty role-sized space.
+   Long AI diagnostics and source coverage remain in expandable details. */
+#news.page>.sectionTitle.newsUnifiedHeading,
+#news.page>.sectionTitle.newsUnifiedHeading>div,
+body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading,
+body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading>div{min-height:55px}
+#news .subscriptionSourceDetails{margin:10px 0;font-size:12px;color:#536A71}
+#news .subscriptionSourceDetails summary{cursor:pointer;min-height:32px;padding:6px 0}
+#news .newsSourceDetails{margin:8px 0;font-size:13px}
+@media(max-width:380px){
+ #news.page>.sectionTitle.newsUnifiedHeading,
+ #news.page>.sectionTitle.newsUnifiedHeading>div,
+ body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading,
+ body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading>div{min-height:81px}
+}
+
+/* One compact metadata line; it may wrap naturally without clipping. */
+:is(#trades,#nearby,#new,#officetel,#complexes,#news).page>.sectionTitle:first-child p.tiny{min-height:21px}
+#complexes.page>.sectionTitle:first-child,
+#complexes.page>.sectionTitle:first-child>div{min-height:55px}
+@media(max-width:380px){
+ #complexes.page>.sectionTitle:first-child,
+ #complexes.page>.sectionTitle:first-child>div{min-height:81px}
+}
+
+/* The same four transaction types retain the same meaning in New trades. */
+#new .newTypeChips>#newTypeAll.active{background:#285970;border-color:#21485C}
+#new .newTypeChips>#newTypeSale.active{background:#255CA5;border-color:#1B4E90}
+#new .newTypeChips>#newTypeLease.active{background:#146A50;border-color:#0B563E}
+#new .newTypeChips>#newTypeMonthly.active{background:#875007;border-color:#754105}
