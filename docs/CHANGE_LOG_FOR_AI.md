@@ -5,6 +5,7 @@
 - 동일 폰트라도 TextView/HTML inline span의 tracking·글자폭 처리와 반올림이 달라질 수 있어 영문 줄을 한 개의 공통 윤곽으로 고정. bundled FHD Brand regular를 generate_brand_subtitle.py로 변환한 동일 path/금색/viewport의 SVG와 Android VectorDrawable 사용. 한글은 이전 live TTF text 그대로. 영문 alt/contentDescription 유지.
 - 기존 영문 1.3em line-box·8/10px 반응형 크기·340px 이하 숨김 유지. native subtitle만 ImageView로 표시하고 실제 웹 img 경계에 X/Y를 각각 정렬하여 native intrinsic 정수 반올림을 끝에서 보정. 다른 로고/제목은 기존 uniform scale/기준선 정렬 그대로. 860ms 이동/190ms 정지 dissolve/도착 확인 흐름 무변경.
 - 검증: Android/Web 두 자산의 path·색·viewport 완전 동일 및 접근성/한글 보존 검사. 5종 화면 폭에서 실제 img가 준비되고 native bridge metrics/착지 표시가 정상인지 확인. 실제 사용자 단말의 체감은 업데이트 후 별도 확인.
+- 배포 확인: Actions 40114854686 attempt2 성공 (attempt1의 기존 Chrome 실행 시간초과 후 같은 commit 재실행). 실제 앱 887개, 착지 5폭×16개(80개), 영문 공통 윤곽2개 및 기존 회귀/Android 빌드 통과. v2.0.86/build137 APK 메타데이터·고정 서명 검증, Release APK(1,735,915 bytes) 및 app_latest.json 등록 확인. 실제 삼성 단말의 마지막 영문 체감은 설치 후 별도 확인.
 
 
 
