@@ -145,7 +145,7 @@
   stats.waves++;
  }
  document.addEventListener('pointerdown',touch,{passive:true});
- window.FirstHyundaiMotion={version:'2.0.63',playEntrance,prepareBrandHandoff,startBrandHandoff,nativeHeaderRects,finishNativeHandoff,_test:{touch,reduced,stats,headerTargets,finishBrandHandoff}};
+ window.FirstHyundaiMotion={version:'2.0.64',playEntrance,prepareBrandHandoff,startBrandHandoff,nativeHeaderRects,finishNativeHandoff,_test:{touch,reduced,stats,headerTargets,finishBrandHandoff}};
  // Browsers used for UI preview have no Android bridge; keep a single
  // elegant initial reveal there as well, without affecting app navigation.
  if(!window.FirstHyundaiNative)playEntrance();
