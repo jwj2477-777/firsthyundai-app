@@ -40,7 +40,7 @@ async function runBrowserTests(){
   check('both painted in actual travel direction',bg(source).includes(angle)&&bg(target).includes(angle));
   for(let i=0;i<bs.length;i++)if(i!==old&&i!==index)
    check('unrelated type '+i+' untouched',bg(bs[i])===rest[i]&&!bs[i].style.background);
-  check('no button geometry or text movement',JSON.stringify(bs.map(rect))===JSON.stringify(rects)&&
+  check((row.id||'news')+' '+old+'→'+index+' no geometry/text movement '+JSON.stringify({before:rects,after:bs.map(rect),labels,now:bs.map(b=>b.textContent)}),JSON.stringify(bs.map(rect))===JSON.stringify(rects)&&
    JSON.stringify(bs.map(b=>b.textContent))===JSON.stringify(labels));
   frame(clock+630);clock+=1000;
   check('all temporary backgrounds removed',bs.every(b=>!b.style.background));
@@ -85,7 +85,7 @@ try{
  const file=path.join(dir,'index.html');fs.writeFileSync(file,html);
  const r=child.spawnSync(binary,['--headless=new','--no-sandbox','--disable-gpu',
   '--disable-dev-shm-usage','--disable-background-timer-throttling','--no-proxy-server',
-  '--window-size=430,1000','--virtual-time-budget=3000','--dump-dom','file://'+file],
+  '--hide-scrollbars','--window-size=430,1000','--virtual-time-budget=3000','--dump-dom','file://'+file],
   {encoding:'utf8',timeout:35000,maxBuffer:8*1024*1024});
  if(r.error)throw r.error;
  assert.equal(r.status,0,'Chrome failed: '+r.stderr.slice(-1400));
