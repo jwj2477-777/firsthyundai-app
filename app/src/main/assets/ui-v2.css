@@ -2566,3 +2566,28 @@ body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading>div{
  body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading,
  body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading>div{min-height:150px}
 }
+
+/* v2.0.75 · No layout movement during background transfer.
+ * Some equal-rank buttons used a 1.5px idle border but a 3px selected
+ * border.  That used to shift the text/content box even with no animation.
+ * Make only the border widths consistent; preserve EACH existing hue,
+ * gradients, active border color, radius, typography and shadow. */
+#nav .primaryNav>button,
+#nav .utilityNav>button,
+.page .propertyTypeSwitch.sectionModeSwitch>button,
+#news .newsCategoryTabs.sectionModeSwitch>button,
+.page .tradeStarter>button,
+.page .tradeTypeBar>button,
+.page .newTypeChips>button{
+ box-sizing:border-box;
+ border-width:2px!important;
+}
+@media(prefers-contrast:more){
+ #nav .primaryNav>button,
+ #nav .utilityNav>button,
+ .page .propertyTypeSwitch.sectionModeSwitch>button,
+ #news .newsCategoryTabs.sectionModeSwitch>button,
+ .page .tradeStarter>button,
+ .page .tradeTypeBar>button,
+ .page .newTypeChips>button{border-width:3px!important}
+}
