@@ -72,7 +72,7 @@ easy.compose();
 assert.equal(E('ct_clauseEffective').checked,false);
 assert.equal(E('ct_clauseCancellation').checked,false);
 assert.equal(E('ct_clauseBrokerFee').checked,false);
-assert(!notice().includes('이체와 동시에 본계약이 체결'),'Consent must not leak into another customer's deal');
+assert(!notice().includes('이체와 동시에 본계약이 체결'),"Consent must not leak into another customer's deal");
 assert(E('ct_missingQuickFields').innerHTML.includes('contractQuickFix'),'Incomplete memo offers a quick fix');
 assert(E('ct_missingQuickFields').innerHTML.includes('FirstHyundaiEasy.focusMissing(&quot;'),'Quick fixes are safely quoted');
 easy.focusMissing('contractDate');
