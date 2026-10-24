@@ -12,9 +12,9 @@
   if(!body?.classList||!nav)return false;
   entrancePlayed=true;stats.entrances++;
   body.classList.add('fhd-first-render');
-  // Remove the one-time class after the last nav card finishes, so later
-  // nav re-renders do not re-run the cold-start sequence.
-  nav.addEventListener?.('animationend',()=>{
+  // The old tile entrance was removed. Only native/header identity remains.
+  const header=document.querySelector?.('header .brandHeaderText');
+  (header||nav).addEventListener?.('animationend',()=>{
    body.classList.remove('fhd-first-render');
   },{once:true});
   return true;
@@ -34,6 +34,7 @@
   handoffDone=true;
   const scene=handoff?.scene;handoff=null;
   document.body?.classList?.remove('fhd-brand-handoff');
+  document.body?.classList?.remove('fhd-first-render');
   scene?.remove?.();
   stats.handoffs++;
  }
@@ -117,6 +118,7 @@
  function finishNativeHandoff(){
   document.body?.classList?.remove('fhd-native-handoff');
   document.body?.classList?.remove('fhd-native-landing');
+  document.body?.classList?.remove('fhd-first-render');
   document.body?.classList?.add('fhd-native-arrived');
  }
  window.FirstHyundaiMotion={version:'2.0.71',playEntrance,prepareBrandHandoff,startBrandHandoff,nativeHeaderRects,beginNativeHandoffLanding,finishNativeHandoff,_test:{reduced,stats,headerTargets,finishBrandHandoff}};
