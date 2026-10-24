@@ -17,20 +17,21 @@ assert(css.includes('.fhd-bridge-backdrop')&&css.includes('linear-gradient(135de
 assert(main.includes('nativeHeaderRects?.()')&&main.includes('overlay.moveToHeader('));
 assert(native.includes('PathInterpolator(.34f,.06f,.18f,1f)'),'Use gentler takeoff and soft landing');
 assert(native.includes('DURATION-LANDING_LEAD')&&native.includes('ObjectAnimator.ofFloat(part,View.ALPHA,1f,0f)'),'Native brand cross-dissolves during landing instead of snapping');
-assert(native.includes('LANDING_LEAD=255L')&&native.includes('fade.setDuration(205)'),'Allow enough overlap to hide font-weight and size change');
+assert(native.includes('fade.setDuration(205)'),'Keep a gentle 205ms native landing opacity blend');
 assert(native.includes('ring.animate().translationX(')&&native.includes('.scaleX(ringScale).scaleY(ringScale)'),'Gold circular halo must travel and shrink with the logo');
 assert(!native.includes('ValueAnimator.ofArgb('),'No native text color change during the flight: both ends must start at final colors');
-assert(identity.includes('SUBTITLE_COLOR=Color.rgb(216,231,228)')&&identity.includes('TITLE_COLOR=Color.rgb(249,255,255)'),'Start, flight and header use the exact same text colors');
+assert(identity.includes('TITLE_COLOR=Color.WHITE')&&identity.includes('SUBTITLE_COLOR=Color.rgb(246,215,145)'),'Start, flight and header use the ORIGINAL splash white and warm gold');
 assert(identity.includes('SUBTITLE="FIRST HYUNDAI · REAL ESTATE"'),'Native brand text has the exact header spacing');
 assert(lock.includes('BrandIdentityStyle.title(title)')&&lock.includes('BrandIdentityStyle.subtitle(subtitle)'),'Native cold start uses shared typography');
 assert(native.includes('BrandIdentityStyle.title(title)')&&native.includes('BrandIdentityStyle.subtitle(subtitle)'),'Native flying text uses the very same typography as cold start');
 assert(css.includes('header .brandSubtitle{font-family:Roboto,"Noto Sans KR",sans-serif}'),'WebView matches the native font family fallbacks');
-assert(lock.includes('BrandIdentityStyle.logoBacking()')&&native.includes('BrandIdentityStyle.logoBacking()'),'Same logo surround appears on the intro and flying emblem');
-assert(native.includes('backing.animate().translationX(')&&native.includes('scaleX(backingScale).scaleY(backingScale)'),'The logo backing travels and shrinks instead of appearing abruptly');
-assert(css.includes('background-color:#FDFBF6!important')&&css.includes('background-color 235ms ease-out'),'Main circular cream backing must appear gradually rather than pop');
-assert(main.includes('beginNativeHandoffLanding?.()')&&main.includes('onApproach,done'),'Android informs the WebView before the native shared elements land');
+assert(!lock.includes('BrandIdentityStyle.logoBacking()')&&!native.includes('backing.animate()'),'Do not fabricate a cream disc that was absent from the original splash');
+assert(css.includes('background:transparent!important;border-color:transparent!important'),'Main header emblem has the same bare circular background as the splash');
+assert(!main.includes('beginNativeHandoffLanding?.()')&&main.includes('overlay.moveToHeader(positions,viewport,view,done)'),'Avoid extra JavaScript signals during the animated flight');
 assert(src.includes('function beginNativeHandoffLanding()'),'Browser can reveal the existing header before native overlay exits');
-assert(css.includes('body.fhd-native-handoff.fhd-native-landing header .officeMark'),'Header arrival CSS blends native and WebView artwork');
+assert(css.includes('@keyframes fhd-native-brand-land')&&css.includes('225ms linear 555ms both'),'Destination header appears on pre-timed CSS animation');
+assert(native.includes('setLayerType(View.LAYER_TYPE_HARDWARE,null)'),'Moving native text and emblem are GPU-backed');
+assert(css.includes('color:#F6D791!important')&&css.includes('font-weight:700!important')&&css.includes('font-weight:400!important'),'Web header matches the original splash styles');
 assert(main.includes('view.setAlpha(1f)')&&main.includes('ANIMATOR_DURATION_SCALE'));
 assert(lock.includes('AccessPolicy.authorized(')&&lock.includes('overridePendingTransition(0,0)'));
 function box(left,top,width,height){return {left,top,width,height};}

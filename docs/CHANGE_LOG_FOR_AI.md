@@ -1,5 +1,13 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-24 · v2.0.67 · 오리지널 스플래시 스타일을 헤더 기준으로 복원, 이동 중 끊김 완화
+- 사용자는 v2.0.66 메인 스타일에 맞추기보다 예전 시작 화면의 화이트 타이틀/금색 영문을 선호. Native 원래 title #FFF Bold(700), English subtitle #F6D791 Regular(400), 자간 0/.1em. 메인 헤더도 동일 CSS 통일하고 크기만 헤더 폭에 따라 축소.
+- 원래 인트로에는 없던 154dp 크림 로고 바탕을 제거하고 헤더의 크림 바탕/그림자도 삭제. 원본 FHD 엠블럼·골드 halo만 이동 후 링 페이드.
+- SmoothBrandOverlay.java는 이동 중 onApproach JavaScript round-trip을 제거. 최초 좌표 측정 시 CSS fade 555~780ms 자동 예약, native 790ms compositor 애니메이션 중 앱/웹 동기화 왕복 없음. TextView 및 로고 GPU pre-layer로 애니메이션 프레임 안정화.
+- 인증·계약·실거래·가격동향·알림 및 기존 앱 서명 업데이트 변경 없음. v2.0.67/build118.
+
+
+
 ## 2026-10-24 · v2.0.66 · 첫 화면과 헤더 브랜드 폰트·색상·원형 통일
 - 같은 로고로 이동하는데도 도착 순간 바뀌던 글꼴/굵기, 영어 색상 및 글자 간격/원형 배경을 근본 정리.
 - Native `BrandIdentityStyle.java`에 한글/영문 문구, Sans-serif(로보토/노토 대체), 굵기 820/670, 자간 -.033/.072em, 제목 #F9FFFF, 영문 #D8E7E4를 단일 정의. LockActivity와 SmoothBrandOverlay 모두 사용. 웹 헤더도 같은 font-family 계열을 명시. 영문 2칸 공백을 실제 헤더와 일치하도록 1칸 공백으로 수정.

@@ -164,10 +164,6 @@ public class LockActivity extends Activity {
         FrameLayout emblemFrame=new FrameLayout(this);
         emblemFrame.setClipChildren(false);
         emblemFrame.setClipToPadding(false);
-        View circleBacking=new View(this);
-        circleBacking.setBackground(BrandIdentityStyle.logoBacking());
-        emblemFrame.addView(circleBacking,new FrameLayout.LayoutParams(
-                dp(154),dp(154),Gravity.CENTER));
         View haloRing=new View(this);
         GradientDrawable ringDrawable=new GradientDrawable();
         ringDrawable.setShape(GradientDrawable.OVAL);

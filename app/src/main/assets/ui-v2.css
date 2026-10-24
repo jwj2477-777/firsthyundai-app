@@ -2577,3 +2577,45 @@ body.fhd-native-handoff.fhd-native-landing header .brandHeaderText{
    larger intro lettering scales toward these final measured dimensions. */
 header .brandWordmark h1,
 header .brandSubtitle{font-family:Roboto,"Noto Sans KR",sans-serif}
+
+
+/* v2.0.67 · Splash-first brand palette and compositor-only handoff.
+ * Keep the original intro white heading, warm gold English and bare circular
+ * FHD emblem, not the formerly added teal text and cream disk.
+ */
+header .brandWordmark h1{
+ font-family:Roboto,"Noto Sans KR",sans-serif!important;
+ font-weight:700!important;letter-spacing:0!important;
+ color:#FFFFFF!important;text-shadow:none!important;
+}
+header .brandSubtitle{
+ font-family:Roboto,"Noto Sans KR",sans-serif!important;
+ font-weight:400!important;letter-spacing:.1em!important;
+ color:#F6D791!important;
+}
+header .officeMark{
+ background:transparent!important;border-color:transparent!important;
+ box-shadow:none!important;
+}
+/* Timed from nativeHeaderRects() while the screen is still hidden. No
+   background JavaScript round-trip during the 790ms Android animation. */
+@keyframes fhd-native-brand-land{from{opacity:0}to{opacity:1}}
+body.fhd-native-handoff header .officeMark,
+body.fhd-native-handoff header .brandHeaderText,
+body.fhd-native-handoff.fhd-native-landing header .officeMark,
+body.fhd-native-handoff.fhd-native-landing header .brandHeaderText{
+ visibility:visible!important;opacity:0!important;
+ animation:fhd-native-brand-land 225ms linear 555ms both!important;
+ transition:none!important;
+}
+body.fhd-native-arrived.fhd-first-render header .officeMark,
+body.fhd-native-arrived.fhd-first-render header .brandHeaderText{
+ animation:none!important;opacity:1!important;transform:none!important;
+}
+@media(prefers-reduced-motion:reduce){
+ body.fhd-native-handoff header .officeMark,
+ body.fhd-native-handoff header .brandHeaderText{
+  animation:none!important;opacity:1!important;transition:none!important;
+ }
+}
+@media(max-width:400px){header .brandSubtitle{letter-spacing:.075em!important}}

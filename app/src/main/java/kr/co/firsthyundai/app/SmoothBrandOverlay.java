@@ -28,12 +28,11 @@ final class SmoothBrandOverlay extends FrameLayout {
     private final ImageView emblem;
     private final TextView title;
     private final TextView subtitle;
-    private final View ring,rule,backing;
+    private final View ring,rule;
     private boolean finished;
     private int layoutAttempts;
     private final ArrayList<ObjectAnimator> arrivalFades=new ArrayList<>();
     private static final long DURATION=790L;
-    private static final long LANDING_LEAD=255L;
     // Quieter takeoff than v2.0.64's fast-start curve, with a long soft landing.
     private final PathInterpolator natural=new PathInterpolator(.34f,.06f,.18f,1f);
 
@@ -56,9 +55,6 @@ final class SmoothBrandOverlay extends FrameLayout {
         emblemFrame=new FrameLayout(activity);
         emblemFrame.setClipChildren(false);
         emblemFrame.setClipToPadding(false);
-        backing=new View(activity);
-        backing.setBackground(BrandIdentityStyle.logoBacking());
-        emblemFrame.addView(backing,new LayoutParams(dp(154),dp(154),Gravity.CENTER));
         ring=new View(activity);
         GradientDrawable oval=new GradientDrawable();
         oval.setShape(GradientDrawable.OVAL);
@@ -71,10 +67,13 @@ final class SmoothBrandOverlay extends FrameLayout {
         emblem.setScaleType(ImageView.ScaleType.FIT_CENTER);
         emblem.setContentDescription("퍼스트현대 FHD FIRST 원본 로고");
         emblemFrame.addView(emblem,new LayoutParams(dp(144),dp(144),Gravity.CENTER));
+        // Pre-compose the travelling identity to keep transforms on Android's GPU.
+        emblem.setLayerType(View.LAYER_TYPE_HARDWARE,null);
         identity.addView(emblemFrame,new LinearLayout.LayoutParams(dp(190),dp(190)));
 
         title=new TextView(activity);
         BrandIdentityStyle.title(title);
+        title.setLayerType(View.LAYER_TYPE_HARDWARE,null);
         LinearLayout.LayoutParams tl=new LinearLayout.LayoutParams(-2,-2);
         tl.topMargin=dp(12);
         identity.addView(title,tl);
@@ -88,6 +87,7 @@ final class SmoothBrandOverlay extends FrameLayout {
         identity.addView(rule,line);
         subtitle=new TextView(activity);
         BrandIdentityStyle.subtitle(subtitle);
+        subtitle.setLayerType(View.LAYER_TYPE_HARDWARE,null);
         LinearLayout.LayoutParams sub=new LinearLayout.LayoutParams(-2,-2);
         sub.topMargin=dp(13);
         identity.addView(subtitle,sub);
@@ -99,7 +99,7 @@ final class SmoothBrandOverlay extends FrameLayout {
      * real native view size. The overlay and WebView share a FrameLayout.
      * Each row: [left,top,width,height]. Input can represent narrow devices.
      */
-    void moveToHeader(float[] rects,float viewportWidth,View web,Runnable onApproach,Runnable done){
+    void moveToHeader(float[] rects,float viewportWidth,View web,Runnable done){
         if(finished)return;
         if(rects==null||rects.length!=12||viewportWidth<=0||web.getWidth()<=0){
             fadeOut(done);
@@ -111,7 +111,7 @@ final class SmoothBrandOverlay extends FrameLayout {
         // exactly matches the original LockActivity welcome center.
         if(emblem.getWidth()==0||title.getWidth()==0){
             if(++layoutAttempts>8){fadeOut(done);return;}
-            postDelayed(()->moveToHeader(rects,viewportWidth,web,onApproach,done),16);
+            postDelayed(()->moveToHeader(rects,viewportWidth,web,done),16);
             return;
         }
         View[] parts={emblem,title,subtitle};
@@ -167,27 +167,11 @@ final class SmoothBrandOverlay extends FrameLayout {
                 .setDuration(DURATION).setInterpolator(natural).start();
         ring.animate().alpha(0f).setStartDelay(DURATION-250L)
                 .setDuration(250L).start();
-        // The cream disk is the very same final header logo surround. Move it
-        // continuously with the emblem instead of creating a new circle at
-        // the very last frame.
-        int[] backAt=new int[2];
-        backing.getLocationOnScreen(backAt);
-        float backingOffsetX=badgeAt[0]+badgePart.getWidth()/2f-backAt[0]-backing.getWidth()/2f;
-        float backingOffsetY=badgeAt[1]+badgePart.getHeight()/2f-backAt[1]-backing.getHeight()/2f;
-        float backingScale=Math.min(rects[2]*pxPerCss/backing.getWidth(),
-                                    rects[3]*pxPerCss/backing.getHeight());
-        backing.animate().translationX(badgeShiftX+backingOffsetX)
-                .translationY(badgeShiftY+backingOffsetY)
-                .scaleX(backingScale).scaleY(backingScale)
-                .setDuration(DURATION).setInterpolator(natural).start();
+        // Both views have the same splash-white title, gold subtitle and
+        // dark logo. Only their geometry changes during the move.
         rule.animate().alpha(0f).setStartDelay(245).setDuration(390).start();
-        // The native logo and the header already share the exact brand
-        // typography and colors. No last-second gold-to-teal color morph:
-        // only position, proportional size and final opacity change.
-        // Reveal the live header just before the native brand arrives, then
-        // cross-dissolve the native and HTML glyphs instead of hard swapping.
-        if(onApproach!=null)
-            postDelayed(()->{if(!finished)onApproach.run();},DURATION-LANDING_LEAD);
+        // HTML reveal was scheduled with the initial DOM geometry measurement.
+        // No JavaScript calls or extra UI-thread handshake during flight.
         for(View part:parts){
             ObjectAnimator fade=ObjectAnimator.ofFloat(part,View.ALPHA,1f,0f);
             fade.setStartDelay(DURATION-215);
@@ -218,7 +202,6 @@ final class SmoothBrandOverlay extends FrameLayout {
         backdrop.animate().cancel();
         rule.animate().cancel();
         ring.animate().cancel();
-        backing.animate().cancel();
         animate().cancel();
         if(done!=null)done.run();
         else detach();

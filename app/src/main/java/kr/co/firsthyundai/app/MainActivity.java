@@ -127,12 +127,7 @@ public class MainActivity extends Activity {
                         },240);
                     };
                     overlay.setOnClickListener(v->overlay.finish(done));
-                    final Runnable onApproach=()->{
-                        if(web!=null&&!isFinishing()&&!isDestroyed())
-                            web.evaluateJavascript(
-                                "window.FirstHyundaiMotion?.beginNativeHandoffLanding?.()",null);
-                    };
-                    overlay.moveToHeader(positions,viewport,view,onApproach,done);
+                    overlay.moveToHeader(positions,viewport,view,done);
                 });
             }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {

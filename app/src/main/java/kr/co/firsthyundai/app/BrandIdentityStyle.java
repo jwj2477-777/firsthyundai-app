@@ -2,26 +2,23 @@ package kr.co.firsthyundai.app;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.view.Gravity;
 import android.widget.TextView;
 
 /**
- * Shared native opening/transition typography. WebView's header uses the same
- * Roboto / Noto Sans Korean fallback, 820/670 weights, colors and letter spacing.
- * The intro is larger on purpose; only its geometry scales during flight.
+ * Preserve the original native splash typography across the intro, native
+ * movement and WebView header. Large intro text only changes size/position.
  */
 final class BrandIdentityStyle {
-    static final int TITLE_COLOR=Color.rgb(249,255,255);      // #F9FFFF
-    static final int SUBTITLE_COLOR=Color.rgb(216,231,228);   // #D8E7E4
-    static final int LOGO_BACKING=Color.rgb(253,251,246);    // #FDFBF6
+    static final int TITLE_COLOR=Color.WHITE;                // original splash
+    static final int SUBTITLE_COLOR=Color.rgb(246,215,145); // original warm gold
     static final String TITLE="퍼스트현대";
     static final String SUBTITLE="FIRST HYUNDAI · REAL ESTATE";
     static final float TITLE_SP=30f;
     static final float SUBTITLE_SP=11f;
-    static final float TITLE_TRACKING=-.033f; // approximately -.9px at 27px
-    static final float SUBTITLE_TRACKING=.072f; // .72px at 10px
+    static final float TITLE_TRACKING=0f;
+    static final float SUBTITLE_TRACKING=.1f;
     private BrandIdentityStyle(){}
 
     private static Typeface weight(int amount) {
@@ -34,7 +31,7 @@ final class BrandIdentityStyle {
         view.setTextColor(TITLE_COLOR);
         view.setTextSize(TITLE_SP);
         view.setGravity(Gravity.CENTER);
-        view.setTypeface(weight(820));
+        view.setTypeface(weight(700));
         view.setLetterSpacing(TITLE_TRACKING);
         view.setIncludeFontPadding(false);
     }
@@ -43,14 +40,8 @@ final class BrandIdentityStyle {
         view.setTextColor(SUBTITLE_COLOR);
         view.setTextSize(SUBTITLE_SP);
         view.setGravity(Gravity.CENTER);
-        view.setTypeface(weight(670));
+        view.setTypeface(weight(400));
         view.setLetterSpacing(SUBTITLE_TRACKING);
         view.setIncludeFontPadding(false);
-    }
-    static GradientDrawable logoBacking(){
-        GradientDrawable shape=new GradientDrawable();
-        shape.setShape(GradientDrawable.OVAL);
-        shape.setColor(LOGO_BACKING);
-        return shape;
     }
 }
