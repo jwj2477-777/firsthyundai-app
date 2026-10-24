@@ -1,5 +1,5 @@
 'use strict';
-/* v7 regression: ONLY source and target background change, 5 routes remain */
+/* v10 regression: trades↔news passes subtly via Apartment Info only */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
@@ -77,43 +77,65 @@ const win={innerWidth:415,innerHeight:980,requestAnimationFrame,
 };
 vm.runInNewContext(code,{window:win,document:doc,Math,Number,Object,Array,Map});
 const api=win.FirstHyundaiSelectionFlow;
-assert.equal(api.version,'9.0.0');
+assert.equal(api.version,'10.0.0');
 assert.equal(api._test.buttons(nav,'top-five').length,5);
 assert(!('beginDirect' in api)&&!('endDirect' in api),'Removed non-working direct-hook branch');
-assert(!/intermediates\(|passPaint\(|mids\b/.test(code),'No intermediate tab may be animated');
+assert.equal(api._test.viaIndex('top-five',0,2),1);
+assert.equal(api._test.viaIndex('top-five',2,0),1);
+for(const pair of [[0,1],[1,2],[0,3],[2,4],[3,4]])
+ assert.equal(api._test.viaIndex('top-five',...pair),-1,
+  'Other navigation paths stay untouched');
+assert.equal(api._test.viaIndex('news',0,2),-1);
+assert.equal(api._test.viaIndex('trade-types',0,2),-1);
+assert.equal(api._test.softlyMix('#FFFFFF','#2456AA',0),'rgb(255, 255, 255)');
+assert.equal(api._test.softlyMix('#FFFFFF','#2456AA',.2),'rgb(211, 221, 238)');
 const before=buttons.map(b=>({text:b.innerHTML,rect:{...b.rect}}));
-click({target:buttons[2],defaultPrevented:false});selected=2;
-frame(0); // next frame, after inline onclick: install initial two gradients
+function complete(end){frame(end)}
+// TRADES → NEWS. The middle "Apartment Info" stays unselected,
+// shows a faint soft-color wash, and returns to its original idle paint.
+click({target:buttons[2],defaultPrevented:false});
+selected=2;
+frame(0); // post-click queue sets up actual selected/idle button colors
 assert.equal(buttons[0].style.getPropertyPriority('background'),'important');
 assert.equal(buttons[2].style.getPropertyPriority('background'),'important');
-assert(buttons[0].style.getPropertyValue('background').includes(colors[0]));
-assert(buttons[2].style.getPropertyValue('background').includes(colors[2]));
-assert.equal(nav.children.length,2,'No DOM/row insertions');
-frame(0);frame(320);
-assert(api._test.stats.lastPath.join(',')==='0,2',
- 'Only the previous and destination menus may participate');
-for(let i=0;i<buttons.length;i++){
- if(i!==0&&i!==2)
-  assert.equal(buttons[i].style.getPropertyValue('background'),'',
-   'Unrelated main menu '+i+' must never change');
-}
-assert.deepEqual(buttons.map(b=>({text:b.innerHTML,rect:{...b.rect}})),before,
- 'No text, size, geometry, icon or position changed');
-frame(630);
-assert.equal(buttons[0].style.getPropertyValue('background'),'');
-assert.equal(buttons[1].style.getPropertyValue('background'),'');
-assert.equal(buttons[2].style.getPropertyValue('background'),'');
+assert.equal(nav.children.length,2,'No DOM, icon or row changes');
+frame(0);frame(395);
+assert.equal(api._test.stats.lastPath.join(','),'0,1,2');
+assert(buttons[1].style.getPropertyValue('background').includes('linear-gradient'),
+ 'Exactly one midpoint is visibly washed with color');
+assert(buttons[1].style.getPropertyValue('background').includes('rgb('),
+ 'Passing shade is light blended pigment rather than fully selected blue');
+assert.equal(buttons[1].getAttribute('aria-current'),'false',
+ 'Midpoint must never become selected');
+for(const i of [3,4])assert.equal(buttons[i].style.getPropertyValue('background'),'');
+assert.deepEqual(buttons.map(b=>({text:b.innerHTML,rect:{...b.rect}})),before);
+complete(790);
+assert(buttons.every(b=>b.style.getPropertyValue('background')===''));
 assert.equal(api._test.stats.finished,1);
-const nr=callbacks.length;
-click({target:buttons[4],defaultPrevented:false});selected=4;
-frame(900);frame(900);frame(1215);frame(1530);
-assert.equal(api._test.stats.topFive,2,'Cross-row menu selection animates');
-assert.equal(buttons[4].style.getPropertyValue('background'),'');
+// NEWS → TRADES in reverse. The middle hint follows the purple source.
+click({target:buttons[0],defaultPrevented:false});
+selected=0;
+frame(1000);frame(1000);frame(1395);
+assert.equal(api._test.stats.lastPath.join(','),'2,1,0');
+assert(buttons[1].style.getPropertyValue('background').includes('linear-gradient'));
+assert(buttons[1].style.getPropertyValue('background').includes('rgb('));
+assert.equal(buttons[1].getAttribute('aria-current'),'false');
+complete(1790);
+assert(buttons.every(b=>b.style.getPropertyValue('background')===''));
+// Other jump: TRADES → CONTRACT never changes Apartment Info or News.
+click({target:buttons[4],defaultPrevented:false});
+selected=4;
+frame(2000);frame(2000);frame(2315);
+assert.equal(api._test.stats.lastPath.join(','),'0,4');
+for(const i of [1,2,3])assert.equal(buttons[i].style.getPropertyValue('background'),'',
+ 'Unrelated main button '+i+' is untouched');
+complete(2630);
+assert.equal(api._test.stats.topFive,3);
+assert(buttons.every(b=>b.style.getPropertyValue('background')===''));
 const vector=api._test.vector(buttons[4].rect,buttons[0].rect);
-assert(vector.dy<0&&vector.dx<0,'Reverse cross-row direction points up-left');
+assert(vector.dy<0&&vector.dx<0,'Cross-row direction still points up-left');
 reduced=true;
 click({target:buttons[3],defaultPrevented:false});
 assert.equal(callbacks.length,0);
 assert.equal(nav.children.length,2);
-assert.equal(nr,0,'No dangling timers from previous selection');
-console.log('V7 minimal two-button color transfer passed: all 5 destinations, no unrelated tiles, no layout changes.');
+console.log('V10 restrained via-Apartment-Info paint: only Trades↔News, both directions, no intermediate selection, no other paths altered.');
