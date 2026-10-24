@@ -2092,3 +2092,83 @@ body[data-section="officetel"] .page#officetel>.sectionTitle:before{
 @media(prefers-contrast:more){
  #contracts .contractCoreFacts,#contracts .contractClauseChoices,#contracts .contractMemoInputArea{border-width:2px}
 }
+
+
+/* v2.0.49 — proposal-first contracts with verbatim specials and inline corrections.
+   Existing family large controls, actual values and review gate are retained. */
+#contracts .contractSpecialMemoArea{
+ margin:12px 0 8px;padding:12px;
+ background:#F2F8F6;border:1px solid #BDDBD1;border-radius:13px;
+}
+#contracts .contractSpecialMemoArea label{
+ display:block;margin:0 0 8px;font-size:16px;font-weight:850;color:#22564E;
+ line-height:1.45;
+}
+#contracts .contractSpecialMemoArea label small{
+ display:block;font-size:12px;font-weight:600;color:#576F6A;margin-top:2px;
+}
+#contracts #ct_specialMemo{
+ display:block;width:100%;box-sizing:border-box;height:130px;min-height:120px;
+ resize:vertical;border:1.5px solid #9DBDB2;border-radius:11px;
+ background:#FFF;padding:12px;font-size:16px;line-height:1.6;color:#243F42;
+}
+#contracts #ct_specialMemo:focus{
+ outline:3px solid #B7DED4;outline-offset:1px;border-color:#136D64;
+}
+#contracts .contractMissingQuick{
+ grid-template-columns:1fr;margin:11px 0 16px;gap:8px;
+}
+#contracts .contractMissingQuick h4{
+ margin:0;font-size:17px;font-weight:850;color:#7D4C31;
+}
+#contracts .contractMissingQuick p{
+ margin:0 0 3px;font-size:13px;color:#5D7171;
+}
+#contracts .contractInlineField{
+ display:flex;flex-direction:column;gap:7px;
+ padding:12px;border:1px solid #DDDCD0;background:#FFFCF6;border-radius:12px;
+}
+#contracts .contractInlineField strong{
+ color:#2D4D50;font-size:15px;
+}
+#contracts .contractInlineField label{
+ font-size:13px;color:#61716F;font-weight:700;
+}
+#contracts .contractInlineField input{
+ min-width:0;box-sizing:border-box;width:100%;min-height:49px;
+ font-size:16px;line-height:1.45;padding:10px;
+ border:1.5px solid #BDD0C8;border-radius:9px;background:#FFFFFF;color:#28444A;
+}
+#contracts .contractInlineField input:focus{
+ border-color:#15746C;outline:2px solid #C5E6DC;
+}
+#contracts .contractQuickApply{
+ min-height:47px;border:1px solid #16685F;border-radius:10px;
+ background:#176C63;color:#FFF;font-size:15px;font-weight:800;
+ padding:9px 12px;cursor:pointer;
+}
+body:not([data-office-role="admin"]) #contracts .adminOnly{display:none!important}
+body:not([data-office-role="admin"]) #contracts #ct_preview.contractEditing{display:none!important}
+#contracts .contractAdminTemplate{
+ margin:16px 0 9px;border:1px solid #CADAD6;border-radius:13px;
+ background:#F6FAF9;padding:13px;
+}
+#contracts .contractAdminTemplate>summary{
+ font-size:15px;font-weight:800;cursor:pointer;min-height:45px;
+ color:#2C5D60;padding:8px 0;
+}
+#contracts .contractAdminTemplate p{
+ font-size:13px;line-height:1.65;color:#61767A;
+}
+#contracts .contractAdminTemplate label{
+ display:block;font-size:13px;font-weight:800;margin:11px 0 5px;
+}
+#contracts .contractAdminTemplate textarea{
+ box-sizing:border-box;width:100%;min-height:70px;resize:vertical;
+ font-size:14px;line-height:1.55;border:1px solid #BCD3CC;
+ border-radius:9px;padding:10px;background:#FFF;
+}
+@media(max-width:540px){
+ #contracts .contractSpecialMemoArea{padding:11px;}
+ #contracts #ct_specialMemo{min-height:126px;}
+}
