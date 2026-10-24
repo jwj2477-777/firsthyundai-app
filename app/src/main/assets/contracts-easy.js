@@ -189,8 +189,8 @@ function renderQuickMissing(errors){
  box.classList.toggle('hidden',!items.length);
  if(!items.length){box.innerHTML='';return;}
  box.innerHTML='<strong>누락·확인 항목 '+errors.length+'개 · 눌러서 수정</strong>'+
-  items.map(([name,label])=>'<button class="contractQuickFix" type="button" onclick="FirstHyundaiEasy.focusMissing(\\''+
-   name+'\\')">'+String(label).replace(/[<>&"]/g,'')+' <span aria-hidden="true">✎</span></button>').join('');
+  items.map(([name,label])=>'<button class="contractQuickFix" type="button" onclick="FirstHyundaiEasy.focusMissing(&quot;'+
+   name+'&quot;)">'+String(label).replace(/[<>&"]/g,'')+' <span aria-hidden="true">✎</span></button>').join('');
 }
 function rebuildAfterClauses(){
  // Never silently grant consent or preserve stale approval for changed terms.
