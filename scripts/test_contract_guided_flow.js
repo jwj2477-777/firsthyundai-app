@@ -114,6 +114,7 @@ assert.equal(easy.showQuickField('contractDate'),true);
 E('ct_quick_contractDate').value='12월 중 협의';
 assert.equal(easy.applyQuickField('contractDate'),true);
 assert.equal(E('ct_contractDate').value,'12월 중 협의','Keep an actual negotiated writing window verbatim');
+assert.equal(easy._test.normalizeQuickField('contractDate','12월 말'),'12월 말','Preserve month-end writing negotiation just like the memo parser');
 E('ct_price').value='';
 app.makePreview();easy.refreshMissing();
 assert.equal(easy.showQuickField('price'),true);

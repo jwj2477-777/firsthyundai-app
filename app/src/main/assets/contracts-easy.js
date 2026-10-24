@@ -251,6 +251,11 @@ function normalizeQuickField(part,raw){
   return String(Math.round(n*100)/100); // All editable price fields store units of 만원.
  }
  if(QUICK_DATES.has(part)){
+  // Keep contract-writing windows consistent with the free-memo schedule parser.
+  if(part==='contractDate'){
+   const flexible=window.FirstHyundaiLanguage?._test?.contractScheduleCandidate?.('계약일 '+text);
+   if(flexible?.flexible)return flexible.value;
+  }
   // No date-only interpretation of ranges, relative instructions or uncertainty.
   if(/(?:~|～|〜|부터|까지|전후|사이|협의|조율|미정|말일|말경|초순|중순|하순|예정|경에)/.test(text))return text;
   const parsed=window.FirstHyundaiLanguage?._test?.dateIn?.(text);

@@ -35,7 +35,7 @@ for(const p of permutations){
  assert.equal(el('ct_account').value,'123-456-789012',p.join('|')+' account must not contain 500');
  assert.equal(el('ct_accountHolder').value,'김철수',p.join('|')+' recipient');
  assert.equal(el('ct_advance').value,'500',p.join('|')+' remittance');
- assert(el('ct_preview').value.includes('▶ 이번 송금 예정액 : 500만원'),'Customer text must show the exact transfer amount without assuming contract formation');
+ assert(el('ct_preview').value.includes('금일 위 계약조건에 따라 계약금 중 일부인 500만원을 매도인 계좌(국민은행 123-456-789012 (예금주 김철수))로 송금하기로 합니다.'),'Preserve the exact remittance in the restored original contract notice');
  assert(!el('ct_preview').value.includes('▶ 이번 선송금 예정액'));
 }
 compose('천만원 오늘 입금 이영희 신한은행 110-222-334455');
