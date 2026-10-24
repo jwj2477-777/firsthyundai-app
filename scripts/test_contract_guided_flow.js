@@ -6,12 +6,22 @@ const html=read('app/src/main/assets/index.html'),css=read('app/src/main/assets/
 const section=html.slice(html.indexOf('<div id="contracts"'),html.indexOf('<div id="notes"'));
 const markers=['ct_flow1','ct_flow2','ct_flow3','ct_keyFacts','ct_factProperty','ct_factPrice','ct_factDeposit',
  'ct_factAdvance','ct_factAccount','ct_missingQuickFields','ct_specialMemo',
- 'ct_templateEditor','ct_imagePrimary','ct_confirmButton','ct_previewHighlight','ct_factUnit'];
+ 'ct_templateEditor','ct_imagePrimary','ct_confirmButton','ct_previewHighlight','ct_factUnit','ct_moreActions'];
 for(const id of markers)assert(section.includes('id="'+id+'"'),'Required review control lost: '+id);
 assert(section.indexOf('ct_keyFacts')<section.indexOf('ct_previewHighlight'),'Summary must precede long preview');
 assert(section.indexOf('ct_confirmButton')<section.indexOf('ct_imagePrimary'),'Final image action follows explicit confirmation');
 assert(section.includes('id="ct_imagePrimary" type="button"')&&section.includes('disabled onclick="FirstHyundaiContractImage.open()"'),
  'Native image action must not be available before explicit approval');
+const primaryStart=section.indexOf('<div class="contractActions contractShareActions"'),extraStart=section.indexOf('<details id="ct_moreActions"');
+assert(primaryStart>0&&extraStart>primaryStart,'The single image action must precede an optional secondary disclosure');
+const primaryHtml=section.slice(primaryStart,extraStart);
+assert(primaryHtml.includes('ct_imagePrimary'),'Image preview/share is the only visible final action');
+assert(!/FirstHyundaiContracts\.(?:copy|share|reset)\(\)/.test(primaryHtml),'Other actions must not appear alongside the primary image action');
+const extraHtml=section.slice(extraStart,section.indexOf('</details>',extraStart));
+assert(extraHtml.includes('문자 복사')&&extraHtml.includes('문자 / 카톡 공유')&&extraHtml.includes('새 계약 시작'),'All alternate actions remain available inside the closed disclosure');
+assert(extraHtml.includes('전송 후 동의 여부를 확인하세요.'),'Extra explanation is hidden with secondary actions');
+assert(!/<details id="ct_moreActions"[^>]*\sopen(?:\s|>)/.test(section),'Secondary actions must be folded initially');
+assert(css.includes('#contracts #ct_resultPanel .contractShareActions #ct_imagePrimary'),'Large image button remains visually primary');
 assert(!section.includes('여기부터 시작'),'Unnecessary duplicated instruction removed');
 const finish=css.slice(css.lastIndexOf('/* v2.0.48 — Guided contract preparation'));
 assert(finish.includes('#contracts .contractMemoCard #ct_rough')&&finish.includes('height:202px'),
@@ -61,6 +71,8 @@ assert.equal(E('ct_flow2').attrs['aria-current'],'step','Second stage is verific
 assert.equal(app._test.collect().errors.length,0,'Fixture complete');
 app.approve();
 assert.equal(E('ct_imagePrimary').disabled,false,'Final image available only after explicit review');
+assert(E('ct_confirmHelp').textContent.includes('안내 이미지 확인·공유'),'Post-confirmation instruction must direct parents to the image preview, not alternate sharing');
+E('ct_moreActions').open=true;
 assert.equal(E('ct_flow3').attrs['aria-current'],'step');
 E('ct_specialMemo').value='근저당은 잔금과 동시에 말소한다\n반려동물 안돼';
 easy.updateSpecials();
@@ -105,6 +117,7 @@ assert.equal(easy.showQuickField('bank'),true);
 E('ct_quick_bank').value='이전고객은행';
 E('ct_rough').value='퍼팍 13블럭 매매 11억 잔금일 2027년 1월 1일';
 assert.equal(easy.compose(),true);
+assert.equal(E('ct_moreActions').open,false,'A new customer memo automatically closes optional controls');
 assert(!E('ct_missingQuickFields').innerHTML.includes('이전고객은행'),'New client memo must clear unfinished payment drafts');
 const parser=ctx.window.FirstHyundaiLanguage._test;
 assert.equal(easy.showQuickField('contractDate'),true,'A missing signing date should be editable in place');

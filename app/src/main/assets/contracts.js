@@ -261,7 +261,7 @@ function syncReviewButton(){
  button.setAttribute?.('aria-pressed',state==='done'?'true':'false');
  const help=E('ct_confirmHelp');
  updateContractFlow();
- if(help)help.textContent=state==='done'?'확인을 마쳤습니다. 문자 복사 또는 공유할 수 있습니다.':
+ if(help)help.textContent=state==='done'?'아래 안내 이미지 확인·공유를 눌러 최종 이미지를 확인해 주세요.':
   state==='ready'?'확인 버튼을 눌러 공유를 준비해 주세요.':
   !hasDraft?'계약문자를 먼저 만들어 주세요.':
   '확인이 필요한 계약정보를 먼저 보완해 주세요.';
@@ -365,7 +365,7 @@ function approve(){
  if(d.errors.length){E('ct_status').textContent='다음 필수 항목을 먼저 보완하세요: '+d.errors.join(' · ');E('ct_status').className='contractReview bad';return;}
  if(!created||!field('property')||!E('ct_preview').value.trim()){alert('먼저 문자 초안을 생성해 주세요.');return;}
  approved=true;
- E('ct_status').className='contractReview ok';E('ct_status').textContent='직접 확인 완료 · 복사 또는 공유할 수 있습니다.';
+ E('ct_status').className='contractReview ok';E('ct_status').textContent='내용 확인 완료 · 다음 단계: 안내 이미지 확인·공유';
  syncReviewButton();
 }
 function assertReady(){
@@ -431,6 +431,7 @@ function fromSelectedComplex(exclusiveM2=null,supplyLabel=''){
  return true;
 }
 function clearForNewMemo(){
+ const extra=E('ct_moreActions');if(extra)extra.open=false;
  const memo=field('rough');
  FIELDS.forEach(id=>{if(id!=='rough'&&E('ct_'+id))E('ct_'+id).value='';});
  E('ct_dealType').value='전세';
@@ -446,6 +447,7 @@ function clearForNewMemo(){
 }
 function reset(){
  if(!confirm('현재 작성 중인 계약 내용을 모두 지우시겠습니까? 저장된 사본은 없습니다.'))return;
+ const extra=E('ct_moreActions');if(extra)extra.open=false;
  FIELDS.forEach(id=>{const el=E('ct_'+id);if(el)el.value='';});
  if(E('ct_specialMemo'))E('ct_specialMemo').value='';
  E('ct_dealType').value='전세';E('ct_preview').value='';refreshHighlightedNotice();

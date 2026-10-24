@@ -89,7 +89,7 @@ assert.equal(state(),'done','Confirmed state must change visibly after clicking'
 assert.equal(button.textContent,'✓ 확인 완료됨');
 assert.equal(button.attributes['aria-pressed'],'true');
 assert.equal(contract.canShare(),true,'Confirmed draft can be shared');
-assert(hint.textContent.includes('공유'));
+assert(hint.textContent.includes('안내 이미지 확인·공유'),'Confirmation should lead directly to the image action');
 E('ct_preview').value+=' [확인 필요]';contract.edited();
 assert.equal(state(),'pending','Unverified edit invalidates the previous approval');
 assert(button.disabled);
