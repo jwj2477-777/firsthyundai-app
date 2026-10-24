@@ -20,7 +20,8 @@ assert(native.includes('windowRoot.setBackgroundColor(Color.rgb(16,45,56))'),
  'Dark background belongs behind white Android status icons');
 assert(native.includes('navigationSurface.setBackgroundColor(Color.rgb(247,248,245))'),
  'Navigation bar must have its own light surface for dark icons');
-assert(main.includes('SystemBars.install(this,web);')&&!main.includes('setContentView(web);'));
+assert(main.includes('SystemBars.install(this,stage);')&&main.includes('stage.addView(web,')&&main.includes('stage.addView(nativeHandoff,'),'WebView and native logo bridge must share one inset-safe content stage');
+assert(!main.includes('setContentView(web);'));
 assert(lock.includes('SystemBars.install(this,stage);')&&!lock.includes('setContentView(stage);'));
 assert(lock.includes('showWelcome(stage);'),'Opening logo must remain present');
 assert(main.includes('web.loadUrl("file:///android_asset/index.html")'),'Same WebView entry');
