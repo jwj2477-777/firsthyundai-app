@@ -75,7 +75,7 @@ frame(0);frame(330);
 assert(buttons[0].style.getPropertyValue('background').includes('linear-gradient'));
 assert(buttons[1].style.getPropertyValue('background').includes('linear-gradient'));
 assert.deepEqual(buttons.map(b=>({...b.rect,text:b.innerHTML})),before);
-frame(720);
+frame(630);
 assert.equal(window.FirstHyundaiSelectionFlow._test.stats.finished,1);
 assert.equal(buttons[0].style.getPropertyValue('background'),'');
 assert.equal(buttons[1].style.getPropertyValue('background'),'');
