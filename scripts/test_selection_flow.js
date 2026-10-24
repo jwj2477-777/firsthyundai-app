@@ -17,7 +17,7 @@ function button(index){
   getAttribute:k=>k==='aria-current'?(index===selected?'page':'false'):null,
   getBoundingClientRect:()=>({left:20+index*140,top:80,width:128,height:110}),
   closest:s=>s==='button'?b:s==='.hidden'?null:group,
-  cloneNode:()=>({innerHTML:b.innerHTML,querySelectorAll:()=>[]})
+  cloneNode:()=>({innerHTML:b.innerHTML,querySelectorAll:()=>[],cloneNode(){return this}})
  };
  return b;
 }
