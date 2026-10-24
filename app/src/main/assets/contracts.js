@@ -365,7 +365,7 @@ function approve(){
  if(d.errors.length){E('ct_status').textContent='다음 필수 항목을 먼저 보완하세요: '+d.errors.join(' · ');E('ct_status').className='contractReview bad';return;}
  if(!created||!field('property')||!E('ct_preview').value.trim()){alert('먼저 문자 초안을 생성해 주세요.');return;}
  approved=true;
- E('ct_status').className='contractReview ok';E('ct_status').textContent='내용 확인 완료 · 다음 단계: 안내 이미지 확인·공유';
+ E('ct_status').className='contractReview ok';E('ct_status').textContent='직접 확인 완료 · 다음 단계: 안내 이미지 확인·공유';
  syncReviewButton();
 }
 function assertReady(){
