@@ -30,9 +30,11 @@
   r.x+r.w>0&&r.x<window.innerWidth;
  function measure(button){
   const r=button.getBoundingClientRect(),s=window.getComputedStyle(button);
-  return {x:r.left,y:r.top,w:r.width,h:r.height,
-   color:s.color,paint:s.backgroundImage&&s.backgroundImage!=='none'?
-    s.backgroundImage:s.backgroundColor,
+  const paint=s.backgroundImage&&s.backgroundImage!=='none'?s.backgroundImage:s.backgroundColor;
+  const tint=(s.backgroundColor&&!/^rgba?\(0[, ]+0[, ]+0[, ]+0\)/.test(s.backgroundColor)&&s.backgroundColor!=='transparent')?s.backgroundColor:
+    (paint.match(/#[0-9a-fA-F]{3,8}|rgba?\([^)]*\)/)||['#176A70'])[0];
+  return {x:r.left,y:r.top,w:r.width,h:r.height,tint,
+   color:s.color,paint,
    border:s.border, radius:s.borderRadius, shadow:s.boxShadow,
    font:s.font, fontFamily:s.fontFamily, fontSize:s.fontSize,
    fontWeight:s.fontWeight,lineHeight:s.lineHeight,
@@ -69,7 +71,7 @@
   });
   return el;
  }
- function animate(fromEl,toBeforeEl,from,to){
+ function animate(fromEl,toBeforeEl,from,to,beforeTarget){
   if(!visible(from)||!visible(to)||typeof document.createElement('div').animate!=='function'){
    stats.skipped++;return;
   }
@@ -79,7 +81,10 @@
    stats.skipped++;return;
   }
   stop();
-  const source=face(fromEl,from),cover=face(toBeforeEl,to);
+  const source=face(fromEl,from),cover=face(toBeforeEl,Object.assign({},to,{
+   paint:beforeTarget.paint,color:beforeTarget.color,border:beforeTarget.border,
+   shadow:beforeTarget.shadow
+  }));
   const distance=Math.hypot(dx,dy), horizontal=Math.abs(dx)>=Math.abs(dy);
   const forwards=horizontal?dx>=0:dy>=0;
   // Colored outgoing face uncovers the original inactive surface,
@@ -100,7 +105,7 @@
    transformOrigin:'left center',
    transform:'translateY(-50%) rotate('+Math.atan2(dy,dx)+'rad)',
    borderRadius:'999px',
-   background:'linear-gradient(90deg,'+from.paint+','+to.paint+')',
+   background:'linear-gradient(90deg,'+from.tint+','+to.tint+')',
    filter:'blur(5px)',opacity:'0'
   });
   // Separate leading meniscus softens the hard straight-line bridge.
@@ -111,7 +116,7 @@
    position:'fixed',zIndex:'1003',pointerEvents:'none',
    left:(from.x+from.w/2-18)+'px',top:(from.y+from.h/2-18)+'px',
    width:'36px',height:'36px',borderRadius:'50%',
-   background:'radial-gradient(circle at 42% 45%,'+from.paint+' 12%,transparent 72%)',
+   background:'radial-gradient(circle at 42% 45%,'+from.tint+' 12%,transparent 72%)',
    filter:'blur(5px)',opacity:'0',willChange:'transform,opacity'
   });
   document.body.append(source,cover,bridge,drop);
@@ -167,7 +172,7 @@
   const peers=buttons(group),next=peers.indexOf(button);
   const old=peers.find(b=>chosen(b));
   if(next<0||!old||old===button)return;
-  const from=measure(old),oldTarget=button.cloneNode(true);
+  const from=measure(old),oldTarget=button.cloneNode(true),beforeTarget=measure(button);
   if(!visible(from))return;
   stats.requests++;
   // MUST wait for target/inline onclick handlers to complete.
@@ -178,7 +183,7 @@
    const selected=buttons(nextGroup)[next];
    if(!selected||!chosen(selected)||selected.disabled){stats.skipped++;return;}
    const to=measure(selected);
-   animate(old,oldTarget,from,to);
+   animate(old,oldTarget,from,to,beforeTarget);
   };
   if(typeof window.requestAnimationFrame==='function')window.requestAnimationFrame(afterClick);
   else window.setTimeout?.(afterClick,0);
