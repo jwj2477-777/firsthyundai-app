@@ -29,8 +29,8 @@ for(const term of [
  '@media(prefers-contrast:more){'
 ])assert(css.includes(term),'Missing role-aware color '+term);
 const contract=markup.slice(markup.indexOf('<div id="contracts"'),markup.indexOf('<div id="notes"'));
-assert(contract.includes('✎ 계약 메모 입력칸'),'Input field must be labeled with pencil');
-assert(contract.includes('여기부터 시작'),'Clear visual starting point');
+assert(contract.includes('✎ 계약 내용 입력'),'Memo textarea retains a clear pencil-labeled entry point');
+assert(!contract.includes('여기부터 시작'),'Avoid duplicated instructions in parent mode');
 assert(contract.includes('이 칸을 눌러 계약 내용을 적으세요.'),'Placeholder must explicitly be an instruction');
 assert(contract.includes('예) 퍼팍 1502동 3004호'),'Illustrative example remains');
 assert.equal((contract.match(/id="ct_rough"/g)||[]).length,1,'Single memo textarea');
