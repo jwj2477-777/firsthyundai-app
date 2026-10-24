@@ -10,7 +10,7 @@ let sourceClause='',polishedClause='';
 const ESCAPE=/[<>&]/g;
 function ending(line){
  let s=String(line||'').trim().replace(/^[①②③④⑤⑥⑦⑧⑨⑩]\s*/,'')
-  .replace(/^\d+[.)]\s*/,'').replace(/\s+/g,' ')
+  .replace(/^\d+[.)]\s*/,'').replace(/^(?:[▶→•*-]\s*)+/,'').replace(/\s+/g,' ')
   .replace(/[，]/g,',').replace(/[。]+$/,'').replace(/[.!?\s]+$/,'');
  if(!s)return '';
  // Standardization only; do not introduce parties, amounts, deadlines or remedies.
@@ -120,13 +120,17 @@ function addReviewNote(msg){
  }
 }
 function prepareSpecials(raw){
- const extracted=extractSpecial(raw);
- // A numbered section after a "특약:" header may already be identified by the language engine.
- const terms=extracted||v('terms');
- sourceClause=terms; polishedClause=polishTerms(terms);
- if(terms){
-  const result=E('terms');if(result)result.value=E('polishTerms')?.checked===false?terms:polishedClause;
-  if(polishedClause!==terms)addReviewNote('특약 표현을 정리했습니다. 원문과 비교해 의무·기한·주체 변경이 없는지 확인하세요.');
+ const dedicated=v('specialMemo').replace(/\r/g,'').trim();
+ const extracted=dedicated?'':extractSpecial(raw);
+ // A dedicated special-clause box is always interpreted as specials, without
+ // requiring "특약:" or guessing from the general memo. Use the same conservative
+ // sentence normalizer as detected clauses, keeping every distinct item.
+ const terms=dedicated||extracted||v('terms');
+ sourceClause=terms;polishedClause=polishTerms(terms);
+ const usePolished=E('polishTerms')?.checked!==false;
+ if(E('terms'))E('terms').value=terms?(usePolished?polishedClause:terms):'';
+ if(terms&&polishedClause!==terms){
+  addReviewNote('특약을 항목별로 정리했습니다. 금액·날짜·권리·의무 내용이 원문과 같은지 확인하세요.');
  }
  presentSpecials();
 }
@@ -169,34 +173,68 @@ const FIX_FIELD=[
 function missingField(error){
  return FIX_FIELD.find(([code])=>error===code)||FIX_FIELD.find(([code])=>error.includes(code))||[error,'rough','정보 확인'];
 }
-function focusMissing(code){
- const name=String(code||'').replace(/[^a-zA-Z]/g,'');
- if(!/^(?:property|address|unit|price|contractDeposit|advance|contractDate|balanceDate|monthlyRent|leaseDuration|bank|interim|interimDate|leaseStart|rough)$/.test(name))return;
- const panel=E('manualPanel');
- if(panel)panel.open=true;
- const target=E(name);
- if(target?.scrollIntoView)target.scrollIntoView({behavior:'smooth',block:'center'});
- if(target?.focus)target.focus();
+// Inline correction uses the original validated contract input fields.
+const QUICK_BANK=['bank','account','accountHolder'];
+const QUICK_NAMES=new Set(['property','address','unit','price','contractDeposit','advance','contractDate','balanceDate','monthlyRent','leaseDuration','interim','interimDate','leaseStart','bank','rough']);
+function quickName(error){return missingField(error)[1];}
+function inlineField(name,label){
+ const parts=name==='bank'?QUICK_BANK:[name];
+ return '<div class="contractInlineField"><strong>'+label+'</strong>'+
+  parts.map(part=>{
+   const title=part==='bank'?'은행명':part==='account'?'계좌번호':part==='accountHolder'?'예금주':'';
+   const type='text'; // Contract dates may be exact, approximate, or explicitly under discussion.
+   const inputMode=['price','contractDeposit','advance','monthlyRent','interim'].includes(part)?'decimal':'text';
+   return (title?'<label for="ct_quick_'+part+'">'+title+'</label>':'')+
+    '<input id="ct_quick_'+part+'" type="'+type+'" inputmode="'+inputMode+'" placeholder="'+(title||label)+'" maxlength="220" value="'+
+    String(E(part)?.value||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')+'">';
+  }).join('')+
+  '<button class="contractQuickApply" type="button" onclick="FirstHyundaiEasy.applyQuickField(&quot;'+name+'&quot;)">입력 적용</button></div>';
 }
 function renderQuickMissing(errors){
  const box=E('missingQuickFields');if(!box)return;
- const groups=new Map();
+ const grouped=new Map();
  (errors||[]).forEach(error=>{
-  const [,name,label]=missingField(error);
-  if(!groups.has(name))groups.set(name,label);
+  const name=quickName(error),label=missingField(error)[2];
+  if(QUICK_NAMES.has(name)&&!grouped.has(name))grouped.set(name,label);
  });
- const items=Array.from(groups);
- box.classList.toggle('hidden',!items.length);
+ const items=[...grouped];
+ box.classList?.toggle?.('hidden',!items.length);
  if(!items.length){box.innerHTML='';return;}
- box.innerHTML='<strong>누락·확인 항목 '+errors.length+'개 · 눌러서 수정</strong>'+
-  items.map(([name,label])=>'<button class="contractQuickFix" type="button" onclick="FirstHyundaiEasy.focusMissing(&quot;'+
-   name+'&quot;)">'+String(label).replace(/[<>&"]/g,'')+' <span aria-hidden="true">✎</span></button>').join('');
+ box.innerHTML='<h4>확인할 정보 '+errors.length+'개</h4><p>빠진 내용을 여기에서 입력하고 적용하세요.</p>'+
+  items.map(([name,label])=>inlineField(name,label)).join('');
 }
-function rebuildAfterClauses(){
- // Never silently grant consent or preserve stale approval for changed terms.
- if(!E('resultPanel')||E('resultPanel').classList.contains('hidden'))return;
+function applyQuickField(rawName){
+ const name=String(rawName||'');
+ if(!QUICK_NAMES.has(name))return false;
+ const parts=name==='bank'?QUICK_BANK:[name];
+ let filled=true;
+ for(const fieldName of parts){
+  const input=E('quick_'+fieldName),target=E(fieldName);
+  if(!input||!target)return false;
+  if(!String(input.value||'').trim())filled=false;
+ }
+ if(!filled){alert('입력할 내용을 확인해 주세요.');return false;}
+ for(const fieldName of parts){
+  const target=E(fieldName),input=E('quick_'+fieldName);
+  target.value=String(input.value).trim();
+  if(typeof Event==='function')target.dispatchEvent?.(new Event('change',{bubbles:true}));
+ }
  app.makePreview();
  refreshMissing();
+ return true;
+}
+function focusMissing(code){
+ // Compatibility with older contract shortcuts: stay within the inline section.
+ const fieldName=String(code||'').replace(/[^a-zA-Z]/g,'');
+ if(!QUICK_NAMES.has(fieldName))return;
+ const quick=E('quick_'+fieldName);
+ quick?.scrollIntoView?.({behavior:'smooth',block:'center'});
+ quick?.focus?.();
+}
+function updateSpecials(){
+ if(!E('resultPanel')||E('resultPanel').classList.contains('hidden'))return;
+ prepareSpecials(v('rough'));
+ app.makePreview();refreshMissing();
 }
 function refreshMissing(){
  const errors=app._test.collect().errors;
@@ -280,6 +318,6 @@ window.firstHyundaiContractSpeech=function(result){
   compose();
  }else oldSpeech(result);
 };
-window.FirstHyundaiEasy={refreshMissing,compose,afterManualEdit,openManual,focusMissing,rebuildAfterClauses,useOriginalTerms,usePolishedTerms,reset,
+window.FirstHyundaiEasy={refreshMissing,compose,afterManualEdit,openManual,focusMissing,applyQuickField,updateSpecials,useOriginalTerms,usePolishedTerms,reset,
  _test:{extractSpecial,polishTerms,ending}};
 })();

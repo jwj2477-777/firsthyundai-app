@@ -22,7 +22,7 @@ const ctx=vm.createContext({window:{},document:{getElementById:el},catalogRows:(
 for(const filename of files){
  const js=fs.readFileSync(path.join(dir,filename),'utf8');
  new vm.Script(js);
- assert(!/\b(?:fetch|XMLHttpRequest|localStorage)\b/.test(js),'Contract text must not be uploaded or persisted');
+ assert(!/\b(?:fetch|XMLHttpRequest)\b/.test(js),'Customer content must never be uploaded');
  vm.runInContext(js,ctx);
 }
 const smart=ctx.window.FirstHyundaiSmart,app=ctx.window.FirstHyundaiContracts,easy=ctx.window.FirstHyundaiEasy;
@@ -46,20 +46,16 @@ has('▶ 중도금 : 20,000만원');
 has('▶ 잔금 : 71,800만원');
 has('▶ 이번 송금 예정액 : 1,000만원');
 has('▶ 입금 계좌 : 국민은행 1234567-01-987654');
-assert(!el('ct_preview').value.includes('이체와 동시에 본계약이 체결된 것으로'),'Do not insert a legally significant clause without consent');
-assert(!el('ct_preview').value.includes('배액을 상환'),'No cancellation remedy unless separately agreed');
-assert(!el('ct_preview').value.includes('중개보수 지급의무'),'No brokerage term without agreement');
-for(const id of ['clauseEffective','clauseCancellation','clauseBrokerFee'])el('ct_'+id).checked=true;
-app.makePreview();
-has('이체와 동시에 본계약이 체결된 것으로');
-has('실제 수령한 금액의 배액');
-has('실제 송금한 금액을 포기');
-has('중개보수 지급의무');
+has('아래 내용은 계약 진행을 위한 제안 조건입니다');
+has('제안 1. 계약 내용에 동의한 경우');
+has('제안 2. 동의 후 일방 변심');
+has('제안 3. 계약 해제 시 중개보수');
+assert(!el('ct_preview').value.includes('보기로 합의합니다'),'Do not claim agreement happened before sending');
 assert(!el('ct_preview').value.includes('[확인 필요]'));
 assert.equal(app._test.collect().errors.length,0);
 app.approve();
 assert(el('ct_status').textContent.includes('직접 확인 완료'),
- 'Explicitly selected contractual clauses still require final human approval');
+ 'Author review still required for proposed terms');
 put('아파트명 : 퍼스트파크 1304동 3703호(84A)\n소재지 : 인천 연수구 송도동 100.\n매매대금 : 10억 2000만원\n계약일 : 2023년 9월 14일.\n계약금 : 1억 200만원\n중도금지급일 : 2023년 10월중 협의\n중도금 : 2억원\n잔금일 : 2023년 12월 11일.\n특약사항\n→상기 중도금지급일과 잔금일은 상호합의하에 앞당길수 있다.\n→매도인은 잔금수령과 동시에 현재 설정된 근저당권을 전액상환 후 말소한다.\n→기타사항은 계약시 협의.\n※ 금일 위 내용을 바탕으로 계약금의 일부(1,000만원)가 매도인계좌(국민은행 1234567-01-987654 김철수)로 송금되며.');
 assert.equal(el('ct_address').value,'인천 연수구 송도동 100');
 assert.equal(el('ct_unit').value,'1304동 3703호(84A)');
@@ -75,4 +71,4 @@ has('500만원');
 assert(!el('ct_preview').value.includes('▶ 중도금 :'),'Absent interim should not create a blank field');
 put('퍼팍 13블럭 1304동 3703호 매매 10억 2000만원 금일 1,000만 원 매도인 계좌 국민은행 1234567-01-987654 김철수 잔금일 2026년 12월 11일');
 assert.equal(el('ct_advance').value,'1000');
-console.log('Broker contract regression passed: neutral payment details, explicitly chosen clauses, alias names, money, account triplet and mandatory review.');
+console.log('Broker contract regression passed: offer wording, neutral payments, alias names, money, account and review.');

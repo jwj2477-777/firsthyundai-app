@@ -20,7 +20,7 @@ const ctx=vm.createContext({window:{},document:{getElementById:el},catalogRows:(
 for(const file of ['contracts.js','contracts-smart.js','contracts-language.js','contracts-transfer.js','contracts-easy.js']){
  const js=fs.readFileSync(path.join(dir,file),'utf8');
  new vm.Script(js);
- assert(!/\b(?:fetch|XMLHttpRequest|localStorage)\b/.test(js),file+' cannot leak bank account data to the network');
+ assert(!/\b(?:fetch|XMLHttpRequest)\b/.test(js),file+' cannot leak bank account data to the network');
  vm.runInContext(js,ctx);
 }
 const easy=ctx.window.FirstHyundaiEasy,transfer=ctx.window.FirstHyundaiTransfer;

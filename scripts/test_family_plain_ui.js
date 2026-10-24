@@ -17,7 +17,7 @@ for(const section of [favorites,news,contract])
 for(const phrase of [
  'Gemini·Groq가 핵심 내용을 요약',
  '금일 천만원',
- '일방 변심에 따른 해제 조건',
+ '이 안내는 거래당사자에게 계약 조건을 제안하고',
  '이 기능은 계약서 자체가 아니라'
 ]){
  const idx=html.indexOf(phrase);
@@ -34,7 +34,7 @@ for(const removed of [
 ])assert(!favorites.includes(removed),'Unnecessary verbose notification explanation removed');
 for(const phrase of [
  '뉴스 요약은 참고용입니다. 중요한 정보는 원문에서 확인하세요.',
- '실제 합의한 조건인지 확인해 주세요.'
+ '전송 후 동의 여부를 확인하세요.'
 ])assert(html.includes(phrase),'Keep short family safety instruction '+phrase);
 for(const k of [
  'id="favoriteTradeAlertEnabled"','id="favoriteTradeNativeEnabled"',

@@ -36,7 +36,7 @@ function E(id){
  return nodes.get(id);
 }
 E('ct_dealType').value='전세';
-const body={getAttribute:name=>name==='data-office-role'?'family':null};
+let activeRole='family';const body={getAttribute:name=>name==='data-office-role'?activeRole:null};
 const ctx=vm.createContext({window:{},document:{getElementById:E,body},alert:x=>warnings.push(x),
  confirm:()=>true,navigator:{},console,Date});
 vm.runInContext(base,ctx);vm.runInContext(easy,ctx);
@@ -52,16 +52,16 @@ app.refreshHighlightedNotice();
 assert(E('ct_previewHighlight').innerHTML.includes('contractNeedsCheck'));
 assert(app._test.previewContainsMissing());
 app.togglePreviewEdit();
-assert(E('ct_preview').classList.contains('contractEditing'),'Parent may explicitly edit original text');
-assert(E('ct_previewHighlight').classList.contains('hidden'),'No duplicate colored/textarea views');
-assert.equal(E('ct_togglePreviewEdit').attrs['aria-expanded'],'true');
-assert(E('ct_preview').focused);
+assert(!E('ct_preview').classList.contains('contractEditing'),'Family cannot directly edit generated template');
+activeRole='admin';
+app.togglePreviewEdit();
+assert(E('ct_preview').classList.contains('contractEditing'),'Admin may edit original notice');
 E('ct_preview').value='변경한 문장 [동·호수 확인 필요]';
 app.edited();
 app.togglePreviewEdit();
 assert(!E('ct_preview').classList.contains('contractEditing'));
 assert(E('ct_previewHighlight').innerHTML.includes('[동·호수 확인 필요]'));
-assert.equal(E('ct_togglePreviewEdit').attrs['aria-expanded'],'false');
+activeRole='family';
 assert.equal(app.canShare(),false,'No preview placeholders may be sent');
 app.approve();
 assert(E('ct_status').textContent.includes('빨간 확인 필요'));
@@ -76,4 +76,4 @@ assert(css.includes('border:3px solid #D94D24'),'Warning emphasis must be visibl
 assert(!E('ct_missing').textContent.includes('property')&&!E('ct_missing').textContent.includes('exclusiveArea'));
 assert(E('ct_fixMissing').classList.contains('hidden')===false);
 assert(E('ct_preview').value==='검토 완료 문구','Highlighted preview must NEVER modify SMS plaintext');
-console.log('Parent contract review passed: 1 clear warning; safe red placeholders; read/edit toggle; no unfinished sharing.');
+console.log('Parent contract review passed: safe red placeholders, family read-only, admin editing and no unfinished sharing.');

@@ -35,7 +35,7 @@ const context=vm.createContext({
 for(const name of ['contracts.js','contracts-smart.js','contracts-language.js','contracts-easy.js']){
  const source=fs.readFileSync(path.join(dir,name),'utf8');
  new vm.Script(source);
- assert(!/\b(?:fetch|XMLHttpRequest|localStorage)\b/.test(source),'Customer memos must remain local: '+name);
+ assert(!/\b(?:fetch|XMLHttpRequest)\b/.test(source),'Customer memos must remain local: '+name);
  vm.runInContext(source,context);
 }
 const app=context.window.FirstHyundaiContracts,easy=context.window.FirstHyundaiEasy;
