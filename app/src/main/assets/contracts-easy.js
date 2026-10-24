@@ -152,6 +152,9 @@ function simpleMissing(errors){
 // A missing item opens only its relevant manual field instead of asking parents
 // to search a long contract form. The original validation list remains authoritative.
 const FIX_FIELD=[
+ ['단지명','property','단지명'],
+ ['중도금 일정은 있는데 금액이 없음','interim','중도금 금액'],
+ ['중도금 지급일 오타 확인','interimDate','중도금 지급일'],
  ['아파트 단지 선택 확인','property','단지 선택'],
  ['소재지 도로명주소','address','소재지 주소'],
  ['동·호수','unit','동·호수'],
@@ -176,60 +179,93 @@ function missingField(error){
 // Inline correction uses the original validated contract input fields.
 const QUICK_BANK=['bank','account','accountHolder'];
 const QUICK_NAMES=new Set(['property','address','unit','price','contractDeposit','advance','contractDate','balanceDate','monthlyRent','leaseDuration','interim','interimDate','leaseStart','bank','rough']);
+let activeQuick='';
+const quickDraft=new Map(); // Volatile only: never persist client/payment information.
 function quickName(error){return missingField(error)[1];}
-function inlineField(name,label){
- const parts=name==='bank'?QUICK_BANK:[name];
- return '<div class="contractInlineField"><strong>'+label+'</strong>'+
-  parts.map(part=>{
-   const title=part==='bank'?'은행명':part==='account'?'계좌번호':part==='accountHolder'?'예금주':'';
-   const type='text'; // Contract dates may be exact, approximate, or explicitly under discussion.
-   const inputMode=['price','contractDeposit','advance','monthlyRent','interim'].includes(part)?'decimal':'text';
-   return (title?'<label for="ct_quick_'+part+'">'+title+'</label>':'')+
-    '<input id="ct_quick_'+part+'" type="'+type+'" inputmode="'+inputMode+'" placeholder="'+(title||label)+'" maxlength="220" value="'+
-    String(E(part)?.value||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')+'">';
-  }).join('')+
-  '<button class="contractQuickApply" type="button" onclick="FirstHyundaiEasy.applyQuickField(&quot;'+name+'&quot;)">입력 적용</button></div>';
-}
-function renderQuickMissing(errors){
- const box=E('missingQuickFields');if(!box)return;
+function quickItems(errors){
  const grouped=new Map();
  (errors||[]).forEach(error=>{
   const name=quickName(error),label=missingField(error)[2];
   if(QUICK_NAMES.has(name)&&!grouped.has(name))grouped.set(name,label);
  });
- const items=[...grouped];
+ return grouped;
+}
+function rememberQuickEdits(){
+ if(!activeQuick)return;
+ const parts=activeQuick==='bank'?QUICK_BANK:[activeQuick];
+ for(const part of parts){
+  const input=E('quick_'+part);
+  if(input)quickDraft.set(part,String(input.value||''));
+ }
+}
+function safeInputValue(value){
+ return String(value||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function inlineField(name,label){
+ const parts=name==='bank'?QUICK_BANK:[name];
+ return '<div class="contractInlineField"><strong>'+label+'</strong>'+
+  parts.map(part=>{
+   const title=part==='bank'?'은행명':part==='account'?'계좌번호':part==='accountHolder'?'예금주':label;
+   const inputMode=['price','contractDeposit','advance','monthlyRent','interim'].includes(part)?'decimal':'text';
+   const current=quickDraft.has(part)?quickDraft.get(part):E(part)?.value;
+   return '<label for="ct_quick_'+part+'">'+title+'</label>'+
+    '<input id="ct_quick_'+part+'" aria-label="'+title+'" type="text" inputmode="'+inputMode+'" placeholder="'+title+'" maxlength="220" value="'+safeInputValue(current)+'">';
+  }).join('')+
+  '<button class="contractQuickApply" type="button" onclick="FirstHyundaiEasy.applyQuickField(&quot;'+name+'&quot;)">입력 적용</button></div>';
+}
+function renderQuickMissing(errors){
+ const box=E('missingQuickFields');if(!box)return;
+ rememberQuickEdits();
+ const grouped=quickItems(errors),items=[...grouped];
  box.classList?.toggle?.('hidden',!items.length);
- if(!items.length){box.innerHTML='';return;}
- box.innerHTML='<h4>확인할 정보 '+errors.length+'개</h4><p>빠진 내용을 여기에서 입력하고 적용하세요.</p>'+
-  items.map(([name,label])=>inlineField(name,label)).join('');
+ if(!items.length){box.innerHTML='';activeQuick='';quickDraft.clear();return;}
+ if(!grouped.has(activeQuick))activeQuick=items[0][0];
+ const choices=items.map(([name,label])=>
+  '<button type="button" class="contractQuickPick'+(name===activeQuick?' is-current':'')+
+  '" aria-pressed="'+(name===activeQuick?'true':'false')+
+  '" onclick="FirstHyundaiEasy.showQuickField(&quot;'+name+'&quot;)">'+label+'</button>').join('');
+ box.innerHTML='<h4>확인할 정보 '+errors.length+'개</h4>'+
+  '<div class="contractQuickPickers" role="group" aria-label="확인할 계약정보 선택">'+choices+'</div>'+
+  inlineField(activeQuick,grouped.get(activeQuick));
+}
+function showQuickField(rawName){
+ const name=String(rawName||''),items=quickItems(app._test.collect().errors);
+ if(!items.has(name))return false;
+ rememberQuickEdits();
+ activeQuick=name;
+ renderQuickMissing(app._test.collect().errors);
+ const first=name==='bank'?'bank':name;
+ E('quick_'+first)?.focus?.();
+ return true;
 }
 function applyQuickField(rawName){
  const name=String(rawName||'');
  if(!QUICK_NAMES.has(name))return false;
+ rememberQuickEdits();
  const parts=name==='bank'?QUICK_BANK:[name];
- let filled=true;
- for(const fieldName of parts){
-  const input=E('quick_'+fieldName),target=E(fieldName);
-  if(!input||!target)return false;
-  if(!String(input.value||'').trim())filled=false;
+ const updated=new Map();
+ for(const part of parts){
+  const input=E('quick_'+part),target=E(part);
+  if(!target)return false;
+  const typed=input?String(input.value||''):String(quickDraft.get(part)||'');
+  if(!typed.trim()){alert('입력할 내용을 확인해 주세요.');input?.focus?.();return false;}
+  updated.set(part,typed.trim());
  }
- if(!filled){alert('입력할 내용을 확인해 주세요.');return false;}
- for(const fieldName of parts){
-  const target=E(fieldName),input=E('quick_'+fieldName);
-  target.value=String(input.value).trim();
-  if(typeof Event==='function')target.dispatchEvent?.(new Event('change',{bubbles:true}));
+ for(const [part,value] of updated){
+  const target=E(part);
+  target.value=value;
+  window.FirstHyundaiSmart?.changed?.({target});
+  quickDraft.delete(part);
  }
+ activeQuick='';
  app.makePreview();
  refreshMissing();
  return true;
 }
 function focusMissing(code){
- // Compatibility with older contract shortcuts: stay within the inline section.
- const fieldName=String(code||'').replace(/[^a-zA-Z]/g,'');
- if(!QUICK_NAMES.has(fieldName))return;
- const quick=E('quick_'+fieldName);
- quick?.scrollIntoView?.({behavior:'smooth',block:'center'});
- quick?.focus?.();
+ const name=String(code||'').replace(/[^a-zA-Z]/g,'');
+ if(!QUICK_NAMES.has(name))return;
+ showQuickField(name);
 }
 function updateSpecials(){
  if(!E('resultPanel')||E('resultPanel').classList.contains('hidden'))return;
@@ -284,7 +320,7 @@ function openManual(){
  if(id)E(lookup[id])?.focus?.();
 }
 function reset(){
- sourceClause='';polishedClause='';
+ sourceClause='';polishedClause='';activeQuick='';quickDraft.clear();
  if(E('oneTapSummary'))E('oneTapSummary').textContent='메모 한 번으로 계약문자를 만들어 보세요.';
  if(E('termOriginal'))E('termOriginal').textContent='';
  if(E('termPolished'))E('termPolished').textContent='';
@@ -318,6 +354,6 @@ window.firstHyundaiContractSpeech=function(result){
   compose();
  }else oldSpeech(result);
 };
-window.FirstHyundaiEasy={refreshMissing,compose,afterManualEdit,openManual,focusMissing,applyQuickField,updateSpecials,useOriginalTerms,usePolishedTerms,reset,
+window.FirstHyundaiEasy={refreshMissing,compose,afterManualEdit,openManual,focusMissing,showQuickField,applyQuickField,updateSpecials,useOriginalTerms,usePolishedTerms,reset,
  _test:{extractSpecial,polishTerms,ending}};
 })();
