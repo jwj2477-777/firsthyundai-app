@@ -1,5 +1,5 @@
 'use strict';
-/* v2.0.59: premium motion is CSS + disposable ripple, never an app workflow change. */
+/* v2.0.60: premium motion is CSS + disposable ripple, never an app workflow change. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const base=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(base,p),'utf8');
 const html=read('app/src/main/assets/index.html'),css=read('app/src/main/assets/ui-v2.css'),

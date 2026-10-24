@@ -1,4 +1,4 @@
-/* v2.0.59 · Touch micro-interactions for the FirstHyundai Android WebView.
+/* v2.0.60 · Touch micro-interactions for the FirstHyundai Android WebView.
  * Visual-only: delegated passive pointer listener, zero navigation/contract effects.
  * CSS owns the press and ripple geometry. Respect Android reduced-motion settings. */
 (function(){
@@ -36,5 +36,5 @@
   stats.waves++;
  }
  document.addEventListener('pointerdown',touch,{passive:true});
- window.FirstHyundaiMotion={version:'2.0.59',_test:{touch,reduced,stats}};
+ window.FirstHyundaiMotion={version:'2.0.60',_test:{touch,reduced,stats}};
 })();
