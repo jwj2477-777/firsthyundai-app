@@ -10,6 +10,8 @@ assert(css.includes('body.fhd-native-handoff header .officeMark')&&css.includes(
 const native=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/SmoothBrandOverlay.java'),'utf8');
 assert(native.includes('R.drawable.ic_launcher_badge')&&native.includes('DURATION=680L')&&native.includes('getLocationOnScreen'));
 assert(native.includes('scaleX(scale).scaleY(scale)'),'Logo scales uniformly, preserving aspect ratio');
+assert(native.includes('layoutAttempts>8'),'Prevent infinite layout retries on slow devices');
+assert(main.includes('ignored->{')&&main.includes('overlay.detach()'),'Reveal live HTML first, then remove the native brand to prevent a visible blink');
 assert(css.includes('.fhd-bridge-backdrop')&&css.includes('linear-gradient(135deg,#03212A,#095B5E)'));
 assert(main.includes('nativeHeaderRects?.()')&&main.includes('overlay.moveToHeader('));
 assert(main.includes('view.setAlpha(1f)')&&main.includes('ANIMATOR_DURATION_SCALE'));

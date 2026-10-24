@@ -107,10 +107,24 @@ public class MainActivity extends Activity {
                     // Manual tap skips the animation without leaving hidden
                     // header elements or an unresponsive transparent layer.
                     final Runnable done=()->{
-                        if(nativeHandoff==overlay)nativeHandoff=null;
-                        if(web!=null)web.evaluateJavascript(
+                        if(web==null||isFinishing()||isDestroyed()){
+                            if(nativeHandoff==overlay)nativeHandoff=null;
+                            overlay.detach();
+                            return;
+                        }
+                        // Reveal the real HTML header before removing the last
+                        // native logo frame; otherwise a one-frame gap makes the
+                        // supposedly shared logo appear to blink.
+                        web.evaluateJavascript(
                             "window.FirstHyundaiMotion?.finishNativeHandoff?.();"+
-                            "window.FirstHyundaiMotion?.playEntrance?.()",null);
+                            "window.FirstHyundaiMotion?.playEntrance?.()",ignored->{
+                                if(nativeHandoff==overlay)nativeHandoff=null;
+                                overlay.detach();
+                            });
+                        overlay.postDelayed(()->{
+                            if(nativeHandoff==overlay)nativeHandoff=null;
+                            overlay.detach();
+                        },240);
                     };
                     overlay.setOnClickListener(v->overlay.finish(done));
                     overlay.moveToHeader(positions,viewport,view,done);

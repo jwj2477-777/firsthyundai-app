@@ -28,6 +28,7 @@ final class SmoothBrandOverlay extends FrameLayout {
     private final TextView subtitle;
     private final View ring,rule;
     private boolean finished;
+    private int layoutAttempts;
     private static final long DURATION=680L;
     private final PathInterpolator natural=new PathInterpolator(.22f,1f,.36f,1f);
 
@@ -109,7 +110,8 @@ final class SmoothBrandOverlay extends FrameLayout {
         // Wait for the native emblem to be laid out, so its starting center
         // exactly matches the original LockActivity welcome center.
         if(emblem.getWidth()==0||title.getWidth()==0){
-            post(()->moveToHeader(rects,viewportWidth,web,done));
+            if(++layoutAttempts>8){fadeOut(done);return;}
+            postDelayed(()->moveToHeader(rects,viewportWidth,web,done),16);
             return;
         }
         View[] parts={emblem,title,subtitle};
@@ -164,6 +166,9 @@ final class SmoothBrandOverlay extends FrameLayout {
         ring.animate().cancel();
         animate().cancel();
         if(done!=null)done.run();
+        else detach();
+    }
+    void detach(){
         if(getParent() instanceof ViewGroup)((ViewGroup)getParent()).removeView(this);
     }
     boolean isFinished(){return finished;}
