@@ -29,6 +29,7 @@ on:
       - 'scripts/test_new_trade_clarity.js'
       - 'scripts/test_navigation_clarity.js'
       - 'scripts/test_unified_top_layout.js'
+      - 'scripts/test_page_title_parity.js'
       - 'scripts/test_segmented_switch_unity.js'
       - 'scripts/test_selection_flow.js'
       - 'scripts/test_premium_visual.js'
@@ -167,6 +168,7 @@ jobs:
           node scripts/test_color_input_roles.js
           node scripts/test_navigation_clarity.js
           node scripts/test_unified_top_layout.js
+          node scripts/test_page_title_parity.js
           node scripts/test_segmented_switch_unity.js
           node scripts/test_ui_v2.js
           node scripts/test_premium_visual.js
@@ -278,22 +280,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.71 quiet fluid background selection APK
+      - name: Publish v2.0.72 unified section typography APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.71.apk
-          unzip -t FirstHyundai-v2.0.71.apk | grep 'No errors detected'
-          if gh release view v2.0.71 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.72.apk
+          unzip -t FirstHyundai-v2.0.72.apk | grep 'No errors detected'
+          if gh release view v2.0.72 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.71 FirstHyundai-v2.0.71.apk \
+            gh release create v2.0.72 FirstHyundai-v2.0.72.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.71 · 초기 튀는 터치 효과 제거' \
-              --notes '중복되던 기존 터치 원형 물결, 버튼 누름 축소·튀어오름, 페이지 진입 페이드, 메뉴 카드 등장 동작 및 팝업의 튀는 효과를 제거했습니다. 버튼 실제 문자와 아이콘은 고정하고 같은 급 버튼의 색상만 물처럼 흐르는 전환을 유지합니다. 시작화면 FHD 로고의 메인 헤더 이동은 유지합니다. 기존 실거래·계약·알림·업데이트 기능은 변경하지 않았습니다. v2.0.71/build122.'
+              --title '퍼스트현대 v2.0.72 · 동급 제목·설명 글자 크기 통일' \
+              --notes '뉴스·아파트정보·아파트 실거래·오피스텔 실거래·관심단지·새거래의 동급 페이지 제목/메타 글자 크기·굵기·줄간격을 공통 CSS 규칙으로 통일했습니다. 과거 실거래에만 남아 있던 13px 우선순위 규칙과 아파트·오피스텔만 22px로 키우던 덮어쓰기를 제거했습니다. 제목 20px(좁은 화면 19px), 설명 14px, 2줄 여백을 동일하게 설정했습니다. 실거래 최신 수집정보, 뉴스 기사 수, 실패 정보와 새 물 흐르는 버튼 색상 애니메이션은 유지합니다. 여섯 화면을 검사하는 회귀 테스트 추가. v2.0.72/build123.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.71 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.71 --apk FirstHyundai-v2.0.71.apk
+          gh release upload v2.0.72 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.72 --apk FirstHyundai-v2.0.72.apk
