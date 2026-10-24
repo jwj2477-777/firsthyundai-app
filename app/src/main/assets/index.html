@@ -554,7 +554,7 @@ body.apartmentSheetActive{overflow:hidden}
    <button type="button" class="btn contractOneTap" onclick="FirstHyundaiEasy.compose()">메모 정리하고 다음 단계 →</button>
    <button type="button" class="btn alt contractVoice" onclick="FirstHyundaiContracts.voice()">🎙 음성으로 메모 입력</button>
   </div>
-  <label class="contractPolishToggle"><input id="ct_polishTerms" type="checkbox" checked> 특약 문장 자동 정리</label>
+  <label class="contractPolishToggle"><input id="ct_polishTerms" type="checkbox" checked onchange="FirstHyundaiEasy.updateSpecials()"> 특약 문장 자동 정리</label>
   <div id="ct_oneTapSummary" class="contractOneTapStatus" role="status" aria-live="polite">메모 한 번으로 계약문자를 만들어 보세요.</div>
   <details id="ct_reviewDetails" class="contractCompactDetails"><summary>인식한 정보와 추가 확인 내용</summary>
     <div id="ct_recognized" class="contractReview" role="status" aria-live="polite">인식한 항목이 여기에 표시됩니다.</div>
