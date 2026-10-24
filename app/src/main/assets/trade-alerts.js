@@ -61,7 +61,15 @@ function notifyPhone(items){
  try{window.FirstHyundaiNative?.postFavoriteTradeNotification?.(Math.min(items.length,100),detail.slice(0,240));}
  catch(e){/* The in-app popup remains available even without Android permission. */}
 }
+function syncBell(){
+ const button=get('favoriteAlertButton');if(!button)return;
+ const n=enabled()?pending.length:0;
+ if(n)button.classList?.add?.('hasNewTrade');
+ else button.classList?.remove?.('hasNewTrade');
+ button.setAttribute?.('aria-label',n?'관심단지 알림 설정, 새 실거래 '+n+'건':'관심단지 알림 설정');
+}
 function syncOption(){
+ syncBell();
  const checkbox=get('favoriteTradeAlertEnabled');
  if(checkbox)checkbox.checked=enabled();
  syncNativeStatus();
@@ -73,6 +81,7 @@ function setEnabled(flag){
  syncOption();
 }
 function hide(){
+ syncBell();
  const box=get('favoriteTradeAlertBanner');
  if(box)box.classList.add('hidden');
  const dialog=get('favoriteTradeAlertDialog');
@@ -146,6 +155,7 @@ function renderDialog(items,isPreview=false){
 }
 function render(){
  if(!pending.length||!enabled()){hide();return;}
+ syncBell();
  const banner=get('favoriteTradeAlertBanner'),count=get('favoriteTradeAlertCount');
  if(count)count.textContent='새 실거래 '+pending.length+'건';
  const names=[...new Set(pending.map(x=>x.group.label))];
@@ -157,7 +167,7 @@ function render(){
 function tryPopup(manual=false){
  const dialog=get('favoriteTradeAlertDialog');
  if(!dialog||(!previewing&&(!pending.length||!enabled()))||dialog.open)return;
- const others=['noteDialog','complexEditor'].some(id=>get(id)?.open);
+ const others=['noteDialog','complexEditor','favoriteAlertSettingsDialog'].some(id=>get(id)?.open);
  if(others)return;
  if(!manual&&(document.activeElement?.matches?.('input,textarea,select,[contenteditable="true"]')||
    document.body?.classList?.contains?.('apartmentSheetActive')||
@@ -165,6 +175,22 @@ function tryPopup(manual=false){
  try{if(typeof dialog.showModal==='function')dialog.showModal();}catch(e){/* banner remains actionable */}
 }
 function open(){if(!pending.length)return;previewing=false;render();tryPopup(true);}
+function openSettings(){
+ const dialog=get('favoriteAlertSettingsDialog'),button=get('favoriteAlertButton');
+ if(!dialog||dialog.open)return;
+ // Never place the trade-detail popup over the settings popup.
+ if(get('favoriteTradeAlertDialog')?.open)later();
+ syncOption();
+ try{dialog.showModal?.();button?.setAttribute?.('aria-expanded','true');}
+ catch(e){button?.setAttribute?.('aria-expanded','false');}
+}
+function closeSettings(){
+ const dialog=get('favoriteAlertSettingsDialog');
+ if(dialog?.open)dialog.close?.();
+ get('favoriteAlertButton')?.setAttribute?.('aria-expanded','false');
+ get('favoriteAlertButton')?.focus?.();
+}
+function previewFromSettings(){closeSettings();preview();}
 function preview(){
  if(['noteDialog','complexEditor'].some(id=>get(id)?.open))return;
  previewing=true;
@@ -209,6 +235,9 @@ function process(payload,context){
  return {status:initialized?'updated':'baseline',newCount:fresh.length};
 }
 get('favoriteTradeAlertDialog')?.addEventListener?.('close',()=>{previewing=false;});
-window.FirstHyundaiTradeAlerts={process,setEnabled,enabled,syncOption,syncNativeStatus,setNativeEnabled,open,view,dismiss,later,preview,stableId,
+get('favoriteAlertSettingsDialog')?.addEventListener?.('close',()=>{
+ get('favoriteAlertButton')?.setAttribute?.('aria-expanded','false');
+});
+window.FirstHyundaiTradeAlerts={process,setEnabled,enabled,syncOption,syncNativeStatus,setNativeEnabled,open,view,dismiss,later,preview,openSettings,closeSettings,previewFromSettings,stableId,
  _test:{stableId,select,formatAmount,hide}};
 })();

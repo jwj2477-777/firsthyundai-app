@@ -273,22 +273,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.56 confirm-to-image streamlined contract APK
+      - name: Publish v2.0.57 global favorite-alert header shortcut APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.56.apk
-          unzip -t FirstHyundai-v2.0.56.apk | grep 'No errors detected'
-          if gh release view v2.0.56 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.57.apk
+          unzip -t FirstHyundai-v2.0.57.apk | grep 'No errors detected'
+          if gh release view v2.0.57 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.56 FirstHyundai-v2.0.56.apk \
+            gh release create v2.0.57 FirstHyundai-v2.0.57.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.56 · 계약 확인에서 이미지 공유까지 단순화' \
-              --notes '계약 확인 완료 이후 바로 아래 단독 안내 이미지 확인·공유 버튼으로 이어지도록 단순화했습니다. 문자 복사·문자/카톡 공유·새 계약 시작 및 반복 설명은 기본 접힘 상태의 기타 기능에서만 표시합니다. 이미지 공유 이전 승인 및 개인정보/계좌 검증을 유지하며 새 메모·새 계약 시작 시 펼침 상태도 초기화합니다. 기존 계약문구, 아파트명/동호수 별도표시, 자동인식, 가족모드/관리자모드, 기존 APK 고정 서명 유지. v2.0.56/build107.'
+              --title '퍼스트현대 v2.0.57 · 상단 알림 아이콘·설정 이동' \
+              --notes '관심 14개 단지의 알림 설정을 실거래 목록 내부에서 제거하고, 어느 화면에서든 접근 가능한 가족·관리자 모드 옆 종 아이콘으로 옮겼습니다. 종 아이콘을 누르면 기존 팝업 알림 켜기, 휴대폰 알림센터 알림 허용, 미리보기 설정창이 열립니다. 새 거래가 남아 있을 때만 종에 작은 점을 표시합니다. 업데이트 알림 배너는 새 버전 감지·설치·닫기 버튼 구조를 유지하며 기존 보안 서명 검증과 직접 설치도 보존했습니다. v2.0.57/build108.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.56 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.56 --apk FirstHyundai-v2.0.56.apk
+          gh release upload v2.0.57 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.57 --apk FirstHyundai-v2.0.57.apk

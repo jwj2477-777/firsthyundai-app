@@ -2215,3 +2215,61 @@ body:not([data-office-role="admin"]) #contracts #ct_preview.contractEditing{disp
  margin:8px 12px 13px;font-size:13px;line-height:1.6;
 }
 @media(max-width:420px){#contracts #ct_resultPanel .contractExtraActions .contractExtraButtons{grid-template-columns:1fr}}
+
+
+/* v2.0.57 — small global notification entry beside family/admin mode. */
+header #modeBar{gap:7px}
+header #favoriteAlertButton{
+ appearance:none;display:inline-flex;align-items:center;justify-content:center;
+ position:relative;flex:0 0 43px;width:43px;height:43px;min-width:43px;min-height:43px;
+ padding:0;border:1.5px solid #CADFDA;border-radius:12px;
+ background:#F3FAF8;color:#23545A;cursor:pointer;box-shadow:none;
+}
+header #favoriteAlertButton svg{display:block;width:22px;height:22px}
+header #favoriteAlertButton:focus-visible{outline:3px solid #E8CF8A;outline-offset:2px}
+header #favoriteAlertButton .headerAlertDot{display:none;position:absolute;top:6px;right:6px;
+ width:8px;height:8px;border-radius:50%;background:#CF6B27;border:1.5px solid white}
+header #favoriteAlertButton.hasNewTrade .headerAlertDot{display:block}
+header #modeBar #roleButton{min-height:43px}
+/* Preserve the wordmark on narrow screens; keep title readable and secondary subtitle unobtrusive. */
+@media(max-width:400px){
+ header #modeBar{gap:5px}
+ header #favoriteAlertButton{flex-basis:40px;width:40px;height:42px;min-width:40px;min-height:42px;border-radius:10px}
+ header #modeBar #roleButton{min-height:42px;padding:6px 7px;font-size:11px}
+ header .brandSubtitle{font-size:8px;letter-spacing:0}
+}
+@media(max-width:340px){
+ header .brandSubtitle{display:none}
+ header .brandWordmark h1{font-size:20px}
+ header #modeBar #roleButton{font-size:10px}
+}
+/* The preferences move out of the long favorites list into a proper modal. */
+.favoriteAlertSettingsDialog{
+ box-sizing:border-box;width:min(440px,calc(100% - 24px));max-height:calc(100dvh - 32px);
+ margin:auto;padding:0;overflow-y:auto;border:1.5px solid #C3DAD5;
+ border-radius:19px;background:#FFFFFF;color:#284750;
+ box-shadow:0 22px 66px #123A4240;
+}
+.favoriteAlertSettingsDialog::backdrop{background:#102E3970}
+.favoriteAlertSettingsDialog .alertSettingsHeader{
+ display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+ padding:20px 19px 15px;border-bottom:1px solid #DEEBE7;background:#F5FAF8;
+}
+.favoriteAlertSettingsDialog .alertSettingsEyebrow{color:#577C7B;font-size:12px;font-weight:750}
+.favoriteAlertSettingsDialog h2{margin:5px 0 0;color:#1B545B;font-size:21px;line-height:1.35}
+.favoriteAlertSettingsDialog .alertSettingsClose{
+ display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;
+ padding:0;border:1px solid #C9DCD6;border-radius:11px;
+ background:#FFFFFF;color:#385A5C;font:inherit;font-size:26px;cursor:pointer;
+}
+.favoriteAlertSettingsDialog .alertSettingsContent{padding:12px 19px 18px}
+.favoriteAlertSettingsDialog .favoriteTradeAlertSwitch{display:flex;align-items:center;gap:12px;
+ padding:12px 1px;min-height:51px;border-bottom:1px solid #E8F0ED;color:#2A4D52;
+ font-size:15px;font-weight:750}
+.favoriteAlertSettingsDialog .favoriteTradeAlertSwitch input{width:23px;height:23px;min-width:23px}
+.favoriteAlertSettingsDialog .favoriteTradeAlertHint{margin:11px 0 14px;font-size:13px;line-height:1.6;color:#5F7377}
+.favoriteAlertSettingsDialog .alertPreviewButton{display:block;width:100%;min-height:50px;
+ margin:8px 0 0;border:1.5px solid #BFD8D1;border-radius:11px;
+ background:#F5FAF8;color:#205B5B;font-size:14px;font-weight:800}
+.favoriteAlertSettingsDialog .alertSettingsClose:focus-visible,
+.favoriteAlertSettingsDialog .alertPreviewButton:focus-visible{outline:3px solid #96D4C6;outline-offset:2px}
