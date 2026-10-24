@@ -2607,7 +2607,10 @@ body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading>div{
  #officetel #officeTypeBar>button,
  #nearbyDetails #nearbyTypeBar>button
 ){
- --fhd-native-fill:0%;
+ /* No --fhd-native-fill here: @property initial-value is 0%.
+    A :is() base rule including two-ID trade selectors previously beat
+    the lower-specificity news [aria-selected="true"] rule, pinning
+    news selection at 0% and completely hiding its animation. */
  --fhd-native-ink:#285970;
  --fhd-native-idle:#F8FAF9;
  --fhd-native-direction:to right;
