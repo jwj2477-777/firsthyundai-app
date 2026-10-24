@@ -77,8 +77,10 @@ const win={innerWidth:415,innerHeight:980,requestAnimationFrame,
 };
 vm.runInNewContext(code,{window:win,document:doc,Math,Number,Object,Array,Map});
 const api=win.FirstHyundaiSelectionFlow;
-assert.equal(api.version,'7.0.0');
+assert.equal(api.version,'8.0.0');
 assert.equal(api._test.buttons(nav,'top-five').length,5);
+assert.equal(typeof api.beginDirect,'function');
+assert.equal(typeof api.endDirect,'function');
 assert(!/intermediates\(|passPaint\(|mids\b/.test(code),'No intermediate tab may be animated');
 const before=buttons.map(b=>({text:b.innerHTML,rect:{...b.rect}}));
 click({target:buttons[2],defaultPrevented:false});selected=2;
