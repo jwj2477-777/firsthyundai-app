@@ -122,13 +122,15 @@ function addReviewNote(msg){
 function prepareSpecials(raw){
  const dedicated=v('specialMemo').replace(/\r/g,'').trim();
  const extracted=dedicated?'':extractSpecial(raw);
- // Dedicated special clauses are a direct input, never dependent on parser recognition.
- // Preserve exactly what was written; do not auto-polish agreed wording.
+ // A dedicated special-clause box is always interpreted as specials, without
+ // requiring "특약:" or guessing from the general memo. Use the same conservative
+ // sentence normalizer as detected clauses, keeping every distinct item.
  const terms=dedicated||extracted||v('terms');
- sourceClause=terms;polishedClause=dedicated?terms:polishTerms(terms);
- if(terms){
-  const result=E('terms');if(result)result.value=dedicated||E('polishTerms')?.checked===false?terms:polishedClause;
-  if(!dedicated&&polishedClause!==terms)addReviewNote('특약 표현을 정리했습니다. 원문과 비교해 의무·기한·주체 변경이 없는지 확인하세요.');
+ sourceClause=terms;polishedClause=polishTerms(terms);
+ const usePolished=E('polishTerms')?.checked!==false;
+ if(E('terms'))E('terms').value=terms?(usePolished?polishedClause:terms):'';
+ if(terms&&polishedClause!==terms){
+  addReviewNote('특약을 항목별로 정리했습니다. 금액·날짜·권리·의무 내용이 원문과 같은지 확인하세요.');
  }
  presentSpecials();
 }
