@@ -36,7 +36,7 @@ function item(tag='button'){
  };
  return el;
 }
-const group=item('div');
+const group=item('div');group.id='newsCategoryTabs';
 group.rect={left:10,top:200,width:375,height:90,right:385,bottom:290};
 const buttons=[0,1].map(i=>{
  const b=item(),x=20+i*177;
@@ -48,6 +48,7 @@ const buttons=[0,1].map(i=>{
 group.children=buttons;
 const document={
  addEventListener(k,fn,opt){if(k==='click'){click=fn;assert.equal(opt.capture,true)}},
+ getElementById:id=>id==='newsCategoryTabs'?group:null,
  querySelector:s=>s==='.page:not(.hidden) .newsCategoryTabs'?group:null
 };
 const window={innerWidth:410,innerHeight:860,
@@ -62,8 +63,10 @@ const window={innerWidth:410,innerHeight:860,
 vm.runInNewContext(code,{window,document,Math,Map,Object,Array,Number});
 function frame(t){const v=queue.shift();assert(v);if(!cancelled.has(v.id))v.fn(t)}
 const before=buttons.map(b=>({...b.rect,text:b.innerHTML}));
-click({target:buttons[1],defaultPrevented:false});
-selected=1;frame(0);
+const API=window.FirstHyundaiSelectionFlow;
+API.beginDirect('newsCategoryTabs',1);
+selected=1; // switchNewsPane updates aria-selected synchronously
+API.endDirect('newsCategoryTabs',1);
 assert.equal(window.FirstHyundaiSelectionFlow._test.stats.news,1,
  'Lower news switch MUST animate');
 assert.equal(group.children.length,2);
@@ -80,4 +83,4 @@ assert.equal(window.FirstHyundaiSelectionFlow._test.stats.finished,1);
 assert.equal(buttons[0].style.getPropertyValue('background'),'');
 assert.equal(buttons[1].style.getPropertyValue('background'),'');
 assert.deepEqual(buttons.map(b=>({...b.rect,text:b.innerHTML})),before);
-console.log('News/subscription switch paints selected color on ACTUAL buttons, preserves size and metadata spacing.');
+console.log('Direct news/subscription update: exact aria-selected commit animates backgrounds; title and typography unaffected.');
