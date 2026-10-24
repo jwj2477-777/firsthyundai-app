@@ -77,7 +77,7 @@ const win={innerWidth:415,innerHeight:980,requestAnimationFrame,
 };
 vm.runInNewContext(code,{window:win,document:doc,Math,Number,Object,Array,Map});
 const api=win.FirstHyundaiSelectionFlow;
-assert.equal(api.version,'12.0.0');
+assert.equal(api.version,'13.0.0');
 assert.equal(api._test.buttons(nav,'top-five').length,5);
 assert(!('beginDirect' in api)&&!('endDirect' in api),'Removed non-working direct-hook branch');
 assert.equal(api._test.viaIndex('top-five',0,2),1);
@@ -160,3 +160,17 @@ assert.equal(buttons[1].style.getPropertyPriority('background'),'important',
 frame(4000);frame(4315);complete(4630);
 assert(buttons.every(b=>!b.style.getPropertyValue('background')));
 console.log('Native-event ordering: capture snapshot → actual onclick → bubble paint; no capture microtask race.');
+
+// Four-way same-row journeys can pass through MORE than one peer, in order.
+const aligned=Array.from({length:4},(_,i)=>{
+ const b=node('button');b.rect={left:10+i*90,top:500,width:80,height:50,right:90+i*90,bottom:550};return b;
+});
+assert.equal(api._test.viaIndices('trade-types',0,3,aligned).join(','),'1,2');
+assert.equal(api._test.viaIndices('trade-types',3,0,aligned).join(','),'2,1');
+assert.equal(api._test.viaIndices('apartments',0,2,aligned).join(','),'1');
+assert.equal(api._test.viaIndices('new-types',2,0,aligned).join(','),'1');
+assert.equal(api._test.viaIndices('trade-types',0,1,aligned).length,0);
+aligned[1].rect.top=600;aligned[1].rect.bottom=650;
+assert.equal(api._test.viaIndices('trade-types',0,3,aligned).join(','),'2','Wrapped rows never receive a wash');
+assert.equal(api._test.viaIndices('trade-types',0,1,aligned).length,0);
+console.log('Skipped-peer path: all intermediate buttons in travel order; adjacent and other visual rows excluded.');

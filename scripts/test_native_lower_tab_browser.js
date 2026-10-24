@@ -13,7 +13,7 @@ async function runBrowserTests(){
  const check=(label,condition)=>{checks.push(label);if(!condition)throw Error(label)};
  const api=window.FirstHyundaiSelectionFlow._test;
  const bg=b=>getComputedStyle(b).backgroundImage;
- const rect=b=>JSON.stringify([b.offsetLeft,b.offsetTop,b.offsetWidth,b.offsetHeight]);
+ const rect=b=>JSON.stringify([b.offsetLeft-b.parentElement.offsetLeft,b.offsetTop-b.parentElement.offsetTop,b.offsetWidth,b.offsetHeight]);
  const raf=new Map();let next=0;
  window.requestAnimationFrame=fn=>{raf.set(++next,fn);return next};
  window.cancelAnimationFrame=id=>raf.delete(id);
@@ -22,27 +22,45 @@ async function runBrowserTests(){
  remote.trades={state:'verified',records:[],checked_at:'2026-10-25T00:00:00+09:00'};
  let clock=0;
  async function click(row,index){
-  const bs=[...row.children].filter(b=>b.tagName==='BUTTON');
-  const old=bs.findIndex(api.chosen),source=bs[old],target=bs[index];
+  let bs=[...row.children].filter(b=>b.tagName==='BUTTON');
+  const old=bs.findIndex(api.chosen);let source=bs[old],target=bs[index];
   row.scrollIntoView({block:'center',behavior:'instant'});
   const labels=bs.map(b=>b.textContent),rects=bs.map(rect),n=api.stats.started;
   const rest=bs.map(bg);
+  const key=row.classList.contains('newsCategoryTabs')?'news':
+   row.classList.contains('tradeStarter')?'apartments':'trade-types';
+  const via=api.viaIndices(key,old,index,bs);
+  const duration=via.length?790+110*(via.length-1):630;
   target.click();await Promise.resolve();await Promise.resolve();
+  if(key==='apartments'){
+   frame(clock);
+   row=document.querySelector('.page:not(.hidden) .apartmentTradeNav');
+   bs=[...row.children];source=bs[old];target=bs[index];
+  }
   check(row.className+' real click starts '+old+'→'+index,api.stats.started===n+1);
   check('real selected state follows handler',api.chosen(target)&&!api.chosen(source));
-  check('paint begins before first animation frame',target.style.background.includes('linear-gradient'));
+  frame(clock); // Stable filters paint in bubble; page-changing menus retain RAF.
+  check('actual row painter begins',target.style.background.includes('linear-gradient'));
   frame(clock);
+  check('travel path contains precisely skipped peers',JSON.stringify(api.stats.lastPath)===JSON.stringify([old,...via,index]));
   const a=bg(source),b=bg(target);
-  frame(clock+315);
+  const span=.68/(1+.55*Math.max(0,via.length-1));
+  for(let n=0;n<via.length;n++){
+   frame(clock+duration*(.16+n*.55*span+span*.5));
+   check('skipped button '+via[n]+' receives subtle traveling wash',
+    bs[via[n]].style.background.includes('linear-gradient')&&bg(bs[via[n]])!==rest[via[n]]);
+   check('passing button never selected or activated',!api.chosen(bs[via[n]]));
+  }
+  frame(clock+duration*.9);
   check('source background visibly changes',bg(source)!==a);
   check('target background visibly changes',bg(target)!==b);
   const angle=index<old?'270deg':'90deg';
   check('both painted in actual travel direction',bg(source).includes(angle)&&bg(target).includes(angle));
-  for(let i=0;i<bs.length;i++)if(i!==old&&i!==index)
+  for(let i=0;i<bs.length;i++)if(i!==old&&i!==index&&!via.includes(i))
    check('unrelated type '+i+' untouched',bg(bs[i])===rest[i]&&!bs[i].style.background);
   check((row.id||'news')+' '+old+'→'+index+' no geometry/text movement '+JSON.stringify({before:rects,after:bs.map(rect),labels,now:bs.map(b=>b.textContent)}),JSON.stringify(bs.map(rect))===JSON.stringify(rects)&&
    JSON.stringify(bs.map(b=>b.textContent))===JSON.stringify(labels));
-  frame(clock+630);clock+=1000;
+  frame(clock+duration);clock+=1200;
   check('all temporary backgrounds removed',bs.every(b=>!b.style.background));
   check('filter/selection remains after cleanup',api.chosen(target)&&!api.chosen(source));
  }
@@ -62,10 +80,17 @@ async function runBrowserTests(){
    const bs=[...row.children];
    bs[0].click();await Promise.resolve();frame(clock);
    bs[3].click();await Promise.resolve();frame(clock+100);
-   bs[1].click();await Promise.resolve();frame(clock+200);frame(clock+830);clock+=1500;
+   bs[1].click();await Promise.resolve();frame(clock+200);frame(clock+1100);clock+=1500;
    check(id+' rapid reverse finishes on latest click',api.chosen(bs[1])&&bs.every(b=>!b.style.background));
    bs[1].click();await Promise.resolve();check('same selected button has no leftover paint',bs.every(b=>!b.style.background));
   }
+  // Page-changing three-way menu: re-rendered row follows the same path,
+  // and only the destination page activates.
+  switchPage('trades');
+  await click(document.querySelector('#trades .apartmentTradeNav'),2);
+  check('new-trade page only is active',currentPage==='new');
+  await click(document.querySelector('#new .apartmentTradeNav'),0);
+  check('latest-trades page only is active',currentPage==='trades');
   const nativeMatch=window.matchMedia;
   window.matchMedia=q=>q.includes('prefers-reduced-motion')?{matches:true}:nativeMatch(q);
   switchPage('news');const before=api.stats.started;

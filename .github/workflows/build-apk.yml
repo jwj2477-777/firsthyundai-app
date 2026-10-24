@@ -286,22 +286,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.83 full-app verified shared-button color flow APK
+      - name: Publish v2.0.84 sequential skipped-peer color flow APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.83.apk
-          unzip -t FirstHyundai-v2.0.83.apk | grep 'No errors detected'
-          if gh release view v2.0.83 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.84.apk
+          unzip -t FirstHyundai-v2.0.84.apk | grep 'No errors detected'
+          if gh release view v2.0.84 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.83 FirstHyundai-v2.0.83.apk \
+            gh release create v2.0.84 FirstHyundai-v2.0.84.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.83 · 뉴스·거래유형 색 흐름 공통화' \
-              --notes '뉴스 브리핑↔인천 청약·분양 및 전체·매매·전세·월세의 색 흐름을 메인 메뉴와 같은 실제 버튼 배경 애니메이션으로 통일했습니다. 별도 CSS 등록 속성 전환을 제거하고 클릭한 줄의 실제 선택 변경 직후 첫 화면 표시 전에 색 흐름을 시작합니다. 메인 5개 메뉴 및 아파트정보 경유 동작은 유지합니다. 실제 앱 HTML·CSS·스크립트와 클릭 처리로 양방향·모든 거래유형 쌍·연속 클릭·정리·동작 줄이기를 검증합니다. v2.0.83/build134.'
+              --title '퍼스트현대 v2.0.84 · 중간 버튼을 차례로 거치는 자연스러운 색 흐름' \
+              --notes '여러 버튼이 한 줄에 나열된 메뉴에서 중간 버튼을 건너뛰어 선택하면 옅은 색이 중간 버튼들을 이동 방향대로 차례로 스쳐 지나갑니다. 전체 최신순↔새 거래는 관심 14개를, 전체↔월세는 매매·전세를 순서대로 거칩니다. 중간 버튼의 화면이나 필터는 실행하지 않으며 최종 선택만 적용합니다. 기존 메인 실거래↔뉴스의 아파트정보 경유 효과와 인접 버튼 전환은 유지합니다. 아파트·오피스텔·관심단지 거래유형에 동일 적용하며 화면 배치 및 접근성 동작 줄이기를 보존합니다. v2.0.84/build135.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.83 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.83 --apk FirstHyundai-v2.0.83.apk
+          gh release upload v2.0.84 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.84 --apk FirstHyundai-v2.0.84.apk
