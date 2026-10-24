@@ -2591,3 +2591,68 @@ body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading>div{
  .page .tradeTypeBar>button,
  .page .newTypeChips>button{border-width:3px!important}
 }
+
+/* v2.0.82 · BROWSER-NATIVE color flow for the two repeatedly failing rows.
+   The selected state (aria-selected / .active) itself drives the motion.
+   No inline background, JS paint frames or copied/translated elements.
+   Other menus preserve their original JavaScript motion and palette. */
+@property --fhd-native-fill {
+ syntax: '<percentage>';
+ inherits: false;
+ initial-value: 0%;
+}
+:is(
+ #news .newsCategoryTabs.sectionModeSwitch>button,
+ #trades #tradeTypeBar>button,
+ #officetel #officeTypeBar>button,
+ #nearbyDetails #nearbyTypeBar>button
+){
+ --fhd-native-fill:0%;
+ --fhd-native-ink:#285970;
+ --fhd-native-idle:#F8FAF9;
+ --fhd-native-direction:to right;
+ background-color:var(--fhd-native-idle)!important;
+ background-image:linear-gradient(
+   var(--fhd-native-direction),
+   var(--fhd-native-ink) 0%,
+   var(--fhd-native-ink) calc(var(--fhd-native-fill) - 5%),
+   var(--fhd-native-idle) calc(var(--fhd-native-fill) + 5%),
+   var(--fhd-native-idle) 100%
+ )!important;
+ transition:--fhd-native-fill 660ms cubic-bezier(.22,.7,.2,1),
+   color 250ms ease!important;
+}
+#news .newsCategoryTabs.sectionModeSwitch>button{
+ --fhd-native-ink:#6547A5;
+ --fhd-native-idle:#FBFAFE;
+}
+#trades #tradeTypeBar>button,
+#officetel #officeTypeBar>button,
+#nearbyDetails #nearbyTypeBar>button{
+ --fhd-native-ink:#285970;
+ --fhd-native-idle:#F8FAF9;
+}
+:is(#trades #tradeTypeBar,#officetel #officeTypeBar,#nearbyDetails #nearbyTypeBar)>button.sale{
+ --fhd-native-ink:#255CA5;
+}
+:is(#trades #tradeTypeBar,#officetel #officeTypeBar,#nearbyDetails #nearbyTypeBar)>button.lease{
+ --fhd-native-ink:#146A50;
+}
+:is(#trades #tradeTypeBar,#officetel #officeTypeBar,#nearbyDetails #nearbyTypeBar)>button.monthly{
+ --fhd-native-ink:#875007;
+}
+#news .newsCategoryTabs.sectionModeSwitch>button[aria-selected="true"],
+:is(#trades #tradeTypeBar,#officetel #officeTypeBar,#nearbyDetails #nearbyTypeBar)>button.active{
+ --fhd-native-fill:100%;
+}
+:is(#news .newsCategoryTabs,#trades #tradeTypeBar,#officetel #officeTypeBar,#nearbyDetails #nearbyTypeBar)[data-fhd-direction="left"]>button{
+ --fhd-native-direction:to left;
+}
+@media(prefers-reduced-motion:reduce){
+ :is(#news .newsCategoryTabs.sectionModeSwitch>button,
+ #trades #tradeTypeBar>button,
+ #officetel #officeTypeBar>button,
+ #nearbyDetails #nearbyTypeBar>button){
+  transition:none!important;
+ }
+}
