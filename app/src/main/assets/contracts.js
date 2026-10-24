@@ -289,7 +289,7 @@ function makePreview(){
  const template=contractTemplate();
  const out=[template.intro,'',typeLine,''];
  out.push('▶ 소재지 : '+(field('address')||'[주소 확인 필요]'));
- out.push('▶ 아파트명 : '+(field('property')||'[단지 확인 필요]')+(field('unit')?' '+field('unit'):' [동·호수 확인 필요]'));
+ out.push('▶ 아파트명/동호수 : '+(field('property')||'[단지 확인 필요]')+(field('unit')?' '+field('unit'):' [동·호수 확인 필요]'));
  if(field('exclusiveArea')){
   const area=Number(field('exclusiveArea'));
   if(Number.isFinite(area)&&area>0&&area<400){

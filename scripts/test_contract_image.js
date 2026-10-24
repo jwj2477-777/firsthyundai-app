@@ -61,7 +61,7 @@ const typical=[
  '안녕하세요. 퍼스트현대부동산입니다.',
  '● 아파트 매매계약 ●',
  '▶ 소재지 : 인천 연수구 가상로 30',
- '▶ 아파트명 : 퍼스트파크 15블럭 1502동 3004호',
+ '▶ 아파트명/동호수 : 퍼스트파크 15블럭 1502동 3004호',
  '▶ 매매대금 : 150,000만원',
  '▶ 계약금 : 15,000만원 (매매대금의 10%)',
  '▶ 중도금 지급일 : 2026-12-05',
@@ -87,6 +87,7 @@ const realFormat=api._test.parseTransfer('금일 위 계약조건에 따라 계�
 assert.deepStrictEqual([realFormat.amount,realFormat.bank,realFormat.account,realFormat.payee],['500만원','우리은행','987-654321-10','홍길동'],'Never use the full contract deposit as today\'s transfer');
 assert.strictEqual(api._test.parseTransfer('금일 위 계약금은 15,000만원입니다.'),null,'Never invent a transfer from the contract deposit');
 const premium=api._test.plan(typical);
+assert(premium[0].items.some(x=>x.text.includes('아파트명/동호수')),'PNG must display the combined apartment and unit label');
 assert.strictEqual(premium[0].items.filter(x=>x.kind==='transfer').length,0,'Do not duplicate the legal remittance clause as a separate card');
 assert(premium[0].items.some(x=>x.runs?.some(r=>r.emphasis&&r.text==='123-45678-01')),'The original account number must receive inline emphasis');
 assert(premium[0].items.some(x=>x.runs?.some(r=>r.kind==='amount'&&r.text==='700만원')),'Actual remittance must receive inline emphasis');

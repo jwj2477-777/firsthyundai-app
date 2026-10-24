@@ -273,22 +273,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.53 restored notice and quick input normalization APK
+      - name: Publish v2.0.54 combined apartment/unit caption APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.53.apk
-          unzip -t FirstHyundai-v2.0.53.apk | grep 'No errors detected'
-          if gh release view v2.0.53 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.54.apk
+          unzip -t FirstHyundai-v2.0.54.apk | grep 'No errors detected'
+          if gh release view v2.0.54 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.53 FirstHyundai-v2.0.53.apk \
+            gh release create v2.0.54 FirstHyundai-v2.0.54.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.53 · 기존 계약문구 복원·누락정보 자동 정리' \
-              --notes '고객에게 사전 동의를 요청하는 계약 안내문 방식에 맞춰 중복되는 사전합의 체크란을 없애고, 계약 성립·해제·중개보수 항목은 이미 합의했다고 단정하지 않는 제안 문구로 안내합니다. 계약 메모 바로 아래 별도 특약 입력창을 추가해 일반 문장 인식이 누락되더라도 특약을 별도 항목으로 반드시 인식하고 문장별로 자동 정리해 최종 안내문에 반영하며 원문과 정리된 문구를 비교할 수 있습니다. 빠진 계약일·금액·계좌 등은 같은 화면의 입력칸에서 바로 보완하며, 기본적으로 긴 상세수정 화면으로 이동하지 않습니다. 가족모드의 직접 문자 수정 버튼을 숨기고, 관리자모드에서 공통 제안문구를 수정하면 같은 기기의 가족모드에도 적용합니다. 다른 휴대폰에는 별도 공통 배포가 필요합니다. 기존 계약금/잔금 계산·필수검증·최종 이미지 확인/공유·모드 전환·실거래/단지/뉴스/알림/업데이트·고정 APK 서명 유지. v2.0.48 복원 버전 보존.'
+              --title '퍼스트현대 v2.0.54 · 계약 안내 아파트명/동호수 표시' \
+              --notes '계약 안내 문자·고객 전달 PNG 이미지의 아파트 항목 제목을 아파트명/동호수로 통일했습니다. 계약 핵심정보 요약도 같은 이름을 사용합니다. 아파트명/동호수 값의 자동 인식, 지번주소, 날짜·금액 자동 정리, 특약, 최종 승인, 계좌 및 실제 송금액 강조, 가족/관리자 모드, 기존 계약 문구 복원은 모두 유지합니다. v2.0.54/build105.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.53 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.53 --apk FirstHyundai-v2.0.53.apk
+          gh release upload v2.0.54 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.54 --apk FirstHyundai-v2.0.54.apk
