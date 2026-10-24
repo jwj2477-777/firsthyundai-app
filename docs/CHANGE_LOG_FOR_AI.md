@@ -7,6 +7,7 @@
 - native 이동 860ms: 감속곡선 보완, native 완주 callback → 상단 underlay 표시 → WebView visual-state 완료 → 정지한 native만 190ms fade. CSS 독립 타이머 제거. tap skip/동작 줄이기/실패시 제한된 fallback 유지.
 - header 실로고는 native vector generator의 동일 경로·그라데이션 SVG를 표시하고 그 실제 img bounds를 측정. 기존 inline SVG는 계약 PNG 원본 경로/색상으로 유지, 고객 문서 로고 무변경.
 - 검증: 320/340/360/393/430px 실제 Chromium에서 내장 폰트·기준선·17개 값·좁은 영문 숨김·1.1초 동안 독립 조기노출 없음·착지 신호 후 표시 확인. JVM BrandLandingMathTest는 밀도/큰 글씨 설정에서도 baseline·실제 글자 크기 정렬 검사. 기존 버튼/계약/보안 회귀 유지. 실제 삼성 단말 native 체감은 설치 후 별도 확인 필요. CI·서명·Release 상태는 별도 검증.
+- 완료 검증: Actions 40113754414 성공. 실제 Chromium 5개 폭 × 15개 착지 검사(총75), 기존 실제 앱 887개 검사 및 JS 64개/Python 89개 검사, JVM 글자 기준선·폰트 배율 검사와 APK 빌드 통과. v2.0.85/build136 메타데이터·고정 서명 확인, Release APK(1,730,764 bytes)와 app_latest.json 게시 확인. 실제 삼성 단말의 native 전환 체감 검증은 사용자 설치 후 별도.
 
 
 
