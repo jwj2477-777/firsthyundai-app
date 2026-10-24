@@ -78,11 +78,11 @@ assert.equal(button.textContent,'✓ 내용 확인 완료하기');
 assert.equal(button.disabled,false);
 assert(hint.textContent.includes('확인 버튼'));
 const beforeApproval=E('ct_preview').value;
-assert(beforeApproval.includes('▶ 이번 송금 예정액 : 500만원'),'Neutral transfer value must appear');
-for(const fragment of ['아래 내용은 계약 진행을 위한 제안 조건입니다','제안 1.','제안 2.','제안 3.']){
- assert(beforeApproval.includes(fragment),'Default offer must present these proposed terms: '+fragment);
+assert(beforeApproval.includes('금일 위 계약조건에 따라 계약금 중 일부인 500만원을 임대인 계좌(테스트은행 111-222-333333 (예금주 홍길동))로 송금하기로 합니다.'),'Original transfer sentence must include precise amount and account');
+for(const fragment of ['※ 계약금 일부 송금 및 계약 성립·해제 조건 확인','본계약이 체결된 것으로 보기로 하며','실제 송금한 금액을 포기','중개보수 지급의무가 없어지는 것은 아니라는 점']){
+ assert(beforeApproval.includes(fragment),'Original office contract notice must be preserved: '+fragment);
 }
-assert(!beforeApproval.includes('보기로 합의합니다'),'No claim of completed agreement');
+assert(!beforeApproval.includes('제안 1.')&&!beforeApproval.includes('제안드립니다'),'Do not reintroduce offer numbering');
 assert.equal(contract.canShare(),false,'Review approval button is still mandatory');
 contract.approve();
 assert.equal(state(),'done','Confirmed state must change visibly after clicking');
@@ -108,4 +108,4 @@ contract.approve();assert.equal(state(),'done');
 contract.reset();
 assert.equal(state(),'pending','Reset must clear confirmation');
 assert.equal(button.attributes['aria-pressed'],'false');
-console.log('Contract confirmation, proposal wording and sharing guards passed.');
+console.log('Contract confirmation, original office notice wording and sharing guards passed.');
