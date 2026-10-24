@@ -21,9 +21,10 @@ for(const [id,func,input,renderer] of [
 }
 assert(html.includes("button.className=(active?'active ':'')+tradeClass(t)"));
 assert(html.includes("button.setAttribute('aria-pressed',active?'true':'false')"));
-assert(css.includes('>button.active{\n --fhd-native-fill:100%;'));
 for(const color of ['#285970','#255CA5','#146A50','#875007'])
- assert(css.includes('--fhd-native-ink:'+color));
-assert(js.includes('if(isNativeRow(row))return null'));
+ assert(css.includes(color));
+assert(js.includes('if(isLowerRow(row))return {group:row,spec:{'));
 assert(js.includes("['tradeTypeBar','officeTypeBar','nearbyTypeBar'].includes(row.id)"));
-console.log('Trade-type native CSS fill: 4 choices across apartment, office and favorites follow real .active state.');
+assert(css.includes('transition-property:color,border-color,box-shadow!important'));
+assert(!css.includes('@property --fhd-native-fill'));
+console.log('Trade-type real-button paint: apartment, office and favorites share the working main-menu engine.');

@@ -1,5 +1,12 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-25 · v2.0.83 · 실패한 두 줄을 메인과 같은 실제 배경 painter로 통일
+- 사용자: 메인 5개는 정상, 뉴스↔청약 및 전체/매매/전세/월세는 여전히 효과가 보이지 않음.
+- v2.0.82는 해당 줄을 JS에서 명시적으로 제외하고 @property CSS로 분리했음. 기존 브라우저 검사는 별도 축약 DOM의 등록 속성 수치만 확인했고 실제 앱의 클릭→화면 배경 흐름을 보증하지 못했음. 사용자 기기의 정확한 실패 원인은 단말 계측 없으므로 확정하지 않음.
+- 두 줄만 동일한 JS real-button background painter에 연결. 클릭한 실제 row와 버튼을 보존하며 inline onclick 후 microtask에서 첫 paint를 준비. @property 및 CSS background-transition 경쟁 제거. top-five 기존 RAF/색상/아파트정보 경유 로직은 유지. 관심단지 상세 nearbyTypeBar도 정확한 row를 사용.
+- 검증: test_native_lower_tab_browser.js를 실제 전체 앱 자산/onclick/DOM 기반으로 교체. 모든 방향·4유형의 모든 순서쌍·빠른 연속 클릭·배치/텍스트 불변·이외 버튼 무효과·cleanup·reduced-motion을 배경 computed style로 검증. 기존 주메뉴 회귀 검사 유지. CI/서명/APK 배포 성공 여부는 Actions와 Release를 따로 확인. 실제 삼성 단말 미검증.
+
+
 ## 2026-10-24 · v2.0.67 · 오리지널 스플래시 스타일을 헤더 기준으로 복원, 이동 중 끊김 완화
 - 사용자는 v2.0.66 메인 스타일에 맞추기보다 예전 시작 화면의 화이트 타이틀/금색 영문을 선호. Native 원래 title #FFF Bold(700), English subtitle #F6D791 Regular(400), 자간 0/.1em. 메인 헤더도 동일 CSS 통일하고 크기만 헤더 폭에 따라 축소.
 - 원래 인트로에는 없던 154dp 크림 로고 바탕을 제거하고 헤더의 크림 바탕/그림자도 삭제. 원본 FHD 엠블럼·골드 halo만 이동 후 링 페이드.

@@ -1,4 +1,4 @@
-/* FIRST HYUNDAI · minimal color flow v11 · native lower-row CSS transition
+/* FIRST HYUNDAI · minimal color flow v12 · shared real-button paint
  * No overlays, masks, moving shapes, transforms, resized buttons or clones.
  * The ACTUAL button backgrounds are painted in place, behind original text.
  * ONLY Trades ↔ News gives Apartment Info a faint passing color wash.
@@ -29,16 +29,18 @@
     (el.parentElement?.classList?.contains('primaryNav')||
      el.parentElement?.classList?.contains('utilityNav'))):
   Array.from(group.children).filter(el=>el.tagName==='BUTTON');
- // News and four-way trade rows use native CSS-registered transitions,
- // so no requestAnimationFrame state guessing or inline-gradient conflicts.
- function isNativeRow(row){
+ // These stable rows use the SAME real-background painter as the main menu.
+ // Retain the clicked row itself, including the open favorites detail sheet.
+ function isLowerRow(row){
   return !!row&&(row.classList?.contains('newsCategoryTabs')||
    (row.classList?.contains('tradeTypeBar')&&
     ['tradeTypeBar','officeTypeBar','nearbyTypeBar'].includes(row.id)));
  }
  function findGroup(button){
   const row=button.parentElement;
-  if(isNativeRow(row))return null;
+  if(isLowerRow(row))return {group:row,spec:{
+   key:row.classList.contains('newsCategoryTabs')?'news':'trade-types',stable:true
+  }};
   const nav=button.closest('#nav');
   if(nav&&(row?.classList?.contains('primaryNav')||
    row?.classList?.contains('utilityNav')))return {group:nav,spec:MAIN};
@@ -202,18 +204,6 @@
   if(reduceMotion()||event.defaultPrevented)return;
   const button=event.target?.closest?.('button');
   if(!button||button.disabled||button.closest('.hidden'))return;
-  const row=button.parentElement;
-  if(isNativeRow(row)){
-   // Before the page's inline onclick changes classes or aria-selected,
-   // choose the direction for a true native CSS color-front transition.
-   const peers=Array.from(row.children).filter(el=>el.tagName==='BUTTON');
-   const previous=peers.findIndex(chosen),next=peers.indexOf(button);
-   if(previous>=0&&next>=0&&next!==previous){
-    stop();
-    row.setAttribute?.('data-fhd-direction',next<previous?'left':'right');
-   }
-   return;
-  }
   const result=findGroup(button);
   if(!result)return;
   stop();
@@ -221,8 +211,11 @@
   const next=peers.indexOf(button),previous=peers.findIndex(chosen);
   if(next<0||previous<0||previous===next)return;
   const selected=getPaint(peers[previous]),idle=getPaint(button),id=++sequence;
-  // Native onclick runs after this capture listener, replacing #nav as needed.
-  window.requestAnimationFrame?.(()=>{
+  // Inline onclick updates real selection before this microtask. Start the
+  // lower-row paint BEFORE the browser can show the new solid fill. Main-menu
+  // timing and via-Apartment-Info motion remain exactly as before.
+  const schedule=spec.stable?fn=>Promise.resolve().then(fn):window.requestAnimationFrame;
+  schedule?.(()=>{
    if(id!==sequence||reduceMotion())return;
    const nextGroup=spec.stable
     ?(group.isConnected===false?document.getElementById?.(group.id):group)
@@ -231,7 +224,7 @@
   });
  }
  document.addEventListener('click',onClick,{capture:true});
- window.FirstHyundaiSelectionFlow={version:'11.0.0',
+ window.FirstHyundaiSelectionFlow={version:'12.0.0',
   _test:{buttons,chosen,findGroup,getPaint,fromPaint,toPaint,
-   vector,viaIndex,softlyMix,middlePaint,isNativeRow,stop,onClick,stats}};
+   vector,viaIndex,softlyMix,middlePaint,isLowerRow,stop,onClick,stats}};
 })();

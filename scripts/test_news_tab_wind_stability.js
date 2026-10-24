@@ -12,13 +12,10 @@ assert(html.includes('onclick="switchNewsPane(\'articles\')"'));
 assert(html.includes('onclick="switchNewsPane(\'subscriptions\')"'));
 assert(html.includes("setAttribute('aria-selected',pane==='articles'?'true':'false')"));
 assert(html.includes("setAttribute('aria-selected',pane==='subscriptions'?'true':'false')"));
-assert(css.includes('@property --fhd-native-fill'));
-assert(css.includes('#news .newsCategoryTabs.sectionModeSwitch>button[aria-selected="true"]'));
-assert(css.includes('--fhd-native-fill:100%'));
-assert(css.includes('transition:--fhd-native-fill 660ms'));
+assert(!css.includes('@property --fhd-native-fill'));
 assert(css.includes('#6547A5'));
 assert(css.includes('v2.0.74 · News tabs must NEVER move'));
-assert(flow.includes("if(isNativeRow(row))return null"),
- 'No JS repaint may override the browser-native fill');
-assert(flow.includes("row.setAttribute?.('data-fhd-direction',next<previous?'left':'right')"));
-console.log('News tab native CSS trigger: both real aria-selected labels and correct purple fill are wired.');
+assert(flow.includes("key:row.classList.contains('newsCategoryTabs')?'news':'trade-types',stable:true"));
+assert(flow.includes('fn=>Promise.resolve().then(fn)'),
+ 'Real onclick state must be painted before the next browser frame');
+console.log('News row shares main-menu painter, retains clicked DOM, both directions and original purple theme.');

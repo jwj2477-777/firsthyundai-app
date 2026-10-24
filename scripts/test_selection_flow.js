@@ -77,11 +77,11 @@ const win={innerWidth:415,innerHeight:980,requestAnimationFrame,
 };
 vm.runInNewContext(code,{window:win,document:doc,Math,Number,Object,Array,Map});
 const api=win.FirstHyundaiSelectionFlow;
-assert.equal(api.version,'11.0.0');
+assert.equal(api.version,'12.0.0');
 assert.equal(api._test.buttons(nav,'top-five').length,5);
 assert(!('beginDirect' in api)&&!('endDirect' in api),'Removed non-working direct-hook branch');
 assert.equal(api._test.viaIndex('top-five',0,2),1);
-assert.equal(typeof api._test.isNativeRow,'function');
+assert.equal(typeof api._test.isLowerRow,'function');
 assert.equal(api._test.viaIndex('top-five',2,0),1);
 for(const pair of [[0,1],[1,2],[0,3],[2,4],[3,4]])
  assert.equal(api._test.viaIndex('top-five',...pair),-1,

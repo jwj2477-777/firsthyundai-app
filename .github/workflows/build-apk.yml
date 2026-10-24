@@ -286,22 +286,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.82 browser-verified news and transaction native color animation APK
+      - name: Publish v2.0.83 full-app verified shared-button color flow APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.82.apk
-          unzip -t FirstHyundai-v2.0.82.apk | grep 'No errors detected'
-          if gh release view v2.0.82 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.83.apk
+          unzip -t FirstHyundai-v2.0.83.apk | grep 'No errors detected'
+          if gh release view v2.0.83 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.82 FirstHyundai-v2.0.82.apk \
+            gh release create v2.0.83 FirstHyundai-v2.0.83.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.82 · 뉴스·청약 및 거래유형 색상 전환 실제 브라우저 검증' \
-              --notes '그동안 효과가 보이지 않던 뉴스 브리핑↔인천 청약·분양과 전체·매매·전세·월세 전환을 원인부터 재검증했습니다. 기존 자바스크립트 프레임 애니메이션을 이 두 줄에서 제거하고, 실제 버튼의 aria-selected와 active 속성만으로 브라우저가 선택색을 천천히 채우는 CSS 등록 속성 전환을 적용했습니다. 뉴스 화면에서 고우선순위의 공통 스타일이 0%를 강제하던 CSS 선택자 충돌도 실제 Chrome 테스트로 찾아 제거했습니다. 뉴스·청약과 아파트·오피스텔·관심단지 거래유형의 애니메이션이 중간 단계에서 실제 보간되는지 크로미움 브라우저에서 검증하는 필수 테스트를 추가했습니다. 다른 메인 5개 메뉴와 실거래↔뉴스 간 아파트정보 경유 효과는 유지합니다. v2.0.82/build133.'
+              --title '퍼스트현대 v2.0.83 · 뉴스·거래유형 색 흐름 공통화' \
+              --notes '뉴스 브리핑↔인천 청약·분양 및 전체·매매·전세·월세의 색 흐름을 메인 메뉴와 같은 실제 버튼 배경 애니메이션으로 통일했습니다. 별도 CSS 등록 속성 전환을 제거하고 클릭한 줄의 실제 선택 변경 직후 첫 화면 표시 전에 색 흐름을 시작합니다. 메인 5개 메뉴 및 아파트정보 경유 동작은 유지합니다. 실제 앱 HTML·CSS·스크립트와 클릭 처리로 양방향·모든 거래유형 쌍·연속 클릭·정리·동작 줄이기를 검증합니다. v2.0.83/build134.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.82 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.82 --apk FirstHyundai-v2.0.82.apk
+          gh release upload v2.0.83 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.83 --apk FirstHyundai-v2.0.83.apk
