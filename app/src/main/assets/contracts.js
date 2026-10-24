@@ -179,8 +179,8 @@ function updateContractFlow(){
   const node=E('flow'+n);if(!node)continue;
   node.classList.toggle('is-current',n===stage);
   node.classList.toggle('is-complete',n<stage);
-  if(n===stage)node.setAttribute('aria-current','step');
-  else node.removeAttribute('aria-current');
+  if(n===stage)node.setAttribute?.('aria-current','step');
+  else node.removeAttribute?.('aria-current');
  }
  const imageButton=E('imagePrimary');
  if(imageButton)imageButton.disabled=!approved||!created||!!collect().errors.length||previewContainsMissing();
