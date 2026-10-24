@@ -6,7 +6,7 @@ const html=read('app/src/main/assets/index.html'),css=read('app/src/main/assets/
 const section=html.slice(html.indexOf('<div id="contracts"'),html.indexOf('<div id="notes"'));
 const markers=['ct_flow1','ct_flow2','ct_flow3','ct_keyFacts','ct_factProperty','ct_factPrice','ct_factDeposit',
  'ct_factAdvance','ct_factAccount','ct_missingQuickFields','ct_specialMemo',
- 'ct_templateEditor','ct_imagePrimary','ct_confirmButton','ct_previewHighlight'];
+ 'ct_templateEditor','ct_imagePrimary','ct_confirmButton','ct_previewHighlight','ct_factUnit'];
 for(const id of markers)assert(section.includes('id="'+id+'"'),'Required review control lost: '+id);
 assert(section.indexOf('ct_keyFacts')<section.indexOf('ct_previewHighlight'),'Summary must precede long preview');
 assert(section.indexOf('ct_confirmButton')<section.indexOf('ct_imagePrimary'),'Final image action follows explicit confirmation');
@@ -48,10 +48,12 @@ assert(notice().includes('본계약이 체결된 것으로 보기로 하며'));
 assert(notice().includes('실제 수령한 금액의 배액을 상환하고'));
 assert(notice().includes('중개보수 지급의무가 없어지는 것은 아니라는 점'));
 assert(!notice().includes('제안 1.')&&!notice().includes('제안드립니다'),'Keep restored office wording without proposal copy');
-assert.equal(E('ct_factProperty').textContent,(E('ct_property').value+' '+E('ct_unit').value).trim()||'확인 필요','Summary must reflect the same locally recognized property fields as the notice');
-assert(section.includes('<span>아파트명/동호수</span>'),'Key facts label must match the combined apartment/unit value');
-assert(notice().includes('▶ 아파트명/동호수 : 퍼스트파크 13블럭 1304동 3703호'),'SMS and PNG input must use the exact combined apartment/unit label');
-assert(!notice().includes('▶ 아파트명 :'),'No previous label should remain in customer notice');
+assert.equal(E('ct_factProperty').textContent,E('ct_property').value,'The apartment name has its own summary field');
+assert.equal(E('ct_factUnit').textContent,E('ct_unit').value,'Dong/ho has its own summary field');
+assert(section.includes('<span>아파트명</span>')&&section.includes('<span>동호수</span>'),'Key facts have separate labels');
+assert(notice().includes('▶ 아파트명 : 퍼스트파크 13블럭'),'The message must show the apartment separately');
+assert(notice().includes('▶ 동호수 : 1304동 3703호'),'The message must show dong/ho separately');
+assert(!notice().includes('▶ 아파트명/동호수 :'),'Do not combine the two fields again');
 assert.equal(E('ct_factAdvance').textContent,'1,000만원');
 assert(E('ct_factAccount').textContent.includes('김철수'));
 assert.equal(E('ct_imagePrimary').disabled,true,'No image sharing without human approval');
