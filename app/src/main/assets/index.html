@@ -195,18 +195,39 @@ body.apartmentSheetActive{overflow:hidden}
  <span class="alertBell" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg></span><div class="alertBannerCopy"><span class="alertEyebrow">관심 단지 소식</span><strong id="favoriteTradeAlertCount">새 실거래</strong><small id="favoriteTradeAlertBannerDetail"></small></div>
  <button type="button" class="btn" onclick="FirstHyundaiTradeAlerts.open()">보기</button><button type="button" class="favoriteTradeAlertDismiss" onclick="FirstHyundaiTradeAlerts.dismiss()" aria-label="새 거래 배너 닫기">×</button>
 </div>
+
 <div id="overview" class="page">
   <div class="sectionTitle"><h2>오늘의 업무 브리핑</h2><button class="btn alt refreshAction" type="button" onclick="refreshAll(true)">새로고침</button></div>
-  <div class="grid">
-   <div class="metric"><small>송도동 실거래 누적</small><strong id="totalDeals">—</strong><small>최근 최대 12개월</small></div>
-   <div class="metric"><small>매매 건수</small><strong id="saleDeals">—</strong><small>신고+해제 표시</small></div>
-   <div class="metric"><small>전·월세 건수</small><strong id="rentDeals">—</strong><small>공개된 계약</small></div>
-   <div class="metric"><small>오늘 신규 공개 확인</small><strong id="newDeals">—</strong><small>최초 발견일 기준</small></div>
-   <div class="metric"><small>뉴스 묶음</small><strong id="newsGroups">—</strong><small>최근 기사 제목</small></div>
-  </div>
-  <div class="panel"><button class="btn nearbyTotal" type="button" onclick="switchPage('nearby')"><span>★ 관심 14개 단지 실거래 바로보기</span><span>→</span></button><button class="btn alt" type="button" onclick="switchPage('complexes')">송도 전체 아파트 기본정보 →</button></div>
-  <div class="panel"><div class="sectionTitle"><h2>수집 상태</h2></div><div id="overviewStatus" class="tiny">연결 정보가 없습니다.</div></div>
-  
+  <section class="panel overviewActionPanel" aria-labelledby="overviewNextTitle">
+    <h3 id="overviewNextTitle">바로 확인할 업무</h3>
+    <div class="overviewActionGrid">
+      <button type="button" class="overviewActionCard overviewActionNew" onclick="openTodayNewTrades()">
+        <span class="overviewActionSymbol" aria-hidden="true">✦</span>
+        <span class="overviewActionCopy"><strong>오늘 새 거래</strong><small>오늘 처음 확인 <b id="overviewNewQuickCount">—</b></small></span>
+        <span class="overviewActionArrow" aria-hidden="true">›</span>
+      </button>
+      <button type="button" class="overviewActionCard overviewActionFavorite" onclick="switchPage('nearby')">
+        <span class="overviewActionSymbol" aria-hidden="true">★</span>
+        <span class="overviewActionCopy"><strong>관심 14개 단지</strong><small>실거래 바로 확인</small></span>
+        <span class="overviewActionArrow" aria-hidden="true">›</span>
+      </button>
+    </div>
+    <button class="overviewActionSecondary" type="button" onclick="openComplexHome()">⌂ 송도 아파트 정보 찾기 <span aria-hidden="true">›</span></button>
+  </section>
+  <section class="panel overviewStatusPanel" aria-labelledby="overviewStatusTitle">
+    <h3 id="overviewStatusTitle">자료 갱신 상태</h3>
+    <div id="overviewStatus" class="tiny" role="status" aria-live="polite">연결 정보가 없습니다.</div>
+  </section>
+  <section class="overviewStats" aria-labelledby="overviewStatsTitle">
+    <h3 id="overviewStatsTitle">전체 현황</h3>
+    <div class="grid">
+      <div class="metric"><small>송도동 실거래 누적</small><strong id="totalDeals">—</strong><small>최근 최대 12개월</small></div>
+      <div class="metric"><small>매매 건수</small><strong id="saleDeals">—</strong><small>신고+해제 표시</small></div>
+      <div class="metric"><small>전·월세 건수</small><strong id="rentDeals">—</strong><small>공개된 계약</small></div>
+      <div class="metric"><small>오늘 신규 공개 확인</small><strong id="newDeals">—</strong><small>최초 발견일 기준</small></div>
+      <div class="metric"><small>뉴스 묶음</small><strong id="newsGroups">—</strong><small>최근 기사 제목</small></div>
+    </div>
+  </section>
 </div>
 <div id="nearby" class="page hidden">
  <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
@@ -397,6 +418,7 @@ body.apartmentSheetActive{overflow:hidden}
     <button type="button" onclick="setTradeType('전세')">전세</button>
     <button type="button" onclick="setTradeType('월세')">월세</button>
   </div>
+  <p id="tradeActiveSummary" class="tradeActiveSummary hidden" role="status" aria-live="polite"></p>
   <details class="tradeAdvanced" id="tradeAdvanced">
     <summary>＋ 상세 검색 조건 (필요할 때만)</summary>
     <label class="inputLabel" for="aptFilter">아파트 이름 직접 검색</label>
@@ -506,7 +528,7 @@ body.apartmentSheetActive{overflow:hidden}
 </div>
 
 <div id="contracts" class="page hidden">
- <div class="contractHero"><h2>계약문자 작성</h2><p>메모를 쓰고 큰 버튼을 누르면 계약문자를 만들어 드립니다.</p><ol class="contractSteps" aria-label="작성 순서"><li>1 메모 입력</li><li>2 조건 확인</li><li>3 복사·이미지 공유</li></ol></div>
+ <div class="contractHero contractHeroCompact"><h2>계약문자 작성</h2><details class="contractFirstGuide"><summary>작성 방법 보기</summary><p>메모를 쓰고 큰 버튼을 누르면 계약문자를 만들어 드립니다.</p><ol class="contractSteps" aria-label="작성 순서"><li>1 메모 입력</li><li>2 조건 확인</li><li>3 복사·이미지 공유</li></ol></details></div>
  <div class="panel contractMemoCard" aria-labelledby="ct_memoTitle">
   <div class="contractMemoHeading">
    <span class="contractMemoStep" aria-hidden="true">1</span>
