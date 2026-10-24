@@ -16,6 +16,10 @@ assert(css.includes('.fhd-bridge-backdrop')&&css.includes('linear-gradient(135de
 assert(main.includes('nativeHeaderRects?.()')&&main.includes('overlay.moveToHeader('));
 assert(native.includes('PathInterpolator(.34f,.06f,.18f,1f)'),'Use gentler takeoff and soft landing');
 assert(native.includes('DURATION-LANDING_LEAD')&&native.includes('ObjectAnimator.ofFloat(part,View.ALPHA,1f,0f)'),'Native brand cross-dissolves during landing instead of snapping');
+assert(native.includes('LANDING_LEAD=255L')&&native.includes('fade.setDuration(205)'),'Allow enough overlap to hide font-weight and size change');
+assert(native.includes('ring.animate().translationX(')&&native.includes('.scaleX(ringScale).scaleY(ringScale)'),'Gold circular halo must travel and shrink with the logo');
+assert(native.includes('ValueAnimator.ofArgb(Color.rgb(246,215,145)')&&native.includes('Color.rgb(216,231,228)'),'Native English subtitle gradually turns gold into header teal before landing');
+assert(css.includes('background-color:#FDFBF6!important')&&css.includes('background-color 235ms ease-out'),'Main circular cream backing must appear gradually rather than pop');
 assert(main.includes('beginNativeHandoffLanding?.()')&&main.includes('onApproach,done'),'Android informs the WebView before the native shared elements land');
 assert(src.includes('function beginNativeHandoffLanding()'),'Browser can reveal the existing header before native overlay exits');
 assert(css.includes('body.fhd-native-handoff.fhd-native-landing header .officeMark'),'Header arrival CSS blends native and WebView artwork');

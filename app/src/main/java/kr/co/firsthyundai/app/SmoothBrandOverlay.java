@@ -2,6 +2,7 @@ package kr.co.firsthyundai.app;
 
 import android.app.Activity;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
@@ -32,8 +33,9 @@ final class SmoothBrandOverlay extends FrameLayout {
     private boolean finished;
     private int layoutAttempts;
     private final ArrayList<ObjectAnimator> arrivalFades=new ArrayList<>();
+    private final ArrayList<ValueAnimator> colorMorphs=new ArrayList<>();
     private static final long DURATION=790L;
-    private static final long LANDING_LEAD=165L;
+    private static final long LANDING_LEAD=255L;
     // Quieter takeoff than v2.0.64's fast-start curve, with a long soft landing.
     private final PathInterpolator natural=new PathInterpolator(.34f,.06f,.18f,1f);
 
@@ -147,23 +149,56 @@ final class SmoothBrandOverlay extends FrameLayout {
                 .scaleX(scale).scaleY(scale).setDuration(DURATION)
                 .setInterpolator(natural).start();
         }
-        ring.animate().alpha(0f).setDuration(460).start();
-        rule.animate().alpha(0f).setDuration(420).start();
+        // Keep the original gold halo visually attached to the emblem rather
+        // than leaving a stationary ring behind in the middle of the screen.
+        View badgePart=emblem;
+        int[] badgeAt=new int[2],ringAt=new int[2];
+        badgePart.getLocationOnScreen(badgeAt);
+        ring.getLocationOnScreen(ringAt);
+        float centerOffsetX=badgeAt[0]+badgePart.getWidth()/2f-ringAt[0]-ring.getWidth()/2f;
+        float centerOffsetY=badgeAt[1]+badgePart.getHeight()/2f-ringAt[1]-ring.getHeight()/2f;
+        float logoCX=rects[0]+rects[2]/2f;
+        float logoCY=rects[1]+rects[3]/2f;
+        float badgeTargetCX=web.getLeft()+logoCX*pxPerCss;
+        float badgeTargetCY=web.getTop()+logoCY*pxPerCss;
+        float nativeBadgeCX=badgeAt[0]-base[0]+badgePart.getWidth()/2f;
+        float nativeBadgeCY=badgeAt[1]-base[1]+badgePart.getHeight()/2f;
+        float badgeShiftX=badgeTargetCX-nativeBadgeCX;
+        float badgeShiftY=badgeTargetCY-nativeBadgeCY;
+        float ringScale=Math.min(rects[2]*pxPerCss/ring.getWidth(),
+                                  rects[3]*pxPerCss/ring.getHeight());
+        ring.animate().cancel();
+        ring.animate().translationX(badgeShiftX+centerOffsetX)
+                .translationY(badgeShiftY+centerOffsetY)
+                .scaleX(ringScale).scaleY(ringScale)
+                .setDuration(DURATION).setInterpolator(natural).start();
+        rule.animate().alpha(0f).setStartDelay(245).setDuration(390).start();
+        // First adjust the travelling letters towards the *final* HTML color:
+        // gold-to-pale-teal subtitle no longer swaps color on the last frame.
+        ValueAnimator titleColor=ValueAnimator.ofArgb(Color.WHITE,Color.rgb(249,255,255));
+        titleColor.addUpdateListener(a->title.setTextColor((Integer)a.getAnimatedValue()));
+        titleColor.setStartDelay(220);titleColor.setDuration(460);titleColor.start();
+        colorMorphs.add(titleColor);
+        ValueAnimator subtitleColor=ValueAnimator.ofArgb(Color.rgb(246,215,145),
+                Color.rgb(216,231,228));
+        subtitleColor.addUpdateListener(a->subtitle.setTextColor((Integer)a.getAnimatedValue()));
+        subtitleColor.setStartDelay(200);subtitleColor.setDuration(510);subtitleColor.start();
+        colorMorphs.add(subtitleColor);
         // Reveal the live header just before the native brand arrives, then
         // cross-dissolve the native and HTML glyphs instead of hard swapping.
         if(onApproach!=null)
             postDelayed(()->{if(!finished)onApproach.run();},DURATION-LANDING_LEAD);
         for(View part:parts){
             ObjectAnimator fade=ObjectAnimator.ofFloat(part,View.ALPHA,1f,0f);
-            fade.setStartDelay(DURATION-120);
-            fade.setDuration(120);
+            fade.setStartDelay(DURATION-215);
+            fade.setDuration(205);
             fade.setInterpolator(new android.view.animation.DecelerateInterpolator());
             arrivalFades.add(fade);
             fade.start();
         }
         // The deep-teal surface recedes before arrival, without a separate
         // cut or a suddenly exposed white background at the beginning.
-        backdrop.animate().alpha(0f).setStartDelay(95).setDuration(DURATION-145)
+        backdrop.animate().alpha(0f).setStartDelay(95).setDuration(DURATION-125)
                 .setInterpolator(natural).start();
         postDelayed(()->finish(done),DURATION);
     }
@@ -177,6 +212,8 @@ final class SmoothBrandOverlay extends FrameLayout {
         finished=true;
         for(ObjectAnimator fade:arrivalFades)fade.cancel();
         arrivalFades.clear();
+        for(ValueAnimator animator:colorMorphs)animator.cancel();
+        colorMorphs.clear();
         emblem.animate().cancel();
         title.animate().cancel();
         subtitle.animate().cancel();

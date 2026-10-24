@@ -2545,3 +2545,28 @@ body.fhd-native-handoff.fhd-native-landing header .brandHeaderText{
   transition:none!important;
  }
 }
+
+
+/* v2.0.65 final landing polish. Main logo's pale circular surround and shadow
+   develop continuously while the gold native halo travels into place. */
+body.fhd-native-handoff header .officeMark{
+ background-color:transparent!important;
+ box-shadow:0 0 0 rgba(7,31,38,0)!important;
+}
+body.fhd-native-handoff.fhd-native-landing header .officeMark{
+ background-color:#FDFBF6!important;
+ box-shadow:0 2px 11px #071F2630!important;
+ transition:opacity 230ms cubic-bezier(.3,.2,.2,1),
+            background-color 235ms ease-out,
+            box-shadow 235ms ease-out!important;
+}
+body.fhd-native-handoff.fhd-native-landing header .brandHeaderText{
+ transition:opacity 230ms cubic-bezier(.3,.2,.2,1)!important;
+}
+@media(prefers-reduced-motion:reduce){
+ body.fhd-native-handoff header .officeMark,
+ body.fhd-native-handoff.fhd-native-landing header .officeMark,
+ body.fhd-native-handoff.fhd-native-landing header .brandHeaderText{
+  transition:none!important;
+ }
+}

@@ -36,8 +36,8 @@ assert(lock.includes('FrameLayout emblemFrame')&&lock.includes('haloRing')&&lock
 assert(lock.includes('reducedMotion?0:920')&&lock.includes('welcomeHandler.postDelayed'),'Welcome is short and skippable, including reduced-motion');
 assert(main.includes('web.setAlpha(0f)')&&main.includes('onPageFinished')&&main.includes('webFirstFrameShown'),'WebView stays hidden until local first frame is loaded');
 assert(main.includes('window.FirstHyundaiMotion?.nativeHeaderRects?.()')&&
- main.includes('overlay.moveToHeader(positions,viewport,view,done)'),
- 'True native shared-element handoff measures the real DOM header');
+ main.includes('overlay.moveToHeader(positions,viewport,view,onApproach,done)'),
+ 'True native shared-element handoff measures the real DOM header and blends landing');
 assert(lock.includes('overridePendingTransition(0,0)'),'Prevent conflicting native activity slide');
 assert(lock.includes('overlay!=null && openAfterWelcome'),'Preserve native badge during authorized activity handoff');
 assert(main.includes('if(motionOff){')&&main.includes('view.setAlpha(1f);'),
