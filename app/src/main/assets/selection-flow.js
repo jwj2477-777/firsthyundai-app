@@ -39,7 +39,7 @@
    if(group&&button.parentElement===group){
     // These two-row controls are committed by their own state setters below:
     // no guessed next-frame selection and no duplicate animation.
-    if(DIRECT_IDS.includes(group.id))return null;
+    if(DIRECT_IDS.includes(group.id)||group.classList?.contains('newsCategoryTabs'))return null;
     return {group,spec};
    }
   }
@@ -148,7 +148,7 @@
  function beginDirect(id,next){
   pendingDirect=null;
   if(!DIRECT_IDS.includes(id)||reduceMotion())return;
-  const group=document.getElementById?.(id);
+  const group=id==='newsCategoryTabs'?document.querySelector?.('.page:not(.hidden) .newsCategoryTabs'):document.getElementById?.(id);
   if(!group)return;
   const key=id==='newsCategoryTabs'?'news':'trade-types';
   const peers=buttons(group,key);
