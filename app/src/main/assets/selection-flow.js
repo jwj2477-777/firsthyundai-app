@@ -1,7 +1,8 @@
-/* FIRST HYUNDAI · minimal two-button color flow v9
+/* FIRST HYUNDAI · minimal color flow v10 · exact trades-news via apartment info
  * No overlays, masks, moving shapes, transforms, resized buttons or clones.
  * The ACTUAL button backgrounds are painted in place, behind original text.
- * Other menus and all intermediate buttons remain entirely untouched.
+ * ONLY Trades ↔ News gives Apartment Info a faint passing color wash.
+ * Other journeys affect only their original selected and destination buttons.
  */
 (function(){
  'use strict';
@@ -80,6 +81,39 @@
   return 'linear-gradient('+angle+'deg, '+
    selected+' '+pct(position-12)+', '+idle+' '+pct(position+12)+')';
  }
+ // Only the top-row pair 0↔2 travels through the visual middle tab 1.
+ // This is visual pigment only; the middle tab never becomes selected.
+ function viaIndex(key,previous,next){
+  return key==='top-five'&&
+   ((previous===0&&next===2)||(previous===2&&next===0))?1:-1;
+ }
+ function rgb(color){
+  if(/^#[0-9a-f]{6}$/i.test(color))
+   return [1,3,5].map(i=>parseInt(color.slice(i,i+2),16));
+  if(/^#[0-9a-f]{3}$/i.test(color))
+   return [1,2,3].map(i=>parseInt(color[i]+color[i],16));
+  const m=color.match(/^rgba?\(\s*(\d+)[ ,]+(\d+)[ ,]+(\d+)/i);
+  return m?[+m[1],+m[2],+m[3]]:null;
+ }
+ function softlyMix(idle,source,amount){
+  const a=rgb(idle),b=rgb(source);
+  if(!a||!b)return idle;
+  const w=clamp(amount);
+  return 'rgb('+a.map((v,i)=>Math.round(v*(1-w)+b[i]*w)).join(', ')+')';
+ }
+ function middlePaint(angle,idle,highlight,center){
+  return 'linear-gradient('+angle+'deg, '+
+   idle+' '+pct(center-41)+', '+
+   highlight+' '+pct(center-14)+', '+
+   highlight+' '+pct(center+14)+', '+
+   idle+' '+pct(center+41)+')';
+ }
+ function restoreOne(saved,button){
+  if(!saved.has(button))return;
+  const old=saved.get(button);
+  if(old.value)button.style.setProperty('background',old.value,old.priority);
+  else button.style.removeProperty('background');
+ }
  function useBackground(button,background,record){
   if(!record.has(button)){
    record.set(button,{
@@ -111,7 +145,11 @@
   const a=source.getBoundingClientRect(),b=target.getBoundingClientRect();
   if(!visible(a)||!visible(b)){stats.skipped++;return;}
   const v=vector(a,b),afterSource=getPaint(source),afterTarget=getPaint(target);
-    const saved=new Map();
+  const middleIndex=viaIndex(key,previous,next);
+  const middle=middleIndex>=0?peers[middleIndex]:null;
+  const middleIdle=middle?getPaint(middle).color:null;
+  const totalDuration=middle?790:DURATION;
+  const saved=new Map();
   let raf=null,initial=null,finished=false;
   const cleanup=()=>{
    if(finished)return;
@@ -123,21 +161,30 @@
   stats.started++;
   if(key==='top-five')stats.topFive++;
   if(key==='news')stats.news++;
-  stats.lastPath=[previous,next];
+  stats.lastPath=middle?[previous,middleIndex,next]:[previous,next];
   const angle=v.angle;
   const oldColor=originalSelected.color;
   const newColor=afterTarget.color;
   function paintFrame(time){
    if(finished)return;
    if(initial==null)initial=time;
-   const t=clamp((time-initial)/DURATION);
-   // A quiet, feathered color boundary moves through the two endpoints.
-   // The old active color recedes, and the destination's own active color
-   // gently appears. Every other tab remains 100% unchanged.
-   const oldFront=-14+128*ease(t);
-   const newFront=-14+128*ease(clamp((t-.065)/.935));
+   const t=clamp((time-initial)/totalDuration);
+   // Existing motion is unchanged on every other route.
+   // Trades↔News: recede from source, pass a faint wash over Apartment Info,
+   // then fill the real destination. Never select or resize Apartment Info.
+   const oldFront=-14+128*ease(middle?clamp(t/.67):t);
+   const newFront=-14+128*ease(middle?clamp((t-.32)/.68):clamp((t-.065)/.935));
    useBackground(source,fromPaint(angle,afterSource.color,oldColor,oldFront),saved);
    useBackground(target,toPaint(angle,originalIdle.color,newColor,newFront),saved);
+   if(middle){
+    const phase=(t-.16)/.68;
+    if(phase>0&&phase<1){
+     const opacity=.21*Math.sin(Math.PI*phase);
+     const tint=softlyMix(middleIdle,oldColor,opacity);
+     const front=-41+182*ease(phase);
+     useBackground(middle,middlePaint(angle,middleIdle,tint,front),saved);
+    }else restoreOne(saved,middle);
+   }
    if(t<1)raf=window.requestAnimationFrame(paintFrame);
    else{
     if(running?.cleanup===cleanup)running=null;
@@ -171,7 +218,7 @@
   });
  }
  document.addEventListener('click',onClick,{capture:true});
- window.FirstHyundaiSelectionFlow={version:'9.0.0',
+ window.FirstHyundaiSelectionFlow={version:'10.0.0',
   _test:{buttons,chosen,findGroup,getPaint,fromPaint,toPaint,
-   vector,stop,onClick,stats}};
+   vector,viaIndex,softlyMix,middlePaint,stop,onClick,stats}};
 })();
