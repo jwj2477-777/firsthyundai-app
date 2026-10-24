@@ -2341,18 +2341,7 @@ header .brandHeaderText{overflow:hidden}
 #complexSheet.apartmentSheet.panel.detailOpen,#nearbyDetails.apartmentSheet.panel.detailOpen{
  transition-timing-function:cubic-bezier(.22,1,.36,1),ease-out,linear;
 }
-/* A little visual polish for confirmation dialogs; no delay before content
-   becomes actionable, and do not animate closing / disrupt keyboard focus. */
-@keyframes fhd-dialog-appear{
- from{opacity:.7;transform:translate3d(0,9px,0) scale(.992)}
- to{opacity:1;transform:translate3d(0,0,0) scale(1)}
-}
-dialog[open]:not(.apartmentSheet):not(.favoriteTradeAlertDialog){
- animation:fhd-dialog-appear 190ms var(--fhd-motion-ease) both
-}
-/* v2.0.61 · One-time brand continuity after the native FHD welcome.
-   Header/title/three navigation tiles arrive only on the first page load.
-   Later route changes keep their existing short fade; no functional layout changes. */
+/* Original FHD brand arrival only. Old staggered nav tile bounce removed. */
 @keyframes fhd-brand-arrive{
  from{opacity:.6;transform:translate3d(0,5px,0)}
  to{opacity:1;transform:translate3d(0,0,0)}
@@ -2521,4 +2510,9 @@ body.fhd-first-render #nav .primaryNav>button{
  #complexSheet.apartmentSheet.panel,#nearbyDetails.apartmentSheet.panel{
   transition:none!important;
  }
+}
+
+/* Resting and pressed contract primary button share identical geometry and shadow. */
+#contracts .contractMemoCard .contractOneTap:active{
+ transform:none!important;box-shadow:0 2px 5px #155F6624!important;
 }
