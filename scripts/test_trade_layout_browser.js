@@ -22,7 +22,12 @@ async function checkLayouts(){
   remote.new_trades={state:'ok',checked_at:time,records:[]};
   remote.news={state:'ok',checked_at:time,briefs:[]};
   remote.complexes={updated_at:'2026-10-20',records:[]};
-  publicServices={subscriptions:{state:'verified',updated_at:time,window_start:'2025-08-30',records:[]},office_sales:{state:'verified',updated_at:time,records:[]},office_rents:{state:'verified',updated_at:time,records:[]}};
+  publicServices={schema_version:1,schools:{state:'awaiting_approval',records:[]},subscriptions:{state:'verified',updated_at:time,window_start:'2025-08-30',records:[]},office_sales:{state:'verified',updated_at:time,records:[]},office_rents:{state:'verified',updated_at:time,records:[]}};
+  // Opening the real office route refreshes its provider. Serve the same
+  // deterministic snapshot there as well; CI network access must not replace
+  // fixtures with live government timestamps partway through a layout test.
+  const providerSnapshot=structuredClone(publicServices);
+  fetchRemote=async filename=>filename==='public_services'?structuredClone(providerSnapshot):null;
   renderTrades();
   for(const officeRole of ['family','admin']){
    document.body.dataset.officeRole=officeRole;
