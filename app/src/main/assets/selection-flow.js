@@ -1,4 +1,4 @@
-/* FIRST HYUNDAI · wind-drift tab selection v4
+/* FIRST HYUNDAI · wind-drift tab selection v4.1
  * Real text and button geometry never move.  A flat color front withdraws
  * from the source and fills the target, accompanied by faint windblown wisps.
  * The five top destinations are ONE logical group across both navigation rows.
@@ -87,16 +87,32 @@
   const motion=el.animate(frames,{duration:TIME,easing:EASE,fill:'both'});
   return motion;
  }
- function fillFrame(direction,reverse,radius){
-  const full='inset(0% 0% 0% 0% round '+radius+')';
-  if(direction==='right')return reverse?'inset(0% 100% 0% 0% round '+radius+')':
-   'inset(0% 0% 0% 100% round '+radius+')';
-  if(direction==='left')return reverse?'inset(0% 0% 0% 100% round '+radius+')':
-   'inset(0% 100% 0% 0% round '+radius+')';
-  if(direction==='down')return reverse?'inset(100% 0% 0% 0% round '+radius+')':
-   'inset(0% 0% 100% 0% round '+radius+')';
-  return reverse?'inset(0% 0% 100% 0% round '+radius+')':
-   'inset(100% 0% 0% 0% round '+radius+')';
+ // A wide, straight color sheet moves along the ACTUAL two-dimensional
+ // path between buttons, including diagonals between both upper rows.
+ function windVector(a,b){
+  const dx=b.x+b.w/2-a.x-a.w/2,dy=b.y+b.h/2-a.y-a.h/2;
+  const length=Math.max(1,Math.hypot(dx,dy));
+  return {dx,dy,ux:dx/length,uy:dy/length,
+   angle:Math.atan2(dy,dx)*180/Math.PI};
+ }
+ function sweep(parent,rect,color,vector,nodes,animations){
+  const diagonal=Math.hypot(rect.w,rect.h);
+  const across=diagonal*2.2,along=diagonal*1.16;
+  const slab=layer(parent,'sweep',{
+   x:rect.w/2-across/2,y:rect.h/2-along/2,w:across,h:along
+  },color,'0px',0);
+  slab.style.transformOrigin='center center';
+  nodes.push(slab);
+  const offset=diagonal*1.26,angle=vector.angle-90;
+  const move=d=>'translate3d('+(vector.ux*d)+'px,'+
+   (vector.uy*d)+'px,0) rotate('+angle+'deg)';
+  animations.push(animate(slab,[
+   {transform:move(-offset),offset:0},
+   {transform:move(-offset*.79),offset:.15},
+   {transform:move(offset*.63),offset:.81},
+   {transform:move(offset),offset:1}
+  ]));
+  return slab;
  }
  function wind(group,from,to,a,b,nodes,animations,oldTone,newTone){
   const cx=a.x+a.w/2,cy=a.y+a.h/2,ex=b.x+b.w/2,ey=b.y+b.h/2;
@@ -153,8 +169,6 @@
   const distanceY=(dst.top+dst.height/2)-(src.top+src.height/2);
   if(Math.abs(distanceX)>window.innerWidth*1.5||
      Math.abs(distanceY)>window.innerHeight*.76){stats.skipped++;return;}
-  const direction=Math.abs(distanceX)>=Math.abs(distanceY)?
-   (distanceX>=0?'right':'left'):(distanceY>=0?'down':'up');
   const sx=group.scrollLeft||0,sy=group.scrollTop||0;
   const a={x:src.left-container.left+sx,y:src.top-container.top+sy,w:src.width,h:src.height};
   const b={x:dst.left-container.left+sx,y:dst.top-container.top+sy,w:dst.width,h:dst.height};
@@ -178,28 +192,19 @@
     afterSource.borderRadius,0));
    nodes.push(layer(group,'target-base',b,oldTarget.background,
     oldTarget.borderRadius,0));
+   const vector=windVector(a,b);
+   // Rounded card-size paint boxes stay fixed. Only their *internal*
+   // straight-edged color sheets drift across. No layout or text motion.
    const out=layer(group,'source-color',a,oldSelection.background,
     oldSelection.borderRadius,1);
-   const incoming=layer(group,'target-color',b,afterTarget.background,
-    afterTarget.borderRadius,1);
+   const incoming=layer(group,'target-color',b,oldTarget.background,
+    oldTarget.borderRadius,1);
+   out.style.overflow='hidden';
+   incoming.style.overflow='hidden';
    nodes.push(out,incoming);
-   const fullSource='inset(0% 0% 0% 0% round '+oldSelection.borderRadius+')';
-   const fullTarget='inset(0% 0% 0% 0% round '+afterTarget.borderRadius+')';
-   const ending=fillFrame(direction,false,oldSelection.borderRadius);
-   const beginning=fillFrame(direction,true,afterTarget.borderRadius);
-   const main=animate(out,[
-    {clipPath:fullSource,opacity:1,offset:0},
-    {clipPath:fullSource,opacity:1,offset:.09},
-    {clipPath:ending,opacity:1,offset:.70},
-    {clipPath:ending,opacity:0,offset:1}
-   ]);
-   animations.push(main);
-   animations.push(animate(incoming,[
-    {clipPath:beginning,opacity:1,offset:0},
-    {clipPath:beginning,opacity:1,offset:.20},
-    {clipPath:fullTarget,opacity:1,offset:.93},
-    {clipPath:fullTarget,opacity:1,offset:1}
-   ]));
+   sweep(out,a,afterSource.background,vector,nodes,animations);
+   sweep(incoming,b,afterTarget.background,vector,nodes,animations);
+   const main=animations[0];
    wind(group,source,target,a,b,nodes,animations,oldSelection.tint,afterTarget.tint);
    animations.push(animate(source,[
     {color:oldSelection.color,offset:0},
@@ -254,6 +259,6 @@
  ].join('');
  document.head.appendChild(css);
  document.addEventListener('click',click,{capture:true});
- window.FirstHyundaiSelectionFlow={version:'4.0.0',
-  _test:{buttons,active,paint,findGroup,stop,click,reduced,fillFrame,stats}};
+ window.FirstHyundaiSelectionFlow={version:'4.1.0',
+  _test:{buttons,active,paint,findGroup,stop,click,reduced,windVector,stats}};
 })();
