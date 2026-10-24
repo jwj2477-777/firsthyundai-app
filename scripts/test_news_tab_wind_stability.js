@@ -80,7 +80,7 @@ onClick({target:b,defaultPrevented:false});
 selected=1;frame();
 const v=window.FirstHyundaiSelectionFlow;
 assert.equal(v._test.stats.started,1,'Both news sub-tabs must animate');
-assert.equal(group.children.length,15,'Two fixed bases, two filled cards and eleven wisps/grains');
+assert.equal(group.children.length,17,'Two buttons, two idle bases, two filled cards, eleven wind grains');
 assert.equal(group.children[4].style.background,'#6547A5','Original purple moves out');
 assert.equal(group.children[5].children[0].style.background,'#6547A5','Purple fills incoming card');
 assert.equal(group.children[4].style.overflow,'hidden','Wind is clipped within button');
