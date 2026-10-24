@@ -25,7 +25,9 @@ assert(lock.includes('SystemBars.install(this,stage);')&&!lock.includes('setCont
 assert(lock.includes('showWelcome(stage);'),'Opening logo must remain present');
 assert(main.includes('web.loadUrl("file:///android_asset/index.html")'),'Same WebView entry');
 assert(css.includes('/* v2.0.41: real-phone screenshot review'));
-const visual=css.slice(css.indexOf('/* v2.0.41: real-phone screenshot review'));
+const visualStart=css.indexOf('/* v2.0.41: real-phone screenshot review');
+const visualEnd=css.indexOf('/* v2.0.42 · SCREENSHOT-DRIVEN CONSISTENCY',visualStart);
+const visual=css.slice(visualStart,visualEnd<0?undefined:visualEnd);
 for(const t of [
  '#nav .primaryNav button.active::after{content:none;display:none}',
  '#nav .primaryNav button{',
