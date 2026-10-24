@@ -2274,3 +2274,65 @@ header .brandHeaderText{overflow:hidden}
  background:#F5FAF8;color:#205B5B;font-size:14px;font-weight:800}
 .favoriteAlertSettingsDialog .alertSettingsClose:focus-visible,
 .favoriteAlertSettingsDialog .alertPreviewButton:focus-visible{outline:3px solid #96D4C6;outline-offset:2px}
+
+
+/* v2.0.58 — professional area-specific price trends with explicit data limitations. */
+#complexSheet .complexPriceTrendShortcut{
+ display:block;width:100%;margin:8px 0 12px;padding:12px 14px;min-height:49px;
+ border:1.5px solid #B9D8D2;border-radius:11px;text-align:left;
+ background:#EAF5F1;color:#1B6864;font-weight:850;font-size:14px;cursor:pointer;
+}
+#nearbyDetails #nearbyTrendButton{background:#E9F6F2;color:#1C685D;border-color:#A6D3C9}
+#complexSheet .priceTrendPanel{max-width:100%;box-sizing:border-box;min-width:0}
+#complexSheet .priceTrendIntro{margin:2px 0 13px}
+#complexSheet .priceTrendIntro h3{font-size:19px;font-weight:850;letter-spacing:-.35px;color:#24525A;margin:3px 0 6px}
+#complexSheet .priceTrendIntro p{font-size:13px;color:#60767B;line-height:1.55;margin:0}
+#complexSheet .priceTrendFilters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+#complexSheet .priceTrendFilters button,#complexSheet .priceTrendPeriods button{
+ min-height:47px;border:1.5px solid #C9DCD6;background:#FFF;color:#395B61;
+ border-radius:10px;font-size:14px;font-weight:790;cursor:pointer;
+}
+#complexSheet .priceTrendFilters button.active,#complexSheet .priceTrendPeriods button.active{
+ background:#146E65;color:white;border-color:#105A53;
+}
+#complexSheet .priceTrendAreaLabel{display:block;color:#526F72;font-size:13px;font-weight:800;margin:7px 0 6px}
+#complexSheet #complexTrendAreaSelect{width:100%;box-sizing:border-box;min-height:50px;
+ border:1.5px solid #C8D9D5;border-radius:10px;background:#fff;color:#244D53;
+ padding:10px;font-size:15px;font-weight:780}
+#complexSheet .priceTrendOptions{display:flex;flex-wrap:wrap;align-items:center;gap:11px;justify-content:space-between;margin:11px 0 13px}
+#complexSheet .priceTrendPeriods{display:flex;gap:6px}
+#complexSheet .priceTrendPeriods button{min-width:73px;min-height:42px;padding:6px 9px}
+#complexSheet .priceTrendRenewal{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:760;color:#536D72;min-height:43px}
+#complexSheet .priceTrendRenewal input{width:20px;height:20px;min-width:20px;accent-color:#166D63}
+#complexSheet .priceTrendHeadline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 8px}
+#complexSheet .priceTrendHeadline strong{font-size:16px;color:#285258;overflow-wrap:anywhere}
+#complexSheet .priceTrendHeadline span{font-size:12px;color:#63797A;white-space:nowrap}
+#complexSheet .priceTrendKpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:12px}
+#complexSheet .priceTrendKpis>div{padding:12px 10px;min-width:0;background:#F1F8F5;border:1px solid #D9E9E2;border-radius:12px}
+#complexSheet .priceTrendKpis small,#complexSheet .priceTrendKpis span{display:block;font-size:12px;color:#61767A;line-height:1.4}
+#complexSheet .priceTrendKpis strong{display:block;font-size:19px;margin:6px 0;color:#1F5D60;line-height:1.35;overflow-wrap:anywhere}
+#complexSheet .priceTrendKpis strong.up{color:#A44836}
+#complexSheet .priceTrendKpis strong.down{color:#2868A2}
+#complexSheet .priceTrendKpis strong.quiet{color:#586C72}
+#complexSheet .priceTrendChart{padding:13px 10px 8px;background:#FFF;border:1px solid #E0EAE7;border-radius:13px;margin:10px 0}
+#complexSheet .priceTrendChart h4{font-size:14px;margin:1px 0 8px;color:#36595F}
+#complexSheet .priceTrendSvg{display:block;max-width:100%;height:auto;width:100%;font-family:inherit;overflow:visible}
+#complexSheet .priceTrendVolume{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px;height:43px;
+ align-items:end;padding:2px 13px;margin-top:10px;border-bottom:1px solid #DAE6E1;background:#F8FBFA;border-radius:8px}
+#complexSheet .priceTrendVolumeCol{height:100%;min-width:0;display:flex;align-items:flex-end;justify-content:center}
+#complexSheet .priceTrendVolumeCol>span{display:block;min-width:0;width:65%;max-width:17px;border-radius:3px 3px 0 0;background:#E0EBE7}
+#complexSheet .priceTrendVolumeCol>span.hasVolume{background:#83B9A9}
+#complexSheet .priceTrendVolumeCaption{font-size:12px;color:#697B7D;margin:5px 0 10px;line-height:1.4}
+#complexSheet .priceTrendTable{margin:10px 0;border:1px solid #DBE7E3;border-radius:12px;overflow:hidden;background:#FFF}
+#complexSheet .priceTrendTable>summary{cursor:pointer;font-size:13px;font-weight:800;padding:14px;color:#366467;min-height:46px;box-sizing:border-box;background:#F4F8F6}
+#complexSheet .priceTrendScroll{overflow-x:auto}
+#complexSheet .priceTrendScroll table{border-collapse:collapse;width:100%;font-size:13px;min-width:290px}
+#complexSheet .priceTrendScroll th,#complexSheet .priceTrendScroll td{padding:9px 8px;text-align:left;border-bottom:1px solid #EBF0ED}
+#complexSheet .priceTrendScroll td:last-child{text-align:right}
+#complexSheet .priceTrendScroll thead th{color:#526B70;background:#F8FAF9;font-size:12px}
+#complexSheet .priceTrendCaution{font-size:12px;color:#657479;line-height:1.6;padding:10px 12px;border-radius:9px;background:#F5F7F6;margin:12px 0}
+#complexSheet .priceTrendEmpty{font-size:14px;line-height:1.6;padding:16px 12px;text-align:center;color:#60737A;background:#F3F7F5;border-radius:10px}
+@media(max-width:385px){#complexSheet .priceTrendKpis strong{font-size:16px}
+ #complexSheet .priceTrendKpis>div{padding:10px 7px}
+ #complexSheet .priceTrendChart{padding:10px 6px}}
+@media(prefers-contrast:more){#complexSheet .priceTrendFilters button.active,#complexSheet .priceTrendPeriods button.active{border-width:3px}}

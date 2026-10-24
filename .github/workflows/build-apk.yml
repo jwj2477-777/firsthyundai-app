@@ -137,6 +137,7 @@ jobs:
         run: |
           python3 -c "from pathlib import Path; x=Path('app/src/main/assets/index.html').read_text(encoding='utf-8'); Path('/tmp/firsthyundai-ui.js').write_text(x.split('<script>',1)[1].split('</script>',1)[0],encoding='utf-8')"
           node --check /tmp/firsthyundai-ui.js
+          node scripts/test_price_trends.js
           node scripts/test_nearby.js
           node scripts/test_compact_complex_cards.js
           node scripts/test_favorite_trade_count_buttons.js
@@ -273,22 +274,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.57 global favorite-alert header shortcut APK
+      - name: Publish v2.0.58 apartment price trend charts APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.57.apk
-          unzip -t FirstHyundai-v2.0.57.apk | grep 'No errors detected'
-          if gh release view v2.0.57 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.58.apk
+          unzip -t FirstHyundai-v2.0.58.apk | grep 'No errors detected'
+          if gh release view v2.0.58 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.57 FirstHyundai-v2.0.57.apk \
+            gh release create v2.0.58 FirstHyundai-v2.0.58.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.57 · 상단 알림 아이콘·설정 이동' \
-              --notes '관심 14개 단지의 알림 설정을 실거래 목록 내부에서 제거하고, 어느 화면에서든 접근 가능한 가족·관리자 모드 옆 종 아이콘으로 옮겼습니다. 종 아이콘을 누르면 기존 팝업 알림 켜기, 휴대폰 알림센터 알림 허용, 미리보기 설정창이 열립니다. 새 거래가 남아 있을 때만 종에 작은 점을 표시합니다. 업데이트 알림 배너는 새 버전 감지·설치·닫기 버튼 구조를 유지하며 기존 보안 서명 검증과 직접 설치도 보존했습니다. v2.0.57/build108.'
+              --title '퍼스트현대 v2.0.58 · 아파트 단지·평형별 가격동향 그래프' \
+              --notes '단지별 가격동향 탭을 추가했습니다. 관심14개 단지와 단지정보에서 이동하며 매매·전세·월세, 전용면적, 6개월·12개월별 계약 중위가격 및 월별 거래량을 표시합니다. 월세는 보증금과 월차임을 분리하여 보여주고 해제거래는 제외, 갱신계약은 별도 포함 선택할 수 있습니다. 저표본 변동률 미표시, 부분 수집오류 경고, 실거래 계약일 기준 월별 상세표 포함. 기존 데이터/API와 부모님 모드·기본 계약 기능·업데이트 서명 검증 유지. v2.0.58/build109.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.57 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.57 --apk FirstHyundai-v2.0.57.apk
+          gh release upload v2.0.58 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.58 --apk FirstHyundai-v2.0.58.apk

@@ -250,6 +250,7 @@ body.apartmentSheetActive{overflow:hidden}
  <section class="panel apartmentSheet" id="nearbyDetails" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="nearbySheetTitle">
   <div class="detailSheetTop"><button class="detailBackButton" type="button" onclick="closeApartmentSheet()" aria-label="관심 아파트 목록으로 돌아가기"><span aria-hidden="true">‹</span><span>목록</span></button><strong id="nearbySheetTitle">관심 아파트 실거래</strong></div>
   <button class="detailSwitchButton" id="nearbyBasicButton" type="button" onclick="openFavoriteBasicInfo()">⌂ 이 아파트 기본정보 보기 ›</button>
+  <button class="detailSwitchButton" id="nearbyTrendButton" type="button" onclick="openFavoritePriceTrend()">↗ 이 아파트 가격동향 보기 ›</button>
   <div class="sectionTitle"><div><h2 id="nearbyTitle">관심 14개 단지 실거래</h2><p class="tiny" id="nearbyMeta">국토교통부 실거래가 자료를 불러오는 중입니다.</p></div></div>
   <p class="tiny" style="margin-bottom:4px">거래 유형</p>
   <div class="tradeTypeBar" id="nearbyTypeBar" aria-label="관심단지 거래유형">
@@ -894,6 +895,14 @@ window.firstHyundaiGoBack=function(){
  if($('favoriteTradeAlertDialog')?.open){window.FirstHyundaiTradeAlerts?.later();return true;}
  return closeApartmentSheet();
 };
+function openFavoritePriceTrend(){
+ const id=nearbySelected;
+ if(id==='all'||!catalogRows().some(x=>x.id===id))return;
+ $('complexSearch').value='';
+ switchPage('complexes');
+ selectComplex(id);
+ setComplexDetailTab('trends');
+}
 function openFavoriteBasicInfo(){
  const id=nearbySelected;
  if(id==='all'||!catalogRows().some(x=>x.id===id))return;
@@ -1017,6 +1026,14 @@ function favoriteIdForBuilding(name){return FAVORITE_MATCH.get(normalizeAptName(
 
 /* APARTMENT_CATALOG_V16: deduplicated, source-backed public facts and quick tabs. */
 let complexSelected='f15', complexDisplayLimit=48, complexDetailTab='basic', complexDealType='';
+let complexTrendType='매매',complexTrendArea='',complexTrendMonths=12,complexTrendIncludeRenewals=false;
+function setComplexTrendType(type){
+ if(!['매매','전세','월세'].includes(type))return;
+ complexTrendType=type;complexTrendArea='';complexTrendIncludeRenewals=false;renderComplexes();
+}
+function setComplexTrendArea(area){complexTrendArea=/^d{1,3}.d{2}$/.test(String(area))?String(area):'';renderComplexes();}
+function setComplexTrendMonths(value){if(value!==6&&value!==12)return;complexTrendMonths=value;renderComplexes();}
+function setComplexTrendRenewals(value){complexTrendIncludeRenewals=!!value;complexTrendArea='';renderComplexes();}
 function baseComplexes(){
  return FAVORITE_APTS.map(g=>({id:g.id,label:g.label,aliases:g.names}));
 }
@@ -1187,7 +1204,7 @@ function displayComplexValue(v,suffix=''){
  return v===null||v===undefined||v===''?'확인 전':String(v)+suffix;
 }
 function setComplexDetailTab(tab){
- if(!['basic','types','schools','deals','public','nearby','sources'].includes(tab))return;
+ if(!['basic','types','schools','deals','trends','public','nearby','sources'].includes(tab))return;
  complexDetailTab=tab;
  renderComplexes();
  if(activeApartmentSheet==='complexSheet')$('complexSheet').scrollTop=0;
@@ -1376,6 +1393,7 @@ function renderComplexes(){
   const dealRows=stats.filter(g=>!active||(active==='매매'?g.sale:active==='전세'?g.lease:g.monthly)>0);
   const deals='<p class="tiny">국토교통부 공개 실거래 기준 · 면적·거래유형을 선택하면 상세 거래로 이동합니다.</p>'+
    '<div class="complexTradeFilters">'+dealButtons+'</div>'+
+   '<button type="button" class="complexPriceTrendShortcut" onclick="setComplexDetailTab(&quot;trends&quot;)">⌁ 이 단지 가격동향 그래프 보기 ›</button>'+
    (dealRows.length?dealRows.slice(0,35).map(g=>{
     const cnt=active==='매매'?g.sale:active==='전세'?g.lease:active==='월세'?g.monthly:g.total;
     return '<button type="button" class="complexTap" onclick="showComplexTrades(\''+p.id+'\','+g.area+',\''+active+'\')">'+
@@ -1410,10 +1428,14 @@ function renderComplexes(){
     '<strong>'+escapeHtml(x.name)+'</strong>'+
     (safeLink(x.source_url)?'<a href="'+escapeHtml(safeLink(x.source_url))+'">근거 확인 ↗</a>':'')+'</div>').join('')+'</div>':
     '<div class="empty">이 단지의 배정학교는 아직 검증되지 않았습니다.</div>';
-  const tabs=[['basic','기본정보'],['types','평형·타입'],['schools','학교·학군'],['deals','실거래'],['public','관리비'],['nearby','주변시설'],['sources','평면도·원문']]
+  const trends=window.FirstHyundaiPriceTrends?.render?.({rows:complexTradeRows(p),type:complexTrendType,
+   area:complexTrendArea,months:complexTrendMonths,includeRenewals:complexTrendIncludeRenewals,
+   snapshot:remote.trades||{},formatArea:area=>displayExclusiveArea(area,p)})||
+   '<div class="empty">가격동향 화면을 불러오지 못했습니다.</div>';
+  const tabs=[['basic','기본정보'],['types','평형·타입'],['schools','학교·학군'],['deals','실거래'],['trends','가격동향'],['public','관리비'],['nearby','주변시설'],['sources','평면도·원문']]
    .map(([id,label])=>'<button type="button" class="'+(id===complexDetailTab?'active':'')+
     '" onclick="setComplexDetailTab(\''+id+'\')" aria-pressed="'+(id===complexDetailTab?'true':'false')+'">'+label+'</button>').join('');
-  const tabBody=complexDetailTab==='types'?areaView:complexDetailTab==='schools'?zoneCard+schoolView+renderSchoolPublicInfo():complexDetailTab==='deals'?deals:complexDetailTab==='public'?renderPublicComplexInfo(p):complexDetailTab==='nearby'?renderNearbyComplexInfo(p):complexDetailTab==='sources'?doc:basic;
+  const tabBody=complexDetailTab==='types'?areaView:complexDetailTab==='schools'?zoneCard+schoolView+renderSchoolPublicInfo():complexDetailTab==='deals'?deals:complexDetailTab==='trends'?trends:complexDetailTab==='public'?renderPublicComplexInfo(p):complexDetailTab==='nearby'?renderNearbyComplexInfo(p):complexDetailTab==='sources'?doc:basic;
   // Sticky heading includes the verified complex name; do not duplicate it above the address.
   $('complexDetails').innerHTML=
    '<div class="complexDetailAddress"><strong>지번 · '+escapeHtml(verifiedLotAddress(p)||'확인 중')+'</strong>'+    (p.address?'<small>도로명 · '+escapeHtml(p.address)+'</small>':'')+'</div>'+
@@ -1902,7 +1924,7 @@ let tradeFocus=null;
 function selectComplex(id){
  const match=catalogRows().find(x=>x.id===id);
  if(!match)return;
- complexSelected=id;complexDetailTab='basic';complexDealType='';nearbyLiveResult=null;nearbyError='';nearbySerial++;nearbyLoading=false;
+ complexSelected=id;complexDetailTab='basic';complexDealType='';complexTrendType='매매';complexTrendArea='';complexTrendMonths=12;complexTrendIncludeRenewals=false;nearbyLiveResult=null;nearbyError='';nearbySerial++;nearbyLoading=false;
  renderComplexes();
  // Favorites can launch from a previous search without losing the target.
  if(complexSelected!==id){
@@ -1924,6 +1946,7 @@ function chooseNearby(id){
  const g=FAVORITE_APTS.find(x=>x.id===id);
  $('nearbySheetTitle').textContent=g?g.label:'관심 14개 단지 전체 실거래';
  $('nearbyBasicButton').classList.toggle('hidden',id==='all');
+ $('nearbyTrendButton').classList.toggle('hidden',id==='all');
  openApartmentSheet('nearbyDetails');
 }
 function showMoreNearby(){nearbyLimit+=40;renderNearbyDetails(false);}
@@ -2649,4 +2672,4 @@ function exportComplexCatalog(){
 }
 window.onCatalogSaved=r=>alert(r.ok?'단지정보 JSON을 저장했습니다. GitHub에 올려야 가족에게 반영됩니다.':'단지정보 파일 저장 실패');
 
-</script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-image.js"></script><script src="scroll-top.js"></script><script src="app-updates.js"></script></body></html>
+</script><script src="price-trends.js"></script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-image.js"></script><script src="scroll-top.js"></script><script src="app-updates.js"></script></body></html>

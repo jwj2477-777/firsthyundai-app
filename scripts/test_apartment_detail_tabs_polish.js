@@ -12,7 +12,7 @@ assert(html.includes('aria-labelledby="complexSheetTitle"') &&
 assert(!script.includes("'<h3 class=\"complexDetailTitle\">'+escapeHtml(p.label)"),
  'The selected complex name must not appear twice in the header');
 for(const tab of ["['basic','기본정보']","['types','평형·타입']",
- "['schools','학교·학군']","['deals','실거래']",
+ "['schools','학교·학군']","['deals','실거래']","['trends','가격동향']",
  "['public','관리비']","['nearby','주변시설']",
  "['sources','평면도·원문']"])
  assert(script.includes(tab),'Missing existing detail tab '+tab);
