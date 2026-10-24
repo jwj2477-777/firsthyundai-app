@@ -8,7 +8,9 @@ const html=fs.readFileSync(path.join(dir,'index.html'),'utf8');
 new vm.Script(base);new vm.Script(smart);
 assert(html.includes('id="contracts"')&&html.includes('contracts-smart.js'));
 assert(html.includes('ct_address')&&html.includes('ct_autoDeposit')&&html.includes('ct_suggestions'));
-assert(!/\b(localStorage|fetch|XMLHttpRequest)\b/.test(base+smart),'Customer contract information must not be sent or persisted');
+assert(!/\b(fetch|XMLHttpRequest)\b/.test(base+smart),'Customer contract information must not be uploaded');
+assert(base.includes("PROPOSAL_TEMPLATE_KEY='fhd_contract_proposal_template_v1'"),'Only preapproved reusable template settings may persist');
+assert(!/localStorage\.setItem\([^\n]*(?:ct_|rough|accountHolder)/.test(base),'Never persist customer-specific contract fields');
 const elements=new Map();
 function el(id){
  if(!elements.has(id)){
