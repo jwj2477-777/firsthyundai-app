@@ -1,12 +1,12 @@
-/* FIRST HYUNDAI · direct background-color flow v6
+/* FIRST HYUNDAI · minimal two-button color flow v7
  * No overlays, masks, moving shapes, transforms, resized buttons or clones.
  * The ACTUAL button backgrounds are painted in place, behind original text.
- * Intermediate top-menu buttons show a brief passing band, never become active.
+ * Other menus and all intermediate buttons remain entirely untouched.
  */
 (function(){
  'use strict';
  if(!document?.addEventListener||!window?.getComputedStyle)return;
- const DURATION=720;
+ const DURATION=630;
  const MAIN={key:'top-five',selector:'#nav'};
  const PEER_GROUPS=[
   {key:'property',selector:'.page:not(.hidden) .propertyTypeSwitch'},
@@ -66,34 +66,11 @@
  // The selected fill moves away from the trailing edge in its true direction.
  function fromPaint(angle,idle,selected,position){
   return 'linear-gradient('+angle+'deg, '+
-   idle+' '+pct(position-5)+', '+selected+' '+pct(position+5)+')';
+   idle+' '+pct(position-12)+', '+selected+' '+pct(position+12)+')';
  }
  function toPaint(angle,idle,selected,position){
   return 'linear-gradient('+angle+'deg, '+
-   selected+' '+pct(position-5)+', '+idle+' '+pct(position+5)+')';
- }
- function passPaint(angle,idle,selected,position){
-  // A small wave of the SAME source pigment briefly crosses a button that
-  // lies between endpoints. It does not change that button's selected state.
-  return 'linear-gradient('+angle+'deg, '+
-   idle+' '+pct(position-33)+', '+selected+' '+pct(position-24)+', '+
-   selected+' '+pct(position+9)+', '+idle+' '+pct(position+18)+')';
- }
- function intermediates(peers,from,to){
-  const r1=peers[from].getBoundingClientRect();
-  const r2=peers[to].getBoundingClientRect();
-  const A=center(r1),v=vector(r1,r2);
-  return peers.map((button,index)=>{
-   if(index===from||index===to)return null;
-   const r=button.getBoundingClientRect(),p=center(r);
-   const vx=p.x-A.x,vy=p.y-A.y;
-   const progress=(vx*v.ux+vy*v.uy)/v.len;
-   const off=Math.abs(vx*v.uy-vy*v.ux);
-   // Only actual between-points, close-to-the-segment tabs glow on passage.
-   const corridor=Math.min(128,Math.max(r.width,r.height)*.68);
-   return progress>.05&&progress<.95&&off<corridor?
-    {index,progress,button}:null;
-  }).filter(Boolean).sort((a,b)=>a.progress-b.progress);
+   selected+' '+pct(position-12)+', '+idle+' '+pct(position+12)+')';
  }
  function useBackground(button,background,record){
   if(!record.has(button)){
@@ -122,8 +99,7 @@
   const a=source.getBoundingClientRect(),b=target.getBoundingClientRect();
   if(!visible(a)||!visible(b)){stats.skipped++;return;}
   const v=vector(a,b),afterSource=getPaint(source),afterTarget=getPaint(target);
-  const mids=key==='top-five'?intermediates(peers,previous,next):[];
-  const saved=new Map();
+    const saved=new Map();
   let raf=null,initial=null,finished=false;
   const cleanup=()=>{
    if(finished)return;
@@ -135,7 +111,7 @@
   stats.started++;
   if(key==='top-five')stats.topFive++;
   if(key==='news')stats.news++;
-  stats.lastPath=[previous,...mids.map(m=>m.index),next];
+  stats.lastPath=[previous,next];
   const angle=v.angle;
   const oldColor=originalSelected.color;
   const newColor=afterTarget.color;
@@ -143,26 +119,13 @@
    if(finished)return;
    if(initial==null)initial=time;
    const t=clamp((time-initial)/DURATION);
-   const oldFront=112*ease(clamp((t+.06)/.89))-6;
-   const newFront=112*ease(clamp((t-.11)/.89))-6;
+   // A quiet, feathered color boundary moves through the two endpoints.
+   // The old active color recedes, and the destination's own active color
+   // gently appears. Every other tab remains 100% unchanged.
+   const oldFront=-14+128*ease(t);
+   const newFront=-14+128*ease(clamp((t-.065)/.935));
    useBackground(source,fromPaint(angle,afterSource.color,oldColor,oldFront),saved);
    useBackground(target,toPaint(angle,originalIdle.color,newColor,newFront),saved);
-   for(const {button,progress} of mids){
-    // Passing color pulse tracks actual distance along the route. The 5
-    // actual states and all onclick handlers remain completely unchanged.
-    const at=.12+progress*.75;
-    const local=(t-(at-.155))/.31;
-    if(local<0||local>1){
-     if(saved.has(button)){
-      const prior=saved.get(button);
-      if(prior.value)button.style.setProperty('background',prior.value,prior.priority);
-      else button.style.removeProperty('background');
-     }
-    }else{
-     useBackground(button,passPaint(angle,getPaintBase(button),oldColor,
-      -24+148*ease(local)),saved);
-    }
-   }
    if(t<1)raf=window.requestAnimationFrame(paintFrame);
    else{
     if(running?.cleanup===cleanup)running=null;
@@ -170,11 +133,9 @@
     stats.finished++;
    }
   }
-  const idleColors=new Map(mids.map(m=>[m.button,getPaint(m.button).color]));
-  function getPaintBase(button){return idleColors.get(button)||'#FFFFFF'}
   // Immediate first paint. No RAF delays between new selected DOM and effect.
-  useBackground(source,fromPaint(angle,afterSource.color,oldColor,-6),saved);
-  useBackground(target,toPaint(angle,originalIdle.color,newColor,-6),saved);
+  useBackground(source,fromPaint(angle,afterSource.color,oldColor,-14),saved);
+  useBackground(target,toPaint(angle,originalIdle.color,newColor,-14),saved);
   raf=window.requestAnimationFrame(paintFrame);
  }
  function onClick(event){
@@ -196,7 +157,7 @@
   });
  }
  document.addEventListener('click',onClick,{capture:true});
- window.FirstHyundaiSelectionFlow={version:'6.0.0',
-  _test:{buttons,chosen,findGroup,getPaint,fromPaint,toPaint,passPaint,
-   vector,intermediates,stop,onClick,stats}};
+ window.FirstHyundaiSelectionFlow={version:'7.0.0',
+  _test:{buttons,chosen,findGroup,getPaint,fromPaint,toPaint,
+   vector,stop,onClick,stats}};
 })();
