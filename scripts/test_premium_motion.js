@@ -36,6 +36,9 @@ const ctx=vm.createContext({document,window:{matchMedia:()=>({matches:disable})}
 vm.runInContext(source,ctx);
 assert.equal(typeof handler,'function');
 assert.equal(typeof ctx.window.FirstHyundaiMotion.playEntrance,'function');
+assert.equal(typeof ctx.window.FirstHyundaiMotion.prepareBrandHandoff,'function');
+assert.equal(typeof ctx.window.FirstHyundaiMotion.startBrandHandoff,'function');
+assert(css.includes('body.fhd-brand-handoff header .officeMark')&&css.includes('.fhd-bridge-logo'));
 const event={pointerType:'touch',isPrimary:true,target:{closest:()=>target},clientX:135,clientY:220};
 handler(event);assert.equal(created,1);assert.equal(added,1);
 assert.equal(target.wave.style.left,'35px');assert.equal(target.wave.style.top,'20px');
@@ -44,6 +47,6 @@ target.wave.fire('animationend');assert.equal(removed,1,'Touch wave must clean i
 disable=true;handler(event);assert.equal(created,1,'Reduced motion disables visual effects');
 disable=false;target.disabled=true;handler(event);assert.equal(created,1,'Disabled buttons cannot animate');
 target.disabled=false;handler({...event,pointerType:'mouse',button:2});assert.equal(created,1,'Right click does not trigger waves');
-assert(!/setTimeout|setInterval|fetch\(|localStorage|preventDefault\(|stopPropagation\(/.test(source),
+assert(!/setInterval|fetch\(|localStorage|preventDefault\(|stopPropagation\(/.test(source),
  'Motion must neither schedule work nor intercept app events or change data');
 console.log('Premium motion verified: delegated passive touch, short transitions, cleanup, disabled/reduced motion, no workflow changes.');

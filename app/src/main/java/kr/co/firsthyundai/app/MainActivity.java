@@ -72,13 +72,27 @@ public class MainActivity extends Activity {
                 if(!"file:///android_asset/index.html".equals(url)||webFirstFrameShown)return;
                 webFirstFrameShown=true;
                 if(isFinishing()||isDestroyed())return;
-                view.evaluateJavascript("window.FirstHyundaiMotion?.playEntrance?.()",null);
                 boolean motionOff=false;
                 try{motionOff=Settings.Global.getFloat(getContentResolver(),
                         Settings.Global.ANIMATOR_DURATION_SCALE,1f)==0f;}
                 catch(Exception ignored){}
-                if(motionOff)view.setAlpha(1f);
-                else view.animate().alpha(1f).setDuration(220).start();
+                if(motionOff){view.setAlpha(1f);return;}
+                // Build the center-logo overlay while WebView is invisible,
+                // then move the SAME brand elements to their measured header
+                // locations. If layout/animation is unsupported, fade normally.
+                view.evaluateJavascript(
+                    "Boolean(window.FirstHyundaiMotion?.prepareBrandHandoff?.())",ready->{
+                    if(isFinishing()||isDestroyed())return;
+                    if("true".equals(ready)){
+                        view.setAlpha(1f);
+                        view.evaluateJavascript(
+                          "window.FirstHyundaiMotion?.startBrandHandoff?.()",null);
+                    }else{
+                        view.evaluateJavascript(
+                          "window.FirstHyundaiMotion?.playEntrance?.()",null);
+                        view.animate().alpha(1f).setDuration(220).start();
+                    }
+                });
             }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return routeExternal(request.getUrl().toString());

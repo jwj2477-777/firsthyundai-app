@@ -246,6 +246,12 @@ public class LockActivity extends Activity {
         if(dismissWelcome!=null)welcomeHandler.removeCallbacks(dismissWelcome);
         FrameLayout overlay=welcomeOverlay;
         welcomeOverlay=null;
+        if(overlay!=null && openAfterWelcome){
+            // Keep the original FHD image visible until Main's shared brand
+            // overlay takes over. Never expose the underlying login screen.
+            openMain();
+            return;
+        }
         if(overlay!=null){
             overlay.animate().cancel();
             overlay.animate().alpha(0f).setDuration(150).withEndAction(()->{
@@ -260,6 +266,7 @@ public class LockActivity extends Activity {
         if(!welcomeDone){openAfterWelcome=true;return;}
         if(isFinishing() || isDestroyed()) return;
         startActivity(new Intent(this, MainActivity.class));
+        overridePendingTransition(0,0);
         finish();
     }
 
