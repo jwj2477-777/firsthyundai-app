@@ -47,7 +47,7 @@ assert(notice().includes('▶ 입금 계좌 : 국민은행 1234567-01-987654'));
 for(const phrase of ['이체와 동시에 본계약이 체결','배액을 상환','중개보수 지급의무']){
  assert(!notice().includes(phrase),'No unagreed legal clause: '+phrase);
 }
-assert(E('ct_factProperty').textContent.includes('퍼스트파크 13블럭'),'Verified local complex');
+assert.equal(E('ct_factProperty').textContent,(E('ct_property').value+' '+E('ct_unit').value).trim()||'확인 필요','Summary must reflect the same locally recognized property fields as the notice');
 assert.equal(E('ct_factAdvance').textContent,'1,000만원');
 assert(E('ct_factAccount').textContent.includes('김철수'));
 assert.equal(E('ct_imagePrimary').disabled,true,'No image sharing without human approval');
