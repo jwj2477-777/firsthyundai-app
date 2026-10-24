@@ -67,7 +67,7 @@ const win={
 };
 vm.runInNewContext(flow,{window:win,document:doc,Math,Map,Object,Array,Number});
 const api=win.FirstHyundaiSelectionFlow;
-assert.equal(api.version,'9.0.0');
+assert.equal(api.version,'10.0.0');
 function step(time){const item=pending.shift();assert(item,'RAF missing');if(!cancelled.has(item.id))item.fn(time)}
 for(const id of ids){
  const g=groups[id],other=ids.filter(x=>x!==id).map(x=>groups[x]);
