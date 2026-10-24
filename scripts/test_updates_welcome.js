@@ -40,7 +40,7 @@ assert(main.includes('window.FirstHyundaiMotion?.prepareBrandHandoff?.()')&&
  'Shared brand handoff waits for measured live header positions');
 assert(lock.includes('overridePendingTransition(0,0)'),'Prevent conflicting native activity slide');
 assert(lock.includes('overlay!=null && openAfterWelcome'),'Preserve native badge during authorized activity handoff');
-assert(main.includes('if(motionOff)view.setAlpha(1f)'),'Reduced motion must reveal instantly');
+assert(main.includes('if(motionOff){view.setAlpha(1f);return;}'),'Reduced motion must reveal instantly and skip the animation');
 
 assert(main.includes('downloadAndInstallVerifiedAppUpdate()')&&main.includes('AppUpdate.allowedDownload(url)'));
 assert(main.includes('AppUpdateInstaller.download(')&&main.includes('beginVerifiedInstallation(apk)'));
