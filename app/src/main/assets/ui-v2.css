@@ -2450,27 +2450,6 @@ body.fhd-native-arrived.fhd-first-render header .brandHeaderText{
 }
 @media(max-width:400px){header .brandSubtitle{letter-spacing:.075em!important}}
 
-/* v2.0.70 · Apartment/officetel heading rhythm: identical hierarchy.
-   The 13px trades-only override previously caused a visible size mismatch. */
-#trades.page>.sectionTitle:first-child,
-#officetel.page>.sectionTitle:first-child{
- margin-top:18px;margin-bottom:13px;
-}
-#trades.page>.sectionTitle:first-child h2,
-#officetel.page>.sectionTitle:first-child h2{
- font-family:inherit;font-size:22px;line-height:1.35;font-weight:850;
- letter-spacing:-.6px;word-break:keep-all;
-}
-#trades.page>.sectionTitle:first-child #tradesMeta,
-#officetel.page>.sectionTitle:first-child p.tiny{
- display:block;margin:8px 0 0;
- font-family:inherit;font-size:14px;line-height:1.5;font-weight:500;
- letter-spacing:-.15px;color:#5F7478;
- min-height:42px;word-break:keep-all;overflow-wrap:break-word;
-}
-#trades .propertyTypeSwitch.sectionModeSwitch,
-#officetel .propertyTypeSwitch.sectionModeSwitch{margin-bottom:12px}
-
 /* v2.0.71 · Quiet interaction policy: ONE transition per peer group.
    Old ripple, tap compression, bouncing nav tiles and page-entry animations
    compete with the fluid background. Preserve focus indication and the
@@ -2515,4 +2494,56 @@ body.fhd-first-render #nav .primaryNav>button{
 /* Resting and pressed contract primary button share identical geometry and shadow. */
 #contracts .contractMemoCard .contractOneTap:active{
  transform:none!important;box-shadow:0 2px 5px #155F6624!important;
+}
+
+/* v2.0.72 · ONE source of truth for equal-rank page headings.
+   Older rules used 20px for news/complexes but overrode only trades and
+   officetel to 22px. All six routes now share the same rhythm and typography.
+   Existing news counts, last-sync timestamps, and failure notices remain. */
+:is(#trades,#nearby,#new,#officetel,#complexes,#news).page>.sectionTitle:first-child{
+ display:flex;
+ align-items:flex-start;
+ justify-content:space-between;
+ gap:9px;
+ margin:16px 0 12px;
+ min-height:0;
+}
+:is(#trades,#nearby,#new,#officetel,#complexes,#news).page>.sectionTitle:first-child>div{
+ flex:1 1 auto;
+ min-width:0;
+}
+:is(#trades,#nearby,#new,#officetel,#complexes,#news).page>.sectionTitle:first-child h2{
+ margin:0;
+ font-family:inherit;
+ font-size:20px;
+ line-height:1.4;
+ font-weight:820;
+ letter-spacing:-.5px;
+ color:#243B44;
+ word-break:keep-all;
+ overflow-wrap:break-word;
+}
+:is(#trades,#nearby,#new,#officetel,#complexes,#news).page>.sectionTitle:first-child p.tiny{
+ display:block;
+ margin:6px 0 0;
+ min-height:42px;
+ font-family:inherit;
+ font-size:14px;
+ line-height:1.5;
+ font-weight:500;
+ letter-spacing:-.12px;
+ color:#536A71;
+ word-break:keep-all;
+ overflow-wrap:break-word;
+}
+:is(#trades,#nearby,#new,#officetel,#complexes,#news).page>.sectionTitle:first-child>.refreshAction{
+ flex:0 0 auto;
+ min-width:74px;
+ min-height:49px;
+}
+@media(max-width:380px){
+ :is(#trades,#nearby,#new,#officetel,#complexes,#news).page>.sectionTitle:first-child h2{
+  font-size:19px;
+  letter-spacing:-.55px;
+ }
 }
