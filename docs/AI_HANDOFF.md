@@ -1,5 +1,14 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-25 · v2.0.85 · 시작→상단 마지막 착지·글꼴 불일치 개선
+- 사용자: 시작 로고/제목이 상단으로 이동할 때 특히 마지막이 매끄럽지 않고 글꼴도 다름.
+- 원인: native 790ms 이동과 DOM 측정 때 시작한 CSS 555+225ms 노출이 서로 다른 시계로 작동하여 이동 중 상단 글자가 겹침. native sans-serif와 웹 Roboto/Noto 폴백은 동일 글꼴 보장 못함. TextView 전체 박스를 CSS line-box에 맞춰 축소해 실제 글자 크기·기준선이 달랐고, 로고는 SVG 실물 대신 wrapper 여백을 측정했음.
+- 동일 Noto Sans KR SIL OFL 기반 브랜드 전용 400/700 static subset TTF(각 약 3.8KB, FHD Brand로 개명)를 Android/웹에서 함께 읽음. 전체 앱 본문 폰트는 기존 유지. 글꼴 준비를 제한 재시도 후 실제 CSS font-size/inline baseline을 native에 전달(17숫자 bridge). 텍스트는 line-box 맞춤이 아닌 실제 font-size와 baseline으로 정렬. 좁은 화면의 숨긴 영문은 0 metrics로 정상 축소 이동 지원.
+- native 이동 860ms: 감속곡선 보완, native 완주 callback → 상단 underlay 표시 → WebView visual-state 완료 → 정지한 native만 190ms fade. CSS 독립 타이머 제거. tap skip/동작 줄이기/실패시 제한된 fallback 유지.
+- header 실로고는 native vector generator의 동일 경로·그라데이션 SVG를 표시하고 그 실제 img bounds를 측정. 기존 inline SVG는 계약 PNG 원본 경로/색상으로 유지, 고객 문서 로고 무변경.
+- 검증: 320/340/360/393/430px 실제 Chromium에서 내장 폰트·기준선·17개 값·좁은 영문 숨김·1.1초 동안 독립 조기노출 없음·착지 신호 후 표시 확인. JVM BrandLandingMathTest는 밀도/큰 글씨 설정에서도 baseline·실제 글자 크기 정렬 검사. 기존 버튼/계약/보안 회귀 유지. 실제 삼성 단말 native 체감은 설치 후 별도 확인 필요. CI·서명·Release 상태는 별도 검증.
+
+
 ## 2026-10-25 · v2.0.84 · 건너뛴 중간 버튼을 차례로 스치는 색 흐름
 - 사용자: 상단 실거래↔뉴스의 아파트정보 경유 효과를 표시한 하위 메뉴와 여러 버튼이 나열된 줄에도 동일하게 적용.
 - selection-flow.js viaIndices는 같은 실제 가로줄의 출발/도착 사이 버튼만 이동 방향대로 수집. 전체 최신순↔새 거래는 관심 14개, 전체↔월세는 매매·전세를 차례로 거침. 1개 경유는 기존 790ms/21% 옅은 색 유지, 2개 경유는 900ms로 짧게 순차 통과. 인접 전환 630ms 및 메인 5개/아파트정보 경유 동작 유지. 다른 줄·관련 없는 버튼에 효과 없음.

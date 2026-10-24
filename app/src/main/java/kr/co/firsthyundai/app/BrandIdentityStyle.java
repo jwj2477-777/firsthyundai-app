@@ -2,7 +2,6 @@ package kr.co.firsthyundai.app;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.view.Gravity;
 import android.widget.TextView;
 
@@ -21,17 +20,21 @@ final class BrandIdentityStyle {
     static final float SUBTITLE_TRACKING=.1f;
     private BrandIdentityStyle(){}
 
-    private static Typeface weight(int amount) {
-        Typeface family=Typeface.create("sans-serif",Typeface.NORMAL);
-        if(Build.VERSION.SDK_INT>=28)return Typeface.create(family,amount,false);
-        return Typeface.create("sans-serif",amount>=700?Typeface.BOLD:Typeface.NORMAL);
+    private static Typeface regular,bold;
+    private static synchronized Typeface font(TextView view,boolean heavy){
+        if(heavy){
+            if(bold==null)bold=Typeface.createFromAsset(view.getContext().getAssets(),"fonts/fhd-brand-bold.ttf");
+            return bold;
+        }
+        if(regular==null)regular=Typeface.createFromAsset(view.getContext().getAssets(),"fonts/fhd-brand-regular.ttf");
+        return regular;
     }
     static void title(TextView view){
         view.setText(TITLE);
         view.setTextColor(TITLE_COLOR);
         view.setTextSize(TITLE_SP);
         view.setGravity(Gravity.CENTER);
-        view.setTypeface(weight(700));
+        view.setTypeface(font(view,true));
         view.setLetterSpacing(TITLE_TRACKING);
         view.setIncludeFontPadding(false);
     }
@@ -40,7 +43,7 @@ final class BrandIdentityStyle {
         view.setTextColor(SUBTITLE_COLOR);
         view.setTextSize(SUBTITLE_SP);
         view.setGravity(Gravity.CENTER);
-        view.setTypeface(weight(400));
+        view.setTypeface(font(view,false));
         view.setLetterSpacing(SUBTITLE_TRACKING);
         view.setIncludeFontPadding(false);
     }

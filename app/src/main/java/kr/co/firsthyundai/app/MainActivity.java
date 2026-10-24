@@ -87,48 +87,7 @@ public class MainActivity extends Activity {
                 // Read real header geometry once DOM layout is stable; animate
                 // the native branded image and text without repainting a second
                 // incompatible SVG layer across Activity boundaries.
-                view.evaluateJavascript(
-                    "window.FirstHyundaiMotion?.nativeHeaderRects?.() ?? null",json->{
-                    if(isFinishing()||isDestroyed())return;
-                    float[] positions=null;float viewport=0f;
-                    try{
-                        JSONArray data=new JSONArray(json);
-                        if(data.length()!=13)throw new IllegalArgumentException("header coordinates missing");
-                        positions=new float[12];
-                        for(int i=0;i<12;i++)positions[i]=(float)data.getDouble(i);
-                        viewport=(float)data.getDouble(12);
-                    }catch(Exception ignored){}
-                    view.setAlpha(1f);
-                    SmoothBrandOverlay overlay=nativeHandoff;
-                    if(overlay==null){
-                        view.evaluateJavascript("window.FirstHyundaiMotion?.playEntrance?.()",null);
-                        return;
-                    }
-                    // Manual tap skips the animation without leaving hidden
-                    // header elements or an unresponsive transparent layer.
-                    final Runnable done=()->{
-                        if(web==null||isFinishing()||isDestroyed()){
-                            if(nativeHandoff==overlay)nativeHandoff=null;
-                            overlay.detach();
-                            return;
-                        }
-                        // Reveal the real HTML header before removing the last
-                        // native logo frame; otherwise a one-frame gap makes the
-                        // supposedly shared logo appear to blink.
-                        web.evaluateJavascript(
-                            "window.FirstHyundaiMotion?.finishNativeHandoff?.();"+
-                            "window.FirstHyundaiMotion?.playEntrance?.()",ignored->{
-                                if(nativeHandoff==overlay)nativeHandoff=null;
-                                overlay.detach();
-                            });
-                        overlay.postDelayed(()->{
-                            if(nativeHandoff==overlay)nativeHandoff=null;
-                            overlay.detach();
-                        },240);
-                    };
-                    overlay.setOnClickListener(v->overlay.finish(done));
-                    overlay.moveToHeader(positions,viewport,view,done);
-                });
+                requestBrandLanding(view,0);
             }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return routeExternal(request.getUrl().toString());
@@ -155,6 +114,59 @@ public class MainActivity extends Activity {
         stage.addView(nativeHandoff,new FrameLayout.LayoutParams(-1,-1));
         SystemBars.install(this,stage);
         web.loadUrl("file:///android_asset/index.html");
+    }
+
+    /** Wait for bundled font layout; never fly toward fallback-font metrics. */
+    private void requestBrandLanding(WebView view,int attempt){
+        if(isFinishing()||isDestroyed())return;
+        view.evaluateJavascript(
+                    "window.FirstHyundaiMotion?.nativeHeaderRects?.() ?? null",json->{
+                    if(isFinishing()||isDestroyed())return;
+                    float[] positions=null,metrics=null;float viewport=0f;
+                    try{
+                        JSONArray data=new JSONArray(json);
+                        if(data.length()!=17)throw new IllegalArgumentException("header coordinates missing");
+                        positions=new float[12];
+                        for(int i=0;i<12;i++)positions[i]=(float)data.getDouble(i);
+                        viewport=(float)data.getDouble(12);
+                        metrics=new float[4];
+                        for(int i=0;i<4;i++)metrics[i]=(float)data.getDouble(13+i);
+                    }catch(Exception ignored){}
+                    if(positions==null&&attempt<12){
+                        view.postDelayed(()->requestBrandLanding(view,attempt+1),32);
+                        return;
+                    }
+                    view.setAlpha(1f);
+                    SmoothBrandOverlay overlay=nativeHandoff;
+                    if(overlay==null){
+                        view.evaluateJavascript("window.FirstHyundaiMotion?.finishNativeHandoff?.()",null);
+                        return;
+                    }
+                    // Manual tap skips the animation without leaving hidden
+                    // header elements or an unresponsive transparent layer.
+                    final Runnable done=()->{
+                        if(web==null||isFinishing()||isDestroyed()){
+                            if(nativeHandoff==overlay)nativeHandoff=null;
+                            overlay.detach();
+                            return;
+                        }
+                        // Reveal the real HTML header before removing the last
+                        // native logo frame; otherwise a one-frame gap makes the
+                        // supposedly shared logo appear to blink.
+                        web.evaluateJavascript(
+                            "window.FirstHyundaiMotion?.finishNativeHandoff?.();"+
+                            "window.FirstHyundaiMotion?.playEntrance?.()",ignored->{
+                                if(nativeHandoff==overlay)nativeHandoff=null;
+                                overlay.detach();
+                            });
+                        overlay.postDelayed(()->{
+                            if(nativeHandoff==overlay)nativeHandoff=null;
+                            overlay.detach();
+                        },240);
+                    };
+                    overlay.setOnClickListener(v->overlay.finish(done));
+                    overlay.moveToHeader(positions,viewport,metrics,view,done);
+                });
     }
 
     private boolean isAdminDeviceMode() {

@@ -59,6 +59,34 @@ def vector_xml(adaptive=False):
     if adaptive:content+='</group>'
     return content+'</vector>\n'
 
+def brand_svg():
+    """WebView displays the SAME paths/gradients as the native welcome badge.
+    The older inline SVG remains solely as the approved contract-PNG source.
+    """
+    from xml.etree import ElementTree as E
+    A='{http://schemas.android.com/apk/res/android}'
+    AA='{http://schemas.android.com/aapt}'
+    defs=[]
+    def convert(node):
+        if node.tag=='group':
+            tx=node.get(A+'translateX','0');ty=node.get(A+'translateY','0')
+            return '<g transform="translate('+tx+' '+ty+')">'+''.join(convert(x) for x in node)+'</g>'
+        if node.tag!='path':return ''
+        attrs={'d':node.get(A+'pathData'),'fill':node.get(A+'fillColor','#000000')}
+        if attrs['fill']=='#00000000':attrs['fill']='none'
+        grad=node.find(AA+'attr/gradient')
+        if grad is not None:
+            key='nativeBadgeGradient'+str(len(defs))
+            stops=''.join('<stop offset="'+v.get(A+'offset')+'" stop-color="'+v.get(A+'color')+'"/>' for v in grad)
+            defs.append('<linearGradient id="'+key+'" gradientUnits="userSpaceOnUse" x1="'+grad.get(A+'startX')+'" y1="'+grad.get(A+'startY')+'" x2="'+grad.get(A+'endX')+'" y2="'+grad.get(A+'endY')+'">'+stops+'</linearGradient>')
+            attrs['fill']='url(#'+key+')'
+        for native,web in [('fillAlpha','fill-opacity'),('strokeColor','stroke'),('strokeAlpha','stroke-opacity'),('strokeWidth','stroke-width')]:
+            if node.get(A+native) is not None:attrs[web]=node.get(A+native)
+        if node.get(A+'fillType')=='evenOdd':attrs['fill-rule']='evenodd'
+        return '<path '+ ' '.join(k+'="'+v+'"' for k,v in attrs.items())+'/>'
+    body=''.join(convert(x) for x in E.fromstring(vector_xml()))
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs>'+''.join(defs)+'</defs>'+body+'</svg>\n'
+
 def background_xml():
     return (
       '<?xml version="1.0" encoding="utf-8"?>\n'
@@ -96,3 +124,6 @@ adaptive_xml=(
 write_asset("mipmap-anydpi-v26/ic_launcher.xml",adaptive_xml)
 write_asset("mipmap-anydpi-v26/ic_launcher_round.xml",adaptive_xml)
 print("FHD FIRST premium gold/emerald layered vectors generated; native adaptive safe zone preserved.")
+
+asset=ROOT/'app/src/main/assets/brand-badge.svg'
+asset.write_text(brand_svg(),encoding='utf-8')

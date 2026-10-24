@@ -31,14 +31,14 @@ let touchListeners=0;
 const flags=new Set(),classList={
  add:x=>flags.add(x),remove:x=>flags.delete(x),contains:x=>flags.has(x)
 };
-const element=()=>({addEventListener(){}});
+const element=()=>({style:{},setAttribute(){},addEventListener(){},getBoundingClientRect(){return {top:this.top||0}},remove(){}});
 const bounds=[
  {left:12,top:18,width:50,height:50},
  {left:77,top:17,width:176,height:34},
  {left:77,top:53,width:240,height:18}
 ];
-const selectors=['header .officeMark','header .brandWordmark h1','header .brandSubtitle'];
-const targets=selectors.map((_,i)=>({getBoundingClientRect:()=>bounds[i]}));
+const selectors=['header .officeMarkDisplay','header .brandWordmark h1','header .brandSubtitle'];
+const targets=selectors.map((_,i)=>({getBoundingClientRect:()=>bounds[i],appendChild(marker){marker.top=bounds[i].top+bounds[i].height*.8}}));
 const doc={
  body:{classList},documentElement:{clientWidth:390},
  addEventListener(type){if(type==='pointerdown')touchListeners++},
@@ -49,7 +49,7 @@ const doc={
 };
 const context=vm.createContext({
  document:doc,
- window:{FirstHyundaiNative:{},matchMedia:()=>({matches:false}),innerWidth:390},
+ window:{FirstHyundaiNative:{},matchMedia:()=>({matches:false}),innerWidth:390,getComputedStyle:node=>({fontSize:node===targets[1]?'28px':'12px'})},
  Number,Math,Promise
 });
 vm.runInContext(js,context);
@@ -59,7 +59,8 @@ assert.equal(api.playEntrance(),true);
 assert.equal(api.playEntrance(),false,'Welcome only once');
 assert(flags.has('fhd-first-render'));
 const rects=api.nativeHeaderRects();
-assert.equal(rects.length,13);
+assert.equal(rects.length,17);
+assert.equal(rects[13],28);assert.equal(rects[15],12);
 assert(flags.has('fhd-native-handoff'));
 api.finishNativeHandoff();
 assert(!flags.has('fhd-first-render'));

@@ -9,28 +9,33 @@ new vm.Script(src);
 assert(css.includes('body.fhd-native-handoff header .officeMark')&&css.includes('body.fhd-native-arrived'));
 const native=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/SmoothBrandOverlay.java'),'utf8');
 const identity=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/BrandIdentityStyle.java'),'utf8');
-assert(native.includes('R.drawable.ic_launcher_badge')&&native.includes('DURATION=790L')&&native.includes('getLocationOnScreen'));
+assert(native.includes('R.drawable.ic_launcher_badge')&&native.includes('DURATION=860L')&&native.includes('getLocationOnScreen'));
 assert(native.includes('scaleX(scale).scaleY(scale)'),'Logo scales uniformly, preserving aspect ratio');
 assert(native.includes('layoutAttempts>8'),'Prevent infinite layout retries on slow devices');
 assert(main.includes('ignored->{')&&main.includes('overlay.detach()'),'Reveal live HTML first, then remove the native brand to prevent a visible blink');
 assert(css.includes('.fhd-bridge-backdrop')&&css.includes('linear-gradient(135deg,#03212A,#095B5E)'));
 assert(main.includes('nativeHeaderRects?.()')&&main.includes('overlay.moveToHeader('));
-assert(native.includes('PathInterpolator(.34f,.06f,.18f,1f)'),'Use gentler takeoff and soft landing');
-assert(native.includes('ObjectAnimator.ofFloat(part,View.ALPHA,1f,0f)'),'Native brand cross-dissolves during landing instead of snapping');
-assert(native.includes('fade.setDuration(205)'),'Keep a gentle 205ms native landing opacity blend');
+assert(native.includes('PathInterpolator(.30f,0f,.18f,1f)'),'Use gentler takeoff and soft landing');
+assert(native.includes('ObjectAnimator.ofFloat(part,View.ALPHA,part.getAlpha(),0f)'),'Native brand cross-dissolves during landing instead of snapping');
+assert(native.includes('fade.setDuration(190)'),'Stationary cover dissolves gently after the actual DOM is rendered');
+assert(native.includes('postVisualStateCallback')&&native.includes('withEndAction(()->settleAtHeader'), 'Actual native end and WebView rendered frame drive landing, not unrelated timers');
+assert(native.includes('BrandLandingMath.textTop')&&native.includes('text.getBaseline()'), 'Match the actual glyph baseline, not TextView line-box height');
 assert(native.includes('ring.animate().translationX(')&&native.includes('.scaleX(ringScale).scaleY(ringScale)'),'Gold circular halo must travel and shrink with the logo');
 assert(!native.includes('ValueAnimator.ofArgb('),'No native text color change during the flight: both ends must start at final colors');
 assert(identity.includes('TITLE_COLOR=Color.WHITE')&&identity.includes('SUBTITLE_COLOR=Color.rgb(246,215,145)'),'Start, flight and header use the ORIGINAL splash white and warm gold');
 assert(identity.includes('SUBTITLE="FIRST HYUNDAI · REAL ESTATE"'),'Native brand text has the exact header spacing');
 assert(lock.includes('BrandIdentityStyle.title(title)')&&lock.includes('BrandIdentityStyle.subtitle(subtitle)'),'Native cold start uses shared typography');
 assert(native.includes('BrandIdentityStyle.title(title)')&&native.includes('BrandIdentityStyle.subtitle(subtitle)'),'Native flying text uses the very same typography as cold start');
-assert(css.includes('header .brandSubtitle{font-family:Roboto,"Noto Sans KR",sans-serif}'),'WebView matches the native font family fallbacks');
+assert(identity.includes('fonts/fhd-brand-bold.ttf')&&identity.includes('fonts/fhd-brand-regular.ttf'));
+assert(css.includes("font-family:'FHD Brand',sans-serif!important")&&css.includes('fonts/fhd-brand-bold.ttf'), 'Both surfaces load the same bundled font bytes');
 assert(!lock.includes('BrandIdentityStyle.logoBacking()')&&!native.includes('backing.animate()'),'Do not fabricate a cream disc that was absent from the original splash');
 assert(css.includes('background:transparent!important;border-color:transparent!important'),'Main header emblem has the same bare circular background as the splash');
-assert(!main.includes('beginNativeHandoffLanding?.()')&&main.includes('overlay.moveToHeader(positions,viewport,view,done)'),'Avoid extra JavaScript signals during the animated flight');
+assert(!main.includes('beginNativeHandoffLanding?.()')&&main.includes('overlay.moveToHeader(positions,viewport,metrics,view,done)'), 'Only native actual-motion completion signals the handoff');
 assert(src.includes('function beginNativeHandoffLanding()'),'Browser can reveal the existing header before native overlay exits');
-assert(css.includes('@keyframes fhd-native-brand-land')&&css.includes('225ms linear 555ms both'),'Destination header appears on pre-timed CSS animation');
-assert(!css.includes('opacity:0!important;\n animation:fhd-native-brand-land'),'No important opacity override may suppress the timed landing keyframes');
+assert(!css.includes('@keyframes fhd-native-brand-land'),'No timer can reveal a second moving title early');
+assert(css.includes('visibility:visible!important;opacity:0!important;')&&
+ css.includes('body.fhd-native-handoff.fhd-native-landing'),'Header stays hidden until actual native arrival');
+assert(main.includes('data.length()!=17')&&src.includes('...metrics]'),'Bridge carries actual font size and baseline');
 assert(native.includes('setLayerType(View.LAYER_TYPE_HARDWARE,null)'),'Moving native text and emblem are GPU-backed');
 assert(css.includes('color:#F6D791!important')&&css.includes('font-weight:700!important')&&css.includes('font-weight:400!important'),'Web header matches the original splash styles');
 assert(main.includes('view.setAlpha(1f)')&&main.includes('ANIMATOR_DURATION_SCALE'));
@@ -68,7 +73,7 @@ function harness(width,{reduced=false,hasNative=true,hasHeader=true}={}){
  targets[0].textContent='FHD';targets[1].textContent='퍼스트현대';targets[2].textContent='FIRST HYUNDAI · REAL ESTATE';
  const nav=new Mock('button');
  const body=new Mock('body');
- const found={'header .officeMark':targets[0],'header .brandWordmark h1':targets[1],
+ const found={'header .officeMarkDisplay':targets[0],'header .brandWordmark h1':targets[1],
   'header .brandSubtitle':targets[2],'#nav .primaryNav button:last-child':nav};
  const document={
   body,createElement:t=>{const n=new Mock(t);created.push(n);return n},

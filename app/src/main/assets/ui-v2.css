@@ -2426,29 +2426,39 @@ header .officeMark{
  background:transparent!important;border-color:transparent!important;
  box-shadow:none!important;
 }
-/* Timed from nativeHeaderRects() while the screen is still hidden. Crucially,
-   no static opacity:0!important, which would override CSS keyframes. No
-   background JavaScript round-trip during the 790ms Android animation. */
-@keyframes fhd-native-brand-land{from{opacity:0}to{opacity:1}}
+/* v2.0.85 · One actual arrival event, no independent CSS landing clock.
+   Native identity stays opaque during the move. The real header is revealed
+   only at rest, then Android waits for its rendered frame before fading out. */
 body.fhd-native-handoff header .officeMark,
-body.fhd-native-handoff header .brandHeaderText,
-body.fhd-native-handoff.fhd-native-landing header .officeMark,
-body.fhd-native-handoff.fhd-native-landing header .brandHeaderText{
- visibility:visible!important;
- animation:fhd-native-brand-land 225ms linear 555ms both!important;
- transition:none!important;
+body.fhd-native-handoff header .brandHeaderText{
+ visibility:visible!important;opacity:0!important;
+ animation:none!important;transition:none!important;
 }
+body.fhd-native-handoff.fhd-native-landing header .officeMark,
+body.fhd-native-handoff.fhd-native-landing header .brandHeaderText,
 body.fhd-native-arrived.fhd-first-render header .officeMark,
 body.fhd-native-arrived.fhd-first-render header .brandHeaderText{
- animation:none!important;opacity:1!important;transform:none!important;
+ opacity:1!important;animation:none!important;transform:none!important;
 }
 @media(prefers-reduced-motion:reduce){
  body.fhd-native-handoff header .officeMark,
- body.fhd-native-handoff header .brandHeaderText{
-  animation:none!important;opacity:1!important;transition:none!important;
- }
+ body.fhd-native-handoff header .brandHeaderText{opacity:1!important}
 }
-@media(max-width:400px){header .brandSubtitle{letter-spacing:.075em!important}}
+@font-face{
+ font-family:'FHD Brand';font-style:normal;font-weight:400;
+ src:url('fonts/fhd-brand-regular.ttf') format('truetype');font-display:block;
+}
+@font-face{
+ font-family:'FHD Brand';font-style:normal;font-weight:700;
+ src:url('fonts/fhd-brand-bold.ttf') format('truetype');font-display:block;
+}
+header .brandWordmark h1,header .brandSubtitle{
+ font-family:'FHD Brand',sans-serif!important;font-synthesis:none;
+ font-kerning:normal;
+}
+header .brandSubtitle{letter-spacing:.1em!important}
+header .officeMarkSvg{display:none}
+header .officeMarkDisplay{display:block;width:52px;height:52px;flex:none}
 
 /* v2.0.71 · Quiet interaction policy: ONE transition per peer group.
    Old ripple, tap compression, bouncing nav tiles and page-entry animations

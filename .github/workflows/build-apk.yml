@@ -35,6 +35,7 @@ on:
       - 'scripts/test_news_tab_wind_stability.js'
       - 'scripts/test_trade_type_direct_flow.js'
       - 'scripts/test_native_lower_tab_browser.js'
+      - 'scripts/test_brand_landing_browser.js'
       - 'scripts/test_premium_visual.js'
       - 'scripts/test_android_insets_presentation.js'
       - 'scripts/test_screenshot_consistency.js'
@@ -148,6 +149,7 @@ jobs:
           node scripts/test_trade_type_direct_flow.js
           node scripts/test_native_lower_tab_browser.js
           node scripts/test_shared_brand_handoff.js
+          node scripts/test_brand_landing_browser.js
           node scripts/test_price_trends.js
           node scripts/test_nearby.js
           node scripts/test_compact_complex_cards.js
@@ -286,22 +288,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.84 sequential skipped-peer color flow APK
+      - name: Publish v2.0.85 shared-font baseline-aligned native brand landing APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.84.apk
-          unzip -t FirstHyundai-v2.0.84.apk | grep 'No errors detected'
-          if gh release view v2.0.84 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.85.apk
+          unzip -t FirstHyundai-v2.0.85.apk | grep 'No errors detected'
+          if gh release view v2.0.85 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.84 FirstHyundai-v2.0.84.apk \
+            gh release create v2.0.85 FirstHyundai-v2.0.85.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.84 · 중간 버튼을 차례로 거치는 자연스러운 색 흐름' \
-              --notes '여러 버튼이 한 줄에 나열된 메뉴에서 중간 버튼을 건너뛰어 선택하면 옅은 색이 중간 버튼들을 이동 방향대로 차례로 스쳐 지나갑니다. 전체 최신순↔새 거래는 관심 14개를, 전체↔월세는 매매·전세를 순서대로 거칩니다. 중간 버튼의 화면이나 필터는 실행하지 않으며 최종 선택만 적용합니다. 기존 메인 실거래↔뉴스의 아파트정보 경유 효과와 인접 버튼 전환은 유지합니다. 아파트·오피스텔·관심단지 거래유형에 동일 적용하며 화면 배치 및 접근성 동작 줄이기를 보존합니다. v2.0.84/build135.'
+              --title '퍼스트현대 v2.0.85 · 시작 로고의 부드러운 착지와 동일 글꼴' \
+              --notes '시작 화면과 메인 상단 제목·영문에 동일한 내장 글꼴 파일을 적용했습니다. 상단 글씨의 실제 크기와 기준선을 측정해 native 글자를 정렬하고, 로고도 여백이 아닌 실제 이미지 경계에 맞춥니다. 이동이 끝나기 전에 별도 CSS 타이머로 상단 글자가 나타나던 흐름을 제거하고, 실제 도착과 WebView 화면 표시 확인 후 정지한 native 레이어를 부드럽게 걷습니다. 시작·상단 로고의 벡터 경로와 금색·청록 그라데이션도 동일하게 맞췄습니다. 버튼 색 흐름·가족/관리자 인증·계약과 기존 업무 기능 유지. v2.0.85/build136.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.84 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.84 --apk FirstHyundai-v2.0.84.apk
+          gh release upload v2.0.85 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.85 --apk FirstHyundai-v2.0.85.apk

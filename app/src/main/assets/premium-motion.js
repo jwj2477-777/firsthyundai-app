@@ -5,6 +5,9 @@
  if(!document?.addEventListener||!document?.createElement)return;
  const reduced=()=>!!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
  const stats={entrances:0,handoffs:0};
+ // Preload both tiny local faces, even where a narrow header hides English.
+ document.fonts?.load?.('700 30px "FHD Brand"');
+ document.fonts?.load?.('400 11px "FHD Brand"');
  let entrancePlayed=false;
  function playEntrance(){
   if(entrancePlayed||reduced())return false;
@@ -23,11 +26,11 @@
  // Destinations are MEASURED after layout, never based on screen-width guesses.
  let handoff=null,handoffDone=false;
  const headerTargets=()=>{
-  const els=['header .officeMark','header .brandWordmark h1','header .brandSubtitle']
+  const els=['header .officeMarkDisplay','header .brandWordmark h1','header .brandSubtitle']
    .map(selector=>document.querySelector?.(selector));
   if(els.some(x=>!x))return null;
   const boxes=els.map(x=>x.getBoundingClientRect());
-  return boxes.some(x=>!x||x.width<=0||x.height<=0)?null:{els,boxes};
+  return boxes.slice(0,2).some(x=>!x||x.width<=0||x.height<=0)?null:{els,boxes};
  };
  function finishBrandHandoff(){
   if(handoffDone)return;
@@ -100,19 +103,36 @@
  // Android main activity draws the SAME native badge/text that the opening
  // screen used. Measure the real DOM header only; do not draw a second CSS
  // lookalike in front of the original artwork.
+ // Zero-sized inline marker gives the actual CSS text baseline, including
+ // line-height. Fitting a TextView into the line-box rectangle shrank its
+ // glyphs and shifted their baseline on the final native-to-web frame.
+ function textMetrics(element){
+  const rect=element.getBoundingClientRect();
+  if(rect.width<=0||rect.height<=0)return [0,0];
+  const marker=document.createElement('span');
+  marker.setAttribute('aria-hidden','true');
+  marker.style.cssText='display:inline-block;width:0;height:0;margin:0;padding:0;border:0;vertical-align:baseline;line-height:0';
+  element.appendChild(marker);
+  const baseline=marker.getBoundingClientRect().top;
+  marker.remove();
+  return [parseFloat(window.getComputedStyle(element).fontSize),baseline];
+ }
  function nativeHeaderRects(){
   const target=headerTargets();
   if(reduced()||!target)return null;
+  if(document.fonts&&(!document.fonts.check('700 30px "FHD Brand"')||
+   !document.fonts.check('400 11px "FHD Brand"')))return null;
   const viewport=document.documentElement?.clientWidth||window.innerWidth||0;
   if(!(viewport>0))return null;
   const values=target.boxes.flatMap(r=>[r.left,r.top,r.width,r.height]);
-  if(values.some(v=>!Number.isFinite(v)))return null;
+  const metrics=[...textMetrics(target.els[1]),...textMetrics(target.els[2])];
+  if([...values,...metrics].some(v=>!Number.isFinite(v)))return null;
   document.body.classList.add('fhd-native-handoff');
-  return [...values,viewport];
+  return [...values,viewport,...metrics];
  }
  function beginNativeHandoffLanding(){
-  // Reveal only the *actual* main-header brand during the last frames of the
-  // native move, never a second cloned logo on top of the splash.
+  // Called only when the native movement has actually ENDED. Android waits
+  // for this web frame before dissolving the now-stationary native identity.
   document.body?.classList?.add('fhd-native-landing');
  }
  function finishNativeHandoff(){
@@ -121,7 +141,7 @@
   document.body?.classList?.remove('fhd-first-render');
   document.body?.classList?.add('fhd-native-arrived');
  }
- window.FirstHyundaiMotion={version:'2.0.71',playEntrance,prepareBrandHandoff,startBrandHandoff,nativeHeaderRects,beginNativeHandoffLanding,finishNativeHandoff,_test:{reduced,stats,headerTargets,finishBrandHandoff}};
+ window.FirstHyundaiMotion={version:'2.0.85',playEntrance,prepareBrandHandoff,startBrandHandoff,nativeHeaderRects,beginNativeHandoffLanding,finishNativeHandoff,_test:{reduced,stats,headerTargets,textMetrics,finishBrandHandoff}};
  // Browsers used for UI preview have no Android bridge; keep a single
  // elegant initial reveal there as well, without affecting app navigation.
  if(!window.FirstHyundaiNative)playEntrance();

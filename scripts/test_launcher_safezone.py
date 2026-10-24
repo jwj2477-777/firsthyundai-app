@@ -27,6 +27,19 @@ class PremiumIconTest(unittest.TestCase):
         self.assertIn('#FFF9D5',colors)
         self.assertIn('#C6872C',colors)
         self.assertNotIn('#FF0000',ET.tostring(badge,encoding='unicode'))
+    def test_live_header_badge_matches_native_paths_and_gradients(self):
+        badge=ET.parse(RES/'drawable'/'ic_launcher_badge.xml').getroot()
+        header=ET.parse(ROOT/'app/src/main/assets/brand-badge.svg').getroot()
+        S='{http://www.w3.org/2000/svg}'
+        self.assertEqual([p.get(A+'pathData') for p in badge.findall('.//path')],
+                         [p.get('d') for p in header.findall('.//'+S+'path')])
+        native=badge.findall('.//aapt:attr/gradient',NS)
+        web=header.findall('.//'+S+'linearGradient')
+        self.assertEqual(len(native),len(web))
+        for a,b in zip(native,web):
+            self.assertEqual([(x.get(A+'offset'),x.get(A+'color')) for x in a.findall('item')],
+                             [(x.get('offset'),x.get('stop-color')) for x in b.findall(S+'stop')])
+
     def test_adaptive_round_masks_fit_original_lettering(self):
         fore=ET.parse(RES/'drawable'/'ic_launcher_foreground.xml').getroot()
         group=fore.find('group')

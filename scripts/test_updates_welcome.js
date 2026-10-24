@@ -39,7 +39,7 @@ assert(nativeBrand.includes('TITLE_COLOR=Color.WHITE')&&nativeBrand.includes('SU
 assert(lock.includes('reducedMotion?0:920')&&lock.includes('welcomeHandler.postDelayed'),'Welcome is short and skippable, including reduced-motion');
 assert(main.includes('web.setAlpha(0f)')&&main.includes('onPageFinished')&&main.includes('webFirstFrameShown'),'WebView stays hidden until local first frame is loaded');
 assert(main.includes('window.FirstHyundaiMotion?.nativeHeaderRects?.()')&&
- main.includes('overlay.moveToHeader(positions,viewport,view,done)')&&
+ main.includes('overlay.moveToHeader(positions,viewport,metrics,view,done)')&&
  !main.includes('beginNativeHandoffLanding?.()'),
  'True native shared-element handoff uses actual DOM measurements without mid-flight JS synchronization');
 assert(lock.includes('overridePendingTransition(0,0)'),'Prevent conflicting native activity slide');

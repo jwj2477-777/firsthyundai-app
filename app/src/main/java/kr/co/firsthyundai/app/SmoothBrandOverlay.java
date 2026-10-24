@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.webkit.WebView;
 import java.util.ArrayList;
 
 /**
@@ -29,12 +30,12 @@ final class SmoothBrandOverlay extends FrameLayout {
     private final TextView title;
     private final TextView subtitle;
     private final View ring,rule;
-    private boolean finished;
+    private boolean finished,landingStarted,dissolveStarted;
     private int layoutAttempts;
     private final ArrayList<ObjectAnimator> arrivalFades=new ArrayList<>();
-    private static final long DURATION=790L;
+    private static final long DURATION=860L;
     // Quieter takeoff than v2.0.64's fast-start curve, with a long soft landing.
-    private final PathInterpolator natural=new PathInterpolator(.34f,.06f,.18f,1f);
+    private final PathInterpolator natural=new PathInterpolator(.30f,0f,.18f,1f);
 
     private int dp(int x){return (int)(getResources().getDisplayMetrics().density*x+.5f);}
     SmoothBrandOverlay(Activity activity){
@@ -99,9 +100,9 @@ final class SmoothBrandOverlay extends FrameLayout {
      * real native view size. The overlay and WebView share a FrameLayout.
      * Each row: [left,top,width,height]. Input can represent narrow devices.
      */
-    void moveToHeader(float[] rects,float viewportWidth,View web,Runnable done){
+    void moveToHeader(float[] rects,float viewportWidth,float[] metrics,WebView web,Runnable done){
         if(finished)return;
-        if(rects==null||rects.length!=12||viewportWidth<=0||web.getWidth()<=0){
+        if(rects==null||rects.length!=12||metrics==null||metrics.length!=4||viewportWidth<=0||web.getWidth()<=0){
             fadeOut(done);
             return;
         }
@@ -111,7 +112,7 @@ final class SmoothBrandOverlay extends FrameLayout {
         // exactly matches the original LockActivity welcome center.
         if(emblem.getWidth()==0||title.getWidth()==0){
             if(++layoutAttempts>8){fadeOut(done);return;}
-            postDelayed(()->moveToHeader(rects,viewportWidth,web,done),16);
+            postDelayed(()->moveToHeader(rects,viewportWidth,metrics,web,done),16);
             return;
         }
         View[] parts={emblem,title,subtitle};
@@ -119,28 +120,40 @@ final class SmoothBrandOverlay extends FrameLayout {
         getLocationOnScreen(base);
         for(int i=0;i<3;i++){
             int k=i*4;
-            float x=rects[k],y=rects[k+1],w=rects[k+2],h=rects[k+3];
-            if(!Float.isFinite(x)||!Float.isFinite(y)||!Float.isFinite(w)||
-               !Float.isFinite(h)||w<=0||h<=0){fadeOut(done);return;}
+            for(int j=0;j<4;j++)if(!Float.isFinite(rects[k+j])){fadeOut(done);return;}
+            if(i<2&&(rects[k+2]<=0||rects[k+3]<=0)){fadeOut(done);return;}
         }
+        for(float value:metrics)if(!Float.isFinite(value)){fadeOut(done);return;}
         for(int i=0;i<3;i++){
             int k=i*4;
             View part=parts[i];
+            if(i==2&&metrics[2]<=0){
+                // Narrow layouts intentionally hide the English line.
+                part.animate().alpha(0f).setDuration(320).start();
+                continue;
+            }
             part.getLocationOnScreen(source);
-            float sourceCX=source[0]-base[0]+part.getWidth()/2f;
-            float sourceCY=source[1]-base[1]+part.getHeight()/2f;
-            float targetCX=web.getLeft()+(rects[k]+rects[k+2]/2f)*pxPerCss;
-            float targetCY=web.getTop()+(rects[k+1]+rects[k+3]/2f)*pxPerCss;
-            // Uniform, aspect-preserving scale. Never stretch the FHD emblem.
-            float scale=Math.min(rects[k+2]*pxPerCss/part.getWidth(),
-                                 rects[k+3]*pxPerCss/part.getHeight());
-            // Large text native/Web font metrics may differ; landing blend
-            // replaces the native glyphs without stretching them.
+            float sourceX=source[0]-base[0],sourceY=source[1]-base[1];
+            float scale,targetX,targetY;
+            if(part instanceof TextView){
+                TextView text=(TextView)part;
+                int metric=i==1?0:2;
+                scale=BrandLandingMath.textScale(metrics[metric],pxPerCss,text.getTextSize());
+                targetX=web.getLeft()+rects[k]*pxPerCss;
+                targetY=web.getTop()+BrandLandingMath.textTop(metrics[metric+1],pxPerCss,text.getBaseline(),scale);
+            }else{
+                scale=Math.min(rects[k+2]*pxPerCss/part.getWidth(),
+                               rects[k+3]*pxPerCss/part.getHeight());
+                targetX=web.getLeft()+(rects[k]+rects[k+2]/2f)*pxPerCss-part.getWidth()*scale/2f;
+                targetY=web.getTop()+(rects[k+1]+rects[k+3]/2f)*pxPerCss-part.getHeight()*scale/2f;
+            }
+            if(!Float.isFinite(scale)||scale<=0){fadeOut(done);return;}
+            part.setPivotX(0f);part.setPivotY(0f);
             part.animate().cancel();
-            part.animate()
-                .translationX(targetCX-sourceCX).translationY(targetCY-sourceCY)
-                .scaleX(scale).scaleY(scale).setDuration(DURATION)
-                .setInterpolator(natural).start();
+            part.animate().translationX(targetX-sourceX).translationY(targetY-sourceY)
+                .scaleX(scale).scaleY(scale).setDuration(DURATION).setInterpolator(natural);
+            if(i==0)part.animate().withEndAction(()->settleAtHeader(web,done));
+            part.animate().start();
         }
         // Keep the original gold halo visually attached to the emblem rather
         // than leaving a stationary ring behind in the middle of the screen.
@@ -174,21 +187,39 @@ final class SmoothBrandOverlay extends FrameLayout {
         // Both views have the same splash-white title, gold subtitle and
         // dark logo. Only their geometry changes during the move.
         rule.animate().alpha(0f).setStartDelay(245).setDuration(390).start();
-        // HTML reveal was scheduled with the initial DOM geometry measurement.
-        // No JavaScript calls or extra UI-thread handshake during flight.
-        for(View part:parts){
-            ObjectAnimator fade=ObjectAnimator.ofFloat(part,View.ALPHA,1f,0f);
-            fade.setStartDelay(DURATION-215);
-            fade.setDuration(205);
-            fade.setInterpolator(new android.view.animation.DecelerateInterpolator());
+        // The identity remains fully visible throughout the move. Its end
+        // callback, rather than a second timer, starts the web/native handoff.
+        backdrop.animate().alpha(0f).setStartDelay(95).setDuration(DURATION-125)
+                .setInterpolator(natural).start();
+        // Bounded recovery if a renderer or animator callback never arrives.
+        postDelayed(()->finish(done),DURATION+900);
+    }
+    private void settleAtHeader(WebView web,Runnable done){
+        if(finished||landingStarted)return;
+        landingStarted=true;
+        web.evaluateJavascript("window.FirstHyundaiMotion?.beginNativeHandoffLanding?.()",ignored->{
+            if(finished)return;
+            // Keep the final native frame until the matching DOM header has
+            // actually been committed by WebView, including the shared fonts.
+            web.postVisualStateCallback(0L,new WebView.VisualStateCallback(){
+                @Override public void onComplete(long requestId){dissolveAtRest(done);}
+            });
+        });
+        postDelayed(()->finish(done),700);
+    }
+    private void dissolveAtRest(Runnable done){
+        if(finished||dissolveStarted)return;
+        dissolveStarted=true;
+        // The live header is already opaque beneath the identical native
+        // glyphs. Fading only the cover avoids a mid-crossfade brightness dip.
+        for(View part:new View[]{emblem,title,subtitle}){
+            ObjectAnimator fade=ObjectAnimator.ofFloat(part,View.ALPHA,part.getAlpha(),0f);
+            fade.setDuration(190);
+            fade.setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator());
             arrivalFades.add(fade);
             fade.start();
         }
-        // The deep-teal surface recedes before arrival, without a separate
-        // cut or a suddenly exposed white background at the beginning.
-        backdrop.animate().alpha(0f).setStartDelay(95).setDuration(DURATION-125)
-                .setInterpolator(natural).start();
-        postDelayed(()->finish(done),DURATION);
+        postDelayed(()->finish(done),210);
     }
     void fadeOut(Runnable done){
         if(finished)return;
