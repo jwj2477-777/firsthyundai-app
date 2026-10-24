@@ -35,6 +35,7 @@ on:
       - 'scripts/test_screenshot_consistency.js'
       - 'scripts/test_cross_screen_polish.js'
       - 'scripts/test_apartment_detail_tabs_polish.js'
+      - 'scripts/test_workflow_pilot.js'
       - 'scripts/test_officetel_heading_color.js'
       - 'scripts/test_office_on_demand.js'
       - 'scripts/test_public_hub.js'
@@ -164,6 +165,7 @@ jobs:
           node scripts/test_screenshot_consistency.js
           node scripts/test_cross_screen_polish.js
           node scripts/test_apartment_detail_tabs_polish.js
+          node scripts/test_workflow_pilot.js
           node scripts/test_officetel_heading_color.js
           node scripts/test_scroll_to_top.js
           node scripts/test_contract_broker.js
@@ -267,22 +269,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.46 apartment detail tabs UI polish APK
+      - name: Publish v2.0.47 reversible parent-workflow pilot APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.46.apk
-          unzip -t FirstHyundai-v2.0.46.apk | grep 'No errors detected'
-          if gh release view v2.0.46 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.47.apk
+          unzip -t FirstHyundai-v2.0.47.apk | grep 'No errors detected'
+          if gh release view v2.0.47 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.46 FirstHyundai-v2.0.46.apk \
+            gh release create v2.0.47 FirstHyundai-v2.0.47.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.46 · 아파트 상세정보 탭 디자인 정리' \
-              --notes '아파트 상세화면 7개 탭(기본정보·평형·타입·학교·학군·실거래·관리비·주변시설·평면도·원문)을 실제 갤럭시 스크린샷으로 검토했습니다. 상단 고정 제목과 본문의 중복 단지명만 제거하고, 탭·면적거래 목록·주변시설·원본 링크의 색상과 가독성을 앱 전체 청록 테마로 통일했습니다. 학교의 상세 출처와 기준일은 펼쳐보기에 정리하되 통학구역 검증·배정 미확인 경고는 항상 표시합니다. 카카오 실시간 연동이 준비되지 않은 경우 외부 카카오맵 검색 가능이라고 정확히 안내합니다. 기존 모든 거래/관리비/학교 데이터·링크·가족과 관리자 접근·계약 버튼/알림/업데이트·서명 방식은 변경하지 않았습니다.'
+              --title '퍼스트현대 v2.0.47 · 업무 중심 UI 시범 개선' \
+              --notes '퍼스트현대 기존 3개 메인 메뉴와 가족·관리자 모드, 계약 및 실거래 기능을 유지한 업무 중심 인터페이스 시범 개선입니다. 오늘 요약의 상단에서 오늘 새 거래·관심 14개 단지·아파트 검색에 바로 접근하며 오늘 새 거래 수는 실제 최초 발견일 기준으로 표시하고 수집 전과 0건을 구별합니다. 뒤에 기존 누적 통계를 모두 보존하고 실거래·신규 거래·뉴스 갱신 상태를 먼저 보여줍니다. 실거래에서 검색 조건을 선택한 경우에만 적용 조건을 표시하고, 계약문자 작성의 반복 3단계 설명을 기본적으로 접어 큰 메모 입력창을 빠르게 볼 수 있게 했습니다. 기존 위치·데이터·해제/갱신 구분·계약문자 필수 확인·알림/업데이트·고정 APK 서명과 아파트정보 7개 상세 탭은 유지했습니다. 복원을 원하면 다음 빌드에 v2.0.46 UI를 되살리는 방식으로 데이터 삭제 없이 되돌릴 수 있습니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.46 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.46 --apk FirstHyundai-v2.0.46.apk
+          gh release upload v2.0.47 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.47 --apk FirstHyundai-v2.0.47.apk

@@ -6,7 +6,9 @@ const root=path.resolve(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const css=read('app/src/main/assets/ui-v2.css');
 const html=read('app/src/main/assets/index.html');
-const theme=css.slice(css.lastIndexOf('/* v2.0.43 · ALL-TABS REAL-DEVICE FINISH'));
+const base=css.lastIndexOf('/* v2.0.43 · ALL-TABS REAL-DEVICE FINISH');
+const cssEnd=css.indexOf('/* v2.0.44 ·',base);
+const theme=css.slice(base,cssEnd<0?undefined:cssEnd);
 assert(theme.length>5000,'Missing scoped cross-screen finishing theme');
 for(const term of [
  '#complexSheet.apartmentSheet.panel','#nearbyDetails.apartmentSheet.panel',
