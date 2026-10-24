@@ -282,22 +282,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.75 stationary color-only transition APK
+      - name: Publish v2.0.76 visible color handoff across five main buttons APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.75.apk
-          unzip -t FirstHyundai-v2.0.75.apk | grep 'No errors detected'
-          if gh release view v2.0.75 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.76.apk
+          unzip -t FirstHyundai-v2.0.76.apk | grep 'No errors detected'
+          if gh release view v2.0.76 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.75 FirstHyundai-v2.0.75.apk \
+            gh release create v2.0.76 FirstHyundai-v2.0.76.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.75 · 버튼 크기 고정·배경색만 부드럽게 이동' \
-              --notes '선택 버튼의 색상이 이동할 때 인위적으로 회전하던 색상 판과 먼지·바람 입자를 전부 제거했습니다. 실제 메뉴 버튼과 글씨, 아이콘, 그림자, 형태는 고정되며 버튼 내부 배경색의 부드러운 경계만 옮겨갑니다. 5개 메인메뉴 간 두 줄 이동을 포함해 출발지에서 도착지 방향의 그라데이션 마스크로 전환합니다. 선택·미선택의 테두리 두께도 통일해 글자 위치가 튀지 않도록 개선했습니다. 뉴스 브리핑·청약·분양의 하단 스위치에도 같은 효과가 적용되고 제목 영역 고정은 유지됩니다. 버튼 텍스트, 너비, 높이 변화를 금지하는 회귀 테스트 추가. v2.0.75/build126.'
+              --title '퍼스트현대 v2.0.76 · 뉴스 전환 복구와 중간 메뉴 색상 흐름' \
+              --notes '기존 색상 레이어가 실제 버튼 배경 뒤에 가려져 특히 뉴스 브리핑과 인천 청약·분양에서 전환이 보이지 않던 원인을 제거했습니다. DOM에 레이어를 추가하지 않고 실제 선택 버튼들의 배경에만 그라데이션을 직접 그려 색이 빠져나가고 들어오는 효과를 냅니다. 상단 5개 주요 메뉴는 출발 버튼과 도착 버튼 사이에 있는 중간 메뉴에도 잠깐 선택색이 통과하는 표현을 적용하며, 실제 메뉴 선택이나 데이터 화면은 중간에 바꾸지 않습니다. 글씨·아이콘·테두리·버튼 크기와 위치는 움직이지 않으며 뉴스 상단 높이 고정은 유지합니다. 상단 5개 및 뉴스·청약 전환 직접 배경 회귀 테스트를 강화했습니다. v2.0.76/build127.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.75 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.75 --apk FirstHyundai-v2.0.75.apk
+          gh release upload v2.0.76 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.76 --apk FirstHyundai-v2.0.76.apk
