@@ -546,6 +546,10 @@ body.apartmentSheetActive{overflow:hidden}
    <textarea id="ct_rough" rows="10" maxlength="12000" aria-describedby="ct_memoHelp ct_memoWriteTip" placeholder="이 칸을 눌러 계약 내용을 적으세요.&#10;&#10;예) 퍼팍 1502동 3004호&#10;매매 16억 / 계약금 6천&#10;중도금 4억 12월4일&#10;잔금 1월5일"></textarea>
    <p id="ct_memoWriteTip" class="contractMemoWriteTip adminExplain">한 줄씩 적어도 되고, 말하듯이 이어 적어도 됩니다.</p>
   </div>
+  <div class="contractSpecialMemoArea">
+   <label for="ct_specialMemo">✎ 특약사항 <small>작성한 문장이 그대로 안내문에 들어갑니다</small></label>
+   <textarea id="ct_specialMemo" rows="4" maxlength="6000" placeholder="예) 잔금일까지 권리관계 변동 없이 유지합니다.&#10;현 시설물 상태로 인도합니다." oninput="FirstHyundaiContracts.updateSummary()" onchange="FirstHyundaiEasy.updateSpecials()"></textarea>
+  </div>
   <div class="contractEasyActions">
    <button type="button" class="btn contractOneTap" onclick="FirstHyundaiEasy.compose()">메모 정리하고 다음 단계 →</button>
    <button type="button" class="btn alt contractVoice" onclick="FirstHyundaiContracts.voice()">🎙 음성으로 메모 입력</button>
@@ -614,9 +618,9 @@ body.apartmentSheetActive{overflow:hidden}
  </div></details></div>
  <div id="ct_resultPanel" class="panel hidden">
   <h3 class="contractSection">계약 안내문 확인</h3>
-  <p class="contractHint adminExplain">사전에 협의한 계약 성립 시점, 일방 변심에 따른 해제 조건, 매도인의 수령액 배액상환, 매수인의 송금액 포기 및 중개보수 관련 조건을 최종 안내문에 항상 명시합니다. 금액·계좌와 실제 협의 내용이 일치하는지 최종 문자에서 검토하세요.</p>
+  <p class="contractHint adminExplain">이 안내는 거래당사자에게 계약 조건을 제안하고 동의 여부를 확인받기 위한 문서입니다. 송금액·계좌와 제안 내용을 발송 전에 확인하세요.</p>
   <div id="ct_missing" class="contractReview" role="status" aria-live="polite">확인할 계약정보를 정리합니다.</div>
-  <div id="ct_missingQuickFields" class="contractMissingQuick hidden" aria-label="빠진 계약정보 바로 수정"></div>
+  <section id="ct_missingQuickFields" class="contractMissingQuick hidden" aria-label="누락된 내용을 이 자리에서 입력"></section>
   <section class="contractCoreFacts" id="ct_keyFacts" aria-label="계약 핵심정보">
     <h4>계약 핵심정보</h4>
     <div class="contractCoreRow"><span>부동산</span><strong id="ct_factProperty">확인 필요</strong></div>
@@ -627,19 +631,12 @@ body.apartmentSheetActive{overflow:hidden}
     <div class="contractPaymentFocus"><small>이번 송금액 · 발송 전 재확인</small><strong id="ct_factAdvance">확인 필요</strong></div>
     <div class="contractCoreRow contractAccount"><span>입금 계좌·예금주</span><strong id="ct_factAccount">확인 필요</strong></div>
   </section>
-  <details id="ct_clauseChoices" class="contractClauseChoices"><summary>계약 성립·해제·중개보수 별도 합의 확인</summary>
-   <p>실제 당사자들이 합의한 항목만 선택하세요. 선택하지 않은 조건은 안내문에 자동 삽입되지 않습니다.</p>
-   <label><input type="checkbox" id="ct_clauseEffective" onchange="FirstHyundaiEasy.rebuildAfterClauses()"> 일부 송금 시 계약 성립에 합의함</label>
-   <label><input type="checkbox" id="ct_clauseCancellation" onchange="FirstHyundaiEasy.rebuildAfterClauses()"> 일방 변심 시 배액상환·송금액 포기 조건에 합의함</label>
-   <label><input type="checkbox" id="ct_clauseBrokerFee" onchange="FirstHyundaiEasy.rebuildAfterClauses()"> 계약 해제와 중개보수 관련 문구에 합의함</label>
-   <p>체크는 합의 여부 확인을 돕기 위한 것으로, 계약의 법적 효력을 보증하지 않습니다. 실제 합의 문구를 최종 검토하세요.</p>
-  </details>
-  <button id="ct_fixMissing" type="button" class="btn alt contractFix hidden" onclick="FirstHyundaiEasy.openManual()">부족하거나 잘못 인식된 부분 수정</button>
+  <button id="ct_fixMissing" type="button" class="btn alt contractFix hidden" onclick="FirstHyundaiEasy.openManual()">계약조건 전체 수정</button>
   <p class="contractHint adminExplain">생성된 문구를 직접 수정할 수 있습니다. 금액·날짜·계좌·특약을 당사자와 재확인한 다음 공유하세요.</p>
   <div id="ct_status" class="contractReview" role="status" aria-live="polite">조건을 입력하면 초안을 생성할 수 있습니다.</div>
   <div class="contractPreviewHeader">
    <label class="inputLabel" for="ct_preview">최종 계약 안내 문자</label>
-   <button id="ct_togglePreviewEdit" type="button" class="btn alt contractPreviewToggle familySimpleNote" aria-controls="ct_preview" aria-expanded="false" onclick="FirstHyundaiContracts.togglePreviewEdit()">✎ 문자 직접 수정</button>
+   <button id="ct_togglePreviewEdit" type="button" class="btn alt contractPreviewToggle adminOnly" aria-controls="ct_preview" aria-expanded="false" onclick="FirstHyundaiContracts.togglePreviewEdit()">✎ 문자 직접 수정</button>
   </div>
   <p class="familySimpleNote contractPreviewHint">빨간 글씨는 아직 확인하지 않은 부분입니다. 확인 후 수정해 주세요.</p>
   <div id="ct_previewHighlight" class="contractPreviewHighlight" role="document" aria-label="빨간색으로 확인이 필요한 항목을 강조한 계약문자 미리보기"></div>
@@ -652,7 +649,18 @@ body.apartmentSheetActive{overflow:hidden}
    <button type="button" class="btn" onclick="FirstHyundaiContracts.share()">문자 / 카톡 공유</button>
    <button type="button" class="btn alt" onclick="FirstHyundaiContracts.reset()">새 계약 시작</button>
   </div>
-  <p class="contractInfo adminExplain">이 기능은 계약서 자체가 아니라 당사자 간 사전 합의 내용을 정리하는 도구입니다. 일부 송금만으로 계약의 효력·해제 조건이 일률적으로 결정되는 것은 아닙니다. 필수 조건과 당사자 의사 확인이 중요합니다. 작성 내용은 공개 GitHub에 업로드하거나 앱의 온라인 데이터로 전송하지 않으며, 별도로 저장하지 않습니다. 복사·공유 후에는 휴대폰 클립보드나 선택한 앱에 내용이 남을 수 있습니다.</p><p class="familySimpleNote familyShortSafety">계약 안내문은 계약서가 아닙니다. 실제 합의한 조건인지 확인해 주세요.</p>
+  <p class="contractInfo adminExplain">이 기능은 계약서 자체가 아니라 당사자 간 사전 합의 내용을 정리하는 도구입니다. 일부 송금만으로 계약의 효력·해제 조건이 일률적으로 결정되는 것은 아닙니다. 필수 조건과 당사자 의사 확인이 중요합니다. 작성 내용은 공개 GitHub에 업로드하거나 앱의 온라인 데이터로 전송하지 않으며, 별도로 저장하지 않습니다. 복사·공유 후에는 휴대폰 클립보드나 선택한 앱에 내용이 남을 수 있습니다.</p><p class="familySimpleNote familyShortSafety">상대방에게 계약조건을 제안하는 안내문입니다. 전송 후 동의 여부를 확인하세요.</p>
+  <details id="ct_templateEditor" class="contractAdminTemplate adminOnly">
+   <summary>⚙ 관리자 · 공통 계약 제안문구 수정</summary>
+   <p>이 기기에 저장한 문구는 관리자·가족모드에서 함께 적용됩니다. 다른 휴대폰에는 별도의 배포가 필요합니다.</p>
+   <label for="ct_tpl_intro">인사말</label><textarea id="ct_tpl_intro" maxlength="240" rows="2"></textarea>
+   <label for="ct_tpl_invitation">동의 요청</label><textarea id="ct_tpl_invitation" maxlength="500" rows="3"></textarea>
+   <label for="ct_tpl_effective">계약 성립 제안</label><textarea id="ct_tpl_effective" maxlength="700" rows="3"></textarea>
+   <label for="ct_tpl_cancellation">해제·계약금 처리 제안</label><textarea id="ct_tpl_cancellation" maxlength="700" rows="3"></textarea>
+   <label for="ct_tpl_broker">중개보수 제안</label><textarea id="ct_tpl_broker" maxlength="700" rows="3"></textarea>
+   <div class="contractActions"><button type="button" class="btn contractPrimary" onclick="FirstHyundaiContracts.saveTemplate()">공통문구 저장</button><button type="button" class="btn alt" onclick="FirstHyundaiContracts.resetTemplate()">기본문구로 복원</button></div>
+   <p id="ct_templateStatus" role="status" aria-live="polite"></p>
+  </details>
  </div>
 </div>
 <dialog id="ct_imageDialog" class="contractImageDialog" aria-label="계약 안내 이미지 미리보기">
