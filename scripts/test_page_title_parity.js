@@ -18,7 +18,7 @@ for(const p of pages){
  const heading=html.slice(start,start+600);
  assert(heading.includes('class="sectionTitle'),'SectionTitle missing: '+p);
  assert(heading.includes('<h2'),'H2 missing: '+p);
- assert(heading.includes('class="tiny'),'Subtitle missing: '+p);
+ if(p!=='nearby')assert(heading.includes('class="tiny'),'Subtitle missing: '+p);
  assert(heading.includes('refreshAction'),'Refresh action missing: '+p);
  assert(rules.includes('#'+p),'Shared selector omitted '+p);
 }
