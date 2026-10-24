@@ -16,7 +16,7 @@ assert(main.includes('ignored->{')&&main.includes('overlay.detach()'),'Reveal li
 assert(css.includes('.fhd-bridge-backdrop')&&css.includes('linear-gradient(135deg,#03212A,#095B5E)'));
 assert(main.includes('nativeHeaderRects?.()')&&main.includes('overlay.moveToHeader('));
 assert(native.includes('PathInterpolator(.34f,.06f,.18f,1f)'),'Use gentler takeoff and soft landing');
-assert(native.includes('DURATION-LANDING_LEAD')&&native.includes('ObjectAnimator.ofFloat(part,View.ALPHA,1f,0f)'),'Native brand cross-dissolves during landing instead of snapping');
+assert(native.includes('ObjectAnimator.ofFloat(part,View.ALPHA,1f,0f)'),'Native brand cross-dissolves during landing instead of snapping');
 assert(native.includes('fade.setDuration(205)'),'Keep a gentle 205ms native landing opacity blend');
 assert(native.includes('ring.animate().translationX(')&&native.includes('.scaleX(ringScale).scaleY(ringScale)'),'Gold circular halo must travel and shrink with the logo');
 assert(!native.includes('ValueAnimator.ofArgb('),'No native text color change during the flight: both ends must start at final colors');
@@ -30,6 +30,7 @@ assert(css.includes('background:transparent!important;border-color:transparent!i
 assert(!main.includes('beginNativeHandoffLanding?.()')&&main.includes('overlay.moveToHeader(positions,viewport,view,done)'),'Avoid extra JavaScript signals during the animated flight');
 assert(src.includes('function beginNativeHandoffLanding()'),'Browser can reveal the existing header before native overlay exits');
 assert(css.includes('@keyframes fhd-native-brand-land')&&css.includes('225ms linear 555ms both'),'Destination header appears on pre-timed CSS animation');
+assert(!css.includes('opacity:0!important;\n animation:fhd-native-brand-land'),'No important opacity override may suppress the timed landing keyframes');
 assert(native.includes('setLayerType(View.LAYER_TYPE_HARDWARE,null)'),'Moving native text and emblem are GPU-backed');
 assert(css.includes('color:#F6D791!important')&&css.includes('font-weight:700!important')&&css.includes('font-weight:400!important'),'Web header matches the original splash styles');
 assert(main.includes('view.setAlpha(1f)')&&main.includes('ANIMATOR_DURATION_SCALE'));

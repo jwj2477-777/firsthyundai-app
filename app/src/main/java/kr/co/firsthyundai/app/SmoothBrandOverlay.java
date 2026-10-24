@@ -165,8 +165,12 @@ final class SmoothBrandOverlay extends FrameLayout {
                 .translationY(badgeShiftY+centerOffsetY)
                 .scaleX(ringScale).scaleY(ringScale)
                 .setDuration(DURATION).setInterpolator(natural).start();
-        ring.animate().alpha(0f).setStartDelay(DURATION-250L)
-                .setDuration(250L).start();
+        // Isolate halo alpha from the ViewPropertyAnimator's motion.
+        ObjectAnimator haloFade=ObjectAnimator.ofFloat(ring,View.ALPHA,1f,0f);
+        haloFade.setStartDelay(DURATION-250L);
+        haloFade.setDuration(250L);
+        haloFade.start();
+        arrivalFades.add(haloFade);
         // Both views have the same splash-white title, gold subtitle and
         // dark logo. Only their geometry changes during the move.
         rule.animate().alpha(0f).setStartDelay(245).setDuration(390).start();
