@@ -74,7 +74,9 @@ assert.equal(node.attributes['data-office-role'],'family','Role must switch with
 assert.equal(elements.roleButton.textContent,'가족 모드');
 assert.equal(elements.roleLabel.textContent,'현재 가족 모드');
 assert(elements.roleButton['aria-label'].includes('관리자 모드로 전환'));
-assert(html.includes('id="favoriteAlertCompact"')&&html.includes('<summary>🔔 관심단지 알림 설정'),'Alert options collapsed by default');
+assert(html.includes('id="favoriteAlertButton"')&&html.includes('id="favoriteAlertSettingsDialog"'),'Header bell opens the notification settings dialog');
+assert(html.indexOf('id="favoriteAlertButton"')<html.indexOf('</header>'),'Bell remains beside family/admin mode');
+assert(!favorites.includes('id="favoriteTradeAlertEnabled"'),'Alert preferences must no longer crowd favorite apartment cards');
 assert(html.includes('id="favoriteTradeAlertEnabled"')&&html.includes('id="favoriteTradeNativeEnabled"'));
 assert(!html.includes('송도 3공구 퍼스트파크 15블럭 사무실 중심'));
 assert(html.indexOf('id="modeBar"')<html.indexOf('</header>'));
