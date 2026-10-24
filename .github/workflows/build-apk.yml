@@ -138,6 +138,7 @@ jobs:
           python3 -c "from pathlib import Path; x=Path('app/src/main/assets/index.html').read_text(encoding='utf-8'); Path('/tmp/firsthyundai-ui.js').write_text(x.split('<script>',1)[1].split('</script>',1)[0],encoding='utf-8')"
           node --check /tmp/firsthyundai-ui.js
           node scripts/test_premium_motion.js
+          node scripts/test_shared_brand_handoff.js
           node scripts/test_price_trends.js
           node scripts/test_nearby.js
           node scripts/test_compact_complex_cards.js
