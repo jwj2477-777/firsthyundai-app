@@ -1971,7 +1971,23 @@ function renderNearbyDetails(resetLimit){
  $('nearbyMore').textContent='거래 더 보기 ('+number(rows.length-shown.length)+'건 남음)';
 }
 
-function renderOverview(){let list=remote.trades?.records||[];$('totalDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.length):'—';$('saleDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.filter(x=>x.type==='매매').length):'—';$('rentDeals').textContent=remote.trades&&remote.trades.state!=='not_started'?number(list.filter(x=>x.type==='전세'||x.type==='월세').length):'—';$('newsGroups').textContent=remote.news&&remote.news.state!=='not_started'?number(remote.news.briefs?.length):'—';$('newDeals').textContent=remote.new_trades&&remote.new_trades.state!=='not_started'?number((remote.new_trades.records||[]).filter(x=>x.first_seen_date===new Date(Date.now()+9*3600000).toISOString().slice(0,10)).length):'—';$('overviewStatus').innerHTML=`<div>${escapeHtml(textState(remote.trades,'실거래가'))}</div><div>${escapeHtml(textState(remote.news,'뉴스'))}</div>${issues.trades?`<div class="flash bad">실거래가 연결 오류: ${escapeHtml(issues.trades)}</div>`:''}${issues.news?`<div class="flash bad">뉴스 연결 오류: ${escapeHtml(issues.news)}</div>`:''}`;}
+function renderOverview(){
+ const tradesReady=!!remote.trades&&remote.trades.state!=='not_started';
+ const newReady=!!remote.new_trades&&remote.new_trades.state!=='not_started';
+ const newsReady=!!remote.news&&remote.news.state!=='not_started';
+ const list=remote.trades?.records||[];
+ const newToday=newReady?(remote.new_trades.records||[]).filter(x=>x.first_seen_date===kstDateOffset(0)).length:null;
+ $('totalDeals').textContent=tradesReady?number(list.length):'—';
+ $('saleDeals').textContent=tradesReady?number(list.filter(x=>x.type==='매매').length):'—';
+ $('rentDeals').textContent=tradesReady?number(list.filter(x=>x.type==='전세'||x.type==='월세').length):'—';
+ $('newsGroups').textContent=newsReady?number(remote.news.briefs?.length):'—';
+ $('newDeals').textContent=newReady?number(newToday):'—';
+ $('overviewNewQuickCount').textContent=newReady?number(newToday)+'건':'확인 전';
+ const states=[textState(remote.trades,'실거래가'),textState(remote.new_trades,'새 거래'),textState(remote.news,'뉴스')];
+ const warnings=[['trades','실거래'],['new_trades','새 거래'],['news','뉴스']]
+  .filter(([key])=>issues[key]).map(([key,name])=>'<div class="flash bad">'+escapeHtml(name+' 갱신 오류: '+issues[key])+'</div>');
+ $('overviewStatus').innerHTML=states.map(item=>'<div>'+escapeHtml(item)+'</div>').join('')+warnings.join('');
+}
 // National trade snapshots store the signed CONTRACT date in ISO (YYYY-MM-DD).
 // Compare inclusive date boundaries; missing/invalid source dates never match a date-limited search.
 function tradeContractDateMatches(contractDate,start,end){
@@ -1991,6 +2007,32 @@ function resetTradeDateFilter(){
  $('tradeDateTo').value='';
  renderTrades();
 }
+// Keep a compact, human-readable summary only when filters actually apply.
+function updateTradeActiveSummary(){
+ const terms=[];
+ if(tradeFocus){
+  const complex=catalogRows().find(item=>item.id===tradeFocus.id);
+  if(complex)terms.push(complex.label);
+  if(tradeFocus.area)terms.push('전용 '+areaKey(tradeFocus.area)+'㎡');
+ }else if(tradeMode==='search'&&selectedTradeBuilding){
+  terms.push(selectedTradeBuilding);
+  if(selectedTradeArea)terms.push('전용 '+selectedTradeArea+'㎡');
+ }
+ const text=String($('aptFilter').value||'').trim();
+ if(text)terms.push('이름: '+text);
+ const type=$('typeFilter').value;
+ if(type)terms.push(type);
+ const start=$('tradeDateFrom').value,end=$('tradeDateTo').value;
+ if(start||end)terms.push('계약일 '+(start||'전체')+' ~ '+(end||'전체'));
+ const status=$('statusFilter').value;
+ if(status==='cancel')terms.push('해제 거래만');
+ if(status==='notcancel')terms.push('해제 제외');
+ if($('tradesFavoriteFilter').value==='favorites')terms.push('관심 14개만');
+ const target=$('tradeActiveSummary');
+ target.classList.toggle('hidden',terms.length===0);
+ const content=terms.length?'적용 조건 · '+terms.join(' · '):'';
+ if(target.textContent!==content)target.textContent=content;
+}
 function renderTrades(){
  const payload=remote.trades;
  // The top trade navigation already provides Latest and Favorites.
@@ -1998,6 +2040,7 @@ function renderTrades(){
  const searchActive=tradeMode==='search';
  $('tradeSearchPanel').classList.toggle('hidden',!searchActive);
  renderTypeButtons('tradeTypeBar',$('typeFilter').value);
+ updateTradeActiveSummary();
  if(tradeMode==='search'){
   if(payload && $('tradeBuildingSelect').options.length<=1)populateTradeBuildings();
   updateTradeAreaOptions();
@@ -2274,6 +2317,16 @@ function updateNewQuickFilters(){
  button.classList.toggle('active',favorite);
  button.setAttribute?.('aria-pressed',favorite?'true':'false');
  button.textContent=favorite?'★ 관심 14개만':'☆ 관심 14개만';
+}
+// Today summary shortcuts open a known date and reset only the related new-trade filters.
+function openTodayNewTrades(){
+ newAlertFocusIds=null;
+ $('newType').value='';
+ $('newFavoriteFilter').value='';
+ $('newAptFilter').value='';
+ switchPage('new');
+ $('newDate').value=kstDateOffset(0);
+ renderNew();
 }
 function renderNew(){
  const select=$('newDate');
