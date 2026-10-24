@@ -32,6 +32,12 @@ assert(lock.includes('R.drawable.ic_launcher_badge')&&lock.includes('showWelcome
 assert(lock.includes('if(!welcomeDone){openAfterWelcome=true;return;}'),'Startup must not bypass splash and login');
 assert(lock.includes('loadLatestPolicy()')&&lock.includes('AccessPolicy.authorized('),'Authentication stays intact');
 assert(lock.includes('welcomeOverlay.setOnClickListener')&&lock.includes('ANIMATOR_DURATION_SCALE'));
+assert(lock.includes('FrameLayout emblemFrame')&&lock.includes('haloRing')&&lock.includes('goldRule')&&lock.includes('R.drawable.ic_launcher_badge'),'Native FHD welcome uses approved emblem with warm ring and accent');
+assert(lock.includes('reducedMotion?0:920')&&lock.includes('welcomeHandler.postDelayed'),'Welcome is short and skippable, including reduced-motion');
+assert(main.includes('web.setAlpha(0f)')&&main.includes('onPageFinished')&&main.includes('webFirstFrameShown'),'WebView stays hidden until local first frame is loaded');
+assert(main.includes('window.FirstHyundaiMotion?.playEntrance?.()'),'Native landing and CSS reveal are synchronized');
+assert(main.includes('if(motionOff)view.setAlpha(1f)'),'Reduced motion must reveal instantly');
+
 assert(main.includes('downloadAndInstallVerifiedAppUpdate()')&&main.includes('AppUpdate.allowedDownload(url)'));
 assert(main.includes('AppUpdateInstaller.download(')&&main.includes('beginVerifiedInstallation(apk)'));
 const installSrc=read('app/src/main/java/kr/co/firsthyundai/app/AppUpdateInstaller.java');

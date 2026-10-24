@@ -2442,3 +2442,39 @@ dialog[open]:not(.apartmentSheet):not(.favoriteTradeAlertDialog){
   transition:none!important;transform:none!important;
  }
 }
+
+
+/* v2.0.61 · One-time brand continuity after the native FHD welcome.
+   Header/title/three navigation tiles arrive only on the first page load.
+   Later route changes keep their existing short fade; no functional layout changes. */
+@keyframes fhd-brand-arrive{
+ from{opacity:.6;transform:translate3d(0,5px,0)}
+ to{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes fhd-identity-arrive{
+ from{opacity:.5;transform:translate3d(0,7px,0)}
+ to{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes fhd-nav-arrive{
+ from{opacity:.65;transform:translate3d(0,6px,0)}
+ to{opacity:1;transform:translate3d(0,0,0)}
+}
+body.fhd-first-render header .officeMark{
+ animation:fhd-identity-arrive 340ms cubic-bezier(.19,1,.31,1) both
+}
+body.fhd-first-render header .brandHeaderText{
+ animation:fhd-brand-arrive 350ms cubic-bezier(.19,1,.31,1) 45ms both
+}
+body.fhd-first-render #nav .primaryNav>button{
+ animation:fhd-nav-arrive 290ms cubic-bezier(.2,.82,.25,1) both
+}
+body.fhd-first-render #nav .primaryNav>button:nth-child(1){animation-delay:90ms}
+body.fhd-first-render #nav .primaryNav>button:nth-child(2){animation-delay:135ms}
+body.fhd-first-render #nav .primaryNav>button:nth-child(3){animation-delay:180ms}
+@media(prefers-reduced-motion:reduce){
+ body.fhd-first-render header .officeMark,
+ body.fhd-first-render header .brandHeaderText,
+ body.fhd-first-render #nav .primaryNav>button{
+  animation:none!important;transform:none!important
+ }
+}

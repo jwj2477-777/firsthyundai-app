@@ -11,6 +11,8 @@ assert(css.includes('.page:not(.hidden){animation:fhd-page-reveal') &&
 assert(css.includes('Do NOT translate .page'),'The fixed apartment sheet must not shift');
 assert(css.includes('prefers-reduced-motion:reduce')&&css.includes('animation:none!important'),'Accessibility setting removes effects');
 assert(css.includes('.fhd-tap-wave')&&css.includes('pointer-events:none'));
+assert(css.includes('body.fhd-first-render header .officeMark')&&css.includes('body.fhd-first-render #nav .primaryNav>button'),'Cold start has one-time subtle branding and tile entrance');
+
 assert(html.includes('onclick="closeApartmentSheet()"')&&html.includes('function switchPage(id)'),
  'All existing navigation paths remain intact');
 new vm.Script(source);
@@ -33,6 +35,7 @@ const target={
 const ctx=vm.createContext({document,window:{matchMedia:()=>({matches:disable})},Number,Math});
 vm.runInContext(source,ctx);
 assert.equal(typeof handler,'function');
+assert.equal(typeof ctx.window.FirstHyundaiMotion.playEntrance,'function');
 const event={pointerType:'touch',isPrimary:true,target:{closest:()=>target},clientX:135,clientY:220};
 handler(event);assert.equal(created,1);assert.equal(added,1);
 assert.equal(target.wave.style.left,'35px');assert.equal(target.wave.style.top,'20px');

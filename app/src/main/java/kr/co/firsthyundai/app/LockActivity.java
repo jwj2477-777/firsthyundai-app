@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -155,10 +156,26 @@ public class LockActivity extends Activity {
         LinearLayout identity=new LinearLayout(this);
         identity.setOrientation(LinearLayout.VERTICAL);
         identity.setGravity(Gravity.CENTER);
+        // Preserve the exact approved FHD/FIRST badge. Animate only its wrapper;
+        // the brand artwork itself is never stretched, recolored or replaced.
+        FrameLayout emblemFrame=new FrameLayout(this);
+        emblemFrame.setClipChildren(false);
+        emblemFrame.setClipToPadding(false);
+        View haloRing=new View(this);
+        GradientDrawable ringDrawable=new GradientDrawable();
+        ringDrawable.setShape(GradientDrawable.OVAL);
+        ringDrawable.setColor(Color.TRANSPARENT);
+        ringDrawable.setStroke(dp(1),Color.argb(115,230,186,95));
+        haloRing.setBackground(ringDrawable);
+        emblemFrame.addView(haloRing,new FrameLayout.LayoutParams(
+                dp(168),dp(168),Gravity.CENTER));
         ImageView emblem=new ImageView(this);
         emblem.setImageResource(R.drawable.ic_launcher_badge);
         emblem.setContentDescription("원본 FHD FIRST 로고");
-        identity.addView(emblem,new LinearLayout.LayoutParams(dp(144),dp(144)));
+        emblem.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        emblemFrame.addView(emblem,new FrameLayout.LayoutParams(
+                dp(144),dp(144),Gravity.CENTER));
+        identity.addView(emblemFrame,new LinearLayout.LayoutParams(dp(190),dp(190)));
         TextView title=new TextView(this);
         title.setText("퍼스트현대");
         title.setTextColor(Color.WHITE);
@@ -168,6 +185,16 @@ public class LockActivity extends Activity {
         LinearLayout.LayoutParams titleParams=new LinearLayout.LayoutParams(-2,-2);
         titleParams.topMargin=dp(12);
         identity.addView(title,titleParams);
+        View goldRule=new View(this);
+        GradientDrawable ruleBackground=new GradientDrawable(
+                GradientDrawable.Orientation.LEFT_RIGHT,
+                new int[]{Color.argb(0,217,173,92),Color.rgb(238,201,126),
+                        Color.argb(0,217,173,92)});
+        goldRule.setBackground(ruleBackground);
+        LinearLayout.LayoutParams ruleParams=new LinearLayout.LayoutParams(dp(96),dp(2));
+        ruleParams.gravity=Gravity.CENTER_HORIZONTAL;
+        ruleParams.topMargin=dp(14);
+        identity.addView(goldRule,ruleParams);
         TextView subtitle=new TextView(this);
         subtitle.setText("FIRST HYUNDAI  ·  REAL ESTATE");
         subtitle.setTextColor(Color.rgb(246,215,145));
@@ -175,7 +202,7 @@ public class LockActivity extends Activity {
         subtitle.setGravity(Gravity.CENTER);
         subtitle.setLetterSpacing(.1f);
         LinearLayout.LayoutParams subtitleParams=new LinearLayout.LayoutParams(-2,-2);
-        subtitleParams.topMargin=dp(5);
+        subtitleParams.topMargin=dp(13);
         identity.addView(subtitle,subtitleParams);
         welcomeOverlay.addView(identity,new FrameLayout.LayoutParams(-1,-2,Gravity.CENTER));
         stage.addView(welcomeOverlay,new FrameLayout.LayoutParams(-1,-1));
@@ -184,15 +211,32 @@ public class LockActivity extends Activity {
                 Settings.Global.ANIMATOR_DURATION_SCALE,1f)==0f;}
         catch(Exception ignored){}
         if(!reducedMotion){
-            emblem.setAlpha(0f);
-            emblem.setScaleX(.84f);emblem.setScaleY(.84f);
-            title.setAlpha(0f);subtitle.setAlpha(0f);
-            emblem.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(480).start();
-            title.animate().alpha(1f).setStartDelay(320).setDuration(350).start();
-            subtitle.animate().alpha(1f).setStartDelay(500).setDuration(350).start();
+            // Short, staggered brand reveal; no spinner, artificial network wait
+            // or animation of any unlock/access controls.
+            emblemFrame.setAlpha(0f);
+            emblemFrame.setTranslationY(dp(11));
+            emblemFrame.setScaleX(.94f);emblemFrame.setScaleY(.94f);
+            haloRing.setAlpha(0f);
+            haloRing.setScaleX(.91f);haloRing.setScaleY(.91f);
+            title.setAlpha(0f);
+            title.setTranslationY(dp(7));
+            goldRule.setScaleX(0f);
+            subtitle.setAlpha(0f);
+            subtitle.setTranslationY(dp(5));
+            emblemFrame.animate().alpha(1f).translationY(0f)
+                    .scaleX(1f).scaleY(1f).setDuration(410)
+                    .setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+            haloRing.animate().alpha(1f).scaleX(1.07f).scaleY(1.07f)
+                    .setStartDelay(125).setDuration(570).start();
+            title.animate().alpha(1f).translationY(0f)
+                    .setStartDelay(185).setDuration(325).start();
+            goldRule.animate().scaleX(1f)
+                    .setStartDelay(320).setDuration(380).start();
+            subtitle.animate().alpha(1f).translationY(0f)
+                    .setStartDelay(360).setDuration(330).start();
         }
         dismissWelcome=this::finishWelcome;
-        welcomeHandler.postDelayed(dismissWelcome,reducedMotion?180:1100);
+        welcomeHandler.postDelayed(dismissWelcome,reducedMotion?0:920);
         welcomeOverlay.setOnClickListener(v->finishWelcome());
     }
 
@@ -204,7 +248,7 @@ public class LockActivity extends Activity {
         welcomeOverlay=null;
         if(overlay!=null){
             overlay.animate().cancel();
-            overlay.animate().alpha(0f).setDuration(180).withEndAction(()->{
+            overlay.animate().alpha(0f).setDuration(150).withEndAction(()->{
                 if(overlay.getParent() instanceof ViewGroup)
                     ((ViewGroup)overlay.getParent()).removeView(overlay);
             }).start();

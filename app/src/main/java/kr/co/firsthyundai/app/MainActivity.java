@@ -49,6 +49,7 @@ public class MainActivity extends Activity {
     private volatile boolean updateDownloading = false;
     private final AtomicBoolean updateChecking = new AtomicBoolean(false);
     private WebView web;
+    private boolean webFirstFrameShown = false;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private String pendingBackup = "";
     private String pendingCatalog = "";
@@ -62,7 +63,23 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         TradeNotifications.ensureChannel(this);
         web = new WebView(this);
+        // Avoid a blank white WebView flash between the native FHD welcome
+        // and the actual app page. Reveal only when local index has loaded.
+        web.setAlpha(0f);
         web.setWebViewClient(new WebViewClient() {
+            @Override public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view,url);
+                if(!"file:///android_asset/index.html".equals(url)||webFirstFrameShown)return;
+                webFirstFrameShown=true;
+                if(isFinishing()||isDestroyed())return;
+                view.evaluateJavascript("window.FirstHyundaiMotion?.playEntrance?.()",null);
+                boolean motionOff=false;
+                try{motionOff=Settings.Global.getFloat(getContentResolver(),
+                        Settings.Global.ANIMATOR_DURATION_SCALE,1f)==0f;}
+                catch(Exception ignored){}
+                if(motionOff)view.setAlpha(1f);
+                else view.animate().alpha(1f).setDuration(220).start();
+            }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return routeExternal(request.getUrl().toString());
             }
