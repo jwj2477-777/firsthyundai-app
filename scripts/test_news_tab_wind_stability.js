@@ -16,6 +16,6 @@ assert(!css.includes('@property --fhd-native-fill'));
 assert(css.includes('#6547A5'));
 assert(css.includes('v2.0.74 · News tabs must NEVER move'));
 assert(flow.includes("key:row.classList.contains('newsCategoryTabs')?'news':'trade-types',stable:true"));
-assert(flow.includes('fn=>Promise.resolve().then(fn)'),
+assert(flow.includes('lowerClicks.get(event)'),
  'Real onclick state must be painted before the next browser frame');
 console.log('News row shares main-menu painter, retains clicked DOM, both directions and original purple theme.');

@@ -13,7 +13,7 @@ async function runBrowserTests(){
  const check=(label,condition)=>{checks.push(label);if(!condition)throw Error(label)};
  const api=window.FirstHyundaiSelectionFlow._test;
  const bg=b=>getComputedStyle(b).backgroundImage;
- const rect=b=>JSON.stringify(b.getBoundingClientRect().toJSON());
+ const rect=b=>JSON.stringify([b.offsetLeft,b.offsetTop,b.offsetWidth,b.offsetHeight]);
  const raf=new Map();let next=0;
  window.requestAnimationFrame=fn=>{raf.set(++next,fn);return next};
  window.cancelAnimationFrame=id=>raf.delete(id);

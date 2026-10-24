@@ -14,7 +14,7 @@ assert(css.includes('v2.0.75 · No layout movement during background transfer'))
 assert(!/createElement\(|cloneNode|fhd-wind-|fhd-color-only-overlay|webkitMaskImage|maskImage|translate3d|rotate\(|\.animate\(/.test(code),
  'Only the REAL button background may be repainted; no hidden layer or transform');
 assert(code.includes("key:'top-five',selector:'#nav'"));
-let selected=0,reduced=false,click;
+let selected=0,reduced=false,click,bubble;
 const callbacks=[],cancelled=new Set();
 let nextId=0;
 const requestAnimationFrame=fn=>{
@@ -63,7 +63,7 @@ const buttons=labels.map((label,i)=>{
 top.children=buttons.slice(0,3);bottom.children=buttons.slice(3);
 nav.querySelectorAll=q=>q==='.primaryNav > button, .utilityNav > button'?buttons:[];
 const doc={
- addEventListener(type,fn,opts){if(type==='click'){click=fn;assert.equal(opts.capture,true)}},
+ addEventListener(type,fn,opts){if(type==='click'&&opts?.capture){click=fn;assert.equal(opts.capture,true)}else if(type==='click')bubble=fn;},
  querySelector:s=>s==='#nav'?nav:null
 };
 const win={innerWidth:415,innerHeight:980,requestAnimationFrame,
@@ -140,3 +140,23 @@ click({target:buttons[3],defaultPrevented:false});
 assert.equal(callbacks.length,0);
 assert.equal(nav.children.length,2);
 console.log('V10 restrained via-Apartment-Info paint: only Trades↔News, both directions, no intermediate selection, no other paths altered.');
+
+// Real native event dispatch can drain microtasks after capture but before
+// inline onclick. Lower rows MUST wait for bubbling (not a capture microtask).
+reduced=false;
+const newsRow=node('div',['newsCategoryTabs']);
+newsRow.children=buttons.slice(0,2);
+for(const b of newsRow.children)b.parentElement=newsRow;
+selected=0;
+const event={target:buttons[1],defaultPrevented:false};
+click(event);
+assert.equal(callbacks.length,0,'Capture must not queue a premature lower-row RAF');
+assert(buttons.every(b=>!b.style.getPropertyValue('background')),
+ 'Capture must not paint the obsolete selection');
+selected=1; // actual switchNewsPane inline handler
+bubble(event);
+assert.equal(buttons[1].style.getPropertyPriority('background'),'important',
+ 'Bubble paints immediately after real selection, before rendering');
+frame(4000);frame(4315);complete(4630);
+assert(buttons.every(b=>!b.style.getPropertyValue('background')));
+console.log('Native-event ordering: capture snapshot → actual onclick → bubble paint; no capture microtask race.');

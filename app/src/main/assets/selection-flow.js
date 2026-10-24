@@ -19,6 +19,7 @@
  ];
  const stats={started:0,finished:0,skipped:0,topFive:0,news:0,lastPath:[]};
  let running=null,sequence=0;
+ const lowerClicks=new WeakMap();
  const reduceMotion=()=>!!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
  const chosen=b=>!!b&&(b.classList.contains('active')||
   b.classList.contains('selected')||b.getAttribute('aria-current')==='page'||
@@ -211,19 +212,25 @@
   const next=peers.indexOf(button),previous=peers.findIndex(chosen);
   if(next<0||previous<0||previous===next)return;
   const selected=getPaint(peers[previous]),idle=getPaint(button),id=++sequence;
-  // Inline onclick updates real selection before this microtask. Start the
-  // lower-row paint BEFORE the browser can show the new solid fill. Main-menu
-  // timing and via-Apartment-Info motion remain exactly as before.
-  const schedule=spec.stable?fn=>Promise.resolve().then(fn):window.requestAnimationFrame;
-  schedule?.(()=>{
+  // Real pointer events may run a microtask checkpoint BETWEEN capture and
+  // the inline onclick. Finish stable rows in BUBBLING, after their handler,
+  // before browser paint. The main menu keeps its original RAF timing.
+  const start=()=>{
    if(id!==sequence||reduceMotion())return;
    const nextGroup=spec.stable
     ?(group.isConnected===false?document.getElementById?.(group.id):group)
     :document.querySelector(spec.selector);
    if(nextGroup)animate(nextGroup,spec.key,previous,next,selected,idle);
-  });
+  };
+  if(spec.stable)lowerClicks.set(event,start);
+  else window.requestAnimationFrame?.(start);
  }
  document.addEventListener('click',onClick,{capture:true});
+ document.addEventListener('click',event=>{
+  const start=lowerClicks.get(event);
+  lowerClicks.delete(event);
+  if(!event.defaultPrevented)start?.();
+ });
  window.FirstHyundaiSelectionFlow={version:'12.0.0',
   _test:{buttons,chosen,findGroup,getPaint,fromPaint,toPaint,
    vector,viaIndex,softlyMix,middlePaint,isLowerRow,stop,onClick,stats}};
