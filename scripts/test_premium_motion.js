@@ -1,53 +1,70 @@
 'use strict';
-/* v2.0.60: premium motion is CSS + disposable ripple, never an app workflow change. */
-const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const base=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(base,p),'utf8');
-const html=read('app/src/main/assets/index.html'),css=read('app/src/main/assets/ui-v2.css'),
- source=read('app/src/main/assets/premium-motion.js');
-assert(html.includes('<script src="premium-motion.js"></script>'),'Motion script must load inside Android');
-assert(css.includes('/* v2.0.59 · FIRST HYUNDAI PREMIUM INTERACTION LAYER'));
-assert(css.includes('.page:not(.hidden){animation:fhd-page-reveal') &&
- css.includes('.page:not(.hidden)>.sectionTitle:first-child'),'Navigation shows a short fade');
-assert(css.includes('Do NOT translate .page'),'The fixed apartment sheet must not shift');
-assert(css.includes('prefers-reduced-motion:reduce')&&css.includes('animation:none!important'),'Accessibility setting removes effects');
-assert(css.includes('.fhd-tap-wave')&&css.includes('pointer-events:none'));
-assert(css.includes('body.fhd-first-render header .officeMark')&&css.includes('body.fhd-first-render #nav .primaryNav>button'),'Cold start has one-time subtle branding and tile entrance');
-
-assert(html.includes('onclick="closeApartmentSheet()"')&&html.includes('function switchPage(id)'),
- 'All existing navigation paths remain intact');
-new vm.Script(source);
-let handler,disable=false,created=0,added=0,removed=0;
-const document={
- addEventListener(name,cb,opts){if(name==='pointerdown'){handler=cb;assert.equal(opts.passive,true)}},
- createElement(){
-  created++;const listeners={};
-  return {className:'',style:{},setAttribute(){},addEventListener(name,cb){listeners[name]=cb},
-   remove(){removed++},fire(name){listeners[name]?.()}};
- }
+/* v2.0.71: old tap/ripple/page-pop motion is removed; startup brand survives. */
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const html=read('app/src/main/assets/index.html'),
+ css=read('app/src/main/assets/ui-v2.css'),
+ js=read('app/src/main/assets/premium-motion.js'),
+ liquid=read('app/src/main/assets/selection-flow.js');
+assert(html.includes('<script src="premium-motion.js"></script>'));
+assert(html.includes('<script src="selection-flow.js"></script>'));
+new vm.Script(js);new vm.Script(liquid);
+assert(!js.includes("pointerdown")&&!js.includes("fhd-tap-wave")&&!js.includes("fhd-touch-feedback"),
+ 'Legacy touch ripple must not be created or attached');
+assert(!css.includes("@keyframes fhd-tap-wave")&&!css.includes(".fhd-tap-wave{"),
+ 'Legacy ripple paint must not be loaded');
+assert(!css.includes("@keyframes fhd-page-reveal")&&!css.includes("@keyframes fhd-section-reveal"),
+ 'Old screen-enter fades must not overlap fluid transfer');
+assert(!css.includes("@keyframes fhd-nav-arrive"),
+ 'Main menu tiles may not hop on appearance');
+assert(!/button:active\s*\{\s*transform:scale/.test(css),
+ 'Old button squeeze must be removed');
+assert(css.includes('v2.0.71 · Quiet interaction policy'));
+assert(css.includes('.page:not(.hidden),.page:not(.hidden)>.sectionTitle:first-child{\n animation:none!important;'));
+assert(css.includes('body.fhd-first-render #nav .primaryNav>button{\n animation:none!important;'));
+assert(css.includes('body.fhd-native-handoff header .officeMark') &&
+ css.includes('.fhd-bridge-logo'),
+ 'Original native-to-WebView logo animation stays intact');
+assert(!/cloneNode/.test(liquid),'Liquid effect must not clone text/icon labels');
+let touchListeners=0;
+const flags=new Set(),classList={
+ add:x=>flags.add(x),remove:x=>flags.delete(x),contains:x=>flags.has(x)
 };
-const box={width:180,height:50,left:100,top:200};
-const target={
- disabled:false,classes:[],getAttribute(){return null},closest(){return null},
- classList:{contains(){return false},add(){added++}},
- getBoundingClientRect(){return box},querySelectorAll(){return []},
- appendChild(wave){this.wave=wave;}
+const element=()=>({addEventListener(){}});
+const bounds=[
+ {left:12,top:18,width:50,height:50},
+ {left:77,top:17,width:176,height:34},
+ {left:77,top:53,width:240,height:18}
+];
+const selectors=['header .officeMark','header .brandWordmark h1','header .brandSubtitle'];
+const targets=selectors.map((_,i)=>({getBoundingClientRect:()=>bounds[i]}));
+const doc={
+ body:{classList},documentElement:{clientWidth:390},
+ addEventListener(type){if(type==='pointerdown')touchListeners++},
+ createElement:element,
+ querySelector:q=>q==='#nav .primaryNav button:last-child'?element():
+  q==='header .brandHeaderText'?element():
+  targets[selectors.indexOf(q)]||null
 };
-const ctx=vm.createContext({document,window:{matchMedia:()=>({matches:disable})},Number,Math});
-vm.runInContext(source,ctx);
-assert.equal(typeof handler,'function');
-assert.equal(typeof ctx.window.FirstHyundaiMotion.playEntrance,'function');
-assert.equal(typeof ctx.window.FirstHyundaiMotion.prepareBrandHandoff,'function');
-assert.equal(typeof ctx.window.FirstHyundaiMotion.startBrandHandoff,'function');
-assert.equal(typeof ctx.window.FirstHyundaiMotion.beginNativeHandoffLanding,'function');
-assert(css.includes('body.fhd-brand-handoff header .officeMark')&&css.includes('.fhd-bridge-logo'));
-const event={pointerType:'touch',isPrimary:true,target:{closest:()=>target},clientX:135,clientY:220};
-handler(event);assert.equal(created,1);assert.equal(added,1);
-assert.equal(target.wave.style.left,'35px');assert.equal(target.wave.style.top,'20px');
-assert.equal(target.wave.className,'fhd-tap-wave');
-target.wave.fire('animationend');assert.equal(removed,1,'Touch wave must clean itself up');
-disable=true;handler(event);assert.equal(created,1,'Reduced motion disables visual effects');
-disable=false;target.disabled=true;handler(event);assert.equal(created,1,'Disabled buttons cannot animate');
-target.disabled=false;handler({...event,pointerType:'mouse',button:2});assert.equal(created,1,'Right click does not trigger waves');
-assert(!/setInterval|fetch\(|localStorage|preventDefault\(|stopPropagation\(/.test(source),
- 'Motion must neither schedule work nor intercept app events or change data');
-console.log('Premium motion verified: delegated passive touch, short transitions, cleanup, disabled/reduced motion, no workflow changes.');
+const context=vm.createContext({
+ document:doc,
+ window:{FirstHyundaiNative:{},matchMedia:()=>({matches:false}),innerWidth:390},
+ Number,Math,Promise
+});
+vm.runInContext(js,context);
+assert.equal(touchListeners,0,'No listener performs extra touch effects');
+const api=context.window.FirstHyundaiMotion;
+assert.equal(api.playEntrance(),true);
+assert.equal(api.playEntrance(),false,'Welcome only once');
+assert(flags.has('fhd-first-render'));
+const rects=api.nativeHeaderRects();
+assert.equal(rects.length,13);
+assert(flags.has('fhd-native-handoff'));
+api.finishNativeHandoff();
+assert(!flags.has('fhd-first-render'));
+assert(!flags.has('fhd-native-handoff'));
+assert(flags.has('fhd-native-arrived'));
+for(const fn of ['prepareBrandHandoff','startBrandHandoff','beginNativeHandoffLanding'])
+ assert.equal(typeof api[fn],'function',fn+' brand API must remain available');
+console.log('Quiet motion verified: no ripple/press/page-hop; native FHD identity preserved; fluid transfer still present.');
