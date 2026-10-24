@@ -28,6 +28,8 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -49,6 +51,7 @@ public class MainActivity extends Activity {
     private volatile boolean updateDownloading = false;
     private final AtomicBoolean updateChecking = new AtomicBoolean(false);
     private WebView web;
+    private SmoothBrandOverlay nativeHandoff;
     private boolean webFirstFrameShown = false;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private String pendingBackup = "";
@@ -76,22 +79,41 @@ public class MainActivity extends Activity {
                 try{motionOff=Settings.Global.getFloat(getContentResolver(),
                         Settings.Global.ANIMATOR_DURATION_SCALE,1f)==0f;}
                 catch(Exception ignored){}
-                if(motionOff){view.setAlpha(1f);return;}
-                // Build the center-logo overlay while WebView is invisible,
-                // then move the SAME brand elements to their measured header
-                // locations. If layout/animation is unsupported, fade normally.
+                if(motionOff){
+                    view.setAlpha(1f);
+                    if(nativeHandoff!=null)nativeHandoff.finish(null);
+                    return;
+                }
+                // Read real header geometry once DOM layout is stable; animate
+                // the native branded image and text without repainting a second
+                // incompatible SVG layer across Activity boundaries.
                 view.evaluateJavascript(
-                    "Boolean(window.FirstHyundaiMotion?.prepareBrandHandoff?.())",ready->{
+                    "window.FirstHyundaiMotion?.nativeHeaderRects?.() ?? null",json->{
                     if(isFinishing()||isDestroyed())return;
-                    if("true".equals(ready)){
-                        view.setAlpha(1f);
-                        view.evaluateJavascript(
-                          "window.FirstHyundaiMotion?.startBrandHandoff?.()",null);
-                    }else{
-                        view.evaluateJavascript(
-                          "window.FirstHyundaiMotion?.playEntrance?.()",null);
-                        view.animate().alpha(1f).setDuration(220).start();
+                    float[] positions=null;float viewport=0f;
+                    try{
+                        JSONArray data=new JSONArray(json);
+                        if(data.length()!=13)throw new IllegalArgumentException("header coordinates missing");
+                        positions=new float[12];
+                        for(int i=0;i<12;i++)positions[i]=(float)data.getDouble(i);
+                        viewport=(float)data.getDouble(12);
+                    }catch(Exception ignored){}
+                    view.setAlpha(1f);
+                    SmoothBrandOverlay overlay=nativeHandoff;
+                    if(overlay==null){
+                        view.evaluateJavascript("window.FirstHyundaiMotion?.playEntrance?.()",null);
+                        return;
                     }
+                    // Manual tap skips the animation without leaving hidden
+                    // header elements or an unresponsive transparent layer.
+                    final Runnable done=()->{
+                        if(nativeHandoff==overlay)nativeHandoff=null;
+                        if(web!=null)web.evaluateJavascript(
+                            "window.FirstHyundaiMotion?.finishNativeHandoff?.();"+
+                            "window.FirstHyundaiMotion?.playEntrance?.()",null);
+                    };
+                    overlay.setOnClickListener(v->overlay.finish(done));
+                    overlay.moveToHeader(positions,viewport,view,done);
                 });
             }
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -112,7 +134,12 @@ public class MainActivity extends Activity {
         s.setAllowUniversalAccessFromFileURLs(false);
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         web.addJavascriptInterface(new Bridge(), "FirstHyundaiNative");
-        SystemBars.install(this,web);
+        FrameLayout stage=new FrameLayout(this);
+        stage.setBackgroundColor(android.graphics.Color.rgb(3,33,42));
+        stage.addView(web,new FrameLayout.LayoutParams(-1,-1));
+        nativeHandoff=new SmoothBrandOverlay(this);
+        stage.addView(nativeHandoff,new FrameLayout.LayoutParams(-1,-1));
+        SystemBars.install(this,stage);
         web.loadUrl("file:///android_asset/index.html");
     }
 
@@ -600,7 +627,7 @@ public class MainActivity extends Activity {
             });
         }
     }
-    @Override protected void onDestroy(){io.shutdownNow();if(web!=null)web.destroy();super.onDestroy();}
+    @Override protected void onDestroy(){io.shutdownNow();if(nativeHandoff!=null){nativeHandoff.finish(null);nativeHandoff=null;}if(web!=null)web.destroy();super.onDestroy();}
     @Override public void onBackPressed() {
         if(web==null) {super.onBackPressed();return;}
         // Close the native-feeling apartment detail screen before leaving the app.

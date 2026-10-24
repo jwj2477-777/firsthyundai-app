@@ -99,6 +99,23 @@
    return true;
   }catch(e){finishBrandHandoff();return false;}
  }
+ // Android main activity draws the SAME native badge/text that the opening
+ // screen used. Measure the real DOM header only; do not draw a second CSS
+ // lookalike in front of the original artwork.
+ function nativeHeaderRects(){
+  const target=headerTargets();
+  if(reduced()||!target)return null;
+  const viewport=document.documentElement?.clientWidth||window.innerWidth||0;
+  if(!(viewport>0))return null;
+  const values=target.boxes.flatMap(r=>[r.left,r.top,r.width,r.height]);
+  if(values.some(v=>!Number.isFinite(v)))return null;
+  document.body.classList.add('fhd-native-handoff');
+  return [...values,viewport];
+ }
+ function finishNativeHandoff(){
+  document.body?.classList?.remove('fhd-native-handoff');
+  document.body?.classList?.add('fhd-native-arrived');
+ }
  function touch(event){
   if(reduced()||event?.isPrimary===false||event?.pointerType==='mouse'&&event?.button!==0)return;
   const origin=event?.target;
@@ -128,7 +145,7 @@
   stats.waves++;
  }
  document.addEventListener('pointerdown',touch,{passive:true});
- window.FirstHyundaiMotion={version:'2.0.62',playEntrance,prepareBrandHandoff,startBrandHandoff,_test:{touch,reduced,stats,headerTargets,finishBrandHandoff}};
+ window.FirstHyundaiMotion={version:'2.0.63',playEntrance,prepareBrandHandoff,startBrandHandoff,nativeHeaderRects,finishNativeHandoff,_test:{touch,reduced,stats,headerTargets,finishBrandHandoff}};
  // Browsers used for UI preview have no Android bridge; keep a single
  // elegant initial reveal there as well, without affecting app navigation.
  if(!window.FirstHyundaiNative)playEntrance();

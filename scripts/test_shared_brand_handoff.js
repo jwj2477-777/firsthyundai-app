@@ -6,9 +6,12 @@ const css=fs.readFileSync(path.join(root,'app/src/main/assets/ui-v2.css'),'utf8'
 const main=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/MainActivity.java'),'utf8');
 const lock=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/LockActivity.java'),'utf8');
 new vm.Script(src);
-assert(css.includes('body.fhd-brand-handoff header .officeMark')&&css.includes('.fhd-bridge-subtitle'));
+assert(css.includes('body.fhd-native-handoff header .officeMark')&&css.includes('body.fhd-native-arrived'));
+const native=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/SmoothBrandOverlay.java'),'utf8');
+assert(native.includes('R.drawable.ic_launcher_badge')&&native.includes('DURATION=680L')&&native.includes('getLocationOnScreen'));
+assert(native.includes('scaleX(scale).scaleY(scale)'),'Logo scales uniformly, preserving aspect ratio');
 assert(css.includes('.fhd-bridge-backdrop')&&css.includes('linear-gradient(135deg,#03212A,#095B5E)'));
-assert(main.includes('prepareBrandHandoff?.()')&&main.includes('startBrandHandoff?.()'));
+assert(main.includes('nativeHeaderRects?.()')&&main.includes('overlay.moveToHeader('));
 assert(main.includes('view.setAlpha(1f)')&&main.includes('ANIMATOR_DURATION_SCALE'));
 assert(lock.includes('AccessPolicy.authorized(')&&lock.includes('overridePendingTransition(0,0)'));
 function box(left,top,width,height){return {left,top,width,height};}
@@ -63,7 +66,7 @@ function harness(width,{reduced=false,hasNative=true,hasHeader=true}={}){
 }
 for(const width of [340,393,430]){
  const h=harness(width);
- assert.equal(h.api.prepareBrandHandoff(),true,'Native view must prepare before becoming visible');
+ assert.equal(h.api.prepareBrandHandoff(),true,'Legacy web bridge fallback remains available if needed');
  assert(h.body.classes.has('fhd-brand-handoff'),'Hide duplicate live header during move');
  assert.equal(h.api.prepareBrandHandoff(),false,'Do not create duplicate splash layers');
  assert.equal(h.api.startBrandHandoff(),true);

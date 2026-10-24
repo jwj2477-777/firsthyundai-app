@@ -2513,3 +2513,14 @@ body.fhd-brand-handoff header .brandHeaderText{opacity:0!important}
  body.fhd-brand-handoff header .officeMark,body.fhd-brand-handoff header .brandHeaderText{opacity:1!important}
  .fhd-brand-bridge{display:none!important}
 }
+
+
+/* v2.0.63: true native-logo shared-element transition.
+ * Hide DOM twins during the 680ms native movement; reveal the final live
+ * header in the SAME frame that the native overlay is removed. */
+body.fhd-native-handoff header .officeMark,
+body.fhd-native-handoff header .brandHeaderText{visibility:hidden!important}
+body.fhd-native-arrived.fhd-first-render header .officeMark,
+body.fhd-native-arrived.fhd-first-render header .brandHeaderText{
+ animation:none!important;opacity:1!important;transform:none!important
+}
