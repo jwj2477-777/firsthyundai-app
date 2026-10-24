@@ -45,6 +45,9 @@ public class LockActivity extends Activity {
     private Runnable dismissWelcome;
     private boolean welcomeDone = false;
     private boolean openAfterWelcome = false;
+    private boolean policyPending = true;
+    private boolean welcomeElapsed = false;
+    private boolean introSkipped = false;
 
     private int dp(int v) { return (int) (getResources().getDisplayMetrics().density * v + 0.5f); }
 
@@ -235,13 +238,17 @@ public class LockActivity extends Activity {
             subtitle.animate().alpha(1f).translationY(0f)
                     .setStartDelay(360).setDuration(330).start();
         }
-        dismissWelcome=this::finishWelcome;
+        dismissWelcome=()->{welcomeElapsed=true;finishWelcome();};
         welcomeHandler.postDelayed(dismissWelcome,reducedMotion?0:920);
-        welcomeOverlay.setOnClickListener(v->finishWelcome());
+        welcomeOverlay.setOnClickListener(v->{introSkipped=true;finishWelcome();});
     }
 
     private void finishWelcome() {
         if(welcomeDone)return;
+        // Never briefly show the security-code page while an already
+        // authorized family's policy is still being checked. Keep the actual
+        // FHD brand visible and hand it directly to the next Activity.
+        if(policyPending&&!introSkipped&&!openAfterWelcome)return;
         welcomeDone=true;
         if(dismissWelcome!=null)welcomeHandler.removeCallbacks(dismissWelcome);
         FrameLayout overlay=welcomeOverlay;
@@ -272,6 +279,7 @@ public class LockActivity extends Activity {
 
     private void loadLatestPolicy() {
         currentPolicy = null;
+        policyPending = true;
         codeField.setEnabled(false);
         unlockButton.setEnabled(false);
         retryButton.setVisibility(android.view.View.GONE);
@@ -282,10 +290,13 @@ public class LockActivity extends Activity {
                 runOnUiThread(() -> {
                     if(isFinishing() || isDestroyed())return;
                     currentPolicy = result.policy;
+                    policyPending = false;
                     if(AccessPolicy.authorized(this,result.policy)){
                         openMain();
+                        if(welcomeElapsed)finishWelcome();
                         return;
                     }
+                    if(welcomeElapsed)finishWelcome();
                     codeField.setEnabled(true);
                     unlockButton.setEnabled(true);
                     status.setText(result.changed
@@ -296,6 +307,8 @@ public class LockActivity extends Activity {
             } catch (Exception error) {
                 runOnUiThread(() -> {
                     if(isFinishing() || isDestroyed())return;
+                    policyPending=false;
+                    if(welcomeElapsed)finishWelcome();
                     status.setText(error.getMessage()==null
                             ? "보안 정책 확인 실패":error.getMessage());
                     retryButton.setVisibility(android.view.View.VISIBLE);
