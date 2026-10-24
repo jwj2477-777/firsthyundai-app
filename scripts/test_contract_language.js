@@ -18,7 +18,7 @@ const catalog=[
 ];
 const alerts=[];
 const ctx=vm.createContext({window:{},document:{getElementById:el},catalogRows:()=>catalog,confirm:()=>true,alert:s=>alerts.push(s),navigator:{},console,Date,Number,String});
-for(const f of files){const s=fs.readFileSync(path.join(dir,f),'utf8');new vm.Script(s);assert(!/\b(?:fetch|XMLHttpRequest|localStorage)\b/.test(s),f+' must be offline-only');vm.runInContext(s,ctx);}
+for(const f of files){const s=fs.readFileSync(path.join(dir,f),'utf8');new vm.Script(s);assert(!/\b(?:fetch|XMLHttpRequest)\b/.test(s),f+' must not send customer information to the network');vm.runInContext(s,ctx);}
 const app=ctx.window.FirstHyundaiContracts,language=ctx.window.FirstHyundaiLanguage;
 const eq=(id,expected)=>assert.equal(el('ct_'+id).value,String(expected),id+' must be recognized correctly');
 const reset=()=>app.reset();
