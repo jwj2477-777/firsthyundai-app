@@ -1955,3 +1955,140 @@ body[data-section="officetel"] .page#officetel>.sectionTitle:before{
 @media(prefers-reduced-motion:reduce){
  #overview .overviewActionCard{transition:none}
 }
+
+
+/* v2.0.48 — Guided contract preparation; confined to the contract page.
+   Draft text, legal review, verification and native image sharing remain intact. */
+#contracts .contractFlowSteps{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:7px;margin:0 0 13px;
+}
+#contracts .contractFlowStep{
+ text-align:center;border:1px solid #DDE7E3;background:#F7FAF9;
+ border-radius:11px;color:#718589;font-size:13px;font-weight:750;
+ padding:11px 5px;line-height:1.35;
+}
+#contracts .contractFlowStep.is-current{
+ border-color:#2B7970;background:#DFF0EA;color:#175C55;
+ box-shadow:0 1px 4px #164F470C;
+}
+#contracts .contractFlowStep.is-complete{
+ border-color:#CBDDD7;background:#F0F7F3;color:#386A60;
+}
+#contracts .contractMemoCard{border:1.5px solid #DCCABB;background:#FFFEFB;box-shadow:0 2px 10px #513D2B0E}
+#contracts .contractMemoHeading{margin-bottom:12px;gap:10px}
+#contracts .contractMemoStep{
+ width:38px;height:38px;min-width:38px;font-size:19px;border:1.5px solid #B88A6D;
+ border-radius:11px;background:#F9EFE6;color:#85513B;
+}
+#contracts .contractMemoTitle{font-size:19px;margin-bottom:3px}
+#contracts .contractMemoHelp{font-size:13px;line-height:1.5}
+#contracts .contractMemoInputArea{background:#FFF9F3;border:1px solid #E8D7C6;padding:11px;border-radius:14px}
+#contracts .contractMemoLabel{font-size:15px;margin-bottom:8px}
+#contracts .contractMemoCard #ct_rough{
+ height:202px;min-height:202px;max-height:none;width:100%;
+ font-size:16px;line-height:1.65;padding:13px 14px;
+ border:1.5px solid #CBA98D;background:#FFFFFF;box-shadow:none;
+ resize:vertical;
+}
+#contracts .contractMemoCard #ct_rough::placeholder{color:#82756B;font-size:15px}
+#contracts .contractMemoCard #ct_rough:focus{border:2px solid #2A7B71;outline:3px solid #CCE8DF;outline-offset:1px}
+#contracts .contractMemoCard .contractEasyActions{gap:8px;margin-top:11px}
+#contracts .contractMemoCard .contractEasyActions .btn{min-height:57px;font-size:15px;border-width:1.5px}
+#contracts .contractMemoCard .contractVoice{min-height:51px;background:#FBF8F5}
+#contracts .contractMemoCard .contractOneTap{background:#155F66;color:#FFFFFF;border-color:#13545B;box-shadow:0 2px 5px #155F6624}
+#contracts .contractMemoCard .contractOneTap:active{transform:none;box-shadow:0 1px 3px #155F6624}
+#contracts #ct_resultPanel{
+ border-color:#D8E5E1;box-shadow:0 2px 8px #1B3F420B;
+}
+#contracts .contractMissingQuick{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:8px;margin:12px 0 18px;
+}
+#contracts .contractMissingQuick.hidden{display:none}
+#contracts .contractMissingQuick>strong{grid-column:1/-1;font-size:15px;color:#8A4C28}
+#contracts .contractQuickFix{
+ min-height:50px;padding:10px 11px;border:1px solid #E4C8A5;
+ border-radius:11px;background:#FFFBF4;color:#73512E;
+ font:inherit;font-size:14px;font-weight:780;text-align:left;
+ display:flex;justify-content:space-between;align-items:center;gap:5px;
+}
+#contracts .contractCoreFacts{
+ padding:15px;border:1px solid #D7E5E0;border-radius:15px;
+ background:#FBFDFC;margin:14px 0;
+}
+#contracts .contractCoreFacts h4{
+ margin:0 0 11px;color:#2A555A;font-size:17px;
+}
+#contracts .contractCoreRow{
+ display:flex;flex-direction:column;gap:6px;padding:11px 0;
+}
+#contracts .contractCoreRow>span,
+#contracts .contractCoreGrid small,
+#contracts .contractPaymentFocus small{
+ font-size:12px;color:#687E83;font-weight:700;
+}
+#contracts .contractCoreRow>strong,
+#contracts .contractCoreGrid strong{
+ color:#2A444B;font-size:16px;line-height:1.55;
+ font-weight:800;overflow-wrap:anywhere;
+}
+#contracts .contractCoreGrid{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;
+}
+#contracts .contractCoreGrid>div{
+ display:flex;flex-direction:column;gap:6px;background:#F0F6F4;
+ padding:12px;border-radius:10px;
+}
+#contracts .contractPaymentFocus{
+ display:flex;flex-direction:column;gap:5px;padding:13px;
+ margin:11px 0;border-radius:11px;border:1px solid #BDD9D2;
+ background:#E4F3EE;
+}
+#contracts .contractPaymentFocus strong{
+ font-size:22px;line-height:1.35;color:#155B52;font-weight:850;
+ font-variant-numeric:tabular-nums;overflow-wrap:anywhere;
+}
+#contracts .contractAccount{border-top:1px solid #E0E9E5}
+#contracts .contractClauseChoices{
+ border:1px solid #D7E3DF;border-radius:12px;background:#FBFDFC;
+ margin:13px 0;padding:11px 12px;color:#344F55;
+}
+#contracts .contractClauseChoices>summary{
+ cursor:pointer;font-size:14px;font-weight:800;line-height:1.5;
+ padding:7px 0;min-height:41px;
+}
+#contracts .contractClauseChoices p{
+ font-size:13px;line-height:1.6;color:#6A6B69;margin:9px 0;
+}
+#contracts .contractClauseChoices label{
+ display:flex;align-items:flex-start;gap:10px;min-height:47px;
+ padding:10px 6px;border-top:1px solid #E4ECE8;
+ font-size:14px;line-height:1.5;
+}
+#contracts .contractClauseChoices input{width:21px;height:21px;min-width:21px;accent-color:#146E65;margin:1px 0}
+#contracts .contractPreviewHighlight{max-height:300px;overflow-y:auto}
+#contracts .contractPreview.contractEditing{max-height:400px;overflow-y:auto}
+#contracts .contractShareActions{gap:8px}
+#contracts .contractShareActions .contractSharePrimary{
+ width:100%;flex:1 1 100%;font-size:17px;min-height:60px;
+ border-radius:12px;background:#176B62;border-color:#11564F;color:#FFFFFF;
+}
+#contracts .contractShareActions .contractSharePrimary:disabled{
+ opacity:.55;cursor:not-allowed;
+}
+#contracts .contractShareActions .btn:not(.contractSharePrimary){min-height:49px}
+@media(max-width:540px){
+ #contracts .contractMemoCard{padding:14px 12px 14px;border-width:1.5px;border-radius:16px}
+ #contracts .contractMemoHeading{gap:9px;margin-bottom:11px}
+ #contracts .contractMemoStep{width:36px;height:36px;min-width:36px;font-size:18px}
+ #contracts .contractMemoTitle{font-size:18px}
+ #contracts .contractMemoCard #ct_rough{height:205px;min-height:205px;padding:12px 13px;font-size:16px}
+ #contracts .contractMemoCard .contractEasyActions .btn{min-height:57px;font-size:15px}
+ #contracts .contractMemoCard .contractVoice{min-height:50px}
+ #contracts .contractCoreGrid{gap:7px}
+ #contracts .contractCoreFacts{padding:12px}
+}
+@media(prefers-contrast:more){
+ #contracts .contractCoreFacts,#contracts .contractClauseChoices,#contracts .contractMemoInputArea{border-width:2px}
+}

@@ -160,6 +160,38 @@ function collect(){
 // Three explicit states: pending (disabled), ready to confirm, confirmed.
 // Keep the existing field validation and consent requirements; this function
 // only expresses that state to parents instead of leaving one green button.
+
+// Family-mode contract summary uses the same verified local fields as the actual preview.
+function renderContractFacts(){
+ const value=(id,empty='확인 필요')=>field(id)||empty;
+ const set=(id,txt)=>{const node=E('ct_'+id);if(node)node.textContent=txt;};
+ const moneyField=id=>{const n=amount(id);return n!==null&&n>0?money(n):'확인 필요';};
+ set('factProperty',(field('property')+' '+field('unit')).trim()||'확인 필요');
+ set('factPrice',moneyField('price'));
+ set('factDeposit',moneyField('contractDeposit'));
+ set('factAdvance',moneyField('advance'));
+ const account=[field('bank'),field('account'),field('accountHolder')].filter(Boolean);
+ set('factAccount',account.length===3?account.join(' · '):'은행·계좌번호·예금주 확인 필요');
+}
+function updateContractFlow(){
+ const stage=approved?3:created?2:1;
+ for(let n=1;n<=3;n++){
+  const node=E('ct_flow'+n);if(!node?.classList?.toggle)continue;
+  node.classList.toggle('is-current',n===stage);
+  node.classList.toggle('is-complete',n<stage);
+  if(n===stage)node.setAttribute?.('aria-current','step');
+  else node.removeAttribute?.('aria-current');
+ }
+ const imageButton=E('ct_imagePrimary');
+ if(imageButton)imageButton.disabled=!approved||!created||!!collect().errors.length||previewContainsMissing();
+}
+function resetContractAgreements(){
+ for(const id of ['clauseEffective','clauseCancellation','clauseBrokerFee']){
+  const node=E('ct_'+id);if(node)node.checked=false;
+ }
+ const container=E('ct_clauseChoices');if(container)container.open=false;
+}
+
 function syncReviewButton(){
  const button=E('ct_confirmButton');if(!button)return;
  const hasDraft=created&&!!E('ct_preview')?.value?.trim();
@@ -171,6 +203,7 @@ function syncReviewButton(){
  button.setAttribute?.('data-review-state',state);
  button.setAttribute?.('aria-pressed',state==='done'?'true':'false');
  const help=E('ct_confirmHelp');
+ updateContractFlow();
  if(help)help.textContent=state==='done'?'확인을 마쳤습니다. 문자 복사 또는 공유할 수 있습니다.':
   state==='ready'?'확인 버튼을 눌러 공유를 준비해 주세요.':
   !hasDraft?'계약문자를 먼저 만들어 주세요.':
@@ -178,6 +211,7 @@ function syncReviewButton(){
 }
 function updateSummary(){
  const data=collect();
+ renderContractFacts();
  E('ct_amountSummary').textContent='총액: '+(data.price===null?'미입력':money(data.price))+
   '\n약정 계약금: '+(data.deposit===null?'미입력':money(data.deposit))+
   '  /  이번 송금: '+(data.advance===null?'미입력':money(data.advance))+
@@ -231,12 +265,24 @@ function makePreview(){
  const account=field('bank')&&field('account')&&field('accountHolder')?
   field('bank')+' '+field('account')+' (예금주 '+field('accountHolder')+')':
   '[은행·계좌번호·예금주 확인 필요]';
- // Office workflow: terms below are agreed before preparing the notice.
- // Always show them; the final human review button remains mandatory.
- out.push('','※ 계약금 일부 송금 및 계약 성립·해제 조건 확인');
- out.push('금일 위 계약조건에 따라 계약금 중 일부인 '+moneyOr(d.advance)+'을 '+who+' 계좌('+account+')로 송금하기로 합니다.');
- out.push('당사자들은 위 금액의 이체와 동시에 본계약이 체결된 것으로 보기로 하며, 일방의 변심으로 계약을 해제하는 경우 '+who+'은 실제 수령한 금액의 배액을 상환하고 '+paying+'은 실제 송금한 금액을 포기하는 조건으로 합의합니다.');
- out.push('또한 위 사유로 계약이 해제되더라도 그 사실만으로 중개보수 지급의무가 없어지는 것은 아니라는 점을 확인합니다.');
+ // Neutral payment instructions are not by themselves an agreement on formation,
+ // forfeiture or brokerage remuneration. Only expressly selected party-agreed
+ // clauses may be included, and any change invalidates prior review approval.
+ out.push('','▶ 이번 송금 예정액 : '+moneyOr(d.advance));
+ out.push('▶ 입금 계좌 : '+account);
+ const agreed=id=>E('ct_'+id)?.checked===true;
+ if(agreed('clauseEffective')){
+  out.push('','※ 별도 합의: 송금과 계약 성립');
+  out.push('당사자들은 위 금액의 이체와 동시에 본계약이 체결된 것으로 보기로 합의합니다.');
+ }
+ if(agreed('clauseCancellation')){
+  out.push('','※ 별도 합의: 계약 해제 조건');
+  out.push('당사자들은 일방의 변심으로 계약을 해제하는 경우 '+who+'은 실제 수령한 금액의 배액을 상환하고 '+paying+'은 실제 송금한 금액을 포기하는 조건으로 합의합니다.');
+ }
+ if(agreed('clauseBrokerFee')){
+  out.push('','※ 별도 합의: 중개보수');
+  out.push('당사자들은 계약이 해제되더라도 그 사실만으로 중개보수 지급의무가 없어지는 것은 아니라는 점에 합의합니다.');
+ }
  E('ct_preview').value=out.join('\n');
  // Newly composed messages always begin in readable, red-marked review mode.
  E('ct_preview')?.classList?.remove?.('contractEditing');
@@ -336,6 +382,7 @@ function fromSelectedComplex(exclusiveM2=null,supplyLabel=''){
 }
 function clearForNewMemo(){
  const memo=field('rough');
+ resetContractAgreements();
  FIELDS.forEach(id=>{if(id!=='rough'&&E('ct_'+id))E('ct_'+id).value='';});
  E('ct_dealType').value='전세';
  E('ct_preview').value='';
@@ -350,6 +397,7 @@ function clearForNewMemo(){
 }
 function reset(){
  if(!confirm('현재 작성 중인 계약 내용을 모두 지우시겠습니까? 저장된 사본은 없습니다.'))return;
+ resetContractAgreements();
  FIELDS.forEach(id=>{const el=E('ct_'+id);if(el)el.value='';});
  E('ct_dealType').value='전세';E('ct_preview').value='';refreshHighlightedNotice();
  E('ct_selectedComplexContext')?.classList?.add?.('hidden');

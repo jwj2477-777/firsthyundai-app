@@ -144,8 +144,63 @@ function simpleMissing(errors){
  };
  return '⚠ 확인할 정보 '+errors.length+'가지: '+errors.map(v=>friendly[v]||v).join(' · ');
 }
+
+// A missing item opens only its relevant manual field instead of asking parents
+// to search a long contract form. The original validation list remains authoritative.
+const FIX_FIELD=[
+ ['아파트 단지 선택 확인','property','단지 선택'],
+ ['소재지 도로명주소','address','소재지 주소'],
+ ['동·호수','unit','동·호수'],
+ ['매매대금 또는 보증금','price','거래금액'],
+ ['약정 계약금','contractDeposit','약정 계약금'],
+ ['이번 송금액','advance','이번 송금액'],
+ ['계약일','contractDate','계약일'],
+ ['잔금 예정일','balanceDate','잔금 예정일'],
+ ['월세 금액','monthlyRent','월세'],
+ ['임대차 기간','leaseDuration','임대차 기간'],
+ ['송금 은행·계좌·예금주','bank','입금 계좌'],
+ ['중도금 숫자','interim','중도금'],
+ ['중도금 지급일','interimDate','중도금 날짜'],
+ ['계약금이 총금액을 초과함','contractDeposit','계약금 확인'],
+ ['이번 송금액이 계약금보다 큼','advance','송금액 확인'],
+ ['잔금 계산이 음수','price','금액 확인'],
+ ['입주일이 잔금일보다 빠름','leaseStart','입주일 확인']
+];
+function missingField(error){
+ return FIX_FIELD.find(([code])=>error===code)||FIX_FIELD.find(([code])=>error.includes(code))||[error,'rough','정보 확인'];
+}
+function focusMissing(code){
+ const name=String(code||'').replace(/[^a-zA-Z]/g,'');
+ if(!/^(?:property|address|unit|price|contractDeposit|advance|contractDate|balanceDate|monthlyRent|leaseDuration|bank|interim|interimDate|leaseStart|rough)$/.test(name))return;
+ const panel=E('manualPanel');
+ if(panel)panel.open=true;
+ const target=E(name);
+ if(target?.scrollIntoView)target.scrollIntoView({behavior:'smooth',block:'center'});
+ if(target?.focus)target.focus();
+}
+function renderQuickMissing(errors){
+ const box=E('missingQuickFields');if(!box)return;
+ const groups=new Map();
+ (errors||[]).forEach(error=>{
+  const [,name,label]=missingField(error);
+  if(!groups.has(name))groups.set(name,label);
+ });
+ const items=Array.from(groups);
+ box.classList.toggle('hidden',!items.length);
+ if(!items.length){box.innerHTML='';return;}
+ box.innerHTML='<strong>누락·확인 항목 '+errors.length+'개 · 눌러서 수정</strong>'+
+  items.map(([name,label])=>'<button class="contractQuickFix" type="button" onclick="FirstHyundaiEasy.focusMissing(&quot;'+
+   name+'&quot;)">'+String(label).replace(/[<>&"]/g,'')+' <span aria-hidden="true">✎</span></button>').join('');
+}
+function rebuildAfterClauses(){
+ // Never silently grant consent or preserve stale approval for changed terms.
+ if(!E('resultPanel')||E('resultPanel').classList.contains('hidden'))return;
+ app.makePreview();
+ refreshMissing();
+}
 function refreshMissing(){
  const errors=app._test.collect().errors;
+ renderQuickMissing(errors);
  const missing=E('missing');
  if(missing){
   missing.textContent=simpleMissing(errors);
@@ -225,6 +280,6 @@ window.firstHyundaiContractSpeech=function(result){
   compose();
  }else oldSpeech(result);
 };
-window.FirstHyundaiEasy={refreshMissing,compose,afterManualEdit,openManual,useOriginalTerms,usePolishedTerms,reset,
+window.FirstHyundaiEasy={refreshMissing,compose,afterManualEdit,openManual,focusMissing,rebuildAfterClauses,useOriginalTerms,usePolishedTerms,reset,
  _test:{extractSpecial,polishTerms,ending}};
 })();
