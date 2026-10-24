@@ -164,7 +164,7 @@ function collect(){
 // Family-mode contract summary uses the same verified local fields as the actual preview.
 function renderContractFacts(){
  const value=(id,empty='확인 필요')=>field(id)||empty;
- const set=(id,txt)=>{const node=E(id);if(node)node.textContent=txt;};
+ const set=(id,txt)=>{const node=E('ct_'+id);if(node)node.textContent=txt;};
  const moneyField=id=>{const n=amount(id);return n!==null&&n>0?money(n):'확인 필요';};
  set('factProperty',(field('property')+' '+field('unit')).trim()||'확인 필요');
  set('factPrice',moneyField('price'));
@@ -176,20 +176,20 @@ function renderContractFacts(){
 function updateContractFlow(){
  const stage=approved?3:created?2:1;
  for(let n=1;n<=3;n++){
-  const node=E('flow'+n);if(!node)continue;
+  const node=E('ct_flow'+n);if(!node)continue;
   node.classList.toggle('is-current',n===stage);
   node.classList.toggle('is-complete',n<stage);
   if(n===stage)node.setAttribute?.('aria-current','step');
   else node.removeAttribute?.('aria-current');
  }
- const imageButton=E('imagePrimary');
+ const imageButton=E('ct_imagePrimary');
  if(imageButton)imageButton.disabled=!approved||!created||!!collect().errors.length||previewContainsMissing();
 }
 function resetContractAgreements(){
  for(const id of ['clauseEffective','clauseCancellation','clauseBrokerFee']){
-  const node=E(id);if(node)node.checked=false;
+  const node=E('ct_'+id);if(node)node.checked=false;
  }
- const container=E('clauseChoices');if(container)container.open=false;
+ const container=E('ct_clauseChoices');if(container)container.open=false;
 }
 
 function syncReviewButton(){
