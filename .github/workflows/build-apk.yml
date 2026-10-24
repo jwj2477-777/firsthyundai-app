@@ -32,6 +32,7 @@ on:
       - 'scripts/test_page_title_parity.js'
       - 'scripts/test_segmented_switch_unity.js'
       - 'scripts/test_selection_flow.js'
+      - 'scripts/test_news_tab_wind_stability.js'
       - 'scripts/test_premium_visual.js'
       - 'scripts/test_android_insets_presentation.js'
       - 'scripts/test_screenshot_consistency.js'
@@ -141,6 +142,7 @@ jobs:
           node --check /tmp/firsthyundai-ui.js
           node scripts/test_premium_motion.js
           node scripts/test_selection_flow.js
+          node scripts/test_news_tab_wind_stability.js
           node scripts/test_shared_brand_handoff.js
           node scripts/test_price_trends.js
           node scripts/test_nearby.js
@@ -280,22 +282,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.73 gentle wind drift for five main menus APK
+      - name: Publish v2.0.74 fixed news tabs and diagonal wind APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.73.apk
-          unzip -t FirstHyundai-v2.0.73.apk | grep 'No errors detected'
-          if gh release view v2.0.73 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.74.apk
+          unzip -t FirstHyundai-v2.0.74.apk | grep 'No errors detected'
+          if gh release view v2.0.74 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.73 FirstHyundai-v2.0.73.apk \
+            gh release create v2.0.74 FirstHyundai-v2.0.74.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.73 · 바람결처럼 흐르는 5개 메뉴 전환' \
-              --notes '기존 동그랗게 축소된 뒤 이동하는 버튼 전환을 완전히 제거하고, 선택된 색이 가장자리를 따라 빠져나가 새 메뉴에 자연스럽게 차오르는 방식으로 교체했습니다. 옮겨가는 바람결은 흐릿한 선 3개와 작은 먼지 입자 8개만 아주 은은하게 나타나며 버튼 크기, 모양, 글씨, 아이콘은 고정됩니다. 실거래·아파트정보·뉴스·오늘 요약·계약문자 만들기까지 상단 두 줄 총 5개를 하나의 그룹으로 묶어 두 줄을 넘어가는 이동도 지원합니다. 각 메뉴 고유 색상과 기존 기능, 동급 제목 크기, 시작 로고 이동은 유지합니다. v2.0.73/build124.'
+              --title '퍼스트현대 v2.0.74 · 뉴스 화면 고정·대각선 색 이동 개선' \
+              --notes '뉴스 브리핑과 청약·분양 간 전환에서 설명줄의 표시/숨김 때문에 제목 영역 높이가 달라져 하단 메뉴가 위아래로 흔들리던 현상을 수정했습니다. 가족·관리자별 제목 영역 최소 높이를 일정하게 유지합니다. 상단 5개 메뉴의 2줄 간 이동은 좌우 판단이 아니라 실제 출발·도착 버튼 사이의 2차원 대각선 벡터를 따라 선택 배경색이 미끄러지듯 들어가게 변경했습니다. 카드·폰트·아이콘의 크기 변화, 원형 변형은 없으며 뉴스/청약 버튼도 전환이 동작하도록 회귀 테스트를 추가했습니다. v2.0.74/build125.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.73 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.73 --apk FirstHyundai-v2.0.73.apk
+          gh release upload v2.0.74 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.74 --apk FirstHyundai-v2.0.74.apk
