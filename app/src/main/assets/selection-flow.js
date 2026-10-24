@@ -95,6 +95,9 @@
    (forwards?'inset(100% 0% 0% 0%)':'inset(0% 0% 100% 0%)');
   const clipIn=horizontal?(forwards?'inset(0% 0% 0% 100%)':'inset(0% 100% 0% 0%)'):
    (forwards?'inset(0% 0% 100% 0%)':'inset(100% 0% 0% 0%)');
+  // Rounded inset shapes must match for continuous WebView interpolation.
+  const outgoingClip=clipOut.replace(')', ' round '+from.radius+')');
+  const incomingClip=clipIn.replace(')', ' round '+to.radius+')');
   const bridge=document.createElement('div');
   bridge.className='fhd-fluid-bridge';
   bridge.setAttribute('aria-hidden','true');
@@ -129,14 +132,14 @@
   play(source,[
    {clipPath:begin,opacity:1,offset:0},
    {clipPath:begin,opacity:1,offset:.11},
-   {clipPath:clipOut,opacity:.94,offset:.85},
-   {clipPath:clipOut,opacity:0,offset:1}
+   {clipPath:outgoingClip,opacity:.94,offset:.85},
+   {clipPath:outgoingClip,opacity:0,offset:1}
   ]);
   const dest=play(cover,[
    {clipPath:end,opacity:1,offset:0},
    {clipPath:end,opacity:1,offset:.11},
-   {clipPath:clipIn,opacity:1,offset:.90},
-   {clipPath:clipIn,opacity:0,offset:1}
+   {clipPath:incomingClip,opacity:1,offset:.90},
+   {clipPath:incomingClip,opacity:0,offset:1}
   ]);
   play(bridge,[
    {clipPath:'inset(0% 100% 0% 0% round 999px)',opacity:0,offset:0},
