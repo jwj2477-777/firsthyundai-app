@@ -17,7 +17,9 @@ assert(script.includes("key:'top-five',selector:'#nav'"),
  'Global navigation must contain both top rows and all 5 destinations');
 assert(script.includes(".primaryNav > button, .utilityNav > button"),
  'All 5 destinations share the same source/target group');
-assert(script.includes("function fillFrame"),'Flat edge-on wipe rather than rounded blob');
+assert(script.includes("function windVector"),'True two-dimensional direction');
+assert(script.includes("function sweep("),'Straight-edged full-size background sweep');
+assert(!script.includes('function fillFrame('),'No legacy dominant-axis masks');
 assert(script.includes("function wind("),'Sparse wind particles accompany the wipe');
 let handler,raf,selected=0,reduced=false;
 const animations=[];
@@ -100,7 +102,7 @@ const window={
 };
 vm.runInNewContext(script,{document,window,Math,Object,Array,Number});
 const api=window.FirstHyundaiSelectionFlow;
-assert.equal(api.version,'4.0.0');
+assert.equal(api.version,'4.1.0');
 assert.equal(api._test.buttons(nav,'top-five').length,5);
 const labels=btns.map(b=>b.innerHTML);
 assert.equal(api._test.findGroup(btns[4]).spec.key,'top-five');
@@ -119,19 +121,26 @@ assert.equal(shapes.filter(x=>x.className==='fhd-wind-grain').length,8);
 assert.equal(shapes[0].style.background,'#FFFFFF','Outgoing rests on original inactive palette');
 assert.equal(shapes[1].style.background,'#FFFFFF','Incoming starts as original idle surface');
 assert.equal(shapes[2].style.background,colors[0],'Original blue selected background is retained');
-assert.equal(shapes[3].style.background,colors[4],'New contract color is retained');
+assert.equal(shapes[3].style.background,'#FFFFFF','Target starts with its idle surface');
+assert.equal(shapes[2].children[0].style.background,'#FFFFFF','Source wipes back to white');
+assert.equal(shapes[3].children[0].style.background,colors[4],'Target fills original contract color');
+assert.equal(shapes[2].style.overflow,'hidden');
+assert.equal(shapes[3].style.overflow,'hidden');
 assert.deepEqual(btns.map(b=>b.innerHTML),labels,'Buttons retain real text and icons');
 assert.equal(btns[0].style.getPropertyValue('background'),'transparent');
 assert.equal(btns[4].style.getPropertyValue('background'),'transparent');
-const retreat=animations.find(a=>a.node===shapes[2]);
-const arrive=animations.find(a=>a.node===shapes[3]);
-assert(retreat.frames.some(x=>x.clipPath?.includes('inset(0% 0% 0% 100%')),
- 'Source color moves away as a flat wipe');
-assert(arrive.frames.some(x=>x.clipPath?.includes('inset(0% 100% 0% 0%')),
- 'Destination fills from incoming edge');
+const retreat=animations.find(a=>a.node===shapes[2].children[0]);
+const arrive=animations.find(a=>a.node===shapes[3].children[0]);
+assert(retreat&&arrive,'Both stationary-color-box wipes are present');
+assert(retreat.frames[0].transform.includes('rotate('));
+assert(arrive.frames[0].transform.includes('rotate('));
+const down=api._test.windVector({x:0,y:0,w:111,h:101},{x:182,y:124,w:172,h:73});
+const up=api._test.windVector({x:182,y:124,w:172,h:73},{x:0,y:0,w:111,h:101});
+assert(down.ux>0&&down.uy>0,'Across rows from left to right must flow diagonally down/right');
+assert(up.ux<0&&up.uy<0,'Reverse cross-row flow must go diagonally up/left');
 assert(animations.every(x=>x.options.duration===760));
-assert(!animations.some(x=>x.node===shapes[2]&&
- x.frames.some(k=>k.transform?.includes('scale('))),'Main tab is not a moving ball');
+assert(!animations.some(x=>(x.node===shapes[2]||x.node===shapes[3])&&
+ x.frames.some(k=>k.transform?.includes('scale('))),'The cards must not shrink/morph');
 assert.equal(api._test.stats.topFive,1);
 retreat.callbacks.finish();
 assert.equal(nav.children.length,2,'All decorative layers must be removed on finish');
@@ -141,10 +150,10 @@ change(1); // cross row reverse: contract -> apartment info
 assert.equal(api._test.stats.topFive,2);
 const next=nav.children.slice(2);
 assert.equal(next[2].style.background,colors[4]);
-assert.equal(next[3].style.background,colors[1]);
-animations.filter(a=>a.node===next[2])[0].callbacks.finish();
+assert.equal(next[3].children[0].style.background,colors[1]);
+animations.filter(a=>a.node===next[2].children[0])[0].callbacks.finish();
 reduced=true;
 handler({target:btns[2],defaultPrevented:false});
 assert.equal(nav.children.length,2,'Reduced motion disables the wind');
 assert.equal(api._test.stats.finished,2);
-console.log('Wind-drift v4 passed: all five upper menus, cross-row palette flow, no circular morph, real text stable, cleanup and accessibility.');
+console.log('Wind-drift v4.1 passed: all five upper menus, cross-row palette flow, no circular morph, real text stable, cleanup and accessibility.');
