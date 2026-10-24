@@ -5,6 +5,7 @@
 - v2.0.82는 해당 줄을 JS에서 명시적으로 제외하고 @property CSS로 분리했음. 기존 브라우저 검사는 별도 축약 DOM의 등록 속성 수치만 확인했고 실제 앱의 클릭→화면 배경 흐름을 보증하지 못했음. 사용자 기기의 정확한 실패 원인은 단말 계측 없으므로 확정하지 않음.
 - 두 줄만 동일한 JS real-button background painter에 연결. 클릭한 실제 row와 버튼을 보존하며 inline onclick 후 버블 단계에서 첫 paint를 준비 (실제 사용자 이벤트의 capture→microtask→onclick 순서 문제 예방). @property 및 CSS background-transition 경쟁 제거. top-five 기존 RAF/색상/아파트정보 경유 로직은 유지. 관심단지 상세 nearbyTypeBar도 정확한 row를 사용.
 - 검증: test_native_lower_tab_browser.js를 실제 전체 앱 자산/onclick/DOM 기반으로 교체. 모든 방향·4유형의 모든 순서쌍·빠른 연속 클릭·배치/텍스트 불변·이외 버튼 무효과·cleanup·reduced-motion을 배경 computed style로 검증. 기존 주메뉴 회귀 검사 유지. CI/서명/APK 배포 성공 여부는 Actions와 Release를 따로 확인. 실제 삼성 단말 미검증.
+- 완료 확인: 실제 전체 앱 브라우저 751개 assertion, 주메뉴/이벤트 순서 포함 JS 64개 및 Python 89개 통과. 모바일 Chromium 실제 trusted touch로 뉴스 양방향·거래유형 양방향·관심단지 상세 색 흐름/정리 및 JS 오류 없음 확인. Actions 40109820553 성공, v2.0.83/build134 APK 메타데이터·고정 서명 검증 및 Release APK(1,718,525 bytes) 게시, data/app_latest.json의 v2.0.83 등록까지 확인. 실제 삼성 단말은 사용자 업데이트 후 확인.
 
 
 ## 2026-10-24 · v2.0.67 · 오리지널 스플래시 스타일을 헤더 기준으로 복원, 이동 중 끊김 완화
