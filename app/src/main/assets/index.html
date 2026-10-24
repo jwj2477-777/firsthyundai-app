@@ -927,7 +927,7 @@ function openNewsHome(){
 function switchNewsPane(pane){
  if(!['articles','subscriptions'].includes(pane))return;
  const nextIndex=pane==='articles'?0:1;
- window.FirstHyundaiSelectionFlow?.beginDirect?.('newsCategoryTabs',nextIndex);
+ if(typeof window!=='undefined')window.FirstHyundaiSelectionFlow?.beginDirect?.('newsCategoryTabs',nextIndex);
  newsPane=pane;
  $('newsArticlesPane').classList.toggle('hidden',pane!=='articles');
  $('newsSubscriptionsPane').classList.toggle('hidden',pane!=='subscriptions');
@@ -942,7 +942,7 @@ function switchNewsPane(pane){
  $('newsMeta').classList.toggle('hidden',pane!=='articles');
  $('newsFamilyMeta').classList.toggle('hidden',pane!=='articles');
  if(pane==='subscriptions')renderPublicSubscriptions();
- window.FirstHyundaiSelectionFlow?.endDirect?.('newsCategoryTabs',nextIndex);
+ if(typeof window!=='undefined')window.FirstHyundaiSelectionFlow?.endDirect?.('newsCategoryTabs',nextIndex);
 }
 function switchPage(id){
  closeApartmentSheet(false);
@@ -1592,9 +1592,9 @@ function chooseOfficeArea(){
 function setOfficeType(type){
  if(!['','매매','전세','월세'].includes(type))return;
  const index=['','매매','전세','월세'].indexOf(type);
- window.FirstHyundaiSelectionFlow?.beginDirect?.('officeTypeBar',index);
+ if(typeof window!=='undefined')window.FirstHyundaiSelectionFlow?.beginDirect?.('officeTypeBar',index);
  $('officeTypeSearch').value=type;officeVisibleLimit=70;renderOfficeRentals();
- window.FirstHyundaiSelectionFlow?.endDirect?.('officeTypeBar',index);
+ if(typeof window!=='undefined')window.FirstHyundaiSelectionFlow?.endDirect?.('officeTypeBar',index);
 }
 function sameOfficeDateOnly(){
  const from=$('officeDateFrom').value,to=$('officeDateTo').value;
@@ -1893,19 +1893,19 @@ function setTradeArea(){selectedTradeArea=$('tradeAreaSelect').value;renderTrade
 function setTradeType(type){
  if(!['','매매','전세','월세'].includes(type))return;
  const index=['','매매','전세','월세'].indexOf(type);
- window.FirstHyundaiSelectionFlow?.beginDirect?.('tradeTypeBar',index);
+ if(typeof window!=='undefined')window.FirstHyundaiSelectionFlow?.beginDirect?.('tradeTypeBar',index);
  $('typeFilter').value=type;
  if(tradeFocus)tradeFocus.type=type;
  renderTrades();
- window.FirstHyundaiSelectionFlow?.endDirect?.('tradeTypeBar',index);
+ if(typeof window!=='undefined')window.FirstHyundaiSelectionFlow?.endDirect?.('tradeTypeBar',index);
 }
 function setNearbyType(type){
  if(!['','매매','전세','월세'].includes(type))return;
  const index=['','매매','전세','월세'].indexOf(type);
- window.FirstHyundaiSelectionFlow?.beginDirect?.('nearbyTypeBar',index);
+ if(typeof window!=='undefined')window.FirstHyundaiSelectionFlow?.beginDirect?.('nearbyTypeBar',index);
  $('nearbyType').value=type;
  renderNearbyDetails(true);
- window.FirstHyundaiSelectionFlow?.endDirect?.('nearbyTypeBar',index);
+ if(typeof window!=='undefined')window.FirstHyundaiSelectionFlow?.endDirect?.('nearbyTypeBar',index);
 }
 function updateNearbyAreas(g,rows){
  const panel=$('nearbyAreaPanel'),input=$('nearbyAreaSelect');
