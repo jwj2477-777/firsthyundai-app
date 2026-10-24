@@ -66,6 +66,14 @@ assert(notice().includes('→ 근저당권은 잔금과 동시에 말소한다.'
 assert(notice().includes('→ 반려동물은 허용하지 않는다.'));
 assert.equal(E('ct_termOriginal').textContent,'근저당은 잔금과 동시에 말소한다\n반려동물 안돼');
 assert.equal(E('ct_termPolished').textContent,E('ct_terms').value);
+E('ct_polishTerms').checked=false;
+easy.updateSpecials();
+assert.equal(E('ct_terms').value,'근저당은 잔금과 동시에 말소한다\n반려동물 안돼',
+ 'User may inspect and use original wording');
+E('ct_polishTerms').checked=true;
+easy.updateSpecials();
+assert.equal(E('ct_terms').value,'근저당권은 잔금과 동시에 말소한다.\n반려동물은 허용하지 않는다.',
+ 'Auto-formatting can be reenabled without losing special clauses');
 assert.equal(E('ct_imagePrimary').disabled,true,'Modified special clauses require fresh review');
 app.approve();assert.equal(E('ct_imagePrimary').disabled,false);
 E('ct_rough').value='퍼팍 13블럭 전세 보증금 5억 오늘 오백만원';
