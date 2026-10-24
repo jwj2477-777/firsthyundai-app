@@ -40,7 +40,9 @@ assert(script.includes('<details class="details complexSourceDetails"><summary>�
 assert(script.includes('현재 선택한 아파트의 배정학교가 아닙니다'),
  'Prominent school allocation caution must remain outside collapsed metadata');
 const marker='/* v2.0.46 · Apartment detail tabs';
-const theme=css.slice(css.lastIndexOf(marker));
+const start=css.lastIndexOf(marker);
+const next=css.indexOf('/* v2.0.47 · REVERSIBLE WORKFLOW PILOT',start+marker.length);
+const theme=css.slice(start,next<0?undefined:next);
 assert(theme.includes(marker));
 for(const s of ['#complexSheet .complexTradeFilters button.active',
  '#complexSheet .complexQuickLinks a','#complexSheet .complexSourceDetails',
