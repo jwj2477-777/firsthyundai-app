@@ -79,15 +79,10 @@ assert.equal(button.disabled,false);
 assert(hint.textContent.includes('확인 버튼'));
 const beforeApproval=E('ct_preview').value;
 assert(beforeApproval.includes('▶ 이번 송금 예정액 : 500만원'),'Neutral transfer value must appear');
-for(const phrase of ['이체와 동시에 본계약이 체결','실제 송금한 금액을 포기','중개보수 지급의무']){
- assert(!beforeApproval.includes(phrase),'No unagreed legal term: '+phrase);
+for(const fragment of ['아래 내용은 계약 진행을 위한 제안 조건입니다','제안 1.','제안 2.','제안 3.']){
+ assert(beforeApproval.includes(fragment),'Default offer must present these proposed terms: '+fragment);
 }
-for(const id of ['clauseEffective','clauseCancellation','clauseBrokerFee'])E('ct_'+id).checked=true;
-contract.makePreview();
-const agreedNotice=E('ct_preview').value;
-for(const phrase of ['이체와 동시에 본계약이 체결','실제 송금한 금액을 포기','중개보수 지급의무']){
- assert(agreedNotice.includes(phrase),'Explicitly chosen clause is included: '+phrase);
-}
+assert(!beforeApproval.includes('보기로 합의합니다'),'No claim of completed agreement');
 assert.equal(contract.canShare(),false,'Review approval button is still mandatory');
 contract.approve();
 assert.equal(state(),'done','Confirmed state must change visibly after clicking');
@@ -113,4 +108,4 @@ contract.approve();assert.equal(state(),'done');
 contract.reset();
 assert.equal(state(),'pending','Reset must clear confirmation');
 assert.equal(button.attributes['aria-pressed'],'false');
-console.log('Contract confirmation, opt-in clauses, edited notice and sharing guards passed.');
+console.log('Contract confirmation, proposal wording and sharing guards passed.');
