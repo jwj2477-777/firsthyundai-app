@@ -35,7 +35,8 @@ assert(news.includes('refreshOne(\'news\',true)')&&news.includes('refreshPublicS
 assert(!news.includes('<h3>인천광역시 청약·분양</h3>'),'Subscription title must not shrink inside a card');
 assert(!news.includes('<h3>송도·부동산 뉴스 브리핑</h3>'),'News article title uses shared h2');
 assert(!news.includes('>공고 갱신</button>'),'No secondary duplicate subscription refresh');
-assert(css.includes('#news.page>.sectionTitle:first-child h2')&&css.includes('font-size:22px'),'Equal heading typography in all three tabs');
+assert(css.includes(':is(#trades,#nearby,#new,#officetel,#complexes,#news).page>.sectionTitle:first-child h2{') &&
+ css.includes('font-size:20px;'),'Same-level news and property headings share 20px typography');
 assert(css.includes('#news .newsCategoryTabs{margin:0 0 14px'),'Same subsection spacing');
 const nodes=new Map();
 function el(id){
