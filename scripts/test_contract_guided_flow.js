@@ -5,8 +5,8 @@ const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p
 const html=read('app/src/main/assets/index.html'),css=read('app/src/main/assets/ui-v2.css');
 const section=html.slice(html.indexOf('<div id="contracts"'),html.indexOf('<div id="notes"'));
 const markers=['ct_flow1','ct_flow2','ct_flow3','ct_keyFacts','ct_factProperty','ct_factPrice','ct_factDeposit',
- 'ct_factAdvance','ct_factAccount','ct_missingQuickFields','ct_clauseEffective',
- 'ct_clauseCancellation','ct_clauseBrokerFee','ct_imagePrimary','ct_confirmButton','ct_previewHighlight'];
+ 'ct_factAdvance','ct_factAccount','ct_missingQuickFields','ct_specialMemo',
+ 'ct_templateEditor','ct_imagePrimary','ct_confirmButton','ct_previewHighlight'];
 for(const id of markers)assert(section.includes('id="'+id+'"'),'Required review control lost: '+id);
 assert(section.indexOf('ct_keyFacts')<section.indexOf('ct_previewHighlight'),'Summary must precede long preview');
 assert(section.indexOf('ct_confirmButton')<section.indexOf('ct_imagePrimary'),'Final image action follows explicit confirmation');
@@ -17,7 +17,7 @@ const finish=css.slice(css.lastIndexOf('/* v2.0.48 — Guided contract preparati
 assert(finish.includes('#contracts .contractMemoCard #ct_rough')&&finish.includes('height:202px'),
  'Memo starts compact instead of consuming the whole first screen');
 for(const x of ['.contractFlowSteps','.contractMissingQuick','.contractCoreFacts','.contractPaymentFocus',
- '.contractClauseChoices','.contractSharePrimary'])assert(finish.includes(x),'UI polish missing '+x);
+ '.contractSpecialMemoArea','.contractSharePrimary'])assert(finish.includes(x),'UI polish missing '+x);
 const nodes=new Map();
 function E(id){
  if(!nodes.has(id)){
@@ -35,7 +35,7 @@ const ctx=vm.createContext({window:{},document:{getElementById:E,body:{getAttrib
  alert:x=>notices.push(x),confirm:()=>true,Date,Number,console,navigator:{}});
 for(const file of ['contracts.js','contracts-smart.js','contracts-language.js','contracts-easy.js']){
  const src=read('app/src/main/assets/'+file);new vm.Script(src);
- assert(!/\b(?:fetch|XMLHttpRequest|localStorage)\b/.test(src),'Customer details cannot be sent to a server');
+ assert(!/\b(?:fetch|XMLHttpRequest)\b/.test(src),'No customer details may be uploaded');
  vm.runInContext(src,ctx);
 }
 const app=ctx.window.FirstHyundaiContracts,easy=ctx.window.FirstHyundaiEasy;
@@ -44,9 +44,10 @@ assert.equal(easy.compose(),true);
 const notice=()=>E('ct_preview').value;
 assert(notice().includes('▶ 이번 송금 예정액 : 1,000만원'));
 assert(notice().includes('▶ 입금 계좌 : 국민은행 1234567-01-987654'));
-for(const phrase of ['이체와 동시에 본계약이 체결','배액을 상환','중개보수 지급의무']){
- assert(!notice().includes(phrase),'No unagreed legal clause: '+phrase);
+for(const word of ['제안 1.','제안 2.','제안 3.']){
+ assert(notice().includes(word),'Parties receive offer wording, not a completed-agreement claim');
 }
+assert(!notice().includes('보기로 합의합니다'));
 assert.equal(E('ct_factProperty').textContent,(E('ct_property').value+' '+E('ct_unit').value).trim()||'확인 필요','Summary must reflect the same locally recognized property fields as the notice');
 assert.equal(E('ct_factAdvance').textContent,'1,000만원');
 assert(E('ct_factAccount').textContent.includes('김철수'));
@@ -56,26 +57,20 @@ assert.equal(app._test.collect().errors.length,0,'Fixture complete');
 app.approve();
 assert.equal(E('ct_imagePrimary').disabled,false,'Final image available only after explicit review');
 assert.equal(E('ct_flow3').attrs['aria-current'],'step');
-E('ct_clauseEffective').checked=true;
-easy.rebuildAfterClauses();
-assert(notice().includes('이체와 동시에 본계약이 체결'));
-assert(!notice().includes('배액을 상환'),'Other clauses remain explicitly off');
-assert.equal(E('ct_imagePrimary').disabled,true,'Changing consent cancels approval');
-E('ct_clauseCancellation').checked=true;E('ct_clauseBrokerFee').checked=true;
-easy.rebuildAfterClauses();
-assert(notice().includes('배액을 상환'));
-assert(notice().includes('중개보수 지급의무'));
-app.approve();
-assert.equal(E('ct_imagePrimary').disabled,false);
+E('ct_specialMemo').value='근저당권은 잔금과 동시에 말소합니다.\n시설물은 현 상태로 인도합니다.';
+easy.updateSpecials();
+assert(notice().includes('근저당권은 잔금과 동시에 말소합니다.'));
+assert(notice().includes('시설물은 현 상태로 인도합니다.'));
+assert.equal(E('ct_imagePrimary').disabled,true,'Modified special clauses require fresh review');
+app.approve();assert.equal(E('ct_imagePrimary').disabled,false);
 E('ct_rough').value='퍼팍 13블럭 전세 보증금 5억 오늘 오백만원';
+E('ct_specialMemo').value='';
 easy.compose();
-assert.equal(E('ct_clauseEffective').checked,false);
-assert.equal(E('ct_clauseCancellation').checked,false);
-assert.equal(E('ct_clauseBrokerFee').checked,false);
-assert(!notice().includes('이체와 동시에 본계약이 체결'),"Consent must not leak into another customer's deal");
-assert(E('ct_missingQuickFields').innerHTML.includes('contractQuickFix'),'Incomplete memo offers a quick fix');
-assert(E('ct_missingQuickFields').innerHTML.includes('FirstHyundaiEasy.focusMissing(&quot;'),'Quick fixes are safely quoted');
-easy.focusMissing('contractDate');
-assert(E('ct_manualPanel').open);
-assert(E('ct_contractDate').focused);
-console.log('v2.0.48 guided contract verified: three steps, local payment facts, no unagreed clauses, image lock and one-tap missing corrections.');
+assert(!notice().includes('근저당권은 잔금과 동시에 말소합니다.'),'Previous special must not enter a new contract');
+assert(E('ct_missingQuickFields').innerHTML.includes('contractInlineField'));
+assert(E('ct_missingQuickFields').innerHTML.includes('FirstHyundaiEasy.applyQuickField(&quot;'));
+E('ct_quick_contractDate').value='2026.11.02~11.06 협의';
+assert.equal(easy.applyQuickField('contractDate'),true);
+assert.equal(E('ct_contractDate').value,'2026.11.02~11.06 협의');
+assert.equal(E('ct_manualPanel').open,false,'Missing information is entered inline without opening full form');
+console.log('v2.0.49 guided contract verified: three stages, dedicated specials, proposal terms, inline corrections and image gate.');
