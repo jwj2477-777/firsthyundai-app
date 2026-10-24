@@ -284,22 +284,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.79 news and transaction switch color fix APK
+      - name: Publish v2.0.80 actual-click news and trade color transfer APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.79.apk
-          unzip -t FirstHyundai-v2.0.79.apk | grep 'No errors detected'
-          if gh release view v2.0.79 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.80.apk
+          unzip -t FirstHyundai-v2.0.80.apk | grep 'No errors detected'
+          if gh release view v2.0.80 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.79 FirstHyundai-v2.0.79.apk \
+            gh release create v2.0.80 FirstHyundai-v2.0.80.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.79 · 뉴스·실거래 하단 버튼 전환 정확도 개선' \
-              --notes '뉴스 브리핑·인천 청약분양, 그리고 아파트/오피스텔의 전체·매매·전세·월세 필터에서 기존 색상 전환이 보이지 않던 문제를 수정했습니다. 뉴스는 aria-selected, 거래유형은 active/aria-pressed 변경이 실제 끝난 직후 정확한 버튼 그룹의 색상 애니메이션을 실행하도록 직접 연결했습니다. 다른 유사한 그룹을 잘못 선택하거나 한 프레임 뒤에 상태를 추측하지 않습니다. 누른 이전 버튼과 새로 선택된 버튼의 배경색만 은은하게 전환하며 주변 버튼, 폰트, 배치, 크기, 테두리에는 효과가 없습니다. 상단 5개 메뉴 애니메이션, 뉴스 높이 고정, 기존 기능은 유지합니다. 뉴스와 세 종류의 거래유형 필터 직접 이벤트 회귀 테스트를 추가했습니다. v2.0.79/build130.'
+              --title '퍼스트현대 v2.0.80 · 하단 두 줄 색상 전환 클릭 처리 통일' \
+              --notes '뉴스 브리핑↔인천 청약·분양과 전체·매매·전세·월세에서 색 전환이 나오지 않던 문제에 대해, 별도로 사용하던 beginDirect/endDirect 우회 경로를 제거했습니다. 클릭 이벤트를 다른 정상 버튼과 동일하게 처리하되 클릭한 정확한 뉴스 또는 거래유형 그룹을 그대로 추적하여 갱신된 두 버튼의 실제 배경색만 조용하게 변화시킵니다. 아파트·오피스텔 거래유형을 지원하며 이미 정상 작동하는 메인 5개 버튼과 다른 화면, 글씨·아이콘·크기·레이아웃·색상은 변경하지 않았습니다. 기존 기능 및 실거래 검색 로직은 유지하고 실제 버튼 클릭 순서를 검증하는 회귀 테스트로 보강했습니다. v2.0.80/build131.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.79 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.79 --apk FirstHyundai-v2.0.79.apk
+          gh release upload v2.0.80 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.80 --apk FirstHyundai-v2.0.80.apk
