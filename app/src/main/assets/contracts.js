@@ -28,6 +28,7 @@ function refreshHighlightedNotice(){
  highlight.innerHTML=highlightedNoticeHtml(E('ct_preview')?.value||'');
 }
 function togglePreviewEdit(){
+ if(!templateAdminAllowed())return;
  const source=E('ct_preview'),button=E('ct_togglePreviewEdit');
  if(!source)return;
  const editing=!!source.classList?.contains?.('contractEditing');
@@ -185,12 +186,58 @@ function updateContractFlow(){
  const imageButton=E('ct_imagePrimary');
  if(imageButton)imageButton.disabled=!approved||!created||!!collect().errors.length||previewContainsMissing();
 }
-function resetContractAgreements(){
- for(const id of ['clauseEffective','clauseCancellation','clauseBrokerFee']){
-  const node=E('ct_'+id);if(node)node.checked=false;
- }
- const container=E('ct_clauseChoices');if(container)container.open=false;
+
+const PROPOSAL_TEMPLATE_KEY='fhd_contract_proposal_template_v1';
+const DEFAULT_PROPOSAL_TEMPLATE=Object.freeze({
+ intro:'안녕하세요. 퍼스트현대부동산입니다.',
+ invitation:'아래 내용은 계약 진행을 위한 제안 조건입니다. 확인 후 동의 여부를 회신해 주세요. 동의 확인 전에는 확정된 계약조건으로 안내하지 않습니다.',
+ effective:'제안 1. 계약 내용에 동의한 경우 계약금 일부 송금 및 수령 확인을 기준으로 계약을 진행하는 조건을 제안드립니다.',
+ cancellation:'제안 2. 동의 후 일방 변심으로 계약을 해제하는 경우 매도인·임대인은 수령액의 배액을 상환하고 매수인·임차인은 송금액을 포기하는 조건을 제안드립니다.',
+ broker:'제안 3. 계약 해제 시 중개보수는 관련 법령 및 별도 합의에 따라 처리하는 조건을 제안드립니다.'
+});
+const TEMPLATE_FIELDS=Object.keys(DEFAULT_PROPOSAL_TEMPLATE);
+function contractTemplate(){
+ try{
+  const obj=JSON.parse(localStorage.getItem(PROPOSAL_TEMPLATE_KEY)||'{}');
+  const cleaned={};
+  for(const key of TEMPLATE_FIELDS){
+   const value=obj&&typeof obj[key]==='string'?obj[key].trim():'';
+   cleaned[key]=value&&value.length<=700?value:DEFAULT_PROPOSAL_TEMPLATE[key];
+  }
+  return cleaned;
+ }catch(e){return {...DEFAULT_PROPOSAL_TEMPLATE};}
 }
+function showTemplateEditor(){
+ const values=contractTemplate();
+ for(const key of TEMPLATE_FIELDS){
+  const element=E('ct_tpl_'+key);if(element)element.value=values[key];
+ }
+}
+function templateAdminAllowed(){return document.body?.getAttribute?.('data-office-role')==='admin';}
+function saveTemplate(){
+ if(!templateAdminAllowed()){alert('관리자모드에서만 공통문구를 바꿀 수 있습니다.');return false;}
+ const next={};
+ for(const key of TEMPLATE_FIELDS){
+  const raw=E('ct_tpl_'+key)?.value?.trim()||'';
+  if(!raw||raw.length>700){alert('공통문구의 내용을 확인해 주세요. 각 항목은 비워둘 수 없습니다.');return false;}
+  next[key]=raw;
+ }
+ try{localStorage.setItem(PROPOSAL_TEMPLATE_KEY,JSON.stringify(next));}
+ catch(e){alert('이 기기에 공통문구를 저장하지 못했습니다.');return false;}
+ if(E('ct_templateStatus'))E('ct_templateStatus').textContent='이 기기에 공통문구를 저장했습니다. 가족모드에도 적용됩니다.';
+ if(created)makePreview();
+ return true;
+}
+function resetTemplate(){
+ if(!templateAdminAllowed())return false;
+ if(!confirm('공통 제안문구를 기본값으로 복원하시겠습니까?'))return false;
+ try{localStorage.removeItem(PROPOSAL_TEMPLATE_KEY);}
+ catch(e){alert('문구 복원에 실패했습니다.');return false;}
+ showTemplateEditor();
+ if(created)makePreview();
+ return true;
+}
+
 
 function syncReviewButton(){
  const button=E('ct_confirmButton');if(!button)return;
@@ -230,7 +277,8 @@ function makePreview(){
  const who=d.type==='매매'?'매도인':'임대인',paying=d.type==='매매'?'매수인':'임차인';
  const totalName=d.type==='매매'?'매매대금':d.type==='전세'?'전세보증금':'보증금';
  const typeLine='● 아파트 '+d.type+'계약 ●';
- const out=['안녕하세요. 퍼스트현대부동산입니다.','',typeLine,''];
+ const template=contractTemplate();
+ const out=[template.intro,'',typeLine,''];
  out.push('▶ 소재지 : '+(field('address')||'[주소 확인 필요]'));
  out.push('▶ 아파트명 : '+(field('property')||'[단지 확인 필요]')+(field('unit')?' '+field('unit'):' [동·호수 확인 필요]'));
  if(field('exclusiveArea')){
@@ -265,24 +313,11 @@ function makePreview(){
  const account=field('bank')&&field('account')&&field('accountHolder')?
   field('bank')+' '+field('account')+' (예금주 '+field('accountHolder')+')':
   '[은행·계좌번호·예금주 확인 필요]';
- // Neutral payment instructions are not by themselves an agreement on formation,
- // forfeiture or brokerage remuneration. Only expressly selected party-agreed
- // clauses may be included, and any change invalidates prior review approval.
+ // Offer terms to the parties for acceptance, not a declaration of prior agreement.
  out.push('','▶ 이번 송금 예정액 : '+moneyOr(d.advance));
  out.push('▶ 입금 계좌 : '+account);
- const agreed=id=>E('ct_'+id)?.checked===true;
- if(agreed('clauseEffective')){
-  out.push('','※ 별도 합의: 송금과 계약 성립');
-  out.push('당사자들은 위 금액의 이체와 동시에 본계약이 체결된 것으로 보기로 합의합니다.');
- }
- if(agreed('clauseCancellation')){
-  out.push('','※ 별도 합의: 계약 해제 조건');
-  out.push('당사자들은 일방의 변심으로 계약을 해제하는 경우 '+who+'은 실제 수령한 금액의 배액을 상환하고 '+paying+'은 실제 송금한 금액을 포기하는 조건으로 합의합니다.');
- }
- if(agreed('clauseBrokerFee')){
-  out.push('','※ 별도 합의: 중개보수');
-  out.push('당사자들은 계약이 해제되더라도 그 사실만으로 중개보수 지급의무가 없어지는 것은 아니라는 점에 합의합니다.');
- }
+ out.push('','※ 아래 조건에 대한 동의를 요청드립니다.');
+ out.push(template.invitation,template.effective,template.cancellation,template.broker);
  E('ct_preview').value=out.join('\n');
  // Newly composed messages always begin in readable, red-marked review mode.
  E('ct_preview')?.classList?.remove?.('contractEditing');
@@ -320,7 +355,7 @@ function approve(){
  syncReviewButton();
 }
 function assertReady(){
- if(!created||!approved||collect().errors.length||previewContainsMissing()){alert('계약 조건·하단 합의문을 확인한 뒤 내용 확인 완료를 눌러주세요.');return false;}
+ if(!created||!approved||collect().errors.length||previewContainsMissing()){alert('계약 조건과 안내문 제안 내용을 확인한 뒤 완료 버튼을 눌러주세요.');return false;}
  return true;
 }
 async function copy(){
@@ -382,7 +417,6 @@ function fromSelectedComplex(exclusiveM2=null,supplyLabel=''){
 }
 function clearForNewMemo(){
  const memo=field('rough');
- resetContractAgreements();
  FIELDS.forEach(id=>{if(id!=='rough'&&E('ct_'+id))E('ct_'+id).value='';});
  E('ct_dealType').value='전세';
  E('ct_preview').value='';
@@ -397,8 +431,8 @@ function clearForNewMemo(){
 }
 function reset(){
  if(!confirm('현재 작성 중인 계약 내용을 모두 지우시겠습니까? 저장된 사본은 없습니다.'))return;
- resetContractAgreements();
  FIELDS.forEach(id=>{const el=E('ct_'+id);if(el)el.value='';});
+ if(E('ct_specialMemo'))E('ct_specialMemo').value='';
  E('ct_dealType').value='전세';E('ct_preview').value='';refreshHighlightedNotice();
  E('ct_selectedComplexContext')?.classList?.add?.('hidden');
  E('ct_status').textContent='조건을 입력하면 초안을 생성할 수 있습니다.';
@@ -418,7 +452,7 @@ window.firstHyundaiContractSpeech=function(result){
  }else if(result&&!result.cancelled)alert('음성입력에 실패했습니다. 직접 입력을 이용해 주세요.');
 };
 window.FirstHyundaiContracts={
- onOpen(){window.FirstHyundaiSmart?.onOpen();updateSummary();refreshHighlightedNotice();syncReviewButton();},canShare:assertReady,updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,togglePreviewEdit,refreshHighlightedNotice,syncReviewButton,
+ onOpen(){window.FirstHyundaiSmart?.onOpen();showTemplateEditor();updateSummary();refreshHighlightedNotice();syncReviewButton();},canShare:assertReady,updateSummary,extractNotes,makePreview,approve,edited,copy,share,reset,voice,fromSelectedComplex,togglePreviewEdit,refreshHighlightedNotice,syncReviewButton,saveTemplate,resetTemplate,
  fromComplex(id){
   const r=catalogRows().find(x=>x.id===id);
   if(!r)return false;
