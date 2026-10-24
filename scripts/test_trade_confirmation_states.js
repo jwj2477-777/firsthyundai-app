@@ -78,12 +78,16 @@ assert.equal(button.textContent,'✓ 내용 확인 완료하기');
 assert.equal(button.disabled,false);
 assert(hint.textContent.includes('확인 버튼'));
 const beforeApproval=E('ct_preview').value;
-for(const paragraph of [
- '※ 계약금 일부 송금 및 계약 성립·해제 조건 확인',
- '당사자들은 위 금액의 이체와 동시에 본계약이 체결된 것으로 보기로 하며',
- '임차인은 실제 송금한 금액을 포기하는 조건으로 합의합니다.',
- '중개보수 지급의무가 없어지는 것은 아니라는 점을 확인합니다.'
-])assert(beforeApproval.includes(paragraph),'Agreed terms always included: '+paragraph);
+assert(beforeApproval.includes('▶ 이번 송금 예정액 : 500만원'),'Neutral transfer value must appear');
+for(const phrase of ['이체와 동시에 본계약이 체결','실제 송금한 금액을 포기','중개보수 지급의무']){
+ assert(!beforeApproval.includes(phrase),'No unagreed legal term: '+phrase);
+}
+for(const id of ['clauseEffective','clauseCancellation','clauseBrokerFee'])E('ct_'+id).checked=true;
+contract.makePreview();
+const agreedNotice=E('ct_preview').value;
+for(const phrase of ['이체와 동시에 본계약이 체결','실제 송금한 금액을 포기','중개보수 지급의무']){
+ assert(agreedNotice.includes(phrase),'Explicitly chosen clause is included: '+phrase);
+}
 assert.equal(contract.canShare(),false,'Review approval button is still mandatory');
 contract.approve();
 assert.equal(state(),'done','Confirmed state must change visibly after clicking');
@@ -109,4 +113,4 @@ contract.approve();assert.equal(state(),'done');
 contract.reset();
 assert.equal(state(),'pending','Reset must clear confirmation');
 assert.equal(button.attributes['aria-pressed'],'false');
-console.log('Contract approval states, mandatory dissolution clauses, no consent checkbox, editing and sharing guard passed.');
+console.log('Contract confirmation, opt-in clauses, edited notice and sharing guards passed.');
