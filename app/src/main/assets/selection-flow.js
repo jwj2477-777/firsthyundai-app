@@ -1,223 +1,259 @@
-/* FIRST HYUNDAI · premium liquid selection v3
- * Only backgrounds move. Text and icons remain in the REAL button.
- * The original selected paints are reinstated after every animation.
+/* FIRST HYUNDAI · wind-drift tab selection v4
+ * Real text and button geometry never move.  A flat color front withdraws
+ * from the source and fills the target, accompanied by faint windblown wisps.
+ * The five top destinations are ONE logical group across both navigation rows.
  */
 (function(){
  'use strict';
- if(!document?.addEventListener||!document?.createElement||!window?.getComputedStyle)return;
- const DURATION=860,EASE='cubic-bezier(.28,.72,.16,1)';
+ if(!document?.addEventListener || !document?.createElement || !window?.getComputedStyle)return;
+ const TIME=760, EASE='cubic-bezier(.26,.76,.21,1)';
+ const ROOT={key:'top-five',selector:'#nav'};
  const GROUPS=[
-  ['main','#nav .primaryNav'],
-  ['shortcuts','#nav .utilityNav'],
-  ['property','.page:not(.hidden) .propertyTypeSwitch'],
-  ['apartments','.page:not(.hidden) .tradeStarter.apartmentTradeNav'],
-  ['office','.page:not(.hidden) .tradeStarter:not(.apartmentTradeNav)'],
-  ['trade-types','.page:not(.hidden) .tradeTypeBar'],
-  ['new-types','.page:not(.hidden) .newTypeChips'],
-  ['news','.page:not(.hidden) .newsCategoryTabs']
+  {key:'property',selector:'.page:not(.hidden) .propertyTypeSwitch'},
+  {key:'apartments',selector:'.page:not(.hidden) .tradeStarter.apartmentTradeNav'},
+  {key:'office',selector:'.page:not(.hidden) .tradeStarter:not(.apartmentTradeNav)'},
+  {key:'trade-types',selector:'.page:not(.hidden) .tradeTypeBar'},
+  {key:'new-types',selector:'.page:not(.hidden) .newTypeChips'},
+  {key:'news',selector:'.page:not(.hidden) .newsCategoryTabs'}
  ];
- const combined=GROUPS.map(g=>g[1]).join(',');
- const stats={started:0,finished:0,skipped:0};
- let cleanup=null,sequence=0;
+ const stats={started:0,finished:0,skipped:0,topFive:0};
+ let stopCurrent=null,sequence=0;
  const reduced=()=>!!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
- const buttons=g=>g?Array.from(g.children).filter(x=>x.tagName==='BUTTON'):[];
- const chosen=b=>!!b&&(b.classList.contains('active')||
+ const active=b=>!!b&&(b.classList.contains('active')||
   b.classList.contains('selected')||b.getAttribute('aria-current')==='page'||
   b.getAttribute('aria-pressed')==='true'||b.getAttribute('aria-selected')==='true');
- function paint(b){
-  const s=window.getComputedStyle(b);
-  const bg=s.backgroundImage&&s.backgroundImage!=='none'?s.backgroundImage:s.backgroundColor;
-  const backgroundColor=s.backgroundColor||'';
-  const tint=backgroundColor&&!/^(?:transparent|rgba\(0,\s*0,\s*0,\s*0\))$/.test(backgroundColor)?
-   backgroundColor:(bg.match(/#[0-9a-fA-F]{3,8}|rgba?\([^)]*\)/)||['#1A6870'])[0];
-  return {background:bg,color:s.color,borderRadius:s.borderRadius,tint};
+ const buttons=(group,key)=>!group?[]:key==='top-five'?
+  Array.from(group.querySelectorAll('.primaryNav > button, .utilityNav > button'))
+   .filter(b=>b.parentElement?.classList?.contains('primaryNav')||
+    b.parentElement?.classList?.contains('utilityNav')):
+  Array.from(group.children).filter(e=>e.tagName==='BUTTON');
+ function findGroup(button){
+  const row=button.parentElement;
+  const nav=button.closest('#nav');
+  if(nav&&(row?.classList?.contains('primaryNav')||row?.classList?.contains('utilityNav')))
+   return {spec:ROOT,group:nav};
+  for(const spec of GROUPS){
+   const group=button.closest(spec.selector);
+   if(group&&button.parentElement===group)return {spec,group};
+  }
+  return null;
  }
- const onScreen=r=>r&&r.width>0&&r.height>0&&
-   r.bottom>0&&r.top<window.innerHeight&&r.right>0&&r.left<window.innerWidth;
- function restoreLater(el,changes,saved){
-  const style=el.style;
-  for(const [name,value,priority] of changes){
-   saved.push([style,name,style.getPropertyValue(name),style.getPropertyPriority(name)]);
-   style.setProperty(name,value,priority||'');
+ function paint(button){
+  const s=window.getComputedStyle(button);
+  const background=s.backgroundImage&&s.backgroundImage!=='none'?
+   s.backgroundImage:s.backgroundColor;
+  const found=(background.match(/#[0-9a-fA-F]{3,8}|rgba?\([^)]+\)/)||[])[0];
+  return {
+   background,color:s.color,borderRadius:s.borderRadius||'12px',
+   tint:(s.backgroundColor&&s.backgroundColor!=='transparent'&&
+    !/^rgba\(0,\s*0,\s*0,\s*0\)$/.test(s.backgroundColor))?
+    s.backgroundColor:(found||'#35666d')
+  };
+ }
+ function visible(rect){
+  return rect&&rect.width>0&&rect.height>0&&rect.bottom>0&&
+   rect.top<window.innerHeight&&rect.right>0&&rect.left<window.innerWidth;
+ }
+ function edits(element,pairs,history){
+  for(const [key,value,priority=''] of pairs){
+   history.push([element.style,key,element.style.getPropertyValue(key),
+    element.style.getPropertyPriority(key)]);
+   element.style.setProperty(key,value,priority);
   }
  }
- function resetRecords(saved){
-  for(let i=saved.length-1;i>=0;i--){
-   const [style,name,value,priority]=saved[i];
-   if(value)style.setProperty(name,value,priority);
-   else style.removeProperty(name);
+ function undo(history){
+  for(let i=history.length-1;i>=0;i--){
+   const [style,key,value,priority]=history[i];
+   if(value)style.setProperty(key,value,priority);else style.removeProperty(key);
   }
  }
  function stop(){
-  if(!cleanup)return;
-  const finish=cleanup;cleanup=null;finish();
+  if(!stopCurrent)return;
+  const fn=stopCurrent;stopCurrent=null;fn();
  }
- function panel(parent,klass,x,y,width,height,background,radius,z){
-  const el=document.createElement('span');
-  el.className=klass;
-  el.setAttribute('aria-hidden','true');
-  Object.assign(el.style,{
-   position:'absolute',left:x+'px',top:y+'px',width:width+'px',height:height+'px',
-   boxSizing:'border-box',borderRadius:radius,background,
-   zIndex:String(z),pointerEvents:'none',willChange:'transform,opacity'
+ function layer(parent,kind,rect,background,radius,z){
+  const node=document.createElement('span');
+  node.className='fhd-wind-'+kind;node.setAttribute('aria-hidden','true');
+  Object.assign(node.style,{
+   position:'absolute',left:rect.x+'px',top:rect.y+'px',
+   width:rect.w+'px',height:rect.h+'px',background,
+   borderRadius:radius,pointerEvents:'none',zIndex:String(z),
+   boxSizing:'border-box'
   });
-  parent.appendChild(el);
-  return el;
+  parent.appendChild(node);
+  return node;
  }
- function frame(el,steps){
-  if(typeof el.animate!=='function')return null;
-  return el.animate(steps,{duration:DURATION,easing:EASE,fill:'both'});
+ function animate(el,frames){
+  const motion=el.animate(frames,{duration:TIME,easing:EASE,fill:'both'});
+  return motion;
  }
- function flow(group,sourceIndex,targetIndex,oldSelection,oldTarget){
-  if(reduced()||typeof group.animate!=='function'){stats.skipped++;return;}
-  const peers=buttons(group),source=peers[sourceIndex],target=peers[targetIndex];
-  if(!source||!target||source===target||!chosen(target)){stats.skipped++;return;}
-  const g=group.getBoundingClientRect(),a=source.getBoundingClientRect(),
-   b=target.getBoundingClientRect();
-  if(!onScreen(a)||!onScreen(b)){stats.skipped++;return;}
-  const dx=(b.left+b.width/2)-(a.left+a.width/2);
-  const dy=(b.top+b.height/2)-(a.top+a.height/2);
-  if(Math.abs(dx)>window.innerWidth*1.12||Math.abs(dy)>window.innerHeight*.55){
-   stats.skipped++;return;
+ function fillFrame(direction,reverse,radius){
+  const full='inset(0% 0% 0% 0% round '+radius+')';
+  if(direction==='right')return reverse?'inset(0% 100% 0% 0% round '+radius+')':
+   'inset(0% 0% 0% 100% round '+radius+')';
+  if(direction==='left')return reverse?'inset(0% 0% 0% 100% round '+radius+')':
+   'inset(0% 100% 0% 0% round '+radius+')';
+  if(direction==='down')return reverse?'inset(100% 0% 0% 0% round '+radius+')':
+   'inset(0% 0% 100% 0% round '+radius+')';
+  return reverse?'inset(0% 0% 100% 0% round '+radius+')':
+   'inset(100% 0% 0% 0% round '+radius+')';
+ }
+ function wind(group,from,to,a,b,nodes,animations,oldTone,newTone){
+  const cx=a.x+a.w/2,cy=a.y+a.h/2,ex=b.x+b.w/2,ey=b.y+b.h/2;
+  const dx=ex-cx,dy=ey-cy,dist=Math.max(1,Math.hypot(dx,dy));
+  const ux=dx/dist,uy=dy/dist,nx=-uy,ny=ux;
+  const launch={x:cx+ux*Math.min(a.w*.41,64),y:cy+uy*Math.min(a.h*.41,37)};
+  const landing={x:ex-ux*Math.min(b.w*.41,64),y:ey-uy*Math.min(b.h*.41,37)};
+  const travelX=landing.x-launch.x,travelY=landing.y-launch.y;
+  const angle=Math.atan2(dy,dx)*180/Math.PI;
+  // Low-opacity wisps and 8 dust grains — never a large colored blob or circle.
+  for(let i=0;i<11;i++){
+   const wisp=i<3;
+   const size=wisp?32+i*11:2+(i%3)*1.4;
+   const thickness=wisp?2.0+(i%2):1.6+(i%2);
+   const drift=(i%5-2)*(wisp?8:11);
+   const node=layer(group,wisp?'wisp':'grain',{
+    x:launch.x+nx*drift-size/2,
+    y:launch.y+ny*drift-thickness/2,
+    w:size,h:thickness
+   },wisp?'linear-gradient(90deg,transparent,'+
+    (i%2?oldTone:newTone)+',transparent)':
+    (i%2?oldTone:newTone),wisp?'12px':'2px',3);
+   node.style.opacity='0';
+   if(wisp)node.style.filter='blur(3px)';
+   else node.style.filter='blur(.75px)';
+   node.style.transformOrigin='center center';
+   nodes.push(node);
+   const sway=(i%4-1.5)*(wisp?3.5:7);
+   const lead=0.04+(i%4)*.045;
+   animations.push(animate(node,[
+    {transform:'translate3d(0,0,0) rotate('+angle+'deg) scaleX(.55)',
+     opacity:0,offset:0},
+    {transform:'translate3d('+(travelX*.22+nx*sway)+'px,'+
+     (travelY*.22+ny*sway)+'px,0) rotate('+angle+'deg) scaleX(1)',
+     opacity:wisp?.17:.22,offset:lead+.22},
+    {transform:'translate3d('+(travelX*.71-nx*sway)+'px,'+
+     (travelY*.71-ny*sway)+'px,0) rotate('+angle+'deg) scaleX(1.08)',
+     opacity:wisp?.13:.16,offset:.64+(i%3)*.035},
+    {transform:'translate3d('+travelX+'px,'+travelY+
+     'px,0) rotate('+angle+'deg) scaleX(.65)',
+     opacity:0,offset:1}
+   ]));
   }
+ }
+ function flow(group,key,oldIndex,nextIndex,oldSelection,oldTarget){
+  if(reduced()){stats.skipped++;return;}
+  const peers=buttons(group,key),source=peers[oldIndex],target=peers[nextIndex];
+  if(!source||!target||source===target||!active(target)||
+     typeof source.animate!=='function'){stats.skipped++;return;}
+  const container=group.getBoundingClientRect(),
+    src=source.getBoundingClientRect(),dst=target.getBoundingClientRect();
+  if(!visible(src)||!visible(dst)){stats.skipped++;return;}
+  const distanceX=(dst.left+dst.width/2)-(src.left+src.width/2);
+  const distanceY=(dst.top+dst.height/2)-(src.top+src.height/2);
+  if(Math.abs(distanceX)>window.innerWidth*1.5||
+     Math.abs(distanceY)>window.innerHeight*.76){stats.skipped++;return;}
+  const direction=Math.abs(distanceX)>=Math.abs(distanceY)?
+   (distanceX>=0?'right':'left'):(distanceY>=0?'down':'up');
+  const sx=group.scrollLeft||0,sy=group.scrollTop||0;
+  const a={x:src.left-container.left+sx,y:src.top-container.top+sy,w:src.width,h:src.height};
+  const b={x:dst.left-container.left+sx,y:dst.top-container.top+sy,w:dst.width,h:dst.height};
   const afterSource=paint(source),afterTarget=paint(target);
-  // Both screens already have the correct states. Only the selected color
-  // is masked temporarily; the actual content, layout and fonts are untouched.
-  const all=peers.map(b=>({button:b,rect:b.getBoundingClientRect(),ink:paint(b)}));
-  const origin={x:a.left-g.left+group.scrollLeft,
-   y:a.top-g.top+group.scrollTop,w:a.width,h:a.height};
-  const dest={x:b.left-g.left+group.scrollLeft,
-   y:b.top-g.top+group.scrollTop,w:b.width,h:b.height};
-  const saved=[],nodes=[],animations=[];
-  const done=()=>{
-   animations.forEach(anim=>{try{anim.cancel()}catch(e){}});
-   // At completion the real button background already owns the final color.
-   resetRecords(saved);nodes.forEach(node=>node.remove());
-  };
-  try {
-   restoreLater(group,[['position','relative'],['isolation','isolate']],saved);
-   // A quiet, real-sized idle surface beneath each button avoids color jumps.
-   // Selected destination starts as its pre-click inactive surface.
-   all.forEach(({button,rect,ink},idx)=>{
-    const base=idx===targetIndex?oldTarget.background:ink.background;
-    const p=panel(group,'fhd-liquid-base',
-     rect.left-g.left+group.scrollLeft,
-     rect.top-g.top+group.scrollTop,
-     rect.width,rect.height,base,ink.borderRadius,0);
-    nodes.push(p);
-    restoreLater(button,[
-     ['position','relative'],['z-index','2'],['background','transparent','important'],
-     ['transition','none','important']
-    ],saved);
-   });
-   const slug=panel(group,'fhd-liquid-color',
-    origin.x,origin.y,origin.w,origin.h,'transparent',oldSelection.borderRadius,1);
-   const outgoing=panel(slug,'fhd-liquid-outgoing',0,0,origin.w,origin.h,
-    oldSelection.background,'inherit',0);
-   const arriving=panel(slug,'fhd-liquid-arriving',0,0,origin.w,origin.h,
-    afterTarget.background,'inherit',1);
-   arriving.style.opacity='0';
-   slug.style.overflow='hidden';
-   nodes.push(slug);
-   // A light, narrow ribbon makes the pigment appear continuous in the gap.
-   // It has no text, no outline and does not affect surrounding layout.
-   const length=Math.hypot(dx,dy);
-   const trail=panel(group,'fhd-liquid-trail',
-    origin.x+origin.w/2,origin.y+origin.h/2,
-    length,Math.max(11,Math.min(21,origin.h*.21)),
-    'linear-gradient(90deg,'+oldSelection.tint+','+afterTarget.tint+')',
-    '999px',1);
-   trail.style.transform='translateY(-50%) rotate('+Math.atan2(dy,dx)+'rad)';
-   trail.style.transformOrigin='left center';
-   trail.style.filter='blur(6px)';
-   trail.style.opacity='0';
-   nodes.push(trail);
-   // Travel is a rounded, narrowing stream, not a moving button/card.
-   const sx=dest.w/origin.w,sy=dest.h/origin.h;
-   const anim=frame(slug,[
-    {transform:'translate3d(0,0,0) scale(1,1)',borderRadius:oldSelection.borderRadius,offset:0},
-    {transform:'translate3d('+(dx*.16)+'px,'+(dy*.16)+'px,0) scale(.78,.70)',
-      borderRadius:'42%',offset:.23},
-    {transform:'translate3d('+(dx*.51)+'px,'+(dy*.51)+'px,0) scale(.47,.24)',
-      borderRadius:'48%',offset:.49},
-    {transform:'translate3d('+(dx*.83)+'px,'+(dy*.83)+'px,0) scale('+(sx*.83)+','+(sy*.72)+')',
-      borderRadius:'36%',offset:.76},
-    {transform:'translate3d('+dx+'px,'+dy+'px,0) scale('+sx+','+sy+')',
-      borderRadius:afterTarget.borderRadius,offset:1}
-   ]);
-   if(!anim)throw new Error('No Web Animations support');
-   animations.push(anim);
-   animations.push(frame(arriving,[
-    {opacity:0,offset:0},{opacity:0,offset:.23},
-    {opacity:.50,offset:.58},{opacity:1,offset:.91}
-   ]));
-   animations.push(frame(trail,[
-    {opacity:0,clipPath:'inset(0 100% 0 0)',offset:0},
-    {opacity:.24,clipPath:'inset(0 58% 0 0)',offset:.27},
-    {opacity:.29,clipPath:'inset(0 4% 0 22%)',offset:.53},
-    {opacity:0,clipPath:'inset(0 0 0 100%)',offset:.92},
-    {opacity:0,clipPath:'inset(0 0 0 100%)',offset:1}
-   ]));
-   // Letterforms stay pixel-stable; only their paint color eases in.
-   const startColor=oldSelection.color,endSource=afterSource.color;
-   const endTarget=afterTarget.color,startTarget=oldTarget.color;
-   if(source.animate)animations.push(source.animate([
-    {color:startColor,offset:0},{color:startColor,offset:.12},
-    {color:endSource,offset:.52},{color:endSource,offset:1}
-   ],{duration:DURATION,easing:EASE}));
-   if(target.animate)animations.push(target.animate([
-    {color:startTarget,offset:0},{color:startTarget,offset:.38},
-    {color:endTarget,offset:.77},{color:endTarget,offset:1}
-   ],{duration:DURATION,easing:EASE}));
-   let finished=false;
-   const settle=()=>{
-    if(finished)return;
-    finished=true;
-    if(cleanup===stopThis)cleanup=null;
-    done();stats.finished++;
-   };
-   function stopThis(){finished=true;done();}
-   cleanup=stopThis;
-   anim.addEventListener('finish',settle,{once:true});
-   anim.addEventListener('cancel',settle,{once:true});
-   stats.started++;
-  }catch(e){
-   done();stats.skipped++;
+  const nodes=[],animations=[],history=[];
+  let settled=false;
+  function release(){
+   if(settled)return;
+   settled=true;
+   for(const a of animations){try{a.cancel()}catch(e){}}
+   undo(history);
+   for(const n of nodes)n.remove();
   }
+  try{
+   edits(group,[['position','relative'],['isolation','isolate']],history);
+   edits(source,[['position','relative'],['z-index','2'],
+    ['background','transparent','important'],['transition','none','important']],history);
+   edits(target,[['position','relative'],['z-index','2'],
+    ['background','transparent','important'],['transition','none','important']],history);
+   nodes.push(layer(group,'source-base',a,afterSource.background,
+    afterSource.borderRadius,0));
+   nodes.push(layer(group,'target-base',b,oldTarget.background,
+    oldTarget.borderRadius,0));
+   const out=layer(group,'source-color',a,oldSelection.background,
+    oldSelection.borderRadius,1);
+   const incoming=layer(group,'target-color',b,afterTarget.background,
+    afterTarget.borderRadius,1);
+   nodes.push(out,incoming);
+   const fullSource='inset(0% 0% 0% 0% round '+oldSelection.borderRadius+')';
+   const fullTarget='inset(0% 0% 0% 0% round '+afterTarget.borderRadius+')';
+   const ending=fillFrame(direction,false,oldSelection.borderRadius);
+   const beginning=fillFrame(direction,true,afterTarget.borderRadius);
+   const main=animate(out,[
+    {clipPath:fullSource,opacity:1,offset:0},
+    {clipPath:fullSource,opacity:1,offset:.09},
+    {clipPath:ending,opacity:1,offset:.70},
+    {clipPath:ending,opacity:0,offset:1}
+   ]);
+   animations.push(main);
+   animations.push(animate(incoming,[
+    {clipPath:beginning,opacity:1,offset:0},
+    {clipPath:beginning,opacity:1,offset:.20},
+    {clipPath:fullTarget,opacity:1,offset:.93},
+    {clipPath:fullTarget,opacity:1,offset:1}
+   ]));
+   wind(group,source,target,a,b,nodes,animations,oldSelection.tint,afterTarget.tint);
+   animations.push(animate(source,[
+    {color:oldSelection.color,offset:0},
+    {color:afterSource.color,offset:.62},
+    {color:afterSource.color,offset:1}
+   ]));
+   animations.push(animate(target,[
+    {color:oldTarget.color,offset:0},
+    {color:oldTarget.color,offset:.26},
+    {color:afterTarget.color,offset:.90},
+    {color:afterTarget.color,offset:1}
+   ]));
+   const finish=()=>{
+    if(settled)return;
+    if(stopCurrent===release)stopCurrent=null;
+    release();stats.finished++;
+   };
+   stopCurrent=release;
+   main.addEventListener('finish',finish,{once:true});
+   main.addEventListener('cancel',finish,{once:true});
+   stats.started++;
+   if(key==='top-five')stats.topFive++;
+  }catch(err){release();stats.skipped++;}
  }
- function click(e){
-  if(reduced()||e.defaultPrevented)return;
-  const button=e.target?.closest?.('button');
+ function click(event){
+  if(reduced()||event.defaultPrevented)return;
+  const button=event.target?.closest?.('button');
   if(!button||button.disabled||button.closest('.hidden'))return;
-  const group=button.closest(combined);
-  if(!group||button.parentElement!==group)return;
-  const entry=GROUPS.find(x=>group.matches(x[1]));
-  if(!entry)return;
+  const result=findGroup(button);
+  if(!result)return;
   stop();
-  const children=buttons(group),index=children.indexOf(button);
-  const oldIndex=children.findIndex(chosen);
-  if(index<0||oldIndex<0||index===oldIndex)return;
-  const oldSelection=paint(children[oldIndex]),oldTarget=paint(button);
+  const {spec,group}=result,peers=buttons(group,spec.key);
+  const next=peers.indexOf(button),previous=peers.findIndex(active);
+  if(next<0||previous<0||next===previous)return;
+  const oldSelected=paint(peers[previous]),oldTarget=paint(button);
   const id=++sequence;
-  // Click capture reads OLD colors. Onclick handlers replace selected markup.
-  // The next animation frame observes the NEW group; no font/element clone.
+  // Rendered on next animation frame AFTER click navigation synchronously
+  // rebuilds #nav; the same 5 logical destinations retain stable ordering.
   const start=()=>{
    if(id!==sequence||reduced())return;
-   const fresh=document.querySelector(entry[1]);
-   if(fresh)flow(fresh,oldIndex,index,oldSelection,oldTarget);
+   const fresh=document.querySelector(spec.selector);
+   if(fresh)flow(fresh,spec.key,previous,next,oldSelected,oldTarget);
   };
-  if(typeof window.requestAnimationFrame==='function')window.requestAnimationFrame(start);
+  if(window.requestAnimationFrame)window.requestAnimationFrame(start);
   else window.setTimeout?.(start,0);
  }
  const css=document.createElement('style');
  css.textContent=[
-  '.fhd-liquid-base,.fhd-liquid-color,.fhd-liquid-trail{pointer-events:none!important}',
-  '.fhd-liquid-color{transform-origin:center center;contain:paint}',
-  '.fhd-liquid-outgoing,.fhd-liquid-arriving{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;pointer-events:none!important}',
-  '@media(prefers-reduced-motion:reduce){.fhd-liquid-base,.fhd-liquid-color,.fhd-liquid-trail{display:none!important}}'
+  '.fhd-wind-source-base,.fhd-wind-target-base,.fhd-wind-source-color,.fhd-wind-target-color,.fhd-wind-wisp,.fhd-wind-grain{pointer-events:none!important}',
+  '.fhd-wind-wisp,.fhd-wind-grain{will-change:transform,opacity}',
+  '@media(prefers-reduced-motion:reduce){[class^="fhd-wind-"]{display:none!important}}'
  ].join('');
  document.head.appendChild(css);
  document.addEventListener('click',click,{capture:true});
- window.FirstHyundaiSelectionFlow={version:'3.0.0',
-  _test:{buttons,chosen,paint,stop,click,reduced,stats}};
+ window.FirstHyundaiSelectionFlow={version:'4.0.0',
+  _test:{buttons,active,paint,findGroup,stop,click,reduced,fillFrame,stats}};
 })();
