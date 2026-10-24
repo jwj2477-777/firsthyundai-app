@@ -276,22 +276,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.67 original-splash palette and smooth handoff APK
+      - name: Publish v2.0.68 liquid-selection motion APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.67.apk
-          unzip -t FirstHyundai-v2.0.67.apk | grep 'No errors detected'
-          if gh release view v2.0.67 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.68.apk
+          unzip -t FirstHyundai-v2.0.68.apk | grep 'No errors detected'
+          if gh release view v2.0.68 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.67 FirstHyundai-v2.0.67.apk \
+            gh release create v2.0.68 FirstHyundai-v2.0.68.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.67 · 시작화면 금색 브랜드와 매끄러운 로고 이동' \
-              --notes '원래 시작 화면의 흰색 한글 제목·따뜻한 금색 영문 문구·원본 FHD 마크를 메인 헤더까지 통일했습니다. 전 버전에서 도입된 청록색 영문과 불필요한 크림색 원형 뒷배경을 제거했습니다. 이동 중 추가 WebView JavaScript 호출이 생기지 않도록 메인 헤더 페이드 타이밍을 첫 좌표 측정 때 미리 예약하고, 안드로이드 로고·문구를 GPU로 합성해 움직임의 버벅임을 줄였습니다. 이전 인증 및 실거래·계약·가격동향·알림·업데이트 기능과 모션 줄이기 접근성은 보존합니다. v2.0.67/build118.'
+              --title '퍼스트현대 v2.0.68 · 버튼 선택 색상 이동 효과' \
+              --notes '동급 버튼 사이에서 선택 색상이 부드럽게 흘러가며 도착 지점의 기존 색상으로 자연스럽게 전환됩니다. 실거래·아파트정보·뉴스 주 메뉴, 오늘 요약·계약문자, 아파트·오피스텔, 실거래 목록, 거래유형, 뉴스·청약 버튼에 적용했습니다. 기존 파랑·청록·보라 색상과 기능은 유지하고 움직임 줄이기 접근성을 지원합니다. v2.0.68/build119.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.67 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.67 --apk FirstHyundai-v2.0.67.apk
+          gh release upload v2.0.68 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.68 --apk FirstHyundai-v2.0.68.apk
