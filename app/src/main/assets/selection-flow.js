@@ -1,206 +1,220 @@
-/* FIRST HYUNDAI · fluid selection transfer v2
- * Purely visual. Never changes navigation, selected states or source colors.
- * The click is sampled BEFORE inline handlers and animated AFTER their updates.
+/* FIRST HYUNDAI · premium liquid selection v3
+ * Only backgrounds move. Text and icons remain in the REAL button.
+ * The original selected paints are reinstated after every animation.
  */
-(function () {
+(function(){
  'use strict';
- if (!document?.addEventListener || !window?.getComputedStyle) return;
- const TIME=820, EASE='cubic-bezier(.38,0,.18,1)';
+ if(!document?.addEventListener||!document?.createElement||!window?.getComputedStyle)return;
+ const DURATION=860,EASE='cubic-bezier(.28,.72,.16,1)';
  const GROUPS=[
   ['main','#nav .primaryNav'],
   ['shortcuts','#nav .utilityNav'],
   ['property','.page:not(.hidden) .propertyTypeSwitch'],
-  ['apartment-modes','.page:not(.hidden) .tradeStarter.apartmentTradeNav'],
-  ['office-modes','.page:not(.hidden) .tradeStarter:not(.apartmentTradeNav)'],
+  ['apartments','.page:not(.hidden) .tradeStarter.apartmentTradeNav'],
+  ['office','.page:not(.hidden) .tradeStarter:not(.apartmentTradeNav)'],
   ['trade-types','.page:not(.hidden) .tradeTypeBar'],
   ['new-types','.page:not(.hidden) .newTypeChips'],
-  ['news-tabs','.page:not(.hidden) .newsCategoryTabs']
+  ['news','.page:not(.hidden) .newsCategoryTabs']
  ];
  const combined=GROUPS.map(g=>g[1]).join(',');
- let running=null;
- const stats={requests:0,completed:0,skipped:0};
+ const stats={started:0,finished:0,skipped:0};
+ let cleanup=null,sequence=0;
  const reduced=()=>!!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
- const buttons=g=>g?Array.from(g.children).filter(e=>e.tagName==='BUTTON'):[];
+ const buttons=g=>g?Array.from(g.children).filter(x=>x.tagName==='BUTTON'):[];
  const chosen=b=>!!b&&(b.classList.contains('active')||
-  b.classList.contains('selected')||
-  b.getAttribute('aria-pressed')==='true'||
-  b.getAttribute('aria-selected')==='true'||
-  b.getAttribute('aria-current')==='page');
- const visible=r=>r&&r.w>0&&r.h>0&&r.y+r.h>0&&r.y<window.innerHeight&&
-  r.x+r.w>0&&r.x<window.innerWidth;
- function measure(button){
-  const r=button.getBoundingClientRect(),s=window.getComputedStyle(button);
-  const paint=s.backgroundImage&&s.backgroundImage!=='none'?s.backgroundImage:s.backgroundColor;
-  const tint=(s.backgroundColor&&!/^rgba?\(0[, ]+0[, ]+0[, ]+0\)/.test(s.backgroundColor)&&s.backgroundColor!=='transparent')?s.backgroundColor:
-    (paint.match(/#[0-9a-fA-F]{3,8}|rgba?\([^)]*\)/)||['#176A70'])[0];
-  return {x:r.left,y:r.top,w:r.width,h:r.height,tint,
-   color:s.color,paint,
-   border:s.border, radius:s.borderRadius, shadow:s.boxShadow,
-   font:s.font, fontFamily:s.fontFamily, fontSize:s.fontSize,
-   fontWeight:s.fontWeight,lineHeight:s.lineHeight,
-   letterSpacing:s.letterSpacing,textAlign:s.textAlign,
-   display:s.display,flexDirection:s.flexDirection,alignItems:s.alignItems,
-   justifyContent:s.justifyContent,gap:s.gap,padding:s.padding};
+  b.classList.contains('selected')||b.getAttribute('aria-current')==='page'||
+  b.getAttribute('aria-pressed')==='true'||b.getAttribute('aria-selected')==='true');
+ function paint(b){
+  const s=window.getComputedStyle(b);
+  const bg=s.backgroundImage&&s.backgroundImage!=='none'?s.backgroundImage:s.backgroundColor;
+  return {background:bg,color:s.color,borderRadius:s.borderRadius};
+ }
+ const onScreen=r=>r&&r.width>0&&r.height>0&&
+   r.bottom>0&&r.top<window.innerHeight&&r.right>0&&r.left<window.innerWidth;
+ function restoreLater(el,changes,saved){
+  const style=el.style;
+  for(const [name,value,priority] of changes){
+   saved.push([style,name,style.getPropertyValue(name),style.getPropertyPriority(name)]);
+   style.setProperty(name,value,priority||'');
+  }
+ }
+ function resetRecords(saved){
+  for(let i=saved.length-1;i>=0;i--){
+   const [style,name,value,priority]=saved[i];
+   if(value)style.setProperty(name,value,priority);
+   else style.removeProperty(name);
+  }
  }
  function stop(){
-  if(!running)return;
-  const current=running;running=null;
-  current.animations.forEach(a=>{try{a.cancel()}catch(e){}});
-  current.elements.forEach(e=>e.remove());
+  if(!cleanup)return;
+  const finish=cleanup;cleanup=null;finish();
  }
- function face(button,geom){
-  const el=document.createElement('div');
-  el.className='fhd-fluid-face';
+ function panel(parent,klass,x,y,width,height,background,radius,z){
+  const el=document.createElement('span');
+  el.className=klass;
   el.setAttribute('aria-hidden','true');
-  // Duplicate visual content only. Ignore pointer ripples; no copied button events.
-  const content=button.cloneNode(true);
-  content.querySelectorAll?.('.fhd-tap-wave')?.forEach(n=>n.remove());
-  el.innerHTML=content.innerHTML;
   Object.assign(el.style,{
-   position:'fixed',pointerEvents:'none',boxSizing:'border-box',
-   zIndex:'1002',left:geom.x+'px',top:geom.y+'px',
-   width:geom.w+'px',height:geom.h+'px',
-   background:geom.paint,color:geom.color,
-   border:geom.border,borderRadius:geom.radius,
-   boxShadow:geom.shadow,font:geom.font,letterSpacing:geom.letterSpacing,
-   textAlign:geom.textAlign,
-   display:geom.display==='grid'?'grid':'flex',
-   flexDirection:geom.flexDirection,alignItems:geom.alignItems,
-   justifyContent:geom.justifyContent,gap:geom.gap,padding:geom.padding,
-   overflow:'hidden',whiteSpace:'normal',willChange:'clip-path,opacity'
+   position:'absolute',left:x+'px',top:y+'px',width:width+'px',height:height+'px',
+   boxSizing:'border-box',borderRadius:radius,background,
+   zIndex:String(z),pointerEvents:'none',willChange:'transform,opacity'
   });
+  parent.appendChild(el);
   return el;
  }
- function animate(fromEl,toBeforeEl,from,to,beforeTarget){
-  if(!visible(from)||!visible(to)||typeof document.createElement('div').animate!=='function'){
-   stats.skipped++;return;
-  }
-  const dx=to.x+to.w/2-from.x-from.w/2;
-  const dy=to.y+to.h/2-from.y-from.h/2;
-  if(Math.abs(dx)>window.innerWidth*1.15||Math.abs(dy)>window.innerHeight*.63){
-   stats.skipped++;return;
-  }
-  stop();
-  const source=face(fromEl,from),cover=face(toBeforeEl,Object.assign({},to,{
-   paint:beforeTarget.paint,color:beforeTarget.color,border:beforeTarget.border,
-   shadow:beforeTarget.shadow
-  }));
-  const distance=Math.hypot(dx,dy), horizontal=Math.abs(dx)>=Math.abs(dy);
-  const forwards=horizontal?dx>=0:dy>=0;
-  // Colored outgoing face uncovers the original inactive surface,
-  // incoming white face uncovers the exact EXISTING selected paint.
-  const begin='inset(0% 0% 0% 0% round '+from.radius+')';
-  const end='inset(0% 0% 0% 0% round '+to.radius+')';
-  const clipOut=horizontal?(forwards?'inset(0% 100% 0% 0%)':'inset(0% 0% 0% 100%)'):
-   (forwards?'inset(100% 0% 0% 0%)':'inset(0% 0% 100% 0%)');
-  const clipIn=horizontal?(forwards?'inset(0% 0% 0% 100%)':'inset(0% 100% 0% 0%)'):
-   (forwards?'inset(0% 0% 100% 0%)':'inset(100% 0% 0% 0%)');
-  // Rounded inset shapes must match for continuous WebView interpolation.
-  const outgoingClip=clipOut.replace(')', ' round '+from.radius+')');
-  const incomingClip=clipIn.replace(')', ' round '+to.radius+')');
-  const bridge=document.createElement('div');
-  bridge.className='fhd-fluid-bridge';
-  bridge.setAttribute('aria-hidden','true');
-  Object.assign(bridge.style,{
-   position:'fixed',zIndex:'1001',pointerEvents:'none',
-   left:(from.x+from.w/2)+'px',top:(from.y+from.h/2)+'px',
-   width:distance+'px',height:Math.min(30,Math.max(14,Math.min(from.h,to.h)*.30))+'px',
-   transformOrigin:'left center',
-   transform:'translateY(-50%) rotate('+Math.atan2(dy,dx)+'rad)',
-   borderRadius:'999px',
-   background:'linear-gradient(90deg,'+from.tint+','+to.tint+')',
-   filter:'blur(5px)',opacity:'0'
-  });
-  // Separate leading meniscus softens the hard straight-line bridge.
-  const drop=document.createElement('div');
-  drop.className='fhd-fluid-drop';
-  drop.setAttribute('aria-hidden','true');
-  Object.assign(drop.style,{
-   position:'fixed',zIndex:'1003',pointerEvents:'none',
-   left:(from.x+from.w/2-18)+'px',top:(from.y+from.h/2-18)+'px',
-   width:'36px',height:'36px',borderRadius:'50%',
-   background:'radial-gradient(circle at 42% 45%,'+from.tint+' 12%,transparent 72%)',
-   filter:'blur(5px)',opacity:'0',willChange:'transform,opacity'
-  });
-  document.body.append(source,cover,bridge,drop);
-  const motions=[];
-  function play(node,frames,options){
-   const a=node.animate(frames,{duration:TIME,easing:EASE,fill:'both',...options});
-   motions.push(a);return a;
-  }
-  // Drawing across the whole duration with staggered fluid edges.
-  play(source,[
-   {clipPath:begin,opacity:1,offset:0},
-   {clipPath:begin,opacity:1,offset:.11},
-   {clipPath:outgoingClip,opacity:.94,offset:.85},
-   {clipPath:outgoingClip,opacity:0,offset:1}
-  ]);
-  const dest=play(cover,[
-   {clipPath:end,opacity:1,offset:0},
-   {clipPath:end,opacity:1,offset:.11},
-   {clipPath:incomingClip,opacity:1,offset:.90},
-   {clipPath:incomingClip,opacity:0,offset:1}
-  ]);
-  play(bridge,[
-   {clipPath:'inset(0% 100% 0% 0% round 999px)',opacity:0,offset:0},
-   {clipPath:'inset(0% 66% 0% 0% round 999px)',opacity:.31,offset:.28},
-   {clipPath:'inset(0% 3% 0% 22% round 999px)',opacity:.42,offset:.62},
-   {clipPath:'inset(0% 0% 0% 100% round 999px)',opacity:0,offset:1}
-  ]);
-  play(drop,[
-   {transform:'translate3d(0,0,0) scale(.5)',opacity:0,offset:0},
-   {transform:'translate3d('+(dx*.22)+'px,'+(dy*.22)+'px,0) scale(1)',opacity:.49,offset:.24},
-   {transform:'translate3d('+(dx*.8)+'px,'+(dy*.8)+'px,0) scale(1.18)',opacity:.44,offset:.75},
-   {transform:'translate3d('+dx+'px,'+dy+'px,0) scale(.48)',opacity:0,offset:1}
-  ]);
-  const effect={elements:[source,cover,bridge,drop],animations:motions};
-  running=effect;
-  function finish(){
-   if(running!==effect)return;
-   running=null;
-   effect.elements.forEach(e=>e.remove());
-   stats.completed++;
-  }
-  dest.addEventListener('finish',finish,{once:true});
-  dest.addEventListener('cancel',finish,{once:true});
+ function frame(el,steps){
+  if(typeof el.animate!=='function')return null;
+  return el.animate(steps,{duration:DURATION,easing:EASE,fill:'both'});
  }
- function click(event){
-  if(reduced()||event.defaultPrevented)return;
-  const button=event.target?.closest?.('button');
+ function flow(group,sourceIndex,targetIndex,oldSelection,oldTarget){
+  if(reduced()||typeof group.animate!=='function'){stats.skipped++;return;}
+  const peers=buttons(group),source=peers[sourceIndex],target=peers[targetIndex];
+  if(!source||!target||source===target||!chosen(target)){stats.skipped++;return;}
+  const g=group.getBoundingClientRect(),a=source.getBoundingClientRect(),
+   b=target.getBoundingClientRect();
+  if(!onScreen(a)||!onScreen(b)){stats.skipped++;return;}
+  const dx=(b.left+b.width/2)-(a.left+a.width/2);
+  const dy=(b.top+b.height/2)-(a.top+a.height/2);
+  if(Math.abs(dx)>window.innerWidth*1.12||Math.abs(dy)>window.innerHeight*.55){
+   stats.skipped++;return;
+  }
+  const afterSource=paint(source),afterTarget=paint(target);
+  // Both screens already have the correct states. Only the selected color
+  // is masked temporarily; the actual content, layout and fonts are untouched.
+  const all=peers.map(b=>({button:b,rect:b.getBoundingClientRect(),ink:paint(b)}));
+  const origin={x:a.left-g.left+group.scrollLeft,
+   y:a.top-g.top+group.scrollTop,w:a.width,h:a.height};
+  const dest={x:b.left-g.left+group.scrollLeft,
+   y:b.top-g.top+group.scrollTop,w:b.width,h:b.height};
+  const saved=[],nodes=[],animations=[];
+  const done=()=>{
+   animations.forEach(anim=>{try{anim.cancel()}catch(e){}});
+   // At completion the real button background already owns the final color.
+   resetRecords(saved);nodes.forEach(node=>node.remove());
+  };
+  try {
+   restoreLater(group,[['position','relative'],['isolation','isolate']],saved);
+   // A quiet, real-sized idle surface beneath each button avoids color jumps.
+   // Selected destination starts as its pre-click inactive surface.
+   all.forEach(({button,rect,ink},idx)=>{
+    const base=idx===targetIndex?oldTarget.background:ink.background;
+    const p=panel(group,'fhd-liquid-base',
+     rect.left-g.left+group.scrollLeft,
+     rect.top-g.top+group.scrollTop,
+     rect.width,rect.height,base,ink.borderRadius,0);
+    nodes.push(p);
+    restoreLater(button,[
+     ['position','relative'],['z-index','2'],['background','transparent','important'],
+     ['transition','none','important']
+    ],saved);
+   });
+   const slug=panel(group,'fhd-liquid-color',
+    origin.x,origin.y,origin.w,origin.h,'transparent',oldSelection.borderRadius,1);
+   const outgoing=panel(slug,'fhd-liquid-outgoing',0,0,origin.w,origin.h,
+    oldSelection.background,'inherit',0);
+   const arriving=panel(slug,'fhd-liquid-arriving',0,0,origin.w,origin.h,
+    afterTarget.background,'inherit',1);
+   arriving.style.opacity='0';
+   slug.style.overflow='hidden';
+   nodes.push(slug);
+   // A light, narrow ribbon makes the pigment appear continuous in the gap.
+   // It has no text, no outline and does not affect surrounding layout.
+   const length=Math.hypot(dx,dy);
+   const trail=panel(group,'fhd-liquid-trail',
+    origin.x+origin.w/2,origin.y+origin.h/2,
+    length,Math.max(11,Math.min(21,origin.h*.21)),
+    'linear-gradient(90deg,'+oldSelection.background+','+afterTarget.background+')',
+    '999px',1);
+   trail.style.transform='translateY(-50%) rotate('+Math.atan2(dy,dx)+'rad)';
+   trail.style.transformOrigin='left center';
+   trail.style.filter='blur(6px)';
+   trail.style.opacity='0';
+   nodes.push(trail);
+   // Travel is a rounded, narrowing stream, not a moving button/card.
+   const sx=dest.w/origin.w,sy=dest.h/origin.h;
+   const anim=frame(slug,[
+    {transform:'translate3d(0,0,0) scale(1,1)',borderRadius:oldSelection.borderRadius,offset:0},
+    {transform:'translate3d('+(dx*.16)+'px,'+(dy*.16)+'px,0) scale(.78,.70)',
+      borderRadius:'42%',offset:.23},
+    {transform:'translate3d('+(dx*.51)+'px,'+(dy*.51)+'px,0) scale(.47,.24)',
+      borderRadius:'48%',offset:.49},
+    {transform:'translate3d('+(dx*.83)+'px,'+(dy*.83)+'px,0) scale('+(sx*.83)+','+(sy*.72)+')',
+      borderRadius:'36%',offset:.76},
+    {transform:'translate3d('+dx+'px,'+dy+'px,0) scale('+sx+','+sy+')',
+      borderRadius:afterTarget.borderRadius,offset:1}
+   ]);
+   if(!anim)throw new Error('No Web Animations support');
+   animations.push(anim);
+   animations.push(frame(arriving,[
+    {opacity:0,offset:0},{opacity:0,offset:.23},
+    {opacity:.50,offset:.58},{opacity:1,offset:.91}
+   ]));
+   animations.push(frame(trail,[
+    {opacity:0,clipPath:'inset(0 100% 0 0)',offset:0},
+    {opacity:.24,clipPath:'inset(0 58% 0 0)',offset:.27},
+    {opacity:.29,clipPath:'inset(0 4% 0 22%)',offset:.53},
+    {opacity:0,clipPath:'inset(0 0 0 100%)',offset:.92},
+    {opacity:0,clipPath:'inset(0 0 0 100%)',offset:1}
+   ]));
+   // Letterforms stay pixel-stable; only their paint color eases in.
+   const startColor=oldSelection.color,endSource=afterSource.color;
+   const endTarget=afterTarget.color,startTarget=oldTarget.color;
+   if(source.animate)animations.push(source.animate([
+    {color:startColor,offset:0},{color:startColor,offset:.12},
+    {color:endSource,offset:.52},{color:endSource,offset:1}
+   ],{duration:DURATION,easing:EASE}));
+   if(target.animate)animations.push(target.animate([
+    {color:startTarget,offset:0},{color:startTarget,offset:.38},
+    {color:endTarget,offset:.77},{color:endTarget,offset:1}
+   ],{duration:DURATION,easing:EASE}));
+   let finished=false;
+   const settle=()=>{
+    if(finished)return;
+    finished=true;
+    if(cleanup===stopThis)cleanup=null;
+    done();stats.finished++;
+   };
+   function stopThis(){finished=true;done();}
+   cleanup=stopThis;
+   anim.addEventListener('finish',settle,{once:true});
+   anim.addEventListener('cancel',settle,{once:true});
+   stats.started++;
+  }catch(e){
+   done();stats.skipped++;
+  }
+ }
+ function click(e){
+  if(reduced()||e.defaultPrevented)return;
+  const button=e.target?.closest?.('button');
   if(!button||button.disabled||button.closest('.hidden'))return;
   const group=button.closest(combined);
   if(!group||button.parentElement!==group)return;
-  const entry=GROUPS.find(g=>group.matches(g[1]));
+  const entry=GROUPS.find(x=>group.matches(x[1]));
   if(!entry)return;
-  const peers=buttons(group),next=peers.indexOf(button);
-  const old=peers.find(b=>chosen(b));
-  if(next<0||!old||old===button)return;
-  const from=measure(old),oldTarget=button.cloneNode(true),beforeTarget=measure(button);
-  if(!visible(from))return;
-  stats.requests++;
-  // MUST wait for target/inline onclick handlers to complete.
-  // A Promise/microtask here can fire *before* inline onclick in Android WebView.
-  const afterClick=()=>{
-   if(reduced())return;
-   const nextGroup=document.querySelector(entry[1]);
-   const selected=buttons(nextGroup)[next];
-   if(!selected||!chosen(selected)||selected.disabled){stats.skipped++;return;}
-   const to=measure(selected);
-   animate(old,oldTarget,from,to,beforeTarget);
+  stop();
+  const children=buttons(group),index=children.indexOf(button);
+  const oldIndex=children.findIndex(chosen);
+  if(index<0||oldIndex<0||index===oldIndex)return;
+  const oldSelection=paint(children[oldIndex]),oldTarget=paint(button);
+  const id=++sequence;
+  // Click capture reads OLD colors. Onclick handlers replace selected markup.
+  // The next animation frame observes the NEW group; no font/element clone.
+  const start=()=>{
+   if(id!==sequence||reduced())return;
+   const fresh=document.querySelector(entry[1]);
+   if(fresh)flow(fresh,oldIndex,index,oldSelection,oldTarget);
   };
-  if(typeof window.requestAnimationFrame==='function')window.requestAnimationFrame(afterClick);
-  else window.setTimeout?.(afterClick,0);
+  if(typeof window.requestAnimationFrame==='function')window.requestAnimationFrame(start);
+  else window.setTimeout?.(start,0);
  }
- const style=document.createElement('style');
- style.textContent=[
-  '.fhd-fluid-face .navIcon{font-size:27px;line-height:1.05;color:inherit}',
-  '.fhd-fluid-face .starterIcon{font-size:1.13em;color:inherit}',
-  '.fhd-fluid-face .fhd-tap-wave{display:none!important}',
-  '@media(prefers-reduced-motion:reduce){.fhd-fluid-face,.fhd-fluid-bridge,.fhd-fluid-drop{display:none!important}}'
+ const css=document.createElement('style');
+ css.textContent=[
+  '.fhd-liquid-base,.fhd-liquid-color,.fhd-liquid-trail{pointer-events:none!important}',
+  '.fhd-liquid-color{transform-origin:center center;contain:paint}',
+  '.fhd-liquid-outgoing,.fhd-liquid-arriving{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;pointer-events:none!important}',
+  '@media(prefers-reduced-motion:reduce){.fhd-liquid-base,.fhd-liquid-color,.fhd-liquid-trail{display:none!important}}'
  ].join('');
- document.head.appendChild(style);
+ document.head.appendChild(css);
  document.addEventListener('click',click,{capture:true});
- window.FirstHyundaiSelectionFlow={
-  version:'2.0.0',_test:{reduced,buttons,chosen,measure,stop,click,stats}
- };
+ window.FirstHyundaiSelectionFlow={version:'3.0.0',
+  _test:{buttons,chosen,paint,stop,click,reduced,stats}};
 })();
