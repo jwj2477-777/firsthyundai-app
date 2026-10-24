@@ -28,7 +28,7 @@ final class SmoothBrandOverlay extends FrameLayout {
     private final FrameLayout emblemFrame;
     private final ImageView emblem;
     private final TextView title;
-    private final TextView subtitle;
+    private final ImageView subtitle;
     private final View ring,rule;
     private boolean finished,landingStarted,dissolveStarted;
     private int layoutAttempts;
@@ -86,10 +86,10 @@ final class SmoothBrandOverlay extends FrameLayout {
         line.gravity=Gravity.CENTER_HORIZONTAL;
         line.topMargin=dp(14);
         identity.addView(rule,line);
-        subtitle=new TextView(activity);
+        subtitle=new ImageView(activity);
         BrandIdentityStyle.subtitle(subtitle);
         subtitle.setLayerType(View.LAYER_TYPE_HARDWARE,null);
-        LinearLayout.LayoutParams sub=new LinearLayout.LayoutParams(-2,-2);
+        LinearLayout.LayoutParams sub=BrandIdentityStyle.subtitleLayout(subtitle);
         sub.topMargin=dp(13);
         identity.addView(subtitle,sub);
         addView(identity,new LayoutParams(-1,-2,Gravity.CENTER));
@@ -110,7 +110,7 @@ final class SmoothBrandOverlay extends FrameLayout {
         if(!Float.isFinite(pxPerCss)||pxPerCss<=0){fadeOut(done);return;}
         // Wait for the native emblem to be laid out, so its starting center
         // exactly matches the original LockActivity welcome center.
-        if(emblem.getWidth()==0||title.getWidth()==0){
+        if(emblem.getWidth()==0||title.getWidth()==0||subtitle.getWidth()==0){
             if(++layoutAttempts>8){fadeOut(done);return;}
             postDelayed(()->moveToHeader(rects,viewportWidth,metrics,web,done),16);
             return;
@@ -127,7 +127,7 @@ final class SmoothBrandOverlay extends FrameLayout {
         for(int i=0;i<3;i++){
             int k=i*4;
             View part=parts[i];
-            if(i==2&&metrics[2]<=0){
+            if(i==2&&(rects[k+2]<=0||rects[k+3]<=0)){
                 // Narrow layouts intentionally hide the English line.
                 part.animate().alpha(0f).setDuration(320).start();
                 continue;
@@ -135,6 +135,7 @@ final class SmoothBrandOverlay extends FrameLayout {
             part.getLocationOnScreen(source);
             float sourceX=source[0]-base[0],sourceY=source[1]-base[1];
             float scale,targetX,targetY;
+            float scaleY;
             if(part instanceof TextView){
                 TextView text=(TextView)part;
                 int metric=i==1?0:2;
@@ -147,11 +148,20 @@ final class SmoothBrandOverlay extends FrameLayout {
                 targetX=web.getLeft()+(rects[k]+rects[k+2]/2f)*pxPerCss-part.getWidth()*scale/2f;
                 targetY=web.getTop()+(rects[k+1]+rects[k+3]/2f)*pxPerCss-part.getHeight()*scale/2f;
             }
-            if(!Float.isFinite(scale)||scale<=0){fadeOut(done);return;}
+            scaleY=scale;
+            if(i==2){
+                // Match the two real vector rectangles exactly, compensating
+                // only the sub-pixel rounding of native WRAP_CONTENT bounds.
+                scale=rects[k+2]*pxPerCss/part.getWidth();
+                scaleY=rects[k+3]*pxPerCss/part.getHeight();
+                targetX=web.getLeft()+rects[k]*pxPerCss;
+                targetY=web.getTop()+rects[k+1]*pxPerCss;
+            }
+            if(!Float.isFinite(scale)||scale<=0||!Float.isFinite(scaleY)||scaleY<=0){fadeOut(done);return;}
             part.setPivotX(0f);part.setPivotY(0f);
             part.animate().cancel();
             part.animate().translationX(targetX-sourceX).translationY(targetY-sourceY)
-                .scaleX(scale).scaleY(scale).setDuration(DURATION).setInterpolator(natural);
+                .scaleX(scale).scaleY(scaleY).setDuration(DURATION).setInterpolator(natural);
             if(i==0)part.animate().withEndAction(()->settleAtHeader(web,done));
             part.animate().start();
         }

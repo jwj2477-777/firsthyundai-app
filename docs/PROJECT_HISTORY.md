@@ -1,5 +1,12 @@
 # 퍼스트현대 — 개발 연혁·버전별 의사결정·실패 재발 방지
 
+## 2026-10-25 · v2.0.86 · 영문 FIRST 줄의 마지막 자간·길이 미세 불일치
+- 사용자: 한글/로고보다 하단 영어 FIRST~만 마지막에 살짝 어긋나 보임. 한글 제목·로고의 이동 및 착지 방식 유지, 영문만 보완.
+- 동일 폰트라도 TextView/HTML inline span의 tracking·글자폭 처리와 반올림이 달라질 수 있어 영문 줄을 한 개의 공통 윤곽으로 고정. bundled FHD Brand regular를 generate_brand_subtitle.py로 변환한 동일 path/금색/viewport의 SVG와 Android VectorDrawable 사용. 한글은 이전 live TTF text 그대로. 영문 alt/contentDescription 유지.
+- 기존 영문 1.3em line-box·8/10px 반응형 크기·340px 이하 숨김 유지. native subtitle만 ImageView로 표시하고 실제 웹 img 경계에 X/Y를 각각 정렬하여 native intrinsic 정수 반올림을 끝에서 보정. 다른 로고/제목은 기존 uniform scale/기준선 정렬 그대로. 860ms 이동/190ms 정지 dissolve/도착 확인 흐름 무변경.
+- 검증: Android/Web 두 자산의 path·색·viewport 완전 동일 및 접근성/한글 보존 검사. 5종 화면 폭에서 실제 img가 준비되고 native bridge metrics/착지 표시가 정상인지 확인. 실제 사용자 단말의 체감은 업데이트 후 별도 확인.
+
+
 ## 2026-10-25 · v2.0.85 · 시작→상단 마지막 착지·글꼴 불일치 개선
 - 사용자: 시작 로고/제목이 상단으로 이동할 때 특히 마지막이 매끄럽지 않고 글꼴도 다름.
 - 원인: native 790ms 이동과 DOM 측정 때 시작한 CSS 555+225ms 노출이 서로 다른 시계로 작동하여 이동 중 상단 글자가 겹침. native sans-serif와 웹 Roboto/Noto 폴백은 동일 글꼴 보장 못함. TextView 전체 박스를 CSS line-box에 맞춰 축소해 실제 글자 크기·기준선이 달랐고, 로고는 SVG 실물 대신 wrapper 여백을 측정했음.

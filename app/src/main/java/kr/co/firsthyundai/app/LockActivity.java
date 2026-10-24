@@ -194,9 +194,9 @@ public class LockActivity extends Activity {
         ruleParams.gravity=Gravity.CENTER_HORIZONTAL;
         ruleParams.topMargin=dp(14);
         identity.addView(goldRule,ruleParams);
-        TextView subtitle=new TextView(this);
+        ImageView subtitle=new ImageView(this);
         BrandIdentityStyle.subtitle(subtitle);
-        LinearLayout.LayoutParams subtitleParams=new LinearLayout.LayoutParams(-2,-2);
+        LinearLayout.LayoutParams subtitleParams=BrandIdentityStyle.subtitleLayout(subtitle);
         subtitleParams.topMargin=dp(13);
         identity.addView(subtitle,subtitleParams);
         welcomeOverlay.addView(identity,new FrameLayout.LayoutParams(-1,-2,Gravity.CENTER));

@@ -4,6 +4,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Gravity;
 import android.widget.TextView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 /**
  * Preserve the original native splash typography across the intro, native
@@ -38,13 +40,18 @@ final class BrandIdentityStyle {
         view.setLetterSpacing(TITLE_TRACKING);
         view.setIncludeFontPadding(false);
     }
-    static void subtitle(TextView view){
-        view.setText(SUBTITLE);
-        view.setTextColor(SUBTITLE_COLOR);
-        view.setTextSize(SUBTITLE_SP);
-        view.setGravity(Gravity.CENTER);
-        view.setTypeface(font(view,false));
-        view.setLetterSpacing(SUBTITLE_TRACKING);
-        view.setIncludeFontPadding(false);
+    static LinearLayout.LayoutParams subtitleLayout(ImageView view){
+        android.util.DisplayMetrics metrics=view.getResources().getDisplayMetrics();
+        float fontScale=metrics.scaledDensity/metrics.density;
+        return new LinearLayout.LayoutParams(
+            Math.round(view.getDrawable().getIntrinsicWidth()*fontScale),
+            Math.round(view.getDrawable().getIntrinsicHeight()*fontScale));
+    }
+    static void subtitle(ImageView view){
+        view.setImageResource(R.drawable.ic_brand_subtitle);
+        view.setContentDescription(SUBTITLE);
+        // This vector is generated from the same gold path as WebView's SVG.
+        // No platform-specific letter spacing, fallback or hinting at landing.
+        view.setScaleType(ImageView.ScaleType.FIT_XY);
     }
 }

@@ -37,7 +37,7 @@ const bounds=[
  {left:77,top:17,width:176,height:34},
  {left:77,top:53,width:240,height:18}
 ];
-const selectors=['header .officeMarkDisplay','header .brandWordmark h1','header .brandSubtitle'];
+const selectors=['header .officeMarkDisplay','header .brandWordmark h1','header .brandSubtitleMark'];
 const targets=selectors.map((_,i)=>({getBoundingClientRect:()=>bounds[i],appendChild(marker){marker.top=bounds[i].top+bounds[i].height*.8}}));
 const doc={
  body:{classList},documentElement:{clientWidth:390},

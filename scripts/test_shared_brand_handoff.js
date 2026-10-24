@@ -10,7 +10,7 @@ assert(css.includes('body.fhd-native-handoff header .officeMark')&&css.includes(
 const native=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/SmoothBrandOverlay.java'),'utf8');
 const identity=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/BrandIdentityStyle.java'),'utf8');
 assert(native.includes('R.drawable.ic_launcher_badge')&&native.includes('DURATION=860L')&&native.includes('getLocationOnScreen'));
-assert(native.includes('scaleX(scale).scaleY(scale)'),'Logo scales uniformly, preserving aspect ratio');
+assert(native.includes('scaleY=scale;')&&native.includes('if(i==2){'),'Logo scales uniformly, preserving aspect ratio');
 assert(native.includes('layoutAttempts>8'),'Prevent infinite layout retries on slow devices');
 assert(main.includes('ignored->{')&&main.includes('overlay.detach()'),'Reveal live HTML first, then remove the native brand to prevent a visible blink');
 assert(css.includes('.fhd-bridge-backdrop')&&css.includes('linear-gradient(135deg,#03212A,#095B5E)'));
@@ -74,7 +74,7 @@ function harness(width,{reduced=false,hasNative=true,hasHeader=true}={}){
  const nav=new Mock('button');
  const body=new Mock('body');
  const found={'header .officeMarkDisplay':targets[0],'header .brandWordmark h1':targets[1],
-  'header .brandSubtitle':targets[2],'#nav .primaryNav button:last-child':nav};
+  'header .brandSubtitleMark':targets[2],'#nav .primaryNav button:last-child':nav};
  const document={
   body,createElement:t=>{const n=new Mock(t);created.push(n);return n},
   querySelector:selector=>hasHeader?found[selector]:null,

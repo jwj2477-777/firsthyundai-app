@@ -26,7 +26,7 @@
  // Destinations are MEASURED after layout, never based on screen-width guesses.
  let handoff=null,handoffDone=false;
  const headerTargets=()=>{
-  const els=['header .officeMarkDisplay','header .brandWordmark h1','header .brandSubtitle']
+  const els=['header .officeMarkDisplay','header .brandWordmark h1','header .brandSubtitleMark']
    .map(selector=>document.querySelector?.(selector));
   if(els.some(x=>!x))return null;
   const boxes=els.map(x=>x.getBoundingClientRect());
@@ -56,7 +56,7 @@
   const badge=dest.els[0].cloneNode(true);badge.className='fhd-bridge-logo';
   const title=make('div','fhd-bridge-title');title.textContent=dest.els[1].textContent;
   const rule=make('span','fhd-bridge-rule');
-  const subtitle=make('div','fhd-bridge-subtitle');subtitle.textContent=dest.els[2].textContent;
+  const subtitle=make('div','fhd-bridge-subtitle');subtitle.textContent=dest.els[2].getAttribute?.('alt')||dest.els[2].textContent;
   badgeStage.appendChild(ring);badgeStage.appendChild(badge);
   identity.appendChild(badgeStage);identity.appendChild(title);
   identity.appendChild(rule);identity.appendChild(subtitle);
@@ -107,6 +107,7 @@
  // line-height. Fitting a TextView into the line-box rectangle shrank its
  // glyphs and shifted their baseline on the final native-to-web frame.
  function textMetrics(element){
+  if(element.tagName==='IMG')return [0,0];
   const rect=element.getBoundingClientRect();
   if(rect.width<=0||rect.height<=0)return [0,0];
   const marker=document.createElement('span');
@@ -141,7 +142,7 @@
   document.body?.classList?.remove('fhd-first-render');
   document.body?.classList?.add('fhd-native-arrived');
  }
- window.FirstHyundaiMotion={version:'2.0.85',playEntrance,prepareBrandHandoff,startBrandHandoff,nativeHeaderRects,beginNativeHandoffLanding,finishNativeHandoff,_test:{reduced,stats,headerTargets,textMetrics,finishBrandHandoff}};
+ window.FirstHyundaiMotion={version:'2.0.86',playEntrance,prepareBrandHandoff,startBrandHandoff,nativeHeaderRects,beginNativeHandoffLanding,finishNativeHandoff,_test:{reduced,stats,headerTargets,textMetrics,finishBrandHandoff}};
  // Browsers used for UI preview have no Android bridge; keep a single
  // elegant initial reveal there as well, without affecting app navigation.
  if(!window.FirstHyundaiNative)playEntrance();

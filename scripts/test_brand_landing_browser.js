@@ -25,7 +25,9 @@ async function checkLanding(){
   check('actual CSS font size transmitted',Math.abs(data[13]-parseFloat(getComputedStyle(title).fontSize))<.01);
   check('title baseline lies inside its line box',data[14]>data[5]&&data[14]<data[5]+data[7]);
   const hidden=getComputedStyle(sub).display==='none';
-  check('hidden narrow-screen subtitle does not cancel movement',hidden?data[15]===0:data[15]>0);
+  check('shared subtitle outline uses its real image rectangle',data[15]===0&&(hidden?data[10]===0:data[10]>0));
+  const english=document.querySelector('.brandSubtitleMark');
+  check('English vector is decoded and has accessible wording',english.complete&&english.naturalWidth>0&&english.alt==='FIRST HYUNDAI · REAL ESTATE');
   const header=document.querySelector('.brandHeaderText');
   check('moving identity has no duplicate visible destination',getComputedStyle(header).opacity==='0');
   await new Promise(r=>setTimeout(r,1100));
