@@ -2232,6 +2232,7 @@ header #favoriteAlertButton .headerAlertDot{display:none;position:absolute;top:6
 header #favoriteAlertButton.hasNewTrade .headerAlertDot{display:block}
 header #modeBar #roleButton{min-height:43px}
 /* Preserve the wordmark on narrow screens; keep title readable and secondary subtitle unobtrusive. */
+header .brandHeaderText{overflow:hidden}
 @media(max-width:400px){
  header #modeBar{gap:5px}
  header #favoriteAlertButton{flex-basis:40px;width:40px;height:42px;min-width:40px;min-height:42px;border-radius:10px}
