@@ -182,7 +182,7 @@ function inlineField(name,label){
  return '<div class="contractInlineField"><strong>'+label+'</strong>'+
   parts.map(part=>{
    const title=part==='bank'?'은행명':part==='account'?'계좌번호':part==='accountHolder'?'예금주':'';
-   const type=['balanceDate','leaseStart'].includes(part)?'date':'text';
+   const type='text'; // Contract dates may be exact, approximate, or explicitly under discussion.
    const inputMode=['price','contractDeposit','advance','monthlyRent','interim'].includes(part)?'decimal':'text';
    return (title?'<label for="ct_quick_'+part+'">'+title+'</label>':'')+
     '<input id="ct_quick_'+part+'" type="'+type+'" inputmode="'+inputMode+'" placeholder="'+(title||label)+'" maxlength="220" value="'+
@@ -217,7 +217,7 @@ function applyQuickField(rawName){
  for(const fieldName of parts){
   const target=E(fieldName),input=E('quick_'+fieldName);
   target.value=String(input.value).trim();
-  target.dispatchEvent?.(new Event('change',{bubbles:true}));
+  if(typeof Event==='function')target.dispatchEvent?.(new Event('change',{bubbles:true}));
  }
  app.makePreview();
  refreshMissing();
