@@ -176,7 +176,7 @@ function renderContractFacts(){
 function updateContractFlow(){
  const stage=approved?3:created?2:1;
  for(let n=1;n<=3;n++){
-  const node=E('ct_flow'+n);if(!node)continue;
+  const node=E('ct_flow'+n);if(!node?.classList?.toggle)continue;
   node.classList.toggle('is-current',n===stage);
   node.classList.toggle('is-complete',n<stage);
   if(n===stage)node.setAttribute?.('aria-current','step');
