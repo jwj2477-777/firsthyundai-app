@@ -1,161 +1,198 @@
-/* FirstHyundai · selection color handoff
- * Independent cosmetic effect. No navigation or filter state is changed here.
- * The chosen button always keeps the existing color defined by ui-v2.css.
+/* FIRST HYUNDAI · fluid selection transfer v2
+ * Purely visual. Never changes navigation, selected states or source colors.
+ * The click is sampled BEFORE inline handlers and animated AFTER their updates.
  */
 (function () {
-  'use strict';
-  if (!document || !document.addEventListener || !window.getComputedStyle) return;
-
-  const DURATION = 490;
-  const EASING = 'cubic-bezier(.22,1,.36,1)';
-  const definitions = [
-    ['main', '#nav .primaryNav'],
-    ['shortcuts', '#nav .utilityNav'],
-    ['property', '.page:not(.hidden) .propertyTypeSwitch'],
-    ['apartment-modes', '.page:not(.hidden) .tradeStarter.apartmentTradeNav'],
-    ['office-modes', '.page:not(.hidden) .tradeStarter:not(.apartmentTradeNav)'],
-    ['trade-types', '.page:not(.hidden) .tradeTypeBar'],
-    ['new-types', '.page:not(.hidden) .newTypeChips'],
-    ['news-tabs', '.page:not(.hidden) .newsCategoryTabs']
-  ];
-  const selector = definitions.map((d) => d[1]).join(',');
-  let activeGhost = null;
-  let activeAnimations = [];
-
-  function reduceMotion() {
-    return !!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+ 'use strict';
+ if (!document?.addEventListener || !window?.getComputedStyle) return;
+ const TIME=820, EASE='cubic-bezier(.38,0,.18,1)';
+ const GROUPS=[
+  ['main','#nav .primaryNav'],
+  ['shortcuts','#nav .utilityNav'],
+  ['property','.page:not(.hidden) .propertyTypeSwitch'],
+  ['apartment-modes','.page:not(.hidden) .tradeStarter.apartmentTradeNav'],
+  ['office-modes','.page:not(.hidden) .tradeStarter:not(.apartmentTradeNav)'],
+  ['trade-types','.page:not(.hidden) .tradeTypeBar'],
+  ['new-types','.page:not(.hidden) .newTypeChips'],
+  ['news-tabs','.page:not(.hidden) .newsCategoryTabs']
+ ];
+ const combined=GROUPS.map(g=>g[1]).join(',');
+ let running=null;
+ const stats={requests:0,completed:0,skipped:0};
+ const reduced=()=>!!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+ const buttons=g=>g?Array.from(g.children).filter(e=>e.tagName==='BUTTON'):[];
+ const chosen=b=>!!b&&(b.classList.contains('active')||
+  b.classList.contains('selected')||
+  b.getAttribute('aria-pressed')==='true'||
+  b.getAttribute('aria-selected')==='true'||
+  b.getAttribute('aria-current')==='page');
+ const visible=r=>r&&r.w>0&&r.h>0&&r.y+r.h>0&&r.y<window.innerHeight&&
+  r.x+r.w>0&&r.x<window.innerWidth;
+ function measure(button){
+  const r=button.getBoundingClientRect(),s=window.getComputedStyle(button);
+  return {x:r.left,y:r.top,w:r.width,h:r.height,
+   color:s.color,paint:s.backgroundImage&&s.backgroundImage!=='none'?
+    s.backgroundImage:s.backgroundColor,
+   border:s.border, radius:s.borderRadius, shadow:s.boxShadow,
+   font:s.font, fontFamily:s.fontFamily, fontSize:s.fontSize,
+   fontWeight:s.fontWeight,lineHeight:s.lineHeight,
+   letterSpacing:s.letterSpacing,textAlign:s.textAlign,
+   display:s.display,flexDirection:s.flexDirection,alignItems:s.alignItems,
+   justifyContent:s.justifyContent,gap:s.gap,padding:s.padding};
+ }
+ function stop(){
+  if(!running)return;
+  const current=running;running=null;
+  current.animations.forEach(a=>{try{a.cancel()}catch(e){}});
+  current.elements.forEach(e=>e.remove());
+ }
+ function face(button,geom){
+  const el=document.createElement('div');
+  el.className='fhd-fluid-face';
+  el.setAttribute('aria-hidden','true');
+  // Duplicate visual content only. Ignore pointer ripples; no copied button events.
+  const content=button.cloneNode(true);
+  content.querySelectorAll?.('.fhd-tap-wave')?.forEach(n=>n.remove());
+  el.innerHTML=content.innerHTML;
+  Object.assign(el.style,{
+   position:'fixed',pointerEvents:'none',boxSizing:'border-box',
+   zIndex:'1002',left:geom.x+'px',top:geom.y+'px',
+   width:geom.w+'px',height:geom.h+'px',
+   background:geom.paint,color:geom.color,
+   border:geom.border,borderRadius:geom.radius,
+   boxShadow:geom.shadow,font:geom.font,letterSpacing:geom.letterSpacing,
+   textAlign:geom.textAlign,
+   display:geom.display==='grid'?'grid':'flex',
+   flexDirection:geom.flexDirection,alignItems:geom.alignItems,
+   justifyContent:geom.justifyContent,gap:geom.gap,padding:geom.padding,
+   overflow:'hidden',whiteSpace:'normal',willChange:'clip-path,opacity'
+  });
+  return el;
+ }
+ function animate(fromEl,toBeforeEl,from,to){
+  if(!visible(from)||!visible(to)||typeof document.createElement('div').animate!=='function'){
+   stats.skipped++;return;
   }
-  function directButtons(group) {
-    return group ? Array.from(group.children).filter((el) => el.tagName === 'BUTTON') : [];
+  const dx=to.x+to.w/2-from.x-from.w/2;
+  const dy=to.y+to.h/2-from.y-from.h/2;
+  if(Math.abs(dx)>window.innerWidth*1.15||Math.abs(dy)>window.innerHeight*.63){
+   stats.skipped++;return;
   }
-  function isChosen(button) {
-    return !!button && (
-      button.classList.contains('active') ||
-      button.classList.contains('selected') ||
-      button.getAttribute('aria-current') === 'page' ||
-      button.getAttribute('aria-pressed') === 'true' ||
-      button.getAttribute('aria-selected') === 'true'
-    );
+  stop();
+  const source=face(fromEl,from),cover=face(toBeforeEl,to);
+  const distance=Math.hypot(dx,dy), horizontal=Math.abs(dx)>=Math.abs(dy);
+  const forwards=horizontal?dx>=0:dy>=0;
+  // Colored outgoing face uncovers the original inactive surface,
+  // incoming white face uncovers the exact EXISTING selected paint.
+  const begin='inset(0% 0% 0% 0% round '+from.radius+')';
+  const end='inset(0% 0% 0% 0% round '+to.radius+')';
+  const clipOut=horizontal?(forwards?'inset(0% 100% 0% 0%)':'inset(0% 0% 0% 100%)'):
+   (forwards?'inset(100% 0% 0% 0%)':'inset(0% 0% 100% 0%)');
+  const clipIn=horizontal?(forwards?'inset(0% 0% 0% 100%)':'inset(0% 100% 0% 0%)'):
+   (forwards?'inset(0% 0% 100% 0%)':'inset(100% 0% 0% 0%)');
+  const bridge=document.createElement('div');
+  bridge.className='fhd-fluid-bridge';
+  bridge.setAttribute('aria-hidden','true');
+  Object.assign(bridge.style,{
+   position:'fixed',zIndex:'1001',pointerEvents:'none',
+   left:(from.x+from.w/2)+'px',top:(from.y+from.h/2)+'px',
+   width:distance+'px',height:Math.min(30,Math.max(14,Math.min(from.h,to.h)*.30))+'px',
+   transformOrigin:'left center',
+   transform:'translateY(-50%) rotate('+Math.atan2(dy,dx)+'rad)',
+   borderRadius:'999px',
+   background:'linear-gradient(90deg,'+from.paint+','+to.paint+')',
+   filter:'blur(5px)',opacity:'0'
+  });
+  // Separate leading meniscus softens the hard straight-line bridge.
+  const drop=document.createElement('div');
+  drop.className='fhd-fluid-drop';
+  drop.setAttribute('aria-hidden','true');
+  Object.assign(drop.style,{
+   position:'fixed',zIndex:'1003',pointerEvents:'none',
+   left:(from.x+from.w/2-18)+'px',top:(from.y+from.h/2-18)+'px',
+   width:'36px',height:'36px',borderRadius:'50%',
+   background:'radial-gradient(circle at 42% 45%,'+from.paint+' 12%,transparent 72%)',
+   filter:'blur(5px)',opacity:'0',willChange:'transform,opacity'
+  });
+  document.body.append(source,cover,bridge,drop);
+  const motions=[];
+  function play(node,frames,options){
+   const a=node.animate(frames,{duration:TIME,easing:EASE,fill:'both',...options});
+   motions.push(a);return a;
   }
-  function shape(button) {
-    const box = button.getBoundingClientRect();
-    const style = window.getComputedStyle(button);
-    return {
-      x: box.left, y: box.top, w: box.width, h: box.height,
-      radius: style.borderRadius,
-      paint: style.backgroundImage && style.backgroundImage !== 'none'
-        ? style.backgroundImage : style.backgroundColor
-    };
+  // Drawing across the whole duration with staggered fluid edges.
+  play(source,[
+   {clipPath:begin,opacity:1,offset:0},
+   {clipPath:begin,opacity:1,offset:.11},
+   {clipPath:clipOut,opacity:.94,offset:.85},
+   {clipPath:clipOut,opacity:0,offset:1}
+  ]);
+  const dest=play(cover,[
+   {clipPath:end,opacity:1,offset:0},
+   {clipPath:end,opacity:1,offset:.11},
+   {clipPath:clipIn,opacity:1,offset:.90},
+   {clipPath:clipIn,opacity:0,offset:1}
+  ]);
+  play(bridge,[
+   {clipPath:'inset(0% 100% 0% 0% round 999px)',opacity:0,offset:0},
+   {clipPath:'inset(0% 66% 0% 0% round 999px)',opacity:.31,offset:.28},
+   {clipPath:'inset(0% 3% 0% 22% round 999px)',opacity:.42,offset:.62},
+   {clipPath:'inset(0% 0% 0% 100% round 999px)',opacity:0,offset:1}
+  ]);
+  play(drop,[
+   {transform:'translate3d(0,0,0) scale(.5)',opacity:0,offset:0},
+   {transform:'translate3d('+(dx*.22)+'px,'+(dy*.22)+'px,0) scale(1)',opacity:.49,offset:.24},
+   {transform:'translate3d('+(dx*.8)+'px,'+(dy*.8)+'px,0) scale(1.18)',opacity:.44,offset:.75},
+   {transform:'translate3d('+dx+'px,'+dy+'px,0) scale(.48)',opacity:0,offset:1}
+  ]);
+  const effect={elements:[source,cover,bridge,drop],animations:motions};
+  running=effect;
+  function finish(){
+   if(running!==effect)return;
+   running=null;
+   effect.elements.forEach(e=>e.remove());
+   stats.completed++;
   }
-  function isInViewport(rect) {
-    return rect.w > 0 && rect.h > 0 && rect.y + rect.h > 0 &&
-      rect.y < window.innerHeight && rect.x + rect.w > 0 && rect.x < window.innerWidth;
-  }
-  function clearEffect() {
-    activeAnimations.forEach((a) => { try { a.cancel(); } catch (_) {} });
-    activeAnimations = [];
-    activeGhost?.remove();
-    activeGhost = null;
-  }
-  function showFlow(before, after, target) {
-    if (typeof target.animate !== 'function' || !isInViewport(before) || !isInViewport(after)) return;
-    const dx = (after.x + after.w / 2) - (before.x + before.w / 2);
-    const dy = (after.y + after.h / 2) - (before.y + before.h / 2);
-    if (Math.abs(dx) > window.innerWidth * 1.1 ||
-        Math.abs(dy) > window.innerHeight * 0.55) return;
-    clearEffect();
-
-    // A translucent 'pigment' moves; existing selected backgrounds stay intact.
-    const ghost = document.createElement('div');
-    ghost.className = 'fhd-selection-flow';
-    ghost.setAttribute('aria-hidden', 'true');
-    Object.assign(ghost.style, {
-      left: before.x + 'px', top: before.y + 'px',
-      width: before.w + 'px', height: before.h + 'px',
-      borderRadius: before.radius
-    });
-    const outgoing = document.createElement('span');
-    const incoming = document.createElement('span');
-    outgoing.className = 'fhd-selection-pigment fhd-selection-out';
-    incoming.className = 'fhd-selection-pigment fhd-selection-in';
-    outgoing.style.background = before.paint;
-    incoming.style.background = after.paint;
-    ghost.append(outgoing, incoming);
-    document.body.appendChild(ghost);
-    activeGhost = ghost;
-
-    const move = ghost.animate([
-      {transform: 'translate3d(0,0,0) scale(1)', opacity: .72, offset: 0},
-      {transform: 'translate3d(' + (dx * .5) + 'px,' + (dy * .5) +
-        'px,0) scale(.76,.88)', opacity: .61, offset: .53},
-      {transform: 'translate3d(' + dx + 'px,' + dy + 'px,0) scale(' +
-        (after.w / before.w) + ',' + (after.h / before.h) + ')',
-       opacity: 0, offset: 1}
-    ], {duration: DURATION, easing: EASING, fill: 'forwards'});
-
-    const morph = incoming.animate(
-      [{opacity:0}, {opacity:.2,offset:.3}, {opacity:1}],
-      {duration:DURATION, easing:'ease-in-out',fill:'forwards'}
-    );
-    // The destination's actual color settles in without changing its palette.
-    const settle = target.animate(
-      [{filter:'saturate(.62) brightness(1.10)',opacity:.83},
-       {filter:'saturate(1) brightness(1)',opacity:1}],
-      {duration:DURATION, easing:EASING}
-    );
-    activeAnimations = [move, morph, settle];
-    const finish = () => {
-      if (activeGhost !== ghost) return;
-      ghost.remove();
-      activeGhost = null;
-      activeAnimations = [];
-    };
-    move.addEventListener('finish', finish, {once:true});
-    move.addEventListener('cancel', finish, {once:true});
-  }
-
-  function click(event) {
-    if (reduceMotion() || event.defaultPrevented) return;
-    const button = event.target?.closest?.('button');
-    if (!button || button.disabled || button.closest('.hidden')) return;
-    const group = button.closest(selector);
-    if (!group || button.parentElement !== group) return;
-    const config = definitions.find((d) => group.matches(d[1]));
-    if (!config) return;
-    const children = directButtons(group);
-    const nextIndex = children.indexOf(button);
-    const selected = children.find((b) => isChosen(b));
-    if (nextIndex < 0 || !selected || selected === button) return;
-    const before = shape(selected);
-    if (!isInViewport(before)) return;
-    // Inline onclick handlers synchronously update selected state, sometimes
-    // rebuilding #nav or replacing the visible apartment/officetel section.
-    // A microtask reads that NEW state after handlers without a painted frame.
-    Promise.resolve().then(() => {
-      const destinationGroup = document.querySelector(config[1]);
-      const destination = directButtons(destinationGroup)[nextIndex];
-      if (!destination || !isChosen(destination) || destination.disabled) return;
-      const after = shape(destination);
-      showFlow(before, after, destination);
-    });
-  }
-
-  const css = document.createElement('style');
-  css.textContent = [
-    '.fhd-selection-flow{position:fixed;z-index:1001;overflow:hidden;',
-    'pointer-events:none;contain:paint;isolation:isolate;',
-    'box-shadow:0 9px 26px rgba(20,57,65,.10);',
-    'will-change:transform,opacity;}',
-    '.fhd-selection-pigment{position:absolute;inset:0;border-radius:inherit;',
-    'background-size:cover;pointer-events:none;}',
-    '.fhd-selection-out{opacity:1;}',
-    '.fhd-selection-in{opacity:0;}',
-    '@media(prefers-reduced-motion:reduce){.fhd-selection-flow{display:none!important;}}'
-  ].join('');
-  document.head.appendChild(css);
-  document.addEventListener('click', click, {capture:true});
-  window.FirstHyundaiSelectionFlow = {
-    version:'1.0.0',
-    _test: {reduceMotion, directButtons, isChosen, clearEffect}
+  dest.addEventListener('finish',finish,{once:true});
+  dest.addEventListener('cancel',finish,{once:true});
+ }
+ function click(event){
+  if(reduced()||event.defaultPrevented)return;
+  const button=event.target?.closest?.('button');
+  if(!button||button.disabled||button.closest('.hidden'))return;
+  const group=button.closest(combined);
+  if(!group||button.parentElement!==group)return;
+  const entry=GROUPS.find(g=>group.matches(g[1]));
+  if(!entry)return;
+  const peers=buttons(group),next=peers.indexOf(button);
+  const old=peers.find(b=>chosen(b));
+  if(next<0||!old||old===button)return;
+  const from=measure(old),oldTarget=button.cloneNode(true);
+  if(!visible(from))return;
+  stats.requests++;
+  // MUST wait for target/inline onclick handlers to complete.
+  // A Promise/microtask here can fire *before* inline onclick in Android WebView.
+  const afterClick=()=>{
+   if(reduced())return;
+   const nextGroup=document.querySelector(entry[1]);
+   const selected=buttons(nextGroup)[next];
+   if(!selected||!chosen(selected)||selected.disabled){stats.skipped++;return;}
+   const to=measure(selected);
+   animate(old,oldTarget,from,to);
   };
+  if(typeof window.requestAnimationFrame==='function')window.requestAnimationFrame(afterClick);
+  else window.setTimeout?.(afterClick,0);
+ }
+ const style=document.createElement('style');
+ style.textContent=[
+  '.fhd-fluid-face .navIcon{font-size:27px;line-height:1.05;color:inherit}',
+  '.fhd-fluid-face .starterIcon{font-size:1.13em;color:inherit}',
+  '.fhd-fluid-face .fhd-tap-wave{display:none!important}',
+  '@media(prefers-reduced-motion:reduce){.fhd-fluid-face,.fhd-fluid-bridge,.fhd-fluid-drop{display:none!important}}'
+ ].join('');
+ document.head.appendChild(style);
+ document.addEventListener('click',click,{capture:true});
+ window.FirstHyundaiSelectionFlow={
+  version:'2.0.0',_test:{reduced,buttons,chosen,measure,stop,click,stats}
+ };
 })();
