@@ -270,7 +270,7 @@ function makePreview(){
  // clauses may be included, and any change invalidates prior review approval.
  out.push('','▶ 이번 송금 예정액 : '+moneyOr(d.advance));
  out.push('▶ 입금 계좌 : '+account);
- const agreed=id=>E(id)?.checked===true;
+ const agreed=id=>E('ct_'+id)?.checked===true;
  if(agreed('clauseEffective')){
   out.push('','※ 별도 합의: 송금과 계약 성립');
   out.push('당사자들은 위 금액의 이체와 동시에 본계약이 체결된 것으로 보기로 합의합니다.');
