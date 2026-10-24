@@ -27,7 +27,9 @@ for(const term of ['id="ct_rough"','FirstHyundaiEasy.compose()',
 assert(html.includes('id="tradeActiveSummary" class="tradeActiveSummary hidden"'),
  'Trade context summary hidden by default');
 const marker='/* v2.0.47 · REVERSIBLE WORKFLOW PILOT';
-const layer=css.slice(css.lastIndexOf(marker));
+const layerStart=css.lastIndexOf(marker);
+const nextVisualLayer=css.indexOf('/* v2.0.58',layerStart+marker.length);
+const layer=css.slice(layerStart,nextVisualLayer<0?undefined:nextVisualLayer);
 assert(layer.includes(marker));
 for(const selector of ['#overview .overviewActionGrid',
  '#overview .overviewActionCard',
