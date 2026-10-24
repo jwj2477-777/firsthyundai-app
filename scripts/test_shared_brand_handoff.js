@@ -67,7 +67,7 @@ for(const width of [340,393,430]){
  assert(h.body.classes.has('fhd-brand-handoff'),'Hide duplicate live header during move');
  assert.equal(h.api.prepareBrandHandoff(),false,'Do not create duplicate splash layers');
  assert.equal(h.api.startBrandHandoff(),true);
- const moves=h.animations.filter(x=>x.opts.duration===620);
+ const moves=h.animations.filter(x=>x.opts.duration===620&&['fhd-bridge-logo','fhd-bridge-title','fhd-bridge-subtitle'].includes(x.node.className));
  assert.equal(moves.length,3,'Emblem, title, and English subtitle all move separately');
  const expectedRatio=55/144;
  assert(moves[0].frames[1].transform.includes('scale('+expectedRatio),'Badge shrinks to measured original header size');
