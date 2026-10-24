@@ -2336,3 +2336,109 @@ header .brandHeaderText{overflow:hidden}
  #complexSheet .priceTrendKpis>div{padding:10px 7px}
  #complexSheet .priceTrendChart{padding:10px 6px}}
 @media(prefers-contrast:more){#complexSheet .priceTrendFilters button.active,#complexSheet .priceTrendPeriods button.active{border-width:3px}}
+
+
+/* v2.0.59 · FIRST HYUNDAI PREMIUM INTERACTION LAYER
+   Decorative motion only. No layout, navigation or button logic changes.
+   Optimized for Android WebView: compositor opacity/transform, ~0.1–0.3s. */
+:root{
+ --fhd-motion-quick:120ms;
+ --fhd-motion-normal:210ms;
+ --fhd-motion-ease:cubic-bezier(.2,.82,.25,1);
+}
+@keyframes fhd-page-reveal{
+ from{opacity:.72}
+ to{opacity:1}
+}
+@keyframes fhd-section-reveal{
+ from{opacity:.75;transform:translate3d(0,6px,0)}
+ to{opacity:1;transform:translate3d(0,0,0)}
+}
+/* Every major page changes with a short, quiet reveal rather than an abrupt cut.
+   Do NOT translate .page: it contains position:fixed apartment detail sheets. */
+.page:not(.hidden){animation:fhd-page-reveal 185ms ease-out both}
+.page:not(.hidden)>.sectionTitle:first-child{animation:fhd-section-reveal 240ms var(--fhd-motion-ease) both}
+/* The existing fixed sheet slides 240ms; give it a more natural easing while
+   retaining the established location/visibility and return-navigation behavior. */
+#complexSheet.apartmentSheet.panel,#nearbyDetails.apartmentSheet.panel{
+ transition-timing-function:cubic-bezier(.22,1,.36,1),ease-out,linear;
+}
+#complexSheet.apartmentSheet.panel.detailOpen,#nearbyDetails.apartmentSheet.panel.detailOpen{
+ transition-timing-function:cubic-bezier(.22,1,.36,1),ease-out,linear;
+}
+/* Small springless pressed-state: visually tactile without shifting layout. */
+#nav button,.btn,button.btn,.nearbyCard,.complexTap,
+.complexTabBar button,.complexTradeFilters button,.tradeTypeBar button,
+.sectionModeSwitch button,.priceTrendFilters button,.priceTrendPeriods button,
+.newsCategoryTabs button,.favoriteSummaryCard,.complexSummaryCard,
+.detailBackButton,.detailSwitchButton,.alertPreviewButton,
+.contractQuickPick,.contractQuickApply,.overviewActionCard,
+.overviewActionSecondary,.contractPrimary,.contractOneTap,
+button.complexAreaContract,#favoriteAlertButton,#roleButton{
+ transition-property:background-color,border-color,color,box-shadow,transform,opacity;
+ transition-duration:170ms,170ms,170ms,200ms,var(--fhd-motion-quick),140ms;
+ transition-timing-function:ease,ease,ease,ease,var(--fhd-motion-ease),ease;
+ -webkit-tap-highlight-color:transparent;
+}
+#nav button:not(:disabled):active,.btn:not(:disabled):active,
+.complexTabBar button:not(:disabled):active,.complexTradeFilters button:not(:disabled):active,
+.tradeTypeBar button:not(:disabled):active,.sectionModeSwitch button:not(:disabled):active,
+.newsCategoryTabs button:not(:disabled):active,.priceTrendFilters button:not(:disabled):active,
+.priceTrendPeriods button:not(:disabled):active,.detailBackButton:not(:disabled):active,
+.detailSwitchButton:not(:disabled):active,.contractQuickPick:not(:disabled):active,
+.contractQuickApply:not(:disabled):active,#favoriteAlertButton:active,#roleButton:active,
+.overviewActionSecondary:active{transform:scale(.972)}
+.nearbyCard:not(:disabled):active,.complexTap:not(:disabled):active,
+.overviewActionCard:not(:disabled):active,
+.favoriteSummaryCard:not(:disabled):active,.complexSummaryCard:not(:disabled):active{
+ transform:scale(.988);
+}
+@media(hover:hover) and (pointer:fine){
+ .nearbyCard:not(:disabled):hover,.overviewActionCard:not(:disabled):hover,
+ .complexTap:not(:disabled):hover{box-shadow:0 5px 17px #153D4A18}
+ .btn:not(:disabled):hover,#nav button:not(:disabled):hover{
+  box-shadow:0 3px 10px #153D4A14
+ }
+}
+/* One disposable wave per touch. Parent keeps its old dimensions/position;
+   pointer-events:none guarantees existing onclick, long press and form input. */
+.fhd-touch-feedback{position:relative;isolation:isolate;overflow:hidden}
+.fhd-tap-wave{
+ position:absolute;z-index:0;border-radius:50%;pointer-events:none;
+ transform:translate3d(-50%,-50%,0) scale(.08);
+ background:currentColor;opacity:0;
+ animation:fhd-tap-wave 390ms ease-out forwards;
+}
+@keyframes fhd-tap-wave{
+ 0%{opacity:.17;transform:translate3d(-50%,-50%,0) scale(.08)}
+ 72%{opacity:.095}
+ 100%{opacity:0;transform:translate3d(-50%,-50%,0) scale(1)}
+}
+.fhd-touch-feedback>.fhd-tap-wave{pointer-events:none}
+.fhd-touch-feedback>*:not(.fhd-tap-wave){position:relative;z-index:1}
+/* A little visual polish for confirmation dialogs; no delay before content
+   becomes actionable, and do not animate closing / disrupt keyboard focus. */
+@keyframes fhd-dialog-appear{
+ from{opacity:.7;transform:translate3d(0,9px,0) scale(.992)}
+ to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+dialog[open]:not(.apartmentSheet):not(.favoriteTradeAlertDialog){
+ animation:fhd-dialog-appear 190ms var(--fhd-motion-ease) both
+}
+/* System accessibility option always wins; no waves or page/section fades. */
+@media(prefers-reduced-motion:reduce){
+ .page:not(.hidden),.page:not(.hidden)>.sectionTitle:first-child,
+ dialog[open]:not(.apartmentSheet),.fhd-tap-wave{
+  animation:none!important;transform:none!important;
+ }
+ #complexSheet.apartmentSheet.panel,#nearbyDetails.apartmentSheet.panel,
+ #complexSheet.apartmentSheet.panel.detailOpen,#nearbyDetails.apartmentSheet.panel.detailOpen{
+  transition:none!important;
+ }
+ #nav button,.btn,button.btn,.nearbyCard,.complexTap,.complexTabBar button,
+ .tradeTypeBar button,.sectionModeSwitch button,.priceTrendFilters button,
+ .newsCategoryTabs button,.overviewActionCard,.contractQuickPick,
+ .detailBackButton,.detailSwitchButton{
+  transition:none!important;transform:none!important;
+ }
+}
