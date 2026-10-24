@@ -83,7 +83,11 @@ assert(!notice().includes('근저당권은 잔금과 동시에 말소한다.'),'
 assert(E('ct_missingQuickFields').innerHTML.includes('contractInlineField'));
 assert(E('ct_missingQuickFields').innerHTML.includes('contractQuickPickers'),'Select one missing item without expanding a full form');
 assert(E('ct_missingQuickFields').innerHTML.includes('FirstHyundaiEasy.applyQuickField(&quot;'));
+E('ct_property').value='';
+app.makePreview();easy.refreshMissing();
 assert(E('ct_missingQuickFields').innerHTML.includes('단지명'),'Missing property must offer a direct inline correction');
+E('ct_property').value='퍼스트파크 13블럭';
+app.makePreview();easy.refreshMissing();
 assert.equal(easy.showQuickField('contractDate'),true);
 E('ct_quick_contractDate').value='2026.11.02~11.06 협의';
 assert.equal(easy.showQuickField('bank'),true);
