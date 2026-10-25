@@ -1,0 +1,11 @@
+name = "firsthyundai-shared-settings"
+main = "src/index.mjs"
+compatibility_date = "2026-10-25"
+workers_dev = true
+
+[[ratelimits]]
+name = "AUTH_LIMITER"
+namespace_id = "872015"
+  [ratelimits.simple]
+  limit = 8
+  period = 60
