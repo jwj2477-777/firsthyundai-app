@@ -61,7 +61,7 @@ assert.equal(backup.preferences.memoOrder,'oldest');
 assert.equal(backup.preferences.memoPhones,'off');
 api.reset();assert.equal(body.attrs['data-list-density'],'standard');
 get('adminSettingsImport').value=exported;
-assert(api.importSettings());assert.equal(body.attrs['data-list-density'],'compact');
+assert(api.importSettings());assert.equal(body.attrs['data-list-density'],'roomy');
 assert.equal(calls.at(-1),false);
 const invalid=JSON.stringify({schema:1,type:'firsthyundai-ui-settings',
  preferences:{...api.get(),motion:'malicious'},tradePopup:false});
