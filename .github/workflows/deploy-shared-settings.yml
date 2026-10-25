@@ -69,5 +69,16 @@ jobs:
           else
             echo "Firebase service account not configured; periodic office note checking remains active."
           fi
+      - name: Install optional public Firebase Android project configuration
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          FHD_FIREBASE_ANDROID_JSON: ${{ secrets.FHD_FIREBASE_ANDROID_JSON }}
+        run: |
+          if [ -n "$FHD_FIREBASE_ANDROID_JSON" ]; then
+            printf '%s' "$FHD_FIREBASE_ANDROID_JSON" | npx --yes wrangler@4 secret put FHD_FIREBASE_ANDROID_JSON --config workers/shared-settings/wrangler.toml
+          else
+            echo "Firebase Android client config not yet registered; app may obtain it after server setup."
+          fi
       - name: Verify Worker ready
         run: python3 scripts/check_shared_settings_health.py

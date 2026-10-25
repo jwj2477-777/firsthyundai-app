@@ -44,6 +44,11 @@ final class OfficeBoardClient {
         return request("POST","/board/push/register",
             new JSONObject().put("device",deviceId(context)).put("fcm",fcm),auth);
     }
+    static JSONObject firebasePublicConfig(Context context) throws Exception {
+        String auth=token(context);
+        if(auth.isEmpty())throw new Exception("사무실 메모 보안 인증 필요");
+        return request("GET","/board/push/config",null,auth);
+    }
     static JSONObject pushAvailability(Context context) throws Exception{
         String auth=token(context);
         if(auth.isEmpty())throw new Exception("사무실 메모 보안 인증 필요");

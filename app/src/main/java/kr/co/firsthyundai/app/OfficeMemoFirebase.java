@@ -1,7 +1,6 @@
 package kr.co.firsthyundai.app;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -11,26 +10,33 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Firebase push transport is optional until Firebase project is configured.
- * Service-account keys remain on the Cloudflare Worker, never in this APK.
- */
+/** FCM push bootstrap. Private authentication and service account never enter WebView. */
 final class OfficeMemoFirebase {
     private static final ExecutorService IO=Executors.newSingleThreadExecutor();
-    private static boolean attempted=false,configured=false,serverReady=false;
+    private static volatile boolean configured=false,serverReady=false;
+    private static long lastAttempt=0L;
     private OfficeMemoFirebase(){}
 
-    static synchronized boolean initialize(Context context){
-        if(attempted)return configured;
-        attempted=true;
+    private static synchronized boolean initialize(Context context){
+        if(configured)return true;
+        // Retry later when the Firebase project gets configured on Cloudflare.
+        long now=System.currentTimeMillis();
+        if(now-lastAttempt<120000L)return false;
+        if(!OfficeBoardClient.enrolled(context))return false;
+        lastAttempt=now;
         try{
-            byte[] bytes;
+            JSONObject config=null;
             try(InputStream input=context.getAssets().open("firebase_public_config.json")){
-                bytes=new byte[4096];int n=input.read(bytes);
-                if(n<2)return false;
-                bytes=java.util.Arrays.copyOf(bytes,n);
+                byte[] bytes=new byte[4096];
+                int count=input.read(bytes);
+                if(count>1)config=new JSONObject(
+                    new String(bytes,0,count,StandardCharsets.UTF_8));
+            }catch(Exception ignored){}
+            if(config==null){
+                JSONObject response=OfficeBoardClient.firebasePublicConfig(context);
+                config=response.optJSONObject("config");
             }
-            JSONObject config=new JSONObject(new String(bytes,StandardCharsets.UTF_8));
+            if(config==null)return false;
             String id=config.optString("app_id","");
             String key=config.optString("api_key","");
             String project=config.optString("project_id","");
@@ -40,8 +46,8 @@ final class OfficeMemoFirebase {
                !project.matches("[a-zA-Z0-9._-]{3,120}")||
                !sender.matches("[0-9]{5,30}"))return false;
             FirebaseOptions opts=new FirebaseOptions.Builder()
-                 .setApplicationId(id).setApiKey(key).setProjectId(project)
-                 .setGcmSenderId(sender).build();
+                .setApplicationId(id).setApiKey(key)
+                .setProjectId(project).setGcmSenderId(sender).build();
             if(FirebaseApp.getApps(context).isEmpty())
                 FirebaseApp.initializeApp(context,opts);
             configured=!FirebaseApp.getApps(context).isEmpty();
@@ -49,36 +55,30 @@ final class OfficeMemoFirebase {
         }catch(Exception ignored){return false;}
     }
 
-    static boolean available(Context context){return initialize(context);}
     static String status(Context context){
-        return !initialize(context)?"not_configured":serverReady?"push_ready":"push_pending";
+        return !configured?"not_configured":serverReady?"push_ready":"push_pending";
     }
-
     static void register(Context context){
-        Context app=context.getApplicationContext();
-        if(!OfficeBoardClient.enrolled(app)||!initialize(app))return;
-        try{
-            FirebaseMessaging.getInstance().getToken().addOnSuccessListener(token->{
-                if(token==null||token.length()<32)return;
-                IO.execute(()->{
-                    try{
-                        org.json.JSONObject result=OfficeBoardClient.registerPush(app,token);
-                        serverReady=result.optBoolean("push_available",false);
-                    }
-                    catch(Exception ignored){} // Retry on app resume / re-enrollment.
+        final Context app=context.getApplicationContext();
+        if(!OfficeBoardClient.enrolled(app))return;
+        IO.execute(()->{
+            if(!initialize(app))return;
+            try{
+                FirebaseMessaging.getInstance().getToken().addOnSuccessListener(token->{
+                    if(token==null||token.length()<32)return;
+                    registerNewToken(app,token);
                 });
-            });
-        }catch(Exception ignored){}
+            }catch(Exception ignored){}
+        });
     }
-    static void registerNewToken(Context context,String value){
-        if(value==null||value.length()<32)return;
+    static void registerNewToken(Context context,String token){
+        if(token==null||token.length()<32)return;
         Context app=context.getApplicationContext();
         IO.execute(()->{
             try{
-                org.json.JSONObject result=OfficeBoardClient.registerPush(app,value);
-                serverReady=result.optBoolean("push_available",false);
-            }
-            catch(Exception ignored){}
+                JSONObject record=OfficeBoardClient.registerPush(app,token);
+                serverReady=record.optBoolean("push_available",false);
+            }catch(Exception ignored){}
         });
     }
 }
