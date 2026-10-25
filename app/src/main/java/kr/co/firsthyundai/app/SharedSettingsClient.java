@@ -19,6 +19,7 @@ final class SharedSettingsClient {
             connection.setUseCaches(false);
             connection.setRequestMethod(method);
             connection.setRequestProperty("Accept","application/json");
+            connection.setRequestProperty("User-Agent","Mozilla/5.0 (Linux; Android 17; FirstHyundai/2.0)");
             connection.setRequestProperty("Cache-Control","no-store");
             if(session!=null&&!session.isEmpty())connection.setRequestProperty("Authorization","Bearer "+session);
             if(data!=null){
