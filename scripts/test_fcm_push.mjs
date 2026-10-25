@@ -15,6 +15,11 @@ const env={
   client_email:"firebase-adminsdk@firsthyundai-test-123.iam.gserviceaccount.com",
   private_key:pem
  }),
+ FHD_FIREBASE_ANDROID_JSON:JSON.stringify({
+  app_id:"1:123456789012:android:0123456789abcdef",
+  api_key:"AIza"+"A".repeat(33),project_id:"firsthyundai-test-123",
+  sender_id:"123456789012"
+ }),
  SETTINGS:{
   async get(key,type){const v=store.get(key);return type==="json"?(v?JSON.parse(v):null):v||null},
   async put(key,value,options={}){store.set(key,value);metadata.set(key,options.metadata||{})},
@@ -49,12 +54,19 @@ const req=(path,method="GET",data=null,token="")=>{
   body:data===null?undefined:JSON.stringify(data)}),env,{waitUntil(task){waiting.push(task)}});
 };
 try{
+ assert.equal((await req("/board/push/config")).status,401,
+  "Firebase public config is distributed only to signed-in office devices");
  assert.equal((await req("/board/push/register","POST",{device:"0".repeat(32),fcm:"a".repeat(100)})).status,401,
   "Unauthenticated devices cannot subscribe");
  const auth=await (await req("/board/session","POST",{code:"familycode2026"})).json();
  assert(auth.token);
  const t=auth.token;
  assert((await (await req("/board/push/status","GET",null,t)).json()).push_available);
+ const options=await (await req("/board/push/config","GET",null,t)).json();
+ assert(options.configured&&options.push_available);
+ assert.equal(options.config.project_id,"firsthyundai-test-123");
+ assert(!JSON.stringify(options).includes("PRIVATE KEY"));
+ assert(!JSON.stringify(options).includes("adminsdk@"));
  const a=await req("/board/push/register","POST",{device:"a".repeat(32),fcm:"token:AAA_"+ "A".repeat(95)},t);
  assert.equal(a.status,200);
  const b=await req("/board/push/register","POST",{device:"b".repeat(32),fcm:"token:BBB_"+ "B".repeat(95)},t);
