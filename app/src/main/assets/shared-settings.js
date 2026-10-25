@@ -45,7 +45,7 @@
   return true;
  }
  async function refresh(){
-  if(publishing||pendingChanges)return false;
+  if(publishing||(pendingChanges&&typeof role!=='undefined'&&role==='admin'))return false;
   try{
    let doc;
    if(native?.fetchSharedSettings)doc=await callNative('read');
