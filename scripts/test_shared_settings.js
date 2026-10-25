@@ -11,7 +11,7 @@ const elements=new Map(),store=new Map(),reads=[],writes=[];
 function el(id){if(!elements.has(id))elements.set(id,{value:'',textContent:'',checked:false,open:false,focus(){},select(){}});return elements.get(id)}
 const native={fetchSharedSettings:id=>reads.push(id),publishSharedSettings:(json,id)=>writes.push({json,id})};
 let popup=true;
-const ctx=vm.createContext({role:'family',document:{getElementById:el,body:{setAttribute(){}}},window:{
+const ctx=vm.createContext({role:'family',document:{getElementById:el,body:{setAttribute(){}},addEventListener(){},hidden:false},window:{
  FirstHyundaiNative:native,FirstHyundaiTradeAlerts:{enabled:()=>popup,setEnabled:x=>{popup=x}},
  addEventListener(){},setInterval(){}},
  localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},
