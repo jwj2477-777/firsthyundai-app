@@ -185,7 +185,7 @@ public class MainActivity extends Activity {
     @Override protected void onResume() {
         super.onResume();
         updateNotificationPermissionUI();
-        if(web!=null)web.evaluateJavascript("window.FirstHyundaiSharedSettings?.refresh?.()",null);
+        if(web!=null)web.evaluateJavascript("window.FirstHyundaiSharedSettings?.refresh?.();window.FirstHyundaiOfficeBoard?.onResume?.()",null);
         final String activeAdmin=adminSessionIdentity;
         if(activeAdmin!=null && !activeAdmin.isEmpty()) {
             io.execute(()->{
@@ -388,6 +388,36 @@ public class MainActivity extends Activity {
         catch(Exception ignored){}
     }
 
+    private void officeBoardLoginDialog(){
+        if(isFinishing()||isDestroyed())return;
+        android.widget.EditText code=new android.widget.EditText(this);
+        code.setSingleLine(true);
+        code.setHint("기존 사무실 보안코드");
+        code.setInputType(android.text.InputType.TYPE_CLASS_TEXT|
+                android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        code.setPadding(38,26,38,26);
+        new AlertDialog.Builder(this)
+            .setTitle("사무실 메모 첫 연결")
+            .setMessage("이 휴대폰에서 최초 한 번만 기존 사무실 보안코드를 확인합니다. 메모 작성 때마다 입력하지 않습니다.")
+            .setView(code)
+            .setNegativeButton("취소",(dialog,which)->{})
+            .setPositiveButton("연결",(dialog,which)->{
+                final char[] entered=code.getText().toString().trim().toCharArray();
+                code.setText("");
+                io.execute(()->{
+                    boolean success=false;
+                    try{
+                        OfficeBoardClient.enroll(getApplicationContext(),entered);
+                        success=true;
+                    }catch(Exception ignored){}
+                    finally{java.util.Arrays.fill(entered,(char)0);}
+                    JSONObject result=new JSONObject();
+                    try{result.put("ok",success);}catch(Exception ignored){}
+                    deliver("onFirstHyundaiOfficeBoardAuth",result);
+                });
+            }).show();
+    }
+
     public final class Bridge {
         @JavascriptInterface public String getTradeNotificationPermissionStatus() {
             return TradeNotifications.status(MainActivity.this);
@@ -449,6 +479,28 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public void switchToFamilyMode() {
             runOnUiThread(() -> changeRole(false));
+        }
+        @JavascriptInterface public void requestOfficeBoardAccess() {
+            runOnUiThread(()->officeBoardLoginDialog());
+        }
+        @JavascriptInterface public void officeBoardAction(String action,String payload,String requestId){
+            if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
+            if(action==null||!java.util.Arrays.asList("list","post","edit","done","delete").contains(action)||
+               payload==null||payload.length()>3000)return;
+            io.execute(()->{
+                JSONObject event=new JSONObject();
+                try{
+                    JSONObject incoming=new JSONObject(payload);
+                    JSONObject data=OfficeBoardClient.perform(getApplicationContext(),action,incoming);
+                    event.put("requestId",requestId).put("ok",true).put("data",data);
+                }catch(Exception e){
+                    try{event.put("requestId",requestId).put("ok",false)
+                        .put("needsAuth",!OfficeBoardClient.enrolled(getApplicationContext()))
+                        .put("error",e.getMessage()==null?"메모 공유 연결 실패":e.getMessage());}
+                    catch(Exception ignored){}
+                }
+                deliver("onFirstHyundaiOfficeBoardResult",event);
+            });
         }
         @JavascriptInterface public void fetchSharedSettings(String requestId) {
             if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;

