@@ -41,7 +41,7 @@ const ctx=vm.createContext({
  window:{FirstHyundaiTradeAlerts:{stableId:x=>x.id}},
  compactTradeCollectedAt:()=> '26.10.23 10:00',
  kstDateOffset:()=> '2026-10-23',
- number:x=>String(x),escapeHtml:s=>String(s),favoriteIdForBuilding:x=>x==='송도 B'?null:'favorite',
+ number:x=>Number(x).toLocaleString('ko-KR'),escapeHtml:s=>String(s),favoriteIdForBuilding:x=>x==='송도 B'?null:'favorite',
  value10k:n=>n+'만원',
  dealArticleClass:()=> 'dealRow',dealBadge:x=>x,tradeStatusBadge:()=>'',tradeExtraBadges:()=>'',displayExclusiveArea:()=> '84㎡',
  catalogForTradeName:()=>null,tradeRenewalDetails:()=>'',tradeBrokerLocation:()=>'',tradeAmount:()=>'',tradeCardFacts:()=>''
