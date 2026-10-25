@@ -1,5 +1,8 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-25 · 알림 및 관리센터 v2.1.03
+v2.1.03/build154: Admin navigation & office memo notifications. Private GET /board/updates ID/device-only, auth-required. Native OfficeMemoNotifications foreground polling 12s, JobScheduler periodic 15min (not realtime push while fully closed); privacy-safe notification, secure LockActivity open, no author self-notification. Admin memoAlerts on/off shared settings. Tests scripts/test_admin_navigation.js, test_office_memo_notifications.mjs, test_office_memo_native.js; FCM setup additional.
+
 ## 2026-10-25 · v2.1.02 · 관리자 검색형 관리센터
 - adminCenter 시작점에 adminCommandBar / search / filter chips / shortcut links. 검색 결과만 설정과 운영 도구에서 필터링하며 결과 없는 경우 안내. settingsGroup 5개 <details>와 aria summary/pressed. data-admin-category view/trade/memo/tools.
 - 신규 admin-settings-navigator.js에 역할가드, 필터 및 검색 단어 일치, 점프 이동/섹션 열기, focus 처리. 테스트 scripts/test_admin_navigation.js 추가.

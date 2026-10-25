@@ -11,6 +11,8 @@ on:
       - 'scripts/test_family_mode.js'
       - 'scripts/test_admin_console.js'
       - 'scripts/test_admin_navigation.js'
+      - 'scripts/test_office_memo_notifications.mjs'
+      - 'scripts/test_office_memo_native.js'
       - 'scripts/test_admin_preferences.js'
       - 'scripts/test_shared_settings.js'
       - 'scripts/test_shared_settings_worker.mjs'
@@ -225,6 +227,8 @@ jobs:
           node scripts/test_admin_guards.js
           node scripts/test_admin_console.js
           node scripts/test_admin_navigation.js
+          node scripts/test_office_memo_notifications.mjs
+          node scripts/test_office_memo_native.js
           node scripts/test_admin_preferences.js
           node scripts/test_shared_settings.js
           node scripts/test_shared_settings_worker.mjs
@@ -311,22 +315,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.02 accessible administrator control hub APK
+      - name: Publish v2.1.03 shared memo notifications and admin controls APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.02.apk
-          unzip -t FirstHyundai-v2.1.02.apk | grep 'No errors detected'
-          if gh release view v2.1.02 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.03.apk
+          unzip -t FirstHyundai-v2.1.03.apk | grep 'No errors detected'
+          if gh release view v2.1.03 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.02 FirstHyundai-v2.1.02.apk \
+            gh release create v2.1.03 FirstHyundai-v2.1.03.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.02 · 관리자 접근성과 설정 편의 개선' \
-              --notes '관리센터에 검색·분야별 필터·접이식 설정·수집 점검/동기화 바로가기, 큰 글씨·큰 버튼 일괄 적용 프리셋과 직전 변경 취소를 추가했습니다. 터치 버튼 크기와 메모 카드 간격도 실제 앱 화면에 적용되고 사무실 공통 설정으로 동기화됩니다. 기존 실거래·계약문자·공유 메모 및 보안은 유지합니다. v2.1.02/build153.'
+              --title '퍼스트현대 v2.1.03 · 공유 메모 알림·관리센터 개선' \
+              --notes '관리센터 검색·필터·바로가기·화면 프리셋·직전 변경 취소와 공통설정을 개선했습니다. 공유메모 새 글은 민감한 본문 없이 휴대폰 알림으로 안내하며 관리자에서 전체 사용·중지를 설정합니다. 앱 사용 중 약 12초마다 확인하고 백그라운드 Android 작업은 최소 15분 간격(지연 가능)입니다. FCM 종료형 실시간 푸시는 아직 미구성이고 휴대폰 알림 권한이 필요합니다. v2.1.03/build154.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.02 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.02 --apk FirstHyundai-v2.1.02.apk
+          gh release upload v2.1.03 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.03 --apk FirstHyundai-v2.1.03.apk
