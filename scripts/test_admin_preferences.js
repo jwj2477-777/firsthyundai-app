@@ -54,7 +54,7 @@ assert.equal(api.set('density','evil'),false,'Reject invalid setting');
 api.setTradePopup(false);assert.equal(calls.at(-1),false);
 api.exportSettings();
 const exported=get('adminSettingsExport').value;
-assert(exported.includes('"start": "news"')||exported.includes('"start":"news"'));
+assert.equal(JSON.parse(exported).preferences.start,'officeBoard','Backup preserves newly selected default page');
 const backup=JSON.parse(exported);
 assert(!('notes' in backup)&&!('password' in backup)&&!('secrets' in backup),'No personal data or credentials in settings backup');
 assert.equal(backup.preferences.memoOrder,'oldest');
