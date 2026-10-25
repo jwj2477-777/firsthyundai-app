@@ -1,5 +1,11 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-25 · v2.0.93 · 시스템 관리센터
+- 신규 assets/admin-center.js/css로 관리자 전용 운영센터 구성, 상태·오류·게시 시각·설치 버전 표시. 앱의 실제 refreshAll/refreshPublicServices 및 appUpdateCheck 연결. 기존 관리자 설정·API·보안·백업·단지 편집으로 진입.
+- 관리자 인증 후 시작 화면 adminCenter, 기존 3대/2보조 업무 메뉴 유지. 가족은 PRIVATE_PAGES로 접근 차단. 기존 AdminPolicy 세션 규칙 불변.
+- 공개 JSON '게시 확인'과 실제 API 작동 여부 구분, GitHub Actions 신규 수집은 외부 웹으로 진입(앱에 PAT/비밀키 없음). 기본 화면 자가점검은 API 진단이라고 주장하지 않음.
+- test_admin_console + 역할/네비/권한 테스트 수정. 2.0.93/build144 릴리스 워크플로 변경. CI/실기기/배포 결과 별도 확인.
+
 ## 2026-10-25 · v2.0.92 · '송도 뉴스' 상단 제목
 - 뉴스 큰 제목 텍스트만 index.html 정적 H2와 switchNewsPane 동적 H2에서 변경. 인천광역시 청약·분양 제목/전환 버튼, 데이터와 디자인 유지.
 - 관련 테스트 test_screenshot_consistency.js, test_unified_top_layout.js, test_segmented_switch_unity.js 수정.

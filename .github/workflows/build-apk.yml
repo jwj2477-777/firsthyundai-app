@@ -213,6 +213,7 @@ jobs:
           node scripts/test_kakao_nearby.mjs
           node scripts/test_family_mode.js
           node scripts/test_admin_guards.js
+          node scripts/test_admin_console.js
           node scripts/test_complexes.js
           node scripts/test_catalog_editor.js
           node scripts/test_complex_discovery.js
@@ -292,22 +293,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.92 Songdo news heading and trade counts APK
+      - name: Publish v2.0.93 administrator system console APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.92.apk
-          unzip -t FirstHyundai-v2.0.92.apk | grep 'No errors detected'
-          if gh release view v2.0.92 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.93.apk
+          unzip -t FirstHyundai-v2.0.93.apk | grep 'No errors detected'
+          if gh release view v2.0.93 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.92 FirstHyundai-v2.0.92.apk \
+            gh release create v2.0.93 FirstHyundai-v2.0.93.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.92 · 송도 뉴스 제목과 거래유형 건수' \
-              --notes '상단 뉴스 제목을 송도 뉴스로 변경합니다. 청약·분양 제목과 메뉴 전환은 유지합니다. 이전 v2.0.91에서 준비된 아파트·오피스텔·신규 공개 거래유형별 보조 건수/50px 고정 크기도 포함합니다. 미수집은 —로 표시하고 기존 색 흐름·계약 기능은 유지합니다. v2.0.92/build143.'
+              --title '퍼스트현대 v2.0.93 · 관리자 시스템 관리센터' \
+              --notes '관리자 인증 후 시스템 관리센터에서 앱 설치 버전·게시자료 상태·오류·미수집을 확인하고 업데이트·보안·백업·API 관리로 이동할 수 있습니다. 가족의 기존 업무 기능은 그대로 유지됩니다. 실제 신규 수집과 게시자료 재확인은 구별합니다. v2.0.93/build144.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.92 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.92 --apk FirstHyundai-v2.0.92.apk
+          gh release upload v2.0.93 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.93 --apk FirstHyundai-v2.0.93.apk

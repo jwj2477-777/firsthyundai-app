@@ -1,0 +1,29 @@
+/* v2.0.93 administrator-only system console */
+#adminCenter .adminCenterPanel{padding:16px;margin:12px 0;border-radius:17px}
+#adminCenter .adminCenterPanel h3{margin:0 0 12px;font-size:17px;color:#233F47}
+#adminCenter .adminCenterHead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+#adminCenter .adminCenterHead h3{margin:0}
+#adminCenter .adminStateBadge{flex:none;display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;font-weight:750;font-size:11px;white-space:nowrap;background:#EDF2F3;color:#567079}
+#adminCenter .adminStateBadge.ok{background:#E5F4EB;color:#11654B}
+#adminCenter .adminStateBadge.warn{background:#FFF0DE;color:#87520C}
+#adminCenter .adminSummary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:13px 0}
+#adminCenter .adminMetric{padding:12px 5px;border-radius:12px;background:#F1F7F4;text-align:center}
+#adminCenter .adminMetric strong{display:block;font-size:24px;line-height:1.2;font-variant-numeric:tabular-nums}
+#adminCenter .adminMetric small{display:block;font-size:11px;color:#66797D;margin-top:4px}
+#adminCenter .adminInstalledVersion{font-size:13px;color:#185C59;font-weight:750}
+#adminCenter .tiny{font-size:12px;line-height:1.55;color:#687B80}
+#adminCenter .adminFeed{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid #E5ECE8;padding:12px 0}
+#adminCenter .adminFeed>div{flex:1;min-width:0}
+#adminCenter .adminFeed strong{display:block;font-size:14px;color:#24424A}
+#adminCenter .adminFeed small{display:block;font-size:11px;color:#6C7F82;line-height:1.5;overflow-wrap:anywhere;margin-top:4px}
+#adminCenter .adminCenterActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:13px 0}
+#adminCenter .adminCenterActions>*{min-width:0;min-height:46px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;text-decoration:none}
+#adminCenter .adminToolGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#adminCenter .adminToolGrid>button{min-width:0;min-height:74px;border-radius:12px;border:1px solid #D9E6E1;background:#FAFCFB;padding:12px;text-align:left;color:#26474F}
+#adminCenter .adminToolGrid b{display:block;font-size:14px}
+#adminCenter .adminToolGrid small{display:block;font-size:11px;line-height:1.4;color:#667C81;margin-top:4px}
+#adminCenter .adminToolGrid>button:focus-visible,#adminCenter details summary:focus-visible{outline:2px solid #168076;outline-offset:2px}
+#adminCenter details summary{font-size:15px;font-weight:780;cursor:pointer}
+#adminCenter .adminDiagnosticDetails{background:#F5F8F6;border:1px solid #E2E9E5;border-radius:11px;padding:12px;font-size:11px;overflow-wrap:anywhere}
+#nav .utilityNav>button.adminCenterNav{color:#186A60}
+#nav .utilityNav>button.adminCenterNav.active{color:white;background:#147368;border-color:#0F5E55}

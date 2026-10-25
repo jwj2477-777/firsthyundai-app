@@ -16,6 +16,6 @@ assert.ok(main.includes('if(!isAdminDeviceMode() || json==null'),'backups admin-
 assert.ok(main.includes('if(!isAdminDeviceMode())return;'),'open backups admin-only');
 assert.ok(ui.includes('FIRSTHYUNDAI_ADMIN_CODE'),'admin security tab should provide private secret name');
 assert.ok(ui.includes('rotate-admin-code.yml'),'administrator rotation workflow linked');
-assert.ok(ui.includes("const PRIVATE_PAGES=new Set(['settings','notes','security','apiGuide'])"),'family UI must hide admin settings');
+assert.ok(ui.includes("const PRIVATE_PAGES=new Set(['settings','notes','security','apiGuide','adminCenter'])"),'family UI must hide admin settings');
 assert.ok(policy.includes('AdminPolicy') && policy.includes('PBKDF2WithHmacSHA256'),'password should not be stored in plain text');
 console.log('Administrator guard tests passed: separate secret, fail closed, no v1.1 admin-mode bypass');

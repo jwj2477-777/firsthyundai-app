@@ -34,7 +34,7 @@ for(const page of ['trades','nearby','new','officetel','complexes','news','overv
  verifyShortcutPlacement(page);
 ctx.role='admin';
 verifyShortcutPlacement('trades');
-assert(nav.includes('관리자 도구'),'Administrator shortcuts must remain accessible');
+assert(nav.includes('관리센터'),'Administrator console shortcut must be accessible');
 ctx.role='family';
 let n=render('complexes');
 assert(n.includes('아파트정보')&&n.includes('✎ 계약문자 만들기'),'Main destinations visible');
