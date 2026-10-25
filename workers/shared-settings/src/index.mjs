@@ -3,6 +3,27 @@ const HEAD={"Content-Type":"application/json; charset=utf-8","Cache-Control":"no
 const key="office-general-settings-v1", enc=new TextEncoder();
 const BOARD_PREFIX="office-postit-v1:", BOARD_MAX_CHARS=1600;
 const BOARD_LIFETIME_DAYS=365, BOARD_ARCHIVE_PREFIX="office-postit-archive-v1:", BOARD_ARCHIVE_DAYS=30;
+const MEMBER_PREFIX="office-member-v2:", DEVICE_PREFIX="office-member-device-v2:";
+const validMemberId=id=>typeof id==="string"&&/^[0-9a-f-]{36}$/.test(id);
+const validDeviceId=id=>typeof id==="string"&&/^[a-f0-9]{32}$/.test(id);
+function safeMemberName(v){
+ if(typeof v!=="string")throw Error("bad_name");
+ const n=v.trim().replace(/\s+/g," ");
+ if(n.length<1||n.length>24||/[<>\u0000-\u001f]/.test(n))throw Error("bad_name");
+ return n;
+}
+async function memberList(env){
+ const keys=await env.SETTINGS.list({prefix:MEMBER_PREFIX,limit:100});
+ return (await Promise.all(keys.keys.map(v=>env.SETTINGS.get(v.name,"json"))))
+ .filter(v=>v&&validMemberId(v.id)&&v.active===true)
+ .map(v=>({id:v.id,name:v.name})).sort((a,b)=>a.name.localeCompare(b.name,"ko"));
+}
+async function ensureInitialMember(env){
+ const all=await env.SETTINGS.list({prefix:MEMBER_PREFIX,limit:100});
+ if(all.keys.length)return;
+ const record={id:crypto.randomUUID(),name:"관리자",active:true,created_at:new Date().toISOString()};
+ await env.SETTINGS.put(MEMBER_PREFIX+record.id,JSON.stringify(record));
+}
 const res=(o,s=200)=>new Response(JSON.stringify(o),{status:s,headers:HEAD});
 function b64(buf){const x=buf instanceof Uint8Array?buf:new Uint8Array(buf);return btoa(String.fromCharCode(...x)).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
 function decoded(x){if(!/^[A-Za-z0-9_-]+$/.test(x)||x.length>1200)throw Error("bad_token");const b=atob(x.replace(/-/g,"+").replace(/_/g,"/")+"=".repeat((4-x.length%4)%4));return Uint8Array.from(b,c=>c.charCodeAt(0))}
@@ -10,21 +31,24 @@ async function hkey(secret){return crypto.subtle.importKey("raw",enc.encode("fhd
 async function token(secret){const part=b64(enc.encode(JSON.stringify({exp:Math.floor(Date.now()/1000)+3600,nonce:b64(crypto.getRandomValues(new Uint8Array(16)))})));return part+"."+b64(await crypto.subtle.sign("HMAC",await hkey(secret),enc.encode(part)))}
 async function checkToken(value,secret){try{if(!value||value.length>1100)return false;const parts=value.split(".");if(parts.length!==2)return false;const p=JSON.parse(new TextDecoder().decode(decoded(parts[0])));const now=Math.floor(Date.now()/1000);if(!Number.isSafeInteger(p.exp)||p.exp<now||p.exp>now+3700)return false;return await crypto.subtle.verify("HMAC",await hkey(secret),decoded(parts[1]),enc.encode(parts[0]))}catch(e){return false}}
 async function same(a,b,min=12){if(typeof a!=="string"||a.length<min||a.length>64||!b)return false;const [x,y]=await Promise.all([a,b].map(async s=>new Uint8Array(await crypto.subtle.digest("SHA-256",enc.encode(s)))));let diff=0;for(let i=0;i<x.length;i++)diff|=x[i]^y[i];return diff===0}
-async function boardToken(secret){
- const part=b64(enc.encode(JSON.stringify({scope:"board",exp:Math.floor(Date.now()/1000)+60*60*24*60,
+async function boardToken(secret,member,device,binding){
+ const part=b64(enc.encode(JSON.stringify({scope:"board-v2",member,device,binding,
+  exp:Math.floor(Date.now()/1000)+60*60*24*60,
   nonce:b64(crypto.getRandomValues(new Uint8Array(16)))})));
- const signature=b64(await crypto.subtle.sign("HMAC",await hkey("board:"+secret),enc.encode(part)));
- return part+"."+signature;
+ return part+"."+b64(await crypto.subtle.sign("HMAC",await hkey("board:"+secret),enc.encode(part)));
 }
-async function validBoardToken(value,secret){
+async function validBoardToken(value,secret,env){
  try{
-  if(!secret||!value||value.length>1100)return false;
-  const bits=value.split(".");if(bits.length!==2)return false;
-  const obj=JSON.parse(new TextDecoder().decode(decoded(bits[0])));
-  const now=Math.floor(Date.now()/1000);
-  if(obj.scope!=="board"||!Number.isSafeInteger(obj.exp)||obj.exp<now||obj.exp>now+60*60*24*61)return false;
-  return crypto.subtle.verify("HMAC",await hkey("board:"+secret),decoded(bits[1]),enc.encode(bits[0]));
- }catch(e){return false}
+  if(!secret||!value||value.length>1100)return null;
+  const bits=value.split(".");if(bits.length!==2)return null;
+  const p=JSON.parse(new TextDecoder().decode(decoded(bits[0]))),now=Math.floor(Date.now()/1000);
+  if(p.scope!=="board-v2"||!Number.isSafeInteger(p.exp)||p.exp<now||p.exp>now+5184000||
+     !validMemberId(p.member)||!validDeviceId(p.device)||!validMemberId(p.binding))return null;
+  if(!await crypto.subtle.verify("HMAC",await hkey("board:"+secret),decoded(bits[1]),enc.encode(bits[0])))return null;
+  const [member,device]=await Promise.all([env.SETTINGS.get(MEMBER_PREFIX+p.member,"json"),env.SETTINGS.get(DEVICE_PREFIX+p.device,"json")]);
+  if(member?.active!==true||device?.revoked===true||device?.member_id!==p.member||device?.binding!==p.binding)return null;
+  return {member,deviceId:p.device};
+ }catch(e){return null}
 }
 function validBoardText(text){
  if(typeof text!=="string")throw Error("not_string");
@@ -53,21 +77,71 @@ async function boardCommand(req,env,url,ctx){
  if(!env.FIRSTHYUNDAI_ACCESS_CODE)return res({error:"board_auth_not_configured"},503);
  // All board data (including phone numbers) is private, on GET as well as writes.
  if(req.headers.has("origin"))return res({error:"native_only"},403);
- if(url.pathname==="/board/session"&&req.method==="POST"){
+ if((url.pathname==="/board/choices"||url.pathname==="/board/session")&&req.method==="POST"){
   if(!env.AUTH_LIMITER)return res({error:"rate_limit_unavailable"},503);
-  const rate=await env.AUTH_LIMITER.limit({key:"board-session"});
-  if(!rate.success)return res({error:"rate_limited"},429);
-  let data;try{data=await body(req)}catch(e){return res({error:"bad_request"},400)}
+  if(!(await env.AUTH_LIMITER.limit({key:"board-enrollment"})).success)return res({error:"rate_limited"},429);
+  let data;try{data=await body(req,3000)}catch(e){return res({error:"bad_request"},400)}
   if(!await same(data?.code,env.FIRSTHYUNDAI_ACCESS_CODE,8))return res({error:"unauthorized"},401);
-  return res({token:await boardToken(env.FIRSTHYUNDAI_ACCESS_CODE),expires_in:5184000});
+  await ensureInitialMember(env);
+  if(url.pathname==="/board/choices")return res({accounts:await memberList(env)});
+  const account=typeof data?.member_id==="string"?data.member_id:"";
+  const deviceId=typeof data?.device==="string"?data.device:"";
+  if(!validMemberId(account)||!validDeviceId(deviceId))return res({error:"account_selection_required"},400);
+  const member=await env.SETTINGS.get(MEMBER_PREFIX+account,"json");
+  if(member?.active!==true)return res({error:"account_removed"},403);
+  // A device may not silently change identity after it has been assigned.
+  const existing=await env.SETTINGS.get(DEVICE_PREFIX+deviceId,"json");
+  if(existing?.revoked===true)return res({error:"device_revoked"},403);
+  if(existing&&existing.member_id!==account)return res({error:"device_already_assigned"},409);
+  const binding=existing?.binding||crypto.randomUUID();
+  await env.SETTINGS.put(DEVICE_PREFIX+deviceId,
+   JSON.stringify({member_id:account,binding,created_at:existing?.created_at||new Date().toISOString()}));
+  return res({token:await boardToken(env.FIRSTHYUNDAI_ACCESS_CODE,account,deviceId,binding),
+   member:{id:member.id,name:member.name},expires_in:5184000});
  }
  const auth=req.headers.get("authorization")||"";
- if(!auth.startsWith("Bearer ")||
-  !await validBoardToken(auth.slice(7),env.FIRSTHYUNDAI_ACCESS_CODE))
-  return res({error:"board_auth_required"},401);
+ const caller=auth.startsWith("Bearer ")?await validBoardToken(auth.slice(7),env.FIRSTHYUNDAI_ACCESS_CODE,env):null;
+ if(!caller)return res({error:"account_session_required"},401);
  const adminHeader=req.headers.get("x-fhd-admin-authorization")||"";
  const isAdmin=async()=>!!env.FIRSTHYUNDAI_ADMIN_CODE&&adminHeader.startsWith("Bearer ")&&
   await checkToken(adminHeader.slice(7),env.FIRSTHYUNDAI_ADMIN_CODE);
+ if(url.pathname==="/board/account"&&req.method==="GET")
+  return res({member:{id:caller.member.id,name:caller.member.name},active:true});
+ if(url.pathname==="/board/members"&&req.method==="GET"){
+  if(!await isAdmin())return res({error:"admin_required"},403);
+  return res({accounts:await memberList(env)});
+ }
+ if(url.pathname==="/board/members"&&req.method==="POST"){
+  if(!await isAdmin())return res({error:"admin_required"},403);
+  let data,name;try{data=await body(req,1000);name=safeMemberName(data?.name)}
+  catch(e){return res({error:"invalid_name"},400)}
+  const members=await memberList(env);
+  if(members.length>=20)return res({error:"account_limit"},409);
+  if(members.some(m=>m.name===name))return res({error:"duplicate_name"},409);
+  const account={id:crypto.randomUUID(),name,active:true,created_at:new Date().toISOString()};
+  await env.SETTINGS.put(MEMBER_PREFIX+account.id,JSON.stringify(account));
+  return res({ok:true,account:{id:account.id,name}},201);
+ }
+ const accountDelete=url.pathname.match(/^\/board\/members\/([0-9a-f-]{36})$/);
+ if(accountDelete&&req.method==="DELETE"){
+  if(!await isAdmin())return res({error:"admin_required"},403);
+  if(accountDelete[1]===caller.member.id)return res({error:"cannot_delete_current_account"},409);
+  const account=await env.SETTINGS.get(MEMBER_PREFIX+accountDelete[1],"json");
+  if(!account||account.active!==true)return res({error:"not_found"},404);
+  const members=await memberList(env);
+  if(members.length<=1)return res({error:"last_account"},409);
+  account.active=false;account.deleted_at=new Date().toISOString();
+  await env.SETTINGS.put(MEMBER_PREFIX+account.id,JSON.stringify(account));
+  const keys=await env.SETTINGS.list({prefix:DEVICE_PREFIX,limit:1000});
+  for(const item of keys.keys){
+   const binding=await env.SETTINGS.get(item.name,"json");
+   if(binding?.member_id===account.id){
+    await env.SETTINGS.put(item.name,JSON.stringify({...binding,revoked:true,revoked_at:new Date().toISOString()}));
+    await env.SETTINGS.delete(PUSH_PREFIX+item.name.slice(DEVICE_PREFIX.length));
+   }
+  }
+  return res({ok:true});
+ }
  if(url.pathname==="/board/archive"&&req.method==="GET"){
   if(!await isAdmin())return res({error:"admin_required"},403);
   const keys=await env.SETTINGS.list({prefix:BOARD_ARCHIVE_PREFIX,limit:200});
@@ -87,7 +161,7 @@ async function boardCommand(req,env,url,ctx){
   await env.SETTINGS.delete(archiveKey);
   return res({ok:true,note:saved});
  }
- if(url.pathname==="/board/push/register"&&req.method==="POST")return pushRegister(req,env);
+ if(url.pathname==="/board/push/register"&&req.method==="POST")return pushRegister(req,env,caller);
  if(url.pathname==="/board/push/status"&&req.method==="GET")return res({push_available:!!fcmConfig(env)});
  if(url.pathname==="/board/push/config"&&req.method==="GET"){
   const config=fcmPublicConfig(env);
@@ -103,9 +177,9 @@ async function boardCommand(req,env,url,ctx){
  if(url.pathname==="/board"&&req.method==="POST"){
   let data,content,scheduled;try{data=await body(req,7000);content=validBoardText(data?.text);scheduled=boardSchedule(data?.scheduled_at)}
   catch(e){return res({error:"invalid_note"},400)}
-  const device=typeof data?.device==="string"&&/^[a-f0-9]{32}$/.test(data.device)?data.device:"";
+  const device=caller.deviceId;
   const id=Date.now().toString(36).padStart(9,"0")+"-"+crypto.randomUUID(),now=new Date().toISOString();
-  const record={id,text:content,done:false,scheduled_at:scheduled,created_at:now,updated_at:now};
+  const record={id,text:content,done:false,scheduled_at:scheduled,all_day:data?.all_day===true,created_at:now,updated_at:now,author:{id:caller.member.id,name:caller.member.name}};
   await env.SETTINGS.put(BOARD_PREFIX+id,JSON.stringify(record),
    {expirationTtl:BOARD_LIFETIME_DAYS*86400,metadata:{device}});
   // Send after storage succeeds. Failure must never lose the saved memo.
@@ -132,7 +206,7 @@ async function boardCommand(req,env,url,ctx){
   let data;try{data=await body(req,7000)}catch(e){return res({error:"bad_request"},400)}
   if(!data||typeof data!=="object")return res({error:"invalid_note"},400);
   const patchKeys=Object.keys(data);
-  if(!patchKeys.length||patchKeys.some(k=>!["text","done","scheduled_at"].includes(k))||
+  if(!patchKeys.length||patchKeys.some(k=>!["text","done","scheduled_at","all_day"].includes(k))||
    (data.done!==undefined&&typeof data.done!=="boolean"))return res({error:"invalid_patch"},400);
   if(data.text!==undefined){
    try{saved.text=validBoardText(data.text)}catch(e){return res({error:"invalid_note"},400)}
@@ -140,7 +214,9 @@ async function boardCommand(req,env,url,ctx){
   if(data.scheduled_at!==undefined){
    try{saved.scheduled_at=boardSchedule(data.scheduled_at)}catch(e){return res({error:"invalid_schedule"},400)}
   }
+  if(data.all_day!==undefined){if(typeof data.all_day!=="boolean")return res({error:"invalid_all_day"},400);saved.all_day=data.all_day;}
   if(data.done!==undefined)saved.done=data.done;
+  saved.edited_by={id:caller.member.id,name:caller.member.name};
   saved.updated_at=new Date().toISOString();
   await env.SETTINGS.put(memoKey,JSON.stringify(saved),
    {expirationTtl:BOARD_LIFETIME_DAYS*86400});
@@ -233,7 +309,9 @@ async function sendPush(env,postId,fromDevice){
  const validRecipients=[];
  for(const device of recipients){
   const record=await env.SETTINGS.get(device.name,"json");
-  if(record?.revision===version&&fcmTokenValid(record.fcm))
+  const binding=await env.SETTINGS.get(DEVICE_PREFIX+device.name.slice(PUSH_PREFIX.length),"json");
+  const member=binding&&await env.SETTINGS.get(MEMBER_PREFIX+binding.member_id,"json");
+  if(record?.revision===version&&binding?.revoked!==true&&member?.active===true&&fcmTokenValid(record.fcm))
    validRecipients.push({key:device.name,fcm:record.fcm});
  }
  if(!validRecipients.length)return {sent:0,reason:"no_authorized_devices"};
@@ -259,10 +337,10 @@ async function sendPush(env,postId,fromDevice){
  }
  return {sent};
 }
-async function pushRegister(req,env){
+async function pushRegister(req,env,caller){
  let data;try{data=await body(req,5500)}catch(e){return res({error:"bad_request"},400)}
  const device=typeof data?.device==="string"?data.device:"";
- if(!/^[a-f0-9]{32}$/.test(device)||!fcmTokenValid(data?.fcm))return res({error:"bad_device"},400);
+ if(device!==caller.deviceId||!fcmTokenValid(data?.fcm))return res({error:"bad_device"},400);
  const revision=await familyRevision(env.FIRSTHYUNDAI_ACCESS_CODE);
  const existing=await env.SETTINGS.get(PUSH_PREFIX+device,"json");
  if(!existing){
@@ -335,4 +413,4 @@ export default {async fetch(req,env,ctx){
   await env.SETTINGS.put(key,JSON.stringify(record));return res(record);
  }
  return res({error:"not_found"},404);
-},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision}};
+},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,memberList,boardToken,validBoardToken,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision}};

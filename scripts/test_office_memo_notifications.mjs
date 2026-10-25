@@ -17,10 +17,11 @@ function call(path,method='GET',data=null,token='',origin='',adminToken=''){
 }
 assert.equal((await call('/board/updates')).status,401);
 assert.equal((await call('/board/updates','GET',null,'','https://unauthorized.example')).status,403);
-const token=(await (await call('/board/session','POST',{code:'familycode2026'})).json()).token;
+const choices=(await (await call('/board/choices','POST',{code:'familycode2026'})).json()).accounts;
+const device='0123456789abcdef0123456789abcdef';
+const token=(await (await call('/board/session','POST',{code:'familycode2026',member_id:choices[0].id,device})).json()).token;
 assert(token);
 assert.deepEqual((await (await call('/board/updates','GET',null,token)).json()).items,[]);
-const device='0123456789abcdef0123456789abcdef';
 const content='방문 예약 · 퍼스트파크\\n전화 010-1111-2222';
 const created=await call('/board','POST',{text:content,device},token);
 assert.equal(created.status,201);

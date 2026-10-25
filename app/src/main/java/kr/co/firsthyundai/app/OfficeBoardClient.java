@@ -17,7 +17,15 @@ final class OfficeBoardClient {
     private static final String PREF="firsthyundai-private-office-board-v1";
     private static final long VALIDITY_MS=60L*24*60*60*1000;
     static void clear(Context context){
-        context.getSharedPreferences(PREF,Context.MODE_PRIVATE).edit().clear().apply();
+        // Do not clear the stable device ID; revoked devices must not silently rejoin.
+        SharedPreferences p=context.getSharedPreferences(PREF,Context.MODE_PRIVATE);
+        p.edit().remove("token").remove("expiry").remove("member_id").remove("member_name").apply();
+    }
+    static String memberName(Context c){
+        return c.getSharedPreferences(PREF,Context.MODE_PRIVATE).getString("member_name","");
+    }
+    static String memberId(Context c){
+        return c.getSharedPreferences(PREF,Context.MODE_PRIVATE).getString("member_id","");
     }
     private static String token(Context context){
         SharedPreferences pref=context.getSharedPreferences(PREF,Context.MODE_PRIVATE);
@@ -25,7 +33,19 @@ final class OfficeBoardClient {
         if(System.currentTimeMillis()>expiry)return "";
         return pref.getString("token","");
     }
-    static boolean enrolled(Context context){return !token(context).isEmpty();}
+    static boolean enrolled(Context context){return !token(context).isEmpty()&&!memberId(context).isEmpty();}
+    static JSONObject checkAccount(Context context) throws Exception {
+        if(!enrolled(context))throw new Exception("사무실 계정 연결이 필요합니다.");
+        try{return request("GET","/board/account",null,token(context));}
+        catch(Exception e){
+            if(e.getMessage()!=null&&e.getMessage().startsWith("account_revoked"))clear(context);
+            throw e;
+        }
+    }
+    static JSONObject choices(Context context,char[] code) throws Exception {
+        if(code==null||code.length<8||code.length>64)throw new Exception("사무실 보안코드를 확인해 주세요.");
+        return request("POST","/board/choices",new JSONObject().put("code",new String(code)),null);
+    }
     static String deviceId(Context context){
         SharedPreferences pref=context.getSharedPreferences(PREF,Context.MODE_PRIVATE);
         String id=pref.getString("device_id","");
@@ -59,15 +79,36 @@ final class OfficeBoardClient {
         if(auth.isEmpty())throw new Exception("사무실 보안 인증 필요");
         return request("GET","/board/updates",null,auth);
     }
-    static void enroll(Context context,char[] code) throws Exception{
+    static void enroll(Context context,char[] code,String memberId) throws Exception{
         if(code==null||code.length<8||code.length>64)throw new Exception("사무실 보안코드를 확인해 주세요.");
-        JSONObject body=new JSONObject().put("code",new String(code));
+        if(memberId==null||!memberId.matches("[0-9a-f-]{36}"))throw new Exception("사용자 계정을 선택해 주세요.");
+        JSONObject body=new JSONObject().put("code",new String(code))
+                .put("member_id",memberId).put("device",deviceId(context));
         JSONObject data=request("POST","/board/session",body,null);
         String token=data.optString("token","");
         if(token.length()<40||token.length()>1100)throw new Exception("보안 인증 응답이 올바르지 않습니다.");
+        JSONObject member=data.optJSONObject("member");
+        if(member==null||!memberId.equals(member.optString("id",""))||member.optString("name","").isEmpty())
+            throw new Exception("계정 인증 응답이 올바르지 않습니다.");
         long now=System.currentTimeMillis();
         context.getSharedPreferences(PREF,Context.MODE_PRIVATE).edit()
-            .putString("token",token).putLong("expiry",now+VALIDITY_MS-300_000L).apply();
+            .putString("token",token).putString("member_id",memberId)
+            .putString("member_name",member.optString("name"))
+            .putLong("expiry",now+VALIDITY_MS-300_000L).apply();
+    }
+    static JSONObject members(Context context,String action,JSONObject payload,String adminToken) throws Exception {
+        if(adminToken==null||adminToken.isEmpty())throw new Exception("관리자 모드 인증이 필요합니다.");
+        String auth=token(context);
+        if(auth.isEmpty())throw new Exception("사무실 계정 인증이 필요합니다.");
+        if("list".equals(action))return request("GET","/board/members",null,auth,adminToken);
+        if("add".equals(action))return request("POST","/board/members",
+                new JSONObject().put("name",payload.optString("name","")),auth,adminToken);
+        if("remove".equals(action)){
+            String id=payload.optString("id","");
+            if(!id.matches("[0-9a-f-]{36}"))throw new Exception("계정 번호를 확인해 주세요.");
+            return request("DELETE","/board/members/"+id,null,auth,adminToken);
+        }
+        throw new Exception("지원하지 않는 계정 작업입니다.");
     }
     static JSONObject perform(Context context,String action,JSONObject payload,String adminToken) throws Exception {
         String auth=token(context);
@@ -79,7 +120,7 @@ final class OfficeBoardClient {
             if(text.isEmpty()||text.length()>1600)throw new Exception("메모 내용은 1~1600자로 적어 주세요.");
             return request("POST","/board",new JSONObject().put("text",text)
                     .put("scheduled_at",payload.has("scheduled_at")?payload.opt("scheduled_at"):JSONObject.NULL)
-                    .put("device",deviceId(context)),auth);
+                    .put("all_day",payload.optBoolean("all_day",false)),auth);
         }
         String id=payload.optString("id","");
         if(!id.matches("[a-z0-9]{8,14}-[0-9a-f-]{36}"))throw new Exception("메모 번호가 올바르지 않습니다.");
@@ -90,6 +131,7 @@ final class OfficeBoardClient {
             if(text.isEmpty()||text.length()>1600)throw new Exception("메모 내용은 1~1600자로 적어 주세요.");
             JSONObject patch=new JSONObject().put("text",text);
             if(payload.has("scheduled_at"))patch.put("scheduled_at",payload.opt("scheduled_at"));
+            if(payload.has("all_day"))patch.put("all_day",payload.optBoolean("all_day",false));
             return request("PATCH","/board/"+id,patch,auth);
         }
         if("schedule".equals(action)){
@@ -137,8 +179,12 @@ final class OfficeBoardClient {
                     if(bytes.size()>250000)throw new Exception("게시판 응답이 너무 큽니다.");
                 }
             }
-            if(status==401)throw new Exception("게시판 보안 인증 만료 · 다시 인증해 주세요.");
-            if(status==403)throw new Exception("관리자 모드 인증이 필요합니다. 관리자모드로 다시 로그인해 주세요.");
+            if(status==401){
+                if(path.startsWith("/board")&&!path.equals("/board/choices")&&!path.equals("/board/session"))
+                    throw new Exception("account_revoked · 관리자에게 계정 상태를 확인해 주세요.");
+                throw new Exception("게시판 보안 인증 만료 · 다시 인증해 주세요.");
+            }
+            if(status==403)throw new Exception("요청 권한이 없습니다. 관리자에게 계정 상태를 확인해 주세요.");
             if(status<200||status>=300)throw new Exception("게시판 서버에 연결할 수 없습니다. HTTP "+status);
             return new JSONObject(bytes.toString("UTF-8"));
         }finally{if(connection!=null)connection.disconnect();}

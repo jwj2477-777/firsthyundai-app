@@ -1,5 +1,12 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-26 · v2.1.07 자동 캘린더/계정
+- Worker: member-v2 KV records, bound-device revocation tombstones, signed board-v2 token + live record verification, /board/choices POST (family code), /board/session POST (family code+member_id+device), /board/account, admin /board/members GET/POST/DELETE. Legacy unbound tokens rejected to enforce revocation.
+- Android: LockActivity member picker after policy password, MainActivity getOfficeMemberName/officeMembersAction and account validation onResume/60s, OfficeBoardClient enroll/choices/checkAccount. No logout UI.
+- Web: memo-dates.js KST parser; office-board.js automatic create/update schedule, all_day/author labels; admin office-members.js CRUD via private native bridge. No customer text in public JS storage. Tests test_memo_dates.js, test_office_board.mjs, test_office_memo_notifications.mjs, test_fcm_push.mjs.
+- Worker deployment branch guard: run only on main to avoid affecting installed app during feature PR tests.
+
+
 ## 2026-10-25 · 알림 및 관리센터 v2.1.03
 v2.1.03/build154: Admin navigation & office memo notifications. Private GET /board/updates ID/device-only, auth-required. Native OfficeMemoNotifications foreground polling 12s, JobScheduler periodic 15min (not realtime push while fully closed); privacy-safe notification, secure LockActivity open, no author self-notification. Admin memoAlerts on/off shared settings. Tests scripts/test_admin_navigation.js, test_office_memo_notifications.mjs, test_office_memo_native.js; FCM setup additional.
 

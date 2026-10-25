@@ -11,7 +11,8 @@ const page=html.slice(html.indexOf('<div id="officeBoard" class="page hidden">')
 assert(page.includes('<h2>사무실 메모</h2>'));
 assert(page.includes('id="officeBoardDraft"')&&page.includes('id="officeBoardPost"'));
 assert(page.includes('메모 붙이기'));
-assert(page.includes('officeBoardCalendarDays')&&page.includes('officeBoardScheduleInput'));
+assert(page.includes('officeBoardCalendarDays')&&page.includes('officeBoardScheduleSuggestion'));
+assert(!page.includes('officeBoardScheduleInput'),'Do not require manual schedule input');
 assert(page.includes('officeBoardArchiveList'));
 assert.equal((page.match(/<textarea /g)||[]).length,1,'Keep one freeform textarea; calendar is an optional supplementary field');
 assert(!page.includes('000-0000-0000'),'Avoid fixture-looking phone numbers as visual clutter');
