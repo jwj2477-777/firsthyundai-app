@@ -46,7 +46,7 @@ async function validBoardToken(value,secret,env){
      !validMemberId(p.member)||!validDeviceId(p.device)||!validMemberId(p.binding))return null;
   if(!await crypto.subtle.verify("HMAC",await hkey("board:"+secret),decoded(bits[1]),enc.encode(bits[0])))return null;
   const [member,device]=await Promise.all([env.SETTINGS.get(MEMBER_PREFIX+p.member,"json"),env.SETTINGS.get(DEVICE_PREFIX+p.device,"json")]);
-  if(member?.active!==true||device?.member_id!==p.member||device?.binding!==p.binding)return null;
+  if(member?.active!==true||device?.revoked===true||device?.member_id!==p.member||device?.binding!==p.binding)return null;
   return {member,deviceId:p.device};
  }catch(e){return null}
 }
@@ -91,6 +91,7 @@ async function boardCommand(req,env,url,ctx){
   if(member?.active!==true)return res({error:"account_removed"},403);
   // A device may not silently change identity after it has been assigned.
   const existing=await env.SETTINGS.get(DEVICE_PREFIX+deviceId,"json");
+  if(existing?.revoked===true)return res({error:"device_revoked"},403);
   if(existing&&existing.member_id!==account)return res({error:"device_already_assigned"},409);
   const binding=existing?.binding||crypto.randomUUID();
   await env.SETTINGS.put(DEVICE_PREFIX+deviceId,
@@ -134,7 +135,7 @@ async function boardCommand(req,env,url,ctx){
   for(const item of keys.keys){
    const binding=await env.SETTINGS.get(item.name,"json");
    if(binding?.member_id===account.id){
-    await env.SETTINGS.delete(item.name);
+    await env.SETTINGS.put(item.name,JSON.stringify({...binding,revoked:true,revoked_at:new Date().toISOString()}));
     await env.SETTINGS.delete(PUSH_PREFIX+item.name.slice(DEVICE_PREFIX.length));
    }
   }
@@ -309,7 +310,7 @@ async function sendPush(env,postId,fromDevice){
   const record=await env.SETTINGS.get(device.name,"json");
   const binding=await env.SETTINGS.get(DEVICE_PREFIX+device.name.slice(PUSH_PREFIX.length),"json");
   const member=binding&&await env.SETTINGS.get(MEMBER_PREFIX+binding.member_id,"json");
-  if(record?.revision===version&&member?.active===true&&fcmTokenValid(record.fcm))
+  if(record?.revision===version&&binding?.revoked!==true&&member?.active===true&&fcmTokenValid(record.fcm))
    validRecipients.push({key:device.name,fcm:record.fcm});
  }
  if(!validRecipients.length)return {sent:0,reason:"no_authorized_devices"};
