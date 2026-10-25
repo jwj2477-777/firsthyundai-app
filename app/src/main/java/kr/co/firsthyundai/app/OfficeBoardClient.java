@@ -69,23 +69,32 @@ final class OfficeBoardClient {
         context.getSharedPreferences(PREF,Context.MODE_PRIVATE).edit()
             .putString("token",token).putLong("expiry",now+VALIDITY_MS-300_000L).apply();
     }
-    static JSONObject perform(Context context,String action,JSONObject payload) throws Exception {
+    static JSONObject perform(Context context,String action,JSONObject payload,String adminToken) throws Exception {
         String auth=token(context);
         if(auth.isEmpty())throw new Exception("최초 한 번 사무실 보안코드 인증이 필요합니다.");
         if("list".equals(action))return request("GET","/board",null,auth);
+        if("archive".equals(action))return request("GET","/board/archive",null,auth,adminToken);
         if("post".equals(action)){
             String text=payload.optString("text","");
             if(text.isEmpty()||text.length()>1600)throw new Exception("메모 내용은 1~1600자로 적어 주세요.");
             return request("POST","/board",new JSONObject().put("text",text)
+                    .put("scheduled_at",payload.has("scheduled_at")?payload.opt("scheduled_at"):JSONObject.NULL)
                     .put("device",deviceId(context)),auth);
         }
         String id=payload.optString("id","");
         if(!id.matches("[a-z0-9]{8,14}-[0-9a-f-]{36}"))throw new Exception("메모 번호가 올바르지 않습니다.");
-        if("delete".equals(action))return request("DELETE","/board/"+id,null,auth);
+        if("delete".equals(action))return request("DELETE","/board/"+id,null,auth,adminToken);
+        if("restore".equals(action))return request("POST","/board/archive/"+id+"/restore",null,auth,adminToken);
         if("edit".equals(action)){
             String text=payload.optString("text","");
             if(text.isEmpty()||text.length()>1600)throw new Exception("메모 내용은 1~1600자로 적어 주세요.");
-            return request("PATCH","/board/"+id,new JSONObject().put("text",text),auth);
+            JSONObject patch=new JSONObject().put("text",text);
+            if(payload.has("scheduled_at"))patch.put("scheduled_at",payload.opt("scheduled_at"));
+            return request("PATCH","/board/"+id,patch,auth);
+        }
+        if("schedule".equals(action)){
+            if(!payload.has("scheduled_at"))throw new Exception("일정 날짜가 필요합니다.");
+            return request("PATCH","/board/"+id,new JSONObject().put("scheduled_at",payload.opt("scheduled_at")),auth);
         }
         if("done".equals(action)){
             if(!payload.has("done")||!(payload.opt("done") instanceof Boolean))throw new Exception("완료 표시 값이 올바르지 않습니다.");
@@ -94,6 +103,9 @@ final class OfficeBoardClient {
         throw new Exception("지원하지 않는 게시판 작업입니다.");
     }
     private static JSONObject request(String method,String path,JSONObject body,String token) throws Exception {
+        return request(method,path,body,token,null);
+    }
+    private static JSONObject request(String method,String path,JSONObject body,String token,String adminToken) throws Exception {
         HttpURLConnection connection=null;
         try{
             connection=(HttpURLConnection)new URL(URL_ROOT+path).openConnection();
@@ -106,6 +118,7 @@ final class OfficeBoardClient {
             connection.setRequestProperty("Cache-Control","no-store");
             connection.setRequestProperty("User-Agent","Mozilla/5.0 (Linux; Android 17; FirstHyundaiOfficeBoard/1.0)");
             if(token!=null)connection.setRequestProperty("Authorization","Bearer "+token);
+            if(adminToken!=null&&!adminToken.isEmpty())connection.setRequestProperty("X-FHD-Admin-Authorization","Bearer "+adminToken);
             if(body!=null){
                 byte[] bytes=body.toString().getBytes(StandardCharsets.UTF_8);
                 if(bytes.length>7000)throw new Exception("메모 크기가 너무 큽니다.");
@@ -125,6 +138,7 @@ final class OfficeBoardClient {
                 }
             }
             if(status==401)throw new Exception("게시판 보안 인증 만료 · 다시 인증해 주세요.");
+            if(status==403)throw new Exception("관리자 모드 인증이 필요합니다. 관리자모드로 다시 로그인해 주세요.");
             if(status<200||status>=300)throw new Exception("게시판 서버에 연결할 수 없습니다. HTTP "+status);
             return new JSONObject(bytes.toString("UTF-8"));
         }finally{if(connection!=null)connection.disconnect();}
