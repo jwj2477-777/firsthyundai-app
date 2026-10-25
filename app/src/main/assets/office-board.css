@@ -181,3 +181,11 @@ body[data-app-contrast="high"] #officeBoard .officeBoardNote{
  #officeBoard.page>.officeBoardTitle h2{font-size:18px}
  #officeBoard.page>.officeBoardTitle .refreshAction{min-width:80px;font-size:11px;padding:8px}
 }
+
+/* Administrator controls affect reading spacing only, never note text or transmission. */
+body[data-memo-layout="compact"] #officeBoard .officeBoardNote{padding:9px 11px 8px!important}
+body[data-memo-layout="compact"] #officeBoard .officeBoardText{margin:7px 0 8px!important;line-height:1.55!important}
+body[data-memo-layout="compact"] #officeBoard .officeBoardList{gap:6px!important}
+body[data-memo-layout="roomy"] #officeBoard .officeBoardNote{padding:19px!important}
+body[data-memo-layout="roomy"] #officeBoard .officeBoardText{margin:15px 0 19px!important;line-height:1.85!important}
+body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}

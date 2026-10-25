@@ -69,3 +69,19 @@ body[data-ui-accent="teal"] #nav .utilityNav>button.active:not(.adminCenterNav){
  background:#17685F!important;border-color:#17685F!important;color:#FFF!important}
 body[data-ui-accent="bronze"] #nav .utilityNav>button.active:not(.adminCenterNav){
  background:#8B683A!important;border-color:#8B683A!important;color:#FFF!important}
+
+/* v2.1.02 · One-tap screen profiles and touch friendly mode. */
+#adminCenter .adminPresets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:11px 0}
+#adminCenter .adminPresets button{min-width:0;min-height:69px;border:1px solid #D7E3DD;border-radius:11px;background:#F7FAF8;color:#36565B;padding:9px 6px;text-align:left}
+#adminCenter .adminPresets strong{display:block;font-size:12px;line-height:1.35}
+#adminCenter .adminPresets small{display:block;font-size:10px;color:#6B8080;margin-top:4px;line-height:1.4}
+#adminCenter .adminUndoBar{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #E0E8E2;border-radius:10px;padding:8px 10px;margin-bottom:8px}
+#adminCenter .adminUndoBar span{flex:1;min-width:0}
+#adminCenter #adminUndoLast{flex:0 0 auto;min-height:43px;border:1px solid #BFD4CB;border-radius:9px;padding:8px 10px;background:#FFF;color:#2E615D;font-size:12px}
+#adminCenter #adminUndoLast:disabled{opacity:.46}
+body[data-touch-size="large"] #nav .primaryNav>button,
+body[data-touch-size="large"] #nav .utilityNav>button,
+body[data-touch-size="large"] :is(.tradeTypeBar,.newsCategoryTabs,.propertyTypeSwitch,.newTypeChips,.tradeStarter)>button{min-height:54px!important;padding-top:12px!important;padding-bottom:12px!important}
+body[data-touch-size="large"] #officeBoard :is(.officeBoardNoteActions button,#officeBoardPost,#officeBoardShowDone),
+body[data-touch-size="large"] #adminCenter :is(.adminPrefRow select,.adminAlertPref input,.adminPresets button){min-height:52px!important}
+@media(max-width:370px){#adminCenter .adminPresets{grid-template-columns:repeat(1,minmax(0,1fr))}#adminCenter .adminPresets button{min-height:48px}}
