@@ -36,6 +36,19 @@ final class OfficeBoardClient {
         id=sb.toString();
         pref.edit().putString("device_id",id).apply();return id;
     }
+    static JSONObject registerPush(Context context,String fcm) throws Exception {
+        String auth=token(context);
+        if(auth.isEmpty())throw new Exception("사무실 메모 보안 인증 필요");
+        if(fcm==null||fcm.length()<32||fcm.length()>4096||
+            !fcm.matches("[A-Za-z0-9_:.~-]+"))throw new Exception("기기 알림 토큰 오류");
+        return request("POST","/board/push/register",
+            new JSONObject().put("device",deviceId(context)).put("fcm",fcm),auth);
+    }
+    static JSONObject pushAvailability(Context context) throws Exception{
+        String auth=token(context);
+        if(auth.isEmpty())throw new Exception("사무실 메모 보안 인증 필요");
+        return request("GET","/board/push/status",null,auth);
+    }
     static JSONObject activity(Context context) throws Exception {
         String auth=token(context);
         if(auth.isEmpty())throw new Exception("사무실 보안 인증 필요");

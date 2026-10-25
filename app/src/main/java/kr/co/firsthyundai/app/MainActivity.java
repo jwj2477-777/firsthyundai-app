@@ -82,6 +82,7 @@ public class MainActivity extends Activity {
         TradeNotifications.ensureChannel(this);
         OfficeMemoNotifications.ensureChannel(this);
         OfficeMemoNotifications.schedule(this);
+        OfficeMemoFirebase.register(this);
         web = new WebView(this);
         // Avoid a blank white WebView flash between the native FHD welcome
         // and the actual app page. Reveal only when local index has loaded.
@@ -205,6 +206,7 @@ public class MainActivity extends Activity {
     @Override protected void onResume() {
         super.onResume();
         OfficeMemoNotifications.schedule(this);
+        OfficeMemoFirebase.register(this);
         memoTimer.removeCallbacks(memoCheck);
         memoTimer.post(memoCheck);
         updateNotificationPermissionUI();
@@ -437,6 +439,7 @@ public class MainActivity extends Activity {
                     try{
                         OfficeBoardClient.enroll(getApplicationContext(),entered);
                         OfficeMemoNotifications.schedule(getApplicationContext());
+                        OfficeMemoFirebase.register(getApplicationContext());
                         success=true;
                     }catch(Exception ignored){}
                     finally{java.util.Arrays.fill(entered,(char)0);}

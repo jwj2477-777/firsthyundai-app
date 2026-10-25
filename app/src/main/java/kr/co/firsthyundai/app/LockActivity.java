@@ -341,6 +341,7 @@ public class LockActivity extends Activity {
                 try{
                     OfficeBoardClient.enroll(getApplicationContext(),boardSecret);
                     OfficeMemoNotifications.schedule(getApplicationContext());
+                    OfficeMemoFirebase.register(getApplicationContext());
                 }
                 catch(Exception ignored){} // One-time retry from the board when offline.
                 finally{Arrays.fill(boardSecret,(char)0);}

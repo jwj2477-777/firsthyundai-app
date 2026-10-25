@@ -26,6 +26,7 @@ final class OfficeMemoNotifications {
     private static final String LAST="last_id";
     private static final String ENABLED="enabled";
     private static final int MAX_BATCH=20;
+    private static final String LAST_PUSH="last_push_id";
 
     private OfficeMemoNotifications(){}
     static void ensureChannel(Context context){
@@ -102,6 +103,16 @@ final class OfficeMemoNotifications {
         if(previous.isEmpty()||count==0||!enabled(c))return count;
         post(c,Math.min(count,MAX_BATCH));
         return count;
+    }
+    static synchronized void receivedPush(Context c,String id){
+        if(!OfficeBoardClient.enrolled(c)||id==null||
+          !id.matches("[a-z0-9]{8,14}-[0-9a-f-]{36}"))return;
+        SharedPreferences prefs=c.getSharedPreferences(PREF,Context.MODE_PRIVATE);
+        if(id.equals(prefs.getString(LAST_PUSH,"")))return;
+        String last=prefs.getString(LAST,"");
+        prefs.edit().putString(LAST_PUSH,id)
+          .putString(LAST,id.compareTo(last)>0?id:last).apply();
+        if(enabled(c))post(c,1);
     }
     private static void post(Context context,int number){
         if(!"enabled".equals(status(context)))return;
