@@ -85,3 +85,14 @@ body[data-touch-size="large"] :is(.tradeTypeBar,.newsCategoryTabs,.propertyTypeS
 body[data-touch-size="large"] #officeBoard :is(.officeBoardNoteActions button,#officeBoardPost,#officeBoardShowDone),
 body[data-touch-size="large"] #adminCenter :is(.adminPrefRow select,.adminAlertPref input,.adminPresets button){min-height:52px!important}
 @media(max-width:370px){#adminCenter .adminPresets{grid-template-columns:repeat(1,minmax(0,1fr))}#adminCenter .adminPresets button{min-height:48px}}
+
+/* Actual real-estate result card uses .money, not a .tradeAmount element. */
+body[data-trade-amount="bold"] :is(#trades,#new,#officetel,#nearby) .dealRow .money{
+ font-size:1.17em!important;font-weight:900!important;line-height:1.5!important
+}
+body[data-cancelled-style="subtle"] :is(#trades,#new,#officetel,#nearby) .dealRow.cancelled{
+ opacity:1!important;background:#F7F8F6!important;border-color:#AABDB8!important
+}
+body[data-cancelled-style="subtle"] :is(#trades,#new,#officetel,#nearby) .dealRow.cancelled .dealCancelLabel{
+ font-weight:800!important;background:#EAEDE9!important;color:#536969!important
+}

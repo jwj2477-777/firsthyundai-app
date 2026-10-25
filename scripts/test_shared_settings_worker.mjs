@@ -38,9 +38,12 @@ assert.equal(publicDocument.status,'ok');
 assert.equal(publicDocument.settings.preferences.density,'compact');
 assert.equal(publicDocument.settings.tradePopup,true);
 assert.equal(publicDocument.settings.preferences.memoRefresh,'45','Old clients receive safe default values');
+assert.equal(publicDocument.settings.preferences.tapSize,'standard','Legacy writers default to normal touch targets');
+assert.equal(publicDocument.settings.preferences.memoLayout,'standard','Legacy writers default to standard memo spacing');
 const extra={...s,preferences:{...s.preferences,start:'officeBoard',reading:'xlarge',density:'roomy',
  quickOrder:'memoFirst',accent:'teal',tradeAmount:'bold',cancelled:'subtle',
- memoOrder:'oldest',memoCompleted:'show',memoRefresh:'120',memoClock:'24',memoPhones:'off'}};
+ memoOrder:'oldest',memoCompleted:'show',memoRefresh:'120',memoClock:'24',memoPhones:'off',
+ tapSize:'large',memoLayout:'roomy'}};
 const upgrade=await invoke('/settings',{method:'PUT',headers:{Authorization:'Bearer '+approved.token},body:JSON.stringify(extra)});
 assert.equal(upgrade.status,200,'Updated settings are allowed on Worker');
 const uploaded=await body(await invoke('/settings'));
@@ -48,6 +51,8 @@ assert.equal(uploaded.settings.preferences.memoRefresh,'120');
 assert.equal(uploaded.settings.preferences.memoOrder,'oldest');
 assert.equal(uploaded.settings.preferences.start,'officeBoard');
 assert.equal(uploaded.settings.preferences.memoPhones,'off');
+assert.equal(uploaded.settings.preferences.tapSize,'large');
+assert.equal(uploaded.settings.preferences.memoLayout,'roomy');
 assert(!JSON.stringify(publicDocument).includes(secret),'Server never writes password into public JSON');
 const malformed={...s,preferences:{...s.preferences,reading:'script'}};
 assert.equal((await invoke('/settings',{method:'PUT',headers:{Authorization:'Bearer '+approved.token},body:JSON.stringify(malformed)})).status,400);
