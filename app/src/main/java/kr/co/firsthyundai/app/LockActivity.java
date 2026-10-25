@@ -276,6 +276,67 @@ public class LockActivity extends Activity {
         finish();
     }
 
+    private void showAccountChoices(char[] code) {
+        status.setText("등록된 사무실 계정을 확인하는 중입니다.");
+        unlockButton.setEnabled(false);
+        new Thread(()->{
+            org.json.JSONArray accounts=null;
+            String error="";
+            try{accounts=OfficeBoardClient.choices(getApplicationContext(),code).getJSONArray("accounts");}
+            catch(Exception e){error=e.getMessage()==null?"계정 목록을 불러올 수 없습니다.":e.getMessage();}
+            final org.json.JSONArray list=accounts;
+            final String failure=error;
+            runOnUiThread(()->{
+                if(isFinishing()||isDestroyed()){Arrays.fill(code,(char)0);return;}
+                unlockButton.setEnabled(true);
+                if(list==null||list.length()==0){
+                    Arrays.fill(code,(char)0);
+                    status.setText(failure.isEmpty()?"계정이 없습니다. 관리자에게 문의해 주세요.":failure);
+                    return;
+                }
+                java.util.ArrayList<String> labels=new java.util.ArrayList<>();
+                java.util.ArrayList<String> ids=new java.util.ArrayList<>();
+                for(int i=0;i<list.length();i++){
+                    org.json.JSONObject x=list.optJSONObject(i);
+                    if(x==null)continue;
+                    String id=x.optString("id","");
+                    if(!id.matches("[0-9a-f-]{36}"))continue;
+                    ids.add(id);labels.add(x.optString("name","구성원"));
+                }
+                if(ids.isEmpty()){Arrays.fill(code,(char)0);status.setText("계정이 없습니다.");return;}
+                new android.app.AlertDialog.Builder(this)
+                    .setTitle("사용할 계정을 선택해 주세요")
+                    .setMessage("처음 한 번 선택하면 이 휴대폰의 계정으로 유지됩니다.")
+                    .setSingleChoiceItems(labels.toArray(new String[0]),-1,(dialog,which)->{
+                        dialog.dismiss();
+                        String chosen=ids.get(which);
+                        status.setText("사무실 계정을 연결하고 있습니다.");
+                        unlockButton.setEnabled(false);
+                        new Thread(()->{
+                            String result="";
+                            try{
+                                OfficeBoardClient.enroll(getApplicationContext(),code,chosen);
+                                AccessPolicy.authorize(this,currentPolicy);
+                                OfficeMemoNotifications.schedule(getApplicationContext());
+                                OfficeMemoFirebase.register(getApplicationContext());
+                            }catch(Exception e){result=e.getMessage()==null?"계정 연결에 실패했습니다.":e.getMessage();}
+                            finally{Arrays.fill(code,(char)0);}
+                            final String err=result;
+                            runOnUiThread(()->{
+                                if(isFinishing()||isDestroyed())return;
+                                unlockButton.setEnabled(true);
+                                if(err.isEmpty()){
+                                    getSharedPreferences(PREFS,MODE_PRIVATE).edit().clear().apply();
+                                    openMain();
+                                }else status.setText(err);
+                            });
+                        },"office-member-select").start();
+                    })
+                    .setNegativeButton("취소",(dialog,which)->Arrays.fill(code,(char)0))
+                    .setOnCancelListener(dialog->Arrays.fill(code,(char)0)).show();
+            });
+        },"office-member-choices").start();
+    }
     private void loadLatestPolicy() {
         currentPolicy = null;
         policyPending = true;
@@ -290,9 +351,25 @@ public class LockActivity extends Activity {
                     if(isFinishing() || isDestroyed())return;
                     currentPolicy = result.policy;
                     policyPending = false;
-                    if(AccessPolicy.authorized(this,result.policy)){
-                        openMain();
-                        if(welcomeElapsed)finishWelcome();
+                    if(AccessPolicy.authorized(this,result.policy)&&OfficeBoardClient.enrolled(this)){
+                        status.setText("사무실 계정 상태를 확인하는 중입니다.");
+                        new Thread(()->{
+                            String error="";
+                            try{OfficeBoardClient.checkAccount(getApplicationContext());}
+                            catch(Exception e){error=e.getMessage()==null?"계정 확인 실패":e.getMessage();}
+                            final String problem=error;
+                            runOnUiThread(()->{
+                                if(isFinishing()||isDestroyed())return;
+                                if(problem.isEmpty()){openMain();if(welcomeElapsed)finishWelcome();}
+                                else{
+                                    if(welcomeElapsed)finishWelcome();
+                                    status.setText(problem.startsWith("account_revoked")?
+                                        "이 계정의 사용 권한이 해제됐습니다. 관리자에게 문의해 주세요.":
+                                        "사무실 계정을 확인할 수 없습니다. 인터넷 연결을 확인해 주세요.");
+                                    retryButton.setVisibility(android.view.View.VISIBLE);
+                                }
+                            });
+                        },"office-member-verify").start();
                         return;
                     }
                     if(welcomeElapsed)finishWelcome();
@@ -340,18 +417,8 @@ public class LockActivity extends Activity {
         Arrays.fill(input, (char) 0);
 
         if (good) {
-            AccessPolicy.authorize(this,currentPolicy);
-            new Thread(()->{
-                try{
-                    OfficeBoardClient.enroll(getApplicationContext(),boardSecret);
-                    OfficeMemoNotifications.schedule(getApplicationContext());
-                    OfficeMemoFirebase.register(getApplicationContext());
-                }
-                catch(Exception ignored){} // One-time retry from the board when offline.
-                finally{Arrays.fill(boardSecret,(char)0);}
-            },"office-board-enrollment").start();
-            prefs.edit().clear().apply();
-            openMain();
+            // One password for the office; choose a managed identity once, never infer it.
+            showAccountChoices(boardSecret);
         } else {
             int attempts = prefs.getInt("attempts", 0) + 1;
             if (attempts >= 5) {
