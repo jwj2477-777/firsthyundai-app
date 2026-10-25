@@ -1222,7 +1222,7 @@ function switchPage(id){
  if(id==='news'){switchNewsPane(newsPane);renderNews();renderPublicSubscriptions();}
  if(id==='notes'&&role==='admin')renderNotes();
  if(id==='officeBoard')window.FirstHyundaiOfficeBoard?.open?.();
- if(id==='adminCenter'&&role==='admin')window.FirstHyundaiAdminCenter?.render?.();
+ if(id==='adminCenter'&&role==='admin'){window.FirstHyundaiAdminCenter?.render?.();window.FirstHyundaiOfficeMembers?.refresh?.();}
  if(id==='security'&&role==='admin'){
   const v=window.FirstHyundaiNative?.getPolicyVersion?.()||0;
   $('securityVersion').textContent='이 휴대폰의 보안 정책 버전: '+(v?v:'확인 전');
