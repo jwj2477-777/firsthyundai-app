@@ -451,6 +451,9 @@ public class MainActivity extends Activity {
     }
 
     public final class Bridge {
+        @JavascriptInterface public String getOfficeMemoPushStatus(){
+            return OfficeMemoFirebase.status(getApplicationContext());
+        }
         @JavascriptInterface public String getOfficeMemoNotificationStatus(){
             return OfficeMemoNotifications.status(MainActivity.this);
         }

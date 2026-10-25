@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
  */
 final class OfficeMemoFirebase {
     private static final ExecutorService IO=Executors.newSingleThreadExecutor();
-    private static boolean attempted=false,configured=false;
+    private static boolean attempted=false,configured=false,serverReady=false;
     private OfficeMemoFirebase(){}
 
     static synchronized boolean initialize(Context context){
@@ -50,6 +50,9 @@ final class OfficeMemoFirebase {
     }
 
     static boolean available(Context context){return initialize(context);}
+    static String status(Context context){
+        return !initialize(context)?"not_configured":serverReady?"push_ready":"push_pending";
+    }
 
     static void register(Context context){
         Context app=context.getApplicationContext();
@@ -58,7 +61,10 @@ final class OfficeMemoFirebase {
             FirebaseMessaging.getInstance().getToken().addOnSuccessListener(token->{
                 if(token==null||token.length()<32)return;
                 IO.execute(()->{
-                    try{OfficeBoardClient.registerPush(app,token);}
+                    try{
+                        org.json.JSONObject result=OfficeBoardClient.registerPush(app,token);
+                        serverReady=result.optBoolean("push_available",false);
+                    }
                     catch(Exception ignored){} // Retry on app resume / re-enrollment.
                 });
             });
@@ -68,7 +74,10 @@ final class OfficeMemoFirebase {
         if(value==null||value.length()<32)return;
         Context app=context.getApplicationContext();
         IO.execute(()->{
-            try{OfficeBoardClient.registerPush(app,value);}
+            try{
+                org.json.JSONObject result=OfficeBoardClient.registerPush(app,value);
+                serverReady=result.optBoolean("push_available",false);
+            }
             catch(Exception ignored){}
         });
     }

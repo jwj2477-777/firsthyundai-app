@@ -118,7 +118,11 @@ function syncNotificationStatus(){
  if(!label||!button)return;
  let status='unavailable';
  try{status=bridge?.getOfficeMemoNotificationStatus?.()||'unavailable'}catch(e){}
- label.textContent=status==='enabled'?'새 메모 알림 켜짐 · 앱 사용 중 빠른 알림':
+ const push=bridge?.getOfficeMemoPushStatus?.()||'not_configured';
+ label.textContent=status==='enabled'?(push==='push_ready'
+  ?'새 메모 알림 켜짐 · 앱 종료 상태에서도 FCM 푸시 연결됨'
+  :push==='push_pending'?'앱 알림 켜짐 · Firebase 서버 또는 기기 연결 확인 중'
+  :'앱 알림 켜짐 · 백그라운드 정기 확인 (FCM 연결 전)') :
    status==='permission_required'?'새 메모 알림을 받으려면 휴대폰 알림을 허용해 주세요.':
    status==='blocked'?'휴대폰 설정에서 퍼스트현대 알림을 허용해 주세요.':
    status==='disabled'?'관리자 설정에서 새 메모 알림이 꺼져 있습니다.':
@@ -186,7 +190,7 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
  if(action==='delete')remove(id);
 });
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
- onResume(){if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true)},
+ onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true)},
  onNewNotification(){if(currentPage==='officeBoard')refresh(true)},
  syncNotificationStatus,enableNotifications,settingsChanged,
  _test:{phones,merge}};
