@@ -5,6 +5,7 @@ on:
       - 'workers/shared-settings/**'
       - '.github/workflows/deploy-shared-settings.yml'
       - 'scripts/setup_shared_settings_kv.py'
+      - 'scripts/check_shared_settings_health.py'
   workflow_dispatch:
 permissions:
   contents: read
