@@ -22,7 +22,12 @@ function send(path,method='GET',data=null,token='',webOrigin='',adminToken=''){
 assert.equal((await send('/board')).status,401,'Notes require a family token even for GET');
 assert.equal((await send('/board/session','POST',{code:'wrong-code'})).status,401);
 assert.equal((await send('/board/session','POST',{code:'password8'},'','https://thirdparty.invalid')).status,403);
-const session=await (await send('/board/session','POST',{code:'password8'})).json();
+const choice=await (await send('/board/choices','POST',{code:'password8'})).json();
+assert.equal(choice.accounts.length,1);
+const member=choice.accounts[0];
+const device='a'.repeat(32);
+assert.equal((await send('/board/session','POST',{code:'password8'})).status,400,'Account selection is mandatory');
+const session=await (await send('/board/session','POST',{code:'password8',member_id:member.id,device})).json();
 assert(session.token?.length>40);
 const token=session.token;
 const noteText='오늘 오후 3시 반 방문\\n퍼스트파크 1502동 3004호\\n손님 전화 010-1234-5678';
@@ -32,6 +37,8 @@ const created=await send('/board','POST',{text:noteText,scheduled_at:date},token
 assert.equal(created.status,201);
 const item=(await created.json()).note;
 assert(item.id&&item.text.includes('010-1234-5678'));
+assert.equal(item.author.id,member.id);
+assert.equal(item.author.name,member.name);
 const list=await (await send('/board','GET',null,token)).json();
 assert.equal(list.notes.length,1);
 assert.equal(list.notes[0].done,false);
@@ -61,6 +68,21 @@ assert.equal((await (await send('/board','GET',null,token)).json()).notes.length
 assert.equal((await send('/board/'+item.id,'PATCH',{scheduled_at:null},token)).status,200);
 assert.equal((await (await send('/board','GET',null,token)).json()).notes[0].scheduled_at,null);
 
+const extra=await send('/board/members','POST',{name:'신규 구성원'},token,'',adminToken);
+assert.equal(extra.status,201);
+const newcomer=(await extra.json()).account;
+const extraDevice='b'.repeat(32);
+const extraToken=(await (await send('/board/session','POST',{code:'password8',member_id:newcomer.id,device:extraDevice})).json()).token;
+assert(extraToken);
+assert.equal((await send('/board','GET',null,extraToken)).status,200);
+assert.equal((await send('/board/members/'+newcomer.id,'DELETE',null,token)).status,403);
+assert.equal((await send('/board/members/'+member.id,'DELETE',null,token,'',adminToken)).status,409,'Cannot remove current manager account');
+assert.equal((await send('/board/members/'+newcomer.id,'DELETE',null,token,'',adminToken)).status,200);
+assert.equal((await send('/board','GET',null,extraToken)).status,401,'Deleted user token revoked on server');
+assert.equal((await send('/board/session','POST',{code:'password8',member_id:newcomer.id,device:extraDevice})).status,403,'Deleted member cannot rejoin');
+const another=(await send('/board/members','POST',{name:'신규 구성원'},token,'',adminToken));
+assert.equal(another.status,201);
+assert.notEqual((await another.json()).account.id,newcomer.id,'Recreated name must not restore revoked account');
 env.FIRSTHYUNDAI_ACCESS_CODE='changedPasswordAfterRotation';
 assert.equal((await send('/board','GET',null,token)).status,401,'Family code rotation invalidates notes token');
 console.log('Private calendar metadata, administrator-only soft-delete and 30-day recovery passed.');
