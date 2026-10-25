@@ -1,5 +1,13 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-25 · v2.1.02 · 관리자 접근성/운영 조정
+- 신규 admin-settings-navigator.js: 관리자 시스템 관리센터 상단 검색, 5개 카테고리 필터, 검색 결과 개수, 세부설정 직접 표시, 주요 화면 설정/메모/동기화/수집점검 버튼으로 이동. 일반모드는 관리자 콘솔 검색/탐색 API 접근 불가, 누락 인풋·복원 제어 안전화. 운영도구만 선택해 찾을 수도 있음.
+- index.html의 5개 설정그룹을 native details + summary로 접고 펼치는 구조로 변경. 텍스트 검색 시 일치하는 설정만 보이고 해당 그룹 자동 확장, 키보드 aria-pressed 안내, 큰 터치 검색/제어 적용.
+- admin-preferences.js: 한 번에 적용하는 3개 화면 프리셋(편하게/한눈에/기본), 직전 변경 취소, 변경 내용 표시. 프리셋은 화면 밀도/본문 크기/대비/터치 크기만 변경하고 고객 메모/알림/시작 화면/서버 자격은 손대지 않는다.
+- 공통 설정 항목 tapSize standard/large, memoLayout standard/compact/roomy를 backend Worker enum+legacy defaults에 추가, 부모님 일반모드 수신 후 CSS body flags. 기존 스키마/백업 호환 유지. 메모 비공개 서버/실거래/계약문자 기능 불변.
+- 별도 관리자 신선도 판단 기준은 기존처럼 해당 휴대폰 로컬 운영설정임. 실제 공유 게시가 실패하면 이전 기기 상태를 유지하며 성공이라고 표현하지 않음.
+- v2.1.02/build153, tests/test_admin_navigation.js는 scripts/test_admin_navigation.js 경로. CI/Cloudflare deploy/실기기 검증 필수.
+
 ## 2026-10-25 · v2.1.01 · 오늘요약↔공유메모 색상 흐름
 - app/src/main/assets/selection-flow.js v14. #nav의 대표 메뉴 3개/빠른업무 3개는 동일 그룹 top-five(기존 내부 명칭 호환 유지). 기존 실거래(index0)↔뉴스(index2)는 아파트정보(index1), 새로 추가한 오늘요약(index3)↔공유메모(index5)는 계약문자(index4)를 거쳐 버튼 배경색만 흐른다. 중간 버튼 선택/클릭/DOM 이동 없음.
 - 관리자가 quickOrder로 시각 순서를 변경할 수 있으므로 index4는 실제 두 버튼 사이 같은 줄일 때만 경유. 아니면 직접 흐르고 다른 버튼/줄을 칠하지 않음. 움직임 최소화 및 OS 접근성 선호 유지.

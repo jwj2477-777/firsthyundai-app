@@ -1,5 +1,12 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-25 · v2.1.02 · 관리자 검색형 관리센터
+- adminCenter 시작점에 adminCommandBar / search / filter chips / shortcut links. 검색 결과만 설정과 운영 도구에서 필터링하며 결과 없는 경우 안내. settingsGroup 5개 <details>와 aria summary/pressed. data-admin-category view/trade/memo/tools.
+- 신규 admin-settings-navigator.js에 역할가드, 필터 및 검색 단어 일치, 점프 이동/섹션 열기, focus 처리. 테스트 scripts/test_admin_navigation.js 추가.
+- UIOptions state 추가 tapSize, memoLayout, preset(comfortable/compact/default), undo() 및 adminLastChange. 변경은 한 번 적용 후 공통 설정 게시 요청, 기존 Cloudflare Worker validates both enum options+missing field defaults.
+- CSS 터치 버튼 52px/메모 간격 3단계, 기존 거래 카드 .money 선택자 실제 적용 수정. 공개 설정에 고객/계약/메모 본문 저장 안 함. 원본 데이터/API/개인정보 공유 경로 변경 없음.
+- Android v2.1.02/build153, signed release와 Worker 자동 배포 결과 확인.
+
 ## 2026-10-25 · v2.1.01 · 빠른업무 동급 버튼 경유
 - 오늘요약(index3)↔공유메모(index5)는 계약문자(index4)를 통과하는 그라데이션 색 흐름을 추가. 기존 미세한 중간 색상 처리 그대로 재사용. 중간 버튼 활성화, 레이아웃 이동, 불필요한 클릭 효과 없음.
 - 관리자 quickOrder로 순서 변경 시 계약문자 위치와 실제 행·좌표 검증 후 경유. Reduced motion/OS 선호 유지. scripts/test_selection_flow.js 6개 기본 버튼 목업, 양방향·재배치 회귀 검증.
