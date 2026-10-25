@@ -64,7 +64,7 @@ assert(el('newsRefreshArticles').classList.contains('hidden'));
 assert(!el('newsRefreshSubscriptions').classList.contains('hidden'));
 assert.equal(refreshed,1);
 vm.runInContext("switchNewsPane('articles')",ctx);
-assert.equal(el('newsSectionTitle').textContent,'송도·부동산 뉴스 브리핑');
+assert.equal(el('newsSectionTitle').textContent,'송도 뉴스');
 assert.equal(el('newsTabArticles').attributes['aria-selected'],'true');
 assert(!el('newsRefreshArticles').classList.contains('hidden'));
 assert(el('newsRefreshSubscriptions').classList.contains('hidden'));

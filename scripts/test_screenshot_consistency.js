@@ -30,7 +30,7 @@ assert(!/grid-template-columns\s*:|(?:^|[{;]\s*)(?:display|position|order|overfl
 assert(/#complexes #complexSearch\{[^}]*min-height:55px/.test(layer),
  'Search target stays comfortably tappable');
 for(const preserved of [
- '<h2 id="newsSectionTitle">송도·부동산 뉴스 브리핑</h2>',
+ '<h2 id="newsSectionTitle">송도 뉴스</h2>',
  '뉴스 요약은 참고용입니다. 중요한 정보는 원문에서 확인하세요.',
  "switchNewsPane('articles')","switchNewsPane('subscriptions')",
  "onclick=\"openTradeLatest()\"","onclick=\"switchPage('nearby')\"",

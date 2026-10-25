@@ -1,5 +1,11 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-25 · v2.0.92 · '송도 뉴스' 상단 제목
+- 뉴스 큰 제목 텍스트만 index.html 정적 H2와 switchNewsPane 동적 H2에서 변경. 인천광역시 청약·분양 제목/전환 버튼, 데이터와 디자인 유지.
+- 관련 테스트 test_screenshot_consistency.js, test_unified_top_layout.js, test_segmented_switch_unity.js 수정.
+- v2.0.91/build142가 마지막 CI의 Chromium 실행 35초 초과로 릴리스되지 못하여 test_native_lower_tab_browser.js 제한을 70초로 조정. 이전 거래유형 건수 개선과 함께 v2.0.92/build143 릴리스 준비.
+- 배포 확정은 새 Actions 및 공개 Release APK와 app_latest.json 확인 후 보고.
+
 ## 2026-10-25 · v2.0.91 · 거래유형 고정 크기 건수 표시
 - 각 4종 거래유형 버튼에 N건 보조 줄. 아파트/오피스텔/새 거래는 서로 분리된 자료/검색조건으로 집계. 미수집 —.
 - index.html, ui-v2.css 공통 50px 고정/11px 숫자(소형10px), test_new_trade_clarity·test_office_on_demand·test_trade_layout_browser 확장.

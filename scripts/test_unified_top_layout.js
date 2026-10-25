@@ -33,7 +33,7 @@ assert(news.includes('id="newsSectionTitle"'));
 assert(news.includes('id="newsRefreshArticles"')&&news.includes('id="newsRefreshSubscriptions"'),'Keep both actual refresh routes');
 assert(news.includes('refreshOne(\'news\',true)')&&news.includes('refreshPublicServices(true)'));
 assert(!news.includes('<h3>인천광역시 청약·분양</h3>'),'Subscription title must not shrink inside a card');
-assert(!news.includes('<h3>송도·부동산 뉴스 브리핑</h3>'),'News article title uses shared h2');
+assert(!news.includes('<h3>송도 뉴스</h3>'),'News article title uses shared h2');
 assert(!news.includes('>공고 갱신</button>'),'No secondary duplicate subscription refresh');
 assert(css.includes(':is(#trades,#nearby,#new,#officetel,#complexes,#news).page>.sectionTitle:first-child h2{') &&
  css.includes('font-size:20px;'),'Same-level news and property headings share 20px typography');
@@ -60,7 +60,7 @@ assert(el('newsMeta').classList.contains('hidden'));
 assert.equal(el('newsTabSubscriptions')['aria-selected'],'true');
 assert.equal(refreshedSubscription,1);
 switcher('articles');
-assert.equal(el('newsSectionTitle').textContent,'송도·부동산 뉴스 브리핑');
+assert.equal(el('newsSectionTitle').textContent,'송도 뉴스');
 assert(!el('newsRefreshArticles').classList.contains('hidden'));
 assert(el('newsRefreshSubscriptions').classList.contains('hidden'));
 assert(!el('newsMeta').classList.contains('hidden'));

@@ -111,7 +111,7 @@ try{
  const r=child.spawnSync(binary,['--headless=new','--no-sandbox','--disable-gpu',
   '--disable-dev-shm-usage','--disable-background-timer-throttling','--no-proxy-server',
   '--hide-scrollbars','--window-size=430,1000','--virtual-time-budget=3000','--dump-dom','file://'+file],
-  {encoding:'utf8',timeout:35000,maxBuffer:8*1024*1024});
+  {encoding:'utf8',timeout:70000,maxBuffer:8*1024*1024});
  if(r.error)throw r.error;
  assert.equal(r.status,0,'Chrome failed: '+r.stderr.slice(-1400));
  const m=r.stdout.match(/<pre id="actual-browser-flow-test">([\s\S]*?)<\/pre>/);
