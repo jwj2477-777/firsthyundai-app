@@ -60,13 +60,21 @@ async function boardCommand(req,env,url){
   !await validBoardToken(auth.slice(7),env.FIRSTHYUNDAI_ACCESS_CODE))
   return res({error:"board_auth_required"},401);
  if(url.pathname==="/board"&&req.method==="GET")return res({schema:1,notes:await boardList(env)});
+ if(url.pathname==="/board/updates"&&req.method==="GET"){
+  const list=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
+  const items=list.keys.slice(-120).filter(x=>validBoardId(x.name.slice(BOARD_PREFIX.length)))
+   .map(x=>({id:x.name.slice(BOARD_PREFIX.length),device:x.metadata?.device||""}));
+  return res({schema:1,items});
+ }
  if(url.pathname==="/board"&&req.method==="POST"){
   let data,content;try{data=await body(req);content=validBoardText(data?.text)}
   catch(e){return res({error:"invalid_note"},400)}
+  const device=typeof data?.device==="string"&&/^[a-f0-9]{32}$/.test(data.device)?data.device:"";
   const id=Date.now().toString(36).padStart(9,"0")+"-"+crypto.randomUUID(),now=new Date().toISOString();
   const record={id,text:content,done:false,created_at:now,updated_at:now};
   await env.SETTINGS.put(BOARD_PREFIX+id,JSON.stringify(record),
-   {expirationTtl:BOARD_LIFETIME_DAYS*86400});
+   {expirationTtl:BOARD_LIFETIME_DAYS*86400,metadata:{device}});
+
   return res({ok:true,note:record},201);
  }
  const match=url.pathname.match(/^\/board\/([a-z0-9-]{45,51})$/);

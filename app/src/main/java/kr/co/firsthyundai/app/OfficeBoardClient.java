@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 
 /** Private access-code authenticated office note exchange. Token never enters WebView. */
 final class OfficeBoardClient {
@@ -25,6 +26,21 @@ final class OfficeBoardClient {
         return pref.getString("token","");
     }
     static boolean enrolled(Context context){return !token(context).isEmpty();}
+    static String deviceId(Context context){
+        SharedPreferences pref=context.getSharedPreferences(PREF,Context.MODE_PRIVATE);
+        String id=pref.getString("device_id","");
+        if(id.matches("[a-f0-9]{32}"))return id;
+        byte[] data=new byte[16];new SecureRandom().nextBytes(data);
+        StringBuilder sb=new StringBuilder(32);
+        for(byte b:data)sb.append(String.format(java.util.Locale.ROOT,"%02x",b&0xff));
+        id=sb.toString();
+        pref.edit().putString("device_id",id).apply();return id;
+    }
+    static JSONObject activity(Context context) throws Exception {
+        String auth=token(context);
+        if(auth.isEmpty())throw new Exception("사무실 보안 인증 필요");
+        return request("GET","/board/updates",null,auth);
+    }
     static void enroll(Context context,char[] code) throws Exception{
         if(code==null||code.length<8||code.length>64)throw new Exception("사무실 보안코드를 확인해 주세요.");
         JSONObject body=new JSONObject().put("code",new String(code));
@@ -42,7 +58,8 @@ final class OfficeBoardClient {
         if("post".equals(action)){
             String text=payload.optString("text","");
             if(text.isEmpty()||text.length()>1600)throw new Exception("메모 내용은 1~1600자로 적어 주세요.");
-            return request("POST","/board",new JSONObject().put("text",text),auth);
+            return request("POST","/board",new JSONObject().put("text",text)
+                    .put("device",deviceId(context)),auth);
         }
         String id=payload.optString("id","");
         if(!id.matches("[a-z0-9]{8,14}-[0-9a-f-]{36}"))throw new Exception("메모 번호가 올바르지 않습니다.");
