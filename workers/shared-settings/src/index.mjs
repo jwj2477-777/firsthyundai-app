@@ -9,7 +9,7 @@ function decoded(x){if(!/^[A-Za-z0-9_-]+$/.test(x)||x.length>1200)throw Error("b
 async function hkey(secret){return crypto.subtle.importKey("raw",enc.encode("fhd-shared:v1:"+secret),{name:"HMAC",hash:"SHA-256"},false,["sign","verify"])}
 async function token(secret){const part=b64(enc.encode(JSON.stringify({exp:Math.floor(Date.now()/1000)+3600,nonce:b64(crypto.getRandomValues(new Uint8Array(16)))})));return part+"."+b64(await crypto.subtle.sign("HMAC",await hkey(secret),enc.encode(part)))}
 async function checkToken(value,secret){try{if(!value||value.length>1100)return false;const parts=value.split(".");if(parts.length!==2)return false;const p=JSON.parse(new TextDecoder().decode(decoded(parts[0])));const now=Math.floor(Date.now()/1000);if(!Number.isSafeInteger(p.exp)||p.exp<now||p.exp>now+3700)return false;return await crypto.subtle.verify("HMAC",await hkey(secret),decoded(parts[1]),enc.encode(parts[0]))}catch(e){return false}}
-async function same(a,b){if(typeof a!=="string"||a.length<12||a.length>64||!b)return false;const [x,y]=await Promise.all([a,b].map(async s=>new Uint8Array(await crypto.subtle.digest("SHA-256",enc.encode(s)))));let diff=0;for(let i=0;i<x.length;i++)diff|=x[i]^y[i];return diff===0}
+async function same(a,b,min=12){if(typeof a!=="string"||a.length<min||a.length>64||!b)return false;const [x,y]=await Promise.all([a,b].map(async s=>new Uint8Array(await crypto.subtle.digest("SHA-256",enc.encode(s)))));let diff=0;for(let i=0;i<x.length;i++)diff|=x[i]^y[i];return diff===0}
 async function boardToken(secret){
  const part=b64(enc.encode(JSON.stringify({scope:"board",exp:Math.floor(Date.now()/1000)+60*60*24*60,
   nonce:b64(crypto.getRandomValues(new Uint8Array(16)))})));
@@ -52,7 +52,7 @@ async function boardCommand(req,env,url){
   const rate=await env.AUTH_LIMITER.limit({key:"board-session"});
   if(!rate.success)return res({error:"rate_limited"},429);
   let data;try{data=await body(req)}catch(e){return res({error:"bad_request"},400)}
-  if(!await same(data?.code,env.FIRSTHYUNDAI_ACCESS_CODE))return res({error:"unauthorized"},401);
+  if(!await same(data?.code,env.FIRSTHYUNDAI_ACCESS_CODE,8))return res({error:"unauthorized"},401);
   return res({token:await boardToken(env.FIRSTHYUNDAI_ACCESS_CODE),expires_in:5184000});
  }
  const auth=req.headers.get("authorization")||"";

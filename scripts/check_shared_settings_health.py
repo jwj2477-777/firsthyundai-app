@@ -14,7 +14,7 @@ for attempt in range(1,4):
         })
         with urllib.request.urlopen(req,timeout=20) as response:
             body=json.load(response)
-        if not body.get('ok') or not body.get('storage') or not body.get('authConfigured'):
+        if not body.get('ok') or not body.get('storage') or not body.get('authConfigured') or not body.get('boardAuthConfigured'):
             raise SystemExit('Shared settings worker KV or private admin verifier missing')
         print('Public shared settings Worker is healthy')
         break
