@@ -275,3 +275,32 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 #officeBoard #officeBoardListHeading.hidden,#officeBoard #officeBoardList.hidden,
 #officeBoard #officeBoardScheduleFields.hidden,#officeBoard #officeBoardScheduleSuggestion.hidden,
 #officeBoard #officeBoardArchiveOpen.hidden{display:none!important}
+
+/* Account name belongs beside the memo timestamp without adding a visual row. */
+#officeBoard .officeBoardAuthor{margin-left:auto;padding:3px 8px;background:#F1F4EE;
+ border-radius:999px;color:#48665C;font-size:11px;font-weight:800;white-space:nowrap}
+#officeBoard .officeBoardAutoSchedule{padding:8px 11px;margin:9px 0 0;
+ background:#F3F9F4;color:#376453;border:1px solid #D8E8DB;
+ border-radius:9px;font-size:12px;font-weight:760}
+#officeBoard .officeBoardAutoSchedule.hidden{display:none!important}
+.officeMemberManager{border:1px solid #D9E4DC;background:#FFF;border-radius:14px;padding:15px;margin:0 0 14px}
+.officeMemberTitle{display:flex;justify-content:space-between;align-items:center;gap:9px}
+.officeMemberTitle strong{font-size:16px;color:#385C53}
+.officeMemberTitle button{font-size:12px;min-height:39px;border-radius:9px}
+.officeMemberManager>.tiny{font-size:12px;line-height:1.6;color:#71847C;margin:8px 0 14px}
+.officeMemberList{display:grid;gap:6px}
+.officeMemberRow{display:flex;align-items:center;gap:10px;border:1px solid #E4ECE6;
+ border-radius:10px;padding:8px 10px;background:#FBFCFA;min-height:42px}
+.officeMemberAvatar{display:inline-flex;align-items:center;justify-content:center;
+ width:32px;height:32px;flex-shrink:0;background:#E4EEE7;border-radius:10px;
+ color:#456C59;font-size:13px;font-weight:850}
+.officeMemberRow strong{font-size:13px;color:#405851;flex:1}
+.officeMemberDelete{min-height:37px;padding:7px 11px;background:#FFF;
+ color:#95594A;border:1px solid #E9D3CA;border-radius:9px;font-size:12px;font-weight:750}
+.officeMemberSelf{font-size:11px;color:#668277}
+.officeMemberAdd{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.officeMemberAdd label{width:100%;font-weight:750;color:#4C675B;font-size:12px}
+.officeMemberAdd input{flex:1;min-width:130px;height:44px;border-radius:9px;
+ border:1px solid #DDE6DF;background:#FFF;padding:8px 11px;font-size:14px}
+.officeMemberAdd button{min-height:44px;border-radius:9px;font-size:12px;font-weight:750}
+#officeMemberFeedback{font-size:12px;color:#8A5B45;line-height:1.5}
