@@ -53,7 +53,8 @@
  function commit(next,info){
   if(!allowedEditor())return false;
   if(!writeState(next)){message('저장 공간에 접근할 수 없어 화면 설정을 저장하지 못했습니다.');return false}
-  state=next;apply();render();message(info||'이 기기의 화면 설정을 저장했습니다.');return true;
+  state=next;apply();render();message(info||'변경 사항을 이 기기에 적용하고 공통 서버에 게시합니다.');
+  window.FirstHyundaiSharedSettings?.changed?.();return true;
  }
  function set(key,value){
   if(!allowedEditor()||!Object.prototype.hasOwnProperty.call(allowed,key)||!allowed[key].includes(value))return false;
@@ -64,12 +65,24 @@
   const alerts=window.FirstHyundaiTradeAlerts;
   if(typeof alerts?.setEnabled!=='function'){message('알림 제어 기능이 준비되지 않았습니다.');return}
   alerts.setEnabled(enabled);render();
-  message('이 기기의 관심단지 팝업 알림 '+(enabled?'사용':'중지')+' 상태를 변경했습니다.');
+  message('관심단지 팝업 알림 '+(enabled?'사용':'중지')+' 상태를 공통 서버에 게시합니다.');
+  window.FirstHyundaiSharedSettings?.changed?.();
  }
  function reset(){
   if(!allowedEditor())return false;
   if(typeof confirm==='function'&&!confirm('이 기기의 화면 표시 설정 다섯 가지만 기본값으로 복원할까요? 알림·메모·보안 설정은 그대로 유지됩니다.'))return false;
   return commit({...defaults},'화면 설정 다섯 가지를 기본값으로 복원했습니다. 알림과 자료는 변경하지 않았습니다.');
+ }
+ function applyShared(settings){
+  let validated;
+  try{validated=validateImport(JSON.stringify(settings))}catch(e){return false}
+  // Remote updates are permitted in normal mode, but local writes stay admin-only.
+  if(!writeState(validated.preferences))return false;
+  state=validated.preferences;apply();render();
+  const alerts=window.FirstHyundaiTradeAlerts;
+  if(typeof alerts?.enabled==='function'&&typeof alerts?.setEnabled==='function'&&
+   alerts.enabled()!==validated.tradePopup)alerts.setEnabled(validated.tradePopup);
+  return true;
  }
  function backupValue(){
   return {schema:1,type:'firsthyundai-ui-settings',
@@ -111,6 +124,6 @@
  }
  state=readStorage();apply();
  window.FirstHyundaiUIOptions={get:()=>({...state}),apply,render,set,setTradePopup,reset,
-  exportSettings,importSettings,_test:{validateImport,backupValue}};
+  exportSettings,importSettings,applyShared,_test:{validateImport,backupValue}};
  render();
 })();

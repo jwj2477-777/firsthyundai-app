@@ -1,5 +1,11 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-25 · v2.0.96 관리 설정 공통 공유
+- workers/shared-settings/src/index.mjs + wrangler.toml + deploy-shared-settings.yml: KV 설정 저장 및 검증된 관리자 1h 세션, 8회/분 인증 제한, GET 공개/PUT 인증. KV namespace 재사용.
+- Android MainActivity + SharedSettingsClient: 기존 AdminPolicy 인증 후 Worker 임시 토큰 메모리에만 보관, family 복귀시 삭제. Native에서 고정 URL GET/PUT만 허용하고 JS에는 토큰 전달 안 함.
+- admin-preferences.js 관리자 변경 시 서버 게시 요청, 일반모드가 applyShared 로컬 설정 반영. shared-settings.js 공개 설정 자동 수신, 게시 실패 상태 표시, Native callback. JSON 내 계약/메모/인증키 없음. 테스트 test_shared_settings.js 추가. 2.0.96/build147.
+- Worker 초기 배포 health 403 이슈: 배포 성공과 공개 주소 접근을 별도 검증하기 전에는 동기화 가능으로 표시하지 말 것.
+
 ## 2026-10-25 · v2.0.95 · 일반모드와 관리자 UI 운영 설정
 - index.html 헤더/ARIA/모드 전환/보조 문구와 MainActivity.java 안내의 '가족 모드' 표시를 '일반모드'로 변경. Native JS role 문자열 'family', 인증정책, 사용자 데이터·키는 불변.
 - adminCenter 앱 환경 패널: 시작화면/밀도/글자/효과/대비/실거래 팝업 알림. 별도 admin-preferences.js/css에서 관리자 인증 role 검사, localStorage 엄격 값 목록·스키마 검증, body data 속성 적용, real-time animation reduction integration.

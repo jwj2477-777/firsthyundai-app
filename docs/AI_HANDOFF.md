@@ -1,5 +1,10 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-25 · v2.0.96 관리자 설정 공통 공유
+- 일반모드 부모님 휴대폰에도 관리자 설정 자동 공유 요구. Cloudflare Worker/KV 사용. 관리자만 Native로 게시, 전 기기 GET/자동 폴링/복귀 수신. 공유 필드는 start,density,reading,motion,contrast,tradePopup; 비밀번호·고객 메모·계약내용 제외.
+- Android SharedSettingsClient.java는 Native HTTPS Worker 통신 전용, 인증 코드·1시간 HMAC 세션은 JS에 노출되지 않음. Frontend assets/shared-settings.js/css와 admin-preferences.js 변경. 서버 실패 시 미반영 명시, 기기 마지막 설정 유지.
+- Worker 배포 Actions는 /health HTTP 403으로 실패한 기록 있음. GitHub Actions 배포·Cloudflare workers.dev 공개 접근을 반드시 별도 확인해야 원격 적용 완료 선언 가능. v2.0.96/build147.
+
 ## 2026-10-25 · v2.0.95 · 일반모드/관리자 사용 환경 설정
 - 사용자 요구: 가족모드→일반모드 명칭, 관리자에서 점검 외 다양한 앱 제어. 헤더·스크린리더·전환 UI 표시는 일반모드지만 Native 내부 식별자 family를 바꾸면 인증/백업이 깨지므로 유지.
 - 새 UI 관리자 사용환경: 로컬 일반모드 시작화면, 목록 밀도, 읽기 글꼴, 앱 애니메이션, 대비, 기존 실거래 팝업 옵션, 설정만 JSON 백업/복원·기본값 복원. 변경은 기기별, 가족 기기로 자동 배포되지 않음. 개인정보/키 저장 금지.
