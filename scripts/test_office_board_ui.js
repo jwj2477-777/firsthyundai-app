@@ -5,6 +5,7 @@ const html=fs.readFileSync(path.join(dir,'index.html'),'utf8');
 const js=fs.readFileSync(path.join(dir,'office-board.js'),'utf8');
 const css=fs.readFileSync(path.join(dir,'office-board.css'),'utf8');
 new vm.Script(js);
+const dates=fs.readFileSync(path.join(dir,'memo-dates.js'),'utf8');new vm.Script(dates);
 assert(js.includes('memoRefresh')&&js.includes('memoOrder')&&js.includes('memoCompleted'));
 assert(js.includes('memoClock')&&js.includes('memoPhones'));
 assert(js.includes('settingsChanged')&&js.includes('clearInterval(timer)'));
@@ -21,7 +22,7 @@ const ctx=vm.createContext({
  requestOfficeBoardAccess(){}}},document:{getElementById:el},
  currentPage:'officeBoard',Date,Promise,setTimeout,clearTimeout,setInterval:()=>0,confirm:()=>true
 });
-vm.runInContext(js,ctx);
+vm.runInContext(dates,ctx);vm.runInContext(js,ctx);
 const api=ctx.window.FirstHyundaiOfficeBoard;
 assert(api._test.phones('010-1234-5678').includes('tel:01012345678'));
 assert(!api._test.phones('<img src=x>').includes('<img'));
