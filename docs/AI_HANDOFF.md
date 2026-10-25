@@ -1,5 +1,8 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-25 · v2.0.97/build148 최종 공통 설정 APK
+- v2.0.96은 중간 수정 전 immutable 릴리스가 이미 생성되어 같은 태그의 APK를 교체하지 못했다. 동기화 최종 코드 및 Android 브리지 User-Agent, 일반모드 후속 수신, Worker 인증 테스트를 v2.0.97/build148 새 서명 릴리스로 묶음. Worker 배포와 health 성공 확인 기록 존재. 설치 후 실기기 3대 환경 검증 필요.
+
 ## 2026-10-25 · v2.0.96 관리자 설정 공통 공유
 - 일반모드 부모님 휴대폰에도 관리자 설정 자동 공유 요구. Cloudflare Worker/KV 사용. 관리자만 Native로 게시, 전 기기 GET/자동 폴링/복귀 수신. 공유 필드는 start,density,reading,motion,contrast,tradePopup; 비밀번호·고객 메모·계약내용 제외.
 - Android SharedSettingsClient.java는 Native HTTPS Worker 통신 전용, 인증 코드·1시간 HMAC 세션은 JS에 노출되지 않음. Frontend assets/shared-settings.js/css와 admin-preferences.js 변경. 서버 실패 시 미반영 명시, 기기 마지막 설정 유지.

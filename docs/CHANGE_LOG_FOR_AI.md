@@ -1,5 +1,9 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-25 · v2.0.97/build148 · 중앙 설정 최종 서명 릴리스
+- Worker 신규 KV 바인딩/배포/secret/health 성공. Android User-Agent가 Cloudflare Worker 접근 검사와 동일 계열로 지정됨. admin-preferences.js에서 변경이 Native 게시 요청으로 연결, shared-settings.js에서 일반모드 자동 수신, 단기 네트워크 실패 시 안전 캐시 적용.
+- test_shared_settings_worker.mjs 서버 인증·필드 allowlist·코드 변경 후 토큰 무효화 검사, test_shared_settings.js 로컬/원격/권한 테스트를 통과하도록 구축. v2.0.96 리리스를 덮어쓸 수 없어 v2.0.97로 최종 배포. CI 서명 APK와 update index는 별도 성공 확인 필수.
+
 ## 2026-10-25 · v2.0.96 관리 설정 공통 공유
 - workers/shared-settings/src/index.mjs + wrangler.toml + deploy-shared-settings.yml: KV 설정 저장 및 검증된 관리자 1h 세션, 8회/분 인증 제한, GET 공개/PUT 인증. KV namespace 재사용.
 - Android MainActivity + SharedSettingsClient: 기존 AdminPolicy 인증 후 Worker 임시 토큰 메모리에만 보관, family 복귀시 삭제. Native에서 고정 URL GET/PUT만 허용하고 JS에는 토큰 전달 안 함.
