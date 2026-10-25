@@ -59,6 +59,7 @@ public class MainActivity extends Activity {
         @Override public void run(){
             if(isFinishing()||isDestroyed())return;
             io.execute(()->{
+                verifyOfficeMember(false);
                 int incoming=OfficeMemoNotifications.check(getApplicationContext());
                 if(incoming>0)runOnUiThread(()->{
                     if(web!=null&&!isFinishing()&&!isDestroyed())
@@ -76,6 +77,7 @@ public class MainActivity extends Activity {
     private volatile String adminSessionIdentity = "";
     private volatile String sharedSettingsToken = "";
     private volatile boolean adminCheckInProgress = false;
+    private volatile long lastMemberValidation = 0L;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -195,6 +197,24 @@ public class MainActivity extends Activity {
                 });
     }
 
+    private void verifyOfficeMember(boolean force){
+        long now=System.currentTimeMillis();
+        if(!OfficeBoardClient.enrolled(this))return;
+        if(!force&&now-lastMemberValidation<60000L)return;
+        lastMemberValidation=now;
+        try{OfficeBoardClient.checkAccount(getApplicationContext());}
+        catch(Exception e){
+            if(!OfficeBoardClient.enrolled(getApplicationContext())){
+                runOnUiThread(()->{
+                    if(isFinishing()||isDestroyed())return;
+                    memoTimer.removeCallbacks(memoCheck);
+                    startActivity(new Intent(this,LockActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    finish();
+                });
+            }
+        }
+    }
     private boolean isAdminDeviceMode() {
         return adminSessionIdentity != null && !adminSessionIdentity.isEmpty();
     }
@@ -211,6 +231,7 @@ public class MainActivity extends Activity {
         super.onResume();
         OfficeMemoNotifications.schedule(this);
         OfficeMemoFirebase.register(this);
+        io.execute(()->verifyOfficeMember(true));
         memoTimer.removeCallbacks(memoCheck);
         memoTimer.post(memoCheck);
         updateNotificationPermissionUI();
@@ -424,33 +445,13 @@ public class MainActivity extends Activity {
 
     private void officeBoardLoginDialog(){
         if(isFinishing()||isDestroyed())return;
-        android.widget.EditText code=new android.widget.EditText(this);
-        code.setSingleLine(true);
-        code.setHint("기존 사무실 보안코드");
-        code.setInputType(android.text.InputType.TYPE_CLASS_TEXT|
-                android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        code.setPadding(38,26,38,26);
         new AlertDialog.Builder(this)
-            .setTitle("사무실 메모 첫 연결")
-            .setMessage("이 휴대폰에서 최초 한 번만 기존 사무실 보안코드를 확인합니다. 메모 작성 때마다 입력하지 않습니다.")
-            .setView(code)
-            .setNegativeButton("취소",(dialog,which)->{})
-            .setPositiveButton("연결",(dialog,which)->{
-                final char[] entered=code.getText().toString().trim().toCharArray();
-                code.setText("");
-                io.execute(()->{
-                    boolean success=false;
-                    try{
-                        OfficeBoardClient.enroll(getApplicationContext(),entered);
-                        OfficeMemoNotifications.schedule(getApplicationContext());
-                        OfficeMemoFirebase.register(getApplicationContext());
-                        success=true;
-                    }catch(Exception ignored){}
-                    finally{java.util.Arrays.fill(entered,(char)0);}
-                    JSONObject result=new JSONObject();
-                    try{result.put("ok",success);}catch(Exception ignored){}
-                    deliver("onFirstHyundaiOfficeBoardAuth",result);
-                });
+            .setTitle("사무실 구성원 계정")
+            .setMessage("계정 선택은 설치 후 최초 인증 화면에서 한 번만 진행합니다. 사무실 공통 보안코드는 관리자만 입력하면 됩니다.")
+            .setNegativeButton("닫기",null)
+            .setPositiveButton("계정 연결하기",(dialog,which)->{
+                startActivity(new Intent(this,LockActivity.class));
+                finish();
             }).show();
     }
 
@@ -531,6 +532,27 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public void switchToFamilyMode() {
             runOnUiThread(() -> changeRole(false));
+        }
+        @JavascriptInterface public String getOfficeMemberName(){
+            return OfficeBoardClient.memberName(getApplicationContext());
+        }
+        @JavascriptInterface public void officeMembersAction(String action,String payload,String requestId){
+            if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
+            if(action==null||!java.util.Arrays.asList("list","add","remove").contains(action)||
+                payload==null||payload.length()>600)return;
+            final String identity=adminSessionIdentity,admin=sharedSettingsToken;
+            io.execute(()->{
+                JSONObject event=new JSONObject();
+                try{
+                    if(identity==null||identity.isEmpty()||!identity.equals(adminSessionIdentity)||
+                        admin==null||admin.isEmpty())throw new Exception("관리자모드에서 다시 인증해 주세요.");
+                    JSONObject data=OfficeBoardClient.members(getApplicationContext(),action,new JSONObject(payload),admin);
+                    event.put("requestId",requestId).put("ok",true).put("data",data);
+                }catch(Exception e){try{event.put("requestId",requestId).put("ok",false)
+                    .put("error",e.getMessage()==null?"계정 관리 오류":e.getMessage());}
+                    catch(Exception ignored){}}
+                deliver("onFirstHyundaiOfficeMembersResult",event);
+            });
         }
         @JavascriptInterface public void requestOfficeBoardAccess() {
             runOnUiThread(()->officeBoardLoginDialog());
