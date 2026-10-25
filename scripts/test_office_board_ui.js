@@ -28,7 +28,9 @@ assert.equal(calls[0].action,'post');
 const note={id:'mhad4vwu-00000000-0000-0000-0000-000000000001',text:'3시 30분 방문',
  created_at:'2026-10-25T01:00:00Z',updated_at:'2026-10-25T01:00:00Z',done:false};
 ctx.window.onFirstHyundaiOfficeBoardResult({requestId:calls[0].id,ok:true,data:{ok:true,note}});
+(async()=>{
 await new Promise(done=>setTimeout(done,10));
 assert(el('officeBoardList').innerHTML.includes('3시 30분 방문'));
 assert.equal(el('officeBoardDraft').value,'');
 console.log('Office board UX, native bridge, freeform post and escaping passed.');
+})().catch(e=>{console.error(e);process.exitCode=1});
