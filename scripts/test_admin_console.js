@@ -13,7 +13,8 @@ assert(css.includes('#adminCenter .adminFeedDetail'));
 const nodes=new Map(),store=new Map(),actions=[];
 function el(id){
  if(!nodes.has(id))nodes.set(id,{id,textContent:'',innerHTML:'',className:'',value:'',open:false,hidden:true,
-  click(){this.clicked=(this.clicked||0)+1},scrollIntoView(){},focus(){},select(){}});
+  click(){this.clicked=(this.clicked||0)+1},scrollIntoView(){},focus(){},select(){},
+  querySelector(){return {scrollIntoView(){}}}});
  return nodes.get(id);
 }
 let fakeNow=Date.parse('2026-10-25T10:00:00+09:00');
