@@ -202,3 +202,76 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 #officeBoard .officeBoardNote.officeBoardNotificationTarget{
  border-left-color:#A44B3A!important;outline:2px solid #D5AD8A;outline-offset:2px;
 }
+
+/* Shared calendar: compact, full-width and accessible within the existing memo section. */
+#officeBoard .officeBoardViewToggle{display:grid;grid-template-columns:1fr 1fr;gap:4px;
+ padding:4px;background:#F0F5F2;border:1px solid #DFE8E2;border-radius:13px;margin:0 0 11px}
+#officeBoard .officeBoardViewToggle button{min-height:43px;background:transparent;color:#52716C;
+ border:0;border-radius:9px;font-size:13px;font-weight:750;box-shadow:none}
+#officeBoard .officeBoardViewToggle button.selected{background:#FFF;color:#315851;
+ box-shadow:0 1px 5px #193A361A}
+#officeBoard .officeBoardScheduleTools{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:9px}
+#officeBoard #officeBoardScheduleToggle{padding:7px 12px;min-height:39px;border-radius:9px;
+ background:#F6F8F5;border:1px solid #DFE6DD;font-size:12px;font-weight:760;color:#406359}
+#officeBoard .officeBoardScheduleSuggestion{background:#F3F8F5;border:1px solid #D8E7DC;
+ color:#436A5B;font-size:12px;font-weight:730;border-radius:9px;padding:8px 10px}
+#officeBoard .officeBoardScheduleFields{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+ margin-top:9px;padding:10px;background:#FBFCFA;border:1px solid #E2E8E2;border-radius:10px}
+#officeBoard .officeBoardScheduleFields label{flex:1 1 100%;font-size:12px;font-weight:750;color:#536D64}
+#officeBoard .officeBoardScheduleFields input{flex:1;min-width:180px;min-height:41px;
+ border-radius:8px;border:1px solid #D8E2DA;background:#FFF;padding:6px 8px;color:#2F5050}
+#officeBoard .officeBoardScheduleFields button{min-height:40px;font-size:12px;padding:8px 11px}
+#officeBoard .officeBoardNoteSchedule{margin:7px 0;color:#426D5B;font-size:12px;font-weight:800}
+#officeBoard .officeBoardEditSchedule{display:block;margin:9px 0;font-size:12px;color:#537066}
+#officeBoard .officeBoardEditSchedule input{width:100%;box-sizing:border-box;min-height:42px;
+ display:block;border:1px solid #D3E2D9;border-radius:8px;margin-top:5px;padding:7px}
+#officeBoard .officeBoardNoteActions.family{grid-template-columns:repeat(2,minmax(0,1fr))}
+#officeBoard .officeBoardListActions{display:flex;align-items:center;gap:7px}
+#officeBoard #officeBoardArchiveOpen{min-height:40px;border:1px solid #E2D9C9;
+ padding:7px 11px;border-radius:10px;background:#FFF;color:#705D44;font-size:12px;font-weight:730}
+#officeBoard .officeBoardArchive{border:1px solid #E4DDCE;background:#FFFBF4;
+ border-radius:12px;margin-bottom:12px;padding:11px}
+#officeBoard .officeBoardArchive>p{font-size:12px;color:#6A624F;margin:0 0 8px}
+#officeBoard .officeBoardArchivedItem{display:flex;align-items:center;justify-content:space-between;
+ border-bottom:1px solid #EBE4D6;gap:9px;padding:9px 0}
+#officeBoard .officeBoardArchivedItem p{font-size:12px;color:#465F59;white-space:pre-wrap;overflow-wrap:anywhere;
+ margin:0;flex:1;max-height:72px;overflow:hidden}
+#officeBoard .officeBoardArchivedItem button{border:1px solid #D9C8AA;border-radius:8px;
+ padding:9px 12px;font-size:12px;background:#FFF;color:#765C3D}
+#officeBoard .officeBoardCalendar{border:1px solid #DEE8E1;background:#FFF;
+ border-radius:15px;padding:12px 10px 14px;box-shadow:0 1px 5px #263D350A;margin:0 0 12px}
+#officeBoard .officeBoardCalendarHeader{display:flex;align-items:center;justify-content:center;
+ gap:13px;padding:1px 0 13px;color:#334F50}
+#officeBoard .officeBoardCalendarHeader strong{font-size:17px;flex:1;text-align:center}
+#officeBoard .officeBoardCalendarHeader button{border:1px solid #E2E9E2;background:#F8FBF8;
+ border-radius:9px;min-height:38px;min-width:38px;color:#486A61;font-size:20px}
+#officeBoard .officeBoardCalendarHeader button.officeBoardToday{padding:5px 10px;font-size:12px;font-weight:750}
+#officeBoard .officeBoardCalendarWeekdays,#officeBoard .officeBoardCalendarDays{display:grid;
+ grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;text-align:center}
+#officeBoard .officeBoardCalendarWeekdays span{font-size:11px;color:#71847E;padding:6px 0 9px}
+#officeBoard .officeBoardCalendarWeekdays span:first-child{color:#AC7066}
+#officeBoard .officeBoardDayEmpty{min-height:49px}
+#officeBoard .officeBoardDay{min-width:0;min-height:49px;display:flex;flex-direction:column;
+ justify-content:flex-start;align-items:center;gap:4px;padding:8px 1px 3px;
+ color:#4B6260;font-size:13px;background:#FFF;border:1px solid transparent;border-radius:9px;
+ box-shadow:none}
+#officeBoard .officeBoardDay small{display:block;border-radius:6px;color:#496D61;
+ background:#E7F1EA;padding:2px 4px;font-size:10px;font-weight:800;line-height:1.3}
+#officeBoard .officeBoardDay.today{background:#F5F7F4;font-weight:800}
+#officeBoard .officeBoardDay.selected{background:#F2EEE5;border-color:#C9B78E;color:#755B37;font-weight:850}
+#officeBoard .officeBoardDay:focus-visible{outline:2px solid #B98D4D;outline-offset:1px}
+#officeBoard .officeBoardCalendarAgenda{border-top:1px solid #EDF0EB;margin:13px 2px 0;padding:13px 0 0}
+#officeBoard .officeBoardCalendarAgenda>strong{display:block;color:#395D56;font-size:13px;margin-bottom:9px}
+#officeBoard .officeBoardAgendaItem{display:flex;gap:11px;align-items:center;text-align:left;
+ background:#FBFCF8;border:1px solid #E3E9E0;border-radius:10px;width:100%;padding:11px 10px;margin:5px 0;
+ color:#365455;box-shadow:none}
+#officeBoard .officeBoardAgendaItem strong{font-size:13px;white-space:nowrap}
+#officeBoard .officeBoardAgendaItem span{flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#officeBoard .officeBoardAgendaItem small{font-size:11px;color:#759087}
+#officeBoard .officeBoardAgendaItem.completed{opacity:.62}
+#officeBoard .officeBoardAddDay{display:block;width:100%;min-height:41px;margin-top:10px;
+ border:1px solid #CBDCD0;border-radius:10px;background:#F4F9F5;color:#3F6755;font-size:12px;font-weight:800}
+#officeBoard #officeBoardArchive.hidden,#officeBoard #officeBoardCalendar.hidden,
+#officeBoard #officeBoardListHeading.hidden,#officeBoard #officeBoardList.hidden,
+#officeBoard #officeBoardScheduleFields.hidden,#officeBoard #officeBoardScheduleSuggestion.hidden,
+#officeBoard #officeBoardArchiveOpen.hidden{display:none!important}
