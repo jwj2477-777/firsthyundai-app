@@ -189,3 +189,11 @@ body[data-memo-layout="compact"] #officeBoard .officeBoardList{gap:6px!important
 body[data-memo-layout="roomy"] #officeBoard .officeBoardNote{padding:19px!important}
 body[data-memo-layout="roomy"] #officeBoard .officeBoardText{margin:15px 0 19px!important;line-height:1.85!important}
 body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
+
+/* A small permission action in the same visual hierarchy as the memo header. */
+#officeBoard .officeMemoNotificationTools{display:flex;gap:9px;align-items:center;
+ justify-content:space-between;margin:1px 0 11px;border:1px solid #DEE8E3;border-radius:10px;
+ background:#F8FBF9;padding:8px 11px}
+#officeBoard #officeMemoNotificationStatus{font-size:11px;line-height:1.5;color:#506E6D;flex:1}
+#officeBoard #officeMemoNotificationPermission{min-height:43px;flex:0 0 auto;font-size:12px;padding:8px 12px}
+#officeBoard #officeMemoNotificationPermission.hidden{display:none}

@@ -373,6 +373,11 @@ body.apartmentSheetActive{overflow:hidden}
    <select id="adminMemoCompleted" onchange="FirstHyundaiUIOptions.set('memoCompleted',this.value)"><option value="hide">완료 메모 숨기기</option><option value="show">함께 표시</option></select></label>
   <label class="adminPrefRow" for="adminMemoRefresh"><span><strong>메모 자동 갱신</strong><small>게시판을 열어 둔 동안만 확인</small></span>
    <select id="adminMemoRefresh" onchange="FirstHyundaiUIOptions.set('memoRefresh',this.value)"><option value="30">30초</option><option value="45">45초 (기본)</option><option value="120">2분</option></select></label>
+  <label class="adminPrefRow" for="adminMemoAlerts"><span><strong>공유 메모 새 글 알림</strong>
+    <small>사무실 전체 알림 사용·중지 · 각 휴대폰에서 알림 권한 허용 필요</small></span>
+   <select id="adminMemoAlerts" onchange="FirstHyundaiUIOptions.set('memoAlerts',this.value)">
+    <option value="on">사용 (기본)</option><option value="off">중지</option>
+   </select></label>
   <label class="adminPrefRow" for="adminMemoLayout"><span><strong>메모 카드 간격</strong><small>많이 보기 또는 읽기 편하게</small></span>
    <select id="adminMemoLayout" onchange="FirstHyundaiUIOptions.set('memoLayout',this.value)">
     <option value="standard">기본</option><option value="compact">촘촘하게</option><option value="roomy">넉넉하게</option>

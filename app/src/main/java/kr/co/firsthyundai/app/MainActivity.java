@@ -436,6 +436,7 @@ public class MainActivity extends Activity {
                     boolean success=false;
                     try{
                         OfficeBoardClient.enroll(getApplicationContext(),entered);
+                        OfficeMemoNotifications.schedule(getApplicationContext());
                         success=true;
                     }catch(Exception ignored){}
                     finally{java.util.Arrays.fill(entered,(char)0);}

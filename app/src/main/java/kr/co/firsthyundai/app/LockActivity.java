@@ -338,7 +338,10 @@ public class LockActivity extends Activity {
         if (good) {
             AccessPolicy.authorize(this,currentPolicy);
             new Thread(()->{
-                try{OfficeBoardClient.enroll(getApplicationContext(),boardSecret);}
+                try{
+                    OfficeBoardClient.enroll(getApplicationContext(),boardSecret);
+                    OfficeMemoNotifications.schedule(getApplicationContext());
+                }
                 catch(Exception ignored){} // One-time retry from the board when offline.
                 finally{Arrays.fill(boardSecret,(char)0);}
             },"office-board-enrollment").start();

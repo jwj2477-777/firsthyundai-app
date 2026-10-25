@@ -110,11 +110,11 @@ function validate(x){
   tradeAmount:["standard","bold"],cancelled:["standard","subtle"],
   memoOrder:["newest","oldest"],memoCompleted:["hide","show"],
   memoRefresh:["30","45","120"],memoClock:["12","24"],memoPhones:["on","off"],
-  tapSize:["standard","large"],memoLayout:["standard","compact","roomy"]
+  tapSize:["standard","large"],memoLayout:["standard","compact","roomy"],memoAlerts:["on","off"]
  };
  const defaults={quickOrder:"standard",accent:"brand",tradeAmount:"standard",cancelled:"standard",
   memoOrder:"newest",memoCompleted:"hide",memoRefresh:"45",memoClock:"12",memoPhones:"on",
-  tapSize:"standard",memoLayout:"standard"};
+  tapSize:"standard",memoLayout:"standard",memoAlerts:"on"};
  const p={schema:1};
  for(const [k,values]of Object.entries(allowed)){
   const raw=x.preferences[k]===undefined?defaults[k]:x.preferences[k];
