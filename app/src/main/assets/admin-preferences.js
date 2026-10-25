@@ -1,4 +1,4 @@
-/* v2.0.95: administrator-managed local UI preferences.
+/* v2.1.02: administrator-managed office-wide UI preferences.
    No change to persisted role names, authentication or customer data. */
 (function(){
  'use strict';
@@ -7,7 +7,8 @@
  const defaults=Object.freeze({schema:1,start:'nearby',density:'standard',reading:'standard',
   motion:'full',contrast:'standard',quickOrder:'standard',accent:'brand',
   tradeAmount:'standard',cancelled:'standard',memoOrder:'newest',
-  memoCompleted:'hide',memoRefresh:'45',memoClock:'12',memoPhones:'on'});
+  memoCompleted:'hide',memoRefresh:'45',memoClock:'12',memoPhones:'on',
+  tapSize:'standard',memoLayout:'standard'});
  const allowed={
   start:['nearby','trades','new','complexes','news','contracts','overview','officetel','officeBoard'],
   density:['standard','compact','roomy'],reading:['standard','large','xlarge'],
@@ -15,15 +16,26 @@
   quickOrder:['standard','contractsFirst','memoFirst'],accent:['brand','teal','bronze'],
   tradeAmount:['standard','bold'],cancelled:['standard','subtle'],
   memoOrder:['newest','oldest'],memoCompleted:['hide','show'],
-  memoRefresh:['30','45','120'],memoClock:['12','24'],memoPhones:['on','off']
+  memoRefresh:['30','45','120'],memoClock:['12','24'],memoPhones:['on','off'],
+  tapSize:['standard','large'],memoLayout:['standard','compact','roomy']
  };
  const fields={start:'adminDefaultPage',density:'adminListDensity',
   reading:'adminReadingSize',motion:'adminMotionStyle',contrast:'adminContrastMode',
   quickOrder:'adminQuickOrder',accent:'adminAccentStyle',tradeAmount:'adminTradeAmountStyle',
   cancelled:'adminCancelledStyle',memoOrder:'adminMemoOrder',memoCompleted:'adminMemoCompleted',
-  memoRefresh:'adminMemoRefresh',memoClock:'adminMemoClock',memoPhones:'adminMemoPhones'};
+  memoRefresh:'adminMemoRefresh',memoClock:'adminMemoClock',memoPhones:'adminMemoPhones',
+  tapSize:'adminTapSize',memoLayout:'adminMemoLayout'};
  const LEGACY_FIELDS=new Set(['start','density','reading','motion','contrast']);
- let state={...defaults},popupBackup=null;
+ let state={...defaults},popupBackup=null,undoSnapshot=null;
+ function popupState(){return Boolean(window.FirstHyundaiTradeAlerts?.enabled?.())}
+ function noteChange(label){
+  const result=get('adminLastChange'),button=get('adminUndoLast');
+  if(result)result.textContent=label||'변경된 설정이 여기에 표시됩니다.';
+  if(button)button.disabled=!undoSnapshot;
+ }
+ function rememberUndo(){
+  undoSnapshot={preferences:{...state},tradePopup:popupState()};
+ }
  function readStorage(){
   try{
    const raw=localStorage.getItem(KEY);
@@ -54,6 +66,8 @@
   node.setAttribute('data-ui-accent',state.accent);
   node.setAttribute('data-trade-amount',state.tradeAmount);
   node.setAttribute('data-cancelled-style',state.cancelled);
+  node.setAttribute('data-touch-size',state.tapSize);
+  node.setAttribute('data-memo-layout',state.memoLayout);
   window.FirstHyundaiOfficeBoard?.settingsChanged?.();
  }
  function render(){
@@ -62,26 +76,52 @@
    const input=get(id);if(input)input.value=state[key];
   }
   const alert=get('adminTradePopupEnabled');
-  if(alert)alert.checked=Boolean(window.FirstHyundaiTradeAlerts?.enabled?.());
+  if(alert)alert.checked=popupState();
+  noteChange();
  }
  function message(text){const out=get('adminPreferencesStatus');if(out)out.textContent=text}
  function commit(next,info){
   if(!allowedEditor())return false;
   if(!writeState(next)){message('저장 공간에 접근할 수 없어 화면 설정을 저장하지 못했습니다.');return false}
-  state=next;apply();render();message(info||'변경 사항을 이 기기에 적용하고 공통 서버에 게시합니다.');
+  rememberUndo();state=next;apply();render();message(info||'변경 사항을 이 기기에 적용하고 공통 서버에 게시합니다.');
   window.FirstHyundaiSharedSettings?.changed?.();return true;
  }
  function set(key,value){
   if(!allowedEditor()||!Object.prototype.hasOwnProperty.call(allowed,key)||!allowed[key].includes(value))return false;
-  return commit({...state,[key]:value},'변경 사항을 바로 적용했습니다. 일반모드 시작 화면은 다음 전환 또는 앱 실행 시 적용됩니다.');
+  if(state[key]===value)return true;
+  return commit({...state,[key]:value},'설정 변경: '+key+' · 이 휴대폰 적용 후 공통 서버 게시 요청');
  }
  function setTradePopup(enabled){
   if(!allowedEditor()||typeof enabled!=='boolean')return;
   const alerts=window.FirstHyundaiTradeAlerts;
   if(typeof alerts?.setEnabled!=='function'){message('알림 제어 기능이 준비되지 않았습니다.');return}
-  alerts.setEnabled(enabled);render();
+  if(popupState()===enabled)return;
+  rememberUndo();alerts.setEnabled(enabled);render();
   message('관심단지 팝업 알림 '+(enabled?'사용':'중지')+' 상태를 공통 서버에 게시합니다.');
   window.FirstHyundaiSharedSettings?.changed?.();
+ }
+ function preset(which){
+  if(!allowedEditor())return false;
+  const sets={
+   comfortable:{density:'roomy',reading:'xlarge',contrast:'high',tapSize:'large'},
+   compact:{density:'compact',reading:'standard',contrast:'standard',tapSize:'standard'},
+   default:{density:'standard',reading:'standard',contrast:'standard',tapSize:'standard'}
+  };
+  if(!Object.prototype.hasOwnProperty.call(sets,which))return false;
+  const title={comfortable:'편하게 보기',compact:'한눈에 보기',default:'화면 기본형'}[which];
+  return commit({...state,...sets[which]},title+' 프리셋 적용 · 공통 서버에 게시합니다.');
+ }
+ function undo(){
+  if(!allowedEditor()||!undoSnapshot)return false;
+  const previous=undoSnapshot;
+  if(!writeState(previous.preferences)){message('이전 화면 설정을 저장하지 못했습니다.');return false}
+  undoSnapshot=null;
+  state={...previous.preferences};apply();
+  const alerts=window.FirstHyundaiTradeAlerts;
+  if(typeof alerts?.setEnabled==='function'&&popupState()!==previous.tradePopup)
+   alerts.setEnabled(previous.tradePopup);
+  render();message('직전 변경을 취소했습니다. 이전 공통 설정을 게시합니다.');
+  window.FirstHyundaiSharedSettings?.changed?.();return true;
  }
  function reset(){
   if(!allowedEditor())return false;
@@ -93,7 +133,7 @@
   try{validated=validateImport(JSON.stringify(settings))}catch(e){return false}
   // Remote updates are permitted in normal mode, but local writes stay admin-only.
   if(!writeState(validated.preferences))return false;
-  state=validated.preferences;apply();render();
+  undoSnapshot=null;state=validated.preferences;apply();render();
   const alerts=window.FirstHyundaiTradeAlerts;
   if(typeof alerts?.enabled==='function'&&typeof alerts?.setEnabled==='function'&&
    alerts.enabled()!==validated.tradePopup)alerts.setEnabled(validated.tradePopup);
@@ -139,7 +179,7 @@
   return true;
  }
  state=readStorage();apply();
- window.FirstHyundaiUIOptions={get:()=>({...state}),apply,render,set,setTradePopup,reset,
+ window.FirstHyundaiUIOptions={get:()=>({...state}),apply,render,set,setTradePopup,reset,preset,undo,
   exportSettings,importSettings,applyShared,_test:{validateImport,backupValue}};
  render();
 })();
