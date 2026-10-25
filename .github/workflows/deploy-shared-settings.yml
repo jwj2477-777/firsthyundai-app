@@ -6,6 +6,9 @@ on:
       - '.github/workflows/deploy-shared-settings.yml'
       - 'scripts/setup_shared_settings_kv.py'
       - 'scripts/check_shared_settings_health.py'
+  workflow_run:
+    workflows: ['Publish Administrator Access Policy']
+    types: [completed]
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,6 +17,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
