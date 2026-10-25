@@ -2,7 +2,7 @@
 const HEAD={"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store","Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET,OPTIONS","Access-Control-Allow-Headers":"Content-Type","X-Content-Type-Options":"nosniff"};
 const key="office-general-settings-v1", enc=new TextEncoder();
 const BOARD_PREFIX="office-postit-v1:", BOARD_MAX_CHARS=1600;
-const BOARD_LIFETIME_DAYS=365;
+const BOARD_LIFETIME_DAYS=365, BOARD_ARCHIVE_PREFIX="office-postit-archive-v1:", BOARD_ARCHIVE_DAYS=30;
 const res=(o,s=200)=>new Response(JSON.stringify(o),{status:s,headers:HEAD});
 function b64(buf){const x=buf instanceof Uint8Array?buf:new Uint8Array(buf);return btoa(String.fromCharCode(...x)).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
 function decoded(x){if(!/^[A-Za-z0-9_-]+$/.test(x)||x.length>1200)throw Error("bad_token");const b=atob(x.replace(/-/g,"+").replace(/_/g,"/")+"=".repeat((4-x.length%4)%4));return Uint8Array.from(b,c=>c.charCodeAt(0))}
@@ -32,6 +32,12 @@ function validBoardText(text){
  if(!normalized||normalized.length>BOARD_MAX_CHARS)throw Error("bad_length");
  return normalized;
 }
+function boardSchedule(value){
+ if(value===undefined||value===null||value==="")return null;
+ if(typeof value!=="string"||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.000Z$/.test(value)||!Number.isFinite(Date.parse(value)))throw Error("invalid_schedule");
+ const year=Number(value.slice(0,4));if(year<2020||year>2100||new Date(value).toISOString()!==value)throw Error("invalid_schedule");
+ return value;
+}
 const validBoardId=x=>typeof x==="string"&&/^([a-z0-9]{8,14})-([0-9a-f-]{36})$/.test(x);
 async function boardList(env){
  const keys=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
@@ -59,6 +65,28 @@ async function boardCommand(req,env,url,ctx){
  if(!auth.startsWith("Bearer ")||
   !await validBoardToken(auth.slice(7),env.FIRSTHYUNDAI_ACCESS_CODE))
   return res({error:"board_auth_required"},401);
+ const adminHeader=req.headers.get("x-fhd-admin-authorization")||"";
+ const isAdmin=async()=>!!env.FIRSTHYUNDAI_ADMIN_CODE&&adminHeader.startsWith("Bearer ")&&
+  await checkToken(adminHeader.slice(7),env.FIRSTHYUNDAI_ADMIN_CODE);
+ if(url.pathname==="/board/archive"&&req.method==="GET"){
+  if(!await isAdmin())return res({error:"admin_required"},403);
+  const keys=await env.SETTINGS.list({prefix:BOARD_ARCHIVE_PREFIX,limit:200});
+  const archived=(await Promise.all(keys.keys.slice(-100).map(x=>env.SETTINGS.get(x.name,"json"))))
+   .filter(x=>x&&validBoardId(x.id)&&typeof x.deleted_at==="string");
+  return res({schema:1,notes:archived.sort((a,b)=>b.deleted_at.localeCompare(a.deleted_at))});
+ }
+ const restoring=url.pathname.match(/^\/board\/archive\/([a-z0-9-]{45,51})\/restore$/);
+ if(restoring&&req.method==="POST"&&validBoardId(restoring[1])){
+  if(!await isAdmin())return res({error:"admin_required"},403);
+  const archiveKey=BOARD_ARCHIVE_PREFIX+restoring[1];
+  const saved=await env.SETTINGS.get(archiveKey,"json");
+  if(!saved)return res({error:"not_found"},404);
+  if(await env.SETTINGS.get(BOARD_PREFIX+restoring[1]))return res({error:"already_exists"},409);
+  delete saved.deleted_at;
+  await env.SETTINGS.put(BOARD_PREFIX+restoring[1],JSON.stringify(saved),{expirationTtl:BOARD_LIFETIME_DAYS*86400});
+  await env.SETTINGS.delete(archiveKey);
+  return res({ok:true,note:saved});
+ }
  if(url.pathname==="/board/push/register"&&req.method==="POST")return pushRegister(req,env);
  if(url.pathname==="/board/push/status"&&req.method==="GET")return res({push_available:!!fcmConfig(env)});
  if(url.pathname==="/board/push/config"&&req.method==="GET"){
@@ -73,11 +101,11 @@ async function boardCommand(req,env,url,ctx){
   return res({schema:1,items});
  }
  if(url.pathname==="/board"&&req.method==="POST"){
-  let data,content;try{data=await body(req,7000);content=validBoardText(data?.text)}
+  let data,content,scheduled;try{data=await body(req,7000);content=validBoardText(data?.text);scheduled=boardSchedule(data?.scheduled_at)}
   catch(e){return res({error:"invalid_note"},400)}
   const device=typeof data?.device==="string"&&/^[a-f0-9]{32}$/.test(data.device)?data.device:"";
   const id=Date.now().toString(36).padStart(9,"0")+"-"+crypto.randomUUID(),now=new Date().toISOString();
-  const record={id,text:content,done:false,created_at:now,updated_at:now};
+  const record={id,text:content,done:false,scheduled_at:scheduled,created_at:now,updated_at:now};
   await env.SETTINGS.put(BOARD_PREFIX+id,JSON.stringify(record),
    {expirationTtl:BOARD_LIFETIME_DAYS*86400,metadata:{device}});
   // Send after storage succeeds. Failure must never lose the saved memo.
@@ -94,14 +122,23 @@ async function boardCommand(req,env,url,ctx){
   if(req.method!=="PATCH"&&req.method!=="DELETE")return res({error:"method_not_allowed"},405);
   const saved=await env.SETTINGS.get(memoKey,"json");
   if(!saved)return res({error:"not_found"},404);
-  if(req.method==="DELETE"){await env.SETTINGS.delete(memoKey);return res({ok:true})}
+  if(req.method==="DELETE"){
+   if(!await isAdmin())return res({error:"admin_required"},403);
+   const deleted={...saved,deleted_at:new Date().toISOString()};
+   await env.SETTINGS.put(BOARD_ARCHIVE_PREFIX+match[1],JSON.stringify(deleted),{expirationTtl:BOARD_ARCHIVE_DAYS*86400});
+   await env.SETTINGS.delete(memoKey);
+   return res({ok:true,archived:true});
+  }
   let data;try{data=await body(req,7000)}catch(e){return res({error:"bad_request"},400)}
   if(!data||typeof data!=="object")return res({error:"invalid_note"},400);
   const patchKeys=Object.keys(data);
-  if(!patchKeys.length||patchKeys.some(k=>!["text","done"].includes(k))||
+  if(!patchKeys.length||patchKeys.some(k=>!["text","done","scheduled_at"].includes(k))||
    (data.done!==undefined&&typeof data.done!=="boolean"))return res({error:"invalid_patch"},400);
   if(data.text!==undefined){
    try{saved.text=validBoardText(data.text)}catch(e){return res({error:"invalid_note"},400)}
+  }
+  if(data.scheduled_at!==undefined){
+   try{saved.scheduled_at=boardSchedule(data.scheduled_at)}catch(e){return res({error:"invalid_schedule"},400)}
   }
   if(data.done!==undefined)saved.done=data.done;
   saved.updated_at=new Date().toISOString();
@@ -298,4 +335,4 @@ export default {async fetch(req,env,ctx){
   await env.SETTINGS.put(key,JSON.stringify(record));return res(record);
  }
  return res({error:"not_found"},404);
-},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision}};
+},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision}};
