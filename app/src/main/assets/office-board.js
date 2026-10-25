@@ -229,7 +229,7 @@ function draw(){
    '<time>'+esc(dateText(note.created_at))+'</time></div>'+
    body+(isEdit?'<label class="officeBoardEditSchedule">일정 날짜·시간 (비워두면 연결 해제)<input type="datetime-local" data-edit-schedule="'+id+'" value="'+esc(inputValue(note.scheduled_at))+'"></label>':
     (note.scheduled_at?'<div class="officeBoardNoteSchedule">▦ '+esc(dateText(note.scheduled_at))+'</div>':''))+
-   '<div class="officeBoardNoteActions'+(isEdit?' editing':'')+'">'+actions+'</div></article>';
+   '<div class="officeBoardNoteActions'+(isEdit?' editing':admin?'':' family')+'">'+actions+'</div></article>';
  }).join('');
  if(pendingFocus){
   const note=list.querySelector?.('[data-note="'+pendingFocus+'"]');
