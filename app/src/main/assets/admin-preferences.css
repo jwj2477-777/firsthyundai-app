@@ -63,3 +63,9 @@ body[data-ui-accent="bronze"] #nav .utilityNav>button.officeBoardNav.active{back
 body[data-trade-amount="bold"] :is(#trades,#new,#officetel,#nearby) .tradeAmount{font-size:1.13em!important;font-weight:900!important;line-height:1.45!important}
 body[data-cancelled-style="subtle"] :is(#trades,#new,#officetel,#nearby) .dealRow.cancelled{background:#F8F8F7!important;border-left-color:#ABB8B5!important;opacity:.78}
 @media(max-width:380px){#adminCenter .adminSettingsSectionHeading small{max-width:44%;font-size:10px}}
+
+/* Shared accent changes selected quick actions, not purpose-specific transaction badges. */
+body[data-ui-accent="teal"] #nav .utilityNav>button.active:not(.adminCenterNav){
+ background:#17685F!important;border-color:#17685F!important;color:#FFF!important}
+body[data-ui-accent="bronze"] #nav .utilityNav>button.active:not(.adminCenterNav){
+ background:#8B683A!important;border-color:#8B683A!important;color:#FFF!important}

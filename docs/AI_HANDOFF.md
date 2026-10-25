@@ -1,5 +1,10 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-25 · v2.1.00 · 운영 설정 패널 확대
+- admin-preferences.js allowed/defaults: quickOrder,accent,tradeAmount,cancelled,memoOrder,memoCompleted,memoRefresh,memoClock,memoPhones. reading xlarge, density roomy, start officeBoard 추가. UI index.html 에 시작/가독성, 화면/탐색, 실거래, 메모 구분.
+- CSS body data-*로 빠른 메뉴 순서·금액·해제거래·포인트색/글씨/밀도 실제 표시 적용. office-board.js에서 순서/완료 기본표시/갱신주기/시각/번호 링크 실제 적용. 기존 관리자 모드 인증 유지.
+- Cloudflare shared-settings Worker schema 1 validate 새 key allowlist+missing optional defaults로 2.0.99 이전 백업 호환. Secret/개인메모는 공개 설정에 포함 금지. Release v2.1.00/build151, CI 및 Worker 배포 확인.
+
 ## 2026-10-25 · v2.0.99 · 간결한 사무실 메모
 - 메모 UX 개선: 카드 색상 난립을 하나의 따뜻한 중립 톤으로 조정, 본문 읽기 편한 여백만 남김. 작성란은 그대로 하나, 커다란 설명/가짜 전화번호 예시 삭제. 완료/수정/삭제 고정 3열 42px; 편집 시 저장/취소 2열. 완료 메모 보기 toggle 표시 ARIA.
 - 모든 화면 네비의 오늘 요약/계약문자/공유 메모를 일반·관리자 동일 3칸 그리드에 고정. 관리자 관리센터는 별도 전체 폭 아래줄. office-board.css만 nav 추가 스코프로 관리하며 main 3개 메뉴 유지. JS는 텍스트와 클래스, 완료 카운트만 변경. 민감한 사무실 메모 서버 API/네이티브 프로토콜 그대로.

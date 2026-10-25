@@ -11,6 +11,10 @@ for(const id of ['adminDefaultPage','adminListDensity','adminReadingSize','admin
 assert(html.indexOf('admin-preferences.js')<html.indexOf('premium-motion.js'),
  'Preferences must load before transition scripts');
 assert(css.includes('data-list-density="compact"')&&css.includes('data-app-motion="reduced"'));
+assert(css.includes('data-shortcut-order="memoFirst"')&&css.includes('data-reading-size="xlarge"'));
+for(const id of ['adminQuickOrder','adminAccentStyle','adminTradeAmountStyle','adminCancelledStyle',
+ 'adminMemoOrder','adminMemoCompleted','adminMemoRefresh','adminMemoClock','adminMemoPhones'])
+ assert(html.includes('id="'+id+'"'),'Missing admin setting '+id);
 assert(html.includes('현재 일반모드')&&html.includes('>일반모드</button>'),'User-facing name must be 일반모드');
 assert(!html.includes('현재 가족 모드')&&!html.includes('가족 모드로 전환'));
 const map=new Map(),nodes=new Map();
@@ -38,12 +42,23 @@ assert(api.set('contrast','high'));
 assert.equal(body.attrs['data-app-contrast'],'high');
 assert(api.set('motion','reduced'));
 assert.equal(body.attrs['data-app-motion'],'reduced');
+for(const [key,value,attr] of [
+ ['quickOrder','memoFirst','data-shortcut-order'],['accent','teal','data-ui-accent'],
+ ['tradeAmount','bold','data-trade-amount'],['cancelled','subtle','data-cancelled-style']]){
+ assert(api.set(key,value),key);assert.equal(body.attrs[attr],value);
+}
+for(const [key,value] of [['memoOrder','oldest'],['memoCompleted','show'],['memoRefresh','120'],
+ ['memoClock','24'],['memoPhones','off'],['density','roomy'],['reading','xlarge'],['start','officeBoard']])
+ assert(api.set(key,value),key);
 assert.equal(api.set('density','evil'),false,'Reject invalid setting');
 api.setTradePopup(false);assert.equal(calls.at(-1),false);
 api.exportSettings();
 const exported=get('adminSettingsExport').value;
 assert(exported.includes('"start": "news"')||exported.includes('"start":"news"'));
-assert(!/secret|token|repository|memo|contract|phone/i.test(exported),'No private data in UI backup');
+const backup=JSON.parse(exported);
+assert(!('notes' in backup)&&!('password' in backup)&&!('secrets' in backup),'No personal data or credentials in settings backup');
+assert.equal(backup.preferences.memoOrder,'oldest');
+assert.equal(backup.preferences.memoPhones,'off');
 api.reset();assert.equal(body.attrs['data-list-density'],'standard');
 get('adminSettingsImport').value=exported;
 assert(api.importSettings());assert.equal(body.attrs['data-list-density'],'compact');
@@ -52,6 +67,7 @@ const invalid=JSON.stringify({schema:1,type:'firsthyundai-ui-settings',
  preferences:{...api.get(),motion:'malicious'},tradePopup:false});
 get('adminSettingsImport').value=invalid;assert.equal(api.importSettings(),false);
 assert.equal(api.get().motion,'reduced','Invalid import cannot replace last valid setting');
+assert.equal(api.get().memoRefresh,'120','Invalid import must not change memo refresh');
 const data=api.get();
 ctx.role='family';assert.equal(api.set('density','standard'),false);
 assert.equal(api.reset(),false);assert.equal(api.importSettings(),false);

@@ -5,6 +5,9 @@ const html=fs.readFileSync(path.join(dir,'index.html'),'utf8');
 const js=fs.readFileSync(path.join(dir,'office-board.js'),'utf8');
 const css=fs.readFileSync(path.join(dir,'office-board.css'),'utf8');
 new vm.Script(js);
+assert(js.includes('memoRefresh')&&js.includes('memoOrder')&&js.includes('memoCompleted'));
+assert(js.includes('memoClock')&&js.includes('memoPhones'));
+assert(js.includes('settingsChanged')&&js.includes('clearInterval(timer)'));
 for(const field of ['officeBoard','officeBoardDraft','officeBoardPost','officeBoardList','officeBoardAuth'])
  assert(html.includes('id="'+field+'"'),field+' missing');
 assert(html.includes("['officeBoard','사무실 메모']"));

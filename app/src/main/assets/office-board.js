@@ -4,6 +4,17 @@
 const $=id=>document.getElementById(id),bridge=window.FirstHyundaiNative;
 const requests=new Map(),localUpdates=new Map(),localDeletes=new Map();
 let sequence=0,items=[],busy=false,lastCheck=0,showCompleted=false,editing='',editDraft='',timer=null;
+let timerMs=45000;
+function preferences(){
+ const p=window.FirstHyundaiUIOptions?.get?.()||{};
+ return {memoOrder:p.memoOrder||'newest',memoCompleted:p.memoCompleted||'hide',
+  memoRefresh:p.memoRefresh||'45',memoClock:p.memoClock||'12',memoPhones:p.memoPhones||'on'};
+}
+function sortItems(){
+ const order=preferences().memoOrder==='oldest'?1:-1;
+ items.sort((a,b)=>a.done!==b.done?(a.done?1:-1):
+  order*String(a.created_at).localeCompare(String(b.created_at)));
+}
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const valid=id=>/^[a-z0-9]{8,14}-[0-9a-f-]{36}$/.test(String(id||''));
 function msg(text){if($('officeBoardFeedback'))$('officeBoardFeedback').textContent=text}
@@ -11,7 +22,7 @@ function dateText(value){
  const d=new Date(value);
  if(!Number.isFinite(d.getTime()))return '';
  return d.toLocaleString('ko-KR',{timeZone:'Asia/Seoul',month:'numeric',day:'numeric',
-  hour:'numeric',minute:'2-digit',hour12:true});
+  hour:'numeric',minute:'2-digit',hour12:preferences().memoClock!=='24'});
 }
 function phones(value){
  const text=String(value||''),re=/(0\d{1,2}[- ]?\d{3,4}[- ]?\d{4})/g;
@@ -37,7 +48,7 @@ function draw(){
  list.innerHTML=visible.map(note=>{
   const id=esc(note.id),isEdit=editing===note.id;
   const body=isEdit?'<textarea class="officeBoardEdit" maxlength="1600" data-edit="'+id+'" aria-label="메모 수정">'+esc(editDraft)+'</textarea>':
-   '<div class="officeBoardText">'+phones(note.text)+'</div>';
+   '<div class="officeBoardText">'+(preferences().memoPhones==='off'?esc(note.text):phones(note.text))+'</div>';
   const actions=isEdit?'<button class="officeBoardSave" data-action="save" data-id="'+id+'">저장</button>'+
     '<button data-action="cancel" data-id="'+id+'">취소</button>':
    '<button class="officeBoardDoneAction" data-action="done" data-id="'+id+'">'+(note.done?'완료 취소':'완료')+'</button>'+
@@ -78,8 +89,8 @@ function merge(server){
  for(const [id,time] of localDeletes){
   if(now-time>120000)localDeletes.delete(id);else merged.delete(id);
  }
- items=[...merged.values()].sort((a,b)=>a.done!==b.done?(a.done?1:-1):String(b.created_at).localeCompare(String(a.created_at)));
- draw();
+ items=[...merged.values()];
+ sortItems();draw();
 }
 async function refresh(silent=false){
  if(busy||currentPage!=='officeBoard')return;
@@ -92,9 +103,18 @@ async function refresh(silent=false){
   if(!silent)msg('메모를 확인했습니다.');
  }catch(e){if(!silent)msg(e.message)}
 }
+function settingsChanged(){
+ const p=preferences();
+ showCompleted=p.memoCompleted==='show';
+ sortItems();draw();
+ const next=Math.max(30000,Math.min(120000,Number(p.memoRefresh)*1000||45000));
+ if(timer&&next!==timerMs){clearInterval(timer);timer=null;}
+ timerMs=next;
+ if(!timer&&typeof currentPage!=='undefined'&&currentPage==='officeBoard')
+  timer=setInterval(()=>{if(currentPage==='officeBoard')refresh(true)},timerMs);
+}
 function open(){
- draw();refresh();
- if(!timer)timer=setInterval(()=>{if(currentPage==='officeBoard')refresh(true)},45000);
+ settingsChanged();refresh();
 }
 async function mutate(action,data){
  if(busy)return null;
@@ -151,6 +171,6 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
  if(action==='delete')remove(id);
 });
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
- onResume(){if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true)},
+ onResume(){if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true)},settingsChanged,
  _test:{phones,merge}};
 })();
