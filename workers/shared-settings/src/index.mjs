@@ -43,7 +43,7 @@ async function boardList(env){
  return notes.filter(x=>x&&validBoardId(x.id)&&typeof x.text==="string"&&
   typeof x.done==="boolean").sort((a,b)=>b.created_at.localeCompare(a.created_at));
 }
-async function boardCommand(req,env,url){
+async function boardCommand(req,env,url,ctx){
  if(!env.FIRSTHYUNDAI_ACCESS_CODE)return res({error:"board_auth_not_configured"},503);
  // All board data (including phone numbers) is private, on GET as well as writes.
  if(req.headers.has("origin"))return res({error:"native_only"},403);
@@ -59,6 +59,8 @@ async function boardCommand(req,env,url){
  if(!auth.startsWith("Bearer ")||
   !await validBoardToken(auth.slice(7),env.FIRSTHYUNDAI_ACCESS_CODE))
   return res({error:"board_auth_required"},401);
+ if(url.pathname==="/board/push/register"&&req.method==="POST")return pushRegister(req,env);
+ if(url.pathname==="/board/push/status"&&req.method==="GET")return res({push_available:!!fcmConfig(env)});
  if(url.pathname==="/board"&&req.method==="GET")return res({schema:1,notes:await boardList(env)});
  if(url.pathname==="/board/updates"&&req.method==="GET"){
   const list=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
@@ -74,7 +76,12 @@ async function boardCommand(req,env,url){
   const record={id,text:content,done:false,created_at:now,updated_at:now};
   await env.SETTINGS.put(BOARD_PREFIX+id,JSON.stringify(record),
    {expirationTtl:BOARD_LIFETIME_DAYS*86400,metadata:{device}});
-
+  // Send after storage succeeds. Failure must never lose the saved memo.
+  // Cloudflare waitUntil continues delivery without delaying the writer's screen.
+  if(fcmConfig(env)){
+   const task=sendPush(env,id,device).catch(()=>({sent:0}));
+   if(ctx?.waitUntil)ctx.waitUntil(task);else await task;
+  }
   return res({ok:true,note:record},201);
  }
  const match=url.pathname.match(/^\/board\/([a-z0-9-]{45,51})$/);
@@ -100,6 +107,97 @@ async function boardCommand(req,env,url){
  }
  return res({error:"not_found"},404);
 }
+
+/* FCM HTTP v1: server-only service account; no customer text or tokens in public settings. */
+const PUSH_PREFIX="office-postit-push-v1:",PUSH_LIMIT=12,PUSH_TTL=90*86400;
+let oauthCache={value:"",expires:0};
+function fcmConfig(env){
+ try{
+  const raw=env.FHD_FCM_SERVICE_ACCOUNT_JSON;
+  if(!raw||raw.length>16000)return null;
+  const credentials=JSON.parse(raw);
+  if(credentials.type!=="service_account"||
+   !/^[A-Za-z0-9._-]{3,120}$/.test(credentials.project_id)||
+   !/^[^@\s]{3,100}@[^@\s]{3,200}$/.test(credentials.client_email)||
+   !credentials.private_key?.includes("BEGIN PRIVATE KEY"))return null;
+  return credentials;
+ }catch(e){return null}
+}
+function fcmTokenValid(value){
+ return typeof value==="string"&&value.length>=32&&value.length<=4096&&
+  /^[A-Za-z0-9_:.~-]+$/.test(value);
+}
+async function fcmOAuth(env){
+ const now=Date.now();
+ if(oauthCache.value&&now<oauthCache.expires)return oauthCache.value;
+ const config=fcmConfig(env);if(!config)throw Error("fcm_unconfigured");
+ const header=b64(enc.encode(JSON.stringify({alg:"RS256",typ:"JWT"})));
+ const claims=b64(enc.encode(JSON.stringify({
+  iss:config.client_email,scope:"https://www.googleapis.com/auth/firebase.messaging",
+  aud:"https://oauth2.googleapis.com/token",iat:Math.floor(now/1000),
+  exp:Math.floor(now/1000)+3500
+ })));
+ const payload=header+"."+claims;
+ const rawKey=config.private_key.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g,"");
+ const bytes=Uint8Array.from(atob(rawKey),x=>x.charCodeAt(0));
+ const privateKey=await crypto.subtle.importKey("pkcs8",bytes,{name:"RSASSA-PKCS1-v1_5",hash:"SHA-256"},false,["sign"]);
+ const sig=b64(await crypto.subtle.sign("RSASSA-PKCS1-v1_5",privateKey,enc.encode(payload)));
+ const response=await fetch("https://oauth2.googleapis.com/token",{
+  method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},
+  body:new URLSearchParams({grant_type:"urn:ietf:params:oauth:grant-type:jwt-bearer",assertion:payload+"."+sig}).toString()
+ });
+ if(!response.ok)throw Error("fcm_oauth_"+response.status);
+ const doc=await response.json();
+ if(typeof doc.access_token!=="string"||!doc.access_token)throw Error("fcm_oauth_empty");
+ oauthCache={value:doc.access_token,expires:now+Math.max(60,Math.min(3300,Number(doc.expires_in)||3500)-90)*1000};
+ return oauthCache.value;
+}
+async function sendPush(env,postId,fromDevice){
+ const config=fcmConfig(env);
+ if(!config)return {sent:0,reason:"fcm_unconfigured"};
+ // Respect the office-wide new memo notification setting, without exposing notes.
+ const office=await env.SETTINGS.get(key,"json");
+ if(office?.settings?.preferences?.memoAlerts==="off")return {sent:0,reason:"disabled"};
+ const keys=await env.SETTINGS.list({prefix:PUSH_PREFIX,limit:100});
+ const recipients=keys.keys.filter(k=>k.name!==PUSH_PREFIX+fromDevice).slice(0,PUSH_LIMIT);
+ if(!recipients.length)return {sent:0,reason:"no_devices"};
+ const auth=await fcmOAuth(env);
+ let sent=0;
+ for(const device of recipients){
+  const obj=await env.SETTINGS.get(device.name,"json");
+  if(!obj?.fcm||!fcmTokenValid(obj.fcm))continue;
+  // Data-only message: the Android service owns the private lock-screen notification.
+  const response=await fetch("https://fcm.googleapis.com/v1/projects/"+config.project_id+"/messages:send",{
+   method:"POST",headers:{"Authorization":"Bearer "+auth,"Content-Type":"application/json; charset=utf-8"},
+   body:JSON.stringify({message:{token:obj.fcm,data:{kind:"office_note",note_id:postId},
+     android:{priority:"HIGH",ttl:"86400s"}}})
+  });
+  if(response.ok){sent++;continue}
+  // Permanently invalid registration tokens are deleted; temporary failures are retained.
+  if(response.status===404||response.status===410){
+   await env.SETTINGS.delete(device.name);
+  }else if(response.status===400){
+   const detail=await response.text();
+   if(/UNREGISTERED|registration.token|invalid registration|UNREGISTERED/i.test(detail))
+    await env.SETTINGS.delete(device.name);
+  }
+ }
+ return {sent};
+}
+async function pushRegister(req,env){
+ let data;try{data=await body(req,5500)}catch(e){return res({error:"bad_request"},400)}
+ const device=typeof data?.device==="string"?data.device:"";
+ if(!/^[a-f0-9]{32}$/.test(device)||!fcmTokenValid(data?.fcm))return res({error:"bad_device"},400);
+ const existing=await env.SETTINGS.get(PUSH_PREFIX+device,"json");
+ if(!existing){
+  const all=await env.SETTINGS.list({prefix:PUSH_PREFIX,limit:100});
+  if(all.keys.length>=PUSH_LIMIT)return res({error:"device_limit"},409);
+ }
+ await env.SETTINGS.put(PUSH_PREFIX+device,JSON.stringify({fcm:data.fcm,registered:new Date().toISOString()}),
+  {expirationTtl:PUSH_TTL});
+ return res({ok:true,push_available:!!fcmConfig(env)});
+}
+
 function validate(x){
  if(!x||x.schema!==1||x.type!=="firsthyundai-ui-settings"||typeof x.tradePopup!=="boolean"||x.preferences?.schema!==1)throw Error("schema");
  const allowed={
@@ -130,13 +228,13 @@ async function body(req,maxBytes=2400){
  if(bytes.byteLength>maxBytes)throw Error("large");
  return JSON.parse(new TextDecoder().decode(bytes));
 }
-export default {async fetch(req,env){
+export default {async fetch(req,env,ctx){
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:HEAD});
  const url=new URL(req.url);
  if(!env.SETTINGS)return res({error:"kv_not_configured"},503);
  if(url.pathname==="/health"&&req.method==="GET")return res({ok:true,storage:true,
-  authConfigured:!!env.FIRSTHYUNDAI_ADMIN_CODE,boardAuthConfigured:!!env.FIRSTHYUNDAI_ACCESS_CODE});
- if(url.pathname.startsWith("/board"))return boardCommand(req,env,url);
+  authConfigured:!!env.FIRSTHYUNDAI_ADMIN_CODE,boardAuthConfigured:!!env.FIRSTHYUNDAI_ACCESS_CODE,fcmConfigured:!!fcmConfig(env)});
+ if(url.pathname.startsWith("/board"))return boardCommand(req,env,url,ctx);
  if(url.pathname==="/settings"&&req.method==="GET")return res((await env.SETTINGS.get(key,"json"))||{schema:1,status:"not_configured"});
  if(req.headers.has("origin"))return res({error:"native_only"},403);
  if(!env.FIRSTHYUNDAI_ADMIN_CODE)return res({error:"auth_not_configured"},503);
@@ -155,4 +253,4 @@ export default {async fetch(req,env){
   await env.SETTINGS.put(key,JSON.stringify(record));return res(record);
  }
  return res({error:"not_found"},404);
-},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList}};
+},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,fcmConfig,fcmTokenValid,sendPush}};
