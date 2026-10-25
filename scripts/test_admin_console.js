@@ -51,7 +51,7 @@ assert.equal(api._test.ageHours('2026-10-25T08:00:00+09:00',fakeNow),2);
 assert.equal(api._test.qualityIssues([{type:'매매',building:'A',contract_date:'2026-10-24'},{type:'전세'}],'trades'),1);
 const stale=api._test.classify(ctx.remote.news,'','news',fakeNow+11*3600000);
 assert.equal(stale.label,'갱신 지연');
-const future=api._test.classify(ctx.remote.news,'','news',fakeNow-5*3600000);
+const future=api._test.classify(ctx.remote.news,'','news',fakeNow-6*3600000);
 assert.equal(future.label,'시각 점검');
 api.levelChanged('relaxed');
 assert.equal(store.get('firsthyundai-admin-freshness-v1'),'relaxed');
