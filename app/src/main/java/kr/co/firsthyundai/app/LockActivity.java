@@ -265,8 +265,12 @@ public class LockActivity extends Activity {
         if(!welcomeDone){openAfterWelcome=true;return;}
         if(isFinishing() || isDestroyed()) return;
         Intent open=new Intent(this,MainActivity.class);
-        if(getIntent()!=null&&getIntent().getBooleanExtra("office_board_from_notification",false))
+        if(getIntent()!=null&&getIntent().getBooleanExtra("office_board_from_notification",false)){
             open.putExtra("office_board_from_notification",true);
+            String id=getIntent().getStringExtra("office_board_note_id");
+            if(id!=null&&id.matches("[a-z0-9]{8,14}-[0-9a-f-]{36}"))
+                open.putExtra("office_board_note_id",id);
+        }
         startActivity(open);
         overridePendingTransition(0,0);
         finish();

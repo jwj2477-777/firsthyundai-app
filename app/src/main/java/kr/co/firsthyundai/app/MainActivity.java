@@ -95,7 +95,11 @@ public class MainActivity extends Activity {
                 if(isFinishing()||isDestroyed())return;
                 if(getIntent()!=null&&getIntent().getBooleanExtra("office_board_from_notification",false)){
                     getIntent().removeExtra("office_board_from_notification");
-                    view.evaluateJavascript("switchPage('officeBoard')",null);
+                    String id=getIntent().getStringExtra("office_board_note_id");
+                    getIntent().removeExtra("office_board_note_id");
+                    if(id!=null&&id.matches("[a-z0-9]{8,14}-[0-9a-f-]{36}"))
+                        view.evaluateJavascript("switchPage('officeBoard');window.FirstHyundaiOfficeBoard?.focusNote?.("+JSONObject.quote(id)+")",null);
+                    else view.evaluateJavascript("switchPage('officeBoard')",null);
                 }
                 boolean motionOff=false;
                 try{motionOff=Settings.Global.getFloat(getContentResolver(),

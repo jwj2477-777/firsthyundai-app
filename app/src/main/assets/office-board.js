@@ -4,7 +4,15 @@
 const $=id=>document.getElementById(id),bridge=window.FirstHyundaiNative;
 const requests=new Map(),localUpdates=new Map(),localDeletes=new Map();
 let sequence=0,items=[],busy=false,lastCheck=0,showCompleted=false,editing='',editDraft='',timer=null;
-let timerMs=45000;
+let timerMs=45000,pendingFocus='';
+function focusNote(id){
+ if(!valid(id))return false;
+ pendingFocus=id;
+ if(typeof currentPage!=='undefined'&&currentPage==='officeBoard'){
+  draw();refresh(true);
+ }
+ return true;
+}
 function preferences(){
  const p=window.FirstHyundaiUIOptions?.get?.()||{};
  return {memoOrder:p.memoOrder||'newest',memoCompleted:p.memoCompleted||'hide',
@@ -59,6 +67,14 @@ function draw(){
    '<time>'+esc(dateText(note.created_at))+'</time></div>'+
    body+'<div class="officeBoardNoteActions'+(isEdit?' editing':'')+'">'+actions+'</div></article>';
  }).join('');
+ if(pendingFocus){
+  const note=list.querySelector?.('[data-note="'+pendingFocus+'"]');
+  if(note){
+   note.classList?.add?.('officeBoardNotificationTarget');
+   note.scrollIntoView?.({behavior:'smooth',block:'center'});
+   pendingFocus='';
+  }
+ }
 }
 function call(action,payload){
  if(typeof bridge?.officeBoardAction!=='function')return Promise.reject(Error('메모 공유는 최신 안드로이드 앱에서 지원합니다.'));
@@ -192,6 +208,6 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
  onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true)},
  onNewNotification(){if(currentPage==='officeBoard')refresh(true)},
- syncNotificationStatus,enableNotifications,settingsChanged,
+ syncNotificationStatus,enableNotifications,settingsChanged,focusNote,
  _test:{phones,merge}};
 })();

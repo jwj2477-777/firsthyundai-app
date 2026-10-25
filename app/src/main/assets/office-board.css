@@ -197,3 +197,8 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 #officeBoard #officeMemoNotificationStatus{font-size:11px;line-height:1.5;color:#506E6D;flex:1}
 #officeBoard #officeMemoNotificationPermission{min-height:43px;flex:0 0 auto;font-size:12px;padding:8px 12px}
 #officeBoard #officeMemoNotificationPermission.hidden{display:none}
+
+/* Focus a specific note when opening a secure notification. */
+#officeBoard .officeBoardNote.officeBoardNotificationTarget{
+ border-left-color:#A44B3A!important;outline:2px solid #D5AD8A;outline-offset:2px;
+}

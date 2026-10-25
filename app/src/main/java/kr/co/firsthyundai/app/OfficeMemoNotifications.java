@@ -112,9 +112,10 @@ final class OfficeMemoNotifications {
         String last=prefs.getString(LAST,"");
         prefs.edit().putString(LAST_PUSH,id)
           .putString(LAST,id.compareTo(last)>0?id:last).apply();
-        if(enabled(c))post(c,1);
+        if(enabled(c))post(c,1,id);
     }
-    private static void post(Context context,int number){
+    private static void post(Context context,int number){post(context,number,"");}
+    private static void post(Context context,int number,String noteId){
         if(!"enabled".equals(status(context)))return;
         ensureChannel(context);
         NotificationManager nm=(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -122,6 +123,8 @@ final class OfficeMemoNotifications {
         Intent open=new Intent(context,LockActivity.class);
         open.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
         open.putExtra("office_board_from_notification",true);
+        if(noteId!=null&&noteId.matches("[a-z0-9]{8,14}-[0-9a-f-]{36}"))
+            open.putExtra("office_board_note_id",noteId);
         PendingIntent tap=PendingIntent.getActivity(context,43153,open,
                 PendingIntent.FLAG_IMMUTABLE|PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Builder notification=Build.VERSION.SDK_INT>=26
