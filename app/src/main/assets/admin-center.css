@@ -27,3 +27,42 @@
 #adminCenter .adminDiagnosticDetails{background:#F5F8F6;border:1px solid #E2E9E5;border-radius:11px;padding:12px;font-size:11px;overflow-wrap:anywhere}
 #nav .utilityNav>button.adminCenterNav{color:#186A60}
 #nav .utilityNav>button.adminCenterNav.active{color:white;background:#147368;border-color:#0F5E55}
+
+/* v2.0.94 · Expanded safe console inspection */
+#adminCenter .adminSmallHint{font-size:11px;color:#6F7F84}
+#adminCenter .adminAttention{margin-top:10px}
+#adminCenter .adminAttentionItem{display:flex;width:100%;gap:8px;align-items:center;text-align:left;
+ border:0;background:transparent;border-bottom:1px solid #E9EFEB;padding:12px 2px;min-height:46px;color:#2B474D}
+#adminCenter .adminAttentionItem>span:nth-child(2){flex:1;min-width:0;font-size:12px;line-height:1.45}
+#adminCenter .adminFreshnessControls{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:14px 0 8px}
+#adminCenter .adminFreshnessControls label{font-size:13px;font-weight:700;color:#385961}
+#adminCenter #adminFreshnessLevel{min-width:86px;max-width:120px;min-height:40px;padding:6px 10px;border:1px solid #C9DDD6;border-radius:10px;background:#FAFDFB;color:#285258;font-size:13px}
+#adminCenter .adminSubtleButton{min-height:40px;background:#F1F6F4;border:1px solid #D7E6E0;
+ border-radius:10px;padding:8px 11px;font-size:12px;font-weight:650;color:#315B5F}
+#adminCenter .adminFeedDetail{border-bottom:1px solid #E4EDE7}
+#adminCenter .adminFeedDetail summary{display:flex;justify-content:space-between;align-items:center;
+ gap:10px;min-height:68px;cursor:pointer;padding:12px 0;list-style:none}
+#adminCenter .adminFeedDetail summary::-webkit-details-marker{display:none}
+#adminCenter .adminFeedCopy{flex:1;min-width:0}
+#adminCenter .adminFeedCopy strong{display:block;font-size:14px;color:#25444D}
+#adminCenter .adminFeedCopy small{display:block;margin-top:4px;font-size:11px;color:#667D81;line-height:1.5}
+#adminCenter .adminFeedMore{margin:0 0 12px;padding:12px;border-radius:11px;background:#F5F9F7;
+ color:#395A61;font-size:12px;line-height:1.6}
+#adminCenter .adminFeedMore p{margin:0 0 7px}
+#adminCenter .adminFeedActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+#adminCenter .adminFeedActions button{min-height:42px;border:1px solid #CEE0D8;border-radius:10px;
+ color:#225C59;font-size:12px;font-weight:750;background:#FFF}
+#adminCenter .adminAuditItem{display:flex;gap:8px;padding:10px 0;border-bottom:1px solid #EDF1EE;
+ font-size:11px;line-height:1.5;color:#445C62}
+#adminCenter .adminAuditItem time{white-space:nowrap;color:#687F82;font-variant-numeric:tabular-nums}
+#adminCenter .adminAuditItem span{flex:1}
+#adminCenter .adminDeveloperActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
+#adminCenter .adminDeveloperActions button{min-width:0;min-height:43px;padding:8px 5px;font-size:12px}
+#adminCenter .adminReportFallback{display:block;box-sizing:border-box;width:100%;min-height:165px;
+ border:1px solid #CADCD6;border-radius:10px;padding:11px;font-size:12px;background:#FAFDFB;margin:9px 0}
+#adminCenter .adminReportFallback[hidden]{display:none}
+#adminCenter :is(.adminAttentionItem,.adminSubtleButton,.adminFeedActions button):focus-visible{
+ outline:3px solid #187A70;outline-offset:2px}
+@media(max-width:370px){#adminCenter .adminAuditItem{display:block}
+ #adminCenter .adminAuditItem time{display:block}
+ #adminCenter .adminFreshnessControls{gap:6px}}

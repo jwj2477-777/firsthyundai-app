@@ -232,13 +232,35 @@ body.apartmentSheetActive{overflow:hidden}
   </section>
 </div>
 <div id="adminCenter" class="page hidden">
- <div class="sectionTitle"><div><h2>시스템 관리센터</h2><p class="tiny">앱 진단·운영 · 관리자 전용</p></div><button type="button" class="btn alt refreshAction" onclick="FirstHyundaiAdminCenter.refresh()">상태 점검</button></div>
- <section class="panel adminCenterPanel"><div class="adminCenterHead"><h3>운영 현황</h3><span id="adminSystemStatus" class="adminStateBadge">확인 중</span></div>
-  <div id="adminSummary" class="adminSummary" aria-live="polite"></div><p id="adminInstalledVersion" class="adminInstalledVersion"></p><p class="tiny" id="adminCheckNote">게시자료의 상태를 보여줍니다.</p></section>
- <section class="panel adminCenterPanel"><h3>자료별 수집·게시 상태</h3><div id="adminFeeds" class="adminFeeds" aria-live="polite"></div>
-  <div class="adminCenterActions"><button class="btn" type="button" onclick="FirstHyundaiAdminCenter.refresh()">게시자료 다시 확인</button>
-   <a class="btn alt" target="_blank" rel="noopener noreferrer" href="https://github.com/jwj2477-777/firsthyundai-app/actions">실제 수집 관리 ↗</a></div>
-  <p class="tiny">자료 새로 확인은 GitHub에 이미 게시된 데이터를 다운로드합니다. 원천 API 신규 수집은 위 실행 페이지에서 관리합니다.</p></section>
+ <div class="sectionTitle"><div><h2>시스템 관리센터</h2><p class="tiny">앱 진단·운영 · 관리자 전용</p></div><button type="button" class="btn alt refreshAction" onclick="FirstHyundaiAdminCenter.refresh()">전체 점검</button></div>
+ <section class="panel adminCenterPanel">
+  <div class="adminCenterHead"><h3>운영 현황</h3><span id="adminSystemStatus" class="adminStateBadge">확인 중</span></div>
+  <div id="adminSummary" class="adminSummary" aria-live="polite"></div>
+  <p id="adminInstalledVersion" class="adminInstalledVersion"></p>
+  <p class="tiny" id="adminConnectionState">기기 연결 상태 확인 중</p>
+  <p class="tiny" id="adminCheckNote">게시자료 상태를 확인하고 있습니다.</p>
+ </section>
+ <section class="panel adminCenterPanel">
+  <div class="adminCenterHead"><h3>우선 점검할 항목</h3><span class="adminSmallHint">오류·지연·미수집 우선</span></div>
+  <div id="adminAttention" class="adminAttention" aria-live="polite"></div>
+ </section>
+ <section class="panel adminCenterPanel">
+  <div class="adminCenterHead"><h3>자료별 수집·게시 상태</h3></div>
+  <div class="adminFreshnessControls">
+   <label for="adminFreshnessLevel">오래된 자료 경고 기준</label>
+   <select id="adminFreshnessLevel" onchange="FirstHyundaiAdminCenter.levelChanged(this.value)">
+    <option value="strict">민감</option><option value="normal">기본</option><option value="relaxed">여유</option>
+   </select>
+   <button type="button" class="adminSubtleButton" onclick="FirstHyundaiAdminCenter.resetLevel()">기본값 복원</button>
+  </div>
+  <p class="tiny">뉴스는 기본 9시간, 일일 수집 자료는 기본 48~72시간을 기준으로 경고합니다. 단지·학교 자료는 별도로 여유 있게 판단합니다. 경고 기준은 이 휴대폰에서만 적용됩니다.</p>
+  <div id="adminFeeds" class="adminFeeds" aria-live="polite"></div>
+  <div class="adminCenterActions">
+   <button class="btn" type="button" onclick="FirstHyundaiAdminCenter.refresh()">전체 게시자료 재확인</button>
+   <a class="btn alt" target="_blank" rel="noopener noreferrer" href="https://github.com/jwj2477-777/firsthyundai-app/actions">실제 수집 관리 ↗</a>
+  </div>
+  <p class="tiny">재확인은 GitHub에 게시된 데이터를 다시 다운로드합니다. 원천 API 신규 수집은 GitHub Actions에서 직접 실행합니다.</p>
+ </section>
  <section class="panel adminCenterPanel"><h3>운영 도구</h3><div class="adminToolGrid">
   <button type="button" onclick="switchPage('settings')"><b>데이터 연결</b><small>저장소·갱신 주기</small></button>
   <button type="button" onclick="switchPage('apiGuide')"><b>API 연동</b><small>신청·승인 현황</small></button>
@@ -246,13 +268,27 @@ body.apartmentSheetActive{overflow:hidden}
   <button type="button" onclick="switchPage('notes')"><b>내 자료·백업</b><small>기기 내 메모 보관</small></button>
   <button type="button" onclick="switchPage('complexes')"><b>단지정보 편집</b><small>단지 선택 후 관리</small></button>
   <button type="button" onclick="FirstHyundaiAdminCenter.checkUpdate()"><b>앱 업데이트</b><small>최신 설치 버전 검사</small></button>
+  <button type="button" onclick="FirstHyundaiAdminCenter.openAlerts()"><b>알림 설정</b><small>관심단지 알림·휴대폰 권한</small></button>
  </div></section>
- <section class="panel adminCenterPanel"><details id="adminDeveloperDetails" ontoggle="FirstHyundaiAdminCenter.detailsChanged(this.open)">
-  <summary>고급 개발자 진단</summary>
-  <p class="tiny">오류와 공개 게시 상태만 표시합니다. 계약·고객 정보와 비밀번호는 진단에 사용하지 않습니다.</p>
-  <button type="button" class="btn alt" onclick="FirstHyundaiAdminCenter.selfTest()">화면 구성 자가점검</button>
-  <p id="adminSelfTestResult" class="tiny" role="status"></p><div id="adminDiagnosticDetails" class="adminDiagnosticDetails"></div>
- </details></section>
+ <section class="panel adminCenterPanel">
+  <div class="adminCenterHead"><h3>최근 관리자 점검</h3><button class="adminSubtleButton" type="button" onclick="FirstHyundaiAdminCenter.clearAudit()">이력만 지우기</button></div>
+  <div id="adminAuditHistory" class="adminAuditHistory"></div>
+  <p class="tiny">이 휴대폰에 상태 점검 일시와 결과만 최대 24건 저장합니다. 거래·고객 정보는 기록하지 않습니다.</p>
+ </section>
+ <section class="panel adminCenterPanel">
+  <details id="adminDeveloperDetails" ontoggle="FirstHyundaiAdminCenter.detailsChanged(this.open)">
+   <summary>고급 개발자 진단</summary>
+   <p class="tiny">게시 건수·상태·시각만 제공합니다. 오류 원문, 고객 정보, 인증키는 복사하지 않습니다.</p>
+   <div class="adminDeveloperActions">
+    <button class="btn alt" type="button" onclick="FirstHyundaiAdminCenter.selfTest()">화면 구성 자가점검</button>
+    <button class="btn alt" type="button" onclick="FirstHyundaiAdminCenter.copyReport()">진단 요약 복사</button>
+   </div>
+   <p id="adminSelfTestResult" class="tiny" role="status"></p>
+   <p id="adminCopyStatus" class="tiny" role="status"></p>
+   <textarea id="adminReportFallback" class="adminReportFallback" readonly hidden aria-label="선택하여 복사할 진단 보고서"></textarea>
+   <div id="adminDiagnosticDetails" class="adminDiagnosticDetails"></div>
+  </details>
+ </section>
 </div>
 <div id="nearby" class="page hidden">
  <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2><p class="tiny" id="nearbyCollectionMeta">송도동 · 수집 시각 확인 중</p></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>

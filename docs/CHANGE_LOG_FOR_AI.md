@@ -1,5 +1,11 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-25 · v2.0.94 · 관리자 정밀 점검 기능
+- app/src/main/assets/admin-center.js: SOURCES 8종 정의, classifiy 대신 정밀 classify(자료 기준/시각/오류/누락/최대 500건 품질점검), 중요도별 우선 점검, details, 소스별 retry/화면 이동, 기간 경고 strict/normal/relaxed 로컬 설정, 개인자료 미포함 보고서 복사+선택 fallback, 이벤트 최대 24건 로컬 저장/삭제, 관심알림 설정 바로가기.
+- HTML adminCenter만 재배치, admin-center.css에 스코프 스타일 확장. 일반 업무·네비·가족모드·별도 인증 정책은 변경 없음.
+- 스냅샷 갱신과 API 수집 분리; 오류 원문/저장소 주소/개인정보/키를 보고서·이력에 기록 금지. test_admin_console.js 정밀 회귀 확대.
+- 버전 2.0.94/build145, 릴리스 워크플로 동기화. APK 서명/실기기 테스트는 CI 결과 확인 후 보고.
+
 ## 2026-10-25 · v2.0.93 · 시스템 관리센터
 - 신규 assets/admin-center.js/css로 관리자 전용 운영센터 구성, 상태·오류·게시 시각·설치 버전 표시. 앱의 실제 refreshAll/refreshPublicServices 및 appUpdateCheck 연결. 기존 관리자 설정·API·보안·백업·단지 편집으로 진입.
 - 관리자 인증 후 시작 화면 adminCenter, 기존 3대/2보조 업무 메뉴 유지. 가족은 PRIVATE_PAGES로 접근 차단. 기존 AdminPolicy 세션 규칙 불변.
