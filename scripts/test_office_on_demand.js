@@ -44,7 +44,10 @@ const run=q=>vm.runInContext(q,ctx);
 run("publicServices={office_rents:{state:'awaiting_approval',records:[]},office_sales:{state:'awaiting_approval',records:[]}};renderOfficeRentals()");
 assert(nodes.officeRentContent.innerHTML.includes('공식 자료 확인 중'));
 assert(!nodes.officeRentContent.innerHTML.includes('검색 결과 <b>0건</b>'),'Pending must not be counted as zero');
-assert.equal(nodes._lastCounts,null);
+assert.equal(nodes._lastCounts[''],null);
+assert.equal(nodes._lastCounts.매매,null);
+assert.equal(nodes._lastCounts.전세,null);
+assert.equal(nodes._lastCounts.월세,null);
 const rentals=[
  {building:'송도 플러스오피스텔',type:'월세',deposit_10k:3000,monthly_10k:85,area_m2:35.5,contract_date:'2026-10-12',floor:'9',lot_number:'123'},
  {building:'송도 퍼스트오피스텔',type:'전세',deposit_10k:20000,monthly_10k:0,area_m2:62.4,contract_date:'2026-09-15',floor:'14',lot_number:'456'},
