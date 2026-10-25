@@ -1,0 +1,35 @@
+/* Shared sticky notes: freeform composer and light post-it cards. */
+#nav .utilityNav>button.officeBoardNav:not(.active){border-left:4px solid #D4AC43}
+#nav .utilityNav>button.officeBoardNav.active{background:#FFF0B8;color:#6C5219;border:2px solid #CEAA4C}
+#officeBoard .officeBoardComposer{background:#FFF9DC;border:1px solid #EAD7A4;padding:15px}
+#officeBoard .officeBoardLabel{display:block;font-size:13px;font-weight:750;color:#665124;margin-bottom:10px}
+#officeBoard #officeBoardDraft{width:100%;min-height:132px;padding:12px;border:1px solid #E0D2B1;border-radius:12px;
+ line-height:1.7;font-size:15px;resize:vertical;background:#FFFEFA}
+#officeBoard .officeBoardComposerFooter{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+#officeBoard .officeBoardComposerFooter small{font-size:11px;flex:1;color:#807251}
+#officeBoard #officeBoardPost{min-width:103px;min-height:45px;background:#756024;color:#FFF}
+#officeBoard .officeBoardFeedback{min-height:20px;margin:9px 1px}
+#officeBoard .officeBoardAuth{background:#FCF2E1;border:1px solid #E9D4AB}
+#officeBoard .officeBoardAuth p{font-size:13px;line-height:1.6}
+#officeBoard .officeBoardListHeading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:20px 0 11px}
+#officeBoard .officeBoardListHeading strong{font-size:15px;color:#385354}
+#officeBoard #officeBoardShowDone{font-size:12px;color:#706A54;border:0;background:none;text-decoration:underline;padding:9px 0}
+#officeBoard .officeBoardList{display:grid;gap:12px}
+#officeBoard .officeBoardNote{padding:15px;border:1px solid #E7D5A1;border-radius:13px;
+ background:#FFF6CB;box-shadow:0 3px 10px #856A3120}
+#officeBoard .officeBoardNote:nth-child(3n+2){background:#E8F7EE;border-color:#CFE7D7}
+#officeBoard .officeBoardNote:nth-child(3n+3){background:#EDF1FF;border-color:#D5DEF4}
+#officeBoard .officeBoardNote.completed{opacity:.78;box-shadow:none}
+#officeBoard .officeBoardNoteTop{display:flex;justify-content:space-between;gap:8px;font-size:11px;font-weight:730;color:#7A694E}
+#officeBoard .officeBoardNoteTop time{font-weight:500;color:#78817A}
+#officeBoard .officeBoardText{white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px;
+ line-height:1.75;color:#294047;margin:13px 0 14px}
+#officeBoard .officeBoardNote.completed .officeBoardText{text-decoration:line-through;text-decoration-color:#98A59D}
+#officeBoard .officeBoardPhone{text-decoration:underline;text-underline-offset:2px;color:#23617B;font-weight:700}
+#officeBoard .officeBoardNoteActions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:7px}
+#officeBoard .officeBoardNoteActions button{min-width:56px;min-height:38px;border-radius:9px;
+ border:1px solid #D8D2BF;background:#FFFFFFC9;color:#435854;font-size:12px;font-weight:750;padding:6px 10px}
+#officeBoard .officeBoardNoteActions button.officeBoardDelete{color:#A0494A}
+#officeBoard .officeBoardEdit{margin:13px 0;min-height:105px;background:#FFF}
+#officeBoard .officeBoardSafetyNote{margin:17px 0;color:#788583}
+@media(max-width:380px){#officeBoard .officeBoardNote{padding:12px}#officeBoard .officeBoardText{font-size:14px}}
