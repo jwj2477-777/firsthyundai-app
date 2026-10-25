@@ -1,5 +1,11 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-25 · v2.0.98 · 비공개 자유 메모 추가
+- assets/index.html: PAGES와 상단 utilityNav에 #officeBoard, 두 역할 모두 접근. #officeBoardDraft 자유 텍스트 + 붙이기, 리스트/완료 보기, 인증/상태 표시. assets/office-board.js/css 신규.
+- Android: OfficeBoardClient.java 고정 Worker URL/토큰 프라이빗 보관/읽기·POST·PATCH·DELETE. LockActivity 가족 암호 확인에서 최초 게시판 자동 등록, 기존 기기에는 MainActivity native password dialog 사용. 브리지 officeBoardAction / requestOfficeBoardAccess, 코드는 JS 미노출.
+- Worker: /board/session POST에 private family code + rate limit, 60일 HMAC board scope. GET/POST /board, PATCH/DELETE /board/:id 모두 인증 필요. per-note KV key로 동시 새 글 게시 시 목록 덮어쓰기 회피. secret FIRSTHYUNDAI_ACCESS_CODE를 Worker deploy action이 설정, 가족 코드 rotate workflow 연동.
+- test_office_board.mjs: 공개 읽기 차단·wrong code·브라우저 origin 차단·추가/완료/수정/삭제·패치 입력 검사·코드 변경 무효화·공개 설정 민감정보 누출 방지. test_office_board_ui.js: 자유 입력, XSS escape, tel 링크, Native 브리지. CI 40164159729 성공. APK v2.0.98/build149, release/manifest 확인. 부모님 휴대폰 실제 테스트 미수행.
+
 ## 2026-10-25 · v2.0.97/build148 · 중앙 설정 최종 서명 릴리스
 - Worker 신규 KV 바인딩/배포/secret/health 성공. Android User-Agent가 Cloudflare Worker 접근 검사와 동일 계열로 지정됨. admin-preferences.js에서 변경이 Native 게시 요청으로 연결, shared-settings.js에서 일반모드 자동 수신, 단기 네트워크 실패 시 안전 캐시 적용.
 - test_shared_settings_worker.mjs 서버 인증·필드 allowlist·코드 변경 후 토큰 무효화 검사, test_shared_settings.js 로컬/원격/권한 테스트를 통과하도록 구축. v2.0.96 리리스를 덮어쓸 수 없어 v2.0.97로 최종 배포. CI 서명 APK와 update index는 별도 성공 확인 필수.

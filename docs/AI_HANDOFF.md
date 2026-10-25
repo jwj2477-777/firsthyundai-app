@@ -1,5 +1,12 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-25 · v2.0.98 · 사무실 공용 포스트잇
+- 사용자 요구: 최대 5명의 직원(일반모드 부모님·관리자)이 예약/방문/전화/전달 메모를 일체 양식 없이 공유. 별도 #officeBoard 페이지에 큰 textarea 한 칸과 '📌 붙이기' 버튼, 붙여진 메모 카드와 완료/수정/삭제·완료 메모 보기. 전화번호 감지 후 tel 링크 제공.
+- 공개 게시가 아닌 인증된 비공개 서버: workers/shared-settings/src/index.mjs의 /board/session, /board, /board/:id. Cloudflare KV에 개별 키/고유 ID로 저장, 읽기 포함 모든 API는 기존 FIRSTHYUNDAI_ACCESS_CODE로 발급한 HMAC 세션 요구, 60일 만료, 코드 변경 시 세션 서명 무효화. 코드 및 토큰은 WebView JS로 전달되지 않음.
+- Native OfficeBoardClient.java, LockActivity.java: 신규 기기 일반 보안코드 확인 후 백그라운드 게시판 등록. 이미 앱에 로그인해 있던 기기는 첫 사용 시 한번 더 원래 사무실 보안코드 입력. MainActivity.java는 읽기/게시/완료/수정/삭제 Native 전용 브리지; 서버 토큰은 Android MODE_PRIVATE SharedPreferences에만 저장.
+- office-board.js/css: JS에서 개인정보를 담는 localStorage 또는 브라우저 네트워크 fetch 미사용. 게시판 활성 시 45초 주기 조회 및 앱 복귀 시 확인. KV 복제 지연을 고려해 최근 기기 조작 120초 임시 병합. 입력은 1600자 이하 자유 텍스트.
+- v2.0.98/build149 APK 자동 빌드와 test_office_board.mjs, test_office_board_ui.js, 이전 실거래/뉴스/계약 회귀 검사 모두 통과. Cloudflare 게시판 Worker 배포 성공. 아직 사용자 3개 실제 기기간 확인은 수행하지 못함.
+
 ## 2026-10-25 · v2.0.97/build148 최종 공통 설정 APK
 - v2.0.96은 중간 수정 전 immutable 릴리스가 이미 생성되어 같은 태그의 APK를 교체하지 못했다. 동기화 최종 코드 및 Android 브리지 User-Agent, 일반모드 후속 수신, Worker 인증 테스트를 v2.0.97/build148 새 서명 릴리스로 묶음. Worker 배포와 health 성공 확인 기록 존재. 설치 후 실기기 3대 환경 검증 필요.
 
