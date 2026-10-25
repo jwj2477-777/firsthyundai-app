@@ -67,7 +67,7 @@ async function boardCommand(req,env,url){
   return res({schema:1,items});
  }
  if(url.pathname==="/board"&&req.method==="POST"){
-  let data,content;try{data=await body(req);content=validBoardText(data?.text)}
+  let data,content;try{data=await body(req,7000);content=validBoardText(data?.text)}
   catch(e){return res({error:"invalid_note"},400)}
   const device=typeof data?.device==="string"&&/^[a-f0-9]{32}$/.test(data.device)?data.device:"";
   const id=Date.now().toString(36).padStart(9,"0")+"-"+crypto.randomUUID(),now=new Date().toISOString();
@@ -84,7 +84,7 @@ async function boardCommand(req,env,url){
   const saved=await env.SETTINGS.get(memoKey,"json");
   if(!saved)return res({error:"not_found"},404);
   if(req.method==="DELETE"){await env.SETTINGS.delete(memoKey);return res({ok:true})}
-  let data;try{data=await body(req)}catch(e){return res({error:"bad_request"},400)}
+  let data;try{data=await body(req,7000)}catch(e){return res({error:"bad_request"},400)}
   if(!data||typeof data!=="object")return res({error:"invalid_note"},400);
   const patchKeys=Object.keys(data);
   if(!patchKeys.length||patchKeys.some(k=>!["text","done"].includes(k))||
@@ -123,7 +123,13 @@ function validate(x){
  }
  return {schema:1,type:"firsthyundai-ui-settings",preferences:p,tradePopup:x.tradePopup};
 }
-async function body(req){if(Number(req.headers.get("content-length")||0)>2400)throw Error("large");const s=await req.text();if(s.length>2400)throw Error("large");return JSON.parse(s)}
+async function body(req,maxBytes=2400){
+ const size=Number(req.headers.get("content-length")||0);
+ if(size>maxBytes)throw Error("large");
+ const bytes=await req.arrayBuffer();
+ if(bytes.byteLength>maxBytes)throw Error("large");
+ return JSON.parse(new TextDecoder().decode(bytes));
+}
 export default {async fetch(req,env){
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:HEAD});
  const url=new URL(req.url);

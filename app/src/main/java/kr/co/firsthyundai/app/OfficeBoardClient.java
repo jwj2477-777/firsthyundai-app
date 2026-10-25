@@ -90,7 +90,7 @@ final class OfficeBoardClient {
             if(token!=null)connection.setRequestProperty("Authorization","Bearer "+token);
             if(body!=null){
                 byte[] bytes=body.toString().getBytes(StandardCharsets.UTF_8);
-                if(bytes.length>3600)throw new Exception("메모 크기가 너무 큽니다.");
+                if(bytes.length>7000)throw new Exception("메모 크기가 너무 큽니다.");
                 connection.setDoOutput(true);
                 connection.setRequestProperty("Content-Type","application/json; charset=utf-8");
                 try(OutputStream out=connection.getOutputStream()){out.write(bytes);}
