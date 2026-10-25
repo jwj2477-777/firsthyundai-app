@@ -125,6 +125,7 @@ async function boardCommand(req,env,url,ctx){
  const accountDelete=url.pathname.match(/^\/board\/members\/([0-9a-f-]{36})$/);
  if(accountDelete&&req.method==="DELETE"){
   if(!await isAdmin())return res({error:"admin_required"},403);
+  if(accountDelete[1]===caller.member.id)return res({error:"cannot_delete_current_account"},409);
   const account=await env.SETTINGS.get(MEMBER_PREFIX+accountDelete[1],"json");
   if(!account||account.active!==true)return res({error:"not_found"},404);
   const members=await memberList(env);
