@@ -4,7 +4,10 @@
 const $=id=>document.getElementById(id),bridge=window.FirstHyundaiNative;
 const requests=new Map(),localUpdates=new Map(),localDeletes=new Map();
 let sequence=0,items=[],busy=false,lastCheck=0,showCompleted=false,editing='',editDraft='',timer=null;
-let timerMs=45000,pendingFocus='';
+let timerMs=45000,pendingFocus='',view='notes',scheduleOpen=false,suggestedDate='';
+let archiveOpen=false,archived=[];
+const startKst=()=>kstDate(new Date());
+let selectedDate='',calendarMonth='';
 function focusNote(id){
  if(!valid(id))return false;
  pendingFocus=id;
@@ -42,16 +45,175 @@ function phones(value){
  }
  return html+esc(text.slice(offset));
 }
+/* Private shared calendar: use the same authenticated notes; no external sync or browser storage. */
+function kstParts(date){
+ const d=date instanceof Date?date:new Date(date);
+ if(!Number.isFinite(d.getTime()))return null;
+ const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',
+  year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',
+  hourCycle:'h23'}).formatToParts(d);
+ const get=t=>parts.find(p=>p.type===t)?.value||'';
+ return {date:get('year')+'-'+get('month')+'-'+get('day'),
+  time:get('hour')+':'+get('minute')};
+}
+function kstDate(date){return kstParts(date)?.date||''}
+function dateKey(value){return value?kstDate(value):''}
+function inputValue(value){const p=value?kstParts(value):null;return p?p.date+'T'+p.time:''}
+function toIso(value){
+ if(!value)return null;
+ if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value))throw Error('일정 날짜와 시간을 확인해 주세요.');
+ const result=new Date(value+':00+09:00');
+ if(!Number.isFinite(result.getTime())||inputValue(result)!==value)
+  throw Error('일정 날짜 또는 시간이 올바르지 않습니다.');
+ return result.toISOString();
+}
+function scheduleSuggestion(text){
+ const value=String(text||'');
+ const nowKst=new Date(Date.now()+9*3600000);
+ let year=nowKst.getUTCFullYear(),month=nowKst.getUTCMonth()+1,day=nowKst.getUTCDate();
+ const full=value.match(/(20\d{2})\s*[.\/-]\s*(\d{1,2})\s*[.\/-]\s*(\d{1,2})/);
+ const simple=value.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
+ const relative=value.match(/오늘|내일|모레/);
+ if(full){year=+full[1];month=+full[2];day=+full[3]}
+ else if(simple){month=+simple[1];day=+simple[2]}
+ else if(relative){
+  const offset=relative[0]==='내일'?1:relative[0]==='모레'?2:0;
+  const d=new Date(Date.UTC(year,month-1,day+offset));
+  year=d.getUTCFullYear();month=d.getUTCMonth()+1;day=d.getUTCDate();
+ }else return '';
+ const time=value.match(/(오전|오후)?\s*(\d{1,2})\s*시\s*(반|\d{1,2}\s*분?)?/);
+ const digital=time?null:value.match(/(?:^|[^\d])((?:[01]?\d|2[0-3])):([0-5]\d)(?!\d)/);
+ if(!time&&!digital)return '';
+ let hour=time?+time[2]:+digital[1],minute=time?(time[3]?.includes('반')?30:parseInt(time[3]||'0',10)): +digital[2];
+ if(time?.[1]==='오후'&&hour<12)hour+=12;
+ if(time?.[1]==='오전'&&hour===12)hour=0;
+ if(hour>23||minute>59||!Number.isFinite(minute))return '';
+ if(month<1||month>12||day<1||day>31)return '';
+ const actual=new Date(Date.UTC(year,month-1,day));
+ if(actual.getUTCFullYear()!==year||actual.getUTCMonth()+1!==month||actual.getUTCDate()!==day)return '';
+ return [year,String(month).padStart(2,'0'),String(day).padStart(2,'0')].join('-')+
+  'T'+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0');
+}
+function checkSuggestion(){
+ suggestedDate=scheduleSuggestion($('officeBoardDraft')?.value);
+ const el=$('officeBoardScheduleSuggestion');
+ if(!el)return;
+ el.classList?.toggle?.('hidden',!suggestedDate||scheduleOpen);
+ if(suggestedDate)el.textContent='인식한 일정 '+suggestedDate.slice(5).replace('T',' ')+' · 연결하기';
+}
+function setScheduleOpen(open){
+ scheduleOpen=!!open;
+ $('officeBoardScheduleFields')?.classList?.toggle?.('hidden',!scheduleOpen);
+ const toggle=$('officeBoardScheduleToggle');
+ if(toggle)toggle.textContent=scheduleOpen?'✓ 일정 연결됨':'＋ 일정 연결';
+ checkSuggestion();
+}
+function toggleSchedule(){setScheduleOpen(!scheduleOpen);if(scheduleOpen)$('officeBoardScheduleInput')?.focus?.()}
+function clearSchedule(){if($('officeBoardScheduleInput'))$('officeBoardScheduleInput').value='';setScheduleOpen(false)}
+function applySuggestion(){
+ if(!suggestedDate)return;
+ $('officeBoardScheduleInput').value=suggestedDate;
+ setScheduleOpen(true);
+}
+function calendarEntries(){return items.filter(n=>!!dateKey(n.scheduled_at))}
+function drawCalendar(){
+ if(!$('officeBoardCalendarDays'))return;
+ const today=kstDate(new Date());
+ if(!selectedDate)selectedDate=today;
+ if(!calendarMonth)calendarMonth=selectedDate.slice(0,7);
+ const [year,month]=calendarMonth.split('-').map(Number);
+ const first=new Date(Date.UTC(year,month-1,1)),start=first.getUTCDay();
+ const count=new Date(Date.UTC(year,month,0)).getUTCDate();
+ const days=calendarEntries(),byDay=new Map();
+ for(const note of days){
+  const key=dateKey(note.scheduled_at);if(!byDay.has(key))byDay.set(key,[]);
+  byDay.get(key).push(note);
+ }
+ $('officeBoardCalendarMonth').textContent=year+'년 '+month+'월';
+ let markup='';
+ for(let i=0;i<start;i++)markup+='<span class="officeBoardDayEmpty"></span>';
+ for(let d=1;d<=count;d++){
+  const key=calendarMonth+'-'+String(d).padStart(2,'0'),dayNotes=byDay.get(key)||[];
+  markup+='<button type="button" class="officeBoardDay'+
+   (key===today?' today':'')+(key===selectedDate?' selected':'')+
+   '" aria-pressed="'+String(key===selectedDate)+'" onclick="FirstHyundaiOfficeBoard.chooseDay(\''+key+'\')">'+
+   '<span>'+d+'</span>'+(dayNotes.length?'<small>'+dayNotes.length+'건</small>':'')+'</button>';
+ }
+ $('officeBoardCalendarDays').innerHTML=markup;
+ const matching=days.filter(n=>dateKey(n.scheduled_at)===selectedDate)
+  .sort((a,b)=>String(a.scheduled_at).localeCompare(String(b.scheduled_at)));
+ $('officeBoardAgendaHeading').textContent=selectedDate.replace(/-/g,'.')+' · 일정 '+matching.length+'건';
+ $('officeBoardAgendaList').innerHTML=matching.length?matching.map(note=>{
+  const p=kstParts(note.scheduled_at),intro=String(note.text).split('\n')[0];
+  return '<button type="button" class="officeBoardAgendaItem'+(note.done?' completed':'')+
+    '" onclick="FirstHyundaiOfficeBoard.openCalendarNote(\''+esc(note.id)+'\')"><strong>'+
+    esc(p?.time||'')+'</strong><span>'+esc(intro)+'</span>'+
+    (note.done?'<small>완료</small>':'')+'</button>';
+ }).join(''):'<p class="tiny">등록된 일정이 없습니다.</p>';
+}
+function syncViews(){
+ const isCal=view==='calendar';
+ $('officeBoardCalendar')?.classList?.toggle?.('hidden',!isCal);
+ $('officeBoardList')?.classList?.toggle?.('hidden',isCal);
+ $('officeBoardListHeading')?.classList?.toggle?.('hidden',isCal);
+ for(const [id,selected] of [['officeBoardNotesView',!isCal],['officeBoardCalendarView',isCal]]){
+  const e=$(id);if(!e)continue;e.classList?.toggle?.('selected',selected);
+  e.setAttribute?.('aria-pressed',String(selected));
+ }
+ if(isCal)drawCalendar();
+}
+function setView(next){if(next!=='calendar'&&next!=='notes')return;view=next;archiveOpen=false;
+ $('officeBoardArchive')?.classList?.add?.('hidden');syncViews();}
+function chooseDay(key){if(!/^\d{4}-\d{2}-\d{2}$/.test(key))return;
+ selectedDate=key;calendarMonth=key.slice(0,7);drawCalendar();}
+function changeMonth(delta){
+ if(!Number.isInteger(delta)||Math.abs(delta)>1)return;
+ const [y,m]=calendarMonth.split('-').map(Number);
+ const d=new Date(Date.UTC(y,m-1+delta,1));
+ calendarMonth=d.toISOString().slice(0,7);
+ selectedDate=calendarMonth+'-01';drawCalendar();
+}
+function today(){selectedDate=kstDate(new Date());calendarMonth=selectedDate.slice(0,7);drawCalendar()}
+function addAtSelectedDay(){
+ if(!selectedDate)today();
+ $('officeBoardScheduleInput').value=selectedDate+'T09:00';setScheduleOpen(true);setView('notes');
+ $('officeBoardDraft')?.scrollIntoView?.({block:'center',behavior:'smooth'});
+ $('officeBoardDraft')?.focus?.();
+}
+function openCalendarNote(id){
+ if(!valid(id))return;showCompleted=true;setView('notes');focusNote(id);
+}
+async function toggleArchive(){
+ if(bridge?.getMode?.()!=='admin'){msg('복구함은 관리자만 열 수 있습니다.');return}
+ archiveOpen=!archiveOpen;
+ $('officeBoardArchive')?.classList?.toggle?.('hidden',!archiveOpen);
+ if(!archiveOpen)return;
+ try{const data=await call('archive',{});archived=Array.isArray(data.notes)?data.notes:[];
+  drawArchive();}catch(e){msg(e.message)}
+}
+function drawArchive(){
+ const root=$('officeBoardArchiveList');if(!root)return;
+ root.innerHTML=archived.length?archived.map(n=>'<article class="officeBoardArchivedItem"><p>'+
+  esc(String(n.text).slice(0,140))+'</p><button type="button" data-restore="'+esc(n.id)+'">복구</button></article>').join(''):
+  '<p class="tiny">복구 가능한 메모가 없습니다.</p>';
+}
+$('officeBoardArchiveList')?.addEventListener?.('click',e=>{
+ const id=e.target?.closest?.('button[data-restore]')?.dataset?.restore;
+ if(valid(id))mutate('restore',{id}).then(result=>{if(result){archived=archived.filter(n=>n.id!==id);drawArchive();refresh(true)}});
+});
+$('officeBoardDraft')?.addEventListener?.('input',checkSuggestion);
 function draw(){
  const list=$('officeBoardList');if(!list)return;
  $('officeBoardCount').textContent=String(items.filter(x=>!x.done).length);
  const completedCount=items.filter(x=>x.done).length;
  $('officeBoardShowDone').textContent=showCompleted?'완료 숨기기':'완료 '+completedCount+'건 보기';
  $('officeBoardShowDone').setAttribute?.('aria-pressed',showCompleted?'true':'false');
+ const admin=bridge?.getMode?.()==='admin';
+ $('officeBoardArchiveOpen')?.classList?.toggle?.('hidden',!admin);
  const visible=items.filter(x=>showCompleted||!x.done);
  if(!visible.length){
   list.innerHTML='<div class="empty">'+(items.length?'표시할 메모가 없습니다. 완료 메모를 열어볼 수 있습니다.':'아직 메모가 없습니다. 첫 포스트잇을 붙여보세요.')+'</div>';
-  return;
+  drawCalendar();syncViews();return;
  }
  list.innerHTML=visible.map(note=>{
   const id=esc(note.id),isEdit=editing===note.id;
@@ -61,11 +223,13 @@ function draw(){
     '<button data-action="cancel" data-id="'+id+'">취소</button>':
    '<button class="officeBoardDoneAction" data-action="done" data-id="'+id+'">'+(note.done?'완료 취소':'완료')+'</button>'+
    '<button data-action="edit" data-id="'+id+'">수정</button>'+
-   '<button data-action="delete" data-id="'+id+'" class="officeBoardDelete">삭제</button>';
+   (admin?'<button data-action="delete" data-id="'+id+'" class="officeBoardDelete">삭제</button>':'');
   return '<article class="officeBoardNote'+(note.done?' completed':'')+'" data-note="'+id+'">'+
    '<div class="officeBoardNoteTop"><span class="officeBoardNoteLabel">'+(note.done?'✓ 완료':'공유 메모')+'</span>'+
    '<time>'+esc(dateText(note.created_at))+'</time></div>'+
-   body+'<div class="officeBoardNoteActions'+(isEdit?' editing':'')+'">'+actions+'</div></article>';
+   body+(isEdit?'<label class="officeBoardEditSchedule">일정 날짜·시간 (비워두면 연결 해제)<input type="datetime-local" data-edit-schedule="'+id+'" value="'+esc(inputValue(note.scheduled_at))+'"></label>':
+    (note.scheduled_at?'<div class="officeBoardNoteSchedule">▦ '+esc(dateText(note.scheduled_at))+'</div>':''))+
+   '<div class="officeBoardNoteActions'+(isEdit?' editing':'')+'">'+actions+'</div></article>';
  }).join('');
  if(pendingFocus){
   const note=list.querySelector?.('[data-note="'+pendingFocus+'"]');
@@ -75,6 +239,7 @@ function draw(){
    pendingFocus='';
   }
  }
+ drawCalendar();syncViews();
 }
 function call(action,payload){
  if(typeof bridge?.officeBoardAction!=='function')return Promise.reject(Error('메모 공유는 최신 안드로이드 앱에서 지원합니다.'));
@@ -149,7 +314,7 @@ function enableNotifications(){
  bridge?.requestOfficeMemoNotifications?.();
 }
 function open(){
- settingsChanged();syncNotificationStatus();refresh();
+ settingsChanged();syncNotificationStatus();syncViews();checkSuggestion();refresh();
 }
 async function mutate(action,data){
  if(busy)return null;
@@ -158,7 +323,10 @@ async function mutate(action,data){
   const result=await call(action,data);
   if(action==='delete')localDeletes.set(data.id,Date.now());
   else if(result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
-  if(action==='post')$('officeBoardDraft').value='';
+  if(action==='post'){
+   $('officeBoardDraft').value='';clearSchedule();checkSuggestion();
+  }
+  if(action==='restore'&&result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
   editing='';editDraft='';
   merge(items);
   msg(action==='post'?'포스트잇을 붙였습니다. 다른 휴대폰에도 공유됩니다.':'메모가 반영됐습니다.');
@@ -170,7 +338,11 @@ function post(){
  const value=String($('officeBoardDraft').value||'').trim();
  if(!value){msg('내용을 적어 주세요.');$('officeBoardDraft').focus();return}
  if(value.length>1600){msg('메모는 최대 1600자입니다.');return}
- mutate('post',{text:value});
+ let scheduled_at=null;
+ try{if(scheduleOpen)scheduled_at=toIso($('officeBoardScheduleInput').value)}
+ catch(e){msg(e.message);return}
+ if(scheduleOpen&&!scheduled_at){msg('연결할 일정 날짜와 시간을 지정해 주세요.');return}
+ mutate('post',{text:value,scheduled_at});
 }
 function edit(id){const note=items.find(x=>x.id===id);if(!note)return;editing=id;editDraft=note.text;draw();$('officeBoardList').querySelector('textarea[data-edit]')?.focus?.()}
 function cancelEdit(){editing='';editDraft='';draw()}
@@ -178,12 +350,16 @@ function saveEdit(id){
  if(id!==editing)return;
  const value=String($('officeBoardList').querySelector('textarea[data-edit]')?.value||'').trim();
  if(!value||value.length>1600){msg('수정 내용은 1~1600자여야 합니다.');return}
- mutate('edit',{id,text:value});
+ let scheduled_at=null;
+ try{scheduled_at=toIso($('officeBoardList').querySelector('input[data-edit-schedule]')?.value||'')}
+ catch(e){msg(e.message);return}
+ mutate('edit',{id,text:value,scheduled_at});
 }
 function setDone(id,done){if(valid(id))mutate('done',{id,done})}
 function remove(id){
  if(!valid(id))return;
- if(typeof confirm==='function'&&!confirm('이 포스트잇을 모든 휴대폰에서 삭제할까요?'))return;
+ if(bridge?.getMode?.()!=='admin'){msg('삭제는 관리자만 할 수 있습니다.');return}
+ if(typeof confirm==='function'&&!confirm('이 메모를 복구함으로 이동할까요? 30일 안에 복구할 수 있습니다.'))return;
  mutate('delete',{id});
 }
 function toggleDone(){showCompleted=!showCompleted;draw()}
@@ -206,8 +382,9 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
  if(action==='delete')remove(id);
 });
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
+ setView,chooseDay,changeMonth,today,addAtSelectedDay,openCalendarNote,toggleSchedule,clearSchedule,applySuggestion,toggleArchive,
  onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true)},
  onNewNotification(){if(currentPage==='officeBoard')refresh(true)},
  syncNotificationStatus,enableNotifications,settingsChanged,focusNote,
- _test:{phones,merge}};
+ _test:{phones,merge,scheduleSuggestion,toIso,dateKey}};
 })();
