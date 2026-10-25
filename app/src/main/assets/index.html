@@ -235,21 +235,20 @@ body.apartmentSheetActive{overflow:hidden}
   </section>
 </div>
 <div id="officeBoard" class="page hidden">
- <div class="sectionTitle"><div><h2>사무실 포스트잇</h2><p class="tiny">서로 남기는 간단한 전달 메모</p></div>
-  <button type="button" class="btn alt refreshAction" onclick="FirstHyundaiOfficeBoard.refresh()">새로고침</button></div>
+ <div class="sectionTitle officeBoardTitle"><div><h2>사무실 메모</h2><p class="tiny">함께 쓰는 포스트잇</p></div>
+  <button type="button" class="btn alt refreshAction" onclick="FirstHyundaiOfficeBoard.refresh()" aria-label="공유 메모 새로고침">↻ 새로고침</button></div>
  <section class="panel officeBoardComposer">
-  <label for="officeBoardDraft" class="officeBoardLabel">그냥 포스트잇처럼 자유롭게 적으세요</label>
-  <textarea id="officeBoardDraft" maxlength="1600" rows="4" placeholder="오늘 오후 3시 반에 ○○부동산과 퍼스트파크 1502동 3004호 방문 예정&#10;부동산: 000-0000-0000&#10;손님: 000-0000-0000"></textarea>
-  <div class="officeBoardComposerFooter"><small>양식 없이 글 그대로 공유</small>
-   <button id="officeBoardPost" class="btn" type="button" onclick="FirstHyundaiOfficeBoard.post()">📌 붙이기</button></div>
+  <label for="officeBoardDraft" class="officeBoardLabel">새 메모</label>
+  <textarea id="officeBoardDraft" maxlength="1600" rows="4" placeholder="전달할 내용을 자유롭게 적어주세요."></textarea>
+  <div class="officeBoardComposerFooter">
+   <button id="officeBoardPost" class="btn" type="button" onclick="FirstHyundaiOfficeBoard.post()">메모 붙이기</button></div>
  </section>
  <p id="officeBoardFeedback" class="tiny officeBoardFeedback" role="status" aria-live="polite"></p>
  <div id="officeBoardAuth" class="panel officeBoardAuth hidden"><p>이 휴대폰에서 최초 한 번만 사무실 보안코드를 확인합니다.</p>
   <button type="button" class="btn" onclick="FirstHyundaiOfficeBoard.authenticate()">사무실 메모 연결하기</button></div>
- <div class="officeBoardListHeading"><strong>공유 메모 <span id="officeBoardCount">—</span></strong>
+ <div class="officeBoardListHeading"><strong>공유 메모 <span id="officeBoardCount" aria-label="미완료 메모 수">—</span></strong>
   <button id="officeBoardShowDone" type="button" onclick="FirstHyundaiOfficeBoard.toggleDone()">완료 메모 보기</button></div>
  <div id="officeBoardList" class="officeBoardList" aria-live="polite"><div class="empty">메모를 불러오는 중입니다.</div></div>
- <p class="tiny officeBoardSafetyNote">사무실 구성원만 읽고 쓸 수 있는 비공개 게시판입니다.</p>
 </div>
 <div id="adminCenter" class="page hidden">
  <div class="sectionTitle"><div><h2>시스템 관리센터</h2><p class="tiny">앱 진단·운영 · 관리자 전용</p></div><button type="button" class="btn alt refreshAction" onclick="FirstHyundaiAdminCenter.refresh()">전체 점검</button></div>
@@ -1006,9 +1005,9 @@ function renderMainNavigation(id){
  const tools='<div class="utilityNav" aria-label="빠른 업무"><button class="'+(id==='overview'?'active':'')+
   '" type="button" aria-current="'+(id==='overview'?'page':'false')+'" onclick="switchPage(\'overview\')">▦ 오늘 요약</button>'+
   '<button class="'+(id==='contracts'?'active':'')+'" type="button" aria-current="'+(id==='contracts'?'page':'false')+'" onclick="switchPage(\'contracts\')">✎ 계약문자 만들기</button>'+
-  '<button class="officeBoardNav '+(id==='officeBoard'?'active':'')+'" type="button" aria-current="'+(id==='officeBoard'?'page':'false')+'" onclick="switchPage(\'officeBoard\')">📌 사무실 포스트잇</button>'+
+  '<button class="officeBoardNav '+(id==='officeBoard'?'active':'')+'" type="button" aria-current="'+(id==='officeBoard'?'page':'false')+'" onclick="switchPage(\'officeBoard\')">▤ 공유 메모</button>'+
   admin+'</div>';
- // Today Summary and Contract sit immediately below the three main tabs on every screen.
+ // Three equal-width common shortcuts sit below the main tabs on every screen.
  // Trade-only apartment/officetel and detail filters follow them.
  $('nav').innerHTML=primary+tools;
 }

@@ -1,0 +1,26 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const dir=path.join(__dirname,'../app/src/main/assets');
+const html=fs.readFileSync(path.join(dir,'index.html'),'utf8');
+const css=fs.readFileSync(path.join(dir,'office-board.css'),'utf8');
+const js=fs.readFileSync(path.join(dir,'office-board.js'),'utf8');
+const main=html.split('<script>')[1].split('</script>')[0];
+new vm.Script(main);new vm.Script(js);
+const page=html.slice(html.indexOf('<div id="officeBoard" class="page hidden">'),
+ html.indexOf('<div id="adminCenter" class="page hidden">'));
+assert(page.includes('<h2>사무실 메모</h2>'));
+assert(page.includes('id="officeBoardDraft"')&&page.includes('id="officeBoardPost"'));
+assert(page.includes('메모 붙이기'));
+assert.equal((page.match(/<textarea /g)||[]).length,1,'Only one freeform composer, no structured appointment fields');
+assert(!page.includes('000-0000-0000'),'Avoid fixture-looking phone numbers as visual clutter');
+assert(main.includes('▤ 공유 메모')&&main.includes('class="officeBoardNav '));
+assert(css.includes('grid-template-columns:repeat(3,minmax(0,1fr))'),'Common navigation and card actions are equal columns');
+assert(css.includes('#nav .utilityNav>button.adminCenterNav')&&css.includes('grid-column:1 / -1'),'Admin shortcut must not shift the 3 common button positions');
+assert(css.includes('.officeBoardNoteActions.editing')&&css.includes('repeat(2,minmax(0,1fr))'),'Stable edit action layout');
+assert(!css.includes('nth-child(3n+2)')&&!css.includes('nth-child(3n+3)'),'No arbitrary rainbow note backgrounds');
+assert(css.includes('data-reading-size="large"'),'Respect existing administrator reading-size setting');
+assert(js.includes('officeBoardNoteActions')&&js.includes('officeBoardDoneAction'));
+assert(js.includes('data-action="done"')&&js.includes('data-action="edit"')&&js.includes('data-action="delete"'));
+assert(js.includes("setAttribute?.('aria-pressed'"),'Completion filter indicates pressed state');
+assert(!js.includes('localStorage')&&!js.includes('fetch('),'Private note transport unchanged');
+console.log('Unified office memo UX passed: 3 fixed shortcuts, equal note actions, compact card, one composer and privacy.');

@@ -15,6 +15,7 @@ on:
       - 'scripts/test_shared_settings_worker.mjs'
       - 'scripts/test_office_board.mjs'
       - 'scripts/test_office_board_ui.js'
+      - 'scripts/test_office_board_layout.js'
       - 'scripts/test_admin_guards.js'
       - 'scripts/test_complexes.js'
       - 'scripts/test_catalog_editor.js'
@@ -226,6 +227,7 @@ jobs:
           node scripts/test_shared_settings_worker.mjs
           node scripts/test_office_board.mjs
           node scripts/test_office_board_ui.js
+          node scripts/test_office_board_layout.js
           node scripts/test_complexes.js
           node scripts/test_catalog_editor.js
           node scripts/test_complex_discovery.js
@@ -305,22 +307,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.0.98 private shared sticky notes APK
+      - name: Publish v2.0.99 modern unified office notes layout APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.98.apk
-          unzip -t FirstHyundai-v2.0.98.apk | grep 'No errors detected'
-          if gh release view v2.0.98 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.0.99.apk
+          unzip -t FirstHyundai-v2.0.99.apk | grep 'No errors detected'
+          if gh release view v2.0.99 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.0.98 FirstHyundai-v2.0.98.apk \
+            gh release create v2.0.99 FirstHyundai-v2.0.99.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.0.98 · 사무실 포스트잇 공유' \
-              --notes '관리자가 시작 화면·목록 밀도·글씨·화면효과·대비·관심단지 알림을 변경하면 공통 설정 서버에 게시하고 일반모드 휴대폰에서 자동 수신합니다. 공개 설정만 공유하며 비밀번호·고객 메모·계약 자료는 공유하지 않습니다. 서버 연결/게시 실패 시 명확한 상태 메시지를 표시합니다. v2.0.98/build149.'
+              --title '퍼스트현대 v2.0.99 · 사무실 메모 UI 정리' \
+              --notes '사무실 포스트잇 화면을 퍼스트현대 디자인과 통일: 작성칸 하나와 메모 붙이기 버튼, 차분한 단일 메모 카드, 일정한 3칸 완료·수정·삭제 버튼, 동일 위치·크기의 상단 오늘 요약·계약문자·공유 메모 버튼. 자유 메모 공유·보안·동기화 기능은 유지합니다. v2.0.99/build150.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.0.98 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.0.98 --apk FirstHyundai-v2.0.98.apk
+          gh release upload v2.0.99 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.0.99 --apk FirstHyundai-v2.0.99.apk

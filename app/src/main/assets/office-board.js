@@ -26,7 +26,9 @@ function phones(value){
 function draw(){
  const list=$('officeBoardList');if(!list)return;
  $('officeBoardCount').textContent=String(items.filter(x=>!x.done).length);
- $('officeBoardShowDone').textContent=showCompleted?'완료 메모 숨기기':'완료 메모 보기';
+ const completedCount=items.filter(x=>x.done).length;
+ $('officeBoardShowDone').textContent=showCompleted?'완료 숨기기':'완료 '+completedCount+'건 보기';
+ $('officeBoardShowDone').setAttribute?.('aria-pressed',showCompleted?'true':'false');
  const visible=items.filter(x=>showCompleted||!x.done);
  if(!visible.length){
   list.innerHTML='<div class="empty">'+(items.length?'표시할 메모가 없습니다. 완료 메모를 열어볼 수 있습니다.':'아직 메모가 없습니다. 첫 포스트잇을 붙여보세요.')+'</div>';
@@ -36,13 +38,15 @@ function draw(){
   const id=esc(note.id),isEdit=editing===note.id;
   const body=isEdit?'<textarea class="officeBoardEdit" maxlength="1600" data-edit="'+id+'" aria-label="메모 수정">'+esc(editDraft)+'</textarea>':
    '<div class="officeBoardText">'+phones(note.text)+'</div>';
-  const actions=isEdit?'<button data-action="save" data-id="'+id+'">저장</button><button data-action="cancel" data-id="'+id+'">취소</button>':
-   '<button data-action="done" data-id="'+id+'">'+(note.done?'다시 표시':'✓ 완료')+'</button>'+
+  const actions=isEdit?'<button class="officeBoardSave" data-action="save" data-id="'+id+'">저장</button>'+
+    '<button data-action="cancel" data-id="'+id+'">취소</button>':
+   '<button class="officeBoardDoneAction" data-action="done" data-id="'+id+'">'+(note.done?'완료 취소':'완료')+'</button>'+
    '<button data-action="edit" data-id="'+id+'">수정</button>'+
    '<button data-action="delete" data-id="'+id+'" class="officeBoardDelete">삭제</button>';
   return '<article class="officeBoardNote'+(note.done?' completed':'')+'" data-note="'+id+'">'+
-   '<div class="officeBoardNoteTop"><span>📌 '+(note.done?'완료':'공유 메모')+'</span><time>'+esc(dateText(note.created_at))+'</time></div>'+
-   body+'<div class="officeBoardNoteActions">'+actions+'</div></article>';
+   '<div class="officeBoardNoteTop"><span class="officeBoardNoteLabel">'+(note.done?'✓ 완료':'공유 메모')+'</span>'+
+   '<time>'+esc(dateText(note.created_at))+'</time></div>'+
+   body+'<div class="officeBoardNoteActions'+(isEdit?' editing':'')+'">'+actions+'</div></article>';
  }).join('');
 }
 function call(action,payload){

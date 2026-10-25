@@ -1,5 +1,10 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-25 · v2.0.99 · 사무실 메모 화면/버튼 통일
+- officeBoard 시각/UI만 조정. 상단 빠른업무 3개(오늘 요약·계약문자·공유 메모)는 동일한 3열 고정 높이. 관리자 4번째 단축메뉴는 별도 전체행으로 배치해 공통 3개 버튼의 좌표가 일반/관리자 전환에도 변하지 않음. 기존 3개 주메뉴(실거래/아파트정보/뉴스)는 위치 변경하지 않음.
+- #officeBoard 작성칸 한 개 + '메모 붙이기' 한 버튼으로 정리, 예시 전화번호 placeholder 제거. 카드 무작위 3색 삭제하고 따뜻한 중립색+작은 골드 포인트, 밀도/본문 크기/대비 관리자 설정 연계, 과도한 그림자 제거. 모든 메모의 완료/수정/삭제 버튼은 동일 3열 42px, 수정 중엔 동일 2열 저장/취소. 완료 메모 toggle ARIA 상태 추가.
+- 게시/수정/삭제/완료 서버/Native 인증/동기화 비즈니스 로직 불변. tests/test_office_board_layout.js (실제 경로 scripts/) 신규 CSS·버튼 정렬 회귀. v2.0.99/build150. CI와 실기기 UX 별도 확인.
+
 ## 2026-10-25 · v2.0.98 · 비공개 자유 메모 추가
 - assets/index.html: PAGES와 상단 utilityNav에 #officeBoard, 두 역할 모두 접근. #officeBoardDraft 자유 텍스트 + 붙이기, 리스트/완료 보기, 인증/상태 표시. assets/office-board.js/css 신규.
 - Android: OfficeBoardClient.java 고정 Worker URL/토큰 프라이빗 보관/읽기·POST·PATCH·DELETE. LockActivity 가족 암호 확인에서 최초 게시판 자동 등록, 기존 기기에는 MainActivity native password dialog 사용. 브리지 officeBoardAction / requestOfficeBoardAccess, 코드는 JS 미노출.
