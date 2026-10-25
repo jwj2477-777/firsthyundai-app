@@ -61,6 +61,10 @@ async function boardCommand(req,env,url,ctx){
   return res({error:"board_auth_required"},401);
  if(url.pathname==="/board/push/register"&&req.method==="POST")return pushRegister(req,env);
  if(url.pathname==="/board/push/status"&&req.method==="GET")return res({push_available:!!fcmConfig(env)});
+ if(url.pathname==="/board/push/config"&&req.method==="GET"){
+  const config=fcmPublicConfig(env);
+  return res({configured:!!config,push_available:!!fcmConfig(env),config:config||null});
+ }
  if(url.pathname==="/board"&&req.method==="GET")return res({schema:1,notes:await boardList(env)});
  if(url.pathname==="/board/updates"&&req.method==="GET"){
   const list=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
@@ -121,6 +125,29 @@ function fcmConfig(env){
    !/^[^@\s]{3,100}@[^@\s]{3,200}$/.test(credentials.client_email)||
    !credentials.private_key?.includes("BEGIN PRIVATE KEY"))return null;
   return credentials;
+ }catch(e){return null}
+}
+function fcmPublicConfig(env){
+ try{
+  const raw=env.FHD_FIREBASE_ANDROID_JSON;
+  if(!raw||raw.length>18000)return null;
+  const doc=JSON.parse(raw);
+  let config;
+  if(doc.project_info&&Array.isArray(doc.client)){
+   const client=doc.client.find(x=>
+    x.client_info?.android_client_info?.package_name==="kr.co.firsthyundai.app");
+   if(!client)return null;
+   config={app_id:client.client_info.mobilesdk_app_id,
+    api_key:client.api_key?.[0]?.current_key,
+    project_id:doc.project_info.project_id,
+    sender_id:String(doc.project_info.project_number||"")};
+  }else config={app_id:doc.app_id,api_key:doc.api_key,
+   project_id:doc.project_id,sender_id:String(doc.sender_id||"")};
+  if(!/^1:[0-9]+:android:[0-9a-fA-F]+$/.test(config.app_id||"")||
+   !/^AIza[A-Za-z0-9_-]{20,}$/.test(config.api_key||"")||
+   !/^[A-Za-z0-9._-]{3,120}$/.test(config.project_id||"")||
+   !/^[0-9]{5,30}$/.test(config.sender_id))return null;
+  return config;
  }catch(e){return null}
 }
 function fcmTokenValid(value){
@@ -271,4 +298,4 @@ export default {async fetch(req,env,ctx){
   await env.SETTINGS.put(key,JSON.stringify(record));return res(record);
  }
  return res({error:"not_found"},404);
-},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,fcmConfig,fcmTokenValid,sendPush,familyRevision}};
+},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision}};
