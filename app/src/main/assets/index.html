@@ -362,7 +362,7 @@ body.apartmentSheetActive{overflow:hidden}
    <button type="button" class="active" aria-current="page" onclick="switchPage('new')"><span class="starterIcon">✦</span>새 거래</button>
   </div>
   <p class="tiny apartmentTradeTypeLabel">거래 유형</p>
-   <div class="newTypeChips" role="group" aria-label="새 거래 유형 선택">
+   <div class="newTypeChips" id="newTypeBar" role="group" aria-label="새 거래 유형 선택">
     <button id="newTypeAll" type="button" aria-pressed="true" onclick="chooseNewType('')">전체</button>
     <button id="newTypeSale" type="button" aria-pressed="false" onclick="chooseNewType('매매')">매매</button>
     <button id="newTypeLease" type="button" aria-pressed="false" onclick="chooseNewType('전세')">전세</button>
@@ -1646,7 +1646,7 @@ function renderOfficeRentals(){
  $('officeModeLatest')?.setAttribute?.('aria-pressed',officeSearchMode==='latest'?'true':'false');
  $('officeModeSearch')?.setAttribute?.('aria-pressed',officeSearchMode==='search'?'true':'false');
  $('officeSearchPanel')?.classList?.toggle?.('hidden',officeSearchMode!=='search');
- renderTypeButtons('officeTypeBar',chosenType);
+ renderTypeButtons('officeTypeBar',chosenType,null);
  if(officeSearchMode==='search'){
   const names=[...new Set(all.map(x=>String(x.building||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko'));
   $('officeBuildingSelect').innerHTML='<option value="">오피스텔을 선택하세요</option>'+names.map(name=>
@@ -1673,14 +1673,20 @@ function renderOfficeRentals(){
   el.innerHTML='<div class="empty">검색 기간과 면적 범위를 확인해 주세요.</div>';
   $('officeMore')?.classList?.add?.('hidden');return;
  }
- const selected=all.filter(x=>(!chosenType||x.type===chosenType)&&
+ const scoped=all.filter(x=>
   (!q||String(x.building||'').toLowerCase().includes(q))&&
   (officeSearchMode!=='search'||!officeSelectedBuilding||x.building===officeSelectedBuilding)&&
   (officeSearchMode!=='search'||!officeSelectedArea||areaKey(x.area_m2)===officeSelectedArea)&&
   (!from||String(x.contract_date||'')>=from)&&(!to||String(x.contract_date||'')<=to)&&
   (minArea===null||Number(x.area_m2)>=minArea)&&(maxArea===null||Number(x.area_m2)<=maxArea)&&
   ($('officeStatusFilter').value==='cancel'?x.status==='해제':
-    $('officeStatusFilter').value==='notcancel'?x.status!=='해제':true))
+    $('officeStatusFilter').value==='notcancel'?x.status!=='해제':true));
+ const counts=tradeTypeCounts(scoped);
+ if(!sales)counts.매매=null;
+ if(!rental){counts.전세=null;counts.월세=null;}
+ if(!sales||!rental)counts['']=null;
+ renderTypeButtons('officeTypeBar',chosenType,counts);
+ const selected=scoped.filter(x=>!chosenType||x.type===chosenType)
   .sort((a,b)=>String(b.contract_date||'').localeCompare(String(a.contract_date||'')));
  const status=(salePending?'<div class="officePending">오피스텔 매매 API 활용승인·첫 수집 확인 중입니다. 아직 매매 0건으로 판단할 수 없습니다.</div>':'')+
   (rentPending?'<div class="officePending">오피스텔 전월세 공식 자료 확인 중입니다. 아직 거래 0건으로 판단할 수 없습니다.</div>':'');
@@ -1859,6 +1865,11 @@ function tradeBrokerLocation(row){
  return region?'<div class="meta tradeBrokerRegion">중개사 소재지 · '+escapeHtml(region)+'</div>':'';
 }
 
+function tradeTypeCounts(rows){
+ const result={'':rows.length,매매:0,전세:0,월세:0};
+ for(const x of rows)if(Object.prototype.hasOwnProperty.call(result,x.type))result[x.type]++;
+ return result;
+}
 function renderTypeButtons(id,type,counts){
  const el=$(id);if(!el)return;
  const buttons=el.querySelectorAll?Array.from(el.querySelectorAll('button')):[];
@@ -2137,7 +2148,7 @@ function renderTrades(){
  // Keep just the apartment search affordance here and make its state explicit.
  const searchActive=tradeMode==='search';
  $('tradeSearchPanel').classList.toggle('hidden',!searchActive);
- renderTypeButtons('tradeTypeBar',$('typeFilter').value);
+ renderTypeButtons('tradeTypeBar',$('typeFilter').value,null);
  updateTradeActiveSummary();
  if(tradeMode==='search'){
   if(payload && $('tradeBuildingSelect').options.length<=1)populateTradeBuildings();
@@ -2171,20 +2182,22 @@ function renderTrades(){
   (tradeFocus.area?' · 전용 '+number(tradeFocus.area)+'㎡':'')+
   ' · '+escapeHtml(type||tradeFocus.type||'전체 거래')+
   ' <button class="btn alt" type="button" onclick="clearTradeFocus()">전체 최신순으로 돌아가기</button></div>':'';
- let records=(payload.records||[]).filter(x=>
+ const scoped=(payload.records||[]).filter(x=>
   (!focused||(
    (focused.aliases||[]).some(name=>normalizeAptName(name)===normalizeAptName(x.building))||
    normalizeAptName(focused.label)===normalizeAptName(x.building)
   ))&&
   (!tradeFocus?.area||areaKey(x.area_m2)===areaKey(tradeFocus.area))&&
-  (!tradeFocus?.type||x.type===tradeFocus.type)&&
+  
   (!favoriteOnly||favoriteIdForBuilding(x.building))&&
-  (!type||x.type===type)&&
+  
   (!q||String(x.building||'').toLowerCase().includes(q))&&
   (tradeMode!=='search'||!selectedTradeBuilding||x.building===selectedTradeBuilding)&&
   (tradeMode!=='search'||!selectedTradeArea||areaKey(x.area_m2)===selectedTradeArea)&&
   (s==='cancel'?x.status==='해제':s==='notcancel'?x.status!=='해제':true)&&
   tradeContractDateMatches(x.contract_date,dateFrom,dateTo));
+ renderTypeButtons('tradeTypeBar',type,tradeTypeCounts(scoped));
+ let records=scoped.filter(x=>(!tradeFocus?.type||x.type===tradeFocus.type)&&(!type||x.type===type));
  records.sort((a,b)=>(b.contract_date||'').localeCompare(a.contract_date||''));
  const rows=records.slice(0,70);
  $('tradesContent').innerHTML=
@@ -2402,13 +2415,17 @@ function toggleNewFavorites(){
  $('newFavoriteFilter').value=$('newFavoriteFilter').value==='favorites'?'':'favorites';
  renderNew();
 }
-function updateNewQuickFilters(){
+function updateNewQuickFilters(counts=null){
  const selected=$('newType').value;
  for(const [id,type] of [['newTypeAll',''],['newTypeSale','매매'],
                          ['newTypeLease','전세'],['newTypeMonthly','월세']]){
   const button=$(id),active=selected===type;
   button.classList.toggle('active',active);
   button.setAttribute?.('aria-pressed',active?'true':'false');
+  const label=type||'전체';
+  const count=counts&&Number.isSafeInteger(counts[type])?number(counts[type])+'건':'—';
+  button.innerHTML='<span class="typeLabel">'+label+'</span><span class="typeCount">'+count+'</span>';
+  button.setAttribute?.('aria-label',label+' '+count);
  }
  const favorite=$('newFavoriteFilter').value==='favorites';
  const button=$('newFavoriteToggle');
@@ -2459,8 +2476,9 @@ function renderNew(){
  const dayRows=(data.records||[]).filter(x=>(newAlertFocusIds?newAlertFocusIds.has(window.FirstHyundaiTradeAlerts.stableId(x)):x.first_seen_date===day)&&
   (!onlyFavorites||favoriteIdForBuilding(x.building)));
  const type=$('newType').value,q=$('newAptFilter').value.trim().toLowerCase();
- const rows=dayRows.filter(x=>(!type||x.type===type)&&
-  (!q||(x.building||'').toLowerCase().includes(q)));
+ const scoped=dayRows.filter(x=>!q||(x.building||'').toLowerCase().includes(q));
+ updateNewQuickFilters(tradeTypeCounts(scoped));
+ const rows=scoped.filter(x=>!type||x.type===type);
  const sale=rows.filter(x=>x.type==='매매').length;
  const lease=rows.filter(x=>x.type==='전세').length;
  const monthly=rows.filter(x=>x.type==='월세').length;

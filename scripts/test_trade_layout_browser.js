@@ -29,6 +29,24 @@ async function checkLayouts(){
   const providerSnapshot=structuredClone(publicServices);
   fetchRemote=async filename=>filename==='public_services'?structuredClone(providerSnapshot):null;
   renderTrades();
+  const stableTypeRow=(page,selector,paint)=>{
+   switchPage(page);
+   const bar=document.querySelector(selector),buttons=Array.from(bar.querySelectorAll('button'));
+   const initial=buttons.map(box),row=box(bar);
+   for(const n of [0,1,10000,250000]){
+    paint({'':n,매매:n,전세:n,월세:n});
+    buttons.forEach((button,i)=>{
+     close('type button unchanged '+page+' '+n+' '+i,box(button),initial[i]);
+     const label=button.querySelector('.typeLabel'),count=button.querySelector('.typeCount');
+     check('count below label '+page,!!label&&!!count&&count.getBoundingClientRect().top>=label.getBoundingClientRect().bottom);
+     check('count formatting '+page,count.textContent===n.toLocaleString('ko-KR')+'건');
+    });
+    close('type row unchanged '+page+' '+n,box(bar),row);
+   }
+  };
+  stableTypeRow('trades','#tradeTypeBar',c=>renderTypeButtons('tradeTypeBar','',c));
+  stableTypeRow('officetel','#officeTypeBar',c=>renderTypeButtons('officeTypeBar','',c));
+  stableTypeRow('new','#newTypeBar',c=>updateNewQuickFilters(c));
   for(const officeRole of ['family','admin']){
    document.body.dataset.officeRole=officeRole;
    for(const partial of [false,true]){

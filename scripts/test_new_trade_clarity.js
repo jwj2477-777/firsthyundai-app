@@ -46,12 +46,15 @@ const ctx=vm.createContext({
  dealArticleClass:()=> 'dealRow',dealBadge:x=>x,tradeStatusBadge:()=>'',tradeExtraBadges:()=>'',displayExclusiveArea:()=> '84㎡',
  catalogForTradeName:()=>null,tradeRenewalDetails:()=>'',tradeBrokerLocation:()=>'',tradeAmount:()=>'',tradeCardFacts:()=>''
 });
+vm.runInContext(js.slice(js.indexOf('function tradeTypeCounts('),js.indexOf('function renderTypeButtons(')),ctx);
 vm.runInContext(js.slice(i,j),ctx);
 const run=stmt=>vm.runInContext(stmt,ctx);
 run('renderNew()');
 assert.equal(el('newMeta').textContent,'송도동 · 확인 26.10.23 10:00');
 assert(el('newCounts').innerHTML.includes('3<small>건</small>'));
 assert(el('newCounts').innerHTML.includes('매매 1 · 전세 1 · 월세 1'));
+for(const [id,count] of [['newTypeAll','3건'],['newTypeSale','1건'],['newTypeLease','1건'],['newTypeMonthly','1건']])
+ assert(el(id).innerHTML.includes('<span class="typeCount">'+count+'</span>'));
 assert(!el('newContent').innerHTML.includes('최대 120건 표시'));
 assert(el('newTypeAll').classList.contains('active'));
 run("chooseNewType('전세')");
@@ -71,8 +74,14 @@ assert(el('newContent').innerHTML.includes('송도 A')&&!el('newContent').innerH
 el('newAptFilter').value='없는 단지';
 run('renderNew()');
 assert(el('newCounts').innerHTML.includes('0<small>건</small>'));
+for(const id of ['newTypeAll','newTypeSale','newTypeLease','newTypeMonthly'])
+ assert(el(id).innerHTML.includes('<span class="typeCount">0건</span>'));
 assert(el('newContent').innerHTML.includes('다른 날짜나 조건으로 확인'));
 el('newAptFilter').value='';
+ctx.remote.new_trades.records=Array.from({length:10000},(_,i)=>({...records[0],id:'bulk-'+i}));
+run('renderNew()');
+assert(el('newTypeAll').innerHTML.includes('10,000건')&&el('newTypeSale').innerHTML.includes('10,000건'));
+ctx.remote.new_trades.records=records;
 ctx.remote.new_trades.state='partial';
 run('renderNew()');
 assert(!el('newStatus').classList.contains('hidden'));

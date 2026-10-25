@@ -33,7 +33,7 @@ const ctx=vm.createContext({
  localStorage,$:element,escapeHtml:escape,prettyTime:s=>s,number:n=>String(n),
  value10k:n=>String(n)+'만원',dealBadge:t=>'<b>'+t+'</b>',
  dealArticleClass:x=>'dealRow '+x.type,tradeStatusBadge:x=>x.status==='해제'?'해제':'',
- tradeExtraBadges:x=>x.dealing_type?'거래방식':'',renderTypeButtons:(id,type)=>{nodes._lastType=type},
+ tradeExtraBadges:x=>x.dealing_type?'거래방식':'',renderTypeButtons:(id,type,counts)=>{nodes._lastType=type;nodes._lastCounts=counts&&{...counts}},
  areaKey:n=>Number.isFinite(Number(n))?String(Number(n)):'',
  sourceLink:()=>'',safeLink:()=>'',fetchRemote:async()=>{},console
 });
@@ -44,6 +44,7 @@ const run=q=>vm.runInContext(q,ctx);
 run("publicServices={office_rents:{state:'awaiting_approval',records:[]},office_sales:{state:'awaiting_approval',records:[]}};renderOfficeRentals()");
 assert(nodes.officeRentContent.innerHTML.includes('공식 자료 확인 중'));
 assert(!nodes.officeRentContent.innerHTML.includes('검색 결과 <b>0건</b>'),'Pending must not be counted as zero');
+assert.equal(nodes._lastCounts,null);
 const rentals=[
  {building:'송도 플러스오피스텔',type:'월세',deposit_10k:3000,monthly_10k:85,area_m2:35.5,contract_date:'2026-10-12',floor:'9',lot_number:'123'},
  {building:'송도 퍼스트오피스텔',type:'전세',deposit_10k:20000,monthly_10k:0,area_m2:62.4,contract_date:'2026-09-15',floor:'14',lot_number:'456'},
@@ -53,6 +54,8 @@ const sales=[{building:'송도 센트럴오피스텔',type:'매매',price_10k:33
  {building:'송도 센트럴오피스텔',type:'매매',price_10k:35000,area_m2:36,contract_date:'2026-10-19',floor:'25',status:'해제',cancellation_date:'2026-10-20'}];
 run('publicServices='+JSON.stringify({office_rents:{state:'verified',records:rentals},office_sales:{state:'verified',records:sales}})+';renderOfficeRentals()');
 assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>5건</b>'));
+assert.equal(nodes._lastCounts[''],5);assert.equal(nodes._lastCounts.매매,2);
+assert.equal(nodes._lastCounts.전세,2);assert.equal(nodes._lastCounts.월세,1);
 assert(nodes.officeRentContent.innerHTML.includes('dealRow'),'Same apartment deal card base class');
 assert(nodes.officeRentContent.innerHTML.includes('9층'),'Office floors visible like apartment cards');
 assert(!nodes.officeRentContent.innerHTML.includes('거래 상세정보 보기'));
@@ -61,7 +64,7 @@ assert(nodes.officeRentContent.innerHTML.includes('tradeDateFloor'));
 assert(nodes.officeRentContent.innerHTML.includes('tradeArea'));
 run("setOfficeType('전세')");
 assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>2건</b>'));
-assert.equal(nodes._lastType,'전세');
+assert.equal(nodes._lastType,'전세');assert.equal(nodes._lastCounts[''],5);
 run("setOfficeType('')");
 run("startOfficeSearch()");
 assert(!nodes.officeSearchPanel.classList.contains('hidden'));
@@ -93,6 +96,10 @@ run('resetOfficeDateFilter()');nodes.officeStatusFilter.value='';
 nodes.officeMinArea.value='40';run('renderOfficeRentals()');
 assert(nodes.officeRentContent.innerHTML.includes('검색 결과 <b>2건</b>'));
 nodes.officeMinArea.value='';
+run("publicServices={office_sales:{state:'verified',records:[]},office_rents:{state:'awaiting_approval'}};setOfficeType('')");
+assert.equal(nodes._lastCounts.매매,0);
+assert.equal(nodes._lastCounts.전세,null);
+assert.equal(nodes._lastCounts[''],null);
 // Header uses the actual included office snapshots, independently of apartments/schools.
 assert(!html.includes('아파트와 동일한 검색 방식 · 오피스텔 자료만 별도 조회'));
 assert(html.includes('id="officeMeta"'));

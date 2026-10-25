@@ -1,5 +1,10 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-25 · v2.0.91 · 거래유형 고정 크기 건수 표시
+- 각 4종 거래유형 버튼에 N건 보조 줄. 아파트/오피스텔/새 거래는 서로 분리된 자료/검색조건으로 집계. 미수집 —.
+- index.html, ui-v2.css 공통 50px 고정/11px 숫자(소형10px), test_new_trade_clarity·test_office_on_demand·test_trade_layout_browser 확장.
+- Gradle 2.0.91/build142 및 자동 Release 업데이트. CI 결과·APK·실기기 검증은 별도 확인.
+
 ## 2026-10-25 · v2.0.90 · 실거래/아파트 정보 화면 제목 4곳 수정
 - 요구: '새소식 · 신규 공개 실거래'→'신규 공개 실거래', '송도동 오피스텔 실거래가'→'송도 오피스텔 실거래', '송도동 아파트 실거래가'→'송도 아파트 실거래', '단지정보 · 송도 아파트'→'송도 아파트 정보'.
 - 변경: app/src/main/assets/index.html의 해당 H2 텍스트만 교체. CSS·버튼·수집시간·데이터·서브메뉴는 유지. 기존 제목 의존 테스트 test_officetel_heading_color.js와 공통 제목 회귀 test_page_title_parity.js를 새 문구 기준으로 수정.
