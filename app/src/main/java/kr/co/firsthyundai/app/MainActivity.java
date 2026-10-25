@@ -60,6 +60,7 @@ public class MainActivity extends Activity {
     // Administrator privilege is deliberately session-only; legacy saved
     // admin_mode=true from v1.1 must not bypass independent verification.
     private volatile String adminSessionIdentity = "";
+    private volatile String sharedSettingsToken = "";
     private volatile boolean adminCheckInProgress = false;
 
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -174,7 +175,7 @@ public class MainActivity extends Activity {
     }
 
     private void changeRole(boolean admin) {
-        if(!admin) adminSessionIdentity = "";
+        if(!admin){adminSessionIdentity = "";sharedSettingsToken = "";}
         // Never persist the admin session in SharedPreferences.
         // Script receives no credential or verifier.
         web.evaluateJavascript("window.onRoleChanged(" +
@@ -184,6 +185,7 @@ public class MainActivity extends Activity {
     @Override protected void onResume() {
         super.onResume();
         updateNotificationPermissionUI();
+        if(web!=null)web.evaluateJavascript("window.FirstHyundaiSharedSettings?.refresh?.()",null);
         final String activeAdmin=adminSessionIdentity;
         if(activeAdmin!=null && !activeAdmin.isEmpty()) {
             io.execute(()->{
@@ -308,10 +310,15 @@ public class MainActivity extends Activity {
                         boolean valid=false;
                         String error="";
                         String identity="";
+                        String syncToken="";
                         try {
                             AdminPolicy.Data policy=AdminPolicy.fetch(MainActivity.this);
                             valid=AdminPolicy.matches(policy,code);
                             identity=policy.identity;
+                            if(valid){
+                                try{syncToken=SharedSettingsClient.authorize(code);}
+                                catch(Exception ignored){/* Admin UI still available while KV server is down. */}
+                            }
                         }catch(Exception e){
                             error=e.getMessage()==null?"관리자 보안 정책을 확인할 수 없습니다.":e.getMessage();
                         }finally {
@@ -320,6 +327,7 @@ public class MainActivity extends Activity {
                         final boolean success=valid;
                         final String errorMessage=error;
                         final String verifiedIdentity=identity;
+                        final String verifiedSyncToken=syncToken;
                         runOnUiThread(()->{
                             waiting.dismiss();
                             adminCheckInProgress=false;
@@ -327,7 +335,10 @@ public class MainActivity extends Activity {
                             if(success){
                                 tries.edit().clear().apply();
                                 adminSessionIdentity=verifiedIdentity;
+                                sharedSettingsToken=verifiedSyncToken;
                                 changeRole(true);
+                                web.evaluateJavascript("window.FirstHyundaiSharedSettings?.authReady?.("+
+                                  (verifiedSyncToken.isEmpty()?"false":"true")+")",null);
                             }else {
                                 String message;
                                 if(!errorMessage.isEmpty()) {
@@ -369,6 +380,12 @@ public class MainActivity extends Activity {
 
     private void deliver(String name, JSONObject data) {
         runOnUiThread(() -> web.evaluateJavascript("window."+name+"("+data.toString()+")", null));
+    }
+
+    private void sharedSettingsDenied(String requestId,String message){
+        try{deliver("onFirstHyundaiSharedSettingsPublished",new JSONObject()
+                .put("requestId",requestId).put("ok",false).put("error",message));}
+        catch(Exception ignored){}
     }
 
     public final class Bridge {
@@ -432,6 +449,46 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public void switchToFamilyMode() {
             runOnUiThread(() -> changeRole(false));
+        }
+        @JavascriptInterface public void fetchSharedSettings(String requestId) {
+            if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
+            io.execute(()->{
+                JSONObject response=new JSONObject();
+                try{
+                    response.put("requestId",requestId).put("ok",true)
+                            .put("payload",SharedSettingsClient.read());
+                }catch(Exception e){
+                    try{response.put("requestId",requestId).put("ok",false)
+                            .put("error","공통 설정 서버를 확인할 수 없습니다.");}
+                    catch(Exception ignored){}
+                }
+                deliver("onFirstHyundaiSharedSettingsFetched",response);
+            });
+        }
+        @JavascriptInterface public void publishSharedSettings(String json,String requestId) {
+            if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
+            if(!isAdminDeviceMode()||json==null||json.length()>2400){
+                sharedSettingsDenied(requestId,"관리자 인증 또는 공통 설정 데이터가 올바르지 않습니다.");
+                return;
+            }
+            final String identity=adminSessionIdentity;
+            final String token=sharedSettingsToken;
+            io.execute(()->{
+                JSONObject response=new JSONObject();
+                try{
+                    if(token.isEmpty()||!identity.equals(adminSessionIdentity))
+                        throw new Exception("공통 설정 게시 인증이 필요합니다. 관리자모드에 다시 로그인해 주세요.");
+                    JSONObject payload=SharedSettingsClient.publish(token,json);
+                    if(!identity.equals(adminSessionIdentity))
+                        throw new Exception("관리자 인증 상태가 변경됐습니다.");
+                    response.put("requestId",requestId).put("ok",true).put("payload",payload);
+                }catch(Exception e){
+                    try{response.put("requestId",requestId).put("ok",false)
+                            .put("error",e.getMessage()==null?"공통 설정 게시 실패":e.getMessage());}
+                    catch(Exception ignored){}
+                }
+                deliver("onFirstHyundaiSharedSettingsPublished",response);
+            });
         }
         @JavascriptInterface public void fetch(String repository, String filename, String requestId) {
             // Public data ONLY. Never inject API tokens / family records into remote requests.
