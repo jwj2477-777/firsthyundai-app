@@ -1,5 +1,10 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-25 · v2.1.01 · 오늘요약↔공유메모 색상 흐름
+- app/src/main/assets/selection-flow.js v14. #nav의 대표 메뉴 3개/빠른업무 3개는 동일 그룹 top-five(기존 내부 명칭 호환 유지). 기존 실거래(index0)↔뉴스(index2)는 아파트정보(index1), 새로 추가한 오늘요약(index3)↔공유메모(index5)는 계약문자(index4)를 거쳐 버튼 배경색만 흐른다. 중간 버튼 선택/클릭/DOM 이동 없음.
+- 관리자가 quickOrder로 시각 순서를 변경할 수 있으므로 index4는 실제 두 버튼 사이 같은 줄일 때만 경유. 아니면 직접 흐르고 다른 버튼/줄을 칠하지 않음. 움직임 최소화 및 OS 접근성 선호 유지.
+- scripts/test_selection_flow.js 양방향 경유 및 시각적 재정렬/줄바꿈 회귀 추가. 앱 버전 v2.1.01/build152. 자동 빌드와 배포 확인 필요.
+
 ## 2026-10-25 · v2.1.00 · 운영 설정 패널 확대
 - admin-preferences.js allowed/defaults: quickOrder,accent,tradeAmount,cancelled,memoOrder,memoCompleted,memoRefresh,memoClock,memoPhones. reading xlarge, density roomy, start officeBoard 추가. UI index.html 에 시작/가독성, 화면/탐색, 실거래, 메모 구분.
 - CSS body data-*로 빠른 메뉴 순서·금액·해제거래·포인트색/글씨/밀도 실제 표시 적용. office-board.js에서 순서/완료 기본표시/갱신주기/시각/번호 링크 실제 적용. 기존 관리자 모드 인증 유지.
