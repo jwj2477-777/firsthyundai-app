@@ -1,5 +1,9 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-25 · v2.0.90 · 네 화면의 제목 문구 간결화
+- 사용자가 요청한 상단 제목을 '신규 공개 실거래', '송도 오피스텔 실거래', '송도 아파트 실거래', '송도 아파트 정보'로 변경. sectionTitle의 구조, 갱신 버튼, 하단 지역·수집일/자료 기준, 스타일과 색상은 그대로 유지.
+- 소스: app/src/main/assets/index.html. 회귀 검사: scripts/test_page_title_parity.js, scripts/test_officetel_heading_color.js. 버전 2.0.90/build141과 자동 APK 배포 워크플로 동기화. CI 성공과 실제 APK 배포 여부는 Actions/Release에서 별도 확인.
+
 ## 2026-10-25 · v2.0.89 · 뉴스·청약 필터와 목록 시작점 통일
 - 사용자 v2.0.88 캡처: 뉴스의 별도 참고용 배너가 필터를 아래로 밀고, 청약의 출처·긴 집계가 목록 앞에서 다른 여백/위치를 만듦. 2열 청약 선택 문구도 잘림.
 - 두 pane에 newsFeedPanel/newsFilterRow를 공통 적용. 카드 padding16px, filter50px, 접힌 안내 summary44px, 결과 count21px 최소로 통일하고 실제 첫 결과 카드의 위 margin도 통일. 고정 높이 빈칸/빈 카드 없이 동일 순서(필터→접이식 안내→건수→목록)로 배치. 안내를 열면 필요한 내용만 자연스럽게 확장.

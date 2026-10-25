@@ -22,6 +22,15 @@ for(const p of pages){
  assert(heading.includes('refreshAction'),'Refresh action missing: '+p);
  assert(rules.includes('#'+p),'Shared selector omitted '+p);
 }
+const exactHeadings={new:'신규 공개 실거래',officetel:'송도 오피스텔 실거래',trades:'송도 아파트 실거래',complexes:'송도 아파트 정보'};
+for(const [id,title] of Object.entries(exactHeadings)){
+ const pos=html.indexOf('<div id="'+id+'" class="page');
+ const start=html.slice(pos,pos+350);
+ assert(start.includes('<h2>'+title+'</h2>'),'Expected screen title '+id+': '+title);
+}
+for(const old of ['새소식 · 신규 공개 실거래','송도동 오피스텔 실거래가','송도동 아파트 실거래가','단지정보 · 송도 아파트']){
+ assert(!html.includes('<h2>'+old+'</h2>'),'Old heading must not return: '+old);
+}
 assert(rules.includes(common+' h2{'),'One authoritative same-rank heading style');
 assert(rules.includes('font-size:20px;')&&rules.includes('line-height:1.4;') &&
  rules.includes('font-weight:820;'),'Base heading font sizing must be consistent');

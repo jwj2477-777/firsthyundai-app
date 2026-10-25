@@ -21,7 +21,7 @@ assert.equal(declarations.length,1,'Only the color may change.');
 assert(/^background:\s*var\(--ui2-trades\)$/.test(declarations[0]),
  'Accent geometry, padding, pseudo-element length and positioning must stay unchanged.');
 assert(html.includes('id="officetel" class="page hidden"') &&
-       html.includes('<h2>송도동 오피스텔 실거래가</h2>') &&
-       html.includes('<h2>송도동 아파트 실거래가</h2>'),
+       html.includes('<h2>송도 오피스텔 실거래</h2>') &&
+       html.includes('<h2>송도 아파트 실거래</h2>'),
        'Both trade screens stay intact.');
 console.log('Officetel heading fixed to solid trades blue; no layout or other color changes.');
