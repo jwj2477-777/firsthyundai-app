@@ -14,6 +14,7 @@ on:
       - 'scripts/test_shared_settings.js'
       - 'scripts/test_shared_settings_worker.mjs'
       - 'scripts/test_office_board.mjs'
+      - 'scripts/test_office_board_ui.js'
       - 'scripts/test_admin_guards.js'
       - 'scripts/test_complexes.js'
       - 'scripts/test_catalog_editor.js'
@@ -224,6 +225,7 @@ jobs:
           node scripts/test_shared_settings.js
           node scripts/test_shared_settings_worker.mjs
           node scripts/test_office_board.mjs
+          node scripts/test_office_board_ui.js
           node scripts/test_complexes.js
           node scripts/test_catalog_editor.js
           node scripts/test_complex_discovery.js
