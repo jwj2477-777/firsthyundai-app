@@ -263,7 +263,7 @@ body.apartmentSheetActive{overflow:hidden}
  <p id="officeBoardFeedback" class="tiny officeBoardFeedback" role="status" aria-live="polite"></p>
  <div id="officeBoardAuth" class="panel officeBoardAuth hidden"><p>이 휴대폰에서 최초 한 번만 사무실 보안코드를 확인합니다.</p>
   <button type="button" class="btn" onclick="FirstHyundaiOfficeBoard.authenticate()">사무실 메모 연결하기</button></div>
- <div class="officeBoardListHeading"><strong>공유 메모 <span id="officeBoardCount" aria-label="미완료 메모 수">—</span></strong>
+ <div id="officeBoardListHeading" class="officeBoardListHeading"><strong>공유 메모 <span id="officeBoardCount" aria-label="미완료 메모 수">—</span></strong>
   <div class="officeBoardListActions"><button id="officeBoardShowDone" type="button" onclick="FirstHyundaiOfficeBoard.toggleDone()">완료 메모 보기</button>
    <button id="officeBoardArchiveOpen" class="hidden" type="button" onclick="FirstHyundaiOfficeBoard.toggleArchive()">복구함</button></div></div>
  <section id="officeBoardArchive" class="officeBoardArchive hidden" aria-label="관리자 메모 복구함"><p>관리자가 삭제한 메모는 30일 동안 보관됩니다.</p><div id="officeBoardArchiveList"></div></section>
