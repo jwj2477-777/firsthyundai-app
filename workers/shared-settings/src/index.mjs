@@ -152,6 +152,10 @@ async function fcmOAuth(env){
  oauthCache={value:doc.access_token,expires:now+Math.max(60,Math.min(3300,Number(doc.expires_in)||3500)-90)*1000};
  return oauthCache.value;
 }
+async function familyRevision(secret){
+ const h=await hkey("board-revision:"+secret);
+ return b64(await crypto.subtle.sign("HMAC",h,enc.encode("registered-office-devices-v1")));
+}
 async function sendPush(env,postId,fromDevice){
  const config=fcmConfig(env);
  if(!config)return {sent:0,reason:"fcm_unconfigured"};
@@ -161,11 +165,18 @@ async function sendPush(env,postId,fromDevice){
  const keys=await env.SETTINGS.list({prefix:PUSH_PREFIX,limit:100});
  const recipients=keys.keys.filter(k=>k.name!==PUSH_PREFIX+fromDevice).slice(0,PUSH_LIMIT);
  if(!recipients.length)return {sent:0,reason:"no_devices"};
+ const version=await familyRevision(env.FIRSTHYUNDAI_ACCESS_CODE);
+ const validRecipients=[];
+ for(const device of recipients){
+  const record=await env.SETTINGS.get(device.name,"json");
+  if(record?.revision===version&&fcmTokenValid(record.fcm))
+   validRecipients.push({key:device.name,fcm:record.fcm});
+ }
+ if(!validRecipients.length)return {sent:0,reason:"no_authorized_devices"};
  const auth=await fcmOAuth(env);
  let sent=0;
- for(const device of recipients){
-  const obj=await env.SETTINGS.get(device.name,"json");
-  if(!obj?.fcm||!fcmTokenValid(obj.fcm))continue;
+ for(const device of validRecipients){
+  const obj=device;
   // Data-only message: the Android service owns the private lock-screen notification.
   const response=await fetch("https://fcm.googleapis.com/v1/projects/"+config.project_id+"/messages:send",{
    method:"POST",headers:{"Authorization":"Bearer "+auth,"Content-Type":"application/json; charset=utf-8"},
@@ -188,12 +199,19 @@ async function pushRegister(req,env){
  let data;try{data=await body(req,5500)}catch(e){return res({error:"bad_request"},400)}
  const device=typeof data?.device==="string"?data.device:"";
  if(!/^[a-f0-9]{32}$/.test(device)||!fcmTokenValid(data?.fcm))return res({error:"bad_device"},400);
+ const revision=await familyRevision(env.FIRSTHYUNDAI_ACCESS_CODE);
  const existing=await env.SETTINGS.get(PUSH_PREFIX+device,"json");
  if(!existing){
   const all=await env.SETTINGS.list({prefix:PUSH_PREFIX,limit:100});
-  if(all.keys.length>=PUSH_LIMIT)return res({error:"device_limit"},409);
+  let active=0;
+  for(const item of all.keys){
+   const value=await env.SETTINGS.get(item.name,"json");
+   if(value?.revision===revision)active++;
+  }
+  if(active>=PUSH_LIMIT)return res({error:"device_limit"},409);
  }
- await env.SETTINGS.put(PUSH_PREFIX+device,JSON.stringify({fcm:data.fcm,registered:new Date().toISOString()}),
+ await env.SETTINGS.put(PUSH_PREFIX+device,
+  JSON.stringify({fcm:data.fcm,registered:new Date().toISOString(),revision}),
   {expirationTtl:PUSH_TTL});
  return res({ok:true,push_available:!!fcmConfig(env)});
 }
@@ -253,4 +271,4 @@ export default {async fetch(req,env,ctx){
   await env.SETTINGS.put(key,JSON.stringify(record));return res(record);
  }
  return res({error:"not_found"},404);
-},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,fcmConfig,fcmTokenValid,sendPush}};
+},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,fcmConfig,fcmTokenValid,sendPush,familyRevision}};
