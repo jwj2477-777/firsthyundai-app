@@ -1,5 +1,10 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-25 · v2.1.05 · FCM 푸시
+- Android FirebaseMessagingService/OfficeMemoFirebase: 가족코드 인증된 /board/push/config 로 Firebase 설정 동적 로딩, /board/push/register 기기 인증, 신규 메모 FCM 수신 후 내용 없는 비공개 notification. 가족 LockActivity 거쳐 해당 note_id 초점. 종전 폴링 유지.
+- Worker: OAuth2 service account JWT -> FCM HTTP v1 /messages:send. Post만 다른 기기에 발송하고 메모 본문/전화번호 불포함. 가족코드 rotation 시 구독 즉시 무효. 서버 서비스 계정 FHD_FCM_SERVICE_ACCOUNT_JSON 및 공개 Android 구성 FHD_FIREBASE_ANDROID_JSON은 GitHub Actions Secret 필요. 자세한 설정 docs/FIREBASE_PUSH_SETUP.md.
+- v2.1.05/build156 빌드/실기기 검증 필요.
+
 ## 2026-10-25 · 알림 및 관리센터 v2.1.03
 v2.1.03/build154: 관리자 설정 검색·분야별 필터·바로가기·화면 프리셋·undo, 공유 touch/memo layout 설정, 새 글 메모 알림 memoAlerts on/off 동기화. 앱 사용 중 12초 간격 메타 조회, 백그라운드 Android JobScheduler 최소 15분 간격이며 앱 완전 종료 후 수초 내 실시간 FCM 푸시는 미구성. 메모 본문/전화번호 알림 미포함. Worker /board/updates 인증 필수 및 device self exclusion. 알림 OS 권한은 기기마다 허용 필요.
 
