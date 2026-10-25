@@ -264,7 +264,10 @@ public class LockActivity extends Activity {
     private void openMain() {
         if(!welcomeDone){openAfterWelcome=true;return;}
         if(isFinishing() || isDestroyed()) return;
-        startActivity(new Intent(this, MainActivity.class));
+        Intent open=new Intent(this,MainActivity.class);
+        if(getIntent()!=null&&getIntent().getBooleanExtra("office_board_from_notification",false))
+            open.putExtra("office_board_from_notification",true);
+        startActivity(open);
         overridePendingTransition(0,0);
         finish();
     }

@@ -54,6 +54,20 @@ public class MainActivity extends Activity {
     private SmoothBrandOverlay nativeHandoff;
     private boolean webFirstFrameShown = false;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
+    private final android.os.Handler memoTimer = new android.os.Handler(android.os.Looper.getMainLooper());
+    private final Runnable memoCheck = new Runnable(){
+        @Override public void run(){
+            if(isFinishing()||isDestroyed())return;
+            io.execute(()->{
+                int incoming=OfficeMemoNotifications.check(getApplicationContext());
+                if(incoming>0)runOnUiThread(()->{
+                    if(web!=null&&!isFinishing()&&!isDestroyed())
+                        web.evaluateJavascript("window.FirstHyundaiOfficeBoard?.onNewNotification?.()",null);
+                });
+            });
+            memoTimer.postDelayed(this,12000L);
+        }
+    };
     private String pendingBackup = "";
     private String pendingCatalog = "";
     private static final String ADMIN_TRIES = "firsthyundai-admin-attempts";
@@ -66,6 +80,8 @@ public class MainActivity extends Activity {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         TradeNotifications.ensureChannel(this);
+        OfficeMemoNotifications.ensureChannel(this);
+        OfficeMemoNotifications.schedule(this);
         web = new WebView(this);
         // Avoid a blank white WebView flash between the native FHD welcome
         // and the actual app page. Reveal only when local index has loaded.
@@ -76,6 +92,10 @@ public class MainActivity extends Activity {
                 if(!"file:///android_asset/index.html".equals(url)||webFirstFrameShown)return;
                 webFirstFrameShown=true;
                 if(isFinishing()||isDestroyed())return;
+                if(getIntent()!=null&&getIntent().getBooleanExtra("office_board_from_notification",false)){
+                    getIntent().removeExtra("office_board_from_notification");
+                    view.evaluateJavascript("switchPage('officeBoard')",null);
+                }
                 boolean motionOff=false;
                 try{motionOff=Settings.Global.getFloat(getContentResolver(),
                         Settings.Global.ANIMATOR_DURATION_SCALE,1f)==0f;}
@@ -184,6 +204,9 @@ public class MainActivity extends Activity {
 
     @Override protected void onResume() {
         super.onResume();
+        OfficeMemoNotifications.schedule(this);
+        memoTimer.removeCallbacks(memoCheck);
+        memoTimer.post(memoCheck);
         updateNotificationPermissionUI();
         if(web!=null)web.evaluateJavascript("window.FirstHyundaiSharedSettings?.refresh?.();window.FirstHyundaiOfficeBoard?.onResume?.()",null);
         final String activeAdmin=adminSessionIdentity;
@@ -259,15 +282,20 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override protected void onPause() {
+        memoTimer.removeCallbacks(memoCheck);
+        super.onPause();
+    }
+
     private void updateNotificationPermissionUI() {
         if (web == null || isFinishing() || isDestroyed()) return;
-        web.evaluateJavascript("window.FirstHyundaiTradeAlerts?.syncNativeStatus?.()", null);
+        web.evaluateJavascript("window.FirstHyundaiTradeAlerts?.syncNativeStatus?.();window.FirstHyundaiOfficeBoard?.syncNotificationStatus?.()", null);
     }
 
     @Override public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                                      int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == TradeNotifications.REQUEST_PERMISSION) {
+        if (requestCode == TradeNotifications.REQUEST_PERMISSION || requestCode == OfficeMemoNotifications.PERMISSION) {
             updateNotificationPermissionUI();
         }
     }
@@ -419,6 +447,19 @@ public class MainActivity extends Activity {
     }
 
     public final class Bridge {
+        @JavascriptInterface public String getOfficeMemoNotificationStatus(){
+            return OfficeMemoNotifications.status(MainActivity.this);
+        }
+        @JavascriptInterface public void requestOfficeMemoNotifications(){
+            runOnUiThread(()->{
+                OfficeMemoNotifications.requestPermission(MainActivity.this);
+                updateNotificationPermissionUI();
+            });
+        }
+        @JavascriptInterface public void setOfficeMemoNotificationsEnabled(boolean enabled){
+            OfficeMemoNotifications.setEnabled(getApplicationContext(),enabled);
+            runOnUiThread(()->updateNotificationPermissionUI());
+        }
         @JavascriptInterface public String getTradeNotificationPermissionStatus() {
             return TradeNotifications.status(MainActivity.this);
         }
@@ -762,7 +803,7 @@ public class MainActivity extends Activity {
             });
         }
     }
-    @Override protected void onDestroy(){io.shutdownNow();if(nativeHandoff!=null){nativeHandoff.finish(null);nativeHandoff=null;}if(web!=null)web.destroy();super.onDestroy();}
+    @Override protected void onDestroy(){memoTimer.removeCallbacks(memoCheck);io.shutdownNow();if(nativeHandoff!=null){nativeHandoff.finish(null);nativeHandoff=null;}if(web!=null)web.destroy();super.onDestroy();}
     @Override public void onBackPressed() {
         if(web==null) {super.onBackPressed();return;}
         // Close the native-feeling apartment detail screen before leaving the app.
