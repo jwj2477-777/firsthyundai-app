@@ -537,13 +537,19 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public void officeBoardAction(String action,String payload,String requestId){
             if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
-            if(action==null||!java.util.Arrays.asList("list","post","edit","done","delete").contains(action)||
+            if(action==null||!java.util.Arrays.asList("list","post","edit","done","schedule","delete","archive","restore").contains(action)||
                payload==null||payload.length()>3000)return;
+            final boolean needsAdmin="delete".equals(action)||"restore".equals(action)||"archive".equals(action);
+            final String adminIdentity=adminSessionIdentity;
+            final String adminToken=sharedSettingsToken;
             io.execute(()->{
                 JSONObject event=new JSONObject();
                 try{
+                    if(needsAdmin&&(adminIdentity==null||adminIdentity.isEmpty()||
+                         !adminIdentity.equals(adminSessionIdentity)||adminToken==null||adminToken.isEmpty()))
+                        throw new Exception("메모 삭제와 복구는 관리자모드에서만 가능합니다. 관리자모드로 로그인해 주세요.");
                     JSONObject incoming=new JSONObject(payload);
-                    JSONObject data=OfficeBoardClient.perform(getApplicationContext(),action,incoming);
+                    JSONObject data=OfficeBoardClient.perform(getApplicationContext(),action,incoming,needsAdmin?adminToken:null);
                     event.put("requestId",requestId).put("ok",true).put("data",data);
                 }catch(Exception e){
                     try{event.put("requestId",requestId).put("ok",false)

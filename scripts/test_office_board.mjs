@@ -12,8 +12,9 @@ const env={
  AUTH_LIMITER:{async limit(){return {success:true}}}
 };
 const origin='https://firsthyundai-shared-settings.jwj2477.workers.dev';
-function send(path,method='GET',data=null,token='',webOrigin=''){
+function send(path,method='GET',data=null,token='',webOrigin='',adminToken=''){
  const headers={};if(token)headers.Authorization='Bearer '+token;
+ if(adminToken)headers['X-FHD-Admin-Authorization']='Bearer '+adminToken;
  if(data!==null)headers['Content-Type']='application/json';
  if(webOrigin)headers.Origin=webOrigin;
  return service.fetch(new Request(origin+path,{method,headers,body:data===null?undefined:JSON.stringify(data)}),env);
@@ -26,23 +27,40 @@ assert(session.token?.length>40);
 const token=session.token;
 const noteText='오늘 오후 3시 반 방문\\n퍼스트파크 1502동 3004호\\n손님 전화 010-1234-5678';
 assert.equal((await send('/board','POST',{text:noteText})).status,401);
-const created=await send('/board','POST',{text:noteText},token);
+const date='2026-10-26T06:30:00.000Z';
+const created=await send('/board','POST',{text:noteText,scheduled_at:date},token);
 assert.equal(created.status,201);
 const item=(await created.json()).note;
 assert(item.id&&item.text.includes('010-1234-5678'));
 const list=await (await send('/board','GET',null,token)).json();
 assert.equal(list.notes.length,1);
 assert.equal(list.notes[0].done,false);
+assert.equal(list.notes[0].scheduled_at,date);
+assert.equal((await send('/board','POST',{text:'bad date',scheduled_at:'2026-99-99'},token)).status,400);
 assert.equal((await send('/board/'+item.id,'PATCH',{done:true},token)).status,200);
-assert.equal((await send('/board/'+item.id,'PATCH',{text:'시간 변경 · 오후 4시'},token)).status,200);
+assert.equal((await send('/board/'+item.id,'PATCH',{text:'시간 변경 · 오후 4시',scheduled_at:'2026-10-26T07:00:00.000Z'},token)).status,200);
 const after=await (await send('/board','GET',null,token)).json();
 assert(after.notes[0].done&&after.notes[0].text.includes('4시'));
+assert.equal(after.notes[0].scheduled_at,'2026-10-26T07:00:00.000Z');
 assert.equal((await send('/board/'+item.id,'PATCH',{admin:true},token)).status,400);
 assert.equal((await send('/board','POST',{text:'    '},token)).status,400);
 const publicSettings=await (await send('/settings')).json();
 assert(!JSON.stringify(publicSettings).includes('010-1234-5678'),'Public settings cannot leak customer phones');
-assert.equal((await send('/board/'+item.id,'DELETE',null,token)).status,200);
+assert.equal((await send('/board/'+item.id,'DELETE',null,token)).status,403,'Family cannot delete');
+assert.equal((await send('/board/archive','GET',null,token)).status,403,'Family cannot read archive');
+const adminToken=(await (await send('/session','POST',{code:env.FIRSTHYUNDAI_ADMIN_CODE})).json()).token;
+assert(adminToken);
+assert.equal((await send('/board/'+item.id,'DELETE',null,token,'',adminToken)).status,200);
 assert.equal((await (await send('/board','GET',null,token)).json()).notes.length,0);
+const archived=await (await send('/board/archive','GET',null,token,'',adminToken)).json();
+assert.equal(archived.notes.length,1);
+assert(archived.notes[0].text.includes('4시'));
+assert.equal((await send('/board/archive/'+item.id+'/restore','POST',null,token)).status,403);
+assert.equal((await send('/board/archive/'+item.id+'/restore','POST',null,token,'',adminToken)).status,200);
+assert.equal((await (await send('/board','GET',null,token)).json()).notes.length,1);
+assert.equal((await send('/board/'+item.id,'PATCH',{scheduled_at:null},token)).status,200);
+assert.equal((await (await send('/board','GET',null,token)).json()).notes[0].scheduled_at,null);
+
 env.FIRSTHYUNDAI_ACCESS_CODE='changedPasswordAfterRotation';
 assert.equal((await send('/board','GET',null,token)).status,401,'Family code rotation invalidates notes token');
-console.log('Office board privacy/auth and create/read/complete/edit/delete passed.');
+console.log('Private calendar metadata, administrator-only soft-delete and 30-day recovery passed.');
