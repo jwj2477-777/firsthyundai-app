@@ -92,7 +92,27 @@ async function boardCommand(req,env,url){
  }
  return res({error:"not_found"},404);
 }
-function validate(x){if(!x||x.schema!==1||x.type!=="firsthyundai-ui-settings"||typeof x.tradePopup!=="boolean"||x.preferences?.schema!==1)throw Error("schema");const allowed={start:["nearby","trades","new","complexes","news","contracts","overview","officetel"],density:["standard","compact"],reading:["standard","large"],motion:["full","reduced"],contrast:["standard","high"]};const p={schema:1};for(const [k,values]of Object.entries(allowed)){if(!values.includes(x.preferences[k]))throw Error("invalid_"+k);p[k]=x.preferences[k]}return {schema:1,type:"firsthyundai-ui-settings",preferences:p,tradePopup:x.tradePopup}}
+function validate(x){
+ if(!x||x.schema!==1||x.type!=="firsthyundai-ui-settings"||typeof x.tradePopup!=="boolean"||x.preferences?.schema!==1)throw Error("schema");
+ const allowed={
+  start:["nearby","trades","new","complexes","news","contracts","overview","officetel","officeBoard"],
+  density:["standard","compact","roomy"],reading:["standard","large","xlarge"],
+  motion:["full","reduced"],contrast:["standard","high"],
+  quickOrder:["standard","contractsFirst","memoFirst"],accent:["brand","teal","bronze"],
+  tradeAmount:["standard","bold"],cancelled:["standard","subtle"],
+  memoOrder:["newest","oldest"],memoCompleted:["hide","show"],
+  memoRefresh:["30","45","120"],memoClock:["12","24"],memoPhones:["on","off"]
+ };
+ const defaults={quickOrder:"standard",accent:"brand",tradeAmount:"standard",cancelled:"standard",
+  memoOrder:"newest",memoCompleted:"hide",memoRefresh:"45",memoClock:"12",memoPhones:"on"};
+ const p={schema:1};
+ for(const [k,values]of Object.entries(allowed)){
+  const raw=x.preferences[k]===undefined?defaults[k]:x.preferences[k];
+  if(!values.includes(raw))throw Error("invalid_"+k);
+  p[k]=raw;
+ }
+ return {schema:1,type:"firsthyundai-ui-settings",preferences:p,tradePopup:x.tradePopup};
+}
 async function body(req){if(Number(req.headers.get("content-length")||0)>2400)throw Error("large");const s=await req.text();if(s.length>2400)throw Error("large");return JSON.parse(s)}
 export default {async fetch(req,env){
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:HEAD});

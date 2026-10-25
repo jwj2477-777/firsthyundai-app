@@ -41,3 +41,25 @@ body[data-app-motion="reduced"] *::after{
  scroll-behavior:auto!important}
 @media(max-width:360px){#adminCenter .adminPrefRow select{min-width:108px;font-size:11px}
  #adminCenter .adminPrefActions button{font-size:11px}}
+
+/* v2.1.0 expanded shared administrator visual controls. */
+#adminCenter .adminSettingsSectionHeading{display:flex;align-items:baseline;justify-content:space-between;
+ gap:8px;border-bottom:1px solid #D7E2DC;margin:18px 0 4px;padding-bottom:9px}
+#adminCenter .adminSettingsSectionHeading strong{font-size:14px;color:#2E5258}
+#adminCenter .adminSettingsSectionHeading small{font-size:11px;color:#748587;text-align:right}
+#adminCenter .adminPrefRow{min-height:49px}
+body[data-list-density="roomy"] :is(#tradesContent,#officeRentContent,#nearbyTrades,#newContent) .dealRow,
+body[data-list-density="roomy"] :is(#complexCards,#nearbyCards) .nearbyCard{padding-top:19px!important;padding-bottom:19px!important;margin-bottom:15px!important}
+body[data-reading-size="xlarge"] :is(#tradesContent,#officeRentContent,#nearbyTrades,#newContent) .dealRow,
+body[data-reading-size="xlarge"] :is(#complexCards,#nearbyCards) .nearbyCard,
+body[data-reading-size="xlarge"] :is(#newsContent,#officeBoard .officeBoardText,#officeBoard #officeBoardDraft){font-size:18px!important;line-height:1.7!important}
+body[data-shortcut-order="contractsFirst"] #nav .utilityNav>button:nth-child(2){order:-1}
+body[data-shortcut-order="memoFirst"] #nav .utilityNav>button.officeBoardNav{order:-1}
+#nav .utilityNav>button.adminCenterNav{order:9}
+body[data-ui-accent="teal"] #officeBoard #officeBoardPost,
+body[data-ui-accent="teal"] #nav .utilityNav>button.officeBoardNav.active{background:#17685F!important;border-color:#17685F!important}
+body[data-ui-accent="bronze"] #officeBoard #officeBoardPost,
+body[data-ui-accent="bronze"] #nav .utilityNav>button.officeBoardNav.active{background:#8B683A!important;border-color:#8B683A!important}
+body[data-trade-amount="bold"] :is(#trades,#new,#officetel,#nearby) .tradeAmount{font-size:1.13em!important;font-weight:900!important;line-height:1.45!important}
+body[data-cancelled-style="subtle"] :is(#trades,#new,#officetel,#nearby) .dealRow.cancelled{background:#F8F8F7!important;border-left-color:#ABB8B5!important;opacity:.78}
+@media(max-width:380px){#adminCenter .adminSettingsSectionHeading small{max-width:44%;font-size:10px}}

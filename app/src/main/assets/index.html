@@ -281,23 +281,24 @@ body.apartmentSheetActive{overflow:hidden}
   <p class="tiny">재확인은 GitHub에 게시된 데이터를 다시 다운로드합니다. 원천 API 신규 수집은 GitHub Actions에서 직접 실행합니다.</p>
  </section>
 <section class="panel adminCenterPanel" id="adminExperiencePanel">
- <div class="adminCenterHead"><h3>앱 사용환경 설정</h3><span class="adminSmallHint">이 휴대폰에만 적용</span></div>
- <p class="tiny">일반모드의 화면 구성과 표시 방식도 관리자만 변경할 수 있습니다. 다른 가족 휴대폰에는 자동으로 전달되지 않습니다.</p>
+ <div class="adminCenterHead"><h3>앱 운영 설정</h3><span class="adminSmallHint">사무실 공통</span></div>
+ <p class="tiny">설정 변경은 즉시 이 휴대폰에 적용되고 서버 게시 성공 후 일반모드 휴대폰에도 전달됩니다. 핵심 업무 메뉴와 원본 자료는 유지합니다.</p>
+ <div class="adminSettingsSectionHeading"><strong>시작 화면과 가독성</strong><small>일반모드 기본값</small></div>
  <div class="adminPrefGrid">
   <label class="adminPrefRow" for="adminDefaultPage"><span><strong>일반모드 시작 화면</strong><small>앱 실행·관리자 해제 시 표시할 화면</small></span>
    <select id="adminDefaultPage" onchange="FirstHyundaiUIOptions.set('start',this.value)">
     <option value="nearby">관심 14개 단지</option><option value="trades">송도 아파트 실거래</option>
     <option value="new">신규 공개 실거래</option><option value="complexes">송도 아파트 정보</option>
     <option value="news">송도 뉴스</option><option value="contracts">계약문자 만들기</option>
-    <option value="overview">오늘 요약</option><option value="officetel">오피스텔 실거래</option>
+    <option value="overview">오늘 요약</option><option value="officetel">오피스텔 실거래</option><option value="officeBoard">사무실 공유 메모</option>
    </select></label>
   <label class="adminPrefRow" for="adminListDensity"><span><strong>정보 목록 밀도</strong><small>목록 여백만 조절, 정보는 숨기지 않음</small></span>
    <select id="adminListDensity" onchange="FirstHyundaiUIOptions.set('density',this.value)">
-    <option value="standard">기본</option><option value="compact">간결하게</option>
+    <option value="standard">기본</option><option value="compact">간결하게</option><option value="roomy">넉넉하게</option>
    </select></label>
   <label class="adminPrefRow" for="adminReadingSize"><span><strong>글씨 가독성</strong><small>거래·단지·뉴스·안내문 본문 크기</small></span>
    <select id="adminReadingSize" onchange="FirstHyundaiUIOptions.set('reading',this.value)">
-    <option value="standard">기본</option><option value="large">크게</option>
+    <option value="standard">기본</option><option value="large">크게</option><option value="xlarge">아주 크게</option>
    </select></label>
   <label class="adminPrefRow" for="adminMotionStyle"><span><strong>화면 애니메이션</strong><small>부드러운 전환 또는 움직임 최소화</small></span>
    <select id="adminMotionStyle" onchange="FirstHyundaiUIOptions.set('motion',this.value)">
@@ -308,8 +309,35 @@ body.apartmentSheetActive{overflow:hidden}
     <option value="standard">기본</option><option value="high">선명하게</option>
    </select></label>
  </div>
+ <div class="adminSettingsSectionHeading"><strong>화면과 탐색</strong><small>모든 휴대폰에 공통 적용</small></div>
+ <div class="adminPrefGrid">
+  <label class="adminPrefRow" for="adminQuickOrder"><span><strong>빠른 메뉴 순서</strong><small>오늘요약·계약문자·공유메모 위치</small></span>
+   <select id="adminQuickOrder" onchange="FirstHyundaiUIOptions.set('quickOrder',this.value)"><option value="standard">현재 순서</option><option value="contractsFirst">계약문자 먼저</option><option value="memoFirst">공유 메모 먼저</option></select></label>
+  <label class="adminPrefRow" for="adminAccentStyle"><span><strong>버튼 강조 색상</strong><small>선택한 빠른 업무 버튼 색상 조정</small></span>
+   <select id="adminAccentStyle" onchange="FirstHyundaiUIOptions.set('accent',this.value)"><option value="brand">기본 레드</option><option value="teal">딥그린</option><option value="bronze">브론즈</option></select></label>
+ </div>
+ <div class="adminSettingsSectionHeading"><strong>실거래 정보 표시</strong><small>원본 자료 변경 없음</small></div>
+ <div class="adminPrefGrid">
+  <label class="adminPrefRow" for="adminTradeAmountStyle"><span><strong>거래금액 강조</strong><small>거래 카드 금액의 크기와 굵기</small></span>
+   <select id="adminTradeAmountStyle" onchange="FirstHyundaiUIOptions.set('tradeAmount',this.value)"><option value="standard">기본</option><option value="bold">더 눈에 띄게</option></select></label>
+  <label class="adminPrefRow" for="adminCancelledStyle"><span><strong>해제 거래 구분</strong><small>해제 거래는 숨기지 않고 배경만 조절</small></span>
+   <select id="adminCancelledStyle" onchange="FirstHyundaiUIOptions.set('cancelled',this.value)"><option value="standard">기본</option><option value="subtle">배경을 옅게</option></select></label>
+ </div>
+ <div class="adminSettingsSectionHeading"><strong>사무실 공유 메모</strong><small>부모님 휴대폰에도 적용</small></div>
+ <div class="adminPrefGrid">
+  <label class="adminPrefRow" for="adminMemoOrder"><span><strong>메모 정렬</strong><small>최신 메모 또는 오래된 메모부터</small></span>
+   <select id="adminMemoOrder" onchange="FirstHyundaiUIOptions.set('memoOrder',this.value)"><option value="newest">최신순</option><option value="oldest">오래된순</option></select></label>
+  <label class="adminPrefRow" for="adminMemoCompleted"><span><strong>완료 메모 기본 표시</strong><small>게시판에 처음 들어갔을 때</small></span>
+   <select id="adminMemoCompleted" onchange="FirstHyundaiUIOptions.set('memoCompleted',this.value)"><option value="hide">완료 메모 숨기기</option><option value="show">함께 표시</option></select></label>
+  <label class="adminPrefRow" for="adminMemoRefresh"><span><strong>메모 자동 갱신</strong><small>게시판을 열어 둔 동안만 확인</small></span>
+   <select id="adminMemoRefresh" onchange="FirstHyundaiUIOptions.set('memoRefresh',this.value)"><option value="30">30초</option><option value="45">45초 (기본)</option><option value="120">2분</option></select></label>
+  <label class="adminPrefRow" for="adminMemoClock"><span><strong>메모 시간 표기</strong><small>오전·오후 또는 24시간</small></span>
+   <select id="adminMemoClock" onchange="FirstHyundaiUIOptions.set('memoClock',this.value)"><option value="12">오전·오후</option><option value="24">24시간</option></select></label>
+  <label class="adminPrefRow" for="adminMemoPhones"><span><strong>전화번호 바로 걸기</strong><small>메모의 전화번호를 링크로 표시</small></span>
+   <select id="adminMemoPhones" onchange="FirstHyundaiUIOptions.set('memoPhones',this.value)"><option value="on">사용</option><option value="off">글자로만 표시</option></select></label>
+ </div>
  <label class="adminAlertPref" for="adminTradePopupEnabled">
-  <span><strong>실거래 팝업 알림</strong><small>이 휴대폰의 기존 관심단지 알림 기능과 연동</small></span>
+  <span><strong>실거래 팝업 알림</strong><small>각 휴대폰의 기존 팝업 설정과 연동 · 알림 권한은 별도</small></span>
   <input type="checkbox" id="adminTradePopupEnabled" onchange="FirstHyundaiUIOptions.setTradePopup(this.checked)">
  </label>
  <p id="adminPreferencesStatus" class="tiny" role="status" aria-live="polite"></p>
@@ -322,12 +350,12 @@ body.apartmentSheetActive{overflow:hidden}
   <p class="tiny">관리자 변경 사항은 공통 서버에 게시됩니다. 부모님 휴대폰은 앱 실행·복귀 및 주기적 확인 시 자동으로 받습니다. 서버 연결 실패 시 다른 휴대폰에는 반영되지 않습니다.</p>
  </div>
  <div class="adminPrefActions">
-  <button type="button" class="btn alt" onclick="FirstHyundaiUIOptions.reset()">화면 설정 기본값 복원</button>
+  <button type="button" class="btn alt" onclick="FirstHyundaiUIOptions.reset()">공통 표시 설정 기본값</button>
   <button type="button" class="btn alt" onclick="FirstHyundaiUIOptions.exportSettings()">설정 백업 만들기</button>
  </div>
  <details class="adminPrefBackup" id="adminPrefBackupDetails">
   <summary>설정 백업·복원</summary>
-  <p class="tiny">화면 설정 다섯 가지와 알림 팝업 사용 여부만 다룹니다. 보안 코드·개인 메모·고객 정보·계약 내용·API 키는 포함되지 않습니다.</p>
+  <p class="tiny">화면·탐색·실거래 표시·공유 메모 설정과 팝업 사용 여부만 다룹니다. 보안 코드·개인 메모·고객 정보·계약 내용·API 키는 포함되지 않습니다.</p>
   <textarea id="adminSettingsExport" class="adminPrefText" readonly placeholder="설정 백업 만들기를 누르면 JSON이 표시됩니다."></textarea>
   <label for="adminSettingsImport" class="inputLabel">복원할 설정 JSON</label>
   <textarea id="adminSettingsImport" class="adminPrefText" placeholder="설정 백업 JSON을 붙여 넣으세요."></textarea>
@@ -933,7 +961,7 @@ try{notes=JSON.parse(localStorage.getItem(NOTE_KEY)||'[]');if(!Array.isArray(not
 $('repo').value=repository;
 
 const GENERAL_START_KEY='firsthyundai-ui-preferences-v1';
-const GENERAL_ALLOWED_START=new Set(['nearby','trades','new','complexes','news','contracts','overview','officetel']);
+const GENERAL_ALLOWED_START=new Set(['nearby','trades','new','complexes','news','contracts','overview','officetel','officeBoard']);
 function generalStartPage(){
  try{
   const parsed=JSON.parse(localStorage.getItem(GENERAL_START_KEY)||'{}');

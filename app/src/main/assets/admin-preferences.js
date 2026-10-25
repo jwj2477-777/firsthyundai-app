@@ -5,14 +5,24 @@
  const KEY='firsthyundai-ui-preferences-v1';
  const get=id=>document.getElementById(id);
  const defaults=Object.freeze({schema:1,start:'nearby',density:'standard',reading:'standard',
-  motion:'full',contrast:'standard'});
+  motion:'full',contrast:'standard',quickOrder:'standard',accent:'brand',
+  tradeAmount:'standard',cancelled:'standard',memoOrder:'newest',
+  memoCompleted:'hide',memoRefresh:'45',memoClock:'12',memoPhones:'on'});
  const allowed={
-  start:['nearby','trades','new','complexes','news','contracts','overview','officetel'],
-  density:['standard','compact'],reading:['standard','large'],
-  motion:['full','reduced'],contrast:['standard','high']
+  start:['nearby','trades','new','complexes','news','contracts','overview','officetel','officeBoard'],
+  density:['standard','compact','roomy'],reading:['standard','large','xlarge'],
+  motion:['full','reduced'],contrast:['standard','high'],
+  quickOrder:['standard','contractsFirst','memoFirst'],accent:['brand','teal','bronze'],
+  tradeAmount:['standard','bold'],cancelled:['standard','subtle'],
+  memoOrder:['newest','oldest'],memoCompleted:['hide','show'],
+  memoRefresh:['30','45','120'],memoClock:['12','24'],memoPhones:['on','off']
  };
  const fields={start:'adminDefaultPage',density:'adminListDensity',
-  reading:'adminReadingSize',motion:'adminMotionStyle',contrast:'adminContrastMode'};
+  reading:'adminReadingSize',motion:'adminMotionStyle',contrast:'adminContrastMode',
+  quickOrder:'adminQuickOrder',accent:'adminAccentStyle',tradeAmount:'adminTradeAmountStyle',
+  cancelled:'adminCancelledStyle',memoOrder:'adminMemoOrder',memoCompleted:'adminMemoCompleted',
+  memoRefresh:'adminMemoRefresh',memoClock:'adminMemoClock',memoPhones:'adminMemoPhones'};
+ const LEGACY_FIELDS=new Set(['start','density','reading','motion','contrast']);
  let state={...defaults},popupBackup=null;
  function readStorage(){
   try{
@@ -40,6 +50,11 @@
   node.setAttribute('data-reading-size',state.reading);
   node.setAttribute('data-app-motion',state.motion);
   node.setAttribute('data-app-contrast',state.contrast);
+  node.setAttribute('data-shortcut-order',state.quickOrder);
+  node.setAttribute('data-ui-accent',state.accent);
+  node.setAttribute('data-trade-amount',state.tradeAmount);
+  node.setAttribute('data-cancelled-style',state.cancelled);
+  window.FirstHyundaiOfficeBoard?.settingsChanged?.();
  }
  function render(){
   if(!allowedEditor())return;
@@ -70,8 +85,8 @@
  }
  function reset(){
   if(!allowedEditor())return false;
-  if(typeof confirm==='function'&&!confirm('이 기기의 화면 표시 설정 다섯 가지만 기본값으로 복원할까요? 알림·메모·보안 설정은 그대로 유지됩니다.'))return false;
-  return commit({...defaults},'화면 설정 다섯 가지를 기본값으로 복원했습니다. 알림과 자료는 변경하지 않았습니다.');
+  if(typeof confirm==='function'&&!confirm('공통 화면·메모 표시 설정을 기본값으로 복원할까요? 실제 메모·거래자료·보안코드와 알림 권한은 유지됩니다.'))return false;
+  return commit({...defaults},'공통 표시 설정이 기본값으로 복원됐습니다. 업무 자료는 변경하지 않았습니다.');
  }
  function applyShared(settings){
   let validated;
@@ -106,6 +121,7 @@
   const p=value.preferences;
   const result={...defaults};
   for(const key of Object.keys(allowed)){
+   if(p[key]===undefined&&!LEGACY_FIELDS.has(key))continue;
    if(!allowed[key].includes(p[key]))throw Error('지원하지 않는 설정 값: '+key);
    result[key]=p[key];
   }
