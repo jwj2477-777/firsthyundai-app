@@ -26,11 +26,12 @@
   memoRefresh:'adminMemoRefresh',memoClock:'adminMemoClock',memoPhones:'adminMemoPhones',
   tapSize:'adminTapSize',memoLayout:'adminMemoLayout'};
  const LEGACY_FIELDS=new Set(['start','density','reading','motion','contrast']);
- let state={...defaults},popupBackup=null,undoSnapshot=null;
+ let state={...defaults},popupBackup=null,undoSnapshot=null,lastChangeText='';
  function popupState(){return Boolean(window.FirstHyundaiTradeAlerts?.enabled?.())}
  function noteChange(label){
   const result=get('adminLastChange'),button=get('adminUndoLast');
-  if(result)result.textContent=label||'변경된 설정이 여기에 표시됩니다.';
+  if(label)lastChangeText=label;
+  if(result)result.textContent=lastChangeText||'변경된 설정이 여기에 표시됩니다.';
   if(button)button.disabled=!undoSnapshot;
  }
  function rememberUndo(){
@@ -83,7 +84,7 @@
  function commit(next,info){
   if(!allowedEditor())return false;
   if(!writeState(next)){message('저장 공간에 접근할 수 없어 화면 설정을 저장하지 못했습니다.');return false}
-  rememberUndo();state=next;apply();render();message(info||'변경 사항을 이 기기에 적용하고 공통 서버에 게시합니다.');
+  rememberUndo();state=next;apply();render();noteChange(info||'화면 설정 변경됨');message(info||'변경 사항을 이 기기에 적용하고 공통 서버에 게시합니다.');
   window.FirstHyundaiSharedSettings?.changed?.();return true;
  }
  function set(key,value){
@@ -96,7 +97,7 @@
   const alerts=window.FirstHyundaiTradeAlerts;
   if(typeof alerts?.setEnabled!=='function'){message('알림 제어 기능이 준비되지 않았습니다.');return}
   if(popupState()===enabled)return;
-  rememberUndo();alerts.setEnabled(enabled);render();
+  rememberUndo();alerts.setEnabled(enabled);render();noteChange('관심단지 팝업 '+(enabled?'사용':'중지'));
   message('관심단지 팝업 알림 '+(enabled?'사용':'중지')+' 상태를 공통 서버에 게시합니다.');
   window.FirstHyundaiSharedSettings?.changed?.();
  }
@@ -120,7 +121,7 @@
   const alerts=window.FirstHyundaiTradeAlerts;
   if(typeof alerts?.setEnabled==='function'&&popupState()!==previous.tradePopup)
    alerts.setEnabled(previous.tradePopup);
-  render();message('직전 변경을 취소했습니다. 이전 공통 설정을 게시합니다.');
+  lastChangeText='';render();noteChange('직전 변경 취소 완료');message('직전 변경을 취소했습니다. 이전 공통 설정을 게시합니다.');
   window.FirstHyundaiSharedSettings?.changed?.();return true;
  }
  function reset(){
@@ -133,7 +134,8 @@
   try{validated=validateImport(JSON.stringify(settings))}catch(e){return false}
   // Remote updates are permitted in normal mode, but local writes stay admin-only.
   if(!writeState(validated.preferences))return false;
-  undoSnapshot=null;state=validated.preferences;apply();render();
+  undoSnapshot=null;lastChangeText='서버의 최신 공통 설정을 적용했습니다.';
+  state=validated.preferences;apply();render();
   const alerts=window.FirstHyundaiTradeAlerts;
   if(typeof alerts?.enabled==='function'&&typeof alerts?.setEnabled==='function'&&
    alerts.enabled()!==validated.tradePopup)alerts.setEnabled(validated.tradePopup);
