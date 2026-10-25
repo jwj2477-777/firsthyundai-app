@@ -122,6 +122,7 @@
   get('adminInstalledVersion').textContent=installedAppVersionLabel(window.FirstHyundaiNative);
   get('adminCheckNote').textContent=checkNote||
    '게시자료 기록 기준입니다. 게시 확인이 공공 API 실시간 정상 작동을 의미하지는 않습니다.';
+  window.FirstHyundaiUIOptions?.render?.();
   const levelSelect=get('adminFreshnessLevel');
   if(levelSelect&&levelSelect.value!==level)levelSelect.value=level;
   const net=get('adminConnectionState');

@@ -3,7 +3,7 @@
 (function(){
  'use strict';
  if(!document?.addEventListener||!document?.createElement)return;
- const reduced=()=>!!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+ const reduced=()=>window.FirstHyundaiUIOptions?.get?.().motion==='reduced'||!!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
  const stats={entrances:0,handoffs:0};
  // Preload both tiny local faces, even where a narrow header hides English.
  document.fonts?.load?.('700 30px "FHD Brand"');

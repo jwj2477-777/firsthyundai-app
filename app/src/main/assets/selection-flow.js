@@ -20,7 +20,7 @@
  const stats={started:0,finished:0,skipped:0,topFive:0,news:0,lastPath:[]};
  let running=null,sequence=0;
  const lowerClicks=new WeakMap();
- const reduceMotion=()=>!!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+ const reduceMotion=()=>window.FirstHyundaiUIOptions?.get?.().motion==='reduced'||!!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
  const chosen=b=>!!b&&(b.classList.contains('active')||
   b.classList.contains('selected')||b.getAttribute('aria-current')==='page'||
   b.getAttribute('aria-pressed')==='true'||b.getAttribute('aria-selected')==='true');

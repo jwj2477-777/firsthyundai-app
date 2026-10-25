@@ -197,7 +197,7 @@ public class MainActivity extends Activity {
                     if(isFinishing()||isDestroyed())return;
                     if(activeAdmin.equals(adminSessionIdentity)){
                         changeRole(false);
-                        Toast.makeText(this,"관리자 정책을 확인할 수 없어 가족 모드로 전환했습니다.",Toast.LENGTH_LONG).show();
+                        Toast.makeText(this,"관리자 정책을 확인할 수 없어 일반모드로 전환했습니다.",Toast.LENGTH_LONG).show();
                     }
                 });
             });

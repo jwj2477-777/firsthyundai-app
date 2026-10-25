@@ -1,0 +1,43 @@
+/* v2.0.95 · Local display preferences, no data or authentication changes. */
+#adminCenter .adminPrefGrid{display:grid;gap:2px;margin-top:8px}
+#adminCenter .adminPrefRow{display:flex;align-items:center;justify-content:space-between;gap:10px;
+ border-bottom:1px solid #E8EFEB;padding:11px 0}
+#adminCenter .adminPrefRow>span,#adminCenter .adminAlertPref>span{flex:1;min-width:0}
+#adminCenter .adminPrefRow strong,#adminCenter .adminAlertPref strong{display:block;font-size:13px;color:#284A50}
+#adminCenter .adminPrefRow small,#adminCenter .adminAlertPref small{display:block;margin-top:3px;
+ font-size:11px;line-height:1.45;color:#667D82}
+#adminCenter .adminPrefRow select{min-width:115px;max-width:48%;border:1px solid #C8DAD3;
+ border-radius:10px;min-height:43px;padding:6px 7px;background:#FBFDFC;color:#275056;font-size:12px}
+#adminCenter .adminAlertPref{display:flex;gap:12px;align-items:center;justify-content:space-between;
+ padding:13px 0;border-bottom:1px solid #E8EFEB}
+#adminCenter .adminAlertPref input{width:20px;height:20px;accent-color:#14695F}
+#adminCenter .adminPrefActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+#adminCenter .adminPrefActions button{min-height:44px;min-width:0;font-size:12px;padding:7px}
+#adminCenter .adminPrefBackup{padding:10px 0}
+#adminCenter .adminPrefBackup summary{cursor:pointer;font-size:13px;font-weight:700;color:#31575A}
+#adminCenter .adminPrefText{display:block;width:100%;min-height:118px;margin:8px 0 14px;
+ padding:10px;border-radius:9px;border:1px solid #C9DCD4;background:#FAFDFC;
+ color:#344D53;font:12px/1.55 ui-monospace,monospace;box-sizing:border-box;overflow:auto}
+#adminCenter .adminPrefBackup>.btn{min-height:43px}
+#adminCenter .adminPrefRow :focus-visible,#adminCenter .adminPrefActions button:focus-visible,
+#adminCenter .adminPrefText:focus-visible{outline:3px solid #19776A;outline-offset:2px}
+body[data-list-density="compact"] :is(#tradesContent,#officeRentContent,#nearbyTrades,#newContent) .dealRow{
+ padding-top:7px!important;padding-bottom:7px!important;margin-bottom:6px!important}
+body[data-list-density="compact"] :is(#complexCards,#nearbyCards) .nearbyCard{
+ padding-top:9px!important;padding-bottom:9px!important;margin-bottom:6px!important}
+body[data-reading-size="large"] :is(#tradesContent,#officeRentContent,#nearbyTrades,#newContent) .dealRow{
+ font-size:16px!important;line-height:1.55}
+body[data-reading-size="large"] :is(#complexCards,#nearbyCards) .nearbyCard{
+ font-size:16px!important;line-height:1.55}
+body[data-reading-size="large"] :is(#newsContent,.familySimpleNote,#adminCenter .tiny){
+ font-size:15px!important;line-height:1.65}
+body[data-app-contrast="high"] :is(.panel,.dealRow,.nearbyCard,.newsCard){
+ border-color:#708E93!important}
+body[data-app-contrast="high"] :is(.tiny,.muted,.complexSummaryAddress,.newsAiSentence){
+ color:#304C55!important}
+body[data-app-motion="reduced"] *,body[data-app-motion="reduced"] *::before,
+body[data-app-motion="reduced"] *::after{
+ animation-duration:.01ms!important;transition-duration:.01ms!important;
+ scroll-behavior:auto!important}
+@media(max-width:360px){#adminCenter .adminPrefRow select{min-width:108px;font-size:11px}
+ #adminCenter .adminPrefActions button{font-size:11px}}

@@ -1,5 +1,11 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-25 · v2.0.95 · 일반모드와 관리자 UI 운영 설정
+- index.html 헤더/ARIA/모드 전환/보조 문구와 MainActivity.java 안내의 '가족 모드' 표시를 '일반모드'로 변경. Native JS role 문자열 'family', 인증정책, 사용자 데이터·키는 불변.
+- adminCenter 앱 환경 패널: 시작화면/밀도/글자/효과/대비/실거래 팝업 알림. 별도 admin-preferences.js/css에서 관리자 인증 role 검사, localStorage 엄격 값 목록·스키마 검증, body data 속성 적용, real-time animation reduction integration.
+- admin-preferences.js를 premium-motion.js와 selection-flow.js 전에 로드, OS reduce-motion 존중. 초기 진입도 generalStartPage()로 설정 반영. 설정만 JSON으로 백업·복원, 고객/비밀키 제외. reset은 알림을 손대지 않음.
+- 기존 admin-center.js 상태 업데이트에서 설정 UI sync; test_admin_preferences.js 추가, 화면/모드 회귀 수정. 버전 2.0.95/build146, CI/공개 APK·실기기 검증 별도.
+
 ## 2026-10-25 · v2.0.94 · 관리자 정밀 점검 기능
 - app/src/main/assets/admin-center.js: SOURCES 8종 정의, classifiy 대신 정밀 classify(자료 기준/시각/오류/누락/최대 500건 품질점검), 중요도별 우선 점검, details, 소스별 retry/화면 이동, 기간 경고 strict/normal/relaxed 로컬 설정, 개인자료 미포함 보고서 복사+선택 fallback, 이벤트 최대 24건 로컬 저장/삭제, 관심알림 설정 바로가기.
 - HTML adminCenter만 재배치, admin-center.css에 스코프 스타일 확장. 일반 업무·네비·가족모드·별도 인증 정책은 변경 없음.

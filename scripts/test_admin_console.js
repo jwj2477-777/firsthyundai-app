@@ -7,7 +7,7 @@ const css=fs.readFileSync(path.join(root,'admin-center.css'),'utf8');
 new vm.Script(js);
 for(const id of ['adminCenter','adminFeeds','adminAttention','adminFreshnessLevel','adminAuditHistory','adminReportFallback','adminConnectionState'])
  assert(html.includes('id="'+id+'"'),'Missing real console control '+id);
-assert(html.includes("switchPage(role==='admin'?'adminCenter':'nearby')"));
+assert(html.includes("switchPage(role==='admin'?'adminCenter':generalStartPage())"));
 assert(html.includes("const PRIVATE_PAGES=new Set(['settings','notes','security','apiGuide','adminCenter'])"));
 assert(css.includes('#adminCenter .adminFeedDetail'));
 const nodes=new Map(),store=new Map(),actions=[];
