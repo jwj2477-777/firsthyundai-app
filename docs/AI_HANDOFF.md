@@ -1,5 +1,12 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-26 · v2.1.07 공유메모 일정·계정 관리
+- 사무실 자유 메모에서 한국어 상대날짜/요일/특정일을 자동 파싱해 종일 또는 지정시간으로 달력에 연결. 수동 일정연결 폼 제거.
+- 일반계정 최초 선택(가족코드는 관리자가 기기에 입력): LockActivity -> POST /board/choices -> 선택 -> POST /board/session. Server member/device KV, HMAC board-v2 session + 실시간 KV 확인; 메모 작성자는 서버에서 검증한 계정으로만 기록. 관리센터 /board/members (native admin token) 추가/삭제, 삭제 시 기기 revoked tombstone 기록 및 FCM 등록 해제. 삭제 계정의 서명 토큰도 거부, 앱은 온라인 검증 시 시작 화면 잠금.
+- 기존 2.1.06 가입 토큰은 v2 토큰과 호환되지 않으므로 업데이트 후 보안코드·계정 선택 한 번 필요. 외부 Google Calendar 연동 기능이 아니라 앱 내부 공유 캘린더임.
+- Server deploy only main; Cloudflare Secrets Firebase 두 개 없으면 앱 종료 중 FCM 실시간 푸시는 활성화되지 않음.
+
+
 ## 2026-10-25 · v2.1.05 · FCM 푸시
 - Android FirebaseMessagingService/OfficeMemoFirebase: 가족코드 인증된 /board/push/config 로 Firebase 설정 동적 로딩, /board/push/register 기기 인증, 신규 메모 FCM 수신 후 내용 없는 비공개 notification. 가족 LockActivity 거쳐 해당 note_id 초점. 종전 폴링 유지.
 - Worker: OAuth2 service account JWT -> FCM HTTP v1 /messages:send. Post만 다른 기기에 발송하고 메모 본문/전화번호 불포함. 가족코드 rotation 시 구독 즉시 무효. 서버 서비스 계정 FHD_FCM_SERVICE_ACCOUNT_JSON 및 공개 Android 구성 FHD_FIREBASE_ANDROID_JSON은 GitHub Actions Secret 필요. 자세한 설정 docs/FIREBASE_PUSH_SETUP.md.
