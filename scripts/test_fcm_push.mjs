@@ -58,7 +58,10 @@ try{
   "Firebase public config is distributed only to signed-in office devices");
  assert.equal((await req("/board/push/register","POST",{device:"0".repeat(32),fcm:"a".repeat(100)})).status,401,
   "Unauthenticated devices cannot subscribe");
- const auth=await (await req("/board/session","POST",{code:"familycode2026"})).json();
+ const choices=(await (await req("/board/choices","POST",{code:"familycode2026"})).json()).accounts;
+ const member=choices[0].id;
+ const da="a".repeat(32),db="b".repeat(32),dc="c".repeat(32);
+ const auth=await (await req("/board/session","POST",{code:"familycode2026",member_id:member,device:da})).json();
  assert(auth.token);
  const t=auth.token;
  assert((await (await req("/board/push/status","GET",null,t)).json()).push_available);
@@ -67,9 +70,10 @@ try{
  assert.equal(options.config.project_id,"firsthyundai-test-123");
  assert(!JSON.stringify(options).includes("PRIVATE KEY"));
  assert(!JSON.stringify(options).includes("adminsdk@"));
- const a=await req("/board/push/register","POST",{device:"a".repeat(32),fcm:"token:AAA_"+ "A".repeat(95)},t);
+ const a=await req("/board/push/register","POST",{device:da,fcm:"token:AAA_"+ "A".repeat(95)},t);
  assert.equal(a.status,200);
- const b=await req("/board/push/register","POST",{device:"b".repeat(32),fcm:"token:BBB_"+ "B".repeat(95)},t);
+ const tb=(await (await req("/board/session","POST",{code:"familycode2026",member_id:member,device:db})).json()).token;
+ const b=await req("/board/push/register","POST",{device:db,fcm:"token:BBB_"+ "B".repeat(95)},tb);
  assert.equal(b.status,200);
  const wrong=await req("/board/push/register","POST",{device:"x".repeat(32),fcm:"bad"},t);
  assert.equal(wrong.status,400);
@@ -87,7 +91,7 @@ try{
   "No push on completion or edit");
  env.FIRSTHYUNDAI_ACCESS_CODE="rotatedfamilycode2026";
  assert.equal((await req("/board","GET",null,t)).status,401);
- const fresh=(await (await req("/board/session","POST",{code:"rotatedfamilycode2026"})).json()).token;
+ const fresh=(await (await req("/board/session","POST",{code:"rotatedfamilycode2026",member_id:member,device:dc})).json()).token;
  assert.equal((await req("/board","POST",{text:"새로운 공유 메모",device:"c".repeat(32)},fresh)).status,201);
  await Promise.all(waiting.splice(0));
  assert.equal(calls.filter(c=>c.uri.includes("fcm.googleapis.com")).length,1,
