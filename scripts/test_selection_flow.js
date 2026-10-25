@@ -1,5 +1,5 @@
 'use strict';
-/* v10 regression: trades↔news passes subtly via Apartment Info only */
+/* v14 regression: trades↔news via Apartment Info, today↔memo via Contracts */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
@@ -49,12 +49,12 @@ function node(tag,klass=[]){
 const nav=node('nav'),top=node('div',['primaryNav']),
  bottom=node('div',['utilityNav']);
 top.parentElement=nav;bottom.parentElement=nav;nav.children=[top,bottom];
-const colors=['#2456AA','#136D63','#6547A5','#4B5895','#9C5737'];
-const labels=['실거래','아파트정보','뉴스','오늘 요약','계약문자 만들기'];
+const colors=['#2456AA','#136D63','#6547A5','#4B5895','#9C5737','#946A37'];
+const labels=['실거래','아파트정보','뉴스','오늘 요약','계약문자 만들기','공유 메모'];
 const buttons=labels.map((label,i)=>{
  const button=node('button');
  button.parentElement=i<3?top:bottom;button.innerHTML=label;
- const x=i<3?24+i*123:35+(i-3)*190,y=i<3?40:240,w=i<3?110:172,h=i<3?130:74;
+ const x=i<3?24+i*123:35+(i-3)*125,y=i<3?40:240,w=i<3?110:115,h=i<3?130:74;
  button.rect={left:x,top:y,width:w,height:h,right:x+w,bottom:y+h};
  button.classList={contains:k=>k==='active'&&selected===i};
  button.getAttribute=k=>k==='aria-current'?(selected===i?'page':'false'):null;
@@ -77,13 +77,17 @@ const win={innerWidth:415,innerHeight:980,requestAnimationFrame,
 };
 vm.runInNewContext(code,{window:win,document:doc,Math,Number,Object,Array,Map});
 const api=win.FirstHyundaiSelectionFlow;
-assert.equal(api.version,'13.0.0');
-assert.equal(api._test.buttons(nav,'top-five').length,5);
+assert.equal(api.version,'14.0.0');
+assert.equal(api._test.buttons(nav,'top-five').length,6);
 assert(!('beginDirect' in api)&&!('endDirect' in api),'Removed non-working direct-hook branch');
 assert.equal(api._test.viaIndex('top-five',0,2),1);
 assert.equal(typeof api._test.isLowerRow,'function');
 assert.equal(api._test.viaIndex('top-five',2,0),1);
-for(const pair of [[0,1],[1,2],[0,3],[2,4],[3,4]])
+assert.equal(api._test.viaIndex('top-five',3,5),4,'Summary → Memo passes via Contracts');
+assert.equal(api._test.viaIndex('top-five',5,3),4,'Memo → Summary passes via Contracts');
+assert.equal(api._test.viaIndices('top-five',3,5,buttons).join(','),'4');
+assert.equal(api._test.viaIndices('top-five',5,3,buttons).join(','),'4');
+for(const pair of [[0,1],[1,2],[0,3],[2,4],[3,4],[3,2],[4,5]])
  assert.equal(api._test.viaIndex('top-five',...pair),-1,
   'Other navigation paths stay untouched');
 assert.equal(api._test.viaIndex('news',0,2),-1);
@@ -128,18 +132,55 @@ click({target:buttons[4],defaultPrevented:false});
 selected=4;
 frame(2000);frame(2000);frame(2315);
 assert.equal(api._test.stats.lastPath.join(','),'0,4');
-for(const i of [1,2,3])assert.equal(buttons[i].style.getPropertyValue('background'),'',
+for(const i of [1,2,3,5])assert.equal(buttons[i].style.getPropertyValue('background'),'',
  'Unrelated main button '+i+' is untouched');
 complete(2630);
 assert.equal(api._test.stats.topFive,3);
 assert(buttons.every(b=>b.style.getPropertyValue('background')===''));
+
+// TODAY → SHARED MEMO. Contract Message is the faint transitional wash.
+// The original DOM contents and button geometry never move.
+selected=3;
+click({target:buttons[5],defaultPrevented:false});
+selected=5;
+frame(3000);frame(3000);frame(3395);
+assert.equal(api._test.stats.lastPath.join(','),'3,4,5');
+assert(buttons[4].style.getPropertyValue('background').includes('linear-gradient'));
+assert.equal(buttons[4].getAttribute('aria-current'),'false');
+for(const i of [0,1,2])assert.equal(buttons[i].style.getPropertyValue('background'),'',
+ 'Unrelated main button '+i+' must not repaint');
+assert.deepEqual(buttons.map(b=>({text:b.innerHTML,rect:{...b.rect}})),before);
+complete(3790);
+assert(buttons.every(b=>b.style.getPropertyValue('background')===''));
+
+// SHARED MEMO → TODAY follows the same route in the opposite direction.
+click({target:buttons[3],defaultPrevented:false});
+selected=3;
+frame(4000);frame(4000);frame(4395);
+assert.equal(api._test.stats.lastPath.join(','),'5,4,3');
+assert(buttons[4].style.getPropertyValue('background').includes('linear-gradient'));
+assert.equal(buttons[4].getAttribute('aria-current'),'false');
+complete(4790);
+assert(buttons.every(b=>b.style.getPropertyValue('background')===''));
+assert.equal(api._test.stats.topFive,5);
+
+// If the administrator reorders the quick actions, the middle button
+// no longer sits between Summary and Memo: no false sideways detour.
+const contractBounds=buttons[4].rect;
+buttons[4].rect={...contractBounds,left:5,right:120};
+assert.equal(api._test.viaIndices('top-five',3,5,buttons).length,0,
+ 'A visually reordered contract shortcut is not on the physical route');
+buttons[4].rect={...contractBounds,top:350,bottom:424};
+assert.equal(api._test.viaIndices('top-five',5,3,buttons).length,0,
+ 'A wrapped contract shortcut is not part of a horizontal route');
+buttons[4].rect=contractBounds;
 const vector=api._test.vector(buttons[4].rect,buttons[0].rect);
 assert(vector.dy<0&&vector.dx<0,'Cross-row direction still points up-left');
 reduced=true;
 click({target:buttons[3],defaultPrevented:false});
 assert.equal(callbacks.length,0);
 assert.equal(nav.children.length,2);
-console.log('V10 restrained via-Apartment-Info paint: only Trades↔News, both directions, no intermediate selection, no other paths altered.');
+console.log('V14 soft intermediate wash: Trades↔News and Today↔Shared Memo, both directions, no extra UI movement.');
 
 // Real native event dispatch can drain microtasks after capture but before
 // inline onclick. Lower rows MUST wait for bubbling (not a capture microtask).

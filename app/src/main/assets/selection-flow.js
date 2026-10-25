@@ -1,8 +1,8 @@
-/* FIRST HYUNDAI · minimal color flow v13 · shared real-button paint
+/* FIRST HYUNDAI · minimal color flow v14 · shared real-button paint
  * No overlays, masks, moving shapes, transforms, resized buttons or clones.
  * The ACTUAL button backgrounds are painted in place, behind original text.
  * Skipped peers on the SAME visual row receive a faint, sequential wash.
- * The top menu retains its established Trades ↔ News route via Apartment Info.
+ * Main Trades ↔ News routes via Apartment Info; Today ↔ Shared Memo routes via Contract.
  */
 (function(){
  'use strict';
@@ -85,17 +85,35 @@
   return 'linear-gradient('+angle+'deg, '+
    selected+' '+pct(position-12)+', '+idle+' '+pct(position+12)+')';
  }
- // Only the top-row pair 0↔2 travels through the visual middle tab 1.
- // This is visual pigment only; the middle tab never becomes selected.
+ // Two three-button lanes: Trades → Apartment Info → News and
+ // Today Summary → Contract Message → Shared Memo (and reverse).
+ // The center button is merely washed by color, never actually selected.
  function viaIndex(key,previous,next){
-  return key==='top-five'&&
-   ((previous===0&&next===2)||(previous===2&&next===0))?1:-1;
+  if(key!=='top-five')return -1;
+  if((previous===0&&next===2)||(previous===2&&next===0))return 1;
+  if((previous===3&&next===5)||(previous===5&&next===3))return 4;
+  return -1;
  }
  // Never paint a different visual row, even when DOM indices are adjacent.
  function viaIndices(key,previous,next,peers){
   if(key==='top-five'){
    const index=viaIndex(key,previous,next);
-   return index<0?[]:[index];
+   if(index<0)return [];
+   // The quick actions support administrator-defined visual ordering.
+   // Follow the contract button only while it is truly BETWEEN the
+   // endpoints on the same visible row, never across a wrapped row.
+   if(index===4){
+    const source=peers[previous],target=peers[next],middle=peers[index];
+    if(!source||!target||!middle||middle.disabled||chosen(middle))return [];
+    const A=source.getBoundingClientRect(),B=target.getBoundingClientRect(),
+     C=middle.getBoundingClientRect();
+    const p=center(A),q=center(B),m=center(C);
+    const tolerance=Math.max(2,Math.min(A.height,B.height,C.height)*.16);
+    if(!visible(A)||!visible(B)||!visible(C)||
+      Math.abs(p.y-q.y)>tolerance||Math.abs(m.y-p.y)>tolerance||
+      !(m.x>Math.min(p.x,q.x)&&m.x<Math.max(p.x,q.x)))return [];
+   }
+   return [index];
   }
   if(!peers[previous]||!peers[next]||Math.abs(next-previous)<2)return [];
   const a=peers[previous].getBoundingClientRect();
@@ -252,7 +270,7 @@
   lowerClicks.delete(event);
   if(!event.defaultPrevented)start?.();
  });
- window.FirstHyundaiSelectionFlow={version:'13.0.0',
+ window.FirstHyundaiSelectionFlow={version:'14.0.0',
   _test:{buttons,chosen,findGroup,getPaint,fromPaint,toPaint,
    vector,viaIndex,viaIndices,softlyMix,middlePaint,isLowerRow,stop,onClick,stats}};
 })();
