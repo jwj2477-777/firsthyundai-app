@@ -16,10 +16,11 @@ for(let hour=15;hour<24;hour++){
 rows.push(row(1,'PTY','1','20261027'));
 const doc={response:{header:{resultCode:'00'},body:{items:{item:rows}}}};
 const parsed=parseForecast(doc,base,now);
-assert.equal(parsed.hours.length,9);
+assert.equal(parsed.hours.length,10,'Next-day hourly forecast is retained');
 assert.equal(parsed.complete,true);
 assert.equal(parsed.hours[0].temp,0,'Zero degrees is a real value');
-assert(parsed.hours.every(h=>h.at.startsWith('2026-10-26')));
+assert.equal(parsed.hours.filter(h=>h.at.startsWith('2026-10-26')).length,9);
+assert.equal(parsed.hours.filter(h=>h.at.startsWith('2026-10-27')).length,1);
 assert.deepEqual(forecastBase(Date.parse('2026-10-26T00:05:00+09:00')),{date:'20261025',time:'2300'});
 assert.deepEqual(forecastBase(now),base);
 assert.throws(()=>parseForecast(doc,base,now+8*3600000));
