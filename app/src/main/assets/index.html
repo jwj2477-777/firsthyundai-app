@@ -2421,7 +2421,7 @@ function todaySongdoNews(payload,now=Date.now()){
 }
 function renderOverviewNews(){
  const root=$('overviewSongdoNews'),list=$('overviewNewsEntries');
- if(!root||!list)return;
+ if(!root||!list||!root.classList)return;
  const picks=todaySongdoNews(remote.news);
  root.classList.toggle('hidden',!picks.length);
  if(!picks.length){list.innerHTML='';return}
