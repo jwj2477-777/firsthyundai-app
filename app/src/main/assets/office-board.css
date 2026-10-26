@@ -324,3 +324,116 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 .officeMemberRename:focus-visible,.officeMemberRenameSave:focus-visible,
 .officeMemberRenameCancel:focus-visible,.officeMemberRenameInput:focus-visible{
  outline:2px solid #397E73;outline-offset:1px}
+
+
+/* v2.1.21 · Office memo mustard / same geometry as News vs Subscriptions.
+   Colors communicate the shared-memo identity; layout is a common segmented bar.
+   All selection effects still paint the real buttons without shifting them. */
+:root{
+ --office-memo-mustard:#87651A;
+ --office-memo-mustard-border:#6D5011;
+ --office-memo-mustard-soft:#F3EBD5;
+ --office-memo-mustard-ink:#69511C;
+}
+#nav .utilityNav>button.officeBoardNav.active{
+ background:var(--office-memo-mustard);
+ border-color:var(--office-memo-mustard-border);
+ color:#FFFFFF;
+ box-shadow:0 3px 9px #54431826;
+}
+#nav .utilityNav>button.officeBoardNav:not(.active){
+ border-left-color:#D4B66E;
+}
+#officeBoard .officeBoardViewToggle.sectionModeSwitch{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ align-items:stretch;
+ gap:5px;
+ width:100%;
+ max-width:100%;
+ margin:0 0 14px;
+ padding:6px;
+ border:1px solid #DECEA5;
+ border-radius:18px;
+ background:var(--office-memo-mustard-soft);
+ box-shadow:0 1px 3px #493B1D0C;
+}
+#officeBoard .officeBoardViewToggle.sectionModeSwitch>button{
+ box-sizing:border-box;
+ appearance:none;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ min-width:0;
+ width:100%;
+ min-height:62px;
+ margin:0;
+ padding:10px 7px;
+ border:2px solid transparent;
+ border-radius:13px;
+ background:#FFFEFA;
+ color:var(--office-memo-mustard-ink);
+ font-family:inherit;
+ font-size:16px;
+ font-weight:850;
+ line-height:1.35;
+ letter-spacing:-.3px;
+ text-align:center;
+ word-break:keep-all;
+ white-space:normal;
+ box-shadow:none;
+ cursor:pointer;
+ transition-property:color,border-color,box-shadow;
+ transition-duration:.16s;
+}
+#officeBoard .officeBoardViewToggle.sectionModeSwitch>button.selected,
+#officeBoard .officeBoardViewToggle.sectionModeSwitch>button[aria-pressed="true"]{
+ background:var(--office-memo-mustard);
+ color:#FFFFFF;
+ border:2px solid var(--office-memo-mustard-border);
+ box-shadow:inset 0 -3px 0 #3A2B1424,0 2px 6px #493B1D22;
+}
+#officeBoard .officeBoardViewToggle.sectionModeSwitch>button:not(.selected){
+ background:#FFFEFA;
+ color:var(--office-memo-mustard-ink);
+ border-color:transparent;
+ box-shadow:none;
+}
+#officeBoard .officeBoardViewToggle.sectionModeSwitch>button:focus-visible{
+ outline:3px solid #C9A65F;
+ outline-offset:2px;
+}
+@media(max-width:410px){
+ #officeBoard .officeBoardViewToggle.sectionModeSwitch>button{
+  min-height:59px;
+  font-size:15px;
+  padding:9px 5px;
+ }
+}
+@media(max-width:350px){
+ #officeBoard .officeBoardViewToggle.sectionModeSwitch>button{font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){
+ #officeBoard .officeBoardViewToggle.sectionModeSwitch>button{transition:none}
+}
+
+/* A notification-permission CTA remains usable if Android requests it.
+   Operational FCM/foreground status never consumes everyday screen space. */
+#officeBoard .officeMemoNotificationTools:not(.hidden){
+ margin:0 0 11px;
+ justify-content:flex-end;
+ background:transparent;
+ border:0;
+ padding:0;
+}
+#officeBoard #officeMemoNotificationStatus{
+ position:absolute;
+ width:1px;height:1px;
+ padding:0;margin:-1px;
+ overflow:hidden;clip:rect(0,0,0,0);
+ white-space:nowrap;border:0;
+}
+#officeBoard .officeBoardComposer.hidden,
+#officeBoard .officeBoardFeedback.hidden{
+ display:none!important;
+}

@@ -34,13 +34,15 @@
  // Retain the clicked row itself, including the open favorites detail sheet.
  function isLowerRow(row){
   return !!row&&(row.classList?.contains('newsCategoryTabs')||
+   row.classList?.contains('officeBoardViewToggle')||
    (row.classList?.contains('tradeTypeBar')&&
     ['tradeTypeBar','officeTypeBar','nearbyTypeBar'].includes(row.id)));
  }
  function findGroup(button){
   const row=button.parentElement;
   if(isLowerRow(row))return {group:row,spec:{
-   key:row.classList.contains('newsCategoryTabs')?'news':'trade-types',stable:true
+   key:row.classList.contains('newsCategoryTabs')?'news':
+    row.classList.contains('officeBoardViewToggle')?'memo':'trade-types',stable:true
   }};
   const nav=button.closest('#nav');
   if(nav&&(row?.classList?.contains('primaryNav')||
