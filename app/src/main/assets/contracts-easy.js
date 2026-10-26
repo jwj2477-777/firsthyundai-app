@@ -121,11 +121,24 @@ function addReviewNote(msg){
 }
 function prepareSpecials(raw){
  const dedicated=v('specialMemo').replace(/\r/g,'').trim();
- const extracted=dedicated?'':extractSpecial(raw);
- // A dedicated special-clause box is always interpreted as specials, without
- // requiring "특약:" or guessing from the general memo. Use the same conservative
- // sentence normalizer as detected clauses, keeping every distinct item.
- const terms=dedicated||extracted||v('terms');
+ const extracted=extractSpecial(v('rough'));
+ // Both inputs go through contract fact recognition. For the optional lower
+ // memo, keep explicitly headed clauses or implicit undertakings. Do not
+ // accidentally turn price, dates or bank details into a special clause.
+ const lowerExtracted=extractSpecial(dedicated);
+ // The implicit extractor is intentionally conservative. Keep additional
+ // free-form clauses too (e.g., "반려동물 안돼") so none is silently lost.
+ const lowerLines=dedicated.split(/\n+/).map(x=>x.trim()).filter(x=>
+   x&&!/^(?:특약(?:사항)?|합의사항|추가\s*조건|별도\s*합의)\s*[:：-]?/.test(x)&&
+   !isDealField(x)&&!isPaymentLine(x)&&
+   !/(?:매매|전세|보증금|계약금|중도금|잔금|월세|송금|입금|계좌|아파트|동호수).{0,30}\d/.test(x));
+ const lines=[extracted,lowerExtracted,...lowerLines].filter(Boolean).join('\n').split(/\n+/).map(x=>x.trim()).filter(Boolean);
+ const unique=[],seen=new Set();
+ for(const line of lines){
+  const key=line.replace(/[^가-힣a-zA-Z0-9]/g,'').toLowerCase();
+  if(!seen.has(key)){seen.add(key);unique.push(line)}
+ }
+ const terms=unique.join('\n')||v('terms');
  sourceClause=terms;polishedClause=polishTerms(terms);
  const usePolished=E('polishTerms')?.checked!==false;
  if(E('terms'))E('terms').value=terms?(usePolished?polishedClause:terms):'';
@@ -334,8 +347,8 @@ function showPreview(){
  if(panel?.scrollIntoView)panel.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function compose(){
- const raw=v('rough');
- if(!raw){alert('먼저 메모를 입력하거나 음성으로 말씀해 주세요.');E('rough')?.focus?.();return false;}
+ const raw=[v('rough'),v('specialMemo')].filter(Boolean).join('\n');
+ if(!raw){alert('먼저 계약 내용을 입력하거나 음성으로 말씀해 주세요.');E('rough')?.focus?.();return false;}
  // Never carry unfinished bank/account answers across a new memo (new client).
  quickDraft.clear();activeQuick='';
  // Each new composition starts with empty deal data, avoiding old customer's account or terms leaking into new draft.

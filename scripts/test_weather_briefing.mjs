@@ -45,15 +45,15 @@ assert(result.precip.includes('오늘 오후 4시')&&result.precip.includes('비
 assert(result.mapAlert.includes('눈 예보')&&result.mapAlert.includes('지도함'),result.mapAlert);
 assert(result.mapAlert.includes('내일 오전 9시'),result.mapAlert);
 assert.equal(result.coverage,false,'Incomplete overnight forecast must be acknowledged');
-assert.equal(result.mapCaution,'','Do not raise gap warning too early');
+assert(!('mapCaution' in result),'Do not render missing-forecast explanations');
 const at=Date.parse('2026-10-26T16:10:00+09:00');
-assert(api.summarize(parsed,at).mapCaution==='',
- 'With known precipitation, display the map-box alert rather than a gap warning');
+assert(api.summarize(parsed,at).mapAlert.includes('지도함'),
+ 'Verified precipitation must produce the map-box action');
 const none={...parsed,hours:parsed.hours.map(h=>({...h,type:'none',pop:10}))};
 assert.equal(api.summarize(none,now).precip,'','No irrelevant dry-weather line');
 assert.equal(api.summarize(none,now).mapAlert,'');
-assert(api.summarize(none,at).mapCaution.includes('확인되지 않았습니다'),
- 'Missing forecast hours must never mean safe or dry');
+assert.equal(api.summarize(none,at).mapAlert,'',
+ 'Incomplete dry forecast should not produce an unverified map-box action');
 const wetProbability={...none,hours:none.hours.map(h=>({...h,pop:90}))};
 assert.equal(api.summarize(wetProbability,now).precip,'',
  'Probability alone must not be misreported as confirmed rain');
@@ -79,13 +79,13 @@ assert.equal(api.weatherDisplay({...obs,temp:null},null,evening).text,'기온 �
 assert.equal(api.weatherDisplay(null,null,evening,false).text,'현재 날씨 확인 불가');
 assert(api.weatherDisplay(null,16,evening).source.includes('강수 실황 확인 중'),
  'Hourly temperature forecast must never masquerade as a precipitation observation');
-assert(api.summarize(null,evening).mapCaution.includes('지도함'),
- 'Unknown forecast after 4pm needs a map-box operational caution');
+assert.equal(api.summarize(null,evening).mapAlert,'',
+ 'Unknown forecast must stay silent, never invent a map-box action');
 assert(!api.summarize(null,evening).mapAlert,'Unknown weather must never fabricate rain');
-assert.equal(api.summarize(null,Date.parse('2026-11-14T18:30:00+09:00')).mapCaution,'',
- 'Do not show a workday departure warning on a closed second Saturday');
-assert.equal(api.summarize(null,now).mapCaution,'',
- 'Avoid premature forecast warnings before afternoon');
+assert.equal(api.summarize(null,Date.parse('2026-11-14T18:30:00+09:00')).mapAlert,'',
+ 'Closed Saturday should not raise an unconfirmed map-box notice');
+assert.equal(api.summarize(null,now).mapAlert,'',
+ 'Unconfirmed forecasts never trigger action');
 assert(api.isClosed('2026-11-01'),'All Sundays closed');
 assert(api.isClosed('2026-11-14'),'Second Saturday closed');
 assert(api.isClosed('2026-11-28'),'Fourth Saturday closed');

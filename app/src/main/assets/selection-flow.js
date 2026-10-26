@@ -2,7 +2,7 @@
  * No overlays, masks, moving shapes, transforms, resized buttons or clones.
  * The ACTUAL button backgrounds are painted in place, behind original text.
  * Skipped peers on the SAME visual row receive a faint, sequential wash.
- * Main Trades ↔ News routes via Apartment Info; Today ↔ Shared Memo routes via Contract.
+ * Trades ↔ Shared Memo routes through BOTH center-column buttons without changing pages.
  */
 (function(){
  'use strict';
@@ -99,6 +99,35 @@
  // Never paint a different visual row, even when DOM indices are adjacent.
  function viaIndices(key,previous,next,peers){
   if(key==='top-five'){
+   // Two opposite-corner journeys of the 2-by-3 grid:
+   // Trades ↔ Shared Memo: Apartment Info + Contract
+   // Today ↔ News: Contract + Apartment Info
+   // A color trace passes through both; never actually open either menu.
+   const diagonal=(previous===0&&next===5)||(previous===5&&next===0)||
+    (previous===3&&next===2)||(previous===2&&next===3);
+   if(diagonal){
+    const through=previous===0||previous===2?[1,4]:[4,1];
+    const start=peers[previous],end=peers[next];
+    if(!start||!end)return [];
+    const A=start.getBoundingClientRect(),B=end.getBoundingClientRect();
+    if(!visible(A)||!visible(B))return [];
+    const x0=center(A).x,x1=center(B).x;
+    // Each intermediate must physically sit in the middle column and
+    // on its intended row. Responsive reflow skips the extra wash safely.
+    const row1=center(peers[0]?.getBoundingClientRect()).y;
+    const row2=center(peers[3]?.getBoundingClientRect()).y;
+    const rowTolerance=Math.max(3,Math.min(A.height,B.height)*.22);
+    if(through.some(index=>{
+     const peer=peers[index];
+     if(!peer||peer.disabled||chosen(peer))return true;
+     const rect=peer.getBoundingClientRect();
+     const mid=center(rect);
+     return !visible(rect)||
+      !(mid.x>Math.min(x0,x1)&&mid.x<Math.max(x0,x1))||
+      Math.abs(mid.y-(index===1?row1:row2))>rowTolerance;
+    }))return [];
+    return through;
+   }
    const index=viaIndex(key,previous,next);
    if(index<0)return [];
    // The quick actions support administrator-defined visual ordering.
@@ -272,7 +301,7 @@
   lowerClicks.delete(event);
   if(!event.defaultPrevented)start?.();
  });
- window.FirstHyundaiSelectionFlow={version:'14.0.0',
+ window.FirstHyundaiSelectionFlow={version:'14.1.0',
   _test:{buttons,chosen,findGroup,getPaint,fromPaint,toPaint,
    vector,viaIndex,viaIndices,softlyMix,middlePaint,isLowerRow,stop,onClick,stats}};
 })();

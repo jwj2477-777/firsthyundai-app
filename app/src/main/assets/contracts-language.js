@@ -438,8 +438,8 @@ function report(data){
    (warnings.length?'미확정 내용은 노란 안내를 확인해 주세요.':'정확한 동호수·금액·계좌를 다시 확인해 주세요.');
 }
 function parse(){
- const raw=val('rough');
- if(!raw){alert('먼저 현장 메모나 음성입력 내용을 적어 주세요.');return;}
+ const raw=[val('rough'),val('specialMemo')].filter(Boolean).join('\n');
+ if(!raw){alert('먼저 계약 내용을 입력하거나 음성으로 말씀해 주세요.');return;}
  const result=recognize(raw);report(result);
  return result;
 }

@@ -48,14 +48,10 @@
   return prefix+(h===0?'자정':h===12?'낮 12시':(h<12?'오전 ':'오후 ')+(h%12||12)+'시');
  }
  function summarize(doc,now=Date.now(),extra=[]){
-  const result={precip:'',mapAlert:'',mapCaution:'',coverage:false};
-  if(!valid(doc,now)){
-   // After 4 PM, unknown forecast coverage for the next opening is a genuine
-   // operational warning, not evidence of dry weather. Do not invent rain.
-   if(!isClosed(localDay(now),extra)&&new Date(now+OFFSET).getUTCHours()>=16)
-    result.mapCaution='다음 영업일 오전 9시까지 비·눈 예보를 확인할 수 없습니다. 지도함 보관 여부를 확인하세요.';
-   return result;
-  }
+  const result={precip:'',mapAlert:'',coverage:false};
+  // An unavailable/partial forecast is simply omitted from the customer-facing
+  // office briefing. Only confirmed forecast precipitation produces a map-box action.
+  if(!valid(doc,now))return result;
   const hours=[...doc.hours].filter(h=>Date.parse(h.at)+HOUR>now).sort((a,b)=>a.at.localeCompare(b.at));
   const wet=hours.filter(h=>h.type!=='none'),today=localDay(now);
   const todayWet=wet.find(h=>localDay(Date.parse(h.at))===today);
@@ -74,9 +70,6 @@
   if(inside){
    const deadline=opening.date===nextDay(today)?'내일 오전 9시':'다음 영업일('+opening.date.slice(5).replace('-','/')+') 오전 9시';
    result.mapAlert=timeLabel(inside.at,now)+'경 '+kinds[inside.type]+' 예보 · '+deadline+'까지 강수 가능성이 있습니다. 지도함을 실내에 들여놓고 퇴근하세요.';
-  }else if(!complete){
-   const h=new Date(now+OFFSET).getUTCHours();
-   if(h>=16)result.mapCaution='퇴근 후부터 다음 영업일 오전 9시까지 일부 예보가 아직 확인되지 않았습니다. 지도함 보관 여부를 다시 확인하세요.';
   }
   return result;
  }
@@ -117,7 +110,7 @@
   $('overviewWeatherDate').textContent=new Date(now).toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul',month:'long',day:'numeric',weekday:'short'});
   const extra=window.FirstHyundaiOfficeBoard?.closureDates?.()||[];
   const view=summarize(data,now,extra);
-  for(const [id,message] of [['overviewPrecipitation',view.precip],['overviewMapAlert',view.mapAlert],['overviewMapCaution',view.mapCaution]]){
+  for(const [id,message] of [['overviewPrecipitation',view.mapAlert?'':view.precip],['overviewMapAlert',view.mapAlert]]){
    const node=$(id);if(!node)continue;node.textContent=message;node.hidden=!message;
   }
  }
