@@ -347,24 +347,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.26 private recurring birthdays and compact administration APK
+      - name: Publish v2.1.27 briefing date and modern vector weather APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.26.apk
-          unzip -t FirstHyundai-v2.1.26.apk | grep 'No errors detected'
-          if gh release view v2.1.26 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.27.apk
+          unzip -t FirstHyundai-v2.1.27.apk | grep 'No errors detected'
+          if gh release view v2.1.27 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.26 FirstHyundai-v2.1.26.apk \
+            gh release create v2.1.27 FirstHyundai-v2.1.27.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.26 · 매년 가족 일정·관리자 설정·갱신시각 개선' \
-              --notes '날씨 정보 중 지도함 안내는 실제 비·눈이 올 것으로 확인된 경우에만 노출합니다. 오늘의 업무브리핑에 어제·오늘 송도 주요 기사 최대 3건을 원문 링크와 함께 표시하며, 해당 기사가 없으면 자동으로 숨깁니다. 상단의 알림함을 기존 모드 전환 위치로 옮기고 일반·관리자 모드 전환 버튼은 앱 하단 업데이트 확인 옆으로 이동해 관리 기능을 한곳에 배치합니다. 하위 분할형 버튼의 높이를 동일하게 맞추고 모든 화면의 새로고침 표기를 작은 회전 아이콘이 있는 ↻ 갱신으로 통일합니다. 메인 실거래↔공유메모 이동 시 가운데 열의 두 버튼을 차례로 거치는 은은한 색 흐름을 적용하되 기능 전환과 높이·배치는 바꾸지 않습니다. 계약 안내문 작성 방법 보기를 삭제하고 계약 내용 입력을 하나의 테두리 안에서 선택 특약 메모와 얇은 구분선으로 분리했습니다. 두 입력란을 모두 인식하고, 특약 없이 계약 진행이 가능하며 작성된 특약은 자연스러운 문장으로 정리합니다. v2.1.26/build177.'
+              --title '퍼스트현대 v2.1.27 · 브리핑 날짜·날씨 아이콘 개선' \
+              --notes '오늘의 업무 브리핑 날짜를 제목 바로 아래로 옮기고 날씨 영역에서 중복 날짜를 제거했습니다. 기온·실황 관측시각을 한눈에 볼 수 있도록 정리했으며, 실제 비 또는 눈 관측 시에만 해당 선형 아이콘을 표시합니다. 날씨 미확인 상태에서 맑음·최고·최저 기온을 추정하지 않습니다. 기존 실거래·계약문자·뉴스·공유메모 및 관리자 설정 기능을 유지합니다. v2.1.27/build178.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.26 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.26 --apk FirstHyundai-v2.1.26.apk
+          gh release upload v2.1.27 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.27 --apk FirstHyundai-v2.1.27.apk
 
 
