@@ -99,19 +99,32 @@
  // Never paint a different visual row, even when DOM indices are adjacent.
  function viaIndices(key,previous,next,peers){
   if(key==='top-five'){
-   // Opposite corners of the 2x3 matrix: two intermediate cards on the
-   // center column, in actual travel order. [Trade, Apartment, Contract, Memo].
-   // Do not simulate navigation or change chosen state of either intermediate.
-   if((previous===0&&next===5)||(previous===5&&next===0)){
-    const through=previous===0?[1,4]:[4,1];
-    const mid=through.map(index=>peers[index]);
-    const A=peers[previous]?.getBoundingClientRect(),
-      B=peers[next]?.getBoundingClientRect();
-    if(!visible(A)||!visible(B)||mid.some(x=>!x||x.disabled||chosen(x)))return [];
+   // Two opposite-corner journeys of the 2-by-3 grid:
+   // Trades ↔ Shared Memo: Apartment Info + Contract
+   // Today ↔ News: Contract + Apartment Info
+   // A color trace passes through both; never actually open either menu.
+   const diagonal=(previous===0&&next===5)||(previous===5&&next===0)||
+    (previous===3&&next===2)||(previous===2&&next===3);
+   if(diagonal){
+    const through=previous===0||previous===2?[1,4]:[4,1];
+    const start=peers[previous],end=peers[next];
+    if(!start||!end)return [];
+    const A=start.getBoundingClientRect(),B=end.getBoundingClientRect();
+    if(!visible(A)||!visible(B))return [];
     const x0=center(A).x,x1=center(B).x;
-    if(mid.some(x=>{
-     const rect=x.getBoundingClientRect(),xval=center(rect).x;
-     return !visible(rect)||!(xval>Math.min(x0,x1)&&xval<Math.max(x0,x1));
+    // Each intermediate must physically sit in the middle column and
+    // on its intended row. Responsive reflow skips the extra wash safely.
+    const row1=center(peers[0]?.getBoundingClientRect()).y;
+    const row2=center(peers[3]?.getBoundingClientRect()).y;
+    const rowTolerance=Math.max(3,Math.min(A.height,B.height)*.22);
+    if(through.some(index=>{
+     const peer=peers[index];
+     if(!peer||peer.disabled||chosen(peer))return true;
+     const rect=peer.getBoundingClientRect();
+     const mid=center(rect);
+     return !visible(rect)||
+      !(mid.x>Math.min(x0,x1)&&mid.x<Math.max(x0,x1))||
+      Math.abs(mid.y-(index===1?row1:row2))>rowTolerance;
     }))return [];
     return through;
    }
