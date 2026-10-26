@@ -1,5 +1,12 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-26 · v2.1.12 · Native LockActivity 프리미엄 브랜드 흐름
+- Intro Splash showWelcome 자체 원본 FHD 금색 서브타이틀/배지 자산 유지. LockActivity 기본 로그인도 동일 BrandIdentityStyle.title+subtitle, ic_launcher_badge 이용.
+- ScrollView 어두운 틸 배경, 브랜드 영역 + 웜 골드 구분선 + 아이보리 로그인Panel. 초기 비밀번호 폼의 입력란/gradient CTA와 계정선택 목록이 같은 패널 내부에서 교체됨; 고정 앱 데이터 삭제 없음.
+- TextWatcher로 상태 메시지는 내용이 있을 때만 표시. 인증 성공 시 키보드 닫고 계정 선택 패널을 245ms로 소폭 나타나게 함(시스템 애니메이션 OFF 시 즉시). 복귀 시 로그인 정보를 복원하고 애니메이션을 취소.
+- scripts/test_account_picker.js 원본 브랜드/패널 구성/IME/단계 보안 경계/애니메이션 설정 검사. Android v2.1.12 build163.
+
+
 ## 2026-10-26 · v2.1.11 · 네이티브 구성원 선택 화면 정돈
 - LockActivity.showAccountChoices: 버튼 대신 접근성 있는 LinearLayout 목록행(56dp/8dp gap/12dp corner, 연한 테두리와 터치 ripple), 현재 계정 우측 '현재', 다른 계정 우측 ›. 계정 선택행은 서버에서 인증 후 반환된 구성원 목록에만 기반.
 - 계정 화면 텍스트 '사용할 계정을 선택해 주세요.' 단문, 하단 암호 안내/버전/중복 상태 숨김, 오류·연결시만 상태 복원. 뒤로가기는 짧은 텍스트 링크.
