@@ -107,8 +107,8 @@
   }
   status();
  }
- async function refresh(){
-  if(options.weatherEffect!=='auto'||document.hidden||pending||Date.now()-lastAttempt<5*60000)return;
+ async function refresh(includeObserved=false){
+  if((options.weatherEffect!=='auto'&&!includeObserved)||document.hidden||pending||Date.now()-lastAttempt<5*60000)return;
   lastAttempt=Date.now();pending=true;const mine=generation;
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
   try{
@@ -121,7 +121,7 @@
    }
    if(mine===generation)weather=fresh(value)?value:null;
   }catch(e){if(mine===generation&&!fresh(weather))weather=null}
-  finally{clearTimeout(timer);pending=false;paint()}
+  finally{clearTimeout(timer);pending=false;paint();document.dispatchEvent?.(new Event('firsthyundai-observed-weather'))}
  }
  function configure(value){
   const previous=options.weatherEffect;
@@ -134,7 +134,7 @@
   if(previous!==options.weatherEffect){generation++;lastAttempt=0}
   paint();refresh();
  }
- window.FirstHyundaiThemes={configure,refresh,_test:{terms,season,fresh,longitude,headerPalette}};
+ window.FirstHyundaiThemes={configure,refresh,refreshObserved:()=>refresh(true),currentWeather:()=>fresh(weather)?weather:null,_test:{terms,season,fresh,longitude,headerPalette}};
  document.addEventListener('visibilitychange',()=>{paint();if(!document.hidden)refresh()});
  window.addEventListener('focus',()=>{paint();refresh()});
  window.addEventListener('resize',paint);
