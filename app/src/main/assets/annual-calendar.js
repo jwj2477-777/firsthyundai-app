@@ -43,9 +43,11 @@
   return new Date(Date.parse(info.first+'T00:00:00Z')+offset*86400000).toISOString().slice(0,10);
  }
  function validBirthday(b){
-  if(!b||!['양력','음력'].includes(b.kind)||!/^[^<>\\r\\n]{1,24}$/.test(b.name))return false;
-  return b.kind==='양력'?!!solarDate(2028,b.month,b.day):
-   !!lunarDate(2028,b.month,b.day,false);
+  if(!b||!['양력','음력'].includes(b.kind)||typeof b.name!=='string'||
+   !b.name.trim()||b.name.length>24||/[<>\r\n]/.test(b.name)||
+   !Number.isInteger(b.month)||b.month<1||b.month>12||
+   !Number.isInteger(b.day)||b.day<1||b.day>30)return false;
+  return b.kind==='양력'?!!solarDate(2028,b.month,b.day):true;
  }
  function parseLine(line){
   const found=String(line||'').trim().match(/^(.{1,24}?)\s+(양력|음력)\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일(?:\s*생일)?$/u);
@@ -83,7 +85,7 @@
   const y=Number(parts[1]);
   const dates=[];
   if(b.kind==='양력'){
-   for(let year=y;year<=y+2;year++)dates.push(solarDate(year,b.month,b.day));
+   for(let year=y;year<=y+8;year++)dates.push(solarDate(year,b.month,b.day));
   }else{
    for(let year=y-1;year<=y+2;year++)dates.push(lunarDate(year,b.month,b.day));
   }
