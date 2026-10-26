@@ -246,6 +246,7 @@ jobs:
           node scripts/test_season_points.js
           node scripts/test_theme_weather.mjs
           node scripts/test_weather_briefing.mjs
+          node scripts/test_conditional_songdo_briefing.js
           node scripts/test_weather_snapshot.mjs
           node scripts/test_theme_layout_browser.js
           node scripts/test_overview_actions_browser.js
@@ -342,24 +343,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.24 corrected Songdo weather and honest briefing APK
+      - name: Publish v2.1.25 streamlined office briefing and contract memo APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.24.apk
-          unzip -t FirstHyundai-v2.1.24.apk | grep 'No errors detected'
-          if gh release view v2.1.24 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.25.apk
+          unzip -t FirstHyundai-v2.1.25.apk | grep 'No errors detected'
+          if gh release view v2.1.25 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.24 FirstHyundai-v2.1.24.apk \
+            gh release create v2.1.25 FirstHyundai-v2.1.25.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.24 · 송도 현재 기온·업무브리핑 표시 수정' \
-              --notes '기상청 초단기실황의 관측 기온 T1H를 실제로 수집·표시하도록 보완했습니다. 관측 기온이 없는 경우 현재 시각에 해당하는 단기예보 기온을 활용하되 반드시 예보기온으로 표시하고, 어느 자료도 없으면 확인 불가를 명확히 표시합니다. 비·눈이 없을 때 중복 안내를 제거하고 강수 관측과 예보 출처를 구분합니다. 오후 4시 이후 다음 영업일 오전 9시까지 비·눈 예보를 확인하지 못하면 지도함 보관 확인 안내를 띄우며, 휴무일·둘째·넷째 토요일·일요일 판단을 유지합니다. 일정·새거래가 없는 날은 날씨 카드만 표시하는 기존 간결한 원칙과 메인 6개 버튼 통합 디자인을 유지합니다. v2.1.24/build175.'
+              --title '퍼스트현대 v2.1.25 · 송도뉴스 업무브리핑·계약 메모·UI 통일' \
+              --notes '날씨 정보 중 지도함 안내는 실제 비·눈이 올 것으로 확인된 경우에만 노출합니다. 오늘의 업무브리핑에 어제·오늘 송도 주요 기사 최대 3건을 원문 링크와 함께 표시하며, 해당 기사가 없으면 자동으로 숨깁니다. 하위 분할형 버튼의 높이를 동일하게 맞추고 모든 화면의 새로고침 표기를 작은 회전 아이콘이 있는 ↻ 갱신으로 통일합니다. 메인 실거래↔공유메모 이동 시 가운데 열의 두 버튼을 차례로 거치는 은은한 색 흐름을 적용하되 기능 전환과 높이·배치는 바꾸지 않습니다. 계약 안내문 작성 방법 보기를 삭제하고 계약 내용 입력을 하나의 테두리 안에서 선택 특약 메모와 얇은 구분선으로 분리했습니다. 두 입력란을 모두 인식하고, 특약 없이 계약 진행이 가능하며 작성된 특약은 자연스러운 문장으로 정리합니다. v2.1.25/build176.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.24 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.24 --apk FirstHyundai-v2.1.24.apk
+          gh release upload v2.1.25 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.25 --apk FirstHyundai-v2.1.25.apk
 
 
