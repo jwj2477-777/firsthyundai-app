@@ -4,38 +4,96 @@ import vm from 'node:vm';
 import {forecastBase,parseForecast,weatherBriefing} from '../workers/shared-settings/src/weather-forecast.mjs';
 const now=Date.parse('2026-10-26T15:35:00+09:00'),base={date:'20261026',time:'1400'};
 const rows=[];
-function row(hour,category,fcstValue,date='20261026'){return {nx:55,ny:123,baseDate:base.date,baseTime:base.time,fcstDate:date,fcstTime:String(hour).padStart(2,'0')+'00',category,fcstValue}}
+const row=(hour,category,fcstValue,date='20261026')=>({
+ nx:55,ny:123,baseDate:base.date,baseTime:base.time,
+ fcstDate:date,fcstTime:String(hour).padStart(2,'0')+'00',category,fcstValue
+});
 for(let hour=15;hour<24;hour++){
  rows.push(row(hour,'PTY',hour===16||hour===17?'1':hour===20?'3':'0'));
- rows.push(row(hour,'POP',hour===16?'70':'10'));rows.push(row(hour,'TMP',hour===15?'0':'10'));
+ rows.push(row(hour,'POP',hour===16?'70':'10'));
+ rows.push(row(hour,'TMP',hour===15?'0':'10'));
 }
 rows.push(row(1,'PTY','1','20261027'));
 const doc={response:{header:{resultCode:'00'},body:{items:{item:rows}}}};
 const parsed=parseForecast(doc,base,now);
-assert.equal(parsed.hours.length,9);assert.equal(parsed.complete,true);assert.equal(parsed.hours[0].temp,0);
+assert.equal(parsed.hours.length,9);
+assert.equal(parsed.complete,true);
+assert.equal(parsed.hours[0].temp,0,'Zero degrees is a real value');
 assert(parsed.hours.every(h=>h.at.startsWith('2026-10-26')));
 assert.deepEqual(forecastBase(Date.parse('2026-10-26T00:05:00+09:00')),{date:'20261025',time:'2300'});
 assert.deepEqual(forecastBase(now),base);
 assert.throws(()=>parseForecast(doc,base,now+8*3600000));
 assert.throws(()=>parseForecast({response:{header:{resultCode:'30'}}},base,now));
-const partial=structuredClone(doc);partial.response.body.items.item=rows.filter(r=>r.fcstTime!=='1900');
+const partial=structuredClone(doc);
+partial.response.body.items.item=rows.filter(r=>r.fcstTime!=='1900');
 assert.equal(parseForecast(partial,base,now).complete,false);
-const offlineFetch=globalThis.fetch;globalThis.fetch=async()=>{throw Error('Offline test fixture')};
-try{assert.equal((await weatherBriefing({})).status,503);}finally{globalThis.fetch=offlineFetch}
-const nodes=new Map();const get=id=>{if(!nodes.has(id))nodes.set(id,{textContent:'',hidden:false});return nodes.get(id)};
-const ctx={Date,AbortController,setTimeout,clearTimeout,window:{setInterval(){}},document:{hidden:true,getElementById:get,addEventListener(){}}};
-vm.createContext(ctx);vm.runInContext(fs.readFileSync('app/src/main/assets/weather-briefing.js','utf8'),ctx);
+const originalFetch=globalThis.fetch;
+globalThis.fetch=async()=>{throw Error('Offline test fixture')};
+try{assert.equal((await weatherBriefing({})).status,503);}
+finally{globalThis.fetch=originalFetch}
+const nodes=new Map();
+const get=id=>{if(!nodes.has(id))nodes.set(id,{textContent:'',hidden:false});return nodes.get(id)};
+const ctx={Date,AbortController,setTimeout,clearTimeout,
+ window:{setInterval(){}},document:{hidden:true,getElementById:get,addEventListener(){}}};
+vm.createContext(ctx);
+vm.runInContext(fs.readFileSync('app/src/main/assets/weather-briefing.js','utf8'),ctx);
 const api=ctx.window.FirstHyundaiWeatherBriefing._test;
-assert(api.valid(parsed,now));const view=api.summarize(parsed,now);
-assert.equal(view.main,'오늘 오후 4시경부터 비 예보가 있습니다.');
-assert(view.extra.includes('오후 8시경부터 눈'));assert(view.extra.includes('0°'),'Zero is a valid forecast temperature');
-const current=api.summarize(parsed,Date.parse('2026-10-26T16:10:00+09:00'));
-assert(current.main.includes('지금 시간대에')&&current.main.includes('예보'),'Does not call a forecast an observation');
+assert(api.valid(parsed,now));
+const result=api.summarize(parsed,now);
+assert(result.precip.includes('오늘 오후 4시')&&result.precip.includes('비 예보'),result.precip);
+assert(result.mapAlert.includes('눈 예보')&&result.mapAlert.includes('지도함'),result.mapAlert);
+assert(result.mapAlert.includes('내일 오전 9시'),result.mapAlert);
+assert.equal(result.coverage,false,'Incomplete overnight forecast must be acknowledged');
+assert.equal(result.mapCaution,'','Do not raise gap warning too early');
+const at=Date.parse('2026-10-26T16:10:00+09:00');
+assert(api.summarize(parsed,at).mapCaution==='',
+ 'With known precipitation, display the map-box alert rather than a gap warning');
 const none={...parsed,hours:parsed.hours.map(h=>({...h,type:'none',pop:10}))};
-assert(api.summarize(none,now).main.includes('남은 시간'));
-const gaps={...none,complete:false,hours:none.hours.filter(h=>!h.at.includes('19:00'))};
-assert(!api.summarize(gaps,now).main.includes('남은 시간'));
-assert(api.summarize({...none,hours:none.hours.map(h=>({...h,pop:60}))},now).main.includes('60%'));
-assert(!api.valid(parsed,Date.parse('2026-10-27T00:01:00+09:00')),'No yesterday-as-today');
-assert(api.summarize(null,now).main.includes('확인할 수 없습니다'));
-console.log('Weather briefing passed: official hourly rain/snow, KST/day rollover, gaps, stale sources, 0°C, probability and observation separation.');
+assert.equal(api.summarize(none,now).precip,'','No irrelevant dry-weather line');
+assert.equal(api.summarize(none,now).mapAlert,'');
+assert(api.summarize(none,at).mapCaution.includes('확인되지 않았습니다'),
+ 'Missing forecast hours must never mean safe or dry');
+const wetProbability={...none,hours:none.hours.map(h=>({...h,pop:90}))};
+assert.equal(api.summarize(wetProbability,now).precip,'',
+ 'Probability alone must not be misreported as confirmed rain');
+assert(!api.valid(parsed,Date.parse('2026-10-27T00:01:00+09:00')),'Stale dates invalid');
+assert.equal(api.summarize(null,now).precip,'','No invented precipitation');
+assert.equal(api.summarize(null,now).mapAlert,'','No invented map-box warning');
+assert(api.isClosed('2026-11-01'),'All Sundays closed');
+assert(api.isClosed('2026-11-14'),'Second Saturday closed');
+assert(api.isClosed('2026-11-28'),'Fourth Saturday closed');
+assert(!api.isClosed('2026-11-07'),'First Saturday open');
+assert(!api.isClosed('2026-11-21'),'Third Saturday open');
+const fri=Date.parse('2026-11-13T18:30:00+09:00');
+assert.equal(api.nextOpen(fri).date,'2026-11-16','Second Friday must forecast through Monday');
+const sat=Date.parse('2026-11-07T18:30:00+09:00');
+assert.equal(api.nextOpen(sat).date,'2026-11-09','Working Saturday must forecast through Monday');
+assert.equal(api.nextOpen(fri,['2026-11-16']).date,'2026-11-17','Shared full-day closure extends horizon');
+function hourlyForecast(reference,through,wetTime=null,type='rain'){
+ const hours=[];
+ const start=Math.floor(reference/3600000)*3600000;
+ for(let t=start;t<through;t+=3600000){
+  hours.push({at:new Date(t).toISOString(),type:t===wetTime?type:'none',pop:0,temp:0});
+ }
+ return {schema:1,status:'ok',date:new Date(reference+9*3600000).toISOString().slice(0,10),
+  issued_at:new Date(reference-3600000).toISOString(),hours};
+}
+const monday=Date.parse('2026-11-16T09:00:00+09:00');
+const saturdayRain=Date.parse('2026-11-14T10:00:00+09:00');
+const holidayDoc=hourlyForecast(fri,monday,saturdayRain);
+assert(api.valid(holidayDoc,fri));
+const weekendView=api.summarize(holidayDoc,fri);
+assert.equal(weekendView.precip,'','Saturday rain is not presented as Friday rain');
+assert(weekendView.mapAlert.includes('지도함')&&weekendView.mapAlert.includes('11/16'),
+ 'Second Friday rain on closed Saturday still needs Friday evening action');
+assert.equal(weekendView.coverage,true,'Full long-weekend forecast covers next opening');
+const mondayAfterSat=Date.parse('2026-11-09T09:00:00+09:00');
+const sundaySnow=Date.parse('2026-11-08T13:00:00+09:00');
+const saturdayDoc=hourlyForecast(sat,mondayAfterSat,sundaySnow,'snow');
+assert(api.summarize(saturdayDoc,sat).mapAlert.includes('눈 예보'),
+ 'Working Saturday must cover Sunday through Monday morning');
+const tuesday=Date.parse('2026-11-17T09:00:00+09:00');
+const holidayExtended=hourlyForecast(fri,tuesday,Date.parse('2026-11-16T13:00:00+09:00'));
+assert(api.summarize(holidayExtended,fri,['2026-11-16']).mapAlert.includes('11/17'),
+ 'Explicit shared closure extends Monday handover through Tuesday');
+console.log('Unified conditional briefing passed: observed vs forecast, dry/uncertain, 2nd/4th Saturdays, Sunday, holiday, verified rain/snow and next 9 AM.');
