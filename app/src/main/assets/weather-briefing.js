@@ -96,7 +96,8 @@
    source=loading?'기상청 관측자료 확인 중':'기상청 관측자료를 불러오지 못했습니다.';
   }
   return {text:temperature+precipitation,source,
-   symbol:obs?.effect==='rain'?'☂':obs?.effect==='snow'?'❄':'🌡'};
+   kind:obs?.effect==='rain'?'rain':obs?.effect==='snow'?'snow':'temperature',
+   hasTemperature:measured||projected};
  }
  function render(){
   if(!$('overviewWeatherMessage'))return;
@@ -104,10 +105,18 @@
   const curr=$('overviewWeatherMessage'),icon=$('overviewWeatherIcon'),source=$('overviewWeatherSource');
   const detail=weatherDisplay(obs,forecastTemperature(now),now,
    !obs&&!data&&(pending||lastAttempt===0));
-  icon.textContent=detail.symbol;
+  icon?.setAttribute?.('data-kind',detail.kind);
   curr.textContent=detail.text;
+  curr.classList?.toggle?.('is-reading',detail.hasTemperature);
   source.textContent=detail.source;
-  $('overviewWeatherDate').textContent=new Date(now).toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul',month:'long',day:'numeric',weekday:'short'});
+  const calendarDay=new Date(now);
+  const titleDate=$('overviewWeatherDate');
+  if(titleDate){
+   titleDate.textContent=calendarDay.toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul',month:'long',day:'numeric',weekday:'short'});
+   const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(calendarDay);
+   const part=type=>parts.find(value=>value.type===type)?.value||'';
+   titleDate.setAttribute?.('datetime',[part('year'),part('month'),part('day')].join('-'));
+  }
   const extra=window.FirstHyundaiOfficeBoard?.closureDates?.()||[];
   const view=summarize(data,now,extra);
   for(const [id,message] of [['overviewPrecipitation',view.mapAlert?'':view.precip],['overviewMapAlert',view.mapAlert]]){
