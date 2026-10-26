@@ -334,3 +334,171 @@ body[data-season-theme]:not([data-season-theme="default"]) #nav.tabs{
   border-color:#8A9996!important;
  }
 }
+
+
+/* v2.1.25 — The same 49px refresh control and 60px secondary
+   segmented controls across pages; all text says "↻ 갱신". */
+:is(#overview,#officeBoard,#news,#trades,#nearby,#new,#officetel,#complexes) .refreshAction{
+ box-sizing:border-box!important;
+ display:inline-flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ gap:5px!important;
+ flex:0 0 auto!important;
+ min-height:49px!important;
+ height:49px!important;
+ min-width:81px!important;
+ padding:8px 10px!important;
+ border-radius:11px!important;
+ font-size:13px!important;
+ line-height:1.3!important;
+ font-weight:750!important;
+ white-space:nowrap!important;
+}
+:is(#overview,#officeBoard,#news,#trades,#nearby,#new,#officetel,#complexes) .refreshAction.hidden{
+ display:none!important;
+}
+.refreshGlyph{display:inline-block;font-size:18px;font-weight:650;line-height:1}
+#news .newsCategoryTabs.sectionModeSwitch>button,
+#officeBoard .officeBoardViewToggle.sectionModeSwitch>button,
+:is(#trades,#nearby,#new,#officetel)>.propertyTypeSwitch.sectionModeSwitch>button{
+ box-sizing:border-box;
+ height:60px!important;
+ min-height:60px!important;
+ max-height:60px!important;
+ padding:9px 8px!important;
+ border-radius:13px!important;
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ line-height:1.3!important;
+}
+@media(max-width:410px){
+ #news .newsCategoryTabs.sectionModeSwitch>button,
+ #officeBoard .officeBoardViewToggle.sectionModeSwitch>button,
+ :is(#trades,#nearby,#new,#officetel)>.propertyTypeSwitch.sectionModeSwitch>button{
+  height:58px!important;min-height:58px!important;max-height:58px!important;
+  font-size:14px!important;
+ }
+}
+
+/* The contract is ONE visual entry rectangle. Both child textareas still have
+   separate accessible labels and feed the SAME local recognizer. */
+#contracts .contractEntryGroup{
+ overflow:hidden;
+ border:1.5px solid #CBA98D;
+ border-radius:14px;
+ background:#FFFCF8;
+ margin:0 0 12px;
+ box-shadow:0 2px 7px #513C2710;
+}
+#contracts .contractEntryGroup>.contractMemoInputArea,
+#contracts .contractEntryGroup>.contractSpecialMemoArea{
+ margin:0!important;
+ padding:14px!important;
+ border:0!important;
+ border-radius:0!important;
+ background:transparent!important;
+ box-shadow:none!important;
+ min-width:0;
+}
+#contracts .contractEntryGroup>.contractSpecialMemoArea{
+ border-top:1px solid #E3D2BD!important;
+ background:#FAF8F3!important;
+}
+#contracts .contractEntryGroup .contractMemoLabel{
+ font-size:16px;
+ margin:0 0 8px;
+}
+#contracts .contractEntryGroup #ct_rough,
+#contracts .contractEntryGroup #ct_specialMemo{
+ width:100%;
+ display:block;
+ box-sizing:border-box;
+ border:0!important;
+ outline:none;
+ box-shadow:none!important;
+ background:transparent!important;
+ border-radius:0!important;
+ padding:8px 4px!important;
+ color:#30424B;
+ resize:vertical;
+ font-family:inherit;
+ font-size:16px!important;
+ line-height:1.65;
+}
+#contracts .contractEntryGroup #ct_rough{
+ height:198px!important;
+ min-height:198px!important;
+}
+#contracts .contractEntryGroup #ct_specialMemo{
+ height:89px!important;
+ min-height:89px!important;
+}
+#contracts .contractEntryGroup :is(#ct_rough,#ct_specialMemo):focus{
+ outline:2px solid #AD8F65!important;
+ outline-offset:3px;
+ border-radius:5px!important;
+}
+#contracts .contractEntryGroup .contractSpecialMemoArea label{
+ display:flex;
+ align-items:baseline;
+ flex-wrap:wrap;
+ gap:6px;
+ font-size:14px;
+ font-weight:790;
+ color:#805F43;
+ margin:0 0 6px;
+}
+#contracts .contractEntryGroup .contractSpecialMemoArea label small{
+ font-size:12px;
+ font-weight:550;
+ color:#897665;
+}
+#contracts .contractEntryGroup .contractMemoWriteTip{
+ margin:5px 0 0;
+}
+@media(max-width:370px){
+ #contracts .contractEntryGroup>.contractMemoInputArea,
+ #contracts .contractEntryGroup>.contractSpecialMemoArea{padding:11px!important}
+}
+
+/* News is a short, conditional office bulletin, not a second full news page. */
+#overview .overviewNewsBrief{
+ margin:13px 0 0;
+ padding:13px 0 0;
+ border-top:1px solid #E2E9E5;
+}
+#overview .overviewNewsBrief.hidden{display:none!important}
+#overview .overviewNewsHead{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:12px;margin:0 0 8px;
+}
+#overview .overviewNewsHead h3{
+ margin:0;color:#2D575D;font-size:15px;font-weight:850;
+}
+#overview .overviewNewsHead h3 small{
+ margin-left:3px;color:#83938E;font-size:11px;font-weight:600;
+}
+#overview .overviewNewsMore{
+ min-height:38px;flex:0 0 auto;padding:6px 9px;
+ border-radius:9px;border:1px solid #CFDED9;background:#FFFFFF;
+ color:#355E62;font-size:12px;font-weight:750;
+}
+#overview .overviewNewsEntries{display:grid;gap:6px}
+#overview .overviewNewsEntry{
+ display:grid;gap:4px;padding:10px 11px;
+ border:1px solid #E5EAE7;border-radius:11px;
+ background:#FFF;color:#2C4F54;text-decoration:none;
+}
+#overview .overviewNewsEntry:focus-visible{outline:3px solid #B4CCC0}
+#overview .overviewNewsTitle{
+ font-size:13px;font-weight:750;line-height:1.55;word-break:keep-all;
+}
+#overview .overviewNewsEntry small{
+ color:#667C78;font-size:12px;line-height:1.55;
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+}
+#overview .overviewNewsEntry em{
+ font-size:11px;font-style:normal;color:#8A9B94;
+}
