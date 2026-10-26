@@ -230,6 +230,7 @@ function merge(server){
  }
  items=[...merged.values()];
  sortItems();draw();renderBriefing();
+ document.dispatchEvent?.(new Event('firsthyundai-office-schedule-updated'));
 }
 // Today's briefing reuses the exact same authenticated private memo records.
 function nextDay(date){
@@ -241,6 +242,33 @@ function briefingRows(day,limit){
   .sort((a,b)=>String(a.scheduled_at).localeCompare(String(b.scheduled_at)))
   .slice(0,limit);
 }
+
+/* Dates explicitly recorded as whole-day closure/holiday in the private shared board.
+   Supports a simple "10월 2일~10월 6일 휴무" range without public data storage. */
+function closureDates(){
+ const result=new Set();
+ for(const note of items){
+  if(note.done||!note.all_day||!note.scheduled_at||
+    !/(?:휴무|휴가|연휴|휴업|쉬는\s*날|쉬는날)/.test(note.text||''))continue;
+  const first=dateKey(note.scheduled_at);if(!first)continue;
+  result.add(first);
+  let end='';
+  const dates=[...String(note.text).matchAll(/(?:20\d{2}\s*[.\/-]\s*)?(\d{1,2})\s*(?:월|[.\/-])\s*(\d{1,2})\s*일?/g)];
+  if(dates.length>=2){
+   const second=dates[1],parts=first.split('-').map(Number);
+   let year=parts[0],month=Number(second[1]),day=Number(second[2]);
+   if(month<parts[1])year++;
+   const dt=new Date(Date.UTC(year,month-1,day));
+   if(dt.getUTCFullYear()===year&&dt.getUTCMonth()+1===month&&dt.getUTCDate()===day)
+    end=dt.toISOString().slice(0,10);
+  }
+  if(end&&end>first){
+   for(let d=nextDay(first),n=0;d<=end&&n++<45;d=nextDay(d))result.add(d);
+  }
+ }
+ return [...result];
+}
+
 function renderBriefing(){
  if(!$('overviewMemoBriefing'))return;
  const date=kstDate(new Date()),tomorrow=nextDay(date);
@@ -248,6 +276,7 @@ function renderBriefing(){
  const todayTotal=items.filter(n=>!n.done&&dateKey(n.scheduled_at)===date).length;
  const tomorrowTotal=items.filter(n=>!n.done&&dateKey(n.scheduled_at)===tomorrow).length;
  $('overviewMemoCount').textContent=todayTotal+'건';
+ $('overviewMemoBriefing').hidden=todayTotal===0;
  const target=$('overviewMemoEntries');if(!target)return;
  const row=(notes)=>notes.map(note=>{
   const t=kstParts(note.scheduled_at),time=note.all_day?'종일':(t?.time||'');
@@ -257,10 +286,7 @@ function renderBriefing(){
    '<span class="overviewMemoCopy">'+esc(title)+'</span>'+
    '<span class="overviewMemoArrow" aria-hidden="true">›</span></button>';
  }).join('');
- target.innerHTML=(todayNotes.length?row(todayNotes):
-  '<p class="overviewMemoEmpty">오늘 예정된 일정이 없습니다.</p>')+
-  (tomorrowTotal?'<div class="overviewMemoNextDay">내일 일정 '+tomorrowTotal+'건</div>'+
-   row(tomorrowNotes):'');
+ target.innerHTML=row(todayNotes);
 }
 function openBriefing(force=false){
  renderBriefing();
@@ -271,7 +297,7 @@ function openBriefing(force=false){
  call('list',{}).then(data=>{
   merge(Array.isArray(data.notes)?data.notes:[]);
   lastBriefing=Date.now();
- },()=>{if(target&&!lastBriefing)target.textContent='공유 일정을 불러오지 못했습니다. 메모 연결을 확인해 주세요.'})
+ },()=>{if(target&&!lastBriefing){$('overviewMemoBriefing').hidden=false;target.textContent='일정 연결을 확인해 주세요.'}})
  .finally(()=>{briefingBusy=false});
 }
 function openBriefingNote(id){
@@ -401,6 +427,6 @@ window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDo
  onNewNotification(){if(currentPage==='officeBoard')refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
  syncNotificationStatus,enableNotifications,settingsChanged,focusNote,
- openBriefing,openBriefingNote,openBriefingCalendar,renderBriefing,
+ openBriefing,openBriefingNote,openBriefingCalendar,renderBriefing,closureDates,
  _test:{phones,merge,scheduleSuggestion,toIso,dateKey,briefingRows,nextDay}};
 })();
