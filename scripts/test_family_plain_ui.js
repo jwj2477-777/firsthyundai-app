@@ -51,7 +51,7 @@ for(const token of [
  'body:not([data-office-role="admin"]) #ct_confirmHelp'
 ])assert(visual.includes(token),'Family no longer sees repeated informational notes: '+token);
 assert(html.includes('id="newsFamilyMeta"'),'Family can still see readable recent news count/time');
-assert(html.includes("$('newsFamilyMeta').textContent='갱신 '+compactTradeCollectedAt(payload.checked_at)"),'Compact news date remains dynamic; counts stay beside filtered results');
+assert(html.includes("$('newsFamilyMeta').textContent='최종 갱신 '+compactTradeCollectedAt(payload.checked_at)"),'Compact news date remains dynamic; counts stay beside filtered results');
 assert(css.includes('word-break:keep-all')&&css.includes('.sectionTitle>.refreshAction'),'Do not vertically wrap refresh button');
 const embedded=html.split('<script>')[1]?.split('</script>')[0];
 assert(embedded,'App script exists');
