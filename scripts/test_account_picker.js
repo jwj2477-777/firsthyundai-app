@@ -7,13 +7,32 @@ const assets=path.join(__dirname,'../app/src/main/assets');
 const html=fs.readFileSync(path.join(assets,'index.html'),'utf8');
 const members=fs.readFileSync(path.join(assets,'office-members.js'),'utf8');
 const worker=fs.readFileSync(path.join(__dirname,'../workers/shared-settings/src/index.mjs'),'utf8');
-assert(lock.includes('OfficeBoardClient.pickerReviewed(getApplicationContext())'),
- 'Existing enrolled users must see the account picker after upgrading');
+// First screen shows only the code. A successful password goes to a dedicated
+// native account-selection page, never a popup displayed before authentication.
+assert(lock.includes('codeField.setVisibility(View.GONE)')&&
+ lock.includes('accountChooser.setVisibility(View.VISIBLE)'));
+assert(lock.includes('accountChooser.setVisibility(View.GONE)')&&
+ lock.includes('codeField.setVisibility(View.VISIBLE)'));
+assert(lock.includes('showAccountChoices(boardSecret)'), 'Correct password must trigger member choices');
+assert(lock.includes('AccessPolicy.matches(currentPolicy,input)'), 'Locally verify code before listing accounts');
+assert(lock.indexOf('AccessPolicy.matches(currentPolicy,input)')<
+ lock.lastIndexOf('showAccountChoices(boardSecret)'), 'Password must precede choices');
+assert(lock.includes('OfficeBoardClient.choices(getApplicationContext(),code)'),
+ 'After correct password fetch managed accounts from server');
+assert(lock.includes('OfficeBoardClient.enroll(getApplicationContext(),code,id)'),
+ 'Selecting a member actually binds the device');
+assert(lock.includes('loginDetail.setText("사용할 사무실 계정을 선택해 주세요.'),
+ 'Account selection page must explain its purpose');
+assert(!lock.includes('showExistingAccountReview()'),
+ 'Never show an account-selection dialog before a password');
+assert(lock.includes('OfficeBoardClient.pickerReviewedV210(getApplicationContext())'),
+ 'Existing authorized devices must receive a one-time password-first migration');
 assert(lock.includes('getBooleanExtra("force_member_picker",false)'),
- 'Admin must be able to reopen picker without uninstalling');
-assert(lock.includes('showExistingAccountReview()')&&lock.includes('promptReassign('));
+ 'Admin can reopen selection but still must provide password');
+assert(client.includes('.putBoolean("password_then_member_v210",true).apply()'),
+ 'Only confirmed account enrollment completes v2.1.10 onboarding');
 assert(lock.includes('OfficeBoardClient.checkAccount(getApplicationContext())'),
- 'Always validate revocation before showing account picker');
+ 'Previously confirmed users still get revocation checks');
 assert(client.includes('memberChoices(Context c)')&&client.includes('request("GET","/board/accounts",null,auth)'),
  'Account choices must be authenticated');
 assert(client.includes('.put("reassign",changing)')&&client.includes('changing?existing:null'),
@@ -28,4 +47,4 @@ assert(html.includes('id="officeCurrentMember"')&&
 assert(members.includes('requestOfficeMemberPicker')&&members.includes('if(!allowed()'));
 assert(!lock.includes('deleteSharedPreferences('),
  'Do not wipe app data just to reselect an office account');
-console.log('One-time upgrade account picker, secured reassignment and administrator reselect UX passed.');
+console.log('Password-first dedicated member page, existing-device migration, secured reassignment and admin chooser passed.');
