@@ -222,9 +222,13 @@
    else{const r=await fetch(ENDPOINT,{cache:'no-store',signal:controller.signal});if(!r.ok)throw Error('unavailable');value=await r.json()}
    data=valid(value)?value:null;
   }catch(e){if(!valid(data))data=null}
-  finally{clearTimeout(timer);pending=false;render()}
+  finally{clearTimeout(timer);pending=false;render();document.dispatchEvent?.(new Event('firsthyundai-weather-forecast-updated'))}
  }
- window.FirstHyundaiWeatherBriefing={refresh,toggleHourly,_test:{valid,summarize,isClosed,nextOpen,timeLabel,atKst,nextDay,weatherDisplay,forecastTemperature,hourlyRows,hourlyCondition,hourlyDayHour,hourlyCards}};
+ window.FirstHyundaiWeatherBriefing={refresh,toggleHourly,
+  forecast:()=>valid(data)?{...data,hours:data.hours.map(h=>({...h}))}:null,
+  getHourly:(limit=12)=>hourlyCards(data,Date.now(),limit),
+  forecastStatus:()=>summarize(data,Date.now(),window.FirstHyundaiOfficeBoard?.closureDates?.()||[]),
+  _test:{valid,summarize,isClosed,nextOpen,timeLabel,atKst,nextDay,weatherDisplay,forecastTemperature,hourlyRows,hourlyCondition,hourlyDayHour,hourlyCards}};
  document.addEventListener('firsthyundai-observed-weather',render);
  document.addEventListener('firsthyundai-office-schedule-updated',render);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
