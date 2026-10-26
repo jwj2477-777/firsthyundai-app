@@ -2747,3 +2747,31 @@ body[data-office-role="admin"] #news.page>.sectionTitle.newsUnifiedHeading>div{m
  :is(#trades #tradeTypeBar,#officetel #officeTypeBar,#new #newTypeBar) .typeLabel{font-size:13px}
  :is(#trades #tradeTypeBar,#officetel #officeTypeBar,#new #newTypeBar) .typeCount{font-size:10px}
 }
+
+
+/* Unified, understated daily agenda connected to the private office post-its. */
+.overviewMemoBriefing{padding:15px 16px;margin:12px 0;border:1px solid #DCE6E1;
+ background:linear-gradient(135deg,#F8FBF9,#FFFFFF 70%);border-radius:17px;box-shadow:none}
+.overviewMemoHead{display:flex;gap:12px;align-items:center;justify-content:space-between}
+.overviewMemoHead h3{margin:0;font-size:17px;line-height:1.4;color:#244E51}
+.overviewMemoHead h3 small{font-size:12px;font-weight:650;color:#65847A;margin-left:5px}
+.overviewMemoHead p{font-size:12px;color:#728480;margin:4px 0 0}
+.overviewMemoOpenCalendar{border:0;background:transparent;color:#56796F;font-size:12px;
+ font-weight:650;min-height:44px;padding:7px 4px;white-space:nowrap;cursor:pointer}
+.overviewMemoEntries{margin-top:9px}
+.overviewMemoEntry{display:flex;align-items:center;gap:10px;text-align:left;width:100%;
+ border:0;border-top:1px solid #E8EEEA;background:transparent;padding:10px 4px;
+ min-height:48px;color:#2D4548;cursor:pointer;font:inherit}
+.overviewMemoTime{flex:0 0 52px;font-size:12px;font-weight:750;color:#33756D;font-variant-numeric:tabular-nums}
+.overviewMemoCopy{font-size:13px;line-height:1.5;flex:1;min-width:0;overflow:hidden;
+ text-overflow:ellipsis;white-space:nowrap}
+.overviewMemoArrow{font-size:18px;color:#A1B4AC}
+.overviewMemoEmpty{color:#7A8B86;font-size:13px;margin:12px 0 3px}
+.overviewMemoNextDay{font-size:12px;color:#74877D;background:#F1F6F2;padding:7px 9px;
+ border-radius:8px;margin-top:5px;font-weight:700}
+.overviewMemoEntry:focus-visible,.overviewMemoOpenCalendar:focus-visible{outline:2px solid #39867A;outline-offset:1px}
+.compactAppFooter .officeFooterMember{font-size:10px;font-weight:400;color:#99A5A4;
+ margin-left:3px;white-space:nowrap;letter-spacing:0}
+@media(max-width:350px){.overviewMemoHead p{font-size:11px}
+ .overviewMemoTime{flex-basis:43px}.overviewMemoCopy{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.overviewMemoEntry{transition:none}}
