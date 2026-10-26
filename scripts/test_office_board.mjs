@@ -100,6 +100,16 @@ const extraDevice='b'.repeat(32);
 const extraToken=(await (await send('/board/session','POST',{code:'password8',member_id:newcomer.id,device:extraDevice})).json()).token;
 assert(extraToken);
 assert.equal((await send('/board','GET',null,extraToken)).status,200);
+assert.equal((await send('/board/members/'+newcomer.id+'/rename','PATCH',
+ {name:'새 이름'},extraToken)).status,403,'Rename requires administrator authentication');
+const rename=await send('/board/members/'+newcomer.id+'/rename','PATCH',
+ {name:'새 이름'},token,'',adminToken);
+assert.equal(rename.status,200,'Authorized admin can rename a member');
+assert.equal((await (await send('/board/account','GET',null,extraToken)).json()).member.name,
+ '새 이름','Renaming must not revoke an existing device or require fresh login');
+assert.equal((await send('/board/members/'+newcomer.id+'/rename','PATCH',
+ {name:'관리자'},token,'',adminToken)).status,409,
+ 'Renaming must not merge two different logical users with the same name');
 assert.equal((await send('/board/members/'+newcomer.id,'DELETE',null,token)).status,403);
 assert.equal((await send('/board/members/'+member.id,'DELETE',null,token,'',adminToken)).status,409,'Cannot remove current manager account');
 assert.equal((await send('/board/members/'+newcomer.id,'DELETE',null,token,'',adminToken)).status,200);
