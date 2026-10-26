@@ -61,9 +61,39 @@ assert(lock.includes('loginFoot.setVisibility(View.GONE)')&&
 assert(lock.includes('loginFoot.setVisibility(View.VISIBLE)')&&
  lock.includes('loginVersion.setVisibility(View.VISIBLE)'),
  'Returning to the password step restores its own informational UI');
-assert(lock.includes('back.setText("뒤로")'), 'Back navigation should be visually subtle');
+assert(lock.includes('back.setText("←  비밀번호로 돌아가기")'), 'Back navigation should be visually subtle');
 assert(!lock.includes('비밀번호를 입력하면 관리자 · 엄마 · 아빠 계정을 선택할 수 있습니다.'),
  'Do not leak account names on the unauthenticated password page');
+// Native premium brand continuity: same badge, same typography and gold
+// accents from the splash to password and member-selection card.
+assert(lock.includes('BrandIdentityStyle.title(wordmark)')&&
+ lock.includes('BrandIdentityStyle.subtitle(subtitle)')&&
+ lock.includes('R.drawable.ic_launcher_badge'),
+ 'Use only the approved original FHD badge and exact brand typography');
+assert(lock.includes('new int[]{Color.rgb(3,33,42),Color.rgb(6,65,70),Color.rgb(10,89,91)}'),
+ 'Password & account pages need the approved deep-teal gradient');
+assert(lock.includes('loginPanel.setBackground(panelSurface)')&&
+ lock.includes('panelSurface.setCornerRadius(dp(23))')&&
+ lock.includes('Color.rgb(255,252,247)'),
+ 'Use the same rounded warm-ivory card for both stages');
+assert(lock.includes('premiumActionSurface()')&&
+ lock.includes('new LinearLayout.LayoutParams(-1,dp(54))'),
+ 'Main login action should be one tasteful consistently sized gradient button');
+assert(lock.includes('inputSurface.setCornerRadius(dp(12))')&&
+ lock.includes('codeField.setImeOptions(EditorInfo.IME_ACTION_DONE)'),
+ 'Password form needs a modern rounded field and keyboard-done affordance');
+assert(lock.includes('revealAccountPanel()')&&
+ lock.includes('if(reducedLoginMotion)return'),
+ 'Step change must be gentle and honor reduced-motion settings');
+assert(lock.includes('hideKeyboard()')&&
+ lock.includes('loginVersion.setVisibility(View.GONE)')&&
+ lock.includes('loginFoot.setVisibility(View.GONE)'),
+ 'Member page must hide keyboard and irrelevant password-stage details');
+assert(lock.includes('status.addTextChangedListener('),
+ 'Transient messages must appear only when meaningful');
+assert(lock.includes('restorePasswordPage()')&&
+ lock.includes('loginDetail.setText("보안코드 입력")'),
+ 'Back navigation must restore the original compact password title');
 assert(!lock.includes('deleteSharedPreferences('),
  'Do not wipe app data just to reselect an office account');
 console.log('Password-first dedicated member page, existing-device migration, secured reassignment and admin chooser passed.');

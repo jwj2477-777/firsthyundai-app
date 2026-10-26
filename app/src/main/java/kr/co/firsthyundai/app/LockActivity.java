@@ -17,6 +17,10 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.widget.Button;
 import android.widget.EditText;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.content.Context;
+import android.graphics.Typeface;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -43,6 +47,8 @@ public class LockActivity extends Activity {
     private LinearLayout accountChooser;
     private TextView loginFoot;
     private TextView loginVersion;
+    private LinearLayout loginPanel;
+    private boolean reducedLoginMotion=false;
     private static final String PREFS = "firsthyundai_access_attempts";
     private FrameLayout welcomeOverlay;
     private final Handler welcomeHandler = new Handler(Looper.getMainLooper());
@@ -55,101 +61,216 @@ public class LockActivity extends Activity {
 
     private int dp(int v) { return (int) (getResources().getDisplayMetrics().density * v + 0.5f); }
 
+    private GradientDrawable premiumActionSurface(){
+        GradientDrawable button=new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+            new int[]{Color.rgb(8,83,87),Color.rgb(5,60,68)});
+        button.setCornerRadius(dp(12));
+        return button;
+    }
+
+    private GradientDrawable outlinedSurface(){
+        GradientDrawable border=new GradientDrawable();
+        border.setColor(Color.rgb(245,248,244));
+        border.setCornerRadius(dp(12));
+        border.setStroke(dp(1),Color.rgb(214,224,216));
+        return border;
+    }
+
+    /** Subtle in-card transition; honors the system's reduced-motion setting. */
+    private void revealAccountPanel(){
+        accountChooser.animate().cancel();
+        if(reducedLoginMotion)return;
+        accountChooser.setAlpha(0f);
+        accountChooser.setTranslationY(dp(10));
+        accountChooser.animate().alpha(1f).translationY(0f).setDuration(245)
+            .setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+    }
+    private void hideKeyboard(){
+        android.view.inputmethod.InputMethodManager keyboard=
+            (android.view.inputmethod.InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(keyboard!=null)keyboard.hideSoftInputFromWindow(codeField.getWindowToken(),0);
+        codeField.clearFocus();
+    }
+
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
 
-        ScrollView scroll = new ScrollView(this);
+        // Premium native onboarding shares the exact deep-teal / warm-gold
+        // palette and approved badge artwork of the existing branded intro.
+        ScrollView scroll=new ScrollView(this);
         scroll.setFillViewport(true);
-        scroll.setBackgroundColor(Color.rgb(240, 248, 246));
-        LinearLayout root = new LinearLayout(this);
+        scroll.setVerticalScrollBarEnabled(false);
+        scroll.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+            new int[]{Color.rgb(3,33,42),Color.rgb(6,65,70),Color.rgb(10,89,91)}));
+        LinearLayout root=new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setGravity(Gravity.CENTER_VERTICAL);
-        root.setPadding(dp(26), dp(32), dp(26), dp(36));
-        scroll.addView(root);
+        root.setGravity(Gravity.CENTER);
+        int screenWidth=getResources().getDisplayMetrics().widthPixels;
+        int horizontalPadding=Math.max(dp(24),(screenWidth-dp(420))/2);
+        root.setPadding(horizontalPadding,dp(25),horizontalPadding,dp(30));
+        scroll.addView(root,new ScrollView.LayoutParams(-1,-1));
 
-        TextView title = new TextView(this);
-        title.setText("퍼스트현대");
-        title.setTextSize(30);
-        title.setTextColor(Color.rgb(24, 69, 76));
-        title.setGravity(Gravity.CENTER);
-        title.setTypeface(null, 1);
-        root.addView(title);
+        // The original FHD badge + native branded wordmark are the exact same
+        // drawables and font metrics as the opening animation. Never redraw.
+        LinearLayout brand=new LinearLayout(this);
+        brand.setOrientation(LinearLayout.VERTICAL);
+        brand.setGravity(Gravity.CENTER);
+        root.addView(brand,new LinearLayout.LayoutParams(-1,-2));
 
-        TextView detail = new TextView(this);
+        FrameLayout emblemFrame=new FrameLayout(this);
+        View fineRing=new View(this);
+        GradientDrawable ring=new GradientDrawable();
+        ring.setShape(GradientDrawable.OVAL);
+        ring.setColor(Color.TRANSPARENT);
+        ring.setStroke(dp(1),Color.argb(112,230,186,95));
+        fineRing.setBackground(ring);
+        emblemFrame.addView(fineRing,new FrameLayout.LayoutParams(dp(105),dp(105),Gravity.CENTER));
+        ImageView emblem=new ImageView(this);
+        emblem.setImageResource(R.drawable.ic_launcher_badge);
+        emblem.setContentDescription("퍼스트현대 공식 로고");
+        emblem.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        emblemFrame.addView(emblem,new FrameLayout.LayoutParams(dp(92),dp(92),Gravity.CENTER));
+        brand.addView(emblemFrame,new LinearLayout.LayoutParams(dp(113),dp(113)));
+
+        TextView wordmark=new TextView(this);
+        BrandIdentityStyle.title(wordmark);
+        LinearLayout.LayoutParams wordmarkParams=new LinearLayout.LayoutParams(-2,-2);
+        wordmarkParams.topMargin=dp(4);
+        brand.addView(wordmark,wordmarkParams);
+        ImageView subtitle=new ImageView(this);
+        BrandIdentityStyle.subtitle(subtitle);
+        LinearLayout.LayoutParams subtitleParams=BrandIdentityStyle.subtitleLayout(subtitle);
+        subtitleParams.topMargin=dp(11);
+        brand.addView(subtitle,subtitleParams);
+
+        View goldRule=new View(this);
+        goldRule.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+            new int[]{Color.argb(0,217,173,92),Color.rgb(238,201,126),
+                Color.argb(0,217,173,92)}));
+        LinearLayout.LayoutParams goldParams=new LinearLayout.LayoutParams(dp(86),dp(1));
+        goldParams.gravity=Gravity.CENTER_HORIZONTAL;
+        goldParams.topMargin=dp(20);
+        brand.addView(goldRule,goldParams);
+
+        loginPanel=new LinearLayout(this);
+        loginPanel.setOrientation(LinearLayout.VERTICAL);
+        loginPanel.setPadding(dp(23),dp(26),dp(23),dp(22));
+        GradientDrawable panelSurface=new GradientDrawable();
+        panelSurface.setColor(Color.rgb(255,252,247));
+        panelSurface.setCornerRadius(dp(23));
+        panelSurface.setStroke(dp(1),Color.rgb(232,222,204));
+        loginPanel.setBackground(panelSurface);
+        loginPanel.setElevation(dp(6));
+        LinearLayout.LayoutParams panelParams=new LinearLayout.LayoutParams(-1,-2);
+        panelParams.topMargin=dp(31);
+        root.addView(loginPanel,panelParams);
+
+        TextView detail=new TextView(this);
         loginDetail=detail;
-        detail.setText("가족 전용 부동산 정보센터\n접근 보안코드를 입력해 주세요.");
-        detail.setTextSize(17);
-        detail.setTextColor(Color.rgb(77, 94, 111));
+        detail.setText("보안코드 입력");
+        detail.setTextSize(20);
+        detail.setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));
+        detail.setTextColor(Color.rgb(28,65,67));
         detail.setGravity(Gravity.CENTER);
-        detail.setPadding(0, dp(18), 0, dp(26));
-        root.addView(detail);
+        detail.setIncludeFontPadding(false);
+        detail.setPadding(0,0,0,dp(21));
+        loginPanel.addView(detail,new LinearLayout.LayoutParams(-1,-2));
 
-        codeField = new EditText(this);
+        codeField=new EditText(this);
         codeField.setSingleLine(true);
-        codeField.setHint("가족 보안코드");
-        codeField.setTextSize(18);
-        codeField.setContentDescription("가족 보안코드 입력칸");
-        codeField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        LinearLayout.LayoutParams inputParams =
-                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(60));
-        root.addView(codeField, inputParams);
+        codeField.setHint("사무실 공통 보안코드");
+        codeField.setTextSize(16);
+        codeField.setTextColor(Color.rgb(34,61,63));
+        codeField.setHintTextColor(Color.rgb(129,139,136));
+        codeField.setGravity(Gravity.CENTER_VERTICAL);
+        codeField.setPadding(dp(17),0,dp(16),0);
+        codeField.setContentDescription("사무실 공통 보안코드 입력");
+        codeField.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        codeField.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        GradientDrawable inputSurface=new GradientDrawable();
+        inputSurface.setColor(Color.WHITE);
+        inputSurface.setCornerRadius(dp(12));
+        inputSurface.setStroke(dp(1),Color.rgb(215,221,214));
+        codeField.setBackground(inputSurface);
+        loginPanel.addView(codeField,new LinearLayout.LayoutParams(-1,dp(56)));
 
-        Button unlock = new Button(this);
-        unlockButton = unlock;
+        Button unlock=new Button(this);
+        unlockButton=unlock;
         unlock.setAllCaps(false);
-        unlock.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.rgb(17, 106, 113)));
+        unlock.setBackgroundTintList(null);
+        unlock.setBackground(premiumActionSurface());
         unlock.setTextColor(Color.WHITE);
-        unlock.setText("인증하고 앱 열기");
-        LinearLayout.LayoutParams buttonParams =
-                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(54));
-        buttonParams.topMargin = dp(16);
-        root.addView(unlock, buttonParams);
+        unlock.setTextSize(16);
+        unlock.setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));
+        unlock.setText("계속");
+        unlock.setMinHeight(dp(54));
+        LinearLayout.LayoutParams buttonParams=new LinearLayout.LayoutParams(-1,dp(54));
+        buttonParams.topMargin=dp(12);
+        loginPanel.addView(unlock,buttonParams);
+        codeField.setOnEditorActionListener((v,action,event)->{
+            if(action!=EditorInfo.IME_ACTION_DONE)return false;
+            if(unlockButton.isEnabled())unlock();
+            return true;
+        });
 
-        // Hidden on the password page: appears only after successful code validation.
+        // Account rows reuse this card, avoiding two unrelated screen designs.
         accountChooser=new LinearLayout(this);
         accountChooser.setOrientation(LinearLayout.VERTICAL);
         accountChooser.setVisibility(View.GONE);
-        root.addView(accountChooser,new LinearLayout.LayoutParams(-1,-2));
+        loginPanel.addView(accountChooser,new LinearLayout.LayoutParams(-1,-2));
 
-        status = new TextView(this);
-        status.setTextSize(15);
-        status.setTextColor(Color.rgb(142, 53, 45));
+        status=new TextView(this);
+        status.setTextSize(13);
+        status.setTextColor(Color.rgb(140,82,61));
         status.setGravity(Gravity.CENTER);
-        status.setPadding(0, dp(14), 0, 0);
-        root.addView(status);
+        status.setPadding(0,dp(13),0,0);
+        status.setLineSpacing(dp(2),1f);
+        status.setVisibility(View.GONE);
+        status.addTextChangedListener(new android.text.TextWatcher(){
+            @Override public void beforeTextChanged(CharSequence value,int start,int count,int after){}
+            @Override public void onTextChanged(CharSequence value,int start,int before,int count){
+                status.setVisibility(value!=null&&value.length()>0?View.VISIBLE:View.GONE);
+            }
+            @Override public void afterTextChanged(android.text.Editable value){}
+        });
+        loginPanel.addView(status,new LinearLayout.LayoutParams(-1,-2));
 
-        retryButton = new Button(this);
+        retryButton=new Button(this);
         retryButton.setAllCaps(false);
-        retryButton.setTextSize(16);
-        retryButton.setMinHeight(dp(52));
+        retryButton.setTextSize(14);
+        retryButton.setMinHeight(dp(48));
         retryButton.setText("연결 다시 확인");
-        retryButton.setVisibility(android.view.View.GONE);
-        root.addView(retryButton);
+        retryButton.setTextColor(Color.rgb(24,84,84));
+        retryButton.setBackgroundTintList(null);
+        retryButton.setBackground(outlinedSurface());
+        retryButton.setVisibility(View.GONE);
+        LinearLayout.LayoutParams retryParams=new LinearLayout.LayoutParams(-1,dp(48));
+        retryParams.topMargin=dp(12);
+        loginPanel.addView(retryButton,retryParams);
 
-        TextView foot = new TextView(this);
+        TextView foot=new TextView(this);
         loginFoot=foot;
-        foot.setText("처음 한 번 인증하면 이후에는 자동으로 열립니다.\n"
-                + "관리자가 보안코드를 변경하면 다시 인증해야 합니다.\n"
-                + "보안 확인에 인터넷이 필요하며 최근 확인한 정책은 24시간 동안 오프라인 이용 가능합니다.");
-        foot.setTextSize(14);
+        foot.setText("한 번만 설정하면 이후에는 자동 로그인됩니다.");
+        foot.setTextSize(12);
         foot.setGravity(Gravity.CENTER);
-        foot.setTextColor(Color.rgb(77, 99, 108));
-        foot.setPadding(0, dp(32), 0, 0);
-        root.addView(foot);
+        foot.setTextColor(Color.rgb(101,119,119));
+        foot.setPadding(0,dp(17),0,0);
+        loginPanel.addView(foot,new LinearLayout.LayoutParams(-1,-2));
 
-        TextView installedVersion = new TextView(this);
+        TextView installedVersion=new TextView(this);
         loginVersion=installedVersion;
-        String installedName = AppVersion.name(this);
-        int installedBuild = AppVersion.buildNumber(this);
-        installedVersion.setText(installedName.isEmpty() ? "설치된 앱 버전 확인 불가" :
-                "설치된 앱 v" + installedName + (installedBuild > 0 ? " · 빌드 " + installedBuild : ""));
-        installedVersion.setTextSize(13);
+        String installedName=AppVersion.name(this);
+        installedVersion.setText(installedName.isEmpty()?"":"v"+installedName);
+        installedVersion.setTextSize(11);
         installedVersion.setGravity(Gravity.CENTER);
-        installedVersion.setTextColor(Color.rgb(79, 99, 107));
-        installedVersion.setPadding(0, dp(14), 0, 0);
-        root.addView(installedVersion);
-
-        codeField.setEnabled(false);
+        installedVersion.setTextColor(Color.argb(170,225,236,230));
+        installedVersion.setPadding(0,dp(16),0,0);
+        root.addView(installedVersion,new LinearLayout.LayoutParams(-1,-2));
+        try{
+            reducedLoginMotion=Settings.Global.getFloat(getContentResolver(),
+                Settings.Global.ANIMATOR_DURATION_SCALE,1f)==0f;
+        }catch(Exception ignored){}
+                codeField.setEnabled(false);
         unlock.setEnabled(false);
         status.setText("최신 가족 보안 정책을 확인하는 중...");
         unlock.setOnClickListener(v -> unlock());
@@ -336,22 +457,22 @@ public class LockActivity extends Activity {
                     choice.setFocusable(true);
                     choice.setContentDescription(name+(current?" · 현재 계정":" · 계정 선택"));
                     GradientDrawable surface=new GradientDrawable();
-                    surface.setColor(current?Color.rgb(239,247,244):Color.WHITE);
+                    surface.setColor(current?Color.rgb(243,248,244):Color.WHITE);
                     surface.setCornerRadius(dp(12));
-                    surface.setStroke(dp(1),current?Color.rgb(167,198,186):Color.rgb(212,226,222));
+                    surface.setStroke(dp(1),current?Color.rgb(206,180,122):Color.rgb(226,225,216));
                     choice.setBackground(new android.graphics.drawable.RippleDrawable(
                         android.content.res.ColorStateList.valueOf(Color.argb(42,20,110,112)),
                         surface,null));
                     TextView label=new TextView(this);
                     label.setText(name);
                     label.setTextSize(16);
-                    label.setTextColor(Color.rgb(35,75,75));
+                    label.setTextColor(Color.rgb(29,65,66));
                     label.setTypeface(null,android.graphics.Typeface.BOLD);
                     choice.addView(label,new LinearLayout.LayoutParams(0,-2,1f));
                     TextView indicator=new TextView(this);
                     indicator.setText(current?"현재":"›");
                     indicator.setTextSize(current?12:21);
-                    indicator.setTextColor(current?Color.rgb(65,119,100):Color.rgb(123,150,143));
+                    indicator.setTextColor(current?Color.rgb(131,105,59):Color.rgb(119,143,138));
                     indicator.setGravity(Gravity.CENTER);
                     choice.addView(indicator,new LinearLayout.LayoutParams(-2,-2));
                     LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(56));
@@ -392,7 +513,7 @@ public class LockActivity extends Activity {
                     return;
                 }
                 TextView back=new TextView(this);
-                back.setText("뒤로");
+                back.setText("←  비밀번호로 돌아가기");
                 back.setTextSize(14);
                 back.setTextColor(Color.rgb(109,131,127));
                 back.setGravity(Gravity.CENTER);
@@ -408,13 +529,15 @@ public class LockActivity extends Activity {
                     status.setText("다시 비밀번호를 입력해 주세요.");
                 });
                 loginDetail.setText("사용할 계정을 선택해 주세요.");
-                loginDetail.setPadding(0,dp(12),0,dp(22));
+                loginDetail.setPadding(0,0,0,dp(19));
+                hideKeyboard();
                 codeField.setVisibility(View.GONE);
                 unlockButton.setVisibility(View.GONE);
                 loginFoot.setVisibility(View.GONE);
                 loginVersion.setVisibility(View.GONE);
                 retryButton.setVisibility(View.GONE);
                 accountChooser.setVisibility(View.VISIBLE);
+                revealAccountPanel();
                 status.setText("");
                 status.setVisibility(View.GONE);
             });
@@ -422,17 +545,20 @@ public class LockActivity extends Activity {
     }
 
     private void restorePasswordPage() {
+        accountChooser.animate().cancel();
         accountChooser.setVisibility(View.GONE);
+        accountChooser.setAlpha(1f);
+        accountChooser.setTranslationY(0f);
         accountChooser.removeAllViews();
         codeField.setVisibility(View.VISIBLE);
         unlockButton.setVisibility(View.VISIBLE);
         loginFoot.setVisibility(View.VISIBLE);
         loginVersion.setVisibility(View.VISIBLE);
-        status.setVisibility(View.VISIBLE);
+        status.setVisibility(View.GONE);
         codeField.setEnabled(true);
         unlockButton.setEnabled(true);
-        loginDetail.setText("가족 전용 부동산 정보센터\n접근 보안코드를 입력해 주세요.");
-        loginDetail.setPadding(0,dp(18),0,dp(26));
+        loginDetail.setText("보안코드 입력");
+        loginDetail.setPadding(0,0,0,dp(21));
     }
     private void loadLatestPolicy() {
         currentPolicy = null;

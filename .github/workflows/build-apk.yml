@@ -326,22 +326,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.11 compact member-selection screen APK
+      - name: Publish v2.1.12 premium unified login and account-selection APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.11.apk
-          unzip -t FirstHyundai-v2.1.11.apk | grep 'No errors detected'
-          if gh release view v2.1.11 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.12.apk
+          unzip -t FirstHyundai-v2.1.12.apk | grep 'No errors detected'
+          if gh release view v2.1.12 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.11 FirstHyundai-v2.1.11.apk \
+            gh release create v2.1.12 FirstHyundai-v2.1.12.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.11 · 간결한 구성원 선택 화면' \
-              --notes '비밀번호 인증 후 계정 선택 화면을 간결한 균일 3개 카드 행으로 개선했습니다. 하단의 중복 안내·빌드정보·불필요한 여백을 숨기고, 현재 계정은 작게 표시하며 부드러운 터치 피드백을 적용했습니다. 비밀번호 인증 후 선택하는 순서와 기존 자동로그인을 유지합니다. 기존 설치 휴대폰도 이 순서로 한 번 확인한 후 자동 로그인합니다. 관리자모드에서 이 휴대폰 계정을 다시 선택할 수 있고, 계정 변경 시 사무실 공통 보안코드를 재확인하고 이전 토큰을 즉시 무효화합니다. 기본 세 계정 자동 생성 기능을 유지합니다. 이전 관리자 계정은 유지하고, 삭제된 구성원은 다시 생성하지 않습니다. 기존 메모·캘린더·계정 권한 관리 기능을 유지합니다. 기존 Firebase FCM 푸시 수신도 유지합니다. 알림을 누르면 기존 보안화면을 거쳐 해당 포스트잇으로 이동합니다. 즉시 푸시 활성화에는 FHD_FIREBASE_ANDROID_JSON 및 FHD_FCM_SERVICE_ACCOUNT_JSON 두 Firebase GitHub Actions Secret 등록과 Worker 재배포가 필요합니다. 미등록 중에는 12초 앱 실행 점검과 최소 15분 백그라운드 점검으로 동작합니다. v2.1.11/build162.'
+              --title '퍼스트현대 v2.1.12 · 고급 로그인 및 계정 선택' \
+              --notes '공식 원본 FHD 로고와 브랜드 타이포그래피, 딥 틸 배경과 웜 골드 악센트를 사용해 비밀번호 첫 화면부터 계정 선택까지 동일한 아이보리 카드 레이아웃으로 정돈했습니다. 간결한 구성원 선택 행, 부드러운 전환, 키보드 완료 인증, 큰 터치 영역과 줄어든 애니메이션 설정을 지원합니다. 하단의 중복 안내·빌드정보·불필요한 여백을 숨기고, 현재 계정은 작게 표시하며 부드러운 터치 피드백을 적용했습니다. 비밀번호 인증 후 선택하는 순서와 기존 자동로그인을 유지합니다. 기존 설치 휴대폰도 이 순서로 한 번 확인한 후 자동 로그인합니다. 관리자모드에서 이 휴대폰 계정을 다시 선택할 수 있고, 계정 변경 시 사무실 공통 보안코드를 재확인하고 이전 토큰을 즉시 무효화합니다. 기본 세 계정 자동 생성 기능을 유지합니다. 이전 관리자 계정은 유지하고, 삭제된 구성원은 다시 생성하지 않습니다. 기존 메모·캘린더·계정 권한 관리 기능을 유지합니다. 기존 Firebase FCM 푸시 수신도 유지합니다. 알림을 누르면 기존 보안화면을 거쳐 해당 포스트잇으로 이동합니다. 즉시 푸시 활성화에는 FHD_FIREBASE_ANDROID_JSON 및 FHD_FCM_SERVICE_ACCOUNT_JSON 두 Firebase GitHub Actions Secret 등록과 Worker 재배포가 필요합니다. 미등록 중에는 12초 앱 실행 점검과 최소 15분 백그라운드 점검으로 동작합니다. v2.1.12/build163.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.11 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.11 --apk FirstHyundai-v2.1.11.apk
+          gh release upload v2.1.12 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.12 --apk FirstHyundai-v2.1.12.apk
