@@ -20,8 +20,16 @@ export function fromKma(doc,now=Date.now()){
  const iso=d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8)+'T'+t.slice(0,2)+':'+t.slice(2)+':00+09:00';
  const stamp=Date.parse(iso);
  if(!Number.isFinite(stamp)||now-stamp>7200000||stamp-now>300000)throw Error('stale_weather');
+ // KMA delivers measured temperature as T1H in the SAME observation batch
+ // as precipitation PTY. Previously T1H was dropped, leaving "checking temp"
+ // on screen despite successful observations.
+ const measured=rows.find(x=>x.category==='T1H'&&Number(x.nx)===55&&Number(x.ny)===123&&
+  x.baseDate===d&&x.baseTime===t);
+ const raw=String(measured?.obsrValue??'').trim();
+ const temp=raw!==''&&Number.isFinite(Number(raw))&&Number(raw)>=-70&&Number(raw)<=70?
+  Number(raw):null;
  return {schema:1,status:'ok',effect:[2,3,6,7].includes(code)?'snow':[1,5].includes(code)?'rain':'none',
-  observed_at:iso,provider:'기상청 초단기실황',area:'송도',grid:{nx:55,ny:123},
+  temp,observed_at:iso,provider:'기상청 초단기실황',area:'송도',grid:{nx:55,ny:123},
   source_url:'https://www.data.go.kr/data/15084084/openapi.do'};
 }
 async function collect(secret){
