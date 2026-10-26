@@ -76,7 +76,7 @@ function cancelRename(){editing='';render()}
 async function saveRename(id){
  if(!allowed()||busy||editing!==id)return;
  const input=$('officeMemberList')?.querySelector?.('input[data-rename-input]');
- const name=String(input?.value||'').trim().replace(/\\s+/g,' ');
+ const name=String(input?.value||'').trim().replace(/\s+/g,' ');
  if(!name||name.length>24){status('계정 이름은 1~24자로 입력해 주세요.');return}
  busy=true;
  try{
