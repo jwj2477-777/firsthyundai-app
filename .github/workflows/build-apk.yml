@@ -63,6 +63,7 @@ on:
       - 'scripts/test_workflow_pilot.js'
       - 'scripts/test_six_nav_header_geometry_browser.js'
       - 'scripts/test_notification_inbox_browser.js'
+      - 'scripts/test_compact_nav_dock_browser.js'
       - 'scripts/test_officetel_heading_color.js'
       - 'scripts/test_office_on_demand.js'
       - 'scripts/test_public_hub.js'
@@ -211,6 +212,7 @@ jobs:
           node scripts/test_workflow_pilot.js
           node scripts/test_six_nav_header_geometry_browser.js
           node scripts/test_notification_inbox_browser.js
+          node scripts/test_compact_nav_dock_browser.js
           node scripts/test_officetel_heading_color.js
           node scripts/test_scroll_to_top.js
           node scripts/test_contract_broker.js
@@ -340,24 +342,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.22 six-button design and private notification inbox APK
+      - name: Publish v2.1.23 compact six-button navigation dock APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.22.apk
-          unzip -t FirstHyundai-v2.1.22.apk | grep 'No errors detected'
-          if gh release view v2.1.22 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.23.apk
+          unzip -t FirstHyundai-v2.1.23.apk | grep 'No errors detected'
+          if gh release view v2.1.23 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.22 FirstHyundai-v2.1.22.apk \
+            gh release create v2.1.23 FirstHyundai-v2.1.23.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.22 · 알림함·첫 실행 알림 허용·메인 버튼 디자인' \
-              --notes '상단 종 아이콘은 관심단지 알림 설정 대신 이 휴대폰에서 실제 받은 알림 이력을 확인하는 알림함으로 변경했습니다. 공유 메모 푸시와 새 실거래 휴대폰 알림 내역을 최대 80건·90일 동안 휴대폰에만 저장하며, 메모 본문과 전화번호는 기록하지 않습니다. 읽음·전체삭제 및 관련 화면 바로가기 기능을 제공합니다. Android 13 이상에서는 로그인 뒤 첫 실행에서 시스템 알림 허용창을 1회 요청합니다(사용자 승인 필요). 기존 알림 세부 설정은 알림함의 설정 버튼에서 접근할 수 있습니다. 메인 6개 버튼은 3x2 동일 높이·모서리·간격의 아이콘 위/글자 아래 형태로 정리했고 실거래 블루, 아파트정보 틸, 뉴스 퍼플, 오늘 요약 인디고, 계약문자 테라코타, 공유메모 머스터드 선택색을 적용했습니다. 하위 탭은 부모 메뉴 톤을 유지하며 거래유형 고유색은 보존합니다. v2.1.22/build173.'
+              --title '퍼스트현대 v2.1.23 · 메인 6개 버튼 그룹형 디자인' \
+              --notes '상단 6개 주요 메뉴 버튼이 따로 떠 있는 듯한 느낌을 줄이고, 한 개의 부드러운 아이보리 바탕과 얇은 테두리·24px 안팎의 둥근 외곽 프레임으로 묶었습니다. 카드 높이는 기존 104px에서 91px(좁은 화면 87px)로 줄이고 간격을 약 5~7px로 좁혀 집중도를 높였습니다. 바깥쪽 작은 여백, 카드별 동일 너비·높이·아이콘·폰트를 유지하며 각 메뉴 선택 색상, 메모 머스터드, 하위 전환 버튼, 계절 테마, 색 흐름 전환 효과는 변경하지 않습니다. 모바일 320/360/393/430/600px 실제 브라우저 규격 회귀검사를 추가했습니다. v2.1.23/build174.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.22 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.22 --apk FirstHyundai-v2.1.22.apk
+          gh release upload v2.1.23 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.23 --apk FirstHyundai-v2.1.23.apk
 
 
