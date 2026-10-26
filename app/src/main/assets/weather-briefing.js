@@ -149,7 +149,7 @@
  function renderHourly(){
   const toggle=$('overviewHourlyToggle'),panel=$('overviewHourlyDetail');
   if(!toggle||!panel)return;
-  toggle.setAttribute('aria-expanded',String(hourlyExpanded));
+  toggle.setAttribute?.('aria-expanded',String(hourlyExpanded));
   panel.hidden=!hourlyExpanded;
   if(!hourlyExpanded)return;
   const rows=hourlyCards(data);
