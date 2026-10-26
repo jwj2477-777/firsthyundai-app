@@ -121,11 +121,16 @@ function addReviewNote(msg){
 }
 function prepareSpecials(raw){
  const dedicated=v('specialMemo').replace(/\r/g,'').trim();
- const extracted=extractSpecial(raw);
- // Both parts of the grouped memo participate in recognition. The lower field
- // is just an optional visual reminder: clauses written above still count.
- // Keep both sources and remove duplicate clauses without dropping obligations.
- const lines=[extracted,dedicated].filter(Boolean).join('\n').split(/\n+/).map(x=>x.trim()).filter(Boolean);
+ const extracted=extractSpecial(v('rough'));
+ // Both inputs go through contract fact recognition. For the optional lower
+ // memo, keep explicitly headed clauses or implicit undertakings. Do not
+ // accidentally turn price, dates or bank details into a special clause.
+ const lowerExtracted=extractSpecial(dedicated);
+ const lowerLines=lowerExtracted?[lowerExtracted]:
+  dedicated.split(/\n+/).map(x=>x.trim()).filter(x=>
+   x&&!isDealField(x)&&!isPaymentLine(x)&&
+   !/(?:매매|전세|보증금|계약금|중도금|잔금|월세|송금|입금|계좌|아파트|동호수).{0,30}\d/.test(x));
+ const lines=[extracted,...lowerLines].filter(Boolean).join('\n').split(/\n+/).map(x=>x.trim()).filter(Boolean);
  const unique=[],seen=new Set();
  for(const line of lines){
   const key=line.replace(/[^가-힣a-zA-Z0-9]/g,'').toLowerCase();
