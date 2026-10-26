@@ -540,10 +540,10 @@ public class MainActivity extends Activity {
             final String authorized=adminSessionIdentity;
             runOnUiThread(()->{
                 if(authorized==null||authorized.isEmpty()||!authorized.equals(adminSessionIdentity)){
-                    Toast.makeText(this,"계정 변경은 관리자모드에서만 가능합니다.",Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this,"계정 변경은 관리자모드에서만 가능합니다.",Toast.LENGTH_LONG).show();
                     return;
                 }
-                Intent select=new Intent(this,LockActivity.class);
+                Intent select=new Intent(MainActivity.this,LockActivity.class);
                 select.putExtra("force_member_picker",true);
                 startActivity(select);
                 finish();
