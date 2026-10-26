@@ -96,7 +96,7 @@ async function checkLayouts(){
   // Existing sibling news navigation must also remain stable when metadata hides.
   switchPage('news');await tick();scrollTo(0,0);
   const news=box(document.querySelector('.newsCategoryTabs'));
-  check('news header shows actual compact time',document.getElementById('newsFamilyMeta').textContent==='최종 갱신 2026.10.25 04:56');
+  check('news header shows actual compact time',document.getElementById('newsFamilyMeta').textContent==='갱신 2026.10.25 04:56');
   check('news header has no large administrative blank',document.querySelector('#news>.sectionTitle').offsetHeight<=(innerWidth>380?56:82));
   document.getElementById('newsTabSubscriptions').click();await tick();scrollTo(0,0);
   close('news sibling tabs remain anchored',box(document.querySelector('.newsCategoryTabs')),news);
