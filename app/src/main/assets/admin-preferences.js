@@ -8,7 +8,8 @@
   motion:'full',contrast:'standard',quickOrder:'standard',accent:'brand',
   tradeAmount:'standard',cancelled:'standard',memoOrder:'newest',
   memoCompleted:'hide',memoRefresh:'45',memoClock:'12',memoPhones:'on',
-  tapSize:'standard',memoLayout:'standard',memoAlerts:'on'});
+  tapSize:'standard',memoLayout:'standard',memoAlerts:'on',
+  theme:'default',themeMode:'manual',weatherEffect:'none'});
  const allowed={
   start:['nearby','trades','new','complexes','news','contracts','overview','officetel','officeBoard'],
   density:['standard','compact','roomy'],reading:['standard','large','xlarge'],
@@ -17,14 +18,17 @@
   tradeAmount:['standard','bold'],cancelled:['standard','subtle'],
   memoOrder:['newest','oldest'],memoCompleted:['hide','show'],
   memoRefresh:['30','45','120'],memoClock:['12','24'],memoPhones:['on','off'],
-  tapSize:['standard','large'],memoLayout:['standard','compact','roomy'],memoAlerts:['on','off']
+  tapSize:['standard','large'],memoLayout:['standard','compact','roomy'],memoAlerts:['on','off'],
+  theme:['default','spring','summer','autumn','winter'],themeMode:['manual','season'],
+  weatherEffect:['none','rain','snow','auto']
  };
  const fields={start:'adminDefaultPage',density:'adminListDensity',
   reading:'adminReadingSize',motion:'adminMotionStyle',contrast:'adminContrastMode',
   quickOrder:'adminQuickOrder',accent:'adminAccentStyle',tradeAmount:'adminTradeAmountStyle',
   cancelled:'adminCancelledStyle',memoOrder:'adminMemoOrder',memoCompleted:'adminMemoCompleted',
   memoRefresh:'adminMemoRefresh',memoClock:'adminMemoClock',memoPhones:'adminMemoPhones',
-  tapSize:'adminTapSize',memoLayout:'adminMemoLayout',memoAlerts:'adminMemoAlerts'};
+  tapSize:'adminTapSize',memoLayout:'adminMemoLayout',memoAlerts:'adminMemoAlerts',
+  theme:'adminTheme',themeMode:'adminThemeMode',weatherEffect:'adminWeatherEffect'};
  const LEGACY_FIELDS=new Set(['start','density','reading','motion','contrast']);
  let state={...defaults},popupBackup=null,undoSnapshot=null,lastChangeText='';
  function popupState(){return Boolean(window.FirstHyundaiTradeAlerts?.enabled?.())}
@@ -71,6 +75,7 @@
   node.setAttribute('data-memo-layout',state.memoLayout);
   try{window.FirstHyundaiNative?.setOfficeMemoNotificationsEnabled?.(state.memoAlerts==='on')}catch(e){}
   window.FirstHyundaiOfficeBoard?.settingsChanged?.();
+  window.FirstHyundaiThemes?.configure?.(state);
  }
  function render(){
   if(!allowedEditor())return;
@@ -90,8 +95,8 @@
  }
  function set(key,value){
   if(!allowedEditor()||!Object.prototype.hasOwnProperty.call(allowed,key)||!allowed[key].includes(value))return false;
-  if(state[key]===value)return true;
-  return commit({...state,[key]:value},'설정 변경: '+key+' · 이 휴대폰 적용 후 공통 서버 게시 요청');
+  if(state[key]===value&&!(key==='theme'&&state.themeMode==='season'))return true;
+  return commit({...state,[key]:value,...(key==='theme'?{themeMode:'manual'}:{})},'설정 변경: '+key+' · 이 휴대폰 적용 후 공통 서버 게시 요청');
  }
  function setTradePopup(enabled){
   if(!allowedEditor()||typeof enabled!=='boolean')return;

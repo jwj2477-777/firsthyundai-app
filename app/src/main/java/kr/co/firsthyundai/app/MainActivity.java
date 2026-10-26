@@ -610,6 +610,20 @@ public class MainActivity extends Activity {
                 deliver("onFirstHyundaiSharedSettingsFetched",response);
             });
         }
+        @JavascriptInterface public void fetchThemeWeather(String requestId) {
+            if(requestId==null || !requestId.matches("theme[0-9]{1,10}"))return;
+            io.execute(() -> {
+                JSONObject response=new JSONObject();
+                try {
+                    response.put("requestId",requestId);
+                    response.put("payload",SharedSettingsClient.readWeather());
+                    response.put("ok",true);
+                } catch(Exception e) {
+                    try {response.put("requestId",requestId);response.put("ok",false);}catch(Exception ignored){}
+                }
+                deliver("onFirstHyundaiThemeWeatherFetched",response);
+            });
+        }
         @JavascriptInterface public void publishSharedSettings(String json,String requestId) {
             if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
             if(!isAdminDeviceMode()||json==null||json.length()>2400){
@@ -870,3 +884,4 @@ public class MainActivity extends Activity {
                 });
     }
 }
+

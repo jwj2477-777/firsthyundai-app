@@ -54,6 +54,7 @@ final class SharedSettingsClient {
         if(token.length()<60||token.length()>1100)throw new Exception("공통 설정 인증 세션 형식 오류");
         return token;
     }
+    static JSONObject readWeather() throws Exception {return call("GET","/theme-weather",null,null);}
     static JSONObject read() throws Exception {return call("GET","/settings",null,null);}
     static JSONObject publish(String token,String json) throws Exception {
         if(token==null||token.isEmpty())throw new Exception("공통 설정 게시 인증이 필요합니다. 관리자모드에 다시 로그인해 주세요.");
@@ -62,3 +63,4 @@ final class SharedSettingsClient {
     }
     private SharedSettingsClient(){}
 }
+

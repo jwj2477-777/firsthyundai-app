@@ -17,7 +17,10 @@
   adminMotionStyle:'애니메이션 효과 색흐름 부드럽게',
   adminContrastMode:'시인성 색 대비 또렷하게',
   adminQuickOrder:'탭 버튼 순서 자리 이동',
-  adminAccentStyle:'테마 배색 빨강 그린 브론즈',
+  adminAccentStyle:'강조 배색 빨강 그린 브론즈',
+  adminTheme:'테마 봄 여름 가을 겨울 기본',
+  adminThemeMode:'테마 자동 절기 입춘 입하 입추 입동 수동',
+  adminWeatherEffect:'날씨 효과 송도 비 눈 수동 자동',
   adminTradeAmountStyle:'실거래 금액 가격 매매 전세 월세',
   adminCancelledStyle:'해제 취소 거래 계약',
   adminMemoOrder:'포스트잇 메모 최신',
@@ -116,3 +119,4 @@
   _test:{matches,normalize}};
  draw();
 })();
+

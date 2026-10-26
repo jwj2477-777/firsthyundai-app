@@ -1,0 +1,39 @@
+/* Color and decoration only. No changes to business UI geometry, typography,
+   navigation, semantic sale/rent/alert colors or original brand handoff. */
+body[data-season-theme="spring"]{--season-page:#F5F8EF;--season-haze:#E7F0DF;--season-paper:#FEFFFA;--season-line:#D9E4D1;--season-glow:#F7DDE3;--season-edge:#6F915E}
+body[data-season-theme="summer"]{--season-page:#F0F7FA;--season-haze:#DCEFF2;--season-paper:#FBFEFF;--season-line:#CEE3E7;--season-glow:#D8F2EC;--season-edge:#548C9B}
+body[data-season-theme="autumn"]{--season-page:#F9F3E9;--season-haze:#F0E1CE;--season-paper:#FFFCF6;--season-line:#E8D9C2;--season-glow:#F6DEC8;--season-edge:#A87845}
+body[data-season-theme="winter"]{--season-page:#F1F5FA;--season-haze:#E0E9F1;--season-paper:#FDFEFF;--season-line:#D3DFEC;--season-glow:#E6E5F4;--season-edge:#7C98B4}
+body[data-season-theme]:not([data-season-theme="default"]){
+ background:radial-gradient(ellipse at 100% 80px,var(--season-glow),transparent 390px),
+  linear-gradient(180deg,var(--season-haze),var(--season-page) 420px);
+ --ui2-card:var(--season-paper);--ui2-line:var(--season-line);
+}
+body[data-season-theme]:not([data-season-theme="default"]) .panel,
+body[data-season-theme]:not([data-season-theme="default"]) :is(.nearbyCard,.newsCard,.officeMemoCard){
+ background-color:var(--season-paper);background-image:linear-gradient(160deg,#FFFFFFC9,var(--season-paper));
+ border-color:var(--season-line);
+}
+/* Readability and familiar functional colors win over decoration. */
+body[data-app-contrast="high"] :is(.panel,.nearbyCard,.newsCard,.officeMemoCard){border-color:#708E93!important}
+#seasonAtmosphere{position:fixed;inset:0;overflow:hidden;pointer-events:none!important;
+ z-index:80;contain:strict;user-select:none;
+ /* The middle stays clear of names, amounts, controls and the original logo. */
+ -webkit-mask-image:linear-gradient(90deg,#000,transparent 7%,transparent 93%,#000);
+ mask-image:linear-gradient(90deg,#000,transparent 7%,transparent 93%,#000)}
+#seasonAtmosphere *{pointer-events:none!important}
+.seasonParticle{position:absolute;left:var(--x);top:-32px;display:block;
+ width:8px;height:11px;opacity:.33;transform:scale(var(--s));
+ animation:season-drift var(--duration) linear var(--delay) infinite}
+.seasonParticle.spring{background:#D6A4AD;border-radius:80% 15% 75% 30%;box-shadow:inset 1px 1px 2px #FFF8}
+.seasonParticle.summer{background:#83B9C8;width:4px;height:4px;border-radius:50%;opacity:.24}
+.seasonParticle.autumn{background:linear-gradient(45deg,#B68852,#CFA464);width:9px;height:14px;border-radius:90% 5% 90% 5%;opacity:.37}
+.seasonParticle.winter{width:3px;height:3px;background:#8DA5C2;border-radius:50%;opacity:.3}
+.seasonParticle.rain{width:1px;height:30px;background:linear-gradient(transparent,#5B829CB0);opacity:.4;animation-name:season-rain}
+.seasonParticle.snow{width:6px;height:6px;background:#FFF;border:1px solid #A9BDD580;border-radius:50%;box-shadow:0 0 3px #7E9CBB45;opacity:.8}
+@keyframes season-drift{0%{transform:translate3d(0,-30px,0) rotate(0) scale(var(--s))}100%{transform:translate3d(7px,110vh,0) rotate(175deg) scale(var(--s))}}
+@keyframes season-rain{0%{transform:translate3d(0,-40px,0) rotate(9deg)}100%{transform:translate3d(-15px,110vh,0) rotate(9deg)}}
+body[data-theme-paused="true"] .seasonParticle{animation-play-state:paused}
+body[data-app-motion="reduced"] .seasonParticle{animation:none!important;top:calc(6vh + var(--s)*30vh)}
+@media(prefers-reduced-motion:reduce){.seasonParticle{animation:none!important;top:calc(6vh + var(--s)*30vh)}}
+@media print{#seasonAtmosphere{display:none}}

@@ -1,3 +1,4 @@
+import {themeWeather} from './theme-weather.mjs';
 /* Public settings reader; authenticated administrator writer. */
 const HEAD={"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store","Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET,OPTIONS","Access-Control-Allow-Headers":"Content-Type","X-Content-Type-Options":"nosniff"};
 const key="office-general-settings-v1", enc=new TextEncoder();
@@ -457,11 +458,13 @@ function validate(x){
   tradeAmount:["standard","bold"],cancelled:["standard","subtle"],
   memoOrder:["newest","oldest"],memoCompleted:["hide","show"],
   memoRefresh:["30","45","120"],memoClock:["12","24"],memoPhones:["on","off"],
-  tapSize:["standard","large"],memoLayout:["standard","compact","roomy"],memoAlerts:["on","off"]
+  tapSize:["standard","large"],memoLayout:["standard","compact","roomy"],memoAlerts:["on","off"],
+  theme:["default","spring","summer","autumn","winter"],themeMode:["manual","season"],
+  weatherEffect:["none","rain","snow","auto"]
  };
  const defaults={quickOrder:"standard",accent:"brand",tradeAmount:"standard",cancelled:"standard",
   memoOrder:"newest",memoCompleted:"hide",memoRefresh:"45",memoClock:"12",memoPhones:"on",
-  tapSize:"standard",memoLayout:"standard",memoAlerts:"on"};
+  tapSize:"standard",memoLayout:"standard",memoAlerts:"on",theme:"default",themeMode:"manual",weatherEffect:"none"};
  const p={schema:1};
  for(const [k,values]of Object.entries(allowed)){
   const raw=x.preferences[k]===undefined?defaults[k]:x.preferences[k];
@@ -480,6 +483,7 @@ async function body(req,maxBytes=2400){
 export default {async fetch(req,env,ctx){
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:HEAD});
  const url=new URL(req.url);
+ if(url.pathname==="/theme-weather"&&req.method==="GET")return themeWeather(env);
  if(!env.SETTINGS)return res({error:"kv_not_configured"},503);
  if(url.pathname==="/health"&&req.method==="GET"){
   if(env.FIRSTHYUNDAI_ACCESS_CODE)await ensureDefaultMembers(env);
@@ -506,3 +510,4 @@ export default {async fetch(req,env,ctx){
  }
  return res({error:"not_found"},404);
 },_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,memberList,boardToken,validBoardToken,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision}};
+
