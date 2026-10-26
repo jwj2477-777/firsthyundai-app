@@ -15,7 +15,9 @@ assert(html.includes("setAttribute('aria-selected',pane==='subscriptions'?'true'
 assert(!css.includes('@property --fhd-native-fill'));
 assert(css.includes('#6547A5'));
 assert(css.includes('v2.0.74 · News tabs must NEVER move'));
-assert(flow.includes("key:row.classList.contains('newsCategoryTabs')?'news':'trade-types',stable:true"));
+assert(flow.includes("key:row.classList.contains('newsCategoryTabs')?'news':") &&
+ flow.includes("row.classList.contains('officeBoardViewToggle')?'memo':'trade-types',stable:true"),
+ 'News and memo switches must share stable bubble-phase color flow');
 assert(flow.includes('lowerClicks.get(event)'),
  'Real onclick state must be painted before the next browser frame');
 console.log('News row shares main-menu painter, retains clicked DOM, both directions and original purple theme.');
