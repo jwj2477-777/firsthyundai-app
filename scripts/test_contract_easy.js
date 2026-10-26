@@ -86,7 +86,7 @@ eq('contractDeposit','3900');
 assert(e('ct_preview').value.includes('▶ 계약금 : 3,900만원'));
 e('ct_rough').value='';
 assert.equal(easy.compose(),false);
-assert(alerts.some(a=>a.includes('먼저 메모')));
+assert(alerts.some(a=>a.includes('먼저 계약 내용')));
 console.log('Contract one-memo workflow passed: collapsed manual UI, local clause polish, source comparison, field reset, stale bank safety, amount checks and copy review.');
 
 
