@@ -293,6 +293,16 @@ function closureDates(){
  return [...result];
 }
 
+/* Minimal private schedule projection for forecast matching.
+   Never expose names, note text, phone numbers, or customer addresses to weather views. */
+function weatherAppointments(reference=Date.now(),hours=48){
+ const start=Number(reference),end=start+Math.min(Math.max(Number(hours)||48,1),120)*3600000;
+ return items.filter(n=>!n.done&&!n.all_day&&n.scheduled_at&&!annualCalendar()?.parseNote(n.text))
+  .map(n=>({id:n.id,at:Date.parse(n.scheduled_at)}))
+  .filter(n=>Number.isFinite(n.at)&&n.at>=start&&n.at<end)
+  .sort((a,b)=>a.at-b.at)
+  .slice(0,6).map(n=>({at:new Date(n.at).toISOString()}));
+}
 function renderBriefing(){
  if(!$('overviewMemoBriefing'))return;
  const date=kstDate(new Date()),tomorrow=nextDay(date);
@@ -494,6 +504,6 @@ window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDo
  onNewNotification(){if(currentPage==='officeBoard')refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
  syncNotificationStatus,enableNotifications,settingsChanged,focusNote,
- openBriefing,openBriefingNote,openBriefingCalendar,renderBriefing,closureDates,
+ openBriefing,openBriefingNote,openBriefingCalendar,renderBriefing,closureDates,weatherAppointments,
  _test:{phones,merge,scheduleSuggestion,toIso,dateKey,briefingRows,nextDay,calendarEntries}};
 })();
