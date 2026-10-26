@@ -211,6 +211,16 @@ body.apartmentSheetActive{overflow:hidden}
         <div><p id="overviewWeatherMessage" role="status">현재 날씨 확인 중</p><small id="overviewWeatherSource">기상청 관측 확인 중</small></div>
       </div>
     </div>
+    <div class="overviewHourlySection">
+      <button id="overviewHourlyToggle" class="overviewHourlyToggle" type="button" aria-expanded="false" aria-controls="overviewHourlyDetail" onclick="FirstHyundaiWeatherBriefing.toggleHourly()">
+        <span class="overviewHourlyToggleCopy"><strong>시간별 예보</strong><small>기온 · 강수확률</small></span><span class="overviewHourlyChevron" aria-hidden="true">⌄</span>
+      </button>
+      <div id="overviewHourlyDetail" class="overviewHourlyDetail" hidden>
+        <div class="overviewHourlyHead"><strong>앞으로 12시간</strong><small id="overviewHourlyMeta">기상청 단기예보</small></div>
+        <div id="overviewHourlyList" class="overviewHourlyList" role="list" aria-label="시간별 기온과 강수확률"></div>
+        <p id="overviewHourlyNotice" class="overviewHourlyNotice" hidden role="status"></p>
+      </div>
+    </div>
     <p id="overviewPrecipitation" class="overviewBriefLine rain" hidden aria-live="polite"></p>
     <p id="overviewMapAlert" class="overviewBriefLine important" hidden role="status"></p>
     
