@@ -188,6 +188,29 @@ async function boardCommand(req,env,url,ctx){
   await env.SETTINGS.put(MEMBER_PREFIX+account.id,JSON.stringify(account));
   return res({ok:true,account:{id:account.id,name}},201);
  }
+ const accountRename=url.pathname.match(/^\\/board\\/members\\/([0-9a-f-]{36})\\/rename$/);
+ if(accountRename&&req.method==="PATCH"){
+  if(!await isAdmin())return res({error:"admin_required"},403);
+  let payload,name;try{payload=await body(req,1000);name=safeMemberName(payload?.name)}
+  catch(e){return res({error:"invalid_name"},400)}
+  const account=await env.SETTINGS.get(MEMBER_PREFIX+accountRename[1],"json");
+  if(account?.active!==true)return res({error:"not_found"},404);
+  const records=await env.SETTINGS.list({prefix:MEMBER_PREFIX,limit:100});
+  const all=(await Promise.all(records.keys.map(k=>env.SETTINGS.get(k.name,"json"))))
+   .filter(v=>v?.active===true&&validMemberId(v.id));
+  const oldIdentity=memberIdentity(account.name),newIdentity=memberIdentity(name);
+  const group=all.filter(v=>memberIdentity(v.name)===oldIdentity);
+  if(all.some(v=>memberIdentity(v.name)===newIdentity&&!group.some(g=>g.id===v.id)))
+   return res({error:"duplicate_name"},409);
+  // A shared identity may belong to two legacy admin records. Rename both
+  // while keeping member IDs / authenticated sessions / phone bindings intact.
+  const at=new Date().toISOString();
+  await Promise.all(group.map(async v=>{
+   await env.SETTINGS.put(MEMBER_PREFIX+v.id,
+    JSON.stringify({...v,name,updated_at:at}));
+  }));
+  return res({ok:true,account:{id:account.id,name},affected:group.length});
+ }
  const accountDelete=url.pathname.match(/^\/board\/members\/([0-9a-f-]{36})$/);
  if(accountDelete&&req.method==="DELETE"){
   if(!await isAdmin())return res({error:"admin_required"},403);
