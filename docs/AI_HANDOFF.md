@@ -1,5 +1,13 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-26 · v2.1.13 · 계정명 변경과 일정 브리핑
+- Worker memberList 함수가 기존 같은 이름을 가진 계정 기록을 표시용으로만 그룹핑하고 기존 연결 기기 수가 많은 프로필을 대표로 선택. 원래 계정/토큰/메모 삭제 금지.
+- 관리자 인증 PATCH /board/members/:id/rename: 중복 계정 ID들 이름 함께 변경하고 불변 ID 유지. Android OfficeBoardClient와 MainActivity JS bridge의 rename action 연결, 관리자 UI 인라인 이름 수정.
+- Native LockActivity는 비밀번호 뒤 Spinner 단일 드롭다운과 하나의 선택 버튼으로 간결화, 기존 자동 로그인 유지. app footer에는 cached native account 이름을 작게 출력; checkAccount에서 서버 변경 이름 동기화.
+- memo-dates.js 무지정 시간은 09-20 및 08-21 중심, 명시 오전/오후/새벽/24h 우선. office-board.js openBriefing은 동일 인증 포스트잇을 KST 오늘+내일 필터링하여 overview에서 표시, 일정/캘린더 바로 이동.
+- APK v2.1.13 build164 및 Cloudflare Worker 동시 배포.
+
+
 ## 2026-10-26 · v2.1.12 · Native LockActivity 프리미엄 브랜드 흐름
 - Intro Splash showWelcome 자체 원본 FHD 금색 서브타이틀/배지 자산 유지. LockActivity 기본 로그인도 동일 BrandIdentityStyle.title+subtitle, ic_launcher_badge 이용.
 - ScrollView 어두운 틸 배경, 브랜드 영역 + 웜 골드 구분선 + 아이보리 로그인Panel. 초기 비밀번호 폼의 입력란/gradient CTA와 계정선택 목록이 같은 패널 내부에서 교체됨; 고정 앱 데이터 삭제 없음.
