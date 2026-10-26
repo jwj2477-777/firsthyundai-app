@@ -1,0 +1,229 @@
+/* v2.1.22 — coherent navigation tiles and a private notification inbox.
+ * This stylesheet is last so all six destinations share exact geometry even
+ * after seasonal themes, family mode or memo customizations. */
+:root{
+ --fhd-tile-ink:#294752;
+ --fhd-tile-idle:#FFFEFB;
+ --fhd-tile-border:#DAE1DE;
+ --fhd-tile-shadow:0 2px 7px #203B4311,0 7px 17px #203B4309;
+ --fhd-gold:#D69C46;
+}
+#nav{gap:9px}
+#nav .primaryNav,#nav .utilityNav{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ width:100%;
+ gap:8px;
+ align-items:stretch;
+}
+#nav .primaryNav>button,#nav .utilityNav>button:not(.adminCenterNav){
+ --tile-color:#245D71;
+ --tile-border:#1D4D60;
+ position:relative;
+ box-sizing:border-box;
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ align-items:center;
+ gap:7px;
+ width:100%;
+ min-width:0;
+ height:104px;
+ min-height:104px;
+ max-height:104px;
+ margin:0;
+ padding:11px 3px 10px;
+ border:2px solid var(--fhd-tile-border)!important;
+ border-radius:17px!important;
+ background:linear-gradient(170deg,#FFFFFF,var(--fhd-tile-idle));
+ color:var(--fhd-tile-ink);
+ text-align:center;
+ white-space:normal;
+ word-break:keep-all;
+ box-shadow:var(--fhd-tile-shadow);
+ font-family:inherit;
+ font-size:14px;
+ line-height:1.25;
+ font-weight:800;
+ overflow:hidden;
+ cursor:pointer;
+ transition-property:color,border-color,box-shadow;
+ transition-duration:.18s;
+}
+#nav .primaryNav>button:nth-child(1){--tile-color:#28618B;--tile-border:#204A6B;--tile-accent:#C58D38}
+#nav .primaryNav>button:nth-child(2){--tile-color:#166D64;--tile-border:#125149;--tile-accent:#C59241}
+#nav .primaryNav>button:nth-child(3){--tile-color:#68509B;--tile-border:#513C80;--tile-accent:#947EC2}
+#nav .utilityNav>button:nth-child(1){--tile-color:#525EA0;--tile-border:#3E4B88;--tile-accent:#7B86B7}
+#nav .utilityNav>button:nth-child(2){--tile-color:#A15738;--tile-border:#7C412E;--tile-accent:#BF7C56}
+#nav .utilityNav>button:nth-child(3){--tile-color:#87651A;--tile-border:#6D5011;--tile-accent:#BE943E}
+#nav .primaryNav>button:not(.active),
+#nav .utilityNav>button:not(.active):not(.adminCenterNav){
+ color:var(--fhd-tile-ink);
+ background:linear-gradient(170deg,#FFFFFF,var(--fhd-tile-idle));
+ border-color:var(--fhd-tile-border)!important;
+ box-shadow:var(--fhd-tile-shadow);
+}
+#nav .primaryNav>button.active,#nav .primaryNav>button[aria-current="page"],
+#nav .utilityNav>button.active:not(.adminCenterNav),
+#nav .utilityNav>button[aria-current="page"]:not(.adminCenterNav){
+ color:#FFFFFF;
+ background:linear-gradient(145deg,color-mix(in srgb,var(--tile-color) 85%,white),var(--tile-color));
+ border-color:var(--tile-border)!important;
+ box-shadow:0 4px 12px #162B4025,inset 0 1px 0 #FFFFFF27;
+}
+#nav .primaryNav>button::after,
+#nav .utilityNav>button:not(.adminCenterNav)::after{content:none!important;display:none!important}
+#nav .primaryNav>button .navIcon,
+#nav .utilityNav>button:not(.adminCenterNav) .navIcon{
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ width:35px;
+ height:35px;
+ margin:0;
+ flex:0 0 35px;
+ line-height:1;
+ font-size:0;
+ color:inherit;
+}
+#nav .primaryNav>button .navIcon svg,
+#nav .utilityNav>button:not(.adminCenterNav) .navIcon svg{
+ display:block;width:34px;height:34px;stroke:currentColor;
+}
+#nav .primaryNav>button .navGlyphAccent,
+#nav .utilityNav>button:not(.adminCenterNav) .navGlyphAccent{
+ stroke:var(--tile-accent,var(--fhd-gold));
+}
+#nav .primaryNav>button.active .navGlyphAccent,
+#nav .utilityNav>button.active:not(.adminCenterNav) .navGlyphAccent{
+ stroke:#F0D6A0;
+}
+#nav .primaryNav>button .navLabel,
+#nav .utilityNav>button:not(.adminCenterNav) .navLabel{
+ display:block;max-width:100%;width:100%;min-width:0;
+ white-space:nowrap;
+ overflow:visible;
+ font-size:clamp(11px,3.34vw,14px);
+ font-weight:850;
+ line-height:1.25;
+ letter-spacing:-.65px;
+}
+#nav .primaryNav>button:focus-visible,
+#nav .utilityNav>button:not(.adminCenterNav):focus-visible{
+ outline:3px solid #D9AD68;outline-offset:2px;
+}
+@media(max-width:370px){
+ #nav .primaryNav>button,#nav .utilityNav>button:not(.adminCenterNav){
+  height:97px;min-height:97px;max-height:97px;
+  border-radius:16px!important;gap:5px;padding:9px 2px;
+ }
+ #nav .primaryNav>button .navIcon,#nav .utilityNav>button:not(.adminCenterNav) .navIcon{
+  width:32px;height:32px;flex-basis:32px;
+ }
+ #nav .primaryNav>button .navIcon svg,#nav .utilityNav>button:not(.adminCenterNav) .navIcon svg{
+  width:31px;height:31px;
+ }
+ #nav .primaryNav>button .navLabel,#nav .utilityNav>button:not(.adminCenterNav) .navLabel{
+  font-size:clamp(10.5px,3.35vw,12px);letter-spacing:-.75px;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ #nav .primaryNav>button,#nav .utilityNav>button:not(.adminCenterNav){transition:none}
+}
+
+/* Keep subnavigation tied to parent category rather than a competing rainbow.
+ * News is purple, memo mustard; data-type chips retain their original
+ * semantic buy/lease/monthly colors. */
+#news .newsCategoryTabs.sectionModeSwitch{--segment-bg:#F0ECF7;--segment-border:#DDD4ED}
+#officeBoard .officeBoardViewToggle.sectionModeSwitch{--segment-bg:#F3EBD5;--segment-border:#DECEA5}
+#trades .propertyTypeSwitch.sectionModeSwitch,
+#nearby .propertyTypeSwitch.sectionModeSwitch,
+#new .propertyTypeSwitch.sectionModeSwitch,
+#officetel .propertyTypeSwitch.sectionModeSwitch{
+ --segment-bg:#EAF3F4;--segment-border:#CFDFE0;
+}
+
+/* Bell: its only primary action is opening the inbox. */
+#favoriteAlertButton{position:relative}
+#favoriteAlertButton.hasUnreadHistory .headerAlertDot{
+ display:block!important;opacity:1!important;
+ background:#D18F3C!important;
+ box-shadow:0 0 0 2px #FFFFFF!important;
+}
+.notificationInboxDialog{
+ box-sizing:border-box;
+ width:min(94vw,480px);
+ max-width:480px;
+ max-height:min(82vh,740px);
+ padding:0;
+ border:1px solid #CADBD8;
+ border-radius:20px;
+ background:#FFFEFC;
+ color:#29464C;
+ box-shadow:0 18px 44px #142E3854;
+ overflow:hidden;
+}
+.notificationInboxDialog::backdrop{background:#071F2B8C}
+.inboxHeader{
+ display:flex;align-items:center;justify-content:space-between;
+ gap:12px;padding:20px 19px 17px;
+ background:linear-gradient(135deg,#F0F7F4,#FCFDFB);
+ border-bottom:1px solid #DBE8E3;
+}
+.inboxHeader h2{font-size:22px;line-height:1.3;margin:4px 0 0;color:#1C5659}
+.inboxEyebrow{font-size:12px;font-weight:750;color:#4F746D}
+.inboxClose{
+ display:flex;align-items:center;justify-content:center;
+ min-width:45px;width:45px;height:45px;border-radius:12px;
+ border:1px solid #CFDFDA;background:#FFFFFF;
+ color:#31565C;font-size:30px;line-height:1;cursor:pointer;
+}
+.inboxBody{padding:14px 16px 17px}
+.inboxMeta{display:flex;align-items:center;justify-content:space-between;gap:12px;
+ padding:2px 0 12px;font-size:13px;color:#59736F}
+.inboxMeta button{
+ min-height:40px;border:1px solid #DFE7E1;border-radius:10px;
+ background:#FFFFFF;color:#667B74;padding:8px 11px;
+ font-size:12px;font-weight:700;
+}
+.inboxMeta button:disabled{opacity:.5}
+.inboxList{max-height:min(47vh,475px);overflow-y:auto;overscroll-behavior:contain;
+ display:flex;flex-direction:column;gap:8px}
+.inboxItem{
+ display:flex;align-items:center;gap:11px;width:100%;min-height:73px;
+ padding:13px 12px;text-align:left;cursor:pointer;
+ border:1px solid #E0EAE5;border-radius:13px;
+ background:#FFFFFF;color:#29464C;
+ box-shadow:0 1px 4px #12303C08;
+}
+.inboxItem:focus-visible{outline:3px solid #BFCCA2;outline-offset:2px}
+.inboxKind{
+ display:grid;place-items:center;flex:0 0 37px;
+ height:37px;border-radius:11px;font-size:20px;font-weight:750;
+ background:#EDF3FA;color:#28618B;
+}
+.inboxKind.memo{background:#F7EFD9;color:#87651A}
+.inboxInfo{flex:1;min-width:0;display:grid;gap:5px}
+.inboxInfo strong{font-size:14px;font-weight:850;color:#28424B;line-height:1.4}
+.inboxInfo small{font-size:12px;line-height:1.45;color:#6B7E7D;
+ word-break:keep-all;overflow-wrap:anywhere}
+.inboxItem time{align-self:flex-start;flex:0 0 auto;font-size:11px;color:#7F918D}
+.inboxEmpty{padding:37px 10px;text-align:center;font-weight:780;font-size:15px;color:#42615D}
+.inboxEmpty small{display:block;margin-top:9px;font-size:12px;line-height:1.6;
+ font-weight:500;color:#80918E}
+.inboxFooter{display:flex;align-items:center;gap:10px;
+ justify-content:space-between;border-top:1px solid #E4EBE6;
+ margin-top:15px;padding-top:12px}
+.inboxFooter small{flex:1;color:#789088;font-size:11px;line-height:1.5}
+.inboxFooter button{
+ flex:0 0 auto;min-height:42px;
+ border-radius:10px;border:1px solid #C7DAD5;
+ background:#F6FAF8;color:#31645F;font-weight:750;
+ font-size:12px;padding:8px 12px;
+}
+@media(max-width:360px){
+ .inboxHeader{padding:17px 13px}
+ .inboxBody{padding:12px}
+ .inboxItem{gap:8px;padding:11px 8px}
+ .inboxItem time{font-size:10px}
+}
