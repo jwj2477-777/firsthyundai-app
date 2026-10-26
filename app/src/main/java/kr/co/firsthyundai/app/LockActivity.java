@@ -41,6 +41,8 @@ public class LockActivity extends Activity {
     private Button retryButton;
     private TextView loginDetail;
     private LinearLayout accountChooser;
+    private TextView loginFoot;
+    private TextView loginVersion;
     private static final String PREFS = "firsthyundai_access_attempts";
     private FrameLayout welcomeOverlay;
     private final Handler welcomeHandler = new Handler(Looper.getMainLooper());
@@ -125,6 +127,7 @@ public class LockActivity extends Activity {
         root.addView(retryButton);
 
         TextView foot = new TextView(this);
+        loginFoot=foot;
         foot.setText("처음 한 번 인증하면 이후에는 자동으로 열립니다.\n"
                 + "관리자가 보안코드를 변경하면 다시 인증해야 합니다.\n"
                 + "보안 확인에 인터넷이 필요하며 최근 확인한 정책은 24시간 동안 오프라인 이용 가능합니다.");
@@ -135,6 +138,7 @@ public class LockActivity extends Activity {
         root.addView(foot);
 
         TextView installedVersion = new TextView(this);
+        loginVersion=installedVersion;
         String installedName = AppVersion.name(this);
         int installedBuild = AppVersion.buildNumber(this);
         installedVersion.setText(installedName.isEmpty() ? "설치된 앱 버전 확인 불가" :
@@ -287,7 +291,8 @@ public class LockActivity extends Activity {
 
     /** Password page -> account-choice page. No pre-password account names. */
     private void showAccountChoices(char[] code) {
-        status.setText("보안코드 확인 완료 · 구성원 목록을 불러옵니다.");
+        status.setVisibility(View.VISIBLE);
+        status.setText("계정 목록을 불러오는 중입니다.");
         unlockButton.setEnabled(false);
         new Thread(()->{
             org.json.JSONArray accounts=null;
@@ -320,21 +325,42 @@ public class LockActivity extends Activity {
                     String name=member.optString("name","").trim();
                     if(name.isEmpty())continue;
                     valid++;
-                    Button choice=new Button(this);
-                    choice.setAllCaps(false);
-                    choice.setMinHeight(dp(62));
-                    choice.setText(name+(id.equals(OfficeBoardClient.memberId(getApplicationContext()))?
-                        "  ·  현재 계정":""));
-                    choice.setTextSize(17);
-                    choice.setTextColor(Color.rgb(32,87,79));
-                    choice.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
-                        Color.rgb(220,237,229)));
-                    LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(62));
-                    lp.bottomMargin=dp(9);
+                    boolean current=id.equals(OfficeBoardClient.memberId(getApplicationContext()));
+                    // Quiet, consistently sized choice rows; no oversized filled buttons.
+                    LinearLayout choice=new LinearLayout(this);
+                    choice.setOrientation(LinearLayout.HORIZONTAL);
+                    choice.setGravity(Gravity.CENTER_VERTICAL);
+                    choice.setPadding(dp(17),0,dp(16),0);
+                    choice.setMinimumHeight(dp(56));
+                    choice.setClickable(true);
+                    choice.setFocusable(true);
+                    choice.setContentDescription(name+(current?" · 현재 계정":" · 계정 선택"));
+                    GradientDrawable surface=new GradientDrawable();
+                    surface.setColor(current?Color.rgb(239,247,244):Color.WHITE);
+                    surface.setCornerRadius(dp(12));
+                    surface.setStroke(dp(1),current?Color.rgb(167,198,186):Color.rgb(212,226,222));
+                    choice.setBackground(new android.graphics.drawable.RippleDrawable(
+                        android.content.res.ColorStateList.valueOf(Color.argb(42,20,110,112)),
+                        surface,null));
+                    TextView label=new TextView(this);
+                    label.setText(name);
+                    label.setTextSize(16);
+                    label.setTextColor(Color.rgb(35,75,75));
+                    label.setTypeface(null,android.graphics.Typeface.BOLD);
+                    choice.addView(label,new LinearLayout.LayoutParams(0,-2,1f));
+                    TextView indicator=new TextView(this);
+                    indicator.setText(current?"현재":"›");
+                    indicator.setTextSize(current?12:21);
+                    indicator.setTextColor(current?Color.rgb(65,119,100):Color.rgb(123,150,143));
+                    indicator.setGravity(Gravity.CENTER);
+                    choice.addView(indicator,new LinearLayout.LayoutParams(-2,-2));
+                    LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(56));
+                    lp.bottomMargin=dp(8);
                     accountChooser.addView(choice,lp);
                     choice.setOnClickListener(v->{
                         for(int j=0;j<accountChooser.getChildCount();j++)
                             accountChooser.getChildAt(j).setEnabled(false);
+                        status.setVisibility(View.VISIBLE);
                         status.setText(name+" 계정으로 연결 중...");
                         new Thread(()->{
                             String problem="";
@@ -365,22 +391,32 @@ public class LockActivity extends Activity {
                     status.setText("사용 가능한 계정이 없습니다.");
                     return;
                 }
-                Button back=new Button(this);
-                back.setAllCaps(false);
-                back.setText("비밀번호 입력으로 돌아가기");
-                back.setTextSize(13);
-                back.setTextColor(Color.rgb(77,94,111));
-                accountChooser.addView(back,new LinearLayout.LayoutParams(-1,dp(50)));
+                TextView back=new TextView(this);
+                back.setText("뒤로");
+                back.setTextSize(14);
+                back.setTextColor(Color.rgb(109,131,127));
+                back.setGravity(Gravity.CENTER);
+                back.setContentDescription("비밀번호 입력 화면으로 돌아가기");
+                back.setClickable(true);
+                back.setFocusable(true);
+                LinearLayout.LayoutParams backParams=new LinearLayout.LayoutParams(-1,dp(44));
+                backParams.topMargin=dp(3);
+                accountChooser.addView(back,backParams);
                 back.setOnClickListener(v->{
                     Arrays.fill(code,(char)0);
                     restorePasswordPage();
                     status.setText("다시 비밀번호를 입력해 주세요.");
                 });
-                loginDetail.setText("사용할 사무실 계정을 선택해 주세요.\n선택한 계정은 이 휴대폰에 유지됩니다.");
+                loginDetail.setText("사용할 계정을 선택해 주세요.");
+                loginDetail.setPadding(0,dp(12),0,dp(22));
                 codeField.setVisibility(View.GONE);
                 unlockButton.setVisibility(View.GONE);
+                loginFoot.setVisibility(View.GONE);
+                loginVersion.setVisibility(View.GONE);
+                retryButton.setVisibility(View.GONE);
                 accountChooser.setVisibility(View.VISIBLE);
-                status.setText("구성원 계정을 선택해 주세요.");
+                status.setText("");
+                status.setVisibility(View.GONE);
             });
         },"office-member-choices").start();
     }
@@ -390,9 +426,13 @@ public class LockActivity extends Activity {
         accountChooser.removeAllViews();
         codeField.setVisibility(View.VISIBLE);
         unlockButton.setVisibility(View.VISIBLE);
+        loginFoot.setVisibility(View.VISIBLE);
+        loginVersion.setVisibility(View.VISIBLE);
+        status.setVisibility(View.VISIBLE);
         codeField.setEnabled(true);
         unlockButton.setEnabled(true);
         loginDetail.setText("가족 전용 부동산 정보센터\n접근 보안코드를 입력해 주세요.");
+        loginDetail.setPadding(0,dp(18),0,dp(26));
     }
     private void loadLatestPolicy() {
         currentPolicy = null;
