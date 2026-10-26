@@ -337,6 +337,111 @@ public class LockActivity extends Activity {
             });
         },"office-member-choices").start();
     }
+    /**
+     * Migrating from v2.1.07/08: these devices were already enrolled, so the
+     * access-policy shortcut silently skipped the only available account picker.
+     * Show it once on upgrade, or on explicit administrator request.
+     */
+    private void showExistingAccountReview() {
+        status.setText("이 휴대폰에서 사용할 계정을 선택해 주세요.");
+        unlockButton.setEnabled(false);
+        new Thread(()->{
+            org.json.JSONArray list=null;
+            String error="";
+            try{list=OfficeBoardClient.memberChoices(getApplicationContext()).getJSONArray("accounts");}
+            catch(Exception exc){error=exc.getMessage()==null?"계정 선택 목록 연결 실패":exc.getMessage();}
+            final org.json.JSONArray choices=list;final String failure=error;
+            runOnUiThread(()->{
+                if(isFinishing()||isDestroyed())return;
+                unlockButton.setEnabled(true);
+                if(choices==null||choices.length()==0) {
+                    status.setText(failure.isEmpty()?"계정 정보를 불러올 수 없습니다.":failure);
+                    new android.app.AlertDialog.Builder(this)
+                        .setTitle("계정 목록 연결 오류")
+                        .setMessage("서버에서 계정 목록을 받지 못했습니다. 기존 계정으로 앱을 계속 사용하거나 다시 확인할 수 있습니다.")
+                        .setNegativeButton("다시 시도",(d,w)->showExistingAccountReview())
+                        .setPositiveButton("기존 계정으로 계속",(d,w)->openMain()).show();
+                    return;
+                }
+                java.util.ArrayList<String> labels=new java.util.ArrayList<>();
+                java.util.ArrayList<String> ids=new java.util.ArrayList<>();
+                String current=OfficeBoardClient.memberId(getApplicationContext());
+                for(int i=0;i<choices.length();i++){
+                    org.json.JSONObject member=choices.optJSONObject(i);
+                    if(member==null)continue;
+                    String id=member.optString("id","");
+                    if(!id.matches("[0-9a-f-]{36}"))continue;
+                    ids.add(id);
+                    labels.add(member.optString("name","구성원")+(id.equals(current)?" · 현재 계정":""));
+                }
+                if(ids.isEmpty()){status.setText("등록된 계정이 없습니다.");return;}
+                new android.app.AlertDialog.Builder(this)
+                    .setTitle("이 휴대폰의 구성원 계정")
+                    .setMessage("관리자 · 엄마 · 아빠 중 사용할 계정을 선택해 주세요. 변경하지 않으면 기존 계정을 유지합니다.")
+                    .setItems(labels.toArray(new String[0]),(dialog,which)->{
+                        String chosen=ids.get(which);
+                        if(chosen.equals(current)){
+                            OfficeBoardClient.markPickerReviewed(getApplicationContext());
+                            openMain();
+                        }else{
+                            promptReassign(chosen,labels.get(which).replace(" · 현재 계정",""));
+                        }
+                    })
+                    .setNegativeButton("기존 계정 유지",(dialog,which)->{
+                        OfficeBoardClient.markPickerReviewed(getApplicationContext());
+                        openMain();
+                    })
+                    .setOnCancelListener(dialog->{
+                        OfficeBoardClient.markPickerReviewed(getApplicationContext());
+                        openMain();
+                    })
+                    .show();
+            });
+        },"office-member-existing-choices").start();
+    }
+
+    private void promptReassign(String accountId,String accountName) {
+        if(isFinishing()||isDestroyed())return;
+        EditText verify=new EditText(this);
+        verify.setSingleLine(true);
+        verify.setHint("기존 사무실 공통 보안코드");
+        verify.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        verify.setPadding(dp(18),dp(12),dp(18),dp(12));
+        new android.app.AlertDialog.Builder(this)
+            .setTitle(accountName+" 계정으로 변경")
+            .setMessage("계정을 바꾸려면 관리자가 사무실 공통 보안코드를 다시 입력해야 합니다. 기존 메모·설정은 삭제되지 않습니다.")
+            .setView(verify)
+            .setNegativeButton("취소",(d,w)->showExistingAccountReview())
+            .setPositiveButton("계정 변경",(d,w)->{
+                final char[] entered=verify.getText().toString().trim().toCharArray();
+                verify.setText("");
+                if(currentPolicy==null||!AccessPolicy.matches(currentPolicy,entered)){
+                    Arrays.fill(entered,(char)0);
+                    status.setText("사무실 공통 보안코드가 올바르지 않습니다.");
+                    showExistingAccountReview();
+                    return;
+                }
+                unlockButton.setEnabled(false);
+                status.setText(accountName+" 계정을 연결하는 중...");
+                new Thread(()->{
+                    String problem="";
+                    try{
+                        OfficeBoardClient.enroll(getApplicationContext(),entered,accountId);
+                        OfficeMemoNotifications.schedule(getApplicationContext());
+                        OfficeMemoFirebase.register(getApplicationContext());
+                    }catch(Exception e){problem=e.getMessage()==null?"계정 변경 실패":e.getMessage();}
+                    finally{Arrays.fill(entered,(char)0);}
+                    final String error=problem;
+                    runOnUiThread(()->{
+                        if(isFinishing()||isDestroyed())return;
+                        unlockButton.setEnabled(true);
+                        if(error.isEmpty()){OfficeBoardClient.markPickerReviewed(getApplicationContext());openMain();}
+                        else {status.setText(error);showExistingAccountReview();}
+                    });
+                },"office-member-reassign").start();
+            }).show();
+    }
+
     private void loadLatestPolicy() {
         currentPolicy = null;
         policyPending = true;
@@ -360,7 +465,13 @@ public class LockActivity extends Activity {
                             final String problem=error;
                             runOnUiThread(()->{
                                 if(isFinishing()||isDestroyed())return;
-                                if(problem.isEmpty()){openMain();if(welcomeElapsed)finishWelcome();}
+                                if(problem.isEmpty()){
+                                    if(welcomeElapsed)finishWelcome();
+                                    if(!OfficeBoardClient.pickerReviewed(getApplicationContext())||
+                                       getIntent().getBooleanExtra("force_member_picker",false))
+                                        showExistingAccountReview();
+                                    else openMain();
+                                }
                                 else{
                                     if(welcomeElapsed)finishWelcome();
                                     status.setText(problem.startsWith("account_revoked")?
