@@ -98,3 +98,27 @@ assert(e('ct_terms').value.includes('잔금일은 상호 합의하에 앞당길 
 assert(!e('ct_preview').value.includes('계약금 잔여액'));
 assert(e('ct_languageWarnings').textContent.includes('월/년 표기가 불명확'));
 console.log('Unlabelled field memo clause regression passed.');
+
+
+/* One visual rectangle, two optional zones: both feed facts, neither requires
+   nonempty special clauses, and top/bottom obligations are combined. */
+e('ct_rough').value='파크애비뉴 1601동 901호 매매 8억 계약금 8천 이번 송금 1천 잔금일 2026.12.30';
+e('ct_specialMemo').value='임대인이 도배 해주는 걸로';
+assert.equal(easy.compose(),true,'Separate reminder text must not block composing');
+eq('terms','임대인이 도배 해주기로 한다.');
+eq('price','80000');
+e('ct_specialMemo').value='';
+assert.equal(easy.compose(),true);
+eq('terms','','Optional special memo must never become required');
+e('ct_rough').value='파크애비뉴 1601동 901호 매매 8억 계약금 8천 이번 송금 1천 잔금일 2026.12.30\n특약: 잔금일은 상호합의하에 앞당길수 있다';
+e('ct_specialMemo').value='임대인이 도배 해주는 걸로';
+assert.equal(easy.compose(),true);
+assert(e('ct_terms').value.includes('잔금일은 상호 합의하에 앞당길 수 있다.'));
+assert(e('ct_terms').value.includes('임대인이 도배 해주기로 한다.'));
+e('ct_rough').value='';
+e('ct_specialMemo').value='파크애비뉴 1601동 901호 매매 8억 계약금 8천 잔금일 2026.12.30\n특약: 임대인이 도배 해주는 걸로';
+assert.equal(easy.compose(),true,'Contract facts entered in either half should be recognized');
+eq('property','파크애비뉴');
+eq('price','80000');
+eq('terms','임대인이 도배 해주기로 한다.');
+console.log('Unified optional contract-note zones preserve recognized facts and natural clause copyediting.');
