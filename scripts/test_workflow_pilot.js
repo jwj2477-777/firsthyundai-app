@@ -42,7 +42,8 @@ assert(render.startsWith('function renderOverview(){'),'Daily trade count render
 const nodes=new Map();
 const element=id=>{if(!nodes.has(id))nodes.set(id,{textContent:'',hidden:false,value:''});return nodes.get(id)};
 const context=vm.createContext({$:element,number:x=>Number(x||0).toLocaleString('ko-KR'),
- kstDateOffset:()=> '2026-10-26',remote:{new_trades:null}});
+ kstDateOffset:()=> '2026-10-26',renderOverviewNews:()=>{},
+ remote:{new_trades:null}});
 vm.runInContext(render,context);
 context.renderOverview();
 assert.equal(element('overviewTodayNewTrade').hidden,true,'No trade means no extra notice');
