@@ -79,11 +79,11 @@ assert(hourlyMarkup.includes('aria-controls="overviewHourlyDetail"')&&hourlyMark
 assert(hourlyMarkup.includes('class="overviewHourlyDetail" hidden'),'Hourly forecast must default closed');
 assert(hourlyCss.includes('.overviewHourlyList')&&hourlyCss.includes('overflow-x:auto'),
  'Full next 12 hours are scrollable without turning the home screen into a long list');
-assert.equal(api.toggleHourly(),true,'User tap expands on-demand weather');
+assert.equal(ctx.window.FirstHyundaiWeatherBriefing.toggleHourly(),true,'User tap expands on-demand weather');
 assert.equal(get('overviewHourlyDetail').hidden,false);
 assert(get('overviewHourlyNotice').textContent.includes('확인할 수 없습니다'),
  'Missing forecast should explain unavailability, not invent values');
-assert.equal(api.toggleHourly(),false,'Second tap closes detail');
+assert.equal(ctx.window.FirstHyundaiWeatherBriefing.toggleHourly(),false,'Second tap closes detail');
 assert.equal(get('overviewHourlyDetail').hidden,true);
 
 const result=api.summarize(parsed,now);
