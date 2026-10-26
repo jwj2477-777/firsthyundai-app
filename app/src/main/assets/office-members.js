@@ -27,6 +27,11 @@ window.onFirstHyundaiOfficeMembersResult=e=>{
  if(e.ok)p.resolve(e.data);else p.reject(Error(e.error||'구성원 계정 처리 실패'));
 };
 function render(){
+ const footerLabel=$('officeFooterMember');
+ if(footerLabel){
+  const account=native?.getOfficeMemberName?.()||'';
+  footerLabel.textContent=account?'· '+account:'';
+ }
  const currentLabel=$('officeCurrentMember');
  if(currentLabel)currentLabel.textContent=native?.getOfficeMemberName?.()||'연결되지 않음';
  const list=$('officeMemberList');if(!list)return;
@@ -65,5 +70,6 @@ $('officeMemberList')?.addEventListener?.('click',event=>{
  const button=event.target?.closest?.('button[data-member]');
  if(button)remove(button.dataset.member,button.dataset.name||'구성원');
 });
+render();
 window.FirstHyundaiOfficeMembers={refresh,add,remove,choose,_test:{render}};
 })();
