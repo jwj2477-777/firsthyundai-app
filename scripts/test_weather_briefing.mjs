@@ -65,6 +65,25 @@ const observedAt='2026-10-26T20:00:00+09:00';
 const obs={status:'ok',temp:16.4,effect:'none',observed_at:observedAt};
 assert.equal(api.weatherDisplay(obs,null,evening).text,'16.4°',
  'Show measured current temperature, do not repeat redundant dry status');
+assert.equal(api.weatherDisplay(obs,null,evening).kind,'temperature',
+ 'Do not invent clear/sunny weather from temperature-only observation');
+assert.equal(api.weatherDisplay({...obs,effect:'rain'},null,evening).kind,'rain');
+assert.equal(api.weatherDisplay({...obs,effect:'snow'},null,evening).kind,'snow');
+assert.equal(api.weatherDisplay(null,null,evening,false).kind,'temperature',
+ 'Unknown weather should use a neutral thermometer icon');
+const briefingHtml=fs.readFileSync('app/src/main/assets/index.html','utf8');
+const briefingCss=fs.readFileSync('app/src/main/assets/weather-briefing.css','utf8');
+const overview=briefingHtml.slice(briefingHtml.indexOf('<div id="overview" class="page">'),briefingHtml.indexOf('<div id="officeBoard" class="page hidden">'));
+const title=overview.indexOf('<h2>오늘의 업무 브리핑</h2>');
+const date=overview.indexOf('id="overviewWeatherDate"');
+const card=overview.indexOf('id="overviewUnified"');
+assert(title>=0&&date>title&&card>date,'Daily date goes directly below briefing heading, outside the weather card');
+assert.equal((overview.match(/id="overviewWeatherDate"/g)||[]).length,1,'Exactly one briefing calendar date');
+assert(overview.includes('overviewWeatherThermometer')&&overview.includes('overviewWeatherRain')&&overview.includes('overviewWeatherSnow'),
+ 'Weather icons are condition-specific vector artwork, not the previous large emoji');
+assert(briefingCss.includes('.overviewBriefDate')&&briefingCss.includes('.overviewWeatherGlyph'),
+ 'Modern heading date and glyph typography styles are present');
+
 assert(api.weatherDisplay(obs,null,evening).source.includes('기상청 실황'),
  'Measured weather needs a clear observation label');
 assert.equal(api.weatherDisplay({...obs,temp:null},16,evening).text,'예보기온 16°',
