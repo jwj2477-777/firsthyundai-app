@@ -7,6 +7,7 @@
  const $=id=>document.getElementById(id),localDay=ms=>new Date(ms+OFFSET).toISOString().slice(0,10);
  const kinds={rain:'비',snow:'눈',mixed:'비·눈'};
  let data=null,lastAttempt=0,pending=false,sequence=0;
+ let hourlyExpanded=false;
  const requests=new Map();
  function atKst(day,hour){
   const [y,m,d]=day.split('-').map(Number);
@@ -99,7 +100,83 @@
    kind:obs?.effect==='rain'?'rain':obs?.effect==='snow'?'snow':'temperature',
    hasTemperature:measured||projected};
  }
- function render(){
+ // Hourly detail deliberately reuses the same verified forecast used for map-box warnings.
+ // SKY describes a *forecast*; it is never used to infer the current observed sky.
+ function hourlyRows(doc,now=Date.now(),limit=12){
+  if(!valid(doc,now))return [];
+  const start=Math.ceil(now/HOUR)*HOUR;
+  return doc.hours.filter(h=>Date.parse(h.at)>=start)
+   .sort((a,b)=>Date.parse(a.at)-Date.parse(b.at))
+   .slice(0,Math.max(0,Math.min(24,limit)));
+ }
+ function hourlyCondition(hour){
+  if(hour.type==='rain')return {kind:'rain',label:'비'};
+  if(hour.type==='snow')return {kind:'snow',label:'눈'};
+  if(hour.type==='mixed')return {kind:'mixed',label:'비·눈'};
+  if(hour.sky===1)return {kind:'sun',label:'맑음 예보'};
+  if(hour.sky===3)return {kind:'partly-cloudy',label:'구름 많음 예보'};
+  if(hour.sky===4)return {kind:'cloud',label:'흐림 예보'};
+  return {kind:'unknown',label:'하늘 상태 미확인'};
+ }
+ const hourlyGlyphs={
+  sun:'<circle cx="16" cy="16" r="5.2"/><path d="M16 2.5v4M16 25.5v4M2.5 16h4M25.5 16h4M6.45 6.45l2.8 2.8m13.5 13.5 2.8 2.8m0-19.1-2.8 2.8m-13.5 13.5-2.8 2.8"/>',
+  cloud:'<path d="M8 23h16a6.5 6.5 0 0 0 .3-13 9 9 0 0 0-17.4 2A5.5 5.5 0 0 0 8 23Z"/>',
+  'partly-cloudy':'<path d="M11 3V1.5M3 11H1.5M5.3 5.3 4 4m14 1.3L20 4"/><path d="M8 11a6.7 6.7 0 0 1 10-5.8M8 24h16a6 6 0 0 0-.1-12 8 8 0 0 0-15.5 1.7A5.3 5.3 0 0 0 8 24Z"/>',
+  rain:'<path d="M8 19h16a6 6 0 0 0 .2-12 9 9 0 0 0-17.3 2A5.3 5.3 0 0 0 8 19Z"/><path d="m10 24-1.5 4m8-4-1.5 4m8-4-1.5 4"/>',
+  snow:'<path d="M8 19h16a6 6 0 0 0 .2-12 9 9 0 0 0-17.3 2A5.3 5.3 0 0 0 8 19Z"/><path d="M13 24v6m-3-3h6m10-3v6m-3-3h6"/>',
+  mixed:'<path d="M8 18h16a6 6 0 0 0 .2-12 9 9 0 0 0-17.3 2A5.3 5.3 0 0 0 8 18Z"/><path d="m11 23-1.5 4M23 23v6m-3-3h6"/>',
+  unknown:'<circle cx="16" cy="16" r="11"/><path d="M13 12a3 3 0 0 1 6 0c0 2.5-3 3-3 5m0 4v1"/>'
+ };
+ function hourlyGlyph(kind){
+  return '<svg viewBox="0 0 32 32" class="overviewHourGlyph" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+
+   (hourlyGlyphs[kind]||hourlyGlyphs.unknown)+'</svg>';
+ }
+ function hourlyDayHour(iso,now=Date.now()){
+  const at=Date.parse(iso),date=localDay(at),today=localDay(now);
+  const hour=new Date(at+OFFSET).getUTCHours();
+  return {day:date===today?'오늘':date===nextDay(today)?'내일':date.slice(5).replace('-','/'),
+   hour:String(hour).padStart(2,'0')+'시'};
+ }
+ function hourlyCards(doc,now=Date.now(),limit=12){
+  return hourlyRows(doc,now,limit).map(hour=>{
+   const cond=hourlyCondition(hour);
+   const dayHour=hourlyDayHour(hour.at,now);
+   const temp=Number.isFinite(hour.temp)?Math.round(hour.temp)+'°':'—';
+   const chance=Number.isFinite(hour.pop)?Math.round(hour.pop)+'%':'—';
+   return {day:dayHour.day,hour:dayHour.hour,condition:cond.label,kind:cond.kind,temp,chance};
+  });
+ }
+ function renderHourly(){
+  const toggle=$('overviewHourlyToggle'),panel=$('overviewHourlyDetail');
+  if(!toggle||!panel)return;
+  toggle.setAttribute('aria-expanded',String(hourlyExpanded));
+  panel.hidden=!hourlyExpanded;
+  if(!hourlyExpanded)return;
+  const rows=hourlyCards(data);
+  const list=$('overviewHourlyList'),notice=$('overviewHourlyNotice'),meta=$('overviewHourlyMeta');
+  if(meta)meta.textContent='기상청 단기예보 · 기온 / 강수확률';
+  if(!list||!notice)return;
+  list.hidden=!rows.length;
+  notice.hidden=!!rows.length;
+  if(!rows.length){
+   list.innerHTML='';
+   notice.textContent=pending?'시간별 예보 확인 중입니다.':'현재 시간별 예보를 확인할 수 없습니다.';
+   return;
+  }
+  notice.textContent='';
+  list.innerHTML=rows.map(row=>'<div class="overviewHourItem" role="listitem" data-kind="'+row.kind+
+   '" aria-label="'+row.day+' '+row.hour+', '+row.condition+', 기온 '+(row.temp==='—'?'미제공':row.temp)+
+   ', 강수확률 '+(row.chance==='—'?'미제공':row.chance)+'">'+
+   '<span class="overviewHourDate">'+row.day+'</span><strong class="overviewHourClock">'+row.hour+
+   '</strong>'+hourlyGlyph(row.kind)+'<strong class="overviewHourTemp">'+row.temp+
+   '</strong><small class="overviewHourPop">'+row.chance+'</small></div>').join('');
+ }
+ function toggleHourly(){
+  hourlyExpanded=!hourlyExpanded;
+  renderHourly();
+  return hourlyExpanded;
+ }
+  function render(){
   if(!$('overviewWeatherMessage'))return;
   const now=Date.now(),obs=window.FirstHyundaiThemes?.currentWeather?.();
   const curr=$('overviewWeatherMessage'),icon=$('overviewWeatherIcon'),source=$('overviewWeatherSource');
@@ -119,6 +196,7 @@
   }
   const extra=window.FirstHyundaiOfficeBoard?.closureDates?.()||[];
   const view=summarize(data,now,extra);
+  renderHourly();
   for(const [id,message] of [['overviewPrecipitation',view.mapAlert?'':view.precip],['overviewMapAlert',view.mapAlert]]){
    const node=$(id);if(!node)continue;node.textContent=message;node.hidden=!message;
   }
@@ -146,7 +224,7 @@
   }catch(e){if(!valid(data))data=null}
   finally{clearTimeout(timer);pending=false;render()}
  }
- window.FirstHyundaiWeatherBriefing={refresh,_test:{valid,summarize,isClosed,nextOpen,timeLabel,atKst,nextDay,weatherDisplay,forecastTemperature}};
+ window.FirstHyundaiWeatherBriefing={refresh,toggleHourly,_test:{valid,summarize,isClosed,nextOpen,timeLabel,atKst,nextDay,weatherDisplay,forecastTemperature,hourlyRows,hourlyCondition,hourlyDayHour,hourlyCards}};
  document.addEventListener('firsthyundai-observed-weather',render);
  document.addEventListener('firsthyundai-office-schedule-updated',render);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
