@@ -126,11 +126,13 @@ function prepareSpecials(raw){
  // memo, keep explicitly headed clauses or implicit undertakings. Do not
  // accidentally turn price, dates or bank details into a special clause.
  const lowerExtracted=extractSpecial(dedicated);
- const lowerLines=lowerExtracted?[lowerExtracted]:
-  dedicated.split(/\n+/).map(x=>x.trim()).filter(x=>
-   x&&!isDealField(x)&&!isPaymentLine(x)&&
+ // The implicit extractor is intentionally conservative. Keep additional
+ // free-form clauses too (e.g., "반려동물 안돼") so none is silently lost.
+ const lowerLines=dedicated.split(/\n+/).map(x=>x.trim()).filter(x=>
+   x&&!/^(?:특약(?:사항)?|합의사항|추가\s*조건|별도\s*합의)\s*[:：-]?/.test(x)&&
+   !isDealField(x)&&!isPaymentLine(x)&&
    !/(?:매매|전세|보증금|계약금|중도금|잔금|월세|송금|입금|계좌|아파트|동호수).{0,30}\d/.test(x));
- const lines=[extracted,...lowerLines].filter(Boolean).join('\n').split(/\n+/).map(x=>x.trim()).filter(Boolean);
+ const lines=[extracted,lowerExtracted,...lowerLines].filter(Boolean).join('\n').split(/\n+/).map(x=>x.trim()).filter(Boolean);
  const unique=[],seen=new Set();
  for(const line of lines){
   const key=line.replace(/[^가-힣a-zA-Z0-9]/g,'').toLowerCase();
