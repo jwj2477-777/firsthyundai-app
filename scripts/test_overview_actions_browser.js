@@ -25,7 +25,7 @@ async function verify(){
   check(root.querySelectorAll('#overviewUnified').length===1,'One unified panel only');
   check(!root.querySelector('.overviewActionGrid,.overviewStats,.overviewStatusPanel'),
    'Obsolete overview blocks must not return');
-  const optional=['overviewPrecipitation','overviewMapAlert','overviewMapCaution',
+  const optional=['overviewPrecipitation','overviewMapAlert','overviewSongdoNews',
    'overviewMemoBriefing','overviewTodayNewTrade'];
   for(const id of optional)check(document.getElementById(id),'Missing conditional section '+id);
   for(const id of optional)document.getElementById(id).hidden=true;
