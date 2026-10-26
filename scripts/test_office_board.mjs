@@ -26,7 +26,7 @@ assert.equal((await send('/board/session','POST',{code:'password8'},'','https://
 const ready=await (await send('/health')).json();
 assert.equal(ready.defaultAccountsReady,true,'Bootstrap precedes first app login');
 const choice=await (await send('/board/choices','POST',{code:'password8'})).json();
-assert.deepEqual(choice.accounts.map(a=>a.name).sort(),['관리자','엄마','아빠'].sort());
+assert.deepEqual(choice.accounts.map(a=>a.name),['관리자','엄마','아빠'],'Account picker has the three defaults in requested order');
 const member=choice.accounts.find(a=>a.name==='관리자');
 assert(member?.id);
 const device='a'.repeat(32);
@@ -96,4 +96,22 @@ assert(!afterRemoval.some(a=>a.name==='엄마'),'Removed default profile must st
 assert(afterRemoval.some(a=>a.name==='아빠'),'Remaining default profile stays enabled');
 env.FIRSTHYUNDAI_ACCESS_CODE='changedPasswordAfterRotation';
 assert.equal((await send('/board','GET',null,token)).status,401,'Family code rotation invalidates notes token');
+
+// Upgrade path: keep an existing original administrator record (do not replace ID)
+// while filling in only the two missing profiles.
+const legacy=new Map(),oldId='ae783501-3a44-4ac1-8e22-77ba17d00012';
+legacy.set('office-member-v2:'+oldId,JSON.stringify({id:oldId,name:'관리자',active:true}));
+const legacyEnv={...env,SETTINGS:{
+ async get(k,format){const v=legacy.get(k);return format==='json'?(v?JSON.parse(v):null):v||null},
+ async put(k,v){legacy.set(k,v)},async delete(k){legacy.delete(k)},
+ async list({prefix,limit}){return {keys:[...legacy.keys()].filter(k=>k.startsWith(prefix)).slice(0,limit).map(name=>({name}))}}
+}};
+const oldHealth=await service.fetch(new Request(origin+'/health'),legacyEnv);
+assert.equal((await oldHealth.json()).defaultAccountsReady,true);
+const upgraded=[...legacy.entries()].filter(([k])=>k.startsWith('office-member-v2:')).map(([,v])=>JSON.parse(v));
+assert.equal(upgraded.length,3);
+assert(upgraded.some(v=>v.id===oldId&&v.name==='관리자'));
+assert(upgraded.some(v=>v.name==='엄마')&&upgraded.some(v=>v.name==='아빠'));
+await service.fetch(new Request(origin+'/health'),legacyEnv);
+assert.equal([...legacy.keys()].filter(k=>k.startsWith('office-member-v2:')).length,3,'Bootstrap must be idempotent');
 console.log('Private calendar metadata, administrator-only soft-delete and 30-day recovery passed.');
