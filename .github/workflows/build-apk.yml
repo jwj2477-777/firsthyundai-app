@@ -19,6 +19,7 @@ on:
       - 'scripts/test_shared_settings.js'
       - 'scripts/test_shared_settings_worker.mjs'
       - 'scripts/test_memo_dates.js'
+      - 'scripts/test_account_picker.js'
       - 'scripts/test_office_board.mjs'
       - 'scripts/test_office_board_ui.js'
       - 'scripts/test_office_board_layout.js'
@@ -237,6 +238,7 @@ jobs:
           node scripts/test_shared_settings.js
           node scripts/test_shared_settings_worker.mjs
           node scripts/test_memo_dates.js
+          node scripts/test_account_picker.js
           node scripts/test_office_board.mjs
           node scripts/test_office_board_ui.js
           node scripts/test_office_board_layout.js
@@ -324,22 +326,22 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.08 ready-to-use family member accounts APK
+      - name: Publish v2.1.09 account picker on upgraded Android devices
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.08.apk
-          unzip -t FirstHyundai-v2.1.08.apk | grep 'No errors detected'
-          if gh release view v2.1.08 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.09.apk
+          unzip -t FirstHyundai-v2.1.09.apk | grep 'No errors detected'
+          if gh release view v2.1.09 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.08 FirstHyundai-v2.1.08.apk \
+            gh release create v2.1.09 FirstHyundai-v2.1.09.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.08 · 초기 계정 자동 생성' \
-              --notes '기본 계정 관리자·엄마·아빠 3개를 서버 초기 설치 시 자동 생성합니다. 이전 관리자 계정은 유지하고, 삭제된 구성원은 다시 생성하지 않습니다. 기존 메모·캘린더·계정 권한 관리 기능을 유지합니다. 기존 Firebase FCM 푸시 수신도 유지합니다. 알림을 누르면 기존 보안화면을 거쳐 해당 포스트잇으로 이동합니다. 즉시 푸시 활성화에는 FHD_FIREBASE_ANDROID_JSON 및 FHD_FCM_SERVICE_ACCOUNT_JSON 두 Firebase GitHub Actions Secret 등록과 Worker 재배포가 필요합니다. 미등록 중에는 12초 앱 실행 점검과 최소 15분 백그라운드 점검으로 동작합니다. v2.1.08/build159.'
+              --title '퍼스트현대 v2.1.09 · 계정 선택 화면 개선' \
+              --notes '기존 설치·업데이트된 휴대폰에서도 관리자·엄마·아빠 계정 선택 화면을 한 번 표시합니다. 관리자모드에서 이 휴대폰 계정을 다시 선택할 수 있고, 계정 변경 시 사무실 공통 보안코드를 재확인하고 이전 토큰을 즉시 무효화합니다. 기본 세 계정 자동 생성 기능을 유지합니다. 이전 관리자 계정은 유지하고, 삭제된 구성원은 다시 생성하지 않습니다. 기존 메모·캘린더·계정 권한 관리 기능을 유지합니다. 기존 Firebase FCM 푸시 수신도 유지합니다. 알림을 누르면 기존 보안화면을 거쳐 해당 포스트잇으로 이동합니다. 즉시 푸시 활성화에는 FHD_FIREBASE_ANDROID_JSON 및 FHD_FCM_SERVICE_ACCOUNT_JSON 두 Firebase GitHub Actions Secret 등록과 Worker 재배포가 필요합니다. 미등록 중에는 12초 앱 실행 점검과 최소 15분 백그라운드 점검으로 동작합니다. v2.1.09/build160.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.08 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.08 --apk FirstHyundai-v2.1.08.apk
+          gh release upload v2.1.09 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.09 --apk FirstHyundai-v2.1.09.apk
