@@ -71,3 +71,7 @@ body.fhdWeatherDetailOpen{overflow:hidden}
 .fhdWeatherBlock{padding:17px 12px}.fhdWeatherHeroIcon{width:63px;height:63px;flex-basis:63px;border-radius:20px}
 .fhdWeatherHeroIcon svg{width:41px;height:41px}.fhdWeatherNav{padding:9px 13px}}
 @media(prefers-reduced-motion:reduce){.fhdWeatherDialog{scroll-behavior:auto}}
+
+/* Never reserve a tall empty graph panel when a provider is unavailable. */
+.fhdWeatherChart:empty{height:0;min-height:0;padding:0;overflow:hidden}
+.fhdWeatherChart:empty+.fhdWeatherFine{margin-top:2px;padding:12px 13px;background:#F4F8F6;border:1px solid #E6EEEA;border-radius:11px;color:#607B79}
