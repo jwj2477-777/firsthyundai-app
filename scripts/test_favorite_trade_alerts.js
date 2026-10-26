@@ -120,7 +120,7 @@ const newer={...re('newer-unread','송도더샵마스터뷰23-1BL','전세','202
 ctx.document.activeElement={matches:()=>true};
 a.process({state:'ok',records:[older,newer]},uiContext);
 assert(!element('favoriteTradeAlertDialog').open,'Typing must not be interrupted by an automatic modal');
-assert(element('favoriteAlertButton').classList.contains('hasNewTrade'),'The header bell still indicates pending alerts without interrupting typing');
+assert(!element('favoriteAlertButton').classList.contains('hasNewTrade'),'The bell now shows delivered notification history, while typing-safe in-app alerts retain their banner');
 assert(!element('favoriteTradeAlertBanner').classList.contains('hidden'));
 ctx.document.activeElement=null;
 a.open();
