@@ -47,6 +47,6 @@ for(const warning of ["issues.trades?' · 실거래 갱신 오류'","issues.comp
  assert(js.includes(warning),'Never hide collection/data warnings');
 const snippet=js.slice(js.indexOf('function compactTradeCollectedAt('),js.indexOf('function number('));
 const ctx=vm.createContext({Date,Intl});vm.runInContext(snippet,ctx);
-assert.equal(vm.runInContext("compactTradeCollectedAt('2026-10-23T21:38:26Z')",ctx),'26.10.24 06:38');
+assert.equal(vm.runInContext("compactTradeCollectedAt('2026-10-23T21:38:26Z')",ctx),'2026.10.24 06:38');
 assert.equal(vm.runInContext("compactTradeCollectedAt(null)",ctx),'아직 수집 전');
 console.log('Three screenshots: consistent headlines, compact KST news metadata, meaningful apartment counts, preserved data warnings and actions.');
