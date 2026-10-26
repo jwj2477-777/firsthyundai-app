@@ -12,12 +12,46 @@ function safeMemberName(v){
  if(n.length<1||n.length>24||/[<>\u0000-\u001f]/.test(n))throw Error("bad_name");
  return n;
 }
+// Four handsets (two for the administrator) share THREE logical user profiles.
+// Legacy installs may have created duplicate admin records with distinct UUIDs.
+// Hide duplicate display identities but NEVER delete their KV records, revoke
+// existing device tokens, or rewrite the authors of old shared notes.
+function memberIdentity(name){
+ const normalized=String(name||"").trim().replace(/\\s+/g," ");
+ if(/^(관리자(?:\\s*계정)?|Admin)$/i.test(normalized))return "관리자";
+ return normalized;
+}
 async function memberList(env){
  const keys=await env.SETTINGS.list({prefix:MEMBER_PREFIX,limit:100});
- return (await Promise.all(keys.keys.map(v=>env.SETTINGS.get(v.name,"json"))))
- .filter(v=>v&&validMemberId(v.id)&&v.active===true)
- .map(v=>({id:v.id,name:v.name})).sort((a,b)=>{
-  const preferred=["관리자","엄마","아빠"];
+ const found=(await Promise.all(keys.keys.map(v=>env.SETTINGS.get(v.name,"json"))))
+  .filter(v=>v&&validMemberId(v.id)&&v.active===true);
+ const grouped=new Map();
+ for(const member of found){
+  const label=memberIdentity(member.name);
+  const records=grouped.get(label)||[];
+  records.push(member);grouped.set(label,records);
+ }
+ // Keep the most-used existing account when old installations created duplicates.
+ // Existing session tokens on other IDs remain valid; do not silently merge them.
+ const hasDuplicates=[...grouped.values()].some(group=>group.length>1);
+ const connected=new Map();
+ if(hasDuplicates){
+  const bindings=await env.SETTINGS.list({prefix:DEVICE_PREFIX,limit:1000});
+  await Promise.all(bindings.keys.map(async item=>{
+   const device=await env.SETTINGS.get(item.name,"json");
+   if(device?.member_id&&device.revoked!==true)
+    connected.set(device.member_id,(connected.get(device.member_id)||0)+1);
+  }));
+ }
+ const members=[...grouped.entries()].map(([name,candidates])=>{
+  candidates.sort((a,b)=>(connected.get(b.id)||0)-(connected.get(a.id)||0)||
+   Number(a.name!==name)-Number(b.name!==name)||
+   String(a.created_at||"").localeCompare(String(b.created_at||""))||
+   a.id.localeCompare(b.id));
+  return {id:candidates[0].id,name};
+ });
+ const preferred=["관리자","엄마","아빠"];
+ return members.sort((a,b)=>{
   const ai=preferred.indexOf(a.name),bi=preferred.indexOf(b.name);
   return (ai>=0?ai:preferred.length)-(bi>=0?bi:preferred.length)||a.name.localeCompare(b.name,"ko");
  });
