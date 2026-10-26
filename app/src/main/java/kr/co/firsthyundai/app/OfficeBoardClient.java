@@ -58,7 +58,17 @@ final class OfficeBoardClient {
     static boolean enrolled(Context context){return !token(context).isEmpty()&&!memberId(context).isEmpty();}
     static JSONObject checkAccount(Context context) throws Exception {
         if(!enrolled(context))throw new Exception("사무실 계정 연결이 필요합니다.");
-        try{return request("GET","/board/account",null,token(context));}
+        try{
+            JSONObject result=request("GET","/board/account",null,token(context));
+            JSONObject member=result.optJSONObject("member");
+            if(member!=null&&memberId(context).equals(member.optString("id",""))){
+                String name=member.optString("name","");
+                if(!name.isEmpty()&&!name.equals(memberName(context)))
+                    context.getSharedPreferences(PREF,Context.MODE_PRIVATE).edit()
+                        .putString("member_name",name).apply();
+            }
+            return result;
+        }
         catch(Exception e){
             if(e.getMessage()!=null&&e.getMessage().startsWith("account_revoked"))clear(context);
             throw e;
