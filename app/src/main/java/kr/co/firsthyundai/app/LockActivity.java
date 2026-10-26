@@ -376,7 +376,7 @@ public class LockActivity extends Activity {
                     restorePasswordPage();
                     status.setText("다시 비밀번호를 입력해 주세요.");
                 });
-                loginDetail.setText("사용할 사무실 계정을 선택해 주세요.\\n선택한 계정은 이 휴대폰에 유지됩니다.");
+                loginDetail.setText("사용할 사무실 계정을 선택해 주세요.\n선택한 계정은 이 휴대폰에 유지됩니다.");
                 codeField.setVisibility(View.GONE);
                 unlockButton.setVisibility(View.GONE);
                 accountChooser.setVisibility(View.VISIBLE);
@@ -392,7 +392,7 @@ public class LockActivity extends Activity {
         unlockButton.setVisibility(View.VISIBLE);
         codeField.setEnabled(true);
         unlockButton.setEnabled(true);
-        loginDetail.setText("가족 전용 부동산 정보센터\\n접근 보안코드를 입력해 주세요.");
+        loginDetail.setText("가족 전용 부동산 정보센터\n접근 보안코드를 입력해 주세요.");
     }
     private void loadLatestPolicy() {
         currentPolicy = null;
