@@ -5,6 +5,12 @@ const $=id=>document.getElementById(id),native=window.FirstHyundaiNative;
 let seq=0,members=[],pending=new Map(),busy=false;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function allowed(){return native?.getMode?.()==='admin'}
+function choose(){
+ if(!allowed()||typeof native?.requestOfficeMemberPicker!=='function'){
+  status('관리자모드에서 계정을 선택할 수 있습니다.');return;
+ }
+ native.requestOfficeMemberPicker();
+}
 function status(v){if($('officeMemberFeedback'))$('officeMemberFeedback').textContent=v}
 function action(kind,payload){
  if(!allowed()||!native?.officeMembersAction)return Promise.reject(Error('관리자모드로 로그인해 주세요.'));
@@ -21,6 +27,8 @@ window.onFirstHyundaiOfficeMembersResult=e=>{
  if(e.ok)p.resolve(e.data);else p.reject(Error(e.error||'구성원 계정 처리 실패'));
 };
 function render(){
+ const currentLabel=$('officeCurrentMember');
+ if(currentLabel)currentLabel.textContent=native?.getOfficeMemberName?.()||'연결되지 않음';
  const list=$('officeMemberList');if(!list)return;
  if(!allowed()){list.textContent='관리자 전용 기능입니다.';return}
  if(!members.length){list.innerHTML='<p class="tiny">등록된 구성원이 없습니다.</p>';return}
@@ -57,5 +65,5 @@ $('officeMemberList')?.addEventListener?.('click',event=>{
  const button=event.target?.closest?.('button[data-member]');
  if(button)remove(button.dataset.member,button.dataset.name||'구성원');
 });
-window.FirstHyundaiOfficeMembers={refresh,add,remove,_test:{render}};
+window.FirstHyundaiOfficeMembers={refresh,add,remove,choose,_test:{render}};
 })();

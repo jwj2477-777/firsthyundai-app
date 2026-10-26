@@ -72,6 +72,27 @@ assert.equal((await (await send('/board','GET',null,token)).json()).notes.length
 assert.equal((await send('/board/'+item.id,'PATCH',{scheduled_at:null},token)).status,200);
 assert.equal((await (await send('/board','GET',null,token)).json()).notes[0].scheduled_at,null);
 
+// Existing device identity may be changed only using BOTH the shared code and
+// its currently valid board session. Previous token is revoked on rebind.
+const momAccount=choice.accounts.find(x=>x.name==='엄마');
+const dadAccount=choice.accounts.find(x=>x.name==='아빠');
+const alternateDevice='c'.repeat(32);
+const momSession=(await (await send('/board/session','POST',
+ {code:'password8',member_id:momAccount.id,device:alternateDevice})).json()).token;
+assert.equal((await (await send('/board/accounts','GET',null,momSession)).json()).accounts.length,3);
+assert.equal((await send('/board/session','POST',
+ {code:'password8',member_id:dadAccount.id,device:alternateDevice,reassign:true})).status,409,
+ 'A bare shared password cannot reassign an already bound device');
+assert.equal((await send('/board/session','POST',
+ {code:'wrong-password',member_id:dadAccount.id,device:alternateDevice,reassign:true},momSession)).status,401);
+const converted=await send('/board/session','POST',
+ {code:'password8',member_id:dadAccount.id,device:alternateDevice,reassign:true},momSession);
+assert.equal(converted.status,200,'A correctly authenticated existing device can change profile');
+const dadSession=(await converted.json()).token;
+assert.equal((await send('/board','GET',null,momSession)).status,401,'Old identity token is invalid after change');
+assert.equal((await send('/board','GET',null,dadSession)).status,200);
+assert.equal((await (await send('/board/account','GET',null,dadSession)).json()).member.name,'아빠');
+
 const extra=await send('/board/members','POST',{name:'신규 구성원'},token,'',adminToken);
 assert.equal(extra.status,201);
 const newcomer=(await extra.json()).account;

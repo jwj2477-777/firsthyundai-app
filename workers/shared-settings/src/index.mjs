@@ -113,8 +113,17 @@ async function boardCommand(req,env,url,ctx){
   // A device may not silently change identity after it has been assigned.
   const existing=await env.SETTINGS.get(DEVICE_PREFIX+deviceId,"json");
   if(existing?.revoked===true)return res({error:"device_revoked"},403);
-  if(existing&&existing.member_id!==account)return res({error:"device_already_assigned"},409);
-  const binding=existing?.binding||crypto.randomUUID();
+  // Existing members can choose a different account only on their already
+  // authorized device AND after supplying the shared code again.
+  // Rotating the binding invalidates the previous member's 60-day token.
+  const changing=!!existing&&existing.member_id!==account;
+  if(changing){
+   const bearer=req.headers.get("authorization")||"";
+   const previous=bearer.startsWith("Bearer ")?await validBoardToken(bearer.slice(7),env.FIRSTHYUNDAI_ACCESS_CODE,env):null;
+   if(data?.reassign!==true||!previous||previous.deviceId!==deviceId||
+     previous.member.id!==existing.member_id)return res({error:"device_already_assigned"},409);
+  }
+  const binding=changing?crypto.randomUUID():(existing?.binding||crypto.randomUUID());
   await env.SETTINGS.put(DEVICE_PREFIX+deviceId,
    JSON.stringify({member_id:account,binding,created_at:existing?.created_at||new Date().toISOString()}));
   return res({token:await boardToken(env.FIRSTHYUNDAI_ACCESS_CODE,account,deviceId,binding),
@@ -126,6 +135,8 @@ async function boardCommand(req,env,url,ctx){
  const adminHeader=req.headers.get("x-fhd-admin-authorization")||"";
  const isAdmin=async()=>!!env.FIRSTHYUNDAI_ADMIN_CODE&&adminHeader.startsWith("Bearer ")&&
   await checkToken(adminHeader.slice(7),env.FIRSTHYUNDAI_ADMIN_CODE);
+ if(url.pathname==="/board/accounts"&&req.method==="GET")
+  return res({accounts:await memberList(env),current:{id:caller.member.id,name:caller.member.name}});
  if(url.pathname==="/board/account"&&req.method==="GET")
   return res({member:{id:caller.member.id,name:caller.member.name},active:true});
  if(url.pathname==="/board/members"&&req.method==="GET"){

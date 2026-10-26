@@ -536,6 +536,19 @@ public class MainActivity extends Activity {
         @JavascriptInterface public String getOfficeMemberName(){
             return OfficeBoardClient.memberName(getApplicationContext());
         }
+        @JavascriptInterface public void requestOfficeMemberPicker(){
+            final String authorized=adminSessionIdentity;
+            runOnUiThread(()->{
+                if(authorized==null||authorized.isEmpty()||!authorized.equals(adminSessionIdentity)){
+                    Toast.makeText(MainActivity.this,"계정 변경은 관리자모드에서만 가능합니다.",Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Intent select=new Intent(MainActivity.this,LockActivity.class);
+                select.putExtra("force_member_picker",true);
+                startActivity(select);
+                finish();
+            });
+        }
         @JavascriptInterface public void officeMembersAction(String action,String payload,String requestId){
             if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
             if(action==null||!java.util.Arrays.asList("list","add","remove").contains(action)||

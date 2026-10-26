@@ -235,7 +235,7 @@ body.apartmentSheetActive{overflow:hidden}
   </section>
 </div>
 <div id="officeBoard" class="page hidden">
- <div class="sectionTitle officeBoardTitle"><div><h2>사무실 메모</h2><p class="tiny">함께 쓰는 포스트잇</p></div>
+ <div class="sectionTitle officeBoardTitle"><div><h2>사무실 메모</h2><p class="tiny">함께 쓰는 포스트잇 · <span id="officeBoardCurrentMember"></span></p></div>
   <button type="button" class="btn alt refreshAction" onclick="FirstHyundaiOfficeBoard.refresh()" aria-label="공유 메모 새로고침">↻ 새로고침</button></div>
  <div class="officeMemoNotificationTools">
   <span id="officeMemoNotificationStatus" class="tiny" role="status">새 메모 알림 확인 중</span>
@@ -274,7 +274,8 @@ body.apartmentSheetActive{overflow:hidden}
  <div class="sectionTitle"><div><h2>시스템 관리센터</h2><p class="tiny">앱 진단·운영 · 관리자 전용</p></div><button type="button" class="btn alt refreshAction" onclick="FirstHyundaiAdminCenter.refresh()">전체 점검</button></div>
  <section class="panel officeMemberManager" aria-label="사무실 구성원 계정 관리">
   <div class="officeMemberTitle"><strong>사무실 계정 관리</strong><button type="button" class="btn alt" onclick="FirstHyundaiOfficeMembers.refresh()">↻ 계정 확인</button></div>
-  <p class="tiny">계정은 처음 설치할 때 선택하며, 삭제하면 해당 기기의 접근도 차단됩니다.</p>
+  <p class="tiny">현재 휴대폰: <strong id="officeCurrentMember">연결 확인 중</strong> · 계정을 삭제하면 해당 기기의 접근도 차단됩니다.</p>
+  <button type="button" class="btn alt officeMemberChoose" onclick="FirstHyundaiOfficeMembers.choose()">이 휴대폰의 계정 선택</button>
   <div id="officeMemberList" class="officeMemberList" aria-live="polite">계정 정보를 불러오는 중입니다.</div>
   <div class="officeMemberAdd"><label for="officeMemberName">구성원 추가</label>
    <input id="officeMemberName" type="text" maxlength="24" autocomplete="off" placeholder="표시 이름">
