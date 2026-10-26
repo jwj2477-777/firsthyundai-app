@@ -47,7 +47,7 @@ context.window.FirstHyundaiWeatherBriefing={
  forecastStatus:()=>({mapAlert:'퇴근 후 비 예보 · 다음 영업일 오전 9시 전 지도함을 실내로 옮기세요.'})
 };
 context.window.FirstHyundaiOfficeBoard={
- weatherAppointments:()=>[{at:new Date(timestamp+4*3600000).toISOString()}],
+ weatherAppointments:()=>[{at:new Date(timestamp+4.5*3600000).toISOString()}],
  openBriefing(){callCounts.openBriefing++},openBriefingCalendar(){callCounts.calendar++}};
 vm.runInContext(code,context);
 const api=context.window.FirstHyundaiWeatherDetail;
@@ -64,7 +64,7 @@ const sparse={...forecast,hours:[hours[0],hours[1],hours[4]]};
 const sparseGraph=api._test.chartMarkup(sparse,timestamp);
 assert.equal((sparseGraph.markup.match(/stroke="#5A968D"/g)||[]).length,1,
  'Do not join absent middle forecast hours with misleading continuous lines');
-const one=api._test.appointments(forecast,timestamp,[{at:new Date(timestamp+4*3600000).toISOString(),text:'고객 전화 010-1111-2222'}]);
+const one=api._test.appointments(forecast,timestamp,[{at:new Date(timestamp+4.5*3600000).toISOString(),text:'고객 전화 010-1111-2222'}]);
 assert.equal(one.length,1);
 assert(!JSON.stringify(one).includes('고객')&&!JSON.stringify(one).includes('010-'),'Private note names and phones never reach weather detail');
 assert(one[0].forecast.includes('비 예보')&&one[0].forecast.includes('75%'));
