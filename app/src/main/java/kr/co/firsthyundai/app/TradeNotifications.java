@@ -90,6 +90,8 @@ final class TradeNotifications {
                 .setShowWhen(true);
         try {
             manager.notify(NOTIFICATION_ID, builder.build());
+            NotificationHistory.record(activity,"trade",
+                "관심 단지 새 실거래 "+count+"건",safeDetail);
             return true;
         } catch (SecurityException ignored) {
             // Permission could be revoked between status check and notify().
