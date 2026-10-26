@@ -1,5 +1,7 @@
 package kr.co.firsthyundai.app;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
@@ -42,6 +44,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainActivity extends Activity {
+    private static final String INITIAL_PERMISSION_PREF="firsthyundai-initial-notification-request-v1";
+    private static final String INITIAL_PERMISSION_ASKED="asked";
+    private void requestInitialNotificationPermission(){
+        // Android 13+ always requires an explicit system permission dialog.
+        // Ask once immediately after a successful authenticated app launch.
+        if(Build.VERSION.SDK_INT<33 || isFinishing() || isDestroyed())return;
+        if(checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)==PackageManager.PERMISSION_GRANTED)return;
+        SharedPreferences state=getSharedPreferences(INITIAL_PERMISSION_PREF,MODE_PRIVATE);
+        if(state.getBoolean(INITIAL_PERMISSION_ASKED,false))return;
+        state.edit().putBoolean(INITIAL_PERMISSION_ASKED,true).apply();
+        TradeNotifications.requestPermission(this);
+    }
     private static final int SAVE_BACKUP = 1021;
     private static final int OPEN_BACKUP = 1022;
     private static final int SAVE_CATALOG = 1023;
@@ -95,6 +109,7 @@ public class MainActivity extends Activity {
                 if(!"file:///android_asset/index.html".equals(url)||webFirstFrameShown)return;
                 webFirstFrameShown=true;
                 if(isFinishing()||isDestroyed())return;
+                memoTimer.postDelayed(()->requestInitialNotificationPermission(),1600L);
                 if(getIntent()!=null&&getIntent().getBooleanExtra("office_board_from_notification",false)){
                     getIntent().removeExtra("office_board_from_notification");
                     String id=getIntent().getStringExtra("office_board_note_id");
@@ -457,6 +472,15 @@ public class MainActivity extends Activity {
     }
 
     public final class Bridge {
+        @JavascriptInterface public String getNotificationHistory(){
+            return NotificationHistory.list(getApplicationContext());
+        }
+        @JavascriptInterface public void markNotificationHistoryRead(){
+            NotificationHistory.markRead(getApplicationContext());
+        }
+        @JavascriptInterface public void clearNotificationHistory(){
+            NotificationHistory.clear(getApplicationContext());
+        }
         @JavascriptInterface public String getOfficeMemoPushStatus(){
             return OfficeMemoFirebase.status(getApplicationContext());
         }
