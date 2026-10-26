@@ -8,12 +8,13 @@ export function validWeatherSnapshot(value,kind,now=Date.now()){
  if(kind==='observed'){
   const t=Date.parse(value.observed_at);
   return ['none','rain','snow'].includes(value.effect)&&Number.isFinite(t)&&now-t<=2*HOUR&&t-now<=300000&&
-   value.grid?.nx===55&&value.grid?.ny===123;
+   value.grid?.nx===55&&value.grid?.ny===123&&
+   (value.temp===undefined||value.temp===null||(Number.isFinite(value.temp)&&value.temp>=-70&&value.temp<=70));
  }
  const t=Date.parse(value.issued_at);
  return value.date===today(now)&&Number.isFinite(t)&&t<=now&&now-t<=7*HOUR&&
-  Array.isArray(value.hours)&&value.hours.length>0&&value.hours.length<=24&&
-  value.hours.every(h=>Number.isFinite(Date.parse(h.at))&&today(Date.parse(h.at))===value.date&&
+  Array.isArray(value.hours)&&value.hours.length>0&&value.hours.length<=144&&
+  value.hours.every(h=>Number.isFinite(Date.parse(h.at))&&today(Date.parse(h.at))>=value.date&&today(Date.parse(h.at))<=today(now+5*24*HOUR)&&
    ['none','rain','snow','mixed'].includes(h.type)&&
    (h.pop===null||Number.isFinite(h.pop)&&h.pop>=0&&h.pop<=100)&&
    (h.temp===null||Number.isFinite(h.temp)&&h.temp>=-70&&h.temp<=70));
