@@ -61,12 +61,10 @@ async function verify(){
    }
    check(document.documentElement.scrollWidth<=innerWidth+1,'Horizontal overflow '+page);
   }
-  const guide=document.querySelector('#contracts .contractFirstGuide');
-  check(guide&&!guide.open,'Contract help begins closed');
-  guide.querySelector('summary').click();
-  check(guide.open&&guide.textContent.includes('계약문자를 만들어'),'Contract help still expands');
-  guide.querySelector('summary').click();
-  check(!guide.open,'Contract help still closes');
+  check(!document.querySelector('#contracts .contractFirstGuide'),
+   'Redundant contract how-to disclosure removed while 3-stage workflow remains');
+  check(!!document.querySelector('#contracts #ct_flowSteps'),
+   'Three-stage contract flow must remain');
   document.body.innerHTML='<pre id="six-nav-geometry">PASS six equal buttons, stable coordinates, six matching titles and live contract help</pre>';
  }catch(e){
   document.body.innerHTML='<pre id="six-nav-geometry">FAIL '+e.message+'</pre>';
