@@ -22,6 +22,7 @@ on:
       - 'scripts/test_account_picker.js'
       - 'scripts/test_office_board.mjs'
       - 'scripts/test_office_board_ui.js'
+      - 'scripts/test_annual_calendar.js'
       - 'scripts/test_office_board_layout.js'
       - 'scripts/test_office_board_tab_switch_browser.js'
       - 'scripts/test_admin_operating_controls.js'
@@ -258,6 +259,7 @@ jobs:
           node scripts/test_account_picker.js
           node scripts/test_office_board.mjs
           node scripts/test_office_board_ui.js
+          node scripts/test_annual_calendar.js
           node scripts/test_office_board_layout.js
           node scripts/test_office_board_tab_switch_browser.js
           node scripts/test_admin_operating_controls.js
