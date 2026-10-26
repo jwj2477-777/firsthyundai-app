@@ -34,7 +34,7 @@
   adminMemoPhones:'전화 바로걸기 번호 메모',
   adminTradePopupEnabled:'알림 실거래 팝업 관심',
  };
- let query='',category='all';
+ let query='',category='view';
  function permitted(){return typeof role!=='undefined'&&role==='admin';}
  function normalize(value){return String(value||'').trim().toLocaleLowerCase('ko-KR').replace(/\s+/g,' ');}
  function matches(text,terms){
@@ -47,6 +47,7 @@
  function draw(){
   if(!permitted())return false;
   const terms=normalize(query).split(' ').filter(Boolean);
+   root?.classList?.toggle?.('adminFocusMode',category!=='all');
   let visible=0,toolsShown=0;
   for(const group of sections()){
    const categoryMatch=category==='all'||group.dataset.adminCategory===category;
