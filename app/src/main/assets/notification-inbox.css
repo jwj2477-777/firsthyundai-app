@@ -231,3 +231,106 @@
 /* The shared-memo tile uses the exact selected mustard of its memo/calendar
    switch. Preserve the same card geometry, light/selected states and shadow. */
 #nav .utilityNav>button.officeBoardNav.active{background:#87651A}
+
+
+/* v2.1.23 — A single contained navigation dock instead of six floating cards.
+ * Deliberately preserve all six category colors, SVGs and color-flow selection
+ * animation. No absolute positioning or overlapping hit areas. */
+#nav.tabs{
+ --fhd-dock-paper:#FFFCF7;
+ --fhd-dock-stroke:#DACFBB;
+ box-sizing:border-box;
+ display:grid;
+ gap:7px;
+ width:100%;
+ margin:5px 0 18px;
+ padding:9px;
+ border:1px solid var(--fhd-dock-stroke);
+ border-radius:23px;
+ background:linear-gradient(155deg,#FFFEF9E8,#F5F2EACD);
+ box-shadow:0 3px 14px #4B44201A,inset 0 1px 0 #FFFFFFDB;
+}
+body[data-season-theme]:not([data-season-theme="default"]) #nav.tabs{
+ --fhd-dock-stroke:var(--season-line,#DACFBB);
+ background:linear-gradient(155deg,#FFFFFFE8,var(--season-paper,#FFFCF7));
+}
+#nav .primaryNav,#nav .utilityNav{
+ gap:6px;
+}
+#nav .primaryNav>button,
+#nav .utilityNav>button:not(.adminCenterNav){
+ height:91px;
+ min-height:91px;
+ max-height:91px;
+ padding:8px 2px;
+ gap:5px;
+ border-radius:14px!important;
+ border-width:1.5px!important;
+ box-shadow:0 1px 4px #253B4212;
+}
+#nav .primaryNav>button:not(.active),
+#nav .utilityNav>button:not(.active):not(.adminCenterNav){
+ box-shadow:0 1px 4px #253B4211;
+}
+#nav .primaryNav>button.active,
+#nav .utilityNav>button.active:not(.adminCenterNav){
+ box-shadow:0 2px 6px #253B4221,inset 0 1px 0 #FFFFFF21;
+}
+#nav .primaryNav>button .navIcon,
+#nav .utilityNav>button:not(.adminCenterNav) .navIcon{
+ width:31px;
+ height:31px;
+ flex-basis:31px;
+}
+#nav .primaryNav>button .navIcon svg,
+#nav .utilityNav>button:not(.adminCenterNav) .navIcon svg{
+ width:30px;
+ height:30px;
+}
+#nav .primaryNav>button .navLabel,
+#nav .utilityNav>button:not(.adminCenterNav) .navLabel{
+ font-size:clamp(10.5px,3.25vw,13px);
+ letter-spacing:-.5px;
+ line-height:1.24;
+}
+#nav .utilityNav>.adminCenterNav{
+ min-height:42px;
+ margin-top:1px;
+}
+@media(max-width:370px){
+ #nav.tabs{
+  padding:8px;
+  gap:6px;
+  border-radius:20px;
+ }
+ #nav .primaryNav,#nav .utilityNav{gap:5px}
+ #nav .primaryNav>button,
+ #nav .utilityNav>button:not(.adminCenterNav){
+  height:87px;
+  min-height:87px;
+  max-height:87px;
+  padding:7px 2px;
+  gap:4px;
+  border-radius:13px!important;
+ }
+ #nav .primaryNav>button .navIcon,
+ #nav .utilityNav>button:not(.adminCenterNav) .navIcon{
+  width:29px;height:29px;flex-basis:29px;
+ }
+ #nav .primaryNav>button .navIcon svg,
+ #nav .utilityNav>button:not(.adminCenterNav) .navIcon svg{
+  width:28px;height:28px;
+ }
+ #nav .primaryNav>button .navLabel,
+ #nav .utilityNav>button:not(.adminCenterNav) .navLabel{
+  font-size:clamp(10px,3.27vw,11.5px);
+  letter-spacing:-.63px;
+ }
+}
+@media(prefers-contrast:more){
+ #nav.tabs{border-color:#5D706E;border-width:2px}
+ #nav .primaryNav>button:not(.active),
+ #nav .utilityNav>button:not(.active):not(.adminCenterNav){
+  border-color:#8A9996!important;
+ }
+}
