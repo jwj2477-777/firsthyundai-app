@@ -91,7 +91,7 @@
  }
  function search(text){
   if(!permitted())return false;
-  query=String(text||'').slice(0,80);draw();return true;
+  query=String(text||'').slice(0,80);if(query.trim())category='all';draw();return true;
  }
  function filter(name){
   if(!permitted()||!['all','view','trade','memo','tools'].includes(name))return false;
