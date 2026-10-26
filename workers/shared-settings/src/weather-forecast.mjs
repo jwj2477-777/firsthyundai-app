@@ -20,12 +20,12 @@ export function parseForecast(doc,base,now=Date.now()){
  const iso=(d,t)=>d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8)+'T'+t.slice(0,2)+':'+t.slice(2)+':00+09:00';
  const issued=iso(base.date,base.time),issuedTime=Date.parse(issued);
  if(!Number.isFinite(issuedTime)||now-issuedTime>7*HOUR||issuedTime>now)throw Error('stale_forecast');
- const today=day(now),grouped=new Map();
+ const today=day(now),lastDay=day(now+5*24*HOUR),grouped=new Map();
  for(const row of items){
   if(Number(row.nx)!==55||Number(row.ny)!==123||row.baseDate!==base.date||row.baseTime!==base.time)continue;
   if(!/^\d{8}$/.test(row.fcstDate)||!/^([01]\d|2[0-3])00$/.test(row.fcstTime))continue;
   const at=iso(row.fcstDate,row.fcstTime),time=Date.parse(at);
-  if(day(time)!==today||time+HOUR<=now)continue;
+  if(day(time)<today||day(time)>lastDay||time+HOUR<=now)continue;
   const value=grouped.get(at)||{at};
   if(['PTY','POP','TMP','SKY'].includes(row.category)){
    if(value[row.category]!==undefined&&value[row.category]!==String(row.fcstValue))throw Error('conflicting_forecast');
@@ -37,10 +37,11 @@ export function parseForecast(doc,base,now=Date.now()){
   at:h.at,type:{0:'none',1:'rain',2:'mixed',3:'snow',4:'rain'}[h.PTY],
   pop:numeric(h.POP,0,100),temp:numeric(h.TMP,-70,70),sky:numeric(h.SKY,1,4)
  }));
- if(!hours.length)throw Error('no_today_forecast');
+ if(!hours.length)throw Error('no_forecast');
  const expected=24-new Date(now+9*HOUR).getUTCHours();
+ const todayHours=hours.filter(h=>day(Date.parse(h.at))===today).length;
  return {schema:1,status:'ok',area:'송도',date:today,issued_at:issued,hours,
-  complete:hours.length===expected,provider:'기상청 단기예보',
+  complete:todayHours===expected,coverage_until:hours.at(-1).at,provider:'기상청 단기예보',
   source_url:'https://www.data.go.kr/data/15084084/openapi.do'};
 }
 export async function weatherBriefing(env){
