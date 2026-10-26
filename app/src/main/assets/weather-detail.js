@@ -71,7 +71,7 @@ function nextSummary(doc,now=Date.now()){
 }
 function chartMarkup(doc,now=Date.now()){
  const rows=nextHours(doc,now,12);
- if(!rows.length)return {markup:'',status:'현재 시간별 예보를 불러오지 못했습니다.'};
+ if(!rows.length)return {markup:'',status:'시간별 예보 연결을 확인해 주세요. 기상청 데이터를 받지 못해 그래프를 표시하지 않았습니다.'};
  const condition=window.FirstHyundaiWeatherBriefing?._test?.hourlyCondition;
  const cards=window.FirstHyundaiWeatherBriefing?._test?.hourlyCards?.(doc,now,12)||[];
  const count=rows.length,w=count*68;
