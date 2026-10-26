@@ -34,8 +34,7 @@ final class OfficeBoardClient {
     }
     static void markPickerReviewed(Context c){
         c.getSharedPreferences(PREF,Context.MODE_PRIVATE).edit()
-            .putBoolean("picker_reviewed_v209",true)
-            .putBoolean("password_then_member_v210",true).apply();
+            .putBoolean("picker_reviewed_v209",true).apply();
     }
     static boolean pickerReviewedV210(Context c){
         return c.getSharedPreferences(PREF,Context.MODE_PRIVATE)
@@ -121,7 +120,8 @@ final class OfficeBoardClient {
             .putString("token",token).putString("member_id",memberId)
             .putString("member_name",member.optString("name"))
             .putLong("expiry",now+VALIDITY_MS-300_000L)
-            .putBoolean("picker_reviewed_v209",true).apply();
+            .putBoolean("picker_reviewed_v209",true)
+            .putBoolean("password_then_member_v210",true).apply();
     }
     static JSONObject members(Context context,String action,JSONObject payload,String adminToken) throws Exception {
         if(adminToken==null||adminToken.isEmpty())throw new Exception("관리자 모드 인증이 필요합니다.");
