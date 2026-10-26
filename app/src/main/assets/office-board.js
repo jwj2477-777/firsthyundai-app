@@ -251,7 +251,7 @@ function renderBriefing(){
  const target=$('overviewMemoEntries');if(!target)return;
  const row=(notes)=>notes.map(note=>{
   const t=kstParts(note.scheduled_at),time=note.all_day?'종일':(t?.time||'');
-  const title=String(note.text||'').split('\\n')[0].trim().slice(0,65);
+  const title=String(note.text||'').split('\n')[0].trim().slice(0,65);
   return '<button type="button" class="overviewMemoEntry" data-brief-note="'+esc(note.id)+'">'+
    '<span class="overviewMemoTime">'+esc(time)+'</span>'+
    '<span class="overviewMemoCopy">'+esc(title)+'</span>'+
