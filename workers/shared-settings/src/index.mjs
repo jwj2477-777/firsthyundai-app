@@ -31,7 +31,7 @@ const DEFAULT_MEMBERS=[
  {id:"77d4f48a-02b3-4dc3-8e1e-202610260003",name:"아빠"}
 ];
 async function ensureDefaultMembers(env){
- if(await env.SETTINGS.get(DEFAULT_MEMBERS_KEY))return;
+ if(await env.SETTINGS.get(DEFAULT_MEMBERS_KEY,"json"))return;
  const all=await env.SETTINGS.list({prefix:MEMBER_PREFIX,limit:100});
  const found=(await Promise.all(all.keys.map(v=>env.SETTINGS.get(v.name,"json"))))
   .filter(x=>x&&validMemberId(x.id));
@@ -415,7 +415,7 @@ export default {async fetch(req,env,ctx){
  if(!env.SETTINGS)return res({error:"kv_not_configured"},503);
  if(url.pathname==="/health"&&req.method==="GET"){
   if(env.FIRSTHYUNDAI_ACCESS_CODE)await ensureDefaultMembers(env);
-  return res({ok:true,storage:true,defaultAccountsReady:!!(await env.SETTINGS.get(DEFAULT_MEMBERS_KEY)),
+  return res({ok:true,storage:true,defaultAccountsReady:!!(await env.SETTINGS.get(DEFAULT_MEMBERS_KEY,"json")),
   authConfigured:!!env.FIRSTHYUNDAI_ADMIN_CODE,boardAuthConfigured:!!env.FIRSTHYUNDAI_ACCESS_CODE,fcmConfigured:!!fcmConfig(env)});
  }
  if(url.pathname.startsWith("/board"))return boardCommand(req,env,url,ctx);
