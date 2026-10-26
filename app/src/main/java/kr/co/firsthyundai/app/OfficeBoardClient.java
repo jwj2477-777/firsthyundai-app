@@ -34,7 +34,16 @@ final class OfficeBoardClient {
     }
     static void markPickerReviewed(Context c){
         c.getSharedPreferences(PREF,Context.MODE_PRIVATE).edit()
-            .putBoolean("picker_reviewed_v209",true).apply();
+            .putBoolean("picker_reviewed_v209",true)
+            .putBoolean("password_then_member_v210",true).apply();
+    }
+    static boolean pickerReviewedV210(Context c){
+        return c.getSharedPreferences(PREF,Context.MODE_PRIVATE)
+            .getBoolean("password_then_member_v210",false);
+    }
+    static void markPickerReviewedV210(Context c){
+        c.getSharedPreferences(PREF,Context.MODE_PRIVATE).edit()
+            .putBoolean("password_then_member_v210",true).apply();
     }
     static JSONObject memberChoices(Context c) throws Exception{
         String auth=token(c);
