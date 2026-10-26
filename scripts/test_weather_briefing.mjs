@@ -13,6 +13,9 @@ for(let hour=15;hour<24;hour++){
  rows.push(row(hour,'POP',hour===16?'70':'10'));
  rows.push(row(hour,'TMP',hour===15?'0':'10'));
 }
+rows.push(row(18,'SKY','4'));
+rows.push(row(19,'SKY','1'));
+rows.push(row(21,'SKY','3'));
 rows.push(row(1,'PTY','1','20261027'));
 const doc={response:{header:{resultCode:'00'},body:{items:{item:rows}}}};
 const parsed=parseForecast(doc,base,now);
@@ -40,6 +43,49 @@ vm.createContext(ctx);
 vm.runInContext(fs.readFileSync('app/src/main/assets/weather-briefing.js','utf8'),ctx);
 const api=ctx.window.FirstHyundaiWeatherBriefing._test;
 assert(api.valid(parsed,now));
+assert.equal(parsed.hours.find(h=>h.at.startsWith('2026-10-26T18')).sky,4,'Official KMA SKY codes are preserved');
+const hourly=api.hourlyRows(parsed,now);
+assert.equal(hourly.length,9,'Current partial hour is skipped; do not manufacture missing hours');
+assert(hourly[0].at.includes('T16:00'),'Start at next full forecast hour');
+assert.equal(api.hourlyRows(parsed,now,3).length,3,'Limited weather cards stay compact');
+assert.equal(api.hourlyRows(null,now).length,0,'Unavailable forecast must not show mock values');
+assert.equal(api.hourlyCondition({type:'none',sky:1}).kind,'sun','Sunny icon only with official forecast SKY');
+assert.equal(api.hourlyCondition({type:'none',sky:3}).kind,'partly-cloudy');
+assert.equal(api.hourlyCondition({type:'none',sky:4}).kind,'cloud');
+assert.equal(api.hourlyCondition({type:'none'}).kind,'unknown','Unknown SKY must not be called sunny');
+assert.equal(api.hourlyCondition({type:'rain',sky:1}).kind,'rain','Forecast precipitation overrides SKY');
+assert.equal(api.hourlyCondition({type:'mixed'}).kind,'mixed');
+const cards=api.hourlyCards(parsed,now,12);
+assert.equal(cards[0].hour,'16시');
+assert.equal(cards[0].day,'오늘');
+assert.equal(cards[0].kind,'rain');
+assert.equal(cards[0].chance,'70%');
+assert.equal(cards[0].temp,'10°');
+assert(cards.some(h=>h.hour==='18시'&&h.kind==='cloud'));
+assert(cards.some(h=>h.hour==='19시'&&h.kind==='sun'));
+assert(cards.some(h=>h.hour==='21시'&&h.kind==='partly-cloudy'));
+assert(cards.some(h=>h.day==='내일'&&h.hour==='01시'&&h.kind==='rain'));
+assert.equal(api.hourlyCards(parsed,now,12).length,new Set(cards.map(x=>x.day+x.hour)).size,
+ 'No duplicated time slots');
+const partialTemps={...parsed,hours:parsed.hours.map(h=>({...h,temp:null,pop:null}))};
+assert.equal(api.hourlyCards(partialTemps,now)[0].temp,'—');
+assert.equal(api.hourlyCards(partialTemps,now)[0].chance,'—','Unknown POP is not 0%');
+const hourlyMarkup=fs.readFileSync('app/src/main/assets/index.html','utf8');
+const hourlyCss=fs.readFileSync('app/src/main/assets/weather-briefing.css','utf8');
+for(const id of ['overviewHourlyToggle','overviewHourlyDetail','overviewHourlyList','overviewHourlyMeta','overviewHourlyNotice'])
+ assert(hourlyMarkup.includes('id="'+id+'"'),id+' is missing from the actual dashboard');
+assert(hourlyMarkup.includes('aria-controls="overviewHourlyDetail"')&&hourlyMarkup.includes('aria-expanded="false"'),
+ 'Hourly detail must be optional and accessible');
+assert(hourlyMarkup.includes('class="overviewHourlyDetail" hidden'),'Hourly forecast must default closed');
+assert(hourlyCss.includes('.overviewHourlyList')&&hourlyCss.includes('overflow-x:auto'),
+ 'Full next 12 hours are scrollable without turning the home screen into a long list');
+assert.equal(api.toggleHourly(),true,'User tap expands on-demand weather');
+assert.equal(get('overviewHourlyDetail').hidden,false);
+assert(get('overviewHourlyNotice').textContent.includes('확인할 수 없습니다'),
+ 'Missing forecast should explain unavailability, not invent values');
+assert.equal(api.toggleHourly(),false,'Second tap closes detail');
+assert.equal(get('overviewHourlyDetail').hidden,true);
+
 const result=api.summarize(parsed,now);
 assert(result.precip.includes('오늘 오후 4시')&&result.precip.includes('비 예보'),result.precip);
 assert(result.mapAlert.includes('눈 예보')&&result.mapAlert.includes('지도함'),result.mapAlert);
