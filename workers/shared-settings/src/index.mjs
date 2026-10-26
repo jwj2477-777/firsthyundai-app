@@ -12,12 +12,46 @@ function safeMemberName(v){
  if(n.length<1||n.length>24||/[<>\u0000-\u001f]/.test(n))throw Error("bad_name");
  return n;
 }
+// Four handsets (two for the administrator) share THREE logical user profiles.
+// Legacy installs may have created duplicate admin records with distinct UUIDs.
+// Hide duplicate display identities but NEVER delete their KV records, revoke
+// existing device tokens, or rewrite the authors of old shared notes.
+function memberIdentity(name){
+ const normalized=String(name||"").trim().replace(/\s+/g," ");
+ if(/^(관리자(?:\s*계정)?|Admin)$/i.test(normalized))return "관리자";
+ return normalized;
+}
 async function memberList(env){
  const keys=await env.SETTINGS.list({prefix:MEMBER_PREFIX,limit:100});
- return (await Promise.all(keys.keys.map(v=>env.SETTINGS.get(v.name,"json"))))
- .filter(v=>v&&validMemberId(v.id)&&v.active===true)
- .map(v=>({id:v.id,name:v.name})).sort((a,b)=>{
-  const preferred=["관리자","엄마","아빠"];
+ const found=(await Promise.all(keys.keys.map(v=>env.SETTINGS.get(v.name,"json"))))
+  .filter(v=>v&&validMemberId(v.id)&&v.active===true);
+ const grouped=new Map();
+ for(const member of found){
+  const label=memberIdentity(member.name);
+  const records=grouped.get(label)||[];
+  records.push(member);grouped.set(label,records);
+ }
+ // Keep the most-used existing account when old installations created duplicates.
+ // Existing session tokens on other IDs remain valid; do not silently merge them.
+ const hasDuplicates=[...grouped.values()].some(group=>group.length>1);
+ const connected=new Map();
+ if(hasDuplicates){
+  const bindings=await env.SETTINGS.list({prefix:DEVICE_PREFIX,limit:1000});
+  await Promise.all(bindings.keys.map(async item=>{
+   const device=await env.SETTINGS.get(item.name,"json");
+   if(device?.member_id&&device.revoked!==true)
+    connected.set(device.member_id,(connected.get(device.member_id)||0)+1);
+  }));
+ }
+ const members=[...grouped.entries()].map(([name,candidates])=>{
+  candidates.sort((a,b)=>(connected.get(b.id)||0)-(connected.get(a.id)||0)||
+   Number(a.name!==name)-Number(b.name!==name)||
+   String(a.created_at||"").localeCompare(String(b.created_at||""))||
+   a.id.localeCompare(b.id));
+  return {id:candidates[0].id,name};
+ });
+ const preferred=["관리자","엄마","아빠"];
+ return members.sort((a,b)=>{
   const ai=preferred.indexOf(a.name),bi=preferred.indexOf(b.name);
   return (ai>=0?ai:preferred.length)-(bi>=0?bi:preferred.length)||a.name.localeCompare(b.name,"ko");
  });
@@ -153,6 +187,29 @@ async function boardCommand(req,env,url,ctx){
   const account={id:crypto.randomUUID(),name,active:true,created_at:new Date().toISOString()};
   await env.SETTINGS.put(MEMBER_PREFIX+account.id,JSON.stringify(account));
   return res({ok:true,account:{id:account.id,name}},201);
+ }
+ const accountRename=url.pathname.match(/^\/board\/members\/([0-9a-f-]{36})\/rename$/);
+ if(accountRename&&req.method==="PATCH"){
+  if(!await isAdmin())return res({error:"admin_required"},403);
+  let payload,name;try{payload=await body(req,1000);name=safeMemberName(payload?.name)}
+  catch(e){return res({error:"invalid_name"},400)}
+  const account=await env.SETTINGS.get(MEMBER_PREFIX+accountRename[1],"json");
+  if(account?.active!==true)return res({error:"not_found"},404);
+  const records=await env.SETTINGS.list({prefix:MEMBER_PREFIX,limit:100});
+  const all=(await Promise.all(records.keys.map(k=>env.SETTINGS.get(k.name,"json"))))
+   .filter(v=>v?.active===true&&validMemberId(v.id));
+  const oldIdentity=memberIdentity(account.name),newIdentity=memberIdentity(name);
+  const group=all.filter(v=>memberIdentity(v.name)===oldIdentity);
+  if(all.some(v=>memberIdentity(v.name)===newIdentity&&!group.some(g=>g.id===v.id)))
+   return res({error:"duplicate_name"},409);
+  // A shared identity may belong to two legacy admin records. Rename both
+  // while keeping member IDs / authenticated sessions / phone bindings intact.
+  const at=new Date().toISOString();
+  await Promise.all(group.map(async v=>{
+   await env.SETTINGS.put(MEMBER_PREFIX+v.id,
+    JSON.stringify({...v,name,updated_at:at}));
+  }));
+  return res({ok:true,account:{id:account.id,name},affected:group.length});
  }
  const accountDelete=url.pathname.match(/^\/board\/members\/([0-9a-f-]{36})$/);
  if(accountDelete&&req.method==="DELETE"){

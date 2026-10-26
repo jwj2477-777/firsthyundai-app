@@ -24,6 +24,8 @@ import android.graphics.Typeface;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -436,82 +438,80 @@ public class LockActivity extends Activity {
                         "사용 가능한 사무실 계정이 없습니다. 관리자에게 확인해 주세요.":failure);
                     return; // Never enter the app before account selection.
                 }
+                // A single collapsed selector instead of 3-4 full-size tiles.
+                // Four devices share the administrator / mother / father identities.
                 accountChooser.removeAllViews();
-                int valid=0;
+                java.util.ArrayList<String> ids=new java.util.ArrayList<>();
+                java.util.ArrayList<String> labels=new java.util.ArrayList<>();
+                String previousId=OfficeBoardClient.memberId(getApplicationContext());
+                int selected=0;
+                java.util.HashSet<String> names=new java.util.HashSet<>();
                 for(int i=0;i<list.length();i++){
                     org.json.JSONObject member=list.optJSONObject(i);
                     if(member==null)continue;
                     String id=member.optString("id","");
-                    if(!id.matches("[0-9a-f-]{36}"))continue;
                     String name=member.optString("name","").trim();
-                    if(name.isEmpty())continue;
-                    valid++;
-                    boolean current=id.equals(OfficeBoardClient.memberId(getApplicationContext()));
-                    // Quiet, consistently sized choice rows; no oversized filled buttons.
-                    LinearLayout choice=new LinearLayout(this);
-                    choice.setOrientation(LinearLayout.HORIZONTAL);
-                    choice.setGravity(Gravity.CENTER_VERTICAL);
-                    choice.setPadding(dp(17),0,dp(16),0);
-                    choice.setMinimumHeight(dp(56));
-                    choice.setClickable(true);
-                    choice.setFocusable(true);
-                    choice.setContentDescription(name+(current?" · 현재 계정":" · 계정 선택"));
-                    GradientDrawable surface=new GradientDrawable();
-                    surface.setColor(current?Color.rgb(243,248,244):Color.WHITE);
-                    surface.setCornerRadius(dp(12));
-                    surface.setStroke(dp(1),current?Color.rgb(206,180,122):Color.rgb(226,225,216));
-                    choice.setBackground(new android.graphics.drawable.RippleDrawable(
-                        android.content.res.ColorStateList.valueOf(Color.argb(42,20,110,112)),
-                        surface,null));
-                    TextView label=new TextView(this);
-                    label.setText(name);
-                    label.setTextSize(16);
-                    label.setTextColor(Color.rgb(29,65,66));
-                    label.setTypeface(null,android.graphics.Typeface.BOLD);
-                    choice.addView(label,new LinearLayout.LayoutParams(0,-2,1f));
-                    TextView indicator=new TextView(this);
-                    indicator.setText(current?"현재":"›");
-                    indicator.setTextSize(current?12:21);
-                    indicator.setTextColor(current?Color.rgb(131,105,59):Color.rgb(119,143,138));
-                    indicator.setGravity(Gravity.CENTER);
-                    choice.addView(indicator,new LinearLayout.LayoutParams(-2,-2));
-                    LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(56));
-                    lp.bottomMargin=dp(8);
-                    accountChooser.addView(choice,lp);
-                    choice.setOnClickListener(v->{
-                        for(int j=0;j<accountChooser.getChildCount();j++)
-                            accountChooser.getChildAt(j).setEnabled(false);
-                        status.setVisibility(View.VISIBLE);
-                        status.setText(name+" 계정으로 연결 중...");
-                        new Thread(()->{
-                            String problem="";
-                            try{
-                                OfficeBoardClient.enroll(getApplicationContext(),code,id);
-                                AccessPolicy.authorize(this,currentPolicy);
-                                OfficeMemoNotifications.schedule(getApplicationContext());
-                                OfficeMemoFirebase.register(getApplicationContext());
-                            }catch(Exception exc){
-                                problem=exc.getMessage()==null?"계정 연결에 실패했습니다.":exc.getMessage();
-                            }finally{Arrays.fill(code,(char)0);}
-                            final String failureDetail=problem;
-                            runOnUiThread(()->{
-                                if(isFinishing()||isDestroyed())return;
-                                if(failureDetail.isEmpty()){
-                                    getSharedPreferences(PREFS,MODE_PRIVATE).edit().clear().apply();
-                                    openMain();
-                                }else {
-                                    restorePasswordPage();
-                                    status.setText(failureDetail+" · 보안코드를 다시 입력해 주세요.");
-                                }
-                            });
-                        },"office-member-select").start();
-                    });
+                    if(!id.matches("[0-9a-f-]{36}")||name.isEmpty()||!names.add(name))continue;
+                    if(id.equals(previousId))selected=ids.size();
+                    ids.add(id);labels.add(name);
                 }
-                if(valid==0){
+                if(ids.isEmpty()){
                     Arrays.fill(code,(char)0);
                     status.setText("사용 가능한 계정이 없습니다.");
                     return;
                 }
+                Spinner accountMenu=new Spinner(this);
+                accountMenu.setContentDescription("계정 선택 · 목록 열기");
+                ArrayAdapter<String> adapter=new ArrayAdapter<>(this,
+                    android.R.layout.simple_spinner_item,labels);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                accountMenu.setAdapter(adapter);
+                accountMenu.setSelection(selected,false);
+                accountMenu.setPadding(dp(12),0,dp(10),0);
+                accountMenu.setBackground(outlinedSurface());
+                accountChooser.addView(accountMenu,
+                    new LinearLayout.LayoutParams(-1,dp(56)));
+                Button enter=new Button(this);
+                enter.setText("선택한 계정으로 시작");
+                enter.setTextSize(15);
+                enter.setTextColor(Color.WHITE);
+                enter.setAllCaps(false);
+                enter.setBackgroundTintList(null);
+                enter.setBackground(premiumActionSurface());
+                LinearLayout.LayoutParams enterParams=new LinearLayout.LayoutParams(-1,dp(52));
+                enterParams.topMargin=dp(12);
+                accountChooser.addView(enter,enterParams);
+                enter.setOnClickListener(v->{
+                    int pos=accountMenu.getSelectedItemPosition();
+                    if(pos<0||pos>=ids.size())return;
+                    String id=ids.get(pos),name=labels.get(pos);
+                    enter.setEnabled(false);
+                    accountMenu.setEnabled(false);
+                    status.setVisibility(View.VISIBLE);
+                    status.setText(name+" 계정으로 연결 중...");
+                    new Thread(()->{
+                        String problem="";
+                        try{
+                            OfficeBoardClient.enroll(getApplicationContext(),code,id);
+                            AccessPolicy.authorize(this,currentPolicy);
+                            OfficeMemoNotifications.schedule(getApplicationContext());
+                            OfficeMemoFirebase.register(getApplicationContext());
+                        }catch(Exception exc){
+                            problem=exc.getMessage()==null?"계정 연결에 실패했습니다.":exc.getMessage();
+                        }finally{Arrays.fill(code,(char)0);}
+                        final String detail=problem;
+                        runOnUiThread(()->{
+                            if(isFinishing()||isDestroyed())return;
+                            if(detail.isEmpty()){
+                                getSharedPreferences(PREFS,MODE_PRIVATE).edit().clear().apply();
+                                openMain();
+                            }else{
+                                restorePasswordPage();
+                                status.setText(detail+" · 보안코드를 다시 입력해 주세요.");
+                            }
+                        });
+                    },"office-member-select").start();
+                });
                 TextView back=new TextView(this);
                 back.setText("←  비밀번호로 돌아가기");
                 back.setTextSize(14);
@@ -528,7 +528,7 @@ public class LockActivity extends Activity {
                     restorePasswordPage();
                     status.setText("다시 비밀번호를 입력해 주세요.");
                 });
-                loginDetail.setText("사용할 계정을 선택해 주세요.");
+                loginDetail.setText("계정 선택");
                 loginDetail.setPadding(0,0,0,dp(19));
                 hideKeyboard();
                 codeField.setVisibility(View.GONE);

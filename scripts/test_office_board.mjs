@@ -100,6 +100,16 @@ const extraDevice='b'.repeat(32);
 const extraToken=(await (await send('/board/session','POST',{code:'password8',member_id:newcomer.id,device:extraDevice})).json()).token;
 assert(extraToken);
 assert.equal((await send('/board','GET',null,extraToken)).status,200);
+assert.equal((await send('/board/members/'+newcomer.id+'/rename','PATCH',
+ {name:'새 이름'},extraToken)).status,403,'Rename requires administrator authentication');
+const rename=await send('/board/members/'+newcomer.id+'/rename','PATCH',
+ {name:'새 이름'},token,'',adminToken);
+assert.equal(rename.status,200,'Authorized admin can rename a member');
+assert.equal((await (await send('/board/account','GET',null,extraToken)).json()).member.name,
+ '새 이름','Renaming must not revoke an existing device or require fresh login');
+assert.equal((await send('/board/members/'+newcomer.id+'/rename','PATCH',
+ {name:'관리자'},token,'',adminToken)).status,409,
+ 'Renaming must not merge two different logical users with the same name');
 assert.equal((await send('/board/members/'+newcomer.id,'DELETE',null,token)).status,403);
 assert.equal((await send('/board/members/'+member.id,'DELETE',null,token,'',adminToken)).status,409,'Cannot remove current manager account');
 assert.equal((await send('/board/members/'+newcomer.id,'DELETE',null,token,'',adminToken)).status,200);
@@ -135,4 +145,34 @@ assert(upgraded.some(v=>v.id===oldId&&v.name==='관리자'));
 assert(upgraded.some(v=>v.name==='엄마')&&upgraded.some(v=>v.name==='아빠'));
 await service.fetch(new Request(origin+'/health'),legacyEnv);
 assert.equal([...legacy.keys()].filter(k=>k.startsWith('office-member-v2:')).length,3,'Bootstrap must be idempotent');
+// Two administrator handsets are not a reason to expose two administrator
+// choices. Preserve old records and tokens; dedupe just the visible profiles.
+const duplicateAdmin='ae783501-3a44-4ac1-8e22-77ba17d00013';
+legacy.set('office-member-v2:'+duplicateAdmin,JSON.stringify({
+ id:duplicateAdmin,name:'관리자',active:true,created_at:'2026-10-26T03:00:00.000Z'
+}));
+legacy.set('office-member-device-v2:'+'c'.repeat(32),JSON.stringify({
+ member_id:oldId,binding:'22d232ba-3399-4b22-aa33-345677998800'
+}));
+legacy.set('office-member-device-v2:'+'d'.repeat(32),JSON.stringify({
+ member_id:oldId,binding:'22d232ba-3399-4b22-aa33-345677998801'
+}));
+legacy.set('office-member-device-v2:'+'e'.repeat(32),JSON.stringify({
+ member_id:duplicateAdmin,binding:'22d232ba-3399-4b22-aa33-345677998802'
+}));
+const duplicateChoice=await service.fetch(new Request(origin+'/board/choices',{
+ method:'POST',headers:{'Content-Type':'application/json'},
+ body:JSON.stringify({code:'changedPasswordAfterRotation'})
+}),legacyEnv);
+assert.equal(duplicateChoice.status,200);
+const displayed=(await duplicateChoice.json()).accounts;
+assert.equal(displayed.filter(v=>v.name==='관리자').length,1,
+ 'Two administrator records should appear as one logical account');
+assert.equal(displayed.length,3,'Admin (2 phones), mom, dad (1 each) are 3 logical profiles');
+assert.equal(displayed[0].id,oldId,
+ 'Keep most-connected existing admin as the selectable identity');
+assert(legacy.has('office-member-v2:'+duplicateAdmin),
+ 'Never delete other admin member records or their existing device bindings');
+assert(legacy.has('office-member-device-v2:'+'e'.repeat(32)));
+
 console.log('Private calendar metadata, administrator-only soft-delete and 30-day recovery passed.');

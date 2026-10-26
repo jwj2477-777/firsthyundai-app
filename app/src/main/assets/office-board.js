@@ -6,6 +6,7 @@ const requests=new Map(),localUpdates=new Map(),localDeletes=new Map();
 let sequence=0,items=[],busy=false,lastCheck=0,showCompleted=false,editing='',editDraft='',timer=null;
 let timerMs=45000,pendingFocus='',view='notes',scheduleOpen=false,suggestedDate='';
 let archiveOpen=false,archived=[];
+let lastBriefing=0,briefingBusy=false;
 const startKst=()=>kstDate(new Date());
 let selectedDate='',calendarMonth='';
 function focusNote(id){
@@ -228,8 +229,66 @@ function merge(server){
   if(now-time>120000)localDeletes.delete(id);else merged.delete(id);
  }
  items=[...merged.values()];
- sortItems();draw();
+ sortItems();draw();renderBriefing();
 }
+// Today's briefing reuses the exact same authenticated private memo records.
+function nextDay(date){
+ const [y,m,d]=date.split('-').map(Number);
+ return new Date(Date.UTC(y,m-1,d+1)).toISOString().slice(0,10);
+}
+function briefingRows(day,limit){
+ return items.filter(n=>!n.done&&n.scheduled_at&&dateKey(n.scheduled_at)===day)
+  .sort((a,b)=>String(a.scheduled_at).localeCompare(String(b.scheduled_at)))
+  .slice(0,limit);
+}
+function renderBriefing(){
+ if(!$('overviewMemoBriefing'))return;
+ const date=kstDate(new Date()),tomorrow=nextDay(date);
+ const todayNotes=briefingRows(date,5),tomorrowNotes=briefingRows(tomorrow,2);
+ const todayTotal=items.filter(n=>!n.done&&dateKey(n.scheduled_at)===date).length;
+ const tomorrowTotal=items.filter(n=>!n.done&&dateKey(n.scheduled_at)===tomorrow).length;
+ $('overviewMemoCount').textContent=todayTotal+'건';
+ const target=$('overviewMemoEntries');if(!target)return;
+ const row=(notes)=>notes.map(note=>{
+  const t=kstParts(note.scheduled_at),time=note.all_day?'종일':(t?.time||'');
+  const title=String(note.text||'').split('\n')[0].trim().slice(0,65);
+  return '<button type="button" class="overviewMemoEntry" data-brief-note="'+esc(note.id)+'">'+
+   '<span class="overviewMemoTime">'+esc(time)+'</span>'+
+   '<span class="overviewMemoCopy">'+esc(title)+'</span>'+
+   '<span class="overviewMemoArrow" aria-hidden="true">›</span></button>';
+ }).join('');
+ target.innerHTML=(todayNotes.length?row(todayNotes):
+  '<p class="overviewMemoEmpty">오늘 예정된 일정이 없습니다.</p>')+
+  (tomorrowTotal?'<div class="overviewMemoNextDay">내일 일정 '+tomorrowTotal+'건</div>'+
+   row(tomorrowNotes):'');
+}
+function openBriefing(force=false){
+ renderBriefing();
+ if(briefingBusy||(!force&&Date.now()-lastBriefing<45000))return;
+ briefingBusy=true;
+ const target=$('overviewMemoEntries');
+ if(target&&!lastBriefing)target.textContent='공유 일정을 확인하는 중…';
+ call('list',{}).then(data=>{
+  merge(Array.isArray(data.notes)?data.notes:[]);
+  lastBriefing=Date.now();
+ },()=>{if(target&&!lastBriefing)target.textContent='공유 일정을 불러오지 못했습니다. 메모 연결을 확인해 주세요.'})
+ .finally(()=>{briefingBusy=false});
+}
+function openBriefingNote(id){
+ if(!valid(id))return;
+ setView('notes');
+ if(typeof switchPage==='function')switchPage('officeBoard');
+ focusNote(id);
+}
+function openBriefingCalendar(){
+ setView('calendar');
+ today();
+ if(typeof switchPage==='function')switchPage('officeBoard');
+}
+$('overviewMemoEntries')?.addEventListener?.('click',e=>{
+ const button=e.target?.closest?.('button[data-brief-note]');
+ if(button)openBriefingNote(button.dataset.briefNote);
+});
 async function refresh(silent=false){
  if(busy||currentPage!=='officeBoard')return;
  if(!silent)msg('메모를 확인하는 중…');
@@ -237,6 +296,7 @@ async function refresh(silent=false){
   const data=await call('list',{});
   merge(Array.isArray(data.notes)?data.notes:[]);
   lastCheck=Date.now();
+  lastBriefing=lastCheck;
   $('officeBoardAuth')?.classList?.add?.('hidden');
   if(!silent)msg('메모를 확인했습니다.');
  }catch(e){if(!silent)msg(e.message)}
@@ -336,8 +396,11 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
 });
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
  setView,chooseDay,changeMonth,today,openCalendarNote,toggleArchive,
- onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true)},
- onNewNotification(){if(currentPage==='officeBoard')refresh(true)},
+ onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true);
+  else if(currentPage==='overview')openBriefing(true)},
+ onNewNotification(){if(currentPage==='officeBoard')refresh(true);
+  else if(currentPage==='overview')openBriefing(true)},
  syncNotificationStatus,enableNotifications,settingsChanged,focusNote,
- _test:{phones,merge,scheduleSuggestion,toIso,dateKey}};
+ openBriefing,openBriefingNote,openBriefingCalendar,renderBriefing,
+ _test:{phones,merge,scheduleSuggestion,toIso,dateKey,briefingRows,nextDay}};
 })();

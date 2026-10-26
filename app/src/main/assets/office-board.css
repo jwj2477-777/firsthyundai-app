@@ -309,3 +309,18 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 .officeMemberChoose{width:100%;margin-bottom:13px;min-height:46px;border-radius:10px;font-size:13px;font-weight:750}
 #officeCurrentMember{font-weight:800;color:#416A5A}
 #officeBoardCurrentMember{font-weight:750;color:#648071}
+
+
+/* Inline account-name editing is administrator-only; compact on narrow phones. */
+.officeMemberRow{flex-wrap:wrap}
+.officeMemberRename,.officeMemberRenameSave,.officeMemberRenameCancel{
+ min-height:37px;flex:0 0 auto;border-radius:9px;padding:7px 10px;
+ background:#fff;border:1px solid #D5E4DB;color:#4E7768;font-size:12px;font-weight:700}
+.officeMemberRenameSave{background:#1E6A63;border-color:#1E6A63;color:#fff}
+.officeMemberRenameCancel{background:#F3F7F4;color:#5F7972}
+.officeMemberRenameInput{flex:1 1 110px;min-width:110px;max-width:240px;
+ border:1px solid #B8CEC1;background:#fff;border-radius:8px;
+ font-size:14px;min-height:40px;padding:7px 10px}
+.officeMemberRename:focus-visible,.officeMemberRenameSave:focus-visible,
+.officeMemberRenameCancel:focus-visible,.officeMemberRenameInput:focus-visible{
+ outline:2px solid #397E73;outline-offset:1px}

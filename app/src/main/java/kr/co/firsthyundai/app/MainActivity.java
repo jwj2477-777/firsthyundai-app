@@ -551,7 +551,7 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public void officeMembersAction(String action,String payload,String requestId){
             if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
-            if(action==null||!java.util.Arrays.asList("list","add","remove").contains(action)||
+            if(action==null||!java.util.Arrays.asList("list","add","remove","rename").contains(action)||
                 payload==null||payload.length()>600)return;
             final String identity=adminSessionIdentity,admin=sharedSettingsToken;
             io.execute(()->{
