@@ -9,7 +9,7 @@
 - 오늘 날씨: 비/눈/진눈깨비 예상 시작 시간을 한국시간으로 짧게 안내하고 추가 눈/비 시간·예보기온을 선택적으로 표시. 불완전 시간표나 미연결을 '비 없음'으로 표시하지 않음. 0°C 유효값·시각 미확인·어제자료·예보/관측 분리 보존.
 - 기존 날씨의 서비스키를 URLSearchParams로 재인코딩하기 전 1회 decodeURIComponent 처리(기존 공공데이터 수집기의 normalize 규칙과 통일). 원문 키/URL/고객자료 로그 금지. 실조회 승인 성공은 배포 후 별도 확인.
 - 검증: test_season_themes.js, test_theme_weather.mjs, test_weather_briefing.mjs, 확대된 test_theme_layout_browser.js(테마×비눈×강도×상단 적용에 따른 9개 업무화면의 컨트롤 좌표/크기/글꼴/기능색 비교), SeasonThemeMathTest. 기존 브랜드·계정·공유메모·설정·업무 브리핑 회귀검사 유지.
-- 배포 상태: v2.1.15/build166 대상. APK 빌드·서명·Release 및 Worker 관측/시간별예보 실응답 성공 여부는 Actions에서 확인. 실제 삼성 휴대폰 화면은 별도 검증 필요.
+- 배포 검증: v2.1.15/build166 고정서명 APK 및 AI 백업 Release 게시 완료. Build Android APK 40287310262 success. 320/393/600px 각 810개 테마/강도/상단/비눈 조합(총2430)에서 기존 컨트롤 위치·크기·글꼴·기능색 보존. Native SeasonThemeMathTest 포함 전체 CI 통과. 실삼성단말 화면은 별도 확인.\n- 실제 날씨 미연결: Worker 배포 40287310440/40287663952 success이지만 초단기실황 및 시간별예보는 연결 미검증. Runner 공식 API 직접 진단도 HTTP 403. 키 1회 디코딩 개선 후에도 접근 오류이므로 승인 성공으로 설명하지 말 것. 사용자에게 기상청 단기예보 조회서비스 https://www.data.go.kr/data/15084084/openapi.do 활용승인 여부 확인 필요를 알림. 예보 안내 코드는 준비됐으나 실제 비/눈 예정 시각은 미연결 화면으로 남음.
 
 
 ## 2026-10-26 · v2.1.14 · 계절 테마와 비·눈 장식
