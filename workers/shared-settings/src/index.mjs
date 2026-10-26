@@ -18,11 +18,28 @@ async function memberList(env){
  .filter(v=>v&&validMemberId(v.id)&&v.active===true)
  .map(v=>({id:v.id,name:v.name})).sort((a,b)=>a.name.localeCompare(b.name,"ko"));
 }
-async function ensureInitialMember(env){
+// Bootstrap exactly once, before the first device signs in. Existing members
+// survive upgrades. A removed member is never silently recreated.
+const DEFAULT_MEMBERS_KEY="office-member-defaults-v3";
+const DEFAULT_MEMBERS=[
+ {id:"77d4f48a-02b3-4dc3-8e1e-202610260001",name:"관리자"},
+ {id:"77d4f48a-02b3-4dc3-8e1e-202610260002",name:"엄마"},
+ {id:"77d4f48a-02b3-4dc3-8e1e-202610260003",name:"아빠"}
+];
+async function ensureDefaultMembers(env){
+ if(await env.SETTINGS.get(DEFAULT_MEMBERS_KEY))return;
  const all=await env.SETTINGS.list({prefix:MEMBER_PREFIX,limit:100});
- if(all.keys.length)return;
- const record={id:crypto.randomUUID(),name:"관리자",active:true,created_at:new Date().toISOString()};
- await env.SETTINGS.put(MEMBER_PREFIX+record.id,JSON.stringify(record));
+ const found=(await Promise.all(all.keys.map(v=>env.SETTINGS.get(v.name,"json"))))
+  .filter(x=>x&&validMemberId(x.id));
+ const known=new Set(found.map(x=>x.name));
+ // Use stable IDs for idempotent retries, not random IDs that can multiply.
+ for(const member of DEFAULT_MEMBERS){
+  if(known.has(member.name))continue;
+  const record={...member,active:true,created_at:new Date().toISOString(),initial:true};
+  await env.SETTINGS.put(MEMBER_PREFIX+record.id,JSON.stringify(record));
+ }
+ // This marker prevents deleted default profiles from returning on future requests.
+ await env.SETTINGS.put(DEFAULT_MEMBERS_KEY,JSON.stringify({seeded:true,at:new Date().toISOString()}));
 }
 const res=(o,s=200)=>new Response(JSON.stringify(o),{status:s,headers:HEAD});
 function b64(buf){const x=buf instanceof Uint8Array?buf:new Uint8Array(buf);return btoa(String.fromCharCode(...x)).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
@@ -82,7 +99,7 @@ async function boardCommand(req,env,url,ctx){
   if(!(await env.AUTH_LIMITER.limit({key:"board-enrollment"})).success)return res({error:"rate_limited"},429);
   let data;try{data=await body(req,3000)}catch(e){return res({error:"bad_request"},400)}
   if(!await same(data?.code,env.FIRSTHYUNDAI_ACCESS_CODE,8))return res({error:"unauthorized"},401);
-  await ensureInitialMember(env);
+  await ensureDefaultMembers(env);
   if(url.pathname==="/board/choices")return res({accounts:await memberList(env)});
   const account=typeof data?.member_id==="string"?data.member_id:"";
   const deviceId=typeof data?.device==="string"?data.device:"";
@@ -392,8 +409,11 @@ export default {async fetch(req,env,ctx){
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:HEAD});
  const url=new URL(req.url);
  if(!env.SETTINGS)return res({error:"kv_not_configured"},503);
- if(url.pathname==="/health"&&req.method==="GET")return res({ok:true,storage:true,
+ if(url.pathname==="/health"&&req.method==="GET"){
+  if(env.FIRSTHYUNDAI_ACCESS_CODE)await ensureDefaultMembers(env);
+  return res({ok:true,storage:true,defaultAccountsReady:!!(await env.SETTINGS.get(DEFAULT_MEMBERS_KEY)),
   authConfigured:!!env.FIRSTHYUNDAI_ADMIN_CODE,boardAuthConfigured:!!env.FIRSTHYUNDAI_ACCESS_CODE,fcmConfigured:!!fcmConfig(env)});
+ }
  if(url.pathname.startsWith("/board"))return boardCommand(req,env,url,ctx);
  if(url.pathname==="/settings"&&req.method==="GET")return res((await env.SETTINGS.get(key,"json"))||{schema:1,status:"not_configured"});
  if(req.headers.has("origin"))return res({error:"native_only"},403);
