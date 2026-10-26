@@ -105,7 +105,7 @@
  function hourlyRows(doc,now=Date.now(),limit=12){
   if(!valid(doc,now))return [];
   const start=Math.ceil(now/HOUR)*HOUR;
-  return doc.hours.filter(h=>Date.parse(h.at)>=start)
+  return doc.hours.filter(h=>Date.parse(h.at)>=start&&Date.parse(h.at)<start+12*HOUR)
    .sort((a,b)=>Date.parse(a.at)-Date.parse(b.at))
    .slice(0,Math.max(0,Math.min(24,limit)));
  }
