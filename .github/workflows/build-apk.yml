@@ -20,6 +20,7 @@ on:
       - 'scripts/test_shared_settings.js'
       - 'scripts/test_shared_settings_worker.mjs'
       - 'scripts/test_weather_briefing.mjs'
+      - 'scripts/test_weather_detail.js'
       - 'scripts/test_memo_dates.js'
       - 'scripts/test_account_picker.js'
       - 'scripts/test_office_board.mjs'
@@ -249,6 +250,7 @@ jobs:
           node scripts/test_season_points.js
           node scripts/test_theme_weather.mjs
           node scripts/test_weather_briefing.mjs
+          node scripts/test_weather_detail.js
           node scripts/test_conditional_songdo_briefing.js
           node scripts/test_header_footer_mode_layout_browser.js
           node scripts/test_weather_snapshot.mjs
@@ -348,24 +350,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.28 hourly Songdo weather forecast APK
+      - name: Publish v2.1.29 Songdo detailed weather and business-linked forecast APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.28.apk
-          unzip -t FirstHyundai-v2.1.28.apk | grep 'No errors detected'
-          if gh release view v2.1.28 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.29.apk
+          unzip -t FirstHyundai-v2.1.29.apk | grep 'No errors detected'
+          if gh release view v2.1.29 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.28 FirstHyundai-v2.1.28.apk \
+            gh release create v2.1.29 FirstHyundai-v2.1.29.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.28 · 송도 시간별 날씨 예보 추가' \
-              --notes '오늘 업무 브리핑의 현재 날씨 아래에 필요할 때만 펼치는 시간별 예보를 추가했습니다. 기상청 단기예보 원자료의 시간별 기온·강수확률·비·눈·하늘 상태를 사용하며, 다음 시간부터 최대 12개의 시간대를 가로로 확인할 수 있습니다. 검증되지 않은 기상 데이터는 추정하지 않고, 지도함·휴무일 경고와 기존 업무 기능 및 계절 테마를 유지합니다. v2.1.28/build179.'
+              --title '퍼스트현대 v2.1.29 · 송도 상세 날씨·업무 일정 예보 연동' \
+              --notes '오늘 업무브리핑의 현재 날씨를 누르면 송도 전용 상세 날씨 화면으로 이동합니다. 기상청 실황과 시간별 단기예보를 구분하여 표시하고, 시간별 기온 추이 그래프·강수확률·향후 예보 구간 최고·최저기온 및 강수 변화 요약을 제공합니다. 공유메모에서는 고객 개인정보가 아닌 일정 시각만 이용해 해당 시간대 기온·비·눈·강수확률을 연결합니다. 기존 지도함 안내 및 휴무일 예보 경고를 상세 화면에서도 확인할 수 있습니다. 확인되지 않은 체감온도·일출/일몰은 추측하지 않으며 기존 전 화면 기능을 유지합니다. v2.1.29/build180.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.28 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.28 --apk FirstHyundai-v2.1.28.apk
+          gh release upload v2.1.29 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.29 --apk FirstHyundai-v2.1.29.apk
 
 
