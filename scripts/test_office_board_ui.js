@@ -9,6 +9,19 @@ const dates=fs.readFileSync(path.join(dir,'memo-dates.js'),'utf8');new vm.Script
 assert(js.includes('memoRefresh')&&js.includes('memoOrder')&&js.includes('memoCompleted'));
 assert(js.includes('memoClock')&&js.includes('memoPhones'));
 assert(js.includes('settingsChanged')&&js.includes('clearInterval(timer)'));
+assert(html.includes('id="overviewMemoBriefing"')&&
+ html.includes('id="overviewMemoEntries"')&&
+ html.includes('FirstHyundaiOfficeBoard.openBriefingCalendar()'),
+ 'Today briefing must have a compact list and a direct calendar route');
+assert(js.includes('function openBriefing(')&&
+ js.includes("call('list',{})")&&
+ js.includes('function briefingRows(')&&
+ js.includes('openBriefingNote(button.dataset.briefNote)'),
+ 'Today briefing must reuse private shared notes and support one-tap memo navigation');
+assert(html.includes("if(id==='overview')window.FirstHyundaiOfficeBoard?.openBriefing?.()"),
+ 'Opening the today tab refreshes the linked memo agenda');
+assert(html.includes('id="officeFooterMember"'),
+ 'Footer quietly shows the native currently selected account');
 for(const field of ['officeBoard','officeBoardDraft','officeBoardPost','officeBoardList','officeBoardAuth'])
  assert(html.includes('id="'+field+'"'),field+' missing');
 assert(html.includes("['officeBoard','사무실 메모']"));
