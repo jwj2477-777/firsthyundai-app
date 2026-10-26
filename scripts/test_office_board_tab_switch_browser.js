@@ -51,7 +51,11 @@ async function verify(){
   check(h(calendar)===h(memo)&&same(calendar),'Button sizes changed when selected');
   check(draft.value==='보존할 미발송 메모 초안','Switching tabs discarded unposted text');
   await new Promise(resolve=>setTimeout(resolve,850));
-  check(getComputedStyle(calendar).backgroundColor===mustard,'Memo/calendar use same active mustard');
+  // Test the *resting* background; the real-button flow momentarily paints
+  // an inline gradient over it (headless Chrome can throttle animation frames).
+  window.FirstHyundaiSelectionFlow?._test?.stop?.();
+  check(getComputedStyle(calendar).backgroundColor===mustard,
+    'Memo/calendar active color differs: '+getComputedStyle(calendar).backgroundColor+' vs '+mustard);
   memo.click();
   check(!composer.classList.contains('hidden')&&!list.classList.contains('hidden'),'Notes controls did not return');
   check(agenda.classList.contains('hidden'),'Calendar was not hidden');
