@@ -1,5 +1,10 @@
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
+## 2026-10-26 · v2.1.08 · 기본 계정 3명 자동 초기화
+- 공유메모 Worker의 ensureDefaultMembers는 관리자/엄마/아빠(3명)를 최초 서버 health check 또는 첫 가족코드 검증 시 생성. 무작위 기본 ID 금지·기존 관리자 계정 보호·한 번만 실행되는 마커로 삭제된 구성원 재생성 금지.
+- /health 의 defaultAccountsReady(boolean)은 계정명·ID·비밀번호를 노출하지 않고 초기화 완료 여부만 전달함. 서버 배포 후 이 필드를 확인할 것.
+
+
 ## 2026-10-26 · v2.1.07 공유메모 일정·계정 관리
 - 사무실 자유 메모에서 한국어 상대날짜/요일/특정일을 자동 파싱해 종일 또는 지정시간으로 달력에 연결. 수동 일정연결 폼 제거.
 - 일반계정 최초 선택(가족코드는 관리자가 기기에 입력): LockActivity -> POST /board/choices -> 선택 -> POST /board/session. Server member/device KV, HMAC board-v2 session + 실시간 KV 확인; 메모 작성자는 서버에서 검증한 계정으로만 기록. 관리센터 /board/members (native admin token) 추가/삭제, 삭제 시 기기 revoked tombstone 기록 및 FCM 등록 해제. 삭제 계정의 서명 토큰도 거부, 앱은 온라인 검증 시 시작 화면 잠금.
