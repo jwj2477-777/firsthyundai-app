@@ -283,3 +283,59 @@ body[data-season-theme]:not([data-season-theme="default"]) #overview .overviewWe
  #overview #overviewWeatherMessage.is-reading{font-size:25px}
  #overview #overviewWeatherSource{font-size:10.5px}
 }
+
+
+/* v2.1.28 · Quiet by default: reveal real short-term forecast only when asked. */
+#overview .overviewHourlySection{margin-top:13px;border-top:1px solid #E6ECE9;padding-top:3px}
+#overview .overviewHourlyToggle{
+ display:flex;align-items:center;justify-content:space-between;width:100%;
+ min-height:43px;margin:0;padding:9px 2px;background:transparent;color:#31585C;
+ border:0;border-radius:7px;font:inherit;text-align:left;cursor:pointer;
+}
+#overview .overviewHourlyToggleCopy{display:flex;align-items:baseline;gap:10px;min-width:0}
+#overview .overviewHourlyToggleCopy strong{font-size:13px;font-weight:780}
+#overview .overviewHourlyToggleCopy small{font-size:11px;color:#718588;font-weight:500}
+#overview .overviewHourlyChevron{display:inline-block;font-size:21px;line-height:1;
+ color:#66888B;transform:rotate(0);transition:transform .2s ease}
+#overview .overviewHourlyToggle[aria-expanded="true"] .overviewHourlyChevron{transform:rotate(180deg)}
+#overview .overviewHourlyToggle:focus-visible{outline:2px solid #3E8A87;outline-offset:2px}
+#overview .overviewHourlyDetail{padding:7px 0 12px}
+#overview .overviewHourlyDetail[hidden],
+#overview .overviewHourlyList[hidden],
+#overview .overviewHourlyNotice[hidden]{display:none!important}
+#overview .overviewHourlyHead{display:flex;align-items:center;justify-content:space-between;
+ gap:9px;margin:0 0 9px}
+#overview .overviewHourlyHead>strong{font-size:11px;color:#61787C;font-weight:780}
+#overview .overviewHourlyHead>small{font-size:10px;color:#879696;text-align:right}
+#overview .overviewHourlyList{
+ display:flex;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;
+ scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#D5E2DD transparent;
+ padding:1px 0 9px;
+}
+#overview .overviewHourItem{
+ box-sizing:border-box;min-width:67px;flex:0 0 67px;scroll-snap-align:start;
+ display:flex;flex-direction:column;align-items:center;gap:5px;
+ background:#F9FBFA;border:1px solid #E5EBE8;border-radius:11px;
+ padding:10px 3px 9px;color:#48696A;font-variant-numeric:tabular-nums;
+}
+#overview .overviewHourDate{font-size:10px;color:#788C8D;font-weight:650;line-height:1.2}
+#overview .overviewHourClock{font-size:12px;color:#325258;font-weight:760;line-height:1.2}
+#overview .overviewHourGlyph{width:26px;height:26px;margin:4px 0 2px;flex:0 0 26px}
+#overview .overviewHourItem[data-kind="sun"] .overviewHourGlyph{color:#CB9A41}
+#overview .overviewHourItem[data-kind="rain"] .overviewHourGlyph,
+#overview .overviewHourItem[data-kind="mixed"] .overviewHourGlyph{color:#4B7B9C}
+#overview .overviewHourItem[data-kind="snow"] .overviewHourGlyph{color:#658DB8}
+#overview .overviewHourTemp{font-size:16px;color:#284D56;font-weight:810;line-height:1.35}
+#overview .overviewHourPop{
+ font-size:11px;line-height:1.5;color:#46778C;font-weight:700;
+ border-top:1px solid #E8EFED;width:80%;text-align:center;padding-top:5px;
+}
+#overview .overviewHourlyNotice{margin:3px 0;color:#77888A;font-size:12px;line-height:1.55}
+@media(max-width:360px){
+ #overview .overviewHourlyToggleCopy{gap:6px}
+ #overview .overviewHourlyToggleCopy small{font-size:10.5px}
+ #overview .overviewHourItem{min-width:62px;flex-basis:62px}
+}
+@media(prefers-reduced-motion:reduce){
+ #overview .overviewHourlyChevron{transition:none}
+}
