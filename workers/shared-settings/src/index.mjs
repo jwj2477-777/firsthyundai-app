@@ -188,7 +188,7 @@ async function boardCommand(req,env,url,ctx){
   await env.SETTINGS.put(MEMBER_PREFIX+account.id,JSON.stringify(account));
   return res({ok:true,account:{id:account.id,name}},201);
  }
- const accountRename=url.pathname.match(/^\\/board\\/members\\/([0-9a-f-]{36})\\/rename$/);
+ const accountRename=url.pathname.match(/^\/board\/members\/([0-9a-f-]{36})\/rename$/);
  if(accountRename&&req.method==="PATCH"){
   if(!await isAdmin())return res({error:"admin_required"},403);
   let payload,name;try{payload=await body(req,1000);name=safeMemberName(payload?.name)}
