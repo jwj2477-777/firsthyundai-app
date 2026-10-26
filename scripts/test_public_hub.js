@@ -117,7 +117,7 @@ run("publicServices.subscriptions="+JSON.stringify({state:'verified',updated_at:
  households:123,notice_url:'https://www.applyhome.co.kr/ai/aia/test.do'}]}));
 run('renderPublicSubscriptions()');
 assert(nodes.publicSubscriptions.innerHTML.includes('송도 새아파트'));
-assert.equal(nodes.subscriptionsMeta.textContent,'청약홈 · 확인 26.10.20 09:30');
+assert.equal(nodes.subscriptionsMeta.textContent,'청약홈 · 확인 2026.10.20 09:30');
 assert(nodes.publicSubscriptions.innerHTML.includes('<details class="subscriptionSourceDetails">'));
 assert(nodes.publicSubscriptions.innerHTML.includes('2025-09-01'),'Source coverage is preserved in expandable details');
 assert(nodes.publicSubscriptions.innerHTML.includes('청약홈 공고 원문'));
