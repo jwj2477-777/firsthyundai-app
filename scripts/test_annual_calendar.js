@@ -27,6 +27,7 @@ assert.equal(api.nextDate(solar,'2026-10-26'),'2027-08-30');
 assert.equal(api.occursOn(solar,'2027-08-30'),true);
 const leap=api.parseLine('가족다 양력 2월 29일');
 assert.equal(api.nextDate(leap,'2029-01-01'),'2032-02-29');
+assert.equal(api.nextDate(api.parseLine('가족바 양력 1월 31일'),'2026-10-26'),'2027-01-31');
 assert.equal(api.parseLine('가족라 음력 13월 5일'),null);
 assert.equal(api.parseLine('가족마 음력 1월 31일'),null);
 assert.equal(api.parseLine(''),null);
