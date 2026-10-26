@@ -437,3 +437,20 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 #officeBoard .officeBoardFeedback.hidden{
  display:none!important;
 }
+
+/* Annual birthdays are private office-board entries, not public source fixtures. */
+#officeBoard .officeBoardBirthdayAdd{min-height:39px;padding:7px 12px;margin:0 0 12px;
+ border:1px solid #E7D8C4;border-radius:10px;background:#FBF4E9;color:#795633;
+ font-size:12px;font-weight:800;width:100%;cursor:pointer}
+#officeBoard .officeBoardBirthdayForm{padding:12px;border:1px solid #EADBCD;
+ border-radius:12px;background:#FFF9F1;margin-bottom:12px}
+#officeBoard .officeBoardBirthdayForm label{display:block;font-size:13px;font-weight:800;color:#654C34}
+#officeBoard .officeBoardBirthdayForm .tiny{margin:5px 0 9px;color:#7E6D5F}
+#officeBoard .officeBoardBirthdayForm textarea{width:100%;min-height:108px;font-size:13px;
+ background:#fff;border-color:#E2D4C2}
+#officeBoard .officeBoardBirthdayActions{display:flex;justify-content:flex-end;gap:7px;margin-top:9px}
+#officeBoard .officeBoardBirthdayActions button{min-height:42px;border-radius:9px;
+ border:1px solid #D8C9B8;background:#FFF;color:#77583B;padding:8px 12px;font-size:12px;font-weight:750}
+#officeBoard .officeBoardBirthdayActions button:last-child{background:#7D6243;color:#FFF;border-color:#7D6243}
+#officeBoard .officeBoardBirthdayActions button:disabled{opacity:.5}
+#officeBoard .officeBoardBirthdayAdd.hidden,#officeBoard .officeBoardBirthdayForm.hidden{display:none!important}
