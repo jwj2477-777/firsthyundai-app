@@ -32,7 +32,7 @@ async function collect(secret){
   url.search=new URLSearchParams({serviceKey:normalizeKmaKey(secret),pageNo:'1',numOfRows:'20',dataType:'JSON',base_date:date,base_time:time,nx:'55',ny:'123'});
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),2500);
   try{
-   const r=await fetch(url,{signal:controller.signal});
+   const r=await fetch(url,{headers:{Accept:'application/json','User-Agent':'Mozilla/5.0 (compatible; FirstHyundaiWeather/1.0)'},signal:controller.signal});
    if(!r.ok)throw Error('provider_unavailable');
    const doc=await r.json();
    if(String(doc?.response?.header?.resultCode)==='03'&&back===0)continue;

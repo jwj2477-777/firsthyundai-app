@@ -20,7 +20,8 @@ assert.throws(()=>parseForecast(doc,base,now+8*3600000));
 assert.throws(()=>parseForecast({response:{header:{resultCode:'30'}}},base,now));
 const partial=structuredClone(doc);partial.response.body.items.item=rows.filter(r=>r.fcstTime!=='1900');
 assert.equal(parseForecast(partial,base,now).complete,false);
-assert.equal((await weatherBriefing({})).status,503);
+const offlineFetch=globalThis.fetch;globalThis.fetch=async()=>{throw Error('Offline test fixture')};
+try{assert.equal((await weatherBriefing({})).status,503);}finally{globalThis.fetch=offlineFetch}
 const nodes=new Map();const get=id=>{if(!nodes.has(id))nodes.set(id,{textContent:'',hidden:false});return nodes.get(id)};
 const ctx={Date,AbortController,setTimeout,clearTimeout,window:{setInterval(){}},document:{hidden:true,getElementById:get,addEventListener(){}}};
 vm.createContext(ctx);vm.runInContext(fs.readFileSync('app/src/main/assets/weather-briefing.js','utf8'),ctx);

@@ -31,10 +31,10 @@ final class SeasonThemeMath {
     static int[] palette(String theme,String intensity) {
         int[] base={0xff102D38,0xff183E49,0xff23575D},target;
         switch(theme){
-            case "spring":target=new int[]{0xff34503C,0xff4B684A,0xff4F6840};break;
-            case "summer":target=new int[]{0xff083D57,0xff075D79,0xff126570};break;
-            case "autumn":target=new int[]{0xff49362F,0xff6D5039,0xff735031};break;
-            case "winter":target=new int[]{0xff263849,0xff3E526D,0xff4F5F78};break;
+            case "spring":target=new int[]{0xff4D354E,0xff704B65,0xff765864};break;
+            case "summer":target=new int[]{0xff073E55,0xff086B7B,0xff0F6A66};break;
+            case "autumn":target=new int[]{0xff51352D,0xff784E32,0xff79532B};break;
+            case "winter":target=new int[]{0xff232F50,0xff35476D,0xff4B557E};break;
             default:return base;
         }
         double k="soft".equals(intensity)?.4:"vivid".equals(intensity)?1:.8;

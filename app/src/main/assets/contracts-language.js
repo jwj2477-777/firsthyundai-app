@@ -38,6 +38,7 @@ function moneyPart(text){
  if(eok){
   const n=spokenNum(eok[1]);if(n===null)return null;
   total+=n*10000;rest=rest.slice(eok[0].length);hasEok=true;
+  if(rest==='원')rest=''; // '1.27억원' has no smaller denomination after 억.
  }
  // Parsed small Korean numerals "오백", "구천", "삼천오백"
  if(/^[일이삼사오육륙칠팔구영공한십백천]+(?:만(?:원)?)?$/.test(rest)){
@@ -75,6 +76,9 @@ function tokenizeMoney(s){
   if(normalized.length===1&&/[가-힣]/.test(text[rx.lastIndex]||''))continue; // 금일·오늘은 금액이 아님
   // Exclude possible apartment dong/ho numbers, year/month/day pieces.
   const behind=text.slice(rx.lastIndex).trimStart();
+  // List markers such as '3.계약금' are never monetary values.
+  if(/^\d{1,2}\.$/.test(normalized)&&/^(?:매매|거래|계약금|중도금|잔금|기타|특약|계좌|주소|소재지)/.test(behind))continue;
+  if(/^\d{1,2}$/.test(normalized)&&/^[.)]\s*(?:매매|거래|계약금|중도금|잔금|기타|특약|계좌|주소|소재지)/.test(behind))continue;
   if(/^(?:동|호|월|일|년|블럭|블록|bl\b|층)/i.test(behind))continue;
   const amount=moneyPart(normalized);
   if(amount!==null&&amount>0)res.push({amount,start:m.index,end:rx.lastIndex,raw:normalized});
@@ -89,7 +93,7 @@ function amountAfter(text,terms){
  for(const p of positions)for(const t of tokens){
   const gap=text.slice(p.end,t.start);
   if(t.start>=p.end&&gap.length<=22&&!/\d{2,4}\s*(?:동|호|월|일)/.test(gap)&&
-     /^(?:\s|[:：,=·]|은|는|으로|에|약|한|금액|총|대략|정도|만원|으로는|할게|할거야|짜리|를|이|가)*$/.test(gap.trim())){
+     /^(?:\s|[:：,=·.。\-–—]|은|는|으로|에|약|한|금액|총|대략|정도|만원|으로는|할게|할거야|짜리|를|이|가)*$/.test(gap.trim())){
    choices.push({...t,offset:t.start-p.end});
   }
  }
@@ -230,7 +234,7 @@ function recognize(raw){
   if(short)apply('unit',short[1]+'동 '+short[2]+'호',found);
  }
  // Contract amount rules. Numerals next to "잔금" are never the total transaction price.
- let price=amountAfter(s,['전세\\s*보증금','보증금','전세금','전세가','전세\\s*대금','매매\\s*대금','매매가','매매금액','매매','집값','전세','보증금은']);
+ let price=amountAfter(s,['전세\\s*보증금','보증금','전세금','전세가','전세\\s*대금','매매\\s*대금','매매가','매매금액','거래\\s*금액','거래대금','매매','집값','전세','보증금은']);
  let rentCombo=s.match(/(?:월세|반전세)\s+([일이삼사오육륙칠팔구한십백천\d,.억만원\\s]+?)\s*에\s*([일이삼사오육륙칠팔구한십백천\d,.억만원]+)(?![가-힣\d])/);
  if(!rentCombo&&deal==='월세')rentCombo=s.match(/(?:^|\s|,)([일이삼사오육륙칠팔구한십백천\d,.억만원]+)\s*에\s*([일이삼사오육륙칠팔구한십백천\d,.억만원]+)(?=\s|,|$)/);
  if(!price&&rentCombo)price={amount:moneyPart(rentCombo[1]),raw:rentCombo[1]};
@@ -277,7 +281,9 @@ function recognize(raw){
   amountAfter(s,['중도금(?!\\s*(?:지급일|지급\\s*예정일|일정|날짜))']);
  if(interim?.amount!=null)apply('interim',interim.amount,found);
  const interimLines=String(raw||'').replace(/\r/g,'').split('\n').filter(line=>/중도금/.test(line));
- for(const line of interimLines){
+ for(const sourceLine of interimLines){
+  // An inline balance date is a separate field, never the interim due date.
+  const line=sourceLine.slice(sourceLine.indexOf('중도금')).split(/(?=잔금(?:일|예정일)?|계약일|특약|기타사항|계좌|은행|예금주)/)[0].trim();
   const schedule=line.match(/중도금\s*(?:지급일|지급\s*예정일|날짜|일정)\s*[:：]?\s*(.+)/);
   if(schedule){
    const due=schedule[1].split(/(?=\s*(?:▶|잔금일|잔금\s*[:：]))/)[0].trim();
@@ -290,7 +296,14 @@ function recognize(raw){
    review.push('중도금 일정 "'+malformed[0].trim()+'"은 월/년 표기가 불명확합니다. 실제 지급일을 직접 확인해 주세요.');
    break;
   }
-  const token=after.match(/(?:20\d{2}\s*년\s*)?\d{1,2}\s*월\s*\d{1,2}\s*일?|20\d{2}[./-]\d{1,2}[./-]\d{1,2}/);
+  const flexible=after.match(/(?:(?:20)?\d{2}\s*년\s*)?\d{1,2}\s*월\s*(?:초순|중순|하순|초|중|말일|말)(?:이나|경|전후|까지|중)?/);
+  if(flexible){
+   const due=after.slice(flexible.index).replace(/[.,;。\s]+$/,'').trim();
+   apply('interimDate',due.slice(0,100),found);
+   review.push('중도금 지급일은 협의 표현을 그대로 반영했습니다. 정확한 날짜가 정해지면 확인해 주세요.');
+   break;
+  }
+  const token=after.match(/(?:(?:20)?\d{2}\s*년\s*)?\d{1,2}\s*월\s*\d{1,2}\s*일?|20\d{2}[./-]\d{1,2}[./-]\d{1,2}/);
   if(token){
    const d=dateIn(token[0]);
    if(d){

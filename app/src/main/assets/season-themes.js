@@ -7,8 +7,8 @@
  const labels={default:'기본',spring:'봄',summer:'여름',autumn:'가을',winter:'겨울'};
  const HOUR=3600000, cache=new Map();
  const headerBase=['#102D38','#183E49','#23575D'];
- const headerColors={spring:['#34503C','#4B684A','#4F6840'],summer:['#083D57','#075D79','#126570'],
-  autumn:['#49362F','#6D5039','#735031'],winter:['#263849','#3E526D','#4F5F78']};
+ const headerColors={spring:['#4D354E','#704B65','#765864'],summer:['#073E55','#086B7B','#0F6A66'],
+  autumn:['#51352D','#784E32','#79532B'],winter:['#232F50','#35476D','#4B557E']};
  function blend(a,b,k){return '#'+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)*(1-k)+parseInt(b.slice(i,i+2),16)*k).toString(16).padStart(2,'0')).join('')}
  function headerPalette(theme,strength){const k={soft:.4,balanced:.8,vivid:1}[strength]??.8;return headerColors[theme]?.map((c,i)=>blend(headerBase[i],c,k))||headerBase}
  let options={theme:'default',themeMode:'manual',weatherEffect:'none',motion:'full'};
@@ -75,6 +75,7 @@
   document.body.setAttribute('data-theme-decor',options.themeDecor);
   document.body.setAttribute('data-theme-header',options.themeHeader);
   document.body.setAttribute('data-theme-intro',options.themeIntro);
+  document.body.setAttribute('data-theme-logo',options.themeLogo);
   const header=document.querySelector?.('header');
   document.body.style?.setProperty('--theme-header-bottom',Math.max(0,header?.getBoundingClientRect?.().bottom||0)+'px');
   const colors=headerPalette(base,options.themeIntensity);
@@ -92,7 +93,7 @@
    }
    layer.replaceChildren();
    const kind=wet!=='none'?wet:base;
-   const amount={default:0,spring:20,summer:12,autumn:18,winter:15,rain:36,snow:30}[kind];
+   const amount={default:0,spring:20,summer:14,autumn:22,winter:18,rain:48,snow:36}[kind];
    const count=options.themeDecor==='off'?0:options.themeDecor==='subtle'?Math.ceil(amount/2):amount;
    for(let i=0;i<count;i++){
     const part=document.createElement('i');part.className='seasonParticle '+kind;
@@ -129,7 +130,7 @@
    weatherEffect:WEATHER.includes(value?.weatherEffect)?value.weatherEffect:'none',motion:value?.motion||'full',
    themeIntensity:['soft','balanced','vivid'].includes(value?.themeIntensity)?value.themeIntensity:'balanced',
    themeDecor:['off','subtle','full'].includes(value?.themeDecor)?value.themeDecor:'full',
-   themeHeader:value?.themeHeader==='off'?'off':'on',themeIntro:value?.themeIntro==='off'?'off':'on'};
+   themeHeader:value?.themeHeader==='off'?'off':'on',themeIntro:value?.themeIntro==='off'?'off':'on',themeLogo:value?.themeLogo==='off'?'off':'on'};
   if(previous!==options.weatherEffect){generation++;lastAttempt=0}
   paint();refresh();
  }

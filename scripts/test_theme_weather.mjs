@@ -10,7 +10,8 @@ for(const value of ['','4','9','NaN'])assert.throws(()=>fromKma(doc(value),now))
 assert.throws(()=>fromKma(doc(),now+7200001));
 assert.throws(()=>fromKma(doc(),now-300001));
 const elsewhere=doc();elsewhere.response.body.items.item[0].nx=60;assert.throws(()=>fromKma(elsewhere,now));
-assert.equal((await themeWeather({})).status,503);
+const offlineFetch=globalThis.fetch;globalThis.fetch=async()=>{throw Error('Offline test fixture')};
+try{assert.equal((await themeWeather({})).status,503);}finally{globalThis.fetch=offlineFetch}
 const original=globalThis.fetch;let calls=0;
 globalThis.fetch=async url=>{
  calls++;assert.equal(url.hostname,'apis.data.go.kr');assert.equal(url.searchParams.get('nx'),'55');assert.equal(url.searchParams.get('ny'),'123');

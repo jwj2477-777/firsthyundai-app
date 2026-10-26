@@ -14,7 +14,7 @@ public class SeasonThemeMathTest {
  }
  @Test public void originalBrandAndIntensityEndpointsStayStable(){
   assertArrayEquals(new int[]{0xff102D38,0xff183E49,0xff23575D},SeasonThemeMath.palette("default","vivid"));
-  assertArrayEquals(new int[]{0xff49362F,0xff6D5039,0xff735031},SeasonThemeMath.palette("autumn","vivid"));
+  assertArrayEquals(new int[]{0xff51352D,0xff784E32,0xff79532B},SeasonThemeMath.palette("autumn","vivid"));
   assertNotEquals(SeasonThemeMath.palette("spring","soft")[0],SeasonThemeMath.palette("spring","vivid")[0]);
  }
 }

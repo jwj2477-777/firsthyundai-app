@@ -461,11 +461,11 @@ function validate(x){
   tapSize:["standard","large"],memoLayout:["standard","compact","roomy"],memoAlerts:["on","off"],
   theme:["default","spring","summer","autumn","winter"],themeMode:["manual","season"],
   weatherEffect:["none","rain","snow","auto"],themeIntensity:["soft","balanced","vivid"],
-  themeDecor:["off","subtle","full"],themeHeader:["on","off"],themeIntro:["on","off"]
+  themeDecor:["off","subtle","full"],themeHeader:["on","off"],themeIntro:["on","off"],themeLogo:["on","off"]
  };
  const defaults={quickOrder:"standard",accent:"brand",tradeAmount:"standard",cancelled:"standard",
   memoOrder:"newest",memoCompleted:"hide",memoRefresh:"45",memoClock:"12",memoPhones:"on",
-  tapSize:"standard",memoLayout:"standard",memoAlerts:"on",theme:"default",themeMode:"manual",weatherEffect:"none",themeIntensity:"balanced",themeDecor:"full",themeHeader:"on",themeIntro:"on"};
+  tapSize:"standard",memoLayout:"standard",memoAlerts:"on",theme:"default",themeMode:"manual",weatherEffect:"none",themeIntensity:"balanced",themeDecor:"full",themeHeader:"on",themeIntro:"on",themeLogo:"on"};
  const p={schema:1};
  for(const [k,values]of Object.entries(allowed)){
   const raw=x.preferences[k]===undefined?defaults[k]:x.preferences[k];

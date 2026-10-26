@@ -54,7 +54,7 @@ export async function weatherBriefing(env){
    url.search=new URLSearchParams({serviceKey:normalizeKmaKey(env.DATA_GO_KR_SERVICE_KEY),pageNo:'1',numOfRows:'1000',dataType:'JSON',base_date:base.date,base_time:base.time,nx:'55',ny:'123'});
    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),4500);
    try{
-    const r=await fetch(url,{signal:controller.signal});if(!r.ok)throw Error('forecast_unavailable');
+    const r=await fetch(url,{headers:{Accept:'application/json','User-Agent':'Mozilla/5.0 (compatible; FirstHyundaiWeather/1.0)'},signal:controller.signal});if(!r.ok)throw Error('forecast_unavailable');
     const value=parseForecast(await r.json(),base,now);cached={at:Date.now(),day:day(now),value};return value;
    }finally{clearTimeout(timeout)}
   })().finally(()=>{inflight=null});

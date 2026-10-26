@@ -1,9 +1,9 @@
 /* Color and decoration only. No changes to business UI geometry, typography,
    navigation, semantic sale/rent/alert colors or original brand handoff. */
-body[data-season-theme="spring"]{--season-page:#EFF5E5;--season-haze:#DCEACB;--season-paper:#FDFFF7;--season-line:#C6DAB7;--season-glow:#F3D1DC;--season-edge:#6F915E}
-body[data-season-theme="summer"]{--season-page:#E7F5F8;--season-haze:#CCE9F0;--season-paper:#F7FEFF;--season-line:#B8DCE4;--season-glow:#C4EEE1;--season-edge:#548C9B}
-body[data-season-theme="autumn"]{--season-page:#F7EBD9;--season-haze:#EBD5B7;--season-paper:#FFFAF0;--season-line:#DCC49E;--season-glow:#F2CEB0;--season-edge:#A87845}
-body[data-season-theme="winter"]{--season-page:#EAF0F8;--season-haze:#D4E0EF;--season-paper:#F9FCFF;--season-line:#C4D3E6;--season-glow:#D9D9EF;--season-edge:#7C98B4}
+body[data-season-theme="spring"]{--season-page:#FAF0F2;--season-haze:#F0D7E3;--season-paper:#FFF9FC;--season-line:#E5C1D0;--season-glow:#DEEDD1;--season-edge:#C1709B;--season-logo:#F2B5CE}
+body[data-season-theme="summer"]{--season-page:#E0F4F5;--season-haze:#BCE5EC;--season-paper:#F2FDFF;--season-line:#9DD1D9;--season-glow:#B9EFDF;--season-edge:#3B91A8;--season-logo:#6ADDE0}
+body[data-season-theme="autumn"]{--season-page:#F6E8D2;--season-haze:#E7C99E;--season-paper:#FFF8EB;--season-line:#D5B37F;--season-glow:#EDB98E;--season-edge:#A86E32;--season-logo:#E9B277}
+body[data-season-theme="winter"]{--season-page:#E9EDF9;--season-haze:#CAD6F0;--season-paper:#F6F9FF;--season-line:#B7C8E5;--season-glow:#D9D0EE;--season-edge:#778DC2;--season-logo:#B9D5FF}
 body[data-season-theme]:not([data-season-theme="default"]){
  background:radial-gradient(ellipse at 100% 80px,var(--season-glow),transparent 390px),
   linear-gradient(180deg,var(--season-haze),var(--season-page) 420px);
@@ -30,12 +30,12 @@ body[data-app-contrast="high"] :is(.panel,.nearbyCard,.newsCard,.officeMemoCard)
 .seasonParticle{position:absolute;left:var(--x);top:-32px;display:block;
  width:10px;height:14px;opacity:.48;transform:scale(var(--s));
  animation:season-drift var(--duration) linear var(--delay) infinite}
-.seasonParticle.spring{background:#D6A4AD;border-radius:80% 15% 75% 30%;box-shadow:inset 1px 1px 2px #FFF8}
-.seasonParticle.summer{background:#83B9C8;width:4px;height:4px;border-radius:50%;opacity:.24}
+.seasonParticle.spring{background:linear-gradient(135deg,#F8CDDC,#CE83A5);border-radius:80% 15% 75% 30%;box-shadow:inset 1px 1px 2px #FFF8;opacity:.62}
+.seasonParticle.summer{background:transparent;width:8px;height:8px;border:1px solid #3F9CB5;border-radius:50%;opacity:.42}
 .seasonParticle.autumn{background:linear-gradient(45deg,#A87032,#D6A065);width:12px;height:18px;border-radius:90% 5% 90% 5%;opacity:.52}
 .seasonParticle.winter{width:3px;height:3px;background:#8DA5C2;border-radius:50%;opacity:.3}
-.seasonParticle.rain{width:1px;height:38px;background:linear-gradient(transparent,#426D93C0);opacity:.57;animation-name:season-rain}
-.seasonParticle.snow{width:6px;height:6px;background:#FFF;border:1px solid #A9BDD580;border-radius:50%;box-shadow:0 0 3px #7E9CBB45;opacity:.8}
+.seasonParticle.rain{width:2px;height:46px;background:linear-gradient(transparent,#3D759DD9);opacity:.65;animation-name:season-rain}
+.seasonParticle.snow{width:11px;height:11px;background:linear-gradient(90deg,transparent 43%,#F7FCFF 43% 57%,transparent 57%),linear-gradient(30deg,transparent 43%,#F7FCFF 43% 57%,transparent 57%),linear-gradient(150deg,transparent 43%,#F7FCFF 43% 57%,transparent 57%);border:0;border-radius:0;filter:drop-shadow(0 0 1px #7797C0);opacity:.92}
 @keyframes season-drift{0%{transform:translate3d(0,-30px,0) rotate(0) scale(var(--s))}100%{transform:translate3d(7px,110vh,0) rotate(175deg) scale(var(--s))}}
 @keyframes season-rain{0%{transform:translate3d(0,-40px,0) rotate(9deg)}100%{transform:translate3d(-15px,110vh,0) rotate(9deg)}}
 body[data-theme-paused="true"] .seasonParticle{animation-play-state:paused}
@@ -47,3 +47,13 @@ body[data-app-motion="reduced"] .seasonParticle{animation:none!important;top:cal
 
 
 body[data-theme-header="off"] #seasonAtmosphere{clip-path:inset(var(--theme-header-bottom,0px) 0 0)}
+
+body[data-theme-header="on"][data-theme-logo="on"] header .officeMark{position:relative;overflow:visible}
+/* The original FHD image and all its path data stay intact. Only its frame is themed. */
+body[data-theme-header="on"][data-theme-logo="on"]:not([data-season-theme="default"]) header .officeMark{position:relative;overflow:visible;box-shadow:0 0 0 2px var(--season-logo),0 0 16px color-mix(in srgb,var(--season-logo) 45%,transparent)!important;border-radius:50%}
+body[data-theme-header="on"][data-theme-logo="on"]:not([data-theme-decor="off"]):not([data-season-theme="default"]) header .officeMark::after{content:"";position:absolute;right:-3px;top:-3px;width:13px;height:13px;pointer-events:none;background:var(--season-logo);box-shadow:0 1px 4px #102D3850;border-radius:80% 15% 75% 30%}
+body[data-season-theme="summer"][data-theme-logo="on"] header .officeMark::after{border-radius:50%;background:#F6D47E}
+body[data-season-theme="winter"][data-theme-logo="on"] header .officeMark::after{border-radius:0;clip-path:polygon(45% 0,55% 0,55% 35%,85% 15%,92% 25%,63% 45%,100% 45%,100% 55%,63% 55%,92% 75%,85% 85%,55% 65%,55% 100%,45% 100%,45% 65%,15% 85%,8% 75%,37% 55%,0 55%,0 45%,37% 45%,8% 25%,15% 15%,45% 35%)}
+body[data-weather-effect="rain"][data-theme-header="on"] header{background-image:linear-gradient(#08283B22,#08283B22),var(--season-header)}
+body[data-weather-effect="rain"][data-theme-header="on"][data-theme-logo="on"]:not([data-theme-decor="off"]) header .officeMark::after{content:"";position:absolute;right:-3px;top:-3px;width:12px;height:15px;background:#78C6DF;border-radius:75% 5% 75% 75%;clip-path:none;transform:rotate(-35deg);pointer-events:none}
+body[data-weather-effect="snow"][data-theme-header="on"][data-theme-logo="on"]:not([data-theme-decor="off"]) header .officeMark::after{content:"";position:absolute;right:-3px;top:-3px;width:15px;height:15px;background:#F3FAFF;border-radius:0;transform:none;pointer-events:none;clip-path:polygon(45% 0,55% 0,55% 35%,85% 15%,92% 25%,63% 45%,100% 45%,100% 55%,63% 55%,92% 75%,85% 85%,55% 65%,55% 100%,45% 100%,45% 65%,15% 85%,8% 75%,37% 55%,0 55%,0 45%,37% 45%,8% 25%,15% 15%,45% 35%)}

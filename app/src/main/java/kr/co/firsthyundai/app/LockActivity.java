@@ -126,6 +126,7 @@ public class LockActivity extends Activity {
         ring.setShape(GradientDrawable.OVAL);
         ring.setColor(Color.TRANSPARENT);
         ring.setStroke(dp(1),Color.argb(112,230,186,95));
+        if(ThemeAppearance.logoAccent(this,true)!=0)ring.setStroke(dp(2),ThemeAppearance.logoAccent(this,true));
         fineRing.setBackground(ring);
         emblemFrame.addView(fineRing,new FrameLayout.LayoutParams(dp(105),dp(105),Gravity.CENTER));
         ImageView emblem=new ImageView(this);
@@ -307,6 +308,7 @@ public class LockActivity extends Activity {
         ringDrawable.setShape(GradientDrawable.OVAL);
         ringDrawable.setColor(Color.TRANSPARENT);
         ringDrawable.setStroke(dp(1),Color.argb(115,230,186,95));
+        if(ThemeAppearance.logoAccent(this,true)!=0)ringDrawable.setStroke(dp(2),ThemeAppearance.logoAccent(this,true));
         haloRing.setBackground(ringDrawable);
         emblemFrame.addView(haloRing,new FrameLayout.LayoutParams(
                 dp(168),dp(168),Gravity.CENTER));

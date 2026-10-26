@@ -21,9 +21,9 @@ for(const t of themeList)for(const w of ['none','rain','snow']){
  assert.equal(body.attrs['data-season-theme'],t);assert.equal(body.attrs['data-weather-effect'],w);
  assert.equal(body.children.length,1,'One inert decoration layer, never duplicate layers');
  assert.equal(body.children[0].attrs['aria-hidden'],'true');
- assert(body.children[0].children.length<=36);
+ assert(body.children[0].children.length<=48);
 }
-for(const key of ['themeHeader','themeIntro']){
+for(const key of ['themeHeader','themeIntro','themeLogo']){
  assert(prefs.set(key,'off'));assert.equal(prefs.get()[key],'off');assert(prefs.set(key,'on'));
 }
 for(const intensity of ['soft','balanced','vivid']){

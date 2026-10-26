@@ -24,7 +24,7 @@ export async function weatherSnapshot(kind){
   checked=now;
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),2500);
   try{
-   const response=await fetch('https://raw.githubusercontent.com/jwj2477-777/firsthyundai-app/main/data/songdo_weather.json',
+   const response=await fetch('https://raw.githubusercontent.com/jwj2477-777/firsthyundai-app/main/data/songdo_weather.json?check='+Math.floor(now/60000),
     {headers:{Accept:'application/json','Cache-Control':'no-cache'},signal:controller.signal});
    if(response.ok){
     const text=await response.text();

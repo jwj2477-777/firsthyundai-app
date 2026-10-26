@@ -184,6 +184,7 @@ jobs:
           node scripts/test_contracts.js
           node --check app/src/main/assets/contracts-language.js
           node scripts/test_contract_language.js
+          node scripts/test_contract_punctuation.js
           node --check app/src/main/assets/contracts-easy.js
           node scripts/test_contract_easy.js
           node scripts/test_contract_parent_review.js
@@ -237,6 +238,7 @@ jobs:
           node scripts/test_season_themes.js
           node scripts/test_theme_weather.mjs
           node scripts/test_weather_briefing.mjs
+          node scripts/test_weather_snapshot.mjs
           node scripts/test_theme_layout_browser.js
           node scripts/test_overview_actions_browser.js
           node scripts/test_admin_preferences.js
@@ -331,24 +333,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.16 readable briefing action cards APK
+      - name: Publish v2.1.17 punctuated contract recognition and distinct seasonal themes APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.16.apk
-          unzip -t FirstHyundai-v2.1.16.apk | grep 'No errors detected'
-          if gh release view v2.1.16 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.17.apk
+          unzip -t FirstHyundai-v2.1.17.apk | grep 'No errors detected'
+          if gh release view v2.1.17 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.16 FirstHyundai-v2.1.16.apk \
+            gh release create v2.1.17 FirstHyundai-v2.1.17.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.16 · 브리핑 업무 버튼 정돈' \
-              --notes '오늘 브리핑의 오늘 새 거래·관심 14개 단지 두 버튼을 정돈했습니다. 큰 장식 아이콘을 줄이고 제목은 한 줄, 건수·실거래 바로 확인은 별도 한 줄로 정렬하여 읽기 편하게 바꿨습니다. 중복 보조문구를 덜어내고 버튼 크기·좌우 위치·이동 기능을 유지합니다. 기존 계절 테마·관리자 세부조절·시작/상단 테마·날씨 브리핑·메모·계정·알림·계약 기능을 보존합니다. v2.1.16/build167.'
+              --title '퍼스트현대 v2.1.17 · 계약 인식·계절 테마 강화' \
+              --notes '번호·마침표·하이픈이 섞인 계약 메모와 소수 억원 표기 인식을 개선했습니다. 매매금액·거래금액·계약금의 다양한 구분기호를 지원하며, 중도금 협의 일정과 잔금일을 분리하고 미기재 송금액·계좌·계약일은 임의로 채우지 않습니다. 기본+4계절 테마와 비·눈 효과를 더 뚜렷하게 나누고 시작 화면·상단·원본 로고 주변에 계절색과 날씨 장식을 적용합니다. 관리자 강도·장식량·시작/상단 적용·로고 장식 제어를 지원합니다. 오늘 브리핑 두 업무 버튼의 한 줄 제목·거래건수 개선, 기존 계정·메모·계약·알림 기능을 보존합니다. v2.1.17/build168.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.16 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.16 --apk FirstHyundai-v2.1.16.apk
+          gh release upload v2.1.17 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.17 --apk FirstHyundai-v2.1.17.apk
 
 

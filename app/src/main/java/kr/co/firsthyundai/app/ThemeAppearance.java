@@ -25,7 +25,7 @@ final class ThemeAppearance {
             String[][] fields={
                 {"theme","default","spring","summer","autumn","winter"},
                 {"themeMode","manual","season"},{"themeIntensity","soft","balanced","vivid"},
-                {"themeDecor","off","subtle","full"},{"themeIntro","on","off"},{"themeHeader","on","off"},
+                {"themeDecor","off","subtle","full"},{"themeIntro","on","off"},{"themeHeader","on","off"},{"themeLogo","on","off"},
                 {"weatherEffect","none","rain","snow","auto"},{"resolvedWeather","none","rain","snow"}
             };
             SharedPreferences.Editor editor=context.getSharedPreferences(PREF,Context.MODE_PRIVATE).edit();
@@ -60,6 +60,28 @@ final class ThemeAppearance {
         String motif="none".equals(wet)?theme:wet;
         return new LayerDrawable(new Drawable[]{base,new Motif(motif,"subtle".equals(decor),"soft".equals(intensity))});
     }
+    static int logoAccent(Context context,boolean intro){
+        SharedPreferences p=context.getSharedPreferences(PREF,Context.MODE_PRIVATE);
+        if(!"on".equals(p.getString(intro?"themeIntro":"themeHeader","on"))||!"on".equals(p.getString("themeLogo","on")))return 0;
+        String wet=p.getString("weatherEffect","none");
+        if("auto".equals(wet)){
+            wet="none";
+            try{
+                long age=System.currentTimeMillis()-OffsetDateTime.parse(p.getString("weatherObserved","")).toInstant().toEpochMilli();
+                if(age>=-300000&&age<=7200000)wet=p.getString("resolvedWeather","none");
+            }catch(Exception ignored){}
+        }
+        if("rain".equals(wet))return 0xff78C6DF;
+        if("snow".equals(wet))return 0xffE3F1FF;
+        String theme="season".equals(p.getString("themeMode","manual"))?SeasonThemeMath.season(System.currentTimeMillis()):p.getString("theme","default");
+        switch(theme){
+            case "spring":return 0xffF2B5CE;
+            case "summer":return 0xff6ADDE0;
+            case "autumn":return 0xffE9B277;
+            case "winter":return 0xffB9D5FF;
+            default:return 0;
+        }
+    }
     /** Static edge artwork during the short native welcome; no animation timer. */
     private static final class Motif extends Drawable{
         private final String kind;private final boolean subtle,soft;
@@ -67,8 +89,10 @@ final class ThemeAppearance {
         Motif(String value,boolean small,boolean gentle){kind=value;subtle=small;soft=gentle;}
         @Override public void draw(Canvas c){
             float w=getBounds().width(),h=getBounds().height(),u=Math.min(w,h)/70f;
-            int count=subtle?9:18;
-            paint.setColor(Color.rgb(246,226,194));paint.setAlpha((int)((soft?30:64)*opacity/255f));
+            int count=subtle?9:("rain".equals(kind)?28:"snow".equals(kind)?24:18);
+            int color="spring".equals(kind)?0xffF2B5CE:"autumn".equals(kind)?0xffE9B277:
+                "rain".equals(kind)?0xff78C6DF:0xffDBECFF;
+            paint.setColor(color);paint.setAlpha((int)((soft?50:100)*opacity/255f));
             paint.setStrokeWidth(Math.max(1,u*.13f));
             if("summer".equals(kind)){
                 paint.setStyle(Paint.Style.STROKE);
@@ -78,10 +102,13 @@ final class ThemeAppearance {
             for(int i=0;i<count;i++){
                 float x=(i%2==0?.035f+(i%3)*.035f:.89f+(i%3)*.035f)*w;
                 float y=((i*17%95)+2)/100f*h;
-                c.save();c.rotate((i*31)%140,x,y);
-                if("rain".equals(kind))c.drawLine(x,y,x+u,y+u*6,paint);
-                else if("snow".equals(kind)||"winter".equals(kind)){
-                    c.drawCircle(x,y,u*.55f,paint);c.drawLine(x-u,y,x+u,y,paint);c.drawLine(x,y-u,x,y+u,paint);
+                c.save();c.rotate("rain".equals(kind)?9:(i*31)%140,x,y);
+                if("rain".equals(kind))c.drawLine(x,y,x,y+u*7,paint);
+                else if("snow".equals(kind)){
+                    c.drawCircle(x,y,u*.65f,paint);
+                    for(int arm=0;arm<3;arm++){c.save();c.rotate(arm*60,x,y);c.drawLine(x-u*1.5f,y,x+u*1.5f,y,paint);c.restore();}
+                }else if("winter".equals(kind)){
+                    c.drawCircle(x,y,u*.25f,paint);
                 }else if("autumn".equals(kind)){
                     Path leaf=new Path();leaf.moveTo(x-u,y+u*2);leaf.quadTo(x-u*2,y-u,x+u,y-u*2);leaf.quadTo(x+u*2,y+u,x-u,y+u*2);c.drawPath(leaf,paint);
                 }else c.drawOval(new RectF(x-u,y-u*1.5f,x+u,y+u*1.5f),paint);

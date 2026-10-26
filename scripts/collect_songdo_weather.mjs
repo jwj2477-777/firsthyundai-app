@@ -28,10 +28,6 @@ function request(endpoint,base){
  const result=spawnSync('python3',['-c',python],{input:JSON.stringify({url:url.href}),encoding:'utf8',timeout:20000,maxBuffer:2*1024*1024});
  if(result.status!==0)throw Error('weather_request_failed');
  const answer=JSON.parse(result.stdout);if(!answer.ok)throw Error('weather_request_failed');
- const response=answer.data?.response,items=response?.body?.items?.item;
- console.log('OFFICIAL_WEATHER_RESPONSE_SHAPE',endpoint,JSON.stringify({code:response?.header?.resultCode,
-  count:response?.body?.totalCount,array:Array.isArray(items),
-  sample:Array.isArray(items)?items.slice(0,2).map(row=>Object.fromEntries(['category','baseDate','baseTime','nx','ny','obsrValue','fcstDate','fcstTime','fcstValue'].filter(k=>row[k]!==undefined).map(k=>[k,row[k]]))):[]}));
  return answer.data;
 }
 let observed=null,forecast=null;

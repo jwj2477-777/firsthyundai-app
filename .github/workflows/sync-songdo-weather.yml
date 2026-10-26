@@ -45,7 +45,7 @@ jobs:
           root='https://firsthyundai-shared-settings.jwj2477.workers.dev'
           for route in ['theme-weather','weather-briefing']:
               try:
-                  with urllib.request.urlopen(root+'/'+route,timeout=20) as stream:
+                  with urllib.request.urlopen(urllib.request.Request(root+'/'+route,headers={'User-Agent':'Mozilla/5.0 (Linux; Android 17; FirstHyundai/2.0)','Accept':'application/json'}),timeout=20) as stream:
                       value=json.load(stream)
                   assert value.get('status')=='ok'
                   print('APP_WEATHER_DELIVERY_VERIFIED',route,value.get('observed_at') or value.get('issued_at'),value.get('transport','direct'))

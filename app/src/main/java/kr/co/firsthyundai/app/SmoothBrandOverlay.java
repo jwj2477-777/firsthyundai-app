@@ -62,6 +62,7 @@ final class SmoothBrandOverlay extends FrameLayout {
         oval.setShape(GradientDrawable.OVAL);
         oval.setColor(Color.TRANSPARENT);
         oval.setStroke(dp(1),Color.argb(115,230,186,95));
+        if(ThemeAppearance.logoAccent(activity,true)!=0)oval.setStroke(dp(2),ThemeAppearance.logoAccent(activity,true));
         ring.setBackground(oval);
         emblemFrame.addView(ring,new LayoutParams(dp(168),dp(168),Gravity.CENTER));
         emblem=new ImageView(activity);

@@ -100,7 +100,7 @@ jobs:
           python3 - <<'PYCODE'
           import json, urllib.request, urllib.error
           try:
-              with urllib.request.urlopen('https://firsthyundai-shared-settings.jwj2477.workers.dev/theme-weather',timeout=20) as r:
+              with urllib.request.urlopen(urllib.request.Request('https://firsthyundai-shared-settings.jwj2477.workers.dev/theme-weather',headers={'User-Agent':'Mozilla/5.0 (Linux; Android 17; FirstHyundai/2.0)','Accept':'application/json'}),timeout=20) as r:
                   w=json.load(r)
               assert w.get('status')=='ok'
               print('SONGDO_WEATHER_VERIFIED',w['effect'],w['observed_at'])
@@ -145,7 +145,7 @@ jobs:
           python3 - <<'PYCODE'
           import json, urllib.request
           try:
-              with urllib.request.urlopen('https://firsthyundai-shared-settings.jwj2477.workers.dev/weather-briefing',timeout=20) as r:
+              with urllib.request.urlopen(urllib.request.Request('https://firsthyundai-shared-settings.jwj2477.workers.dev/weather-briefing',headers={'User-Agent':'Mozilla/5.0 (Linux; Android 17; FirstHyundai/2.0)','Accept':'application/json'}),timeout=20) as r:
                   w=json.load(r)
               assert w.get('status')=='ok' and w.get('hours')
               print('SONGDO_FORECAST_VERIFIED',w['date'],w['issued_at'],len(w['hours']))
