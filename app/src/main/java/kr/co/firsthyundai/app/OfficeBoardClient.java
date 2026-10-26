@@ -27,6 +27,20 @@ final class OfficeBoardClient {
     static String memberId(Context c){
         return c.getSharedPreferences(PREF,Context.MODE_PRIVATE).getString("member_id","");
     }
+    // One-time update migration: show existing users the newly-added three-account picker.
+    // Unlike token / device ID this local UI acknowledgement contains no security state.
+    static boolean pickerReviewed(Context c){
+        return c.getSharedPreferences(PREF,Context.MODE_PRIVATE).getBoolean("picker_reviewed_v209",false);
+    }
+    static void markPickerReviewed(Context c){
+        c.getSharedPreferences(PREF,Context.MODE_PRIVATE).edit()
+            .putBoolean("picker_reviewed_v209",true).apply();
+    }
+    static JSONObject memberChoices(Context c) throws Exception{
+        String auth=token(c);
+        if(auth.isEmpty())throw new Exception("사무실 계정 인증이 필요합니다.");
+        return request("GET","/board/accounts",null,auth);
+    }
     private static String token(Context context){
         SharedPreferences pref=context.getSharedPreferences(PREF,Context.MODE_PRIVATE);
         long expiry=pref.getLong("expiry",0);
@@ -82,9 +96,12 @@ final class OfficeBoardClient {
     static void enroll(Context context,char[] code,String memberId) throws Exception{
         if(code==null||code.length<8||code.length>64)throw new Exception("사무실 보안코드를 확인해 주세요.");
         if(memberId==null||!memberId.matches("[0-9a-f-]{36}"))throw new Exception("사용자 계정을 선택해 주세요.");
+        String existing=token(context);
+        boolean changing=!existing.isEmpty()&&!memberId.equals(memberId(context));
         JSONObject body=new JSONObject().put("code",new String(code))
-                .put("member_id",memberId).put("device",deviceId(context));
-        JSONObject data=request("POST","/board/session",body,null);
+                .put("member_id",memberId).put("device",deviceId(context))
+                .put("reassign",changing);
+        JSONObject data=request("POST","/board/session",body,changing?existing:null);
         String token=data.optString("token","");
         if(token.length()<40||token.length()>1100)throw new Exception("보안 인증 응답이 올바르지 않습니다.");
         JSONObject member=data.optJSONObject("member");
@@ -94,7 +111,8 @@ final class OfficeBoardClient {
         context.getSharedPreferences(PREF,Context.MODE_PRIVATE).edit()
             .putString("token",token).putString("member_id",memberId)
             .putString("member_name",member.optString("name"))
-            .putLong("expiry",now+VALIDITY_MS-300_000L).apply();
+            .putLong("expiry",now+VALIDITY_MS-300_000L)
+            .putBoolean("picker_reviewed_v209",true).apply();
     }
     static JSONObject members(Context context,String action,JSONObject payload,String adminToken) throws Exception {
         if(adminToken==null||adminToken.isEmpty())throw new Exception("관리자 모드 인증이 필요합니다.");
