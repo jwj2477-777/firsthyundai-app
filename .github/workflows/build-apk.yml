@@ -60,6 +60,7 @@ on:
       - 'scripts/test_cross_screen_polish.js'
       - 'scripts/test_apartment_detail_tabs_polish.js'
       - 'scripts/test_workflow_pilot.js'
+      - 'scripts/test_six_nav_header_geometry_browser.js'
       - 'scripts/test_officetel_heading_color.js'
       - 'scripts/test_office_on_demand.js'
       - 'scripts/test_public_hub.js'
@@ -206,6 +207,7 @@ jobs:
           node scripts/test_cross_screen_polish.js
           node scripts/test_apartment_detail_tabs_polish.js
           node scripts/test_workflow_pilot.js
+          node scripts/test_six_nav_header_geometry_browser.js
           node scripts/test_officetel_heading_color.js
           node scripts/test_scroll_to_top.js
           node scripts/test_contract_broker.js
@@ -334,24 +336,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.19 single conditional office briefing APK
+      - name: Publish v2.1.20 consistent navigation and title geometry APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.19.apk
-          unzip -t FirstHyundai-v2.1.19.apk | grep 'No errors detected'
-          if gh release view v2.1.19 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.20.apk
+          unzip -t FirstHyundai-v2.1.20.apk | grep 'No errors detected'
+          if gh release view v2.1.20 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.19 FirstHyundai-v2.1.19.apk \
+            gh release create v2.1.20 FirstHyundai-v2.1.20.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.19 · 오늘 업무브리핑 통합' \
-              --notes '오늘의 업무 브리핑을 상시 송도 현재 날씨와 필요한 정보만 표시하는 하나의 카드로 통합했습니다. 비·눈 예보, 오늘 일정, 신고된 새 거래가 있을 때만 해당 내용을 노출합니다. 지도함 관리 예보는 사무실 퇴근 후부터 다음 영업일 오전 9시까지 확인하고, 일요일 및 둘째·넷째 토요일 휴무를 포함합니다. 공유메모의 종일 휴무·휴가도 다음 영업일 계산에 반영하고, 예보 누락 시 안전하다고 잘못 안내하지 않습니다. 기존 계정·공유 메모·계약 안내·관리자 설정·계절 테마 기능을 유지합니다. v2.1.19/build170.'
+              --title '퍼스트현대 v2.1.20 · 6개 버튼·화면 제목 규격 통일' \
+              --notes '메인 6개 이동 버튼을 같은 폭·높이·모서리·테두리와 일정한 간격으로 통일했습니다. 위 3개 버튼의 기존 크기를 기준으로 아래의 오늘 요약·계약문자 만들기·공유 메모도 같은 상자로 맞추고 각 메뉴의 기존 선택 색상 및 전환 동작을 유지했습니다. 화면 제목은 실거래·아파트정보·뉴스의 제목 높이·글꼴·시작 위치·오른쪽 기능 버튼 규격을 기준으로 오늘 요약·계약 안내문·사무실 메모에 적용했습니다. 계약 작성 방법 토글, 공유메모·계약 기능, 기존 날씨 업무브리핑은 유지합니다. v2.1.20/build171.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.19 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.19 --apk FirstHyundai-v2.1.19.apk
+          gh release upload v2.1.20 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.20 --apk FirstHyundai-v2.1.20.apk
 
 
