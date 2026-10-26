@@ -91,6 +91,10 @@ assert.equal(api._test.viaIndices('top-five',0,5,buttons).join(','),'1,4',
  'Trades → Shared Memo travels across both center-column buttons');
 assert.equal(api._test.viaIndices('top-five',5,0,buttons).join(','),'4,1',
  'Shared Memo → Trades follows the exact reverse journey');
+assert.equal(api._test.viaIndices('top-five',3,2,buttons).join(','),'4,1',
+ 'Today Summary → News travels Contract → Apartment Info');
+assert.equal(api._test.viaIndices('top-five',2,3,buttons).join(','),'1,4',
+ 'News → Today Summary travels Apartment Info → Contract');
 for(const pair of [[0,1],[1,2],[0,3],[2,4],[3,4],[3,2],[4,5]])
  assert.equal(api._test.viaIndex('top-five',...pair),-1,
   'Other navigation paths stay untouched');
@@ -185,6 +189,24 @@ frame(6000);frame(6000);frame(6380);
 assert.equal(api._test.stats.lastPath.join(','),'5,4,1,0');
 complete(6900);
 assert(buttons.every(b=>b.style.getPropertyValue('background')===''));
+// Other opposite corner: TODAY → NEWS travels both center-column tiles.
+selected=3;
+click({target:buttons[2],defaultPrevented:false});
+selected=2;
+frame(7000);frame(7000);frame(7380);
+assert.equal(api._test.stats.lastPath.join(','),'3,4,1,2');
+for(const i of [4,1])assert.equal(buttons[i].getAttribute('aria-current'),'false');
+complete(7900);
+assert(buttons.every(b=>b.style.getPropertyValue('background')===''));
+// NEWS → TODAY is exactly the reverse, and never switches the middle pages.
+click({target:buttons[3],defaultPrevented:false});
+selected=3;
+frame(8000);frame(8000);frame(8380);
+assert.equal(api._test.stats.lastPath.join(','),'2,1,4,3');
+for(const i of [1,4])assert.equal(buttons[i].getAttribute('aria-current'),'false');
+complete(8900);
+assert(buttons.every(b=>b.style.getPropertyValue('background')===''));
+
 
 
 // If the administrator reorders the quick actions, the middle button
