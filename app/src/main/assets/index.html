@@ -205,7 +205,7 @@ body.apartmentSheetActive{overflow:hidden}
 </div>
 
 <div id="overview" class="page">
-  <div class="sectionTitle"><h2>오늘의 업무 브리핑</h2><button class="btn alt refreshAction" type="button" onclick="refreshAll(true)">새로고침</button></div>
+  <div class="sectionTitle"><h2>오늘의 업무 브리핑</h2><button class="btn alt refreshAction" type="button" onclick="refreshAll(true)"><span class="refreshGlyph" aria-hidden="true">↻</span> 갱신</button></div>
   <section class="panel overviewUnified" id="overviewUnified" aria-label="오늘의 업무와 날씨">
     <div class="overviewCurrentWeather">
       <div class="overviewWeatherHeading"><span>송도 현재 날씨</span><time id="overviewWeatherDate"></time></div>
@@ -215,13 +215,19 @@ body.apartmentSheetActive{overflow:hidden}
     </div>
     <p id="overviewPrecipitation" class="overviewBriefLine rain" hidden aria-live="polite"></p>
     <p id="overviewMapAlert" class="overviewBriefLine important" hidden role="status"></p>
-    <p id="overviewMapCaution" class="overviewBriefLine caution" hidden></p>
+    
     <div id="overviewMemoBriefing" class="overviewMemoBriefing" hidden aria-labelledby="overviewMemoTitle">
       <div class="overviewMemoHead">
         <h3 id="overviewMemoTitle">오늘 일정 <small id="overviewMemoCount"></small></h3>
         <button type="button" class="overviewMemoOpenCalendar" onclick="FirstHyundaiOfficeBoard.openBriefingCalendar()">캘린더 ›</button>
       </div>
       <div id="overviewMemoEntries" class="overviewMemoEntries" aria-live="polite"></div>
+    </div>
+    <div id="overviewSongdoNews" class="overviewNewsBrief hidden" aria-label="어제와 오늘 송도 주요 뉴스">
+      <div class="overviewNewsHead"><h3>송도 주요 뉴스 <small>어제·오늘</small></h3>
+        <button type="button" class="overviewNewsMore" onclick="openNewsHome()">뉴스 더보기 ›</button>
+      </div>
+      <div id="overviewNewsEntries" class="overviewNewsEntries"></div>
     </div>
     <button type="button" id="overviewTodayNewTrade" class="overviewBriefTrade" hidden onclick="openTodayNewTrades()" aria-describedby="overviewNewQuickCount">
       <span>오늘 새 거래</span><strong id="overviewNewQuickCount">—</strong><span aria-hidden="true">›</span>
@@ -230,7 +236,7 @@ body.apartmentSheetActive{overflow:hidden}
 </div>
 <div id="officeBoard" class="page hidden">
  <div class="sectionTitle officeBoardTitle"><div><h2>사무실 메모</h2><p class="tiny">함께 쓰는 포스트잇 · <span id="officeBoardCurrentMember"></span></p></div>
-  <button type="button" class="btn alt refreshAction" onclick="FirstHyundaiOfficeBoard.refresh()" aria-label="공유 메모 새로고침">↻ 새로고침</button></div>
+  <button type="button" class="btn alt refreshAction" onclick="FirstHyundaiOfficeBoard.refresh()" aria-label="공유 메모 갱신"><span class="refreshGlyph" aria-hidden="true">↻</span> 갱신</button></div>
  <div class="officeMemoNotificationTools hidden" aria-label="알림 권한 요청">
   <span id="officeMemoNotificationStatus" class="tiny" role="status">새 메모 알림 확인 중</span>
   <button id="officeMemoNotificationPermission" type="button" class="btn alt hidden" onclick="FirstHyundaiOfficeBoard.enableNotifications()">알림 허용</button>
@@ -489,7 +495,7 @@ body.apartmentSheetActive{overflow:hidden}
  </section>
 </div>
 <div id="nearby" class="page hidden">
- <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2><p class="tiny" id="nearbyCollectionMeta">송도동 · 수집 시각 확인 중</p></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
+ <div class="sectionTitle"><div><h2>★ 주변단지 모음</h2><p class="tiny" id="nearbyCollectionMeta">송도동 · 수집 시각 확인 중</p></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)"><span class="refreshGlyph" aria-hidden="true">↻</span> 갱신</button></div>
  <div class="propertyTypeSwitch sectionSubnav sectionModeSwitch" data-tone="teal" role="group" aria-label="실거래 부동산 종류 선택">
   <button type="button" class="selected" aria-pressed="true" onclick="openTradeLatest()">아파트</button>
   <button type="button" class="" aria-pressed="false" onclick="switchPage('officetel')">오피스텔</button>
@@ -546,7 +552,7 @@ body.apartmentSheetActive{overflow:hidden}
  </div>
 </div>
 <div id="complexes" class="page hidden">
- <div class="sectionTitle"><div><h2>송도 아파트 정보</h2><p class="tiny" id="complexCollectionMeta">송도동 · 자료 기준 확인 중</p></div><button class="btn alt refreshAction" type="button" data-refresh="complexes" onclick="refreshOne('complexes',true)">갱신</button></div>
+ <div class="sectionTitle"><div><h2>송도 아파트 정보</h2><p class="tiny" id="complexCollectionMeta">송도동 · 자료 기준 확인 중</p></div><button class="btn alt refreshAction" type="button" data-refresh="complexes" onclick="refreshOne('complexes',true)"><span class="refreshGlyph" aria-hidden="true">↻</span> 갱신</button></div>
  
  <div class="panel complexSearchPanel">
   <h3 class="complexSearchHeading">아파트 찾기</h3>
@@ -608,7 +614,7 @@ body.apartmentSheetActive{overflow:hidden}
 <button class="btn alt" type="button" onclick="document.getElementById('complexEditor').close()">닫기</button>
 </div></form></dialog>
 <div id="new" class="page hidden">
- <div class="sectionTitle"><div><h2>신규 공개 실거래</h2><p class="tiny" id="newMeta">송도동 · 확인 시각 확인 중</p></div><button class="btn alt refreshAction" type="button" data-refresh="new_trades" onclick="refreshOne('new_trades',true)">갱신</button></div>
+ <div class="sectionTitle"><div><h2>신규 공개 실거래</h2><p class="tiny" id="newMeta">송도동 · 확인 시각 확인 중</p></div><button class="btn alt refreshAction" type="button" data-refresh="new_trades" onclick="refreshOne('new_trades',true)"><span class="refreshGlyph" aria-hidden="true">↻</span> 갱신</button></div>
  <div class="propertyTypeSwitch sectionSubnav sectionModeSwitch" data-tone="teal" role="group" aria-label="실거래 부동산 종류 선택">
   <button type="button" class="selected" aria-pressed="true" onclick="openTradeLatest()">아파트</button>
   <button type="button" class="" aria-pressed="false" onclick="switchPage('officetel')">오피스텔</button>
@@ -643,7 +649,7 @@ body.apartmentSheetActive{overflow:hidden}
  </div>
 </div>
 <div id="trades" class="page hidden">
- <div class="sectionTitle"><div><h2>송도 아파트 실거래</h2><p class="tiny" id="tradesMeta">송도동 · 수집 시각 확인 중</p></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)">갱신</button></div>
+ <div class="sectionTitle"><div><h2>송도 아파트 실거래</h2><p class="tiny" id="tradesMeta">송도동 · 수집 시각 확인 중</p></div><button class="btn alt refreshAction" type="button" data-refresh="trades" onclick="refreshOne('trades',true)"><span class="refreshGlyph" aria-hidden="true">↻</span> 갱신</button></div>
  <div class="propertyTypeSwitch sectionSubnav sectionModeSwitch" data-tone="teal" role="group" aria-label="실거래 부동산 종류 선택">
   <button type="button" class="selected" aria-pressed="true" onclick="openTradeLatest()">아파트</button>
   <button type="button" class="" aria-pressed="false" onclick="switchPage('officetel')">오피스텔</button>
@@ -696,7 +702,7 @@ body.apartmentSheetActive{overflow:hidden}
 </div>
 <div id="officetel" class="page hidden">
  <div class="sectionTitle"><div><h2>송도 오피스텔 실거래</h2><p class="tiny" id="officeMeta">송도동 · 수집 시각 확인 중</p></div>
-   <button type="button" class="btn alt refreshAction" onclick="refreshPublicServices(true)">갱신</button></div>
+   <button type="button" class="btn alt refreshAction" onclick="refreshPublicServices(true)"><span class="refreshGlyph" aria-hidden="true">↻</span> 갱신</button></div>
  <div class="propertyTypeSwitch sectionSubnav sectionModeSwitch" data-tone="teal" role="group" aria-label="실거래 부동산 종류 선택">
   <button type="button" class="" aria-pressed="false" onclick="openTradeLatest()">아파트</button>
   <button type="button" class="selected" aria-pressed="true" onclick="switchPage('officetel')">오피스텔</button>
@@ -754,8 +760,8 @@ body.apartmentSheetActive{overflow:hidden}
    <p class="tiny" id="newsFamilyMeta" role="status">뉴스 · 수집 확인 중</p>
    <p class="tiny hidden" id="subscriptionsMeta" role="status">청약 자료 확인 중입니다.</p>
   </div>
-  <button id="newsRefreshArticles" class="btn alt refreshAction" type="button" data-refresh="news" onclick="refreshOne('news',true)">갱신</button>
-  <button id="newsRefreshSubscriptions" class="btn alt refreshAction hidden" type="button" onclick="refreshPublicServices(true)">갱신</button>
+  <button id="newsRefreshArticles" class="btn alt refreshAction" type="button" data-refresh="news" onclick="refreshOne('news',true)"><span class="refreshGlyph" aria-hidden="true">↻</span> 갱신</button>
+  <button id="newsRefreshSubscriptions" class="btn alt refreshAction hidden" type="button" onclick="refreshPublicServices(true)"><span class="refreshGlyph" aria-hidden="true">↻</span> 갱신</button>
  </div>
  <div class="controls newsCategoryTabs sectionModeSwitch" data-tone="purple" role="tablist" aria-label="뉴스와 청약 화면 전환">
    <button id="newsTabArticles" type="button" class="btn" role="tab" aria-selected="true" aria-controls="newsArticlesPane" onclick="switchNewsPane('articles')">뉴스 브리핑</button>
@@ -787,7 +793,7 @@ body.apartmentSheetActive{overflow:hidden}
 </div>
 
 <div id="contracts" class="page hidden">
- <div class="contractHero contractHeroCompact"><h2>계약 안내문 작성</h2><details class="contractFirstGuide"><summary>작성 방법 보기</summary><p>메모를 쓰고 큰 버튼을 누르면 계약문자를 만들어 드립니다.</p><ol class="contractSteps" aria-label="작성 순서"><li>1 메모 입력</li><li>2 조건 확인</li><li>3 복사·이미지 공유</li></ol></details></div>
+ <div class="contractHero contractHeroCompact"><h2>계약 안내문 작성</h2></div>
  <div class="contractFlowSteps" id="ct_flowSteps" aria-label="계약 안내 작성 단계">
   <span class="contractFlowStep is-current" id="ct_flow1" aria-current="step">1 메모 작성</span><span class="contractFlowStep" id="ct_flow2">2 내용 확인</span><span class="contractFlowStep" id="ct_flow3">3 완성·공유</span>
  </div>
@@ -2380,7 +2386,50 @@ function renderNearbyDetails(resetLimit){
  $('nearbyMore').textContent='거래 더 보기 ('+number(rows.length-shown.length)+'건 남음)';
 }
 
+// Short, source-grounded news from the existing published feed; nothing invented.
+function todaySongdoNews(payload,now=Date.now()){
+ const day=t=>new Date(t+9*3600000).toISOString().slice(0,10);
+ const today=day(now),yesterday=day(now-24*3600000);
+ if(!payload||!['ok','partial'].includes(payload.state)||!Array.isArray(payload.briefs))return [];
+ const priorities={'개발·교통':5,'분양·입주':5,'정책·규제':4,'송도 종합':2};
+ const candidates=payload.briefs.filter(x=>{
+  const time=Date.parse(x?.last_published_at);
+  if(!Number.isFinite(time))return false;
+  const d=day(time);
+  if(d!==today&&d!==yesterday||time>now+60000)return false;
+  const title=String(x.title||'');
+  return /송도|연수구|GTX.B|인천대|국제도시|퍼스트파크|컨벤시아|청학/i.test(title);
+ }).map(x=>{
+  const url=safeLink(x.sources?.[0]?.link||x.summary_source_url||'');
+  const validSummary=['gemini_article','groq_article','openai_article'].includes(x.summary_method)&&
+    String(x.summary||'').trim().length>=20;
+  const summary=validSummary?String(x.summary).split(/\r?\n/)[0].trim().slice(0,96):'';
+  const newsDay=day(Date.parse(x.last_published_at));
+  return {...x,sourceUrl:url,briefLine:summary,publishedDay:newsDay,
+   score:(priorities[x.category]||1)+(validSummary?1:0)};
+ }).filter(x=>x.sourceUrl);
+ candidates.sort((a,b)=>b.score-a.score||
+  Date.parse(b.last_published_at)-Date.parse(a.last_published_at));
+ const used=new Set();
+ return candidates.filter(x=>{
+  const key=String(x.title||'').replace(/[^가-힣A-Za-z0-9]/g,'').slice(0,32);
+  if(!key||used.has(key))return false;
+  used.add(key);return true;
+ }).slice(0,3);
+}
+function renderOverviewNews(){
+ const root=$('overviewSongdoNews'),list=$('overviewNewsEntries');
+ if(!root||!list)return;
+ const picks=todaySongdoNews(remote.news);
+ root.classList.toggle('hidden',!picks.length);
+ if(!picks.length){list.innerHTML='';return}
+ list.innerHTML=picks.map(x=>'<a class="overviewNewsEntry" href="'+escapeHtml(x.sourceUrl)+'">'+
+  '<span class="overviewNewsTitle">'+escapeHtml(x.title)+'</span>'+
+  (x.briefLine?'<small>'+escapeHtml(x.briefLine)+'</small>':'')+
+  '<em>'+escapeHtml(x.publishedDay.slice(5).replace('-','/'))+' · '+escapeHtml(x.sources?.[0]?.publisher||x.category||'기사 원문')+' ↗</em></a>').join('');
+}
 function renderOverview(){
+ renderOverviewNews();
  const newReady=!!remote.new_trades&&remote.new_trades.state!=='not_started';
  const newToday=newReady?(remote.new_trades.records||[]).filter(x=>x.first_seen_date===kstDateOffset(0)).length:0;
  $('overviewNewQuickCount').textContent=number(newToday)+'건';
