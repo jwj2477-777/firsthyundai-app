@@ -8,6 +8,8 @@ const observed={schema:1,status:'ok',effect:'rain',observed_at:new Date(now-3600
 const forecast={schema:1,status:'ok',date,issued_at:new Date(now-3600000).toISOString(),complete:false,
  hours:[{at:hour.toISOString(),type:'snow',pop:70,temp:0,sky:3}],provider:'기상청 단기예보'};
 assert(validWeatherSnapshot(observed,'observed',now));
+assert(validWeatherSnapshot({...observed,temp:0},'observed',now),'Measured zero Celsius should be preserved');
+assert(!validWeatherSnapshot({...observed,temp:'0'},'observed',now),'Measured temperature cannot be a display string');
 assert(!validWeatherSnapshot({...observed,grid:{nx:60,ny:127}},'observed',now));
 assert(!validWeatherSnapshot(observed,'observed',now+2*3600000));
 assert(validWeatherSnapshot(forecast,'forecast',now));

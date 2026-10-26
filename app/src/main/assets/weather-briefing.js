@@ -49,7 +49,13 @@
  }
  function summarize(doc,now=Date.now(),extra=[]){
   const result={precip:'',mapAlert:'',mapCaution:'',coverage:false};
-  if(!valid(doc,now))return result;
+  if(!valid(doc,now)){
+   // After 4 PM, unknown forecast coverage for the next opening is a genuine
+   // operational warning, not evidence of dry weather. Do not invent rain.
+   if(!isClosed(localDay(now),extra)&&new Date(now+OFFSET).getUTCHours()>=16)
+    result.mapCaution='다음 영업일 오전 9시까지 비·눈 예보를 확인할 수 없습니다. 지도함 보관 여부를 확인하세요.';
+   return result;
+  }
   const hours=[...doc.hours].filter(h=>Date.parse(h.at)+HOUR>now).sort((a,b)=>a.at.localeCompare(b.at));
   const wet=hours.filter(h=>h.type!=='none'),today=localDay(now);
   const todayWet=wet.find(h=>localDay(Date.parse(h.at))===today);
@@ -74,15 +80,40 @@
   }
   return result;
  }
+ function forecastTemperature(now){
+  if(!valid(data,now))return null;
+  const current=data.hours.find(h=>{
+   const at=Date.parse(h.at);
+   return at<=now&&now<at+HOUR&&Number.isFinite(h.temp);
+  });
+  return current?Math.round(current.temp*10)/10:null;
+ }
+ function weatherDisplay(obs,forecastTemp,now=Date.now(),loading=false){
+  const measured=Number.isFinite(obs?.temp),projected=Number.isFinite(forecastTemp);
+  const temperature=measured?Math.round(obs.temp*10)/10+'°':
+   projected?'예보기온 '+forecastTemp+'°':obs?'기온 정보 없음':loading?'현재 날씨 확인 중':'현재 날씨 확인 불가';
+  const precipitation=obs?.effect==='rain'?' · 현재 비':obs?.effect==='snow'?' · 현재 눈':'';
+  let source;
+  if(obs&&Number.isFinite(Date.parse(obs.observed_at))){
+   source='기상청 실황 · '+timeLabel(obs.observed_at,now)+' 관측';
+   if(projected&&!measured)source+=' · 기온은 시간별 예보';
+  }else if(projected){
+   source='기상청 시간별 기온 예보 · 강수 실황 확인 중';
+  }else{
+   source=loading?'기상청 관측자료 확인 중':'기상청 관측자료를 불러오지 못했습니다.';
+  }
+  return {text:temperature+precipitation,source,
+   symbol:obs?.effect==='rain'?'☂':obs?.effect==='snow'?'❄':'🌡'};
+ }
  function render(){
   if(!$('overviewWeatherMessage'))return;
   const now=Date.now(),obs=window.FirstHyundaiThemes?.currentWeather?.();
-  const obsTime=Date.parse(obs?.observed_at);
   const curr=$('overviewWeatherMessage'),icon=$('overviewWeatherIcon'),source=$('overviewWeatherSource');
-  const current=Number.isFinite(obs?.temp)?Math.round(obs.temp*10)/10+'°':'기온 확인 중';
-  icon.textContent=obs?.effect==='rain'?'☂':obs?.effect==='snow'?'❄':'◌';
-  curr.textContent=obs?(current+' · '+({none:'비·눈 없음',rain:'비',snow:'눈'}[obs.effect]||'')):'현재 날씨 확인 중';
-  source.textContent=obs&&Number.isFinite(obsTime)?'기상청 관측 · '+timeLabel(obs.observed_at,now)+' 기준':'기상청 관측 확인 중';
+  const detail=weatherDisplay(obs,forecastTemperature(now),now,
+   !obs&&!data&&(pending||lastAttempt===0));
+  icon.textContent=detail.symbol;
+  curr.textContent=detail.text;
+  source.textContent=detail.source;
   $('overviewWeatherDate').textContent=new Date(now).toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul',month:'long',day:'numeric',weekday:'short'});
   const extra=window.FirstHyundaiOfficeBoard?.closureDates?.()||[];
   const view=summarize(data,now,extra);
@@ -113,7 +144,7 @@
   }catch(e){if(!valid(data))data=null}
   finally{clearTimeout(timer);pending=false;render()}
  }
- window.FirstHyundaiWeatherBriefing={refresh,_test:{valid,summarize,isClosed,nextOpen,timeLabel,atKst,nextDay}};
+ window.FirstHyundaiWeatherBriefing={refresh,_test:{valid,summarize,isClosed,nextOpen,timeLabel,atKst,nextDay,weatherDisplay,forecastTemperature}};
  document.addEventListener('firsthyundai-observed-weather',render);
  document.addEventListener('firsthyundai-office-schedule-updated',render);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});

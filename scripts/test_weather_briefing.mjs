@@ -60,6 +60,32 @@ assert.equal(api.summarize(wetProbability,now).precip,'',
 assert(!api.valid(parsed,Date.parse('2026-10-27T00:01:00+09:00')),'Stale dates invalid');
 assert.equal(api.summarize(null,now).precip,'','No invented precipitation');
 assert.equal(api.summarize(null,now).mapAlert,'','No invented map-box warning');
+const evening=Date.parse('2026-10-26T20:35:00+09:00');
+const observedAt='2026-10-26T20:00:00+09:00';
+const obs={status:'ok',temp:16.4,effect:'none',observed_at:observedAt};
+assert.equal(api.weatherDisplay(obs,null,evening).text,'16.4°',
+ 'Show measured current temperature, do not repeat redundant dry status');
+assert(api.weatherDisplay(obs,null,evening).source.includes('기상청 실황'),
+ 'Measured weather needs a clear observation label');
+assert.equal(api.weatherDisplay({...obs,temp:null},16,evening).text,'예보기온 16°',
+ 'Use hourly forecast only with explicit forecast labeling');
+assert(api.weatherDisplay({...obs,temp:null},16,evening).source.includes('기온은 시간별 예보'));
+assert(api.weatherDisplay({...obs,effect:'rain'},null,evening).text.includes('현재 비'));
+assert(api.weatherDisplay({...obs,effect:'snow'},null,evening).text.includes('현재 눈'));
+assert(!api.weatherDisplay(obs,null,evening).text.includes('비·눈 없음'),
+ 'No unnecessary dry-weather disclaimer');
+assert.equal(api.weatherDisplay({...obs,temp:null},null,evening).text,'기온 정보 없음',
+ 'Missing measured temperature cannot remain an endless spinner');
+assert.equal(api.weatherDisplay(null,null,evening,false).text,'현재 날씨 확인 불가');
+assert(api.weatherDisplay(null,16,evening).source.includes('강수 실황 확인 중'),
+ 'Hourly temperature forecast must never masquerade as a precipitation observation');
+assert(api.summarize(null,evening).mapCaution.includes('지도함'),
+ 'Unknown forecast after 4pm needs a map-box operational caution');
+assert(!api.summarize(null,evening).mapAlert,'Unknown weather must never fabricate rain');
+assert.equal(api.summarize(null,Date.parse('2026-11-14T18:30:00+09:00')).mapCaution,'',
+ 'Do not show a workday departure warning on a closed second Saturday');
+assert.equal(api.summarize(null,now).mapCaution,'',
+ 'Avoid premature forecast warnings before afternoon');
 assert(api.isClosed('2026-11-01'),'All Sundays closed');
 assert(api.isClosed('2026-11-14'),'Second Saturday closed');
 assert(api.isClosed('2026-11-28'),'Fourth Saturday closed');
