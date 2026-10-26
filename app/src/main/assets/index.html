@@ -205,49 +205,26 @@ body.apartmentSheetActive{overflow:hidden}
 
 <div id="overview" class="page">
   <div class="sectionTitle"><h2>오늘의 업무 브리핑</h2><button class="btn alt refreshAction" type="button" onclick="refreshAll(true)">새로고침</button></div>
-  <section class="panel overviewWeather" id="overviewWeather" aria-labelledby="overviewWeatherTitle">
-   <div class="overviewWeatherHeading"><span id="overviewWeatherTitle">송도 오늘 날씨</span><time id="overviewWeatherDate"></time></div>
-   <div class="overviewWeatherMain"><span class="overviewWeatherIcon" id="overviewWeatherIcon" aria-hidden="true">☂</span>
-    <div><p id="overviewWeatherMessage" role="status">시간대별 예보를 확인하는 중입니다.</p><p id="overviewWeatherExtra" hidden></p></div></div>
-   <small id="overviewWeatherSource">기상청 단기예보</small>
-  </section>
-  <section id="overviewMemoBriefing" class="panel overviewMemoBriefing" aria-labelledby="overviewMemoTitle">
-   <div class="overviewMemoHead">
-    <div><h3 id="overviewMemoTitle">오늘 일정 <small id="overviewMemoCount">—</small></h3>
-     <p>공유메모에 적은 일정이 자동으로 표시됩니다.</p></div>
-    <button type="button" class="overviewMemoOpenCalendar" onclick="FirstHyundaiOfficeBoard.openBriefingCalendar()">캘린더 보기 <span aria-hidden="true">›</span></button>
-   </div>
-   <div id="overviewMemoEntries" class="overviewMemoEntries" aria-live="polite"><p class="overviewMemoEmpty">일정을 확인하는 중…</p></div>
-  </section>
-  <section class="panel overviewActionPanel" aria-labelledby="overviewNextTitle">
-    <h3 id="overviewNextTitle">바로 확인할 업무</h3>
-    <div class="overviewActionGrid">
-      <button type="button" class="overviewActionCard overviewActionNew" onclick="openTodayNewTrades()" aria-label="오늘 처음 확인한 새 거래 보기" aria-describedby="overviewNewQuickCount">
-        <span class="overviewActionSymbol" aria-hidden="true">✦</span>
-        <span class="overviewActionCopy"><strong>오늘 새 거래</strong><small><b id="overviewNewQuickCount">—</b></small></span>
-        <span class="overviewActionArrow" aria-hidden="true">›</span>
-      </button>
-      <button type="button" class="overviewActionCard overviewActionFavorite" onclick="switchPage('nearby')">
-        <span class="overviewActionSymbol" aria-hidden="true">★</span>
-        <span class="overviewActionCopy"><strong>관심 14개 단지</strong><small>실거래 바로 확인</small></span>
-        <span class="overviewActionArrow" aria-hidden="true">›</span>
-      </button>
+  <section class="panel overviewUnified" id="overviewUnified" aria-label="오늘의 업무와 날씨">
+    <div class="overviewCurrentWeather">
+      <div class="overviewWeatherHeading"><span>송도 현재 날씨</span><time id="overviewWeatherDate"></time></div>
+      <div class="overviewWeatherMain"><span class="overviewWeatherIcon" id="overviewWeatherIcon" aria-hidden="true">◌</span>
+        <div><p id="overviewWeatherMessage" role="status">현재 날씨 확인 중</p><small id="overviewWeatherSource">기상청 관측 확인 중</small></div>
+      </div>
     </div>
-    <button class="overviewActionSecondary" type="button" onclick="openComplexHome()">⌂ 송도 아파트 정보 찾기 <span aria-hidden="true">›</span></button>
-  </section>
-  <section class="panel overviewStatusPanel" aria-labelledby="overviewStatusTitle">
-    <h3 id="overviewStatusTitle">자료 갱신 상태</h3>
-    <div id="overviewStatus" class="tiny" role="status" aria-live="polite">연결 정보가 없습니다.</div>
-  </section>
-  <section class="overviewStats" aria-labelledby="overviewStatsTitle">
-    <h3 id="overviewStatsTitle">전체 현황</h3>
-    <div class="grid">
-      <div class="metric"><small>송도동 실거래 누적</small><strong id="totalDeals">—</strong><small>최근 최대 12개월</small></div>
-      <div class="metric"><small>매매 건수</small><strong id="saleDeals">—</strong><small>신고+해제 표시</small></div>
-      <div class="metric"><small>전·월세 건수</small><strong id="rentDeals">—</strong><small>공개된 계약</small></div>
-      <div class="metric"><small>오늘 신규 공개 확인</small><strong id="newDeals">—</strong><small>최초 발견일 기준</small></div>
-      <div class="metric"><small>뉴스 묶음</small><strong id="newsGroups">—</strong><small>최근 기사 제목</small></div>
+    <p id="overviewPrecipitation" class="overviewBriefLine rain" hidden aria-live="polite"></p>
+    <p id="overviewMapAlert" class="overviewBriefLine important" hidden role="status"></p>
+    <p id="overviewMapCaution" class="overviewBriefLine caution" hidden></p>
+    <div id="overviewMemoBriefing" class="overviewMemoBriefing" hidden aria-labelledby="overviewMemoTitle">
+      <div class="overviewMemoHead">
+        <h3 id="overviewMemoTitle">오늘 일정 <small id="overviewMemoCount"></small></h3>
+        <button type="button" class="overviewMemoOpenCalendar" onclick="FirstHyundaiOfficeBoard.openBriefingCalendar()">캘린더 ›</button>
+      </div>
+      <div id="overviewMemoEntries" class="overviewMemoEntries" aria-live="polite"></div>
     </div>
+    <button type="button" id="overviewTodayNewTrade" class="overviewBriefTrade" hidden onclick="openTodayNewTrades()" aria-describedby="overviewNewQuickCount">
+      <span>오늘 새 거래</span><strong id="overviewNewQuickCount">—</strong><span aria-hidden="true">›</span>
+    </button>
   </section>
 </div>
 <div id="officeBoard" class="page hidden">
@@ -2381,21 +2358,10 @@ function renderNearbyDetails(resetLimit){
 }
 
 function renderOverview(){
- const tradesReady=!!remote.trades&&remote.trades.state!=='not_started';
  const newReady=!!remote.new_trades&&remote.new_trades.state!=='not_started';
- const newsReady=!!remote.news&&remote.news.state!=='not_started';
- const list=remote.trades?.records||[];
- const newToday=newReady?(remote.new_trades.records||[]).filter(x=>x.first_seen_date===kstDateOffset(0)).length:null;
- $('totalDeals').textContent=tradesReady?number(list.length):'—';
- $('saleDeals').textContent=tradesReady?number(list.filter(x=>x.type==='매매').length):'—';
- $('rentDeals').textContent=tradesReady?number(list.filter(x=>x.type==='전세'||x.type==='월세').length):'—';
- $('newsGroups').textContent=newsReady?number(remote.news.briefs?.length):'—';
- $('newDeals').textContent=newReady?number(newToday):'—';
- $('overviewNewQuickCount').textContent=newReady?number(newToday)+'건':'확인 전';
- const states=[textState(remote.trades,'실거래가'),textState(remote.new_trades,'새 거래'),textState(remote.news,'뉴스')];
- const warnings=[['trades','실거래'],['new_trades','새 거래'],['news','뉴스']]
-  .filter(([key])=>issues[key]).map(([key,name])=>'<div class="flash bad">'+escapeHtml(name+' 갱신 오류: '+issues[key])+'</div>');
- $('overviewStatus').innerHTML=states.map(item=>'<div>'+escapeHtml(item)+'</div>').join('')+warnings.join('');
+ const newToday=newReady?(remote.new_trades.records||[]).filter(x=>x.first_seen_date===kstDateOffset(0)).length:0;
+ $('overviewNewQuickCount').textContent=number(newToday)+'건';
+ $('overviewTodayNewTrade').hidden=!newReady||newToday<=0;
 }
 // National trade snapshots store the signed CONTRACT date in ISO (YYYY-MM-DD).
 // Compare inclusive date boundaries; missing/invalid source dates never match a date-limited search.
