@@ -18,7 +18,7 @@ function safeMemberName(v){
 // existing device tokens, or rewrite the authors of old shared notes.
 function memberIdentity(name){
  const normalized=String(name||"").trim().replace(/\s+/g," ");
- if(/^(관리자(?:\\s*계정)?|Admin)$/i.test(normalized))return "관리자";
+ if(/^(관리자(?:\s*계정)?|Admin)$/i.test(normalized))return "관리자";
  return normalized;
 }
 async function memberList(env){
