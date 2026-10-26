@@ -21,7 +21,7 @@ assert(lock.includes('OfficeBoardClient.choices(getApplicationContext(),code)'),
  'After correct password fetch managed accounts from server');
 assert(lock.includes('OfficeBoardClient.enroll(getApplicationContext(),code,id)'),
  'Selecting a member actually binds the device');
-assert(lock.includes('loginDetail.setText("사용할 사무실 계정을 선택해 주세요.'),
+assert(lock.includes('loginDetail.setText("사용할 계정을 선택해 주세요."'),
  'Account selection page must explain its purpose');
 assert(!lock.includes('showExistingAccountReview()'),
  'Never show an account-selection dialog before a password');
@@ -45,6 +45,25 @@ assert(main.includes('requestOfficeMemberPicker()')&&main.includes('adminSession
 assert(html.includes('id="officeCurrentMember"')&&
  html.includes('FirstHyundaiOfficeMembers.choose()'));
 assert(members.includes('requestOfficeMemberPicker')&&members.includes('if(!allowed()'));
+// The authenticated picker should be a compact, calm dedicated page.
+assert(lock.includes('accountChooser.addView(choice,lp)')&&
+ lock.includes('new LinearLayout.LayoutParams(-1,dp(56))'),
+ 'All member rows need a uniform compact 56dp height');
+assert(lock.includes('surface.setCornerRadius(dp(12))')&&
+ lock.includes('surface.setStroke(dp(1)'),
+ 'Member rows must have understated rounded outline, not large filled system buttons');
+assert(lock.includes('choice.setBackground(new android.graphics.drawable.RippleDrawable('),
+ 'Clickable member rows must give native touch feedback');
+assert(lock.includes('loginFoot.setVisibility(View.GONE)')&&
+ lock.includes('loginVersion.setVisibility(View.GONE)')&&
+ lock.includes('status.setVisibility(View.GONE)'),
+ 'Do not clutter member picker with password-help footer, build number, duplicate status');
+assert(lock.includes('loginFoot.setVisibility(View.VISIBLE)')&&
+ lock.includes('loginVersion.setVisibility(View.VISIBLE)'),
+ 'Returning to the password step restores its own informational UI');
+assert(lock.includes('back.setText("뒤로")'), 'Back navigation should be visually subtle');
+assert(!lock.includes('비밀번호를 입력하면 관리자 · 엄마 · 아빠 계정을 선택할 수 있습니다.'),
+ 'Do not leak account names on the unauthenticated password page');
 assert(!lock.includes('deleteSharedPreferences('),
  'Do not wipe app data just to reselect an office account');
 console.log('Password-first dedicated member page, existing-device migration, secured reassignment and admin chooser passed.');
