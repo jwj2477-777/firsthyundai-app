@@ -114,7 +114,17 @@ jobs:
                   query=urllib.parse.urlencode(dict(serviceKey=secret,pageNo=1,numOfRows=20,dataType='JSON',base_date=base.strftime('%Y%m%d'),base_time=base.strftime('%H')+'00',nx=55,ny=123))
                   try:
                       with urllib.request.urlopen('https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?'+query,timeout=15) as provider:
-                          data=json.load(provider)
+                          raw=provider.read()
+                      try:
+                          data=json.loads(raw)
+                      except Exception:
+                          import xml.etree.ElementTree as ET, re
+                          error=ET.fromstring(raw)
+                          reason=error.findtext('.//returnReasonCode') or ''
+                          name=error.findtext('.//returnAuthMsg') or ''
+                          if reason.isdigit(): print('KMA_PROVIDER_REASON_CODE',reason)
+                          if re.fullmatch(r'[A-Z_ ]{3,80}',name): print('KMA_PROVIDER_REASON',name)
+                          data={}
                       code=str(data.get('response',{}).get('header',{}).get('resultCode','unknown'))
                       print('KMA_PERMISSION_RESULT_CODE',code if code.isdigit() else 'unknown')
                   except urllib.error.HTTPError as exc:
