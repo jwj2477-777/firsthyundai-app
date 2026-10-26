@@ -1,60 +1,94 @@
-/* One short, source-backed daily forecast. No forecasts are used as observations. */
+/* One actionable office briefing: live observation, optional precipitation and map-box alert.
+   Forecast cannot stand in for observed conditions; missing hours cannot mean "dry". */
 (function(){
  'use strict';
- const HOUR=3600000,ENDPOINT='https://firsthyundai-shared-settings.jwj2477.workers.dev/weather-briefing';
- const byId=id=>document.getElementById(id),day=ms=>new Date(ms+9*HOUR).toISOString().slice(0,10);
- const typeNames={rain:'비',snow:'눈',mixed:'비 또는 눈'};
+ const HOUR=3600000,DAY=24*HOUR,OFFSET=9*HOUR;
+ const ENDPOINT='https://firsthyundai-shared-settings.jwj2477.workers.dev/weather-briefing';
+ const $=id=>document.getElementById(id),localDay=ms=>new Date(ms+OFFSET).toISOString().slice(0,10);
+ const kinds={rain:'비',snow:'눈',mixed:'비·눈'};
  let data=null,lastAttempt=0,pending=false,sequence=0;
  const requests=new Map();
- function clock(iso){
-  const h=new Date(Date.parse(iso)+9*HOUR).getUTCHours();
-  return h===0?'자정':h===12?'낮 12시':(h<12?'오전 ':'오후 ')+(h%12||12)+'시';
+ function atKst(day,hour){
+  const [y,m,d]=day.split('-').map(Number);
+  return Date.UTC(y,m-1,d,hour-9);
+ }
+ function nextDay(date,amount=1){
+  return new Date(atKst(date,9)+amount*DAY+OFFSET).toISOString().slice(0,10);
+ }
+ function isClosed(date,extra=[]){
+  if(extra.includes(date))return true;
+  const [y,m,d]=date.split('-').map(Number);
+  const dow=new Date(Date.UTC(y,m-1,d)).getUTCDay();
+  return dow===0||(dow===6&&[2,4].includes(Math.floor((d-1)/7)+1));
+ }
+ function nextOpen(now=Date.now(),extra=[]){
+  const today=localDay(now);
+  for(let i=1;i<=60;i++){
+   const candidate=nextDay(today,i);
+   if(!isClosed(candidate,extra))return {date:candidate,time:atKst(candidate,9)};
+  }
+  return null;
  }
  function valid(doc,now=Date.now()){
   const issued=Date.parse(doc?.issued_at);
-  return doc?.schema===1&&doc.status==='ok'&&doc.date===day(now)&&Number.isFinite(issued)&&
-   now-issued>=0&&now-issued<=7*HOUR&&Array.isArray(doc.hours)&&doc.hours.length>0&&doc.hours.length<=24&&
-   doc.hours.every(h=>Number.isFinite(Date.parse(h.at))&&day(Date.parse(h.at))===doc.date&&
-    ['none','rain','snow','mixed'].includes(h.type)&&(h.pop===null||Number.isFinite(h.pop)&&h.pop>=0&&h.pop<=100)&&
-    (h.temp===null||Number.isFinite(h.temp)&&h.temp>=-70&&h.temp<=70));
+  if(doc?.schema!==1||doc.status!=='ok'||doc.date!==localDay(now)||
+    !Number.isFinite(issued)||now-issued<0||now-issued>7*HOUR||
+    !Array.isArray(doc.hours)||!doc.hours.length||doc.hours.length>144)return false;
+  return doc.hours.every(h=>{
+   const stamp=Date.parse(h?.at);
+   return Number.isFinite(stamp)&&localDay(stamp)>=doc.date&&localDay(stamp)<=localDay(now+5*DAY)&&
+    ['none','rain','snow','mixed'].includes(h.type)&&
+    (h.pop===null||(Number.isFinite(h.pop)&&h.pop>=0&&h.pop<=100))&&
+    (h.temp===null||(Number.isFinite(h.temp)&&h.temp>=-70&&h.temp<=70));
+  });
  }
- function summarize(doc,now=Date.now()){
-  if(!valid(doc,now))return {main:'오늘 날씨 예보를 확인할 수 없습니다.',extra:'',icon:'☂',source:'날씨 연결 확인 중'};
-  const hours=doc.hours.filter(h=>Date.parse(h.at)+HOUR>now).sort((a,b)=>a.at.localeCompare(b.at));
-  if(!hours.length)return {main:'오늘 남은 시간의 예보를 확인하는 중입니다.',extra:'',icon:'◌',source:'기상청 예보 갱신 대기'};
-  const events=[];
-  for(const h of hours){
-   if(h.type==='none')continue;
-   const prev=events.at(-1);
-   if(prev&&prev.type===h.type&&Date.parse(h.at)-Date.parse(prev.last)===HOUR)prev.last=h.at;
-   else events.push({...h,last:h.at});
+ function timeLabel(iso,reference=Date.now()){
+  const stamp=Date.parse(iso),h=new Date(stamp+OFFSET).getUTCHours();
+  const date=localDay(stamp),prefix=date===localDay(reference)?'오늘 ':date===nextDay(localDay(reference))?'내일 ':date.slice(5).replace('-','/')+' ';
+  return prefix+(h===0?'자정':h===12?'낮 12시':(h<12?'오전 ':'오후 ')+(h%12||12)+'시');
+ }
+ function summarize(doc,now=Date.now(),extra=[]){
+  const result={precip:'',mapAlert:'',mapCaution:'',coverage:false};
+  if(!valid(doc,now))return result;
+  const hours=[...doc.hours].filter(h=>Date.parse(h.at)+HOUR>now).sort((a,b)=>a.at.localeCompare(b.at));
+  const wet=hours.filter(h=>h.type!=='none'),today=localDay(now);
+  const todayWet=wet.find(h=>localDay(Date.parse(h.at))===today);
+  if(todayWet)result.precip=''+timeLabel(todayWet.at,now)+'경 '+kinds[todayWet.type]+' 예보가 있습니다.';
+  if(isClosed(today,extra))return result;
+  const opening=nextOpen(now,extra);if(!opening)return result;
+  const start=Math.max(now,atKst(today,19));
+  const inside=wet.find(h=>Date.parse(h.at)<opening.time&&Date.parse(h.at)+HOUR>start);
+  const covered=new Set(hours.filter(h=>Date.parse(h.at)+HOUR>start&&Date.parse(h.at)<opening.time)
+   .map(h=>Math.floor(Date.parse(h.at)/HOUR)*HOUR));
+  let complete=true;
+  for(let stamp=Math.floor(start/HOUR)*HOUR;stamp<opening.time;stamp+=HOUR){
+   if(!covered.has(stamp)){complete=false;break}
   }
-  const describe=e=>{
-   const active=Date.parse(e.at)<=now;
-   const when=active?'지금 시간대에':clock(e.at)+'경부터';
-   return '오늘 '+when+' '+typeNames[e.type]+' 예보가 있습니다.';
-  };
-  let main,extra='',icon='◌';
-  if(events.length){main=describe(events[0]);icon=events[0].type==='snow'?'❄':'☂';if(events[1])extra=describe(events[1]);}
-  else{
-   const uncertain=hours.find(h=>h.pop!==null&&h.pop>=50);
-   // A gap or expired last slot can never be summarized as an all-clear.
-   const remaining=24-new Date(now+9*HOUR).getUTCHours();
-   const actual=new Set(hours.map(h=>h.at));
-   if(uncertain)main='오늘 '+clock(uncertain.at)+'경 강수확률이 '+uncertain.pop+'%입니다.';
-   else main=doc.complete===true&&actual.size===remaining?'오늘 남은 시간에는 비·눈 예보가 없습니다.':'확인된 시간대에는 비·눈 예보가 없습니다.';
+  result.coverage=complete;
+  if(inside){
+   const deadline=opening.date===nextDay(today)?'내일 오전 9시':'다음 영업일('+opening.date.slice(5).replace('-','/')+') 오전 9시';
+   result.mapAlert=timeLabel(inside.at,now)+'경 '+kinds[inside.type]+' 예보 · '+deadline+'까지 강수 가능성이 있습니다. 지도함을 실내에 들여놓고 퇴근하세요.';
+  }else if(!complete){
+   const h=new Date(now+OFFSET).getUTCHours();
+   if(h>=16)result.mapCaution='퇴근 후부터 다음 영업일 오전 9시까지 일부 예보가 아직 확인되지 않았습니다. 지도함 보관 여부를 다시 확인하세요.';
   }
-  const first=hours[0];
-  if(first?.temp!==null&&first?.temp!==undefined)extra=(extra?extra+' · ':'')+clock(first.at)+' 예보기온 '+first.temp+'°';
-  return {main,extra,icon,source:'기상청 · '+clock(doc.issued_at)+' 발표 · 예보는 바뀔 수 있습니다.'};
+  return result;
  }
  function render(){
-  if(!byId('overviewWeatherMessage'))return;
-  const view=summarize(data);
-  byId('overviewWeatherMessage').textContent=view.main;
-  const extra=byId('overviewWeatherExtra');extra.textContent=view.extra;extra.hidden=!view.extra;
-  byId('overviewWeatherIcon').textContent=view.icon;byId('overviewWeatherSource').textContent=view.source;
-  byId('overviewWeatherDate').textContent=new Date().toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul',month:'long',day:'numeric',weekday:'short'});
+  if(!$('overviewWeatherMessage'))return;
+  const now=Date.now(),obs=window.FirstHyundaiThemes?.currentWeather?.();
+  const obsTime=Date.parse(obs?.observed_at);
+  const curr=$('overviewWeatherMessage'),icon=$('overviewWeatherIcon'),source=$('overviewWeatherSource');
+  const current=Number.isFinite(obs?.temp)?Math.round(obs.temp*10)/10+'°':'기온 확인 중';
+  icon.textContent=obs?.effect==='rain'?'☂':obs?.effect==='snow'?'❄':'◌';
+  curr.textContent=obs?(current+' · '+({none:'비·눈 없음',rain:'비',snow:'눈'}[obs.effect]||'')):'현재 날씨 확인 중';
+  source.textContent=obs&&Number.isFinite(obsTime)?'기상청 관측 · '+timeLabel(obs.observed_at,now)+' 기준':'기상청 관측 확인 중';
+  $('overviewWeatherDate').textContent=new Date(now).toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul',month:'long',day:'numeric',weekday:'short'});
+  const extra=window.FirstHyundaiOfficeBoard?.closureDates?.()||[];
+  const view=summarize(data,now,extra);
+  for(const [id,message] of [['overviewPrecipitation',view.precip],['overviewMapAlert',view.mapAlert],['overviewMapCaution',view.mapCaution]]){
+   const node=$(id);if(!node)continue;node.textContent=message;node.hidden=!message;
+  }
  }
  window.onFirstHyundaiWeatherBriefingFetched=result=>{
   const task=requests.get(result?.requestId);if(!task)return;requests.delete(result.requestId);
@@ -67,6 +101,7 @@
  })}
  async function refresh(force=false){
   render();
+  window.FirstHyundaiThemes?.refreshObserved?.();
   if(document.hidden||pending||Date.now()-lastAttempt<(force?30000:15*60000))return;
   lastAttempt=Date.now();pending=true;
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
@@ -78,7 +113,9 @@
   }catch(e){if(!valid(data))data=null}
   finally{clearTimeout(timer);pending=false;render()}
  }
- window.FirstHyundaiWeatherBriefing={refresh,_test:{valid,summarize,clock}};
+ window.FirstHyundaiWeatherBriefing={refresh,_test:{valid,summarize,isClosed,nextOpen,timeLabel,atKst,nextDay}};
+ document.addEventListener('firsthyundai-observed-weather',render);
+ document.addEventListener('firsthyundai-office-schedule-updated',render);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
  window.setInterval(()=>{render();if(typeof currentPage!=='undefined'&&currentPage==='overview')refresh()},60000);
  refresh();
