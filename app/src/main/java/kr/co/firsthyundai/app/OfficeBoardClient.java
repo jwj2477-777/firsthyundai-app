@@ -130,6 +130,20 @@ final class OfficeBoardClient {
         if("list".equals(action))return request("GET","/board/members",null,auth,adminToken);
         if("add".equals(action))return request("POST","/board/members",
                 new JSONObject().put("name",payload.optString("name","")),auth,adminToken);
+        if("rename".equals(action)){
+            String id=payload.optString("id","");
+            String name=payload.optString("name","").trim();
+            if(!id.matches("[0-9a-f-]{36}")||name.isEmpty()||name.length()>24)
+                throw new Exception("계정 이름이나 계정 번호를 확인해 주세요.");
+            JSONObject result=request("PATCH","/board/members/"+id+"/rename",
+                new JSONObject().put("name",name),auth,adminToken);
+            JSONObject renamed=result.optJSONObject("account");
+            if(renamed!=null&&memberId(context).equals(id)){
+                context.getSharedPreferences(PREF,Context.MODE_PRIVATE).edit()
+                    .putString("member_name",renamed.optString("name",name)).apply();
+            }
+            return result;
+        }
         if("remove".equals(action)){
             String id=payload.optString("id","");
             if(!id.matches("[0-9a-f-]{36}"))throw new Exception("계정 번호를 확인해 주세요.");
