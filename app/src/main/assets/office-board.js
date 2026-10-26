@@ -115,9 +115,13 @@ function drawCalendar(){
 }
 function syncViews(){
  const isCal=view==='calendar';
+ // One tab, one job. The free-form composer and its feedback belong to notes,
+ // not to the calendar. Keep the typed draft untouched when switching tabs.
+ for(const id of ['officeBoardComposer','officeBoardFeedback','officeBoardList','officeBoardListHeading']){
+  const e=id==='officeBoardComposer'?document.querySelector?.('#officeBoard .officeBoardComposer'):$(id);
+  e?.classList?.toggle?.('hidden',isCal);
+ }
  $('officeBoardCalendar')?.classList?.toggle?.('hidden',!isCal);
- $('officeBoardList')?.classList?.toggle?.('hidden',isCal);
- $('officeBoardListHeading')?.classList?.toggle?.('hidden',isCal);
  for(const [id,selected] of [['officeBoardNotesView',!isCal],['officeBoardCalendarView',isCal]]){
   const e=$(id);if(!e)continue;e.classList?.toggle?.('selected',selected);
   e.setAttribute?.('aria-pressed',String(selected));
@@ -351,7 +355,11 @@ function syncNotificationStatus(){
    status==='blocked'?'휴대폰 설정에서 퍼스트현대 알림을 허용해 주세요.':
    status==='disabled'?'관리자 설정에서 새 메모 알림이 꺼져 있습니다.':
    '휴대폰 알림은 안드로이드 앱에서 사용할 수 있습니다.';
- button.classList.toggle('hidden',status!=='permission_required');
+ const needsPermission=status==='permission_required';
+ button.classList.toggle('hidden',!needsPermission);
+ // Healthy FCM status is background operational detail, not an always-on banner.
+ // The action row appears only when Android notification permission needs a tap.
+ $('officeMemoNotificationStatus')?.parentElement?.classList?.toggle?.('hidden',!needsPermission);
 }
 function enableNotifications(){
  bridge?.requestOfficeMemoNotifications?.();
