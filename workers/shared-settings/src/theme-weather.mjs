@@ -1,5 +1,6 @@
 export {weatherBriefing} from './weather-forecast.mjs';
 import {normalizeKmaKey} from './kma-key.mjs';
+import {weatherSnapshot} from './weather-snapshot.mjs';
 /* Fixed Songdo grid. Official observed precipitation only; no user location,
    forecasts, customer data or credentials are returned. */
 const HEAD={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',
@@ -29,7 +30,7 @@ async function collect(secret){
   const dt=new Date(base.getTime()-back*3600000),date=dt.toISOString().slice(0,10).replace(/-/g,''),time=String(dt.getUTCHours()).padStart(2,'0')+'00';
   const url=new URL('https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst');
   url.search=new URLSearchParams({serviceKey:normalizeKmaKey(secret),pageNo:'1',numOfRows:'20',dataType:'JSON',base_date:date,base_time:time,nx:'55',ny:'123'});
-  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),5000);
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),2500);
   try{
    const r=await fetch(url,{signal:controller.signal});
    if(!r.ok)throw Error('provider_unavailable');
@@ -41,15 +42,17 @@ async function collect(secret){
  throw Error('provider_unavailable');
 }
 export async function themeWeather(env){
- if(!env.DATA_GO_KR_SERVICE_KEY)return response({status:'unavailable',reason:'weather_service_not_connected'},503);
+ if(!env.DATA_GO_KR_SERVICE_KEY){const fallback=await weatherSnapshot('observed');return fallback?response(fallback):response({status:'unavailable',reason:'weather_service_not_connected'},503);}
  const now=Date.now();
  if(cached&&now-cached.at<600000)return response(cached.value);
- if(now<retryAfter)return response({status:'unavailable',reason:'weather_service_unavailable'},503);
+ if(now<retryAfter){const fallback=await weatherSnapshot('observed');return fallback?response(fallback):response({status:'unavailable',reason:'weather_service_unavailable'},503);}
  try{
   if(!inflight)inflight=collect(env.DATA_GO_KR_SERVICE_KEY).then(value=>{cached={at:Date.now(),value};return value}).finally(()=>{inflight=null});
   return response(await inflight);
  }catch(e){
   retryAfter=Date.now()+60000;
+  const fallback=await weatherSnapshot('observed');
+  if(fallback){cached={at:Date.now(),value:fallback};return response(fallback)}
   // Never return an old rain/snow flag as if it were current, nor log provider URLs.
   return response({status:'unavailable',reason:'weather_service_unavailable'},503);
  }

@@ -1,5 +1,6 @@
 /* Official hourly forecast for Songdo. Forecasts never activate the observed-weather overlay. */
 import {normalizeKmaKey} from './kma-key.mjs';
+import {weatherSnapshot} from './weather-snapshot.mjs';
 const HOUR=3600000;
 const day=ms=>new Date(ms+9*HOUR).toISOString().slice(0,10);
 const reply=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{
@@ -43,20 +44,24 @@ export function parseForecast(doc,base,now=Date.now()){
   source_url:'https://www.data.go.kr/data/15084084/openapi.do'};
 }
 export async function weatherBriefing(env){
- if(!env.DATA_GO_KR_SERVICE_KEY)return reply({status:'unavailable',reason:'weather_service_not_connected'},503);
+ if(!env.DATA_GO_KR_SERVICE_KEY){const fallback=await weatherSnapshot('forecast');return fallback?reply(fallback):reply({status:'unavailable',reason:'weather_service_not_connected'},503);}
  const now=Date.now();
  if(cached&&cached.day===day(now)&&now-cached.at<1200000)return reply(cached.value);
- if(now<retryAfter)return reply({status:'unavailable',reason:'forecast_unavailable'},503);
+ if(now<retryAfter){const fallback=await weatherSnapshot('forecast');return fallback?reply(fallback):reply({status:'unavailable',reason:'forecast_unavailable'},503);}
  try{
   if(!inflight)inflight=(async()=>{
    const base=forecastBase(now),url=new URL('https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst');
    url.search=new URLSearchParams({serviceKey:normalizeKmaKey(env.DATA_GO_KR_SERVICE_KEY),pageNo:'1',numOfRows:'1000',dataType:'JSON',base_date:base.date,base_time:base.time,nx:'55',ny:'123'});
-   const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),7000);
+   const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),4500);
    try{
     const r=await fetch(url,{signal:controller.signal});if(!r.ok)throw Error('forecast_unavailable');
     const value=parseForecast(await r.json(),base,now);cached={at:Date.now(),day:day(now),value};return value;
    }finally{clearTimeout(timeout)}
   })().finally(()=>{inflight=null});
   return reply(await inflight);
- }catch(e){retryAfter=Date.now()+60000;return reply({status:'unavailable',reason:'forecast_unavailable'},503)}
+ }catch(e){
+  retryAfter=Date.now()+60000;const fallback=await weatherSnapshot('forecast');
+  if(fallback){cached={at:Date.now(),day:day(Date.now()),value:fallback};return reply(fallback)}
+  return reply({status:'unavailable',reason:'forecast_unavailable'},503);
+ }
 }
