@@ -94,6 +94,8 @@ jobs:
             printf '%s' "$DATA_GO_KR_SERVICE_KEY" | npx --yes wrangler@4 secret put DATA_GO_KR_SERVICE_KEY --config workers/shared-settings/wrangler.toml
           fi
       - name: Check official weather availability without credentials in logs
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
         run: |
           python3 - <<'PYCODE'
           import json, urllib.request, urllib.error
@@ -103,7 +105,22 @@ jobs:
               assert w.get('status')=='ok'
               print('SONGDO_WEATHER_VERIFIED',w['effect'],w['observed_at'])
           except Exception:
-              print('SONGDO_WEATHER_PENDING: official short-range weather API approval or availability needs checking; manual themes remain available.')
+              print('SONGDO_WEATHER_PENDING: checking provider permission without exposing the key.')
+              import os, datetime, urllib.parse
+              secret=os.environ.get('DATA_GO_KR_SERVICE_KEY','')
+              if secret:
+                  kst=datetime.timezone(datetime.timedelta(hours=9))
+                  base=datetime.datetime.now(kst)-datetime.timedelta(minutes=40)
+                  query=urllib.parse.urlencode(dict(serviceKey=secret,pageNo=1,numOfRows=20,dataType='JSON',base_date=base.strftime('%Y%m%d'),base_time=base.strftime('%H')+'00',nx=55,ny=123))
+                  try:
+                      with urllib.request.urlopen('https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?'+query,timeout=15) as provider:
+                          data=json.load(provider)
+                      code=str(data.get('response',{}).get('header',{}).get('resultCode','unknown'))
+                      print('KMA_PERMISSION_RESULT_CODE',code if code.isdigit() else 'unknown')
+                  except urllib.error.HTTPError as exc:
+                      print('KMA_PROVIDER_HTTP_STATUS',exc.code)
+                  except Exception:
+                      print('KMA_PROVIDER_UNAVAILABLE_OR_NON_JSON')
           PYCODE
       - name: Verify Worker ready
         run: python3 scripts/check_shared_settings_health.py
