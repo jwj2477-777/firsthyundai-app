@@ -21,7 +21,7 @@ assert(lock.includes('OfficeBoardClient.choices(getApplicationContext(),code)'),
  'After correct password fetch managed accounts from server');
 assert(lock.includes('OfficeBoardClient.enroll(getApplicationContext(),code,id)'),
  'Selecting a member actually binds the device');
-assert(lock.includes('loginDetail.setText("사용할 계정을 선택해 주세요."'),
+assert(lock.includes('loginDetail.setText("계정 선택"'),
  'Account selection page must explain its purpose');
 assert(!lock.includes('showExistingAccountReview()'),
  'Never show an account-selection dialog before a password');
@@ -46,14 +46,16 @@ assert(html.includes('id="officeCurrentMember"')&&
  html.includes('FirstHyundaiOfficeMembers.choose()'));
 assert(members.includes('requestOfficeMemberPicker')&&members.includes('if(!allowed()'));
 // The authenticated picker should be a compact, calm dedicated page.
-assert(lock.includes('accountChooser.addView(choice,lp)')&&
+assert(lock.includes('accountChooser.addView(accountMenu,')&&
  lock.includes('new LinearLayout.LayoutParams(-1,dp(56))'),
- 'All member rows need a uniform compact 56dp height');
-assert(lock.includes('surface.setCornerRadius(dp(12))')&&
- lock.includes('surface.setStroke(dp(1)'),
- 'Member rows must have understated rounded outline, not large filled system buttons');
-assert(lock.includes('choice.setBackground(new android.graphics.drawable.RippleDrawable('),
- 'Clickable member rows must give native touch feedback');
+ 'A single collapsed selector must replace a long list of tiles');
+assert(lock.includes('accountMenu.setBackground(outlinedSurface())')&&
+ lock.includes('accountMenu.setAdapter(adapter)'),
+ 'Member dropdown is styled with the same brand card');
+assert(lock.includes('new Spinner(this)')&&
+ lock.includes('accountMenu.setContentDescription("계정 선택 · 목록 열기")')&&
+ lock.includes('enter.setText("선택한 계정으로 시작")'),
+ 'Choose from native dropdown then explicitly confirm member');
 assert(lock.includes('loginFoot.setVisibility(View.GONE)')&&
  lock.includes('loginVersion.setVisibility(View.GONE)')&&
  lock.includes('status.setVisibility(View.GONE)'),
@@ -94,6 +96,13 @@ assert(lock.includes('status.addTextChangedListener('),
 assert(lock.includes('restorePasswordPage()')&&
  lock.includes('loginDetail.setText("보안코드 입력")'),
  'Back navigation must restore the original compact password title');
+assert(worker.includes('function memberIdentity(name)')&&
+ worker.includes('const grouped=new Map()')&&
+ worker.includes('connected.set(device.member_id'),
+ 'Four handsets must share deduplicated logical profiles without destroying legacy bindings');
+assert(html.includes('id="officeFooterMember"')&&
+ members.includes("footerLabel.textContent=account?'· '+account:''"),
+ 'Current account is displayed discreetly beside the footer brand');
 assert(!lock.includes('deleteSharedPreferences('),
  'Do not wipe app data just to reselect an office account');
 console.log('Password-first dedicated member page, existing-device migration, secured reassignment and admin chooser passed.');
