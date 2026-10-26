@@ -6,6 +6,20 @@ assert.equal(normalizeKmaKey('synthetic+key/='),'synthetic+key/=');
 const now=Date.parse('2026-10-26T15:00:00+09:00');
 const doc=(code='0')=>({response:{header:{resultCode:'00'},body:{items:{item:[{category:'PTY',nx:55,ny:123,baseDate:'20261026',baseTime:'1500',obsrValue:code}]}}}});
 for(const [code,effect] of [['0','none'],['1','rain'],['2','snow'],['3','snow'],['5','rain'],['6','snow'],['7','snow']])assert.equal(fromKma(doc(code),now).effect,effect);
+assert.equal(fromKma(doc('0'),now).temp,null,'PTY-only data must not invent a measured temperature');
+const weatherWithTemp=(value,when='1500')=>{
+ const d=doc('0');
+ d.response.body.items.item.push({
+  category:'T1H',nx:55,ny:123,baseDate:'20261026',baseTime:when,obsrValue:value
+ });
+ return d;
+};
+assert.equal(fromKma(weatherWithTemp('17.2'),now).temp,17.2,'Actual T1H is retained');
+assert.equal(fromKma(weatherWithTemp('0'),now).temp,0,'Zero °C remains a valid measured value');
+assert.equal(fromKma(weatherWithTemp('-2.7'),now).temp,-2.7,'Below-freezing observations remain valid');
+assert.equal(fromKma(weatherWithTemp(''),now).temp,null,'Blank temperature cannot become false 0 °C');
+assert.equal(fromKma(weatherWithTemp('NaN'),now).temp,null,'Invalid T1H cannot contaminate the UI');
+assert.equal(fromKma(weatherWithTemp('12','1400'),now).temp,null,'Do not mix temperatures from other observation hours');
 for(const value of ['','4','9','NaN'])assert.throws(()=>fromKma(doc(value),now));
 assert.throws(()=>fromKma(doc(),now+7200001));
 assert.throws(()=>fromKma(doc(),now-300001));
