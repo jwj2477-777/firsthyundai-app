@@ -1641,7 +1641,7 @@ function complexCollectionLabel(payload){
  if(/^\d{4}-\d{2}-\d{2}$/.test(stamp)){
   const date=new Date(stamp+'T00:00:00Z');
   if(Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===stamp)
-   return '송도동 · 자료 기준 '+stamp.slice(2).replace(/-/g,'.');
+   return '송도동 · 자료 기준 '+stamp.replace(/-/g,'.');
   return '송도동 · 자료 기준 확인 필요';
  }
  if(stamp)return '송도동 · 자료 갱신 '+compactTradeCollectedAt(stamp);
