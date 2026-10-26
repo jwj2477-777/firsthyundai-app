@@ -46,7 +46,7 @@
   if(!b||!['양력','음력'].includes(b.kind)||typeof b.name!=='string'||
    !b.name.trim()||b.name.length>24||/[<>\r\n]/.test(b.name)||
    !Number.isInteger(b.month)||b.month<1||b.month>12||
-   !Number.isInteger(b.day)||b.day<1||b.day>30)return false;
+   !Number.isInteger(b.day)||b.day<1||b.day>(b.kind==='양력'?31:30))return false;
   return b.kind==='양력'?!!solarDate(2028,b.month,b.day):true;
  }
  function parseLine(line){
