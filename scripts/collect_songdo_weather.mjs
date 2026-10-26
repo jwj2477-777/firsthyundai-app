@@ -27,7 +27,12 @@ function request(endpoint,base){
  url.search=new URLSearchParams({serviceKey:secret,pageNo:'1',numOfRows:'1000',dataType:'JSON',base_date:base.date,base_time:base.time,nx:'55',ny:'123'});
  const result=spawnSync('python3',['-c',python],{input:JSON.stringify({url:url.href}),encoding:'utf8',timeout:20000,maxBuffer:2*1024*1024});
  if(result.status!==0)throw Error('weather_request_failed');
- const answer=JSON.parse(result.stdout);if(!answer.ok)throw Error('weather_request_failed');return answer.data;
+ const answer=JSON.parse(result.stdout);if(!answer.ok)throw Error('weather_request_failed');
+ const response=answer.data?.response,items=response?.body?.items?.item;
+ console.log('OFFICIAL_WEATHER_RESPONSE_SHAPE',endpoint,JSON.stringify({code:response?.header?.resultCode,
+  count:response?.body?.totalCount,array:Array.isArray(items),
+  sample:Array.isArray(items)?items.slice(0,2).map(row=>Object.fromEntries(['category','baseDate','baseTime','nx','ny','obsrValue','fcstDate','fcstTime','fcstValue'].filter(k=>row[k]!==undefined).map(k=>[k,row[k]]))):[]}));
+ return answer.data;
 }
 let observed=null,forecast=null;
 try{
@@ -35,11 +40,11 @@ try{
  const base={date:local.toISOString().slice(0,10).replace(/-/g,''),time:String(local.getUTCHours()).padStart(2,'0')+'00'};
  observed=fromKma(request('getUltraSrtNcst',base),now);
  console.log('OFFICIAL_SONGDO_OBSERVED_VERIFIED',observed.observed_at,observed.effect);
-}catch(e){console.log('OFFICIAL_SONGDO_OBSERVED_PENDING');if(validWeatherSnapshot(previous.observed,'observed',now))observed=previous.observed}
+}catch(e){console.log('OFFICIAL_SONGDO_OBSERVED_PENDING');if(/^[a-z_]+$/.test(e.message))console.log('OFFICIAL_WEATHER_REASON',e.message);if(validWeatherSnapshot(previous.observed,'observed',now))observed=previous.observed}
 try{
  const base=forecastBase(now);forecast=parseForecast(request('getVilageFcst',base),base,now);
  console.log('OFFICIAL_SONGDO_FORECAST_VERIFIED',forecast.issued_at,forecast.hours.length);
-}catch(e){console.log('OFFICIAL_SONGDO_FORECAST_PENDING');if(validWeatherSnapshot(previous.forecast,'forecast',now))forecast=previous.forecast}
+}catch(e){console.log('OFFICIAL_SONGDO_FORECAST_PENDING');if(/^[a-z_]+$/.test(e.message))console.log('OFFICIAL_WEATHER_REASON',e.message);if(validWeatherSnapshot(previous.forecast,'forecast',now))forecast=previous.forecast}
 if(!observed&&!forecast)throw Error('No verified weather data; previous file left unchanged');
 fs.mkdirSync('data',{recursive:true});
 fs.writeFileSync(file,JSON.stringify({schema:1,status:observed&&forecast?'ok':'partial',checked_at:new Date(now).toISOString(),observed,forecast},null,2)+'\n');
