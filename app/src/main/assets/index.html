@@ -230,15 +230,15 @@ body.apartmentSheetActive{overflow:hidden}
 <div id="officeBoard" class="page hidden">
  <div class="sectionTitle officeBoardTitle"><div><h2>사무실 메모</h2><p class="tiny">함께 쓰는 포스트잇 · <span id="officeBoardCurrentMember"></span></p></div>
   <button type="button" class="btn alt refreshAction" onclick="FirstHyundaiOfficeBoard.refresh()" aria-label="공유 메모 새로고침">↻ 새로고침</button></div>
- <div class="officeMemoNotificationTools">
+ <div class="officeMemoNotificationTools hidden" aria-label="알림 권한 요청">
   <span id="officeMemoNotificationStatus" class="tiny" role="status">새 메모 알림 확인 중</span>
   <button id="officeMemoNotificationPermission" type="button" class="btn alt hidden" onclick="FirstHyundaiOfficeBoard.enableNotifications()">알림 허용</button>
  </div>
- <div class="officeBoardViewToggle" role="group" aria-label="공유 메모 보기 방식">
+ <div class="officeBoardViewToggle sectionModeSwitch" data-tone="memo" role="group" aria-label="공유 메모 보기 방식">
   <button id="officeBoardNotesView" type="button" class="selected" aria-pressed="true" onclick="FirstHyundaiOfficeBoard.setView('notes')">▤ 메모</button>
   <button id="officeBoardCalendarView" type="button" aria-pressed="false" onclick="FirstHyundaiOfficeBoard.setView('calendar')">▦ 일정 캘린더</button>
  </div>
- <section class="panel officeBoardComposer">
+ <section class="panel officeBoardComposer" aria-label="새 공유 메모 작성">
   <label for="officeBoardDraft" class="officeBoardLabel">새 메모</label>
   <textarea id="officeBoardDraft" maxlength="1600" rows="4" placeholder="전달할 내용을 자유롭게 적어주세요."></textarea>
   <p id="officeBoardScheduleSuggestion" class="officeBoardAutoSchedule hidden" role="status"></p>
