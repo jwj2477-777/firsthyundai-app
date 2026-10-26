@@ -77,7 +77,7 @@ public class MainActivity extends Activity {
                 int incoming=OfficeMemoNotifications.check(getApplicationContext());
                 if(incoming>0)runOnUiThread(()->{
                     if(web!=null&&!isFinishing()&&!isDestroyed())
-                        web.evaluateJavascript("window.FirstHyundaiOfficeBoard?.onNewNotification?.()",null);
+                        web.evaluateJavascript("window.FirstHyundaiOfficeBoard?.onNewNotification?.();window.FirstHyundaiNotificationInbox?.refresh?.()",null);
                 });
             });
             memoTimer.postDelayed(this,12000L);
@@ -251,7 +251,7 @@ public class MainActivity extends Activity {
         memoTimer.removeCallbacks(memoCheck);
         memoTimer.post(memoCheck);
         updateNotificationPermissionUI();
-        if(web!=null)web.evaluateJavascript("window.FirstHyundaiSharedSettings?.refresh?.();window.FirstHyundaiOfficeBoard?.onResume?.();window.FirstHyundaiWeatherBriefing?.refresh?.();window.FirstHyundaiThemes?.refresh?.()",null);
+        if(web!=null)web.evaluateJavascript("window.FirstHyundaiSharedSettings?.refresh?.();window.FirstHyundaiOfficeBoard?.onResume?.();window.FirstHyundaiNotificationInbox?.refresh?.();window.FirstHyundaiWeatherBriefing?.refresh?.();window.FirstHyundaiThemes?.refresh?.()",null);
         final String activeAdmin=adminSessionIdentity;
         if(activeAdmin!=null && !activeAdmin.isEmpty()) {
             io.execute(()->{
@@ -332,7 +332,7 @@ public class MainActivity extends Activity {
 
     private void updateNotificationPermissionUI() {
         if (web == null || isFinishing() || isDestroyed()) return;
-        web.evaluateJavascript("window.FirstHyundaiTradeAlerts?.syncNativeStatus?.();window.FirstHyundaiOfficeBoard?.syncNotificationStatus?.()", null);
+        web.evaluateJavascript("window.FirstHyundaiTradeAlerts?.syncNativeStatus?.();window.FirstHyundaiOfficeBoard?.syncNotificationStatus?.();window.FirstHyundaiNotificationInbox?.refresh?.()", null);
     }
 
     @Override public void onRequestPermissionsResult(int requestCode, String[] permissions,
