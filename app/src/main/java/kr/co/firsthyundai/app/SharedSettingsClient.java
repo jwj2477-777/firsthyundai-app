@@ -32,12 +32,17 @@ final class SharedSettingsClient {
             int status=connection.getResponseCode();
             InputStream response=status>=200&&status<300?connection.getInputStream():connection.getErrorStream();
             if(response==null)throw new Exception("공통 설정 서버 응답 없음");
+            // The short shared-settings envelope remains capped at 5 KB.
+            // Only the published, fixed-area weather hourly endpoint may return a larger
+            // verified forecast (80+ hours). A blanket limit was silently rejecting
+            // valid forecast JSON before the WebView ever received it.
+            final int maxResponseBytes="/weather-briefing".equals(endpoint)?65536:5000;
             ByteArrayOutputStream result=new ByteArrayOutputStream();
             try(InputStream stream=response){
                 byte[] chunk=new byte[1024];int n;
                 while((n=stream.read(chunk))!=-1){
                     result.write(chunk,0,n);
-                    if(result.size()>5000)throw new Exception("서버 응답 용량 제한 초과");
+                    if(result.size()>maxResponseBytes)throw new Exception("서버 응답 용량 제한 초과");
                 }
             }
             if(status<200||status>=300)throw new Exception(status==401?
