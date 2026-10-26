@@ -1,6 +1,6 @@
 name: Deploy Shared Office Settings
 # Re-apply already-registered Firebase GitHub Secrets to the existing Worker.
-# This documentation-only change intentionally triggers the push deployment.
+# Recheck official observed/forecast weather after the owner applied for service access.
 on:
   push:
     paths:
@@ -154,5 +154,6 @@ jobs:
           PYCODE
       - name: Verify Worker ready
         run: python3 scripts/check_shared_settings_health.py
+
 
 

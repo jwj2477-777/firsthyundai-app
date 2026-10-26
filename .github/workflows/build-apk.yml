@@ -238,6 +238,7 @@ jobs:
           node scripts/test_theme_weather.mjs
           node scripts/test_weather_briefing.mjs
           node scripts/test_theme_layout_browser.js
+          node scripts/test_overview_actions_browser.js
           node scripts/test_admin_preferences.js
           node scripts/test_shared_settings.js
           node scripts/test_shared_settings_worker.mjs
@@ -330,24 +331,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.15 adjustable season appearance and weather briefing APK
+      - name: Publish v2.1.16 readable briefing action cards APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.15.apk
-          unzip -t FirstHyundai-v2.1.15.apk | grep 'No errors detected'
-          if gh release view v2.1.15 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.16.apk
+          unzip -t FirstHyundai-v2.1.16.apk | grep 'No errors detected'
+          if gh release view v2.1.16 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.15 FirstHyundai-v2.1.15.apk \
+            gh release create v2.1.16 FirstHyundai-v2.1.16.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.15 · 테마 세부조정·날씨 브리핑' \
-              --notes '계절 테마를 더 선명한 색감과 풍성한 장식으로 보강했습니다. 관리자에서 테마 강도·장식량·메인 상단 적용·시작 화면 적용을 각각 선택할 수 있습니다. 원본 로고와 기존 메뉴·버튼·글꼴·사용 순서는 유지하며 시작 화면과 상단 색조를 연결합니다. 오늘 브리핑에 기상청 시간대별 예보 기반 비·눈 안내를 추가하고 일정·업무·자료 현황을 정갈하게 정리했습니다. 예보 미연결·과거자료·부분시간대는 비가 없다고 단정하지 않습니다. 기존 5개 테마와 수동 비/눈·절기 자동·설정 동기화·공유메모·계정·알림·계약 기능을 유지합니다. v2.1.15/build166.'
+              --title '퍼스트현대 v2.1.16 · 브리핑 업무 버튼 정돈' \
+              --notes '오늘 브리핑의 오늘 새 거래·관심 14개 단지 두 버튼을 정돈했습니다. 큰 장식 아이콘을 줄이고 제목은 한 줄, 건수·실거래 바로 확인은 별도 한 줄로 정렬하여 읽기 편하게 바꿨습니다. 중복 보조문구를 덜어내고 버튼 크기·좌우 위치·이동 기능을 유지합니다. 기존 계절 테마·관리자 세부조절·시작/상단 테마·날씨 브리핑·메모·계정·알림·계약 기능을 보존합니다. v2.1.16/build167.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.15 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.15 --apk FirstHyundai-v2.1.15.apk
+          gh release upload v2.1.16 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.16 --apk FirstHyundai-v2.1.16.apk
 
 
