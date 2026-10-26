@@ -121,11 +121,17 @@ function addReviewNote(msg){
 }
 function prepareSpecials(raw){
  const dedicated=v('specialMemo').replace(/\r/g,'').trim();
- const extracted=dedicated?'':extractSpecial(raw);
- // A dedicated special-clause box is always interpreted as specials, without
- // requiring "특약:" or guessing from the general memo. Use the same conservative
- // sentence normalizer as detected clauses, keeping every distinct item.
- const terms=dedicated||extracted||v('terms');
+ const extracted=extractSpecial(raw);
+ // Both parts of the grouped memo participate in recognition. The lower field
+ // is just an optional visual reminder: clauses written above still count.
+ // Keep both sources and remove duplicate clauses without dropping obligations.
+ const lines=[extracted,dedicated].filter(Boolean).join('\n').split(/\n+/).map(x=>x.trim()).filter(Boolean);
+ const unique=[],seen=new Set();
+ for(const line of lines){
+  const key=line.replace(/[^가-힣a-zA-Z0-9]/g,'').toLowerCase();
+  if(!seen.has(key)){seen.add(key);unique.push(line)}
+ }
+ const terms=unique.join('\n')||v('terms');
  sourceClause=terms;polishedClause=polishTerms(terms);
  const usePolished=E('polishTerms')?.checked!==false;
  if(E('terms'))E('terms').value=terms?(usePolished?polishedClause:terms):'';
@@ -334,8 +340,8 @@ function showPreview(){
  if(panel?.scrollIntoView)panel.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function compose(){
- const raw=v('rough');
- if(!raw){alert('먼저 메모를 입력하거나 음성으로 말씀해 주세요.');E('rough')?.focus?.();return false;}
+ const raw=[v('rough'),v('specialMemo')].filter(Boolean).join('\n');
+ if(!raw){alert('먼저 계약 내용을 입력하거나 음성으로 말씀해 주세요.');E('rough')?.focus?.();return false;}
  // Never carry unfinished bank/account answers across a new memo (new client).
  quickDraft.clear();activeQuick='';
  // Each new composition starts with empty deal data, avoiding old customer's account or terms leaking into new draft.
