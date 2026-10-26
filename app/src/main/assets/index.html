@@ -1281,7 +1281,7 @@ function switchPage(id){
  if(id==='officeBoard')window.FirstHyundaiOfficeBoard?.open?.();
  if(id==='overview')window.FirstHyundaiOfficeBoard?.openBriefing?.();
  if(id==='overview')window.FirstHyundaiWeatherBriefing?.refresh?.();
- if(id==='adminCenter'&&role==='admin'){window.FirstHyundaiAdminCenter?.render?.();window.FirstHyundaiOfficeMembers?.refresh?.();}
+ if(id==='adminCenter'&&role==='admin'){window.FirstHyundaiAdminCenter?.render?.();window.FirstHyundaiAdminNavigator?.render?.();window.FirstHyundaiOfficeMembers?.refresh?.();}
  if(id==='security'&&role==='admin'){
   const v=window.FirstHyundaiNative?.getPolicyVersion?.()||0;
   $('securityVersion').textContent='이 휴대폰의 보안 정책 버전: '+(v?v:'확인 전');
