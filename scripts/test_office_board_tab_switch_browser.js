@@ -50,6 +50,7 @@ async function verify(){
   check(!agenda.classList.contains('hidden'),'Calendar panel missing');
   check(h(calendar)===h(memo)&&same(calendar),'Button sizes changed when selected');
   check(draft.value==='보존할 미발송 메모 초안','Switching tabs discarded unposted text');
+  await new Promise(resolve=>setTimeout(resolve,850));
   check(getComputedStyle(calendar).backgroundColor===mustard,'Memo/calendar use same active mustard');
   memo.click();
   check(!composer.classList.contains('hidden')&&!list.classList.contains('hidden'),'Notes controls did not return');
