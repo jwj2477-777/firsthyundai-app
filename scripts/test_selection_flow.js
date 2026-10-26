@@ -77,7 +77,7 @@ const win={innerWidth:415,innerHeight:980,requestAnimationFrame,
 };
 vm.runInNewContext(code,{window:win,document:doc,Math,Number,Object,Array,Map});
 const api=win.FirstHyundaiSelectionFlow;
-assert.equal(api.version,'14.0.0');
+assert.equal(api.version,'14.1.0');
 assert.equal(api._test.buttons(nav,'top-five').length,6);
 assert(!('beginDirect' in api)&&!('endDirect' in api),'Removed non-working direct-hook branch');
 assert.equal(api._test.viaIndex('top-five',0,2),1);
@@ -87,6 +87,10 @@ assert.equal(api._test.viaIndex('top-five',3,5),4,'Summary → Memo passes via C
 assert.equal(api._test.viaIndex('top-five',5,3),4,'Memo → Summary passes via Contracts');
 assert.equal(api._test.viaIndices('top-five',3,5,buttons).join(','),'4');
 assert.equal(api._test.viaIndices('top-five',5,3,buttons).join(','),'4');
+assert.equal(api._test.viaIndices('top-five',0,5,buttons).join(','),'1,4',
+ 'Trades → Shared Memo travels across both center-column buttons');
+assert.equal(api._test.viaIndices('top-five',5,0,buttons).join(','),'4,1',
+ 'Shared Memo → Trades follows the exact reverse journey');
 for(const pair of [[0,1],[1,2],[0,3],[2,4],[3,4],[3,2],[4,5]])
  assert.equal(api._test.viaIndex('top-five',...pair),-1,
   'Other navigation paths stay untouched');
@@ -163,6 +167,25 @@ assert.equal(buttons[4].getAttribute('aria-current'),'false');
 complete(4790);
 assert(buttons.every(b=>b.style.getPropertyValue('background')===''));
 assert.equal(api._test.stats.topFive,5);
+// Diagonal route must wash only Apartment Info then Contract Message, never
+// select either; endpoints are the user's actual first and last pressed tiles.
+selected=0;
+click({target:buttons[5],defaultPrevented:false});
+selected=5;
+frame(5000);frame(5000);frame(5380);
+assert.equal(api._test.stats.lastPath.join(','),'0,1,4,5');
+assert.equal(buttons[1].getAttribute('aria-current'),'false');
+assert.equal(buttons[4].getAttribute('aria-current'),'false');
+assert.equal(nav.children.length,2);
+complete(5900);
+assert(buttons.every(b=>b.style.getPropertyValue('background')===''));
+click({target:buttons[0],defaultPrevented:false});
+selected=0;
+frame(6000);frame(6000);frame(6380);
+assert.equal(api._test.stats.lastPath.join(','),'5,4,1,0');
+complete(6900);
+assert(buttons.every(b=>b.style.getPropertyValue('background')===''));
+
 
 // If the administrator reorders the quick actions, the middle button
 // no longer sits between Summary and Memo: no false sideways detour.
