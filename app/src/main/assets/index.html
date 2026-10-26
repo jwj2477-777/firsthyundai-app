@@ -183,6 +183,7 @@ body.apartmentSheetActive{overflow:hidden}
 <link rel="stylesheet" href="office-board.css">
 <link rel="stylesheet" href="season-themes.css">
 <link rel="stylesheet" href="weather-briefing.css">
+<link rel="stylesheet" href="weather-detail.css">
 <link rel="stylesheet" href="notification-inbox.css">
 </head>
 <body data-office-role="family" data-section="nearby">
@@ -206,7 +207,7 @@ body.apartmentSheetActive{overflow:hidden}
   <div class="sectionTitle overviewBriefTitle"><div class="overviewBriefHeadingCopy"><h2>오늘의 업무 브리핑</h2><time id="overviewWeatherDate" class="overviewBriefDate" aria-label="오늘 날짜"></time></div><button class="btn alt refreshAction" type="button" onclick="refreshAll(true)"><span class="refreshGlyph" aria-hidden="true">↻</span> 갱신</button></div>
   <section class="panel overviewUnified" id="overviewUnified" aria-label="오늘의 업무와 날씨">
     <div class="overviewCurrentWeather">
-      <div class="overviewWeatherHeading"><span>송도 현재 날씨</span></div>
+      <div class="overviewWeatherHeading"><span>송도 현재 날씨</span><span class="overviewWeatherMore" aria-hidden="true">상세 날씨 ›</span></div><button id="weatherDetailEntry" type="button" class="overviewWeatherEntry" aria-label="송도 상세 날씨 열기" aria-controls="fhdWeatherDialog" aria-haspopup="dialog" onclick="FirstHyundaiWeatherDetail.open()"></button>
       <div class="overviewWeatherMain"><span class="overviewWeatherIcon" id="overviewWeatherIcon" data-kind="temperature" aria-hidden="true"><svg class="overviewWeatherGlyph overviewWeatherThermometer" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 19.8V7.5a4 4 0 0 1 8 0v12.3a7 7 0 1 1-8 0Z"/><path d="M17 13v11"/><circle cx="17" cy="24" r="1.6" fill="currentColor" stroke="none"/></svg><svg class="overviewWeatherGlyph overviewWeatherRain" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 18.5a7.5 7.5 0 0 1 1.3-14.1 9.5 9.5 0 0 1 17.2 8.3 6 6 0 0 1-3 10.3H9"/><path d="m11 23-2 4m9-4-2 4m9-4-2 4"/></svg><svg class="overviewWeatherGlyph overviewWeatherSnow" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3v26M3 16h26M6.8 6.8l18.4 18.4m0-18.4L6.8 25.2M12.8 7l3.2 3.2L19.2 7M12.8 25l3.2-3.2 3.2 3.2"/></svg></span>
         <div><p id="overviewWeatherMessage" role="status">현재 날씨 확인 중</p><small id="overviewWeatherSource">기상청 관측 확인 중</small></div>
       </div>
@@ -242,6 +243,31 @@ body.apartmentSheetActive{overflow:hidden}
     </button>
   </section>
 </div>
+<section id="fhdWeatherDialog" class="fhdWeatherDialog" role="dialog" aria-modal="true" aria-label="송도 상세 날씨" aria-hidden="true" hidden>
+ <div class="fhdWeatherDialogInner">
+  <div class="fhdWeatherNav"><button type="button" id="fhdWeatherClose" onclick="FirstHyundaiWeatherDetail.close()" aria-label="업무브리핑으로 돌아가기"><span aria-hidden="true">‹</span> 업무브리핑</button><strong>송도동 · 날씨</strong></div>
+  <div class="fhdWeatherHero">
+   <p id="fhdWeatherDate" class="fhdWeatherDate"></p>
+   <div class="fhdWeatherHeroMain"><span id="fhdWeatherHeroIcon" class="fhdWeatherHeroIcon" aria-hidden="true"></span><div><strong id="fhdWeatherTemp" class="fhdWeatherTemp">—</strong><p id="fhdWeatherCondition" class="fhdWeatherCondition">실황 확인 중</p></div></div>
+   <div class="fhdWeatherStats"><span id="fhdWeatherHighLow">예보 최고·최저 확인 중</span><span id="fhdWeatherObserved">기상청 실황 확인 중</span></div>
+   <p id="fhdWeatherSummary" class="fhdWeatherSummary"></p>
+  </div>
+  <div class="fhdWeatherBody">
+   <section class="fhdWeatherBlock" aria-labelledby="fhdWeatherHoursTitle">
+    <div class="fhdWeatherBlockHead"><h3 id="fhdWeatherHoursTitle">시간별 날씨</h3><small>기온 변화 · 강수확률</small></div>
+    <div id="fhdWeatherChart" class="fhdWeatherChart" role="region" tabindex="0" aria-label="기상청 시간별 기온 그래프와 강수확률, 좌우로 스크롤하여 확인"></div>
+    <p id="fhdWeatherChartStatus" class="fhdWeatherFine"></p>
+   </section>
+   <section id="fhdWeatherOffice" class="fhdWeatherBlock" aria-labelledby="fhdWeatherOfficeTitle">
+    <div class="fhdWeatherBlockHead"><h3 id="fhdWeatherOfficeTitle">사무실 업무 날씨</h3><small>공유 일정·지도함 연동</small></div>
+    <p id="fhdWeatherOfficeAlert" class="fhdWeatherOfficeAlert" hidden></p>
+    <div id="fhdWeatherSchedule" class="fhdWeatherSchedule"></div>
+    <button type="button" class="fhdWeatherCalendar" onclick="FirstHyundaiWeatherDetail.openCalendar()">공유 일정 확인 ›</button>
+   </section>
+   <p id="fhdWeatherAttribution" class="fhdWeatherAttribution">기상청 실황 및 단기예보 · 확인된 값만 표시</p>
+  </div>
+ </div>
+</section>
 <div id="officeBoard" class="page hidden">
  <div class="sectionTitle officeBoardTitle"><div><h2>사무실 메모</h2><p class="tiny">함께 쓰는 포스트잇 · <span id="officeBoardCurrentMember"></span></p></div>
   <button type="button" class="btn alt refreshAction" onclick="FirstHyundaiOfficeBoard.refresh()" aria-label="공유 메모 갱신"><span class="refreshGlyph" aria-hidden="true">↻</span> 갱신</button></div>
@@ -3095,6 +3121,6 @@ function exportComplexCatalog(){
 }
 window.onCatalogSaved=r=>alert(r.ok?'단지정보 JSON을 저장했습니다. GitHub에 올려야 가족에게 반영됩니다.':'단지정보 파일 저장 실패');
 
-</script><script src="price-trends.js"></script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-image.js"></script><script src="scroll-top.js"></script><script src="admin-preferences.js"></script><script src="season-themes.js"></script><script src="weather-briefing.js"></script><script src="premium-motion.js"></script><script src="selection-flow.js"></script><script src="app-updates.js"></script><script src="admin-center.js"></script><script src="shared-settings.js"></script><script src="memo-dates.js"></script><script src="annual-calendar.js"></script><script src="office-board.js"></script><script src="office-members.js"></script><script src="admin-settings-navigator.js"></script><script src="notification-inbox.js"></script></body></html>
+</script><script src="price-trends.js"></script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-image.js"></script><script src="scroll-top.js"></script><script src="admin-preferences.js"></script><script src="season-themes.js"></script><script src="weather-briefing.js"></script><script src="premium-motion.js"></script><script src="selection-flow.js"></script><script src="app-updates.js"></script><script src="admin-center.js"></script><script src="shared-settings.js"></script><script src="memo-dates.js"></script><script src="annual-calendar.js"></script><script src="office-board.js"></script><script src="office-members.js"></script><script src="admin-settings-navigator.js"></script><script src="notification-inbox.js"></script><script src="weather-detail.js"></script></body></html>
 
 
