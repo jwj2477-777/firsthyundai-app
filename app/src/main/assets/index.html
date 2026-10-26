@@ -1243,6 +1243,7 @@ function closeApartmentSheet(restoreFocus=true){
  return true;
 }
 window.firstHyundaiGoBack=function(){
+ if($('fhdWeatherDialog')?.hidden===false){window.FirstHyundaiWeatherDetail?.close?.();return true;}
  if($('favoriteAlertSettingsDialog')?.open){window.FirstHyundaiTradeAlerts?.closeSettings();return true;}
  if($('favoriteTradeAlertDialog')?.open){window.FirstHyundaiTradeAlerts?.later();return true;}
  return closeApartmentSheet();
