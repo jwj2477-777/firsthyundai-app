@@ -16,7 +16,11 @@ async function memberList(env){
  const keys=await env.SETTINGS.list({prefix:MEMBER_PREFIX,limit:100});
  return (await Promise.all(keys.keys.map(v=>env.SETTINGS.get(v.name,"json"))))
  .filter(v=>v&&validMemberId(v.id)&&v.active===true)
- .map(v=>({id:v.id,name:v.name})).sort((a,b)=>a.name.localeCompare(b.name,"ko"));
+ .map(v=>({id:v.id,name:v.name})).sort((a,b)=>{
+  const preferred=["관리자","엄마","아빠"];
+  const ai=preferred.indexOf(a.name),bi=preferred.indexOf(b.name);
+  return (ai>=0?ai:preferred.length)-(bi>=0?bi:preferred.length)||a.name.localeCompare(b.name,"ko");
+ });
 }
 // Bootstrap exactly once, before the first device signs in. Existing members
 // survive upgrades. A removed member is never silently recreated.
