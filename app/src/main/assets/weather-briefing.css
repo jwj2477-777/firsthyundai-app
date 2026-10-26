@@ -33,3 +33,28 @@ body[data-season-theme]:not([data-season-theme="default"]) #overview .overviewWe
  #overview .overviewActionCard small{font-size:11.5px;gap:5px}
  #overview .overviewActionCard b{font-size:16px}
 }
+
+/* v2.1.19 · Unified weather-led work briefing; optional rows never leave blanks. */
+#overview .overviewUnified{padding:17px 18px;overflow:hidden}
+#overview .overviewCurrentWeather{min-width:0}
+#overview .overviewBriefLine{font-size:13px;line-height:1.6;letter-spacing:-.1px;
+  margin:10px 0 0;padding:10px 12px;border-radius:11px;word-break:keep-all;
+  background:#F4F8F8;color:#385E65}
+#overview .overviewBriefLine.rain{background:#ECF5F8;color:#285E75}
+#overview .overviewBriefLine.important{background:#FFF3E7;color:#81542F;
+  border-left:3px solid #CD955E;font-weight:700}
+#overview .overviewBriefLine.caution{background:#F8F7F0;color:#746847}
+#overview .overviewMemoBriefing{margin:12px 0 0;padding:12px 0 0;border:none;
+  border-top:1px solid #E0E8E7;border-radius:0;background:transparent;box-shadow:none}
+#overview .overviewBriefTrade{display:flex;align-items:center;justify-content:space-between;
+  gap:10px;width:100%;min-height:48px;margin:12px 0 0;padding:11px 13px;
+  border:1px solid #D8E7E3;border-radius:12px;background:#F4FAF7;color:#285754;
+  font:inherit;font-size:13px;font-weight:700;text-align:left;cursor:pointer}
+#overview .overviewBriefTrade strong{font-size:15px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#overview .overviewBriefTrade:focus-visible{outline:3px solid #8CBAB3;outline-offset:2px}
+#overview :is(.overviewBriefLine,.overviewMemoBriefing,.overviewBriefTrade)[hidden]{display:none!important}
+@media(max-width:360px){
+ #overview .overviewUnified{padding:14px 13px}
+ #overview .overviewBriefLine{padding:9px 10px;font-size:12.5px}
+ #overview .overviewBriefTrade{padding:10px 11px}
+}

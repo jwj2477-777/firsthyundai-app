@@ -334,24 +334,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.18 punctuated contract recognition and distinct seasonal themes APK
+      - name: Publish v2.1.19 single conditional office briefing APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.18.apk
-          unzip -t FirstHyundai-v2.1.18.apk | grep 'No errors detected'
-          if gh release view v2.1.18 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.19.apk
+          unzip -t FirstHyundai-v2.1.19.apk | grep 'No errors detected'
+          if gh release view v2.1.19 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.18 FirstHyundai-v2.1.18.apk \
+            gh release create v2.1.19 FirstHyundai-v2.1.19.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.18 · 계약 인식·계절 테마 강화' \
-              --notes '번호·마침표·하이픈이 섞인 계약 메모와 소수 억원 표기 인식을 개선했습니다. 매매금액·거래금액·계약금의 다양한 구분기호를 지원하며, 중도금 협의 일정과 잔금일을 분리하고 미기재 송금액·계좌·계약일은 임의로 채우지 않습니다. 기본+4계절 테마와 비·눈 효과를 더 뚜렷하게 나누고 시작 화면·상단·원본 로고 주변에 계절색과 날씨 장식을 적용합니다. 시작 화면에 실제 한국 연도와 선택된 계절을 은은하게 표시하며, 관리자 강도·장식량·시작/상단 적용·로고 장식·연도계절 문구 제어를 지원합니다. 봄꽃·여름 해와 물결·가을 단풍·겨울 설경 포인트와 안드로이드 비 아이콘 호환성을 보강했습니다. 오늘 브리핑 두 업무 버튼의 한 줄 제목·거래건수 개선, 기존 계정·메모·계약·알림 기능을 보존합니다. v2.1.18/build169.'
+              --title '퍼스트현대 v2.1.19 · 오늘 업무브리핑 통합' \
+              --notes '오늘의 업무 브리핑을 상시 송도 현재 날씨와 필요한 정보만 표시하는 하나의 카드로 통합했습니다. 비·눈 예보, 오늘 일정, 신고된 새 거래가 있을 때만 해당 내용을 노출합니다. 지도함 관리 예보는 사무실 퇴근 후부터 다음 영업일 오전 9시까지 확인하고, 일요일 및 둘째·넷째 토요일 휴무를 포함합니다. 공유메모의 종일 휴무·휴가도 다음 영업일 계산에 반영하고, 예보 누락 시 안전하다고 잘못 안내하지 않습니다. 기존 계정·공유 메모·계약 안내·관리자 설정·계절 테마 기능을 유지합니다. v2.1.19/build170.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.18 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.18 --apk FirstHyundai-v2.1.18.apk
+          gh release upload v2.1.19 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.19 --apk FirstHyundai-v2.1.19.apk
 
 
