@@ -13,8 +13,8 @@ assert(start>=0&&end>start,'Unified overview exists before shared notes');
 const overview=html.slice(start,end);
 let previous=-1;
 for(const term of ['id="overviewWeatherMessage"','id="overviewPrecipitation"',
- 'id="overviewMapAlert"','id="overviewMapCaution"','id="overviewMemoBriefing"',
- 'id="overviewTodayNewTrade"','id="overviewNewQuickCount"']){
+ 'id="overviewMapAlert"','id="overviewMemoBriefing"',
+ 'id="overviewSongdoNews"','id="overviewTodayNewTrade"','id="overviewNewQuickCount"']){
  const next=overview.indexOf(term);
  assert(next>previous,'Weather, notices, agenda and trade follow task order: '+term);
  previous=next;
@@ -26,8 +26,9 @@ for(const term of ['id="overviewUnified"','id="overviewWeatherDate"',
  assert(overview.includes(term),'Essential unified briefing element missing: '+term);
 assert(/id="overviewMemoBriefing"[^>]*hidden/.test(overview),'No empty schedule box');
 assert(/id="overviewTodayNewTrade"[^>]*hidden/.test(overview),'No empty new-trade box');
-for(const id of ['overviewPrecipitation','overviewMapAlert','overviewMapCaution'])
+for(const id of ['overviewPrecipitation','overviewMapAlert'])
  assert(new RegExp('id="'+id+'"[^>]*hidden').test(overview),'No empty rain/snow boxes: '+id);
+assert(!overview.includes('id="overviewMapCaution"'),'Never show speculative map-box forecast warnings');
 assert(!overview.includes('id="overviewStatsTitle"'),'No old static statistics panel');
 assert(!overview.includes('id="overviewNextTitle"'),'No old hardcoded shortcut list');
 assert(css.includes('.overviewBriefLine')||html.includes('overviewBriefLine'),'Important alert layout remains styled');
