@@ -146,7 +146,7 @@ final class ThemeAppearance {
                 fill(c,"M12 1L6 8h3l3-2 3 2h3zM7 12l-3 2h4l4-2 4 2h4l-3-2-5-3zM6 17l-3 3h18l-3-3-6-2z",0xffEEF7FF);
                 stroke(c,"M12 20v3",0xffC8A77D,2);
             }else if("rain".equals(kind)){
-                fill(c,"M12 1C10 5 4 10 4 15a8 8 0 0016 0C20 10 14 5 12 1z",0xff78C6DF);
+                fill(c,"M12 1C10 5 4 10 4 15a8 8 0 0 0 16 0C20 10 14 5 12 1z",0xff78C6DF);
                 stroke(c,"M8 14q-2 4 2 5",0xffD6F5FF,1.6f);
             }else if("snow".equals(kind))stroke(c,"M12 1v22M2.5 6.5l19 11M2.5 17.5l19-11M8.5 3.5L12 7l3.5-3.5M8.5 20.5L12 17l3.5 3.5M3 10l4.7-1.3L6.5 4M17.5 20l-1.2-4.7L21 14M6.5 20l1.2-4.7L3 14M21 10l-4.7-1.3L17.5 4",0xffECF8FF,1.6f);
             c.restore();
