@@ -2589,7 +2589,7 @@ function renderNews(){
  const waiting=briefs.length-aiCount;
  $('newsMeta').textContent='마지막 수집 '+prettyTime(payload.checked_at)+' · AI 본문요약 '+aiCount+'/'+briefs.length+
   '건'+(waiting?' · '+waiting+'건 원문 확인 대기':'')+' · 공식 사실검증 별도';
- if($('newsFamilyMeta'))$('newsFamilyMeta').textContent='최종 갱신 '+compactTradeCollectedAt(payload.checked_at);
+ if($('newsFamilyMeta'))$('newsFamilyMeta').textContent='갱신 '+compactTradeCollectedAt(payload.checked_at);
  const cat=$('newsCategory').value;
  const filtered=briefs.filter(x=>!cat||x.category===cat);
  const scopedAI=filtered.filter(isAI).length;
