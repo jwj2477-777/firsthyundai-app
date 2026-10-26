@@ -1,5 +1,12 @@
 # AI 개발 인수인계 변경 로그 — 항상 새 항목을 맨 위에 추가
 
+## 2026-10-26 · v2.1.09 기존 기기 계정 재선택
+- LockActivity authorized + OfficeBoardClient.enrolled 자동진입에 pickerReviewed_v209 및 force_member_picker 분기 추가; 이전 설치 사용자 1회 팝업, 현재 계정 유지·재선택 지원.
+- /board/accounts(GET) current bound valid token으로 계정 선택 목록 조회. /board/session(POST) 재연결은 기존 서명 board token + 사무실 공통 code 함께 필요, 바인딩 rotate로 이전 세션 즉시 차단, 삭제 기기 차단 유지.
+- MainActivity.requestOfficeMemberPicker 관리자모드 native bridge; office-members.js 계정 선택 버튼, memo card 계정 이름 표시. 기존 메모 저장소/비밀번호/앱 데이터 리셋 없음.
+- 검증: scripts/test_account_picker.js 및 scripts/test_office_board.mjs 재연결 권한 테스트.
+
+
 ## 2026-10-26 · v2.1.07 자동 캘린더/계정
 - Worker: member-v2 KV records, bound-device revocation tombstones, signed board-v2 token + live record verification, /board/choices POST (family code), /board/session POST (family code+member_id+device), /board/account, admin /board/members GET/POST/DELETE. Legacy unbound tokens rejected to enforce revocation.
 - Android: LockActivity member picker after policy password, MainActivity getOfficeMemberName/officeMembersAction and account validation onResume/60s, OfficeBoardClient enroll/choices/checkAccount. No logout UI.
