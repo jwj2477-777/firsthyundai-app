@@ -17,7 +17,7 @@ function safeMemberName(v){
 // Hide duplicate display identities but NEVER delete their KV records, revoke
 // existing device tokens, or rewrite the authors of old shared notes.
 function memberIdentity(name){
- const normalized=String(name||"").trim().replace(/\\s+/g," ");
+ const normalized=String(name||"").trim().replace(/\s+/g," ");
  if(/^(관리자(?:\\s*계정)?|Admin)$/i.test(normalized))return "관리자";
  return normalized;
 }
