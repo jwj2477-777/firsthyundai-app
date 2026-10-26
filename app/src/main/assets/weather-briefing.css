@@ -249,3 +249,37 @@ body[data-season-theme]:not([data-season-theme="default"]) #overview .overviewWe
   padding:8px;
  }
 }
+
+
+/* v2.1.27 — Date belongs to the briefing heading, not to the weather row.
+   Only verified observed rain/snow changes the icon; unknown skies stay a thermometer. */
+#overview.page>.sectionTitle.overviewBriefTitle{align-items:flex-start}
+#overview .overviewBriefHeadingCopy{min-width:0;flex:1 1 auto}
+#overview .overviewBriefDate{
+ display:block;margin:4px 0 0;color:#687D80;font-size:12px;font-weight:580;
+ line-height:1.45;letter-spacing:.1px;font-variant-numeric:tabular-nums;
+}
+#overview .overviewWeatherHeading{display:block;color:#486A6A;font-size:12px;font-weight:750;letter-spacing:.05px}
+#overview .overviewWeatherMain{gap:12px;margin:9px 0 2px;align-items:center}
+#overview .overviewWeatherIcon{
+ flex:0 0 48px;box-sizing:border-box;width:48px;height:48px;
+ display:inline-flex;align-items:center;justify-content:center;
+ border:1px solid #DFE8E3;border-radius:13px;background:#F4F8F5;
+ color:#527875;line-height:1;overflow:hidden;
+}
+#overview .overviewWeatherGlyph{display:none;width:29px;height:29px;flex:0 0 29px}
+#overview .overviewWeatherIcon[data-kind="temperature"] .overviewWeatherThermometer{display:block}
+#overview .overviewWeatherIcon[data-kind="rain"] .overviewWeatherRain{display:block}
+#overview .overviewWeatherIcon[data-kind="snow"] .overviewWeatherSnow{display:block}
+#overview .overviewWeatherIcon[data-kind="rain"]{color:#376B8D;background:#EFF6FA;border-color:#DBE8F1}
+#overview .overviewWeatherIcon[data-kind="snow"]{color:#587A9C;background:#F1F6FA;border-color:#E0E8F1}
+#overview #overviewWeatherMessage{font-size:16px;font-weight:710;line-height:1.3;letter-spacing:-.2px}
+#overview #overviewWeatherMessage.is-reading{font-size:28px;font-weight:800;letter-spacing:-.8px;font-variant-numeric:tabular-nums}
+#overview #overviewWeatherSource{margin-top:6px;font-size:11px;line-height:1.45;color:#718487}
+@media(max-width:360px){
+ #overview .overviewBriefDate{font-size:12px}
+ #overview .overviewWeatherIcon{flex-basis:43px;width:43px;height:43px;border-radius:12px}
+ #overview .overviewWeatherGlyph{width:26px;height:26px;flex-basis:26px}
+ #overview #overviewWeatherMessage.is-reading{font-size:25px}
+ #overview #overviewWeatherSource{font-size:10.5px}
+}
