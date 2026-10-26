@@ -261,6 +261,13 @@ body.apartmentSheetActive{overflow:hidden}
    <div class="officeBoardCalendarHeader"><button type="button" onclick="FirstHyundaiOfficeBoard.changeMonth(-1)" aria-label="이전 달">‹</button>
     <strong id="officeBoardCalendarMonth"></strong><button type="button" onclick="FirstHyundaiOfficeBoard.changeMonth(1)" aria-label="다음 달">›</button>
     <button type="button" class="officeBoardToday" onclick="FirstHyundaiOfficeBoard.today()">오늘</button></div>
+   <button id="officeBoardBirthdayAdd" type="button" class="officeBoardBirthdayAdd hidden" onclick="FirstHyundaiOfficeBoard.toggleBirthdayForm(true)">+ 매년 생일 등록</button>
+   <div id="officeBoardBirthdayForm" class="officeBoardBirthdayForm hidden">
+    <label for="officeBoardBirthdayInput">생일 일괄 등록</label>
+    <p class="tiny">한 줄에 한 명씩 입력 · 양력·음력 자동 반복 · 사무실 비공개 공유메모에만 저장됩니다.</p>
+    <textarea id="officeBoardBirthdayInput" rows="5" placeholder="가족1 양력 1월 3일&#10;가족2 음력 11월 11일" autocomplete="off"></textarea>
+    <div class="officeBoardBirthdayActions"><button type="button" onclick="FirstHyundaiOfficeBoard.toggleBirthdayForm(false)">취소</button><button type="button" id="officeBoardBirthdaySave" onclick="FirstHyundaiOfficeBoard.addBirthdays()">반복 생일 저장</button></div>
+   </div>
    <div class="officeBoardCalendarWeekdays"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
    <div id="officeBoardCalendarDays" class="officeBoardCalendarDays" role="group" aria-label="날짜 선택"></div>
    <div class="officeBoardCalendarAgenda"><strong id="officeBoardAgendaHeading"></strong><div id="officeBoardAgendaList"></div>
@@ -342,7 +349,7 @@ body.apartmentSheetActive{overflow:hidden}
   <span id="adminLastChange" class="tiny" aria-live="polite">변경된 설정이 여기에 표시됩니다.</span>
   <button type="button" id="adminUndoLast" disabled onclick="FirstHyundaiUIOptions.undo()">직전 변경 취소</button>
  </div>
- <details class="adminSettingsGroup" data-admin-category="view" open><summary class="adminSettingsSectionHeading"><strong>시작 화면과 가독성</strong><small>화면 맞춤</small></summary>
+ <details class="adminSettingsGroup" data-admin-category="view"><summary class="adminSettingsSectionHeading"><strong>시작 화면과 가독성</strong><small>화면 맞춤</small></summary>
  <div class="adminPrefGrid">
   <label class="adminPrefRow" for="adminDefaultPage"><span><strong>일반모드 시작 화면</strong><small>앱 실행·관리자 해제 시 표시할 화면</small></span>
    <select id="adminDefaultPage" onchange="FirstHyundaiUIOptions.set('start',this.value)">
@@ -1298,13 +1305,21 @@ function renderInstalledAppVersion(){
  const security=$('securityAppVersion');
  if(security)security.textContent=version;
 }
-function prettyTime(s){if(!s)return '아직 수집 전';try{return new Date(s).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour12:false});}catch{return s;}}
+function prettyTime(s){
+ if(!s)return '아직 수집 전';
+ const date=new Date(s);
+ if(!Number.isFinite(date.getTime()))return '수집 시각 확인 필요';
+ const tokens=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Seoul',year:'numeric',
+  month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(date);
+ const get=k=>tokens.find(x=>x.type===k)?.value||'--';
+ return get('year')+'.'+get('month')+'.'+get('day')+' '+get('hour')+':'+get('minute');
+}
 function compactTradeCollectedAt(iso){
  if(!iso)return '아직 수집 전';
  const date=new Date(iso);
  if(!Number.isFinite(date.getTime()))return '수집 시각 확인 필요';
  const tokens=new Intl.DateTimeFormat('en-US',{
-  timeZone:'Asia/Seoul',year:'2-digit',month:'2-digit',day:'2-digit',
+  timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',
   hour:'2-digit',minute:'2-digit',hourCycle:'h23'
  }).formatToParts(date);
  const pick=type=>tokens.find(p=>p.type===type)?.value||'--';
@@ -2574,7 +2589,7 @@ function renderNews(){
  const waiting=briefs.length-aiCount;
  $('newsMeta').textContent='마지막 수집 '+prettyTime(payload.checked_at)+' · AI 본문요약 '+aiCount+'/'+briefs.length+
   '건'+(waiting?' · '+waiting+'건 원문 확인 대기':'')+' · 공식 사실검증 별도';
- if($('newsFamilyMeta'))$('newsFamilyMeta').textContent='갱신 '+compactTradeCollectedAt(payload.checked_at);
+ if($('newsFamilyMeta'))$('newsFamilyMeta').textContent='최종 갱신 '+compactTradeCollectedAt(payload.checked_at);
  const cat=$('newsCategory').value;
  const filtered=briefs.filter(x=>!cat||x.category===cat);
  const scopedAI=filtered.filter(isAI).length;
@@ -3070,6 +3085,6 @@ function exportComplexCatalog(){
 }
 window.onCatalogSaved=r=>alert(r.ok?'단지정보 JSON을 저장했습니다. GitHub에 올려야 가족에게 반영됩니다.':'단지정보 파일 저장 실패');
 
-</script><script src="price-trends.js"></script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-image.js"></script><script src="scroll-top.js"></script><script src="admin-preferences.js"></script><script src="season-themes.js"></script><script src="weather-briefing.js"></script><script src="premium-motion.js"></script><script src="selection-flow.js"></script><script src="app-updates.js"></script><script src="admin-center.js"></script><script src="shared-settings.js"></script><script src="memo-dates.js"></script><script src="office-board.js"></script><script src="office-members.js"></script><script src="admin-settings-navigator.js"></script><script src="notification-inbox.js"></script></body></html>
+</script><script src="price-trends.js"></script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-image.js"></script><script src="scroll-top.js"></script><script src="admin-preferences.js"></script><script src="season-themes.js"></script><script src="weather-briefing.js"></script><script src="premium-motion.js"></script><script src="selection-flow.js"></script><script src="app-updates.js"></script><script src="admin-center.js"></script><script src="shared-settings.js"></script><script src="memo-dates.js"></script><script src="annual-calendar.js"></script><script src="office-board.js"></script><script src="office-members.js"></script><script src="admin-settings-navigator.js"></script><script src="notification-inbox.js"></script></body></html>
 
 
