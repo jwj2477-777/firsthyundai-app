@@ -16,7 +16,7 @@ assert(!page.includes('officeBoardScheduleInput'),'Do not require manual schedul
 assert(page.includes('officeBoardArchiveList'));
 assert.equal((page.match(/<textarea /g)||[]).length,1,'Keep one freeform textarea; calendar is an optional supplementary field');
 assert(!page.includes('000-0000-0000'),'Avoid fixture-looking phone numbers as visual clutter');
-assert(main.includes('▤ 공유 메모')&&main.includes('class="officeBoardNav '));
+assert(main.includes("navTileIcon('officeBoard','공유 메모')")&&main.includes('class="officeBoardNav '));
 assert(css.includes('grid-template-columns:repeat(3,minmax(0,1fr))'),'Common navigation and card actions are equal columns');
 assert(css.includes('#nav .utilityNav>button.adminCenterNav')&&css.includes('grid-column:1 / -1'),'Admin shortcut must not shift the 3 common button positions');
 assert(css.includes('.officeBoardNoteActions.editing')&&css.includes('repeat(2,minmax(0,1fr))'),'Stable edit action layout');

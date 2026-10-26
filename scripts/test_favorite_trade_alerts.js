@@ -55,7 +55,7 @@ response=a.process({state:'ok',records:[first,re('new-one','송도더샵퍼스�
 assert.equal(response.newCount,1);
 assert(element('favoriteTradeAlertDialog').open);
 assert(element('favoriteTradeAlertCount').textContent.includes('1건'));
-assert(element('favoriteAlertButton').classList.contains('hasNewTrade'),'New favorite transaction shows a small bell dot');
+assert(!element('favoriteAlertButton').classList.contains('hasNewTrade'),'Bell is reserved for recorded Android notifications, not unposted trade popups');
 assert(element('favoriteTradeAlertRows').innerHTML.includes('퍼스트파크 15블럭'));
 assert(element('favoriteTradeAlertRows').innerHTML.includes('매매 1건'));
 assert(element('favoriteTradeAlertRows').innerHTML.includes('9억 5,000만원'));
@@ -120,7 +120,7 @@ const newer={...re('newer-unread','송도더샵마스터뷰23-1BL','전세','202
 ctx.document.activeElement={matches:()=>true};
 a.process({state:'ok',records:[older,newer]},uiContext);
 assert(!element('favoriteTradeAlertDialog').open,'Typing must not be interrupted by an automatic modal');
-assert(element('favoriteAlertButton').classList.contains('hasNewTrade'),'The header bell still indicates pending alerts without interrupting typing');
+assert(!element('favoriteAlertButton').classList.contains('hasNewTrade'),'The bell now shows delivered notification history, while typing-safe in-app alerts retain their banner');
 assert(!element('favoriteTradeAlertBanner').classList.contains('hidden'));
 ctx.document.activeElement=null;
 a.open();

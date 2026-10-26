@@ -37,7 +37,7 @@ verifyShortcutPlacement('trades');
 assert(nav.includes('관리센터'),'Administrator console shortcut must be accessible');
 ctx.role='family';
 let n=render('complexes');
-assert(n.includes('아파트정보')&&n.includes('✎ 계약문자 만들기'),'Main destinations visible');
+assert(n.includes('아파트정보')&&n.includes('계약문자 만들기'),'Main destinations visible');
 assert(n.includes('openComplexHome()'),'Apartment button must jump to search');
 assert(!n.includes('secondaryNav'),'Never display a redundant only-child apartment button');
 assert(!n.includes('송도 단지 검색'),'Duplicate apartment search button removed');

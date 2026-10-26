@@ -26,7 +26,7 @@ function enabled(){
  const raw=load(PREF);
  return raw!=='0'&&memoryEnabled;
 }
-function nativeEnabled(){return enabled()&&load(NATIVE_PREF)==='1';}
+function nativeEnabled(){return enabled()&&load(NATIVE_PREF)!=='0';}
 function nativePermissionStatus(){
  try{return window.FirstHyundaiNative?.getTradeNotificationPermissionStatus?.()||'unavailable';}
  catch(e){return 'unavailable';}
@@ -35,9 +35,9 @@ function syncNativeStatus(){
  const label=get('favoriteTradeNativeStatus');
  if(!label)return;
  const setting=get('favoriteTradeNativeEnabled');
- if(setting)setting.checked=load(NATIVE_PREF)==='1';
+ if(setting)setting.checked=load(NATIVE_PREF)!=='0';
  const status=nativePermissionStatus();
- const wanted=load(NATIVE_PREF)==='1';
+ const wanted=load(NATIVE_PREF)!=='0';
  label.textContent=status==='enabled'?
   (wanted?'휴대폰 알림 사용 중 · 앱을 열거나 갱신하면 알려드립니다.':'휴대폰 알림 권한 허용됨 · 알림을 사용하려면 위 옵션을 켜세요.') :
   status==='permission_required'?'휴대폰 알림 권한이 필요합니다. 허용 요청 후에도 차단되면 휴대폰 설정에서 변경하세요.' :
@@ -62,11 +62,9 @@ function notifyPhone(items){
  catch(e){/* The in-app popup remains available even without Android permission. */}
 }
 function syncBell(){
- const button=get('favoriteAlertButton');if(!button)return;
- const n=enabled()?pending.length:0;
- if(n)button.classList?.add?.('hasNewTrade');
- else button.classList?.remove?.('hasNewTrade');
- button.setAttribute?.('aria-label',n?'관심단지 알림 설정, 새 실거래 '+n+'건':'관심단지 알림 설정');
+ // The bell is now an inbox. New trade popups must not overwrite its
+ // accessible name or simulate unread OS notifications.
+ window.FirstHyundaiNotificationInbox?.refresh?.();
 }
 function syncOption(){
  syncBell();
@@ -176,19 +174,17 @@ function tryPopup(manual=false){
 }
 function open(){if(!pending.length)return;previewing=false;render();tryPopup(true);}
 function openSettings(){
- const dialog=get('favoriteAlertSettingsDialog'),button=get('favoriteAlertButton');
+ const dialog=get('favoriteAlertSettingsDialog');
  if(!dialog||dialog.open)return;
  // Never place the trade-detail popup over the settings popup.
  if(get('favoriteTradeAlertDialog')?.open)later();
  syncOption();
- try{dialog.showModal?.();button?.setAttribute?.('aria-expanded','true');}
- catch(e){button?.setAttribute?.('aria-expanded','false');}
+ try{dialog.showModal?.();}catch(e){}
 }
 function closeSettings(){
  const dialog=get('favoriteAlertSettingsDialog');
  if(dialog?.open)dialog.close?.();
- get('favoriteAlertButton')?.setAttribute?.('aria-expanded','false');
- get('favoriteAlertButton')?.focus?.();
+ get('notificationInboxClear')?.focus?.();
 }
 function previewFromSettings(){closeSettings();preview();}
 function preview(){
@@ -237,9 +233,7 @@ function process(payload,context){
  return {status:initialized?'updated':'baseline',newCount:fresh.length};
 }
 get('favoriteTradeAlertDialog')?.addEventListener?.('close',()=>{previewing=false;});
-get('favoriteAlertSettingsDialog')?.addEventListener?.('close',()=>{
- get('favoriteAlertButton')?.setAttribute?.('aria-expanded','false');
-});
+get('favoriteAlertSettingsDialog')?.addEventListener?.('close',()=>{});
 window.FirstHyundaiTradeAlerts={process,setEnabled,enabled,syncOption,syncNativeStatus,setNativeEnabled,open,view,dismiss,later,preview,openSettings,closeSettings,previewFromSettings,stableId,
  _test:{stableId,select,formatAmount,hide}};
 })();
