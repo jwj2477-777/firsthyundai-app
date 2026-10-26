@@ -23,7 +23,7 @@ for(const t of themeList)for(const w of ['none','rain','snow']){
  assert.equal(body.children[0].attrs['aria-hidden'],'true');
  assert(body.children[0].children.length<=48);
 }
-for(const key of ['themeHeader','themeIntro','themeLogo']){
+for(const key of ['themeHeader','themeIntro','themeLogo','themeCaption']){
  assert(prefs.set(key,'off'));assert.equal(prefs.get()[key],'off');assert(prefs.set(key,'on'));
 }
 for(const intensity of ['soft','balanced','vivid']){
@@ -66,6 +66,11 @@ assert.equal(body.attrs['data-season-theme'],'spring');assert.equal(body.attrs['
 const legacy={...backup,preferences:{schema:1,start:'nearby',density:'standard',reading:'standard',motion:'full',contrast:'standard'}};
 assert(prefs.applyShared(legacy));assert.equal(prefs.get().theme,'default');
 const css=asset('season-themes.css');
+for(const kind of ['spring','summer','autumn','winter','rain','snow']){
+ assert(asset('season-point-'+kind+'.svg').includes('viewBox="0 0 24 24"'));
+ assert(css.includes('season-point-'+kind+'.svg'));
+}
+assert.equal(prefs.get().themeCaption,'on','Old settings default to showing the seasonal caption');
 for(const block of css.matchAll(/body\[data-season-theme[^{}]*\{([^{}]*)\}/g))
  assert(!/(?:^|;)\s*(?:font|width|height|padding|margin|display|position|order|gap|grid|transform)\b/.test(block[1]),'Season rules change appearance only');
 assert(css.includes('pointer-events:none!important')&&css.includes('prefers-reduced-motion:reduce'));

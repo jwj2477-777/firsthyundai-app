@@ -130,7 +130,7 @@
    weatherEffect:WEATHER.includes(value?.weatherEffect)?value.weatherEffect:'none',motion:value?.motion||'full',
    themeIntensity:['soft','balanced','vivid'].includes(value?.themeIntensity)?value.themeIntensity:'balanced',
    themeDecor:['off','subtle','full'].includes(value?.themeDecor)?value.themeDecor:'full',
-   themeHeader:value?.themeHeader==='off'?'off':'on',themeIntro:value?.themeIntro==='off'?'off':'on',themeLogo:value?.themeLogo==='off'?'off':'on'};
+   themeHeader:value?.themeHeader==='off'?'off':'on',themeIntro:value?.themeIntro==='off'?'off':'on',themeLogo:value?.themeLogo==='off'?'off':'on',themeCaption:value?.themeCaption==='off'?'off':'on'};
   if(previous!==options.weatherEffect){generation++;lastAttempt=0}
   paint();refresh();
  }

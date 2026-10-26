@@ -28,6 +28,17 @@ final class SeasonThemeMath {
         int year=Instant.ofEpochMilli(now).atOffset(KST).getYear();
         for(int i=0;i<4;i++)if(now>=termDay(year,i))name=names[i];return name;
     }
+    static String caption(String theme,long now) {
+        String label;
+        switch(theme){
+            case "spring":label="봄";break;
+            case "summer":label="여름";break;
+            case "autumn":label="가을";break;
+            case "winter":label="겨울";break;
+            default:return "";
+        }
+        return Instant.ofEpochMilli(now).atOffset(KST).getYear()+"년 "+label;
+    }
     static int[] palette(String theme,String intensity) {
         int[] base={0xff102D38,0xff183E49,0xff23575D},target;
         switch(theme){

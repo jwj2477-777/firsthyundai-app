@@ -23,7 +23,7 @@
   adminWeatherEffect:'날씨 효과 송도 비 눈 수동 자동',
   adminThemeIntensity:'테마 강도 선명 또렷 진하게 은은',
   adminThemeDecor:'테마 장식 꽃잎 낙엽 비 눈 양 효과',
-  adminThemeLogo:'로고 마크 테마 장식',adminThemeHeader:'상단 메인 로고 테마',adminThemeIntro:'시작 첫화면 인트로 테마',
+  adminThemeCaption:'시작 첫화면 연도 년 계절 문구 표시 숨기기',adminThemeLogo:'로고 마크 테마 장식',adminThemeHeader:'상단 메인 로고 테마',adminThemeIntro:'시작 첫화면 인트로 테마',
   adminTradeAmountStyle:'실거래 금액 가격 매매 전세 월세',
   adminCancelledStyle:'해제 취소 거래 계약',
   adminMemoOrder:'포스트잇 메모 최신',

@@ -12,6 +12,15 @@ public class SeasonThemeMathTest {
    assertEquals(i==0?"winter":names[i-1],SeasonThemeMath.season(t-1));
   }
  }
+ @Test public void seasonalCaptionUsesSelectedThemeAndActualKoreanYear(){
+  long autumn=OffsetDateTime.parse("2027-10-26T00:00:00+09:00").toInstant().toEpochMilli();
+  assertEquals("2027년 가을",SeasonThemeMath.caption("autumn",autumn));
+  assertEquals("2027년 봄",SeasonThemeMath.caption("spring",autumn));
+  long midnight=OffsetDateTime.parse("2028-01-01T00:00:00+09:00").toInstant().toEpochMilli();
+  assertEquals("2027년 겨울",SeasonThemeMath.caption("winter",midnight-1));
+  assertEquals("2028년 겨울",SeasonThemeMath.caption("winter",midnight));
+  assertEquals("",SeasonThemeMath.caption("default",midnight));
+ }
  @Test public void originalBrandAndIntensityEndpointsStayStable(){
   assertArrayEquals(new int[]{0xff102D38,0xff183E49,0xff23575D},SeasonThemeMath.palette("default","vivid"));
   assertArrayEquals(new int[]{0xff51352D,0xff784E32,0xff79532B},SeasonThemeMath.palette("autumn","vivid"));

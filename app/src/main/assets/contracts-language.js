@@ -284,7 +284,7 @@ function recognize(raw){
  for(const sourceLine of interimLines){
   // An inline balance date is a separate field, never the interim due date.
   const line=sourceLine.slice(sourceLine.indexOf('중도금')).split(/(?=잔금(?:일|예정일)?|계약일|특약|기타사항|계좌|은행|예금주)/)[0].trim();
-  const schedule=line.match(/중도금\s*(?:지급일|지급\s*예정일|날짜|일정)\s*[:：]?\s*(.+)/);
+  const schedule=sourceLine.match(/중도금\s*(?:지급일|지급\s*예정일|날짜|일정)\s*[:：]?\s*(.+)/);
   if(schedule){
    const due=schedule[1].split(/(?=\s*(?:▶|잔금일|잔금\s*[:：]))/)[0].trim();
    if(due){apply('interimDate',due.slice(0,100),found);break;}

@@ -10,7 +10,7 @@
   memoCompleted:'hide',memoRefresh:'45',memoClock:'12',memoPhones:'on',
   tapSize:'standard',memoLayout:'standard',memoAlerts:'on',
   theme:'default',themeMode:'manual',weatherEffect:'none',
-  themeIntensity:'balanced',themeDecor:'full',themeHeader:'on',themeIntro:'on',themeLogo:'on'});
+  themeIntensity:'balanced',themeDecor:'full',themeHeader:'on',themeIntro:'on',themeLogo:'on',themeCaption:'on'});
  const allowed={
   start:['nearby','trades','new','complexes','news','contracts','overview','officetel','officeBoard'],
   density:['standard','compact','roomy'],reading:['standard','large','xlarge'],
@@ -22,7 +22,7 @@
   tapSize:['standard','large'],memoLayout:['standard','compact','roomy'],memoAlerts:['on','off'],
   theme:['default','spring','summer','autumn','winter'],themeMode:['manual','season'],
   weatherEffect:['none','rain','snow','auto'],themeIntensity:['soft','balanced','vivid'],
-  themeDecor:['off','subtle','full'],themeHeader:['on','off'],themeIntro:['on','off'],themeLogo:['on','off']
+  themeDecor:['off','subtle','full'],themeHeader:['on','off'],themeIntro:['on','off'],themeLogo:['on','off'],themeCaption:['on','off']
  };
  const fields={start:'adminDefaultPage',density:'adminListDensity',
   reading:'adminReadingSize',motion:'adminMotionStyle',contrast:'adminContrastMode',
@@ -31,7 +31,7 @@
   memoRefresh:'adminMemoRefresh',memoClock:'adminMemoClock',memoPhones:'adminMemoPhones',
   tapSize:'adminTapSize',memoLayout:'adminMemoLayout',memoAlerts:'adminMemoAlerts',
   theme:'adminTheme',themeMode:'adminThemeMode',weatherEffect:'adminWeatherEffect',themeIntensity:'adminThemeIntensity',themeDecor:'adminThemeDecor',
-  themeHeader:'adminThemeHeader',themeIntro:'adminThemeIntro',themeLogo:'adminThemeLogo'};
+  themeHeader:'adminThemeHeader',themeIntro:'adminThemeIntro',themeLogo:'adminThemeLogo',themeCaption:'adminThemeCaption'};
  const LEGACY_FIELDS=new Set(['start','density','reading','motion','contrast']);
  let state={...defaults},popupBackup=null,undoSnapshot=null,lastChangeText='';
  function popupState(){return Boolean(window.FirstHyundaiTradeAlerts?.enabled?.())}

@@ -29,7 +29,8 @@ final class SmoothBrandOverlay extends FrameLayout {
     private final ImageView emblem;
     private final TextView title;
     private final ImageView subtitle;
-    private final View ring,rule;
+    private final View ring,rule,seasonPoint;
+    private final TextView seasonCaption;
     private boolean finished,landingStarted,dissolveStarted;
     private int layoutAttempts;
     private final ArrayList<ObjectAnimator> arrivalFades=new ArrayList<>();
@@ -70,6 +71,7 @@ final class SmoothBrandOverlay extends FrameLayout {
         emblem.setScaleType(ImageView.ScaleType.FIT_CENTER);
         emblem.setContentDescription("퍼스트현대 FHD FIRST 원본 로고");
         emblemFrame.addView(emblem,new LayoutParams(dp(144),dp(144),Gravity.CENTER));
+        seasonPoint=ThemeAppearance.addLogoPoint(emblemFrame,activity,190,144);
         // Pre-compose the travelling identity to keep transforms on Android's GPU.
         emblem.setLayerType(View.LAYER_TYPE_HARDWARE,null);
         identity.addView(emblemFrame,new LinearLayout.LayoutParams(dp(190),dp(190)));
@@ -95,6 +97,7 @@ final class SmoothBrandOverlay extends FrameLayout {
         sub.topMargin=dp(13);
         identity.addView(subtitle,sub);
         addView(identity,new LayoutParams(-1,-2,Gravity.CENTER));
+        seasonCaption=ThemeAppearance.addSeasonCaption(this,activity);
     }
 
     /**
@@ -190,6 +193,15 @@ final class SmoothBrandOverlay extends FrameLayout {
                 .translationY(badgeShiftY+centerOffsetY)
                 .scaleX(ringScale).scaleY(ringScale)
                 .setDuration(DURATION).setInterpolator(natural).start();
+        if(seasonPoint!=null){
+            int[] pointAt=new int[2];seasonPoint.getLocationOnScreen(pointAt);
+            float pointCX=pointAt[0]-base[0]+seasonPoint.getWidth()/2f;
+            float pointCY=pointAt[1]-base[1]+seasonPoint.getHeight()/2f;
+            float scale=Math.min(rects[2]*pxPerCss/emblem.getWidth(),rects[3]*pxPerCss/emblem.getHeight());
+            seasonPoint.animate().translationX(badgeTargetCX+(pointCX-nativeBadgeCX)*scale-pointCX)
+                .translationY(badgeTargetCY+(pointCY-nativeBadgeCY)*scale-pointCY)
+                .scaleX(scale).scaleY(scale).setDuration(DURATION).setInterpolator(natural).start();
+        }
         // Isolate halo alpha from the ViewPropertyAnimator's motion.
         ObjectAnimator haloFade=ObjectAnimator.ofFloat(ring,View.ALPHA,1f,0f);
         haloFade.setStartDelay(DURATION-250L);
@@ -203,6 +215,8 @@ final class SmoothBrandOverlay extends FrameLayout {
         // callback, rather than a second timer, starts the web/native handoff.
         backdrop.animate().alpha(0f).setStartDelay(95).setDuration(DURATION-125)
                 .setInterpolator(natural).start();
+        if(seasonCaption!=null)seasonCaption.animate().alpha(0f).setStartDelay(95)
+                .setDuration(DURATION-125).setInterpolator(natural).start();
         // Bounded recovery if a renderer or animator callback never arrives.
         postDelayed(()->finish(done),DURATION+900);
     }
@@ -231,6 +245,10 @@ final class SmoothBrandOverlay extends FrameLayout {
             arrivalFades.add(fade);
             fade.start();
         }
+        if(seasonPoint!=null){
+            ObjectAnimator fade=ObjectAnimator.ofFloat(seasonPoint,View.ALPHA,seasonPoint.getAlpha(),0f);
+            fade.setDuration(190);arrivalFades.add(fade);fade.start();
+        }
         postDelayed(()->finish(done),210);
     }
     void fadeOut(Runnable done){
@@ -249,6 +267,8 @@ final class SmoothBrandOverlay extends FrameLayout {
         backdrop.animate().cancel();
         rule.animate().cancel();
         ring.animate().cancel();
+        if(seasonPoint!=null)seasonPoint.animate().cancel();
+        if(seasonCaption!=null)seasonCaption.animate().cancel();
         animate().cancel();
         if(done!=null)done.run();
         else detach();

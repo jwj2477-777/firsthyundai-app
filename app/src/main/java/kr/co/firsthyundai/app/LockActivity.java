@@ -134,6 +134,7 @@ public class LockActivity extends Activity {
         emblem.setContentDescription("퍼스트현대 공식 로고");
         emblem.setScaleType(ImageView.ScaleType.FIT_CENTER);
         emblemFrame.addView(emblem,new FrameLayout.LayoutParams(dp(92),dp(92),Gravity.CENTER));
+        ThemeAppearance.addLogoPoint(emblemFrame,this,113,92);
         brand.addView(emblemFrame,new LinearLayout.LayoutParams(dp(113),dp(113)));
 
         TextView wordmark=new TextView(this);
@@ -318,6 +319,7 @@ public class LockActivity extends Activity {
         emblem.setScaleType(ImageView.ScaleType.FIT_CENTER);
         emblemFrame.addView(emblem,new FrameLayout.LayoutParams(
                 dp(144),dp(144),Gravity.CENTER));
+        ThemeAppearance.addLogoPoint(emblemFrame,this,190,144);
         identity.addView(emblemFrame,new LinearLayout.LayoutParams(dp(190),dp(190)));
         TextView title=new TextView(this);
         BrandIdentityStyle.title(title);
@@ -340,6 +342,7 @@ public class LockActivity extends Activity {
         subtitleParams.topMargin=dp(13);
         identity.addView(subtitle,subtitleParams);
         welcomeOverlay.addView(identity,new FrameLayout.LayoutParams(-1,-2,Gravity.CENTER));
+        ThemeAppearance.addSeasonCaption(welcomeOverlay,this);
         stage.addView(welcomeOverlay,new FrameLayout.LayoutParams(-1,-1));
         boolean reducedMotion=false;
         try{reducedMotion=Settings.Global.getFloat(getContentResolver(),
