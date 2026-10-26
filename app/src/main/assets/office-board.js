@@ -271,6 +271,8 @@ function enableNotifications(){
  bridge?.requestOfficeMemoNotifications?.();
 }
 function open(){
+ const account=$('officeBoardCurrentMember');
+ if(account)account.textContent=bridge?.getOfficeMemberName?.()||'계정 연결 필요';
  settingsChanged();syncNotificationStatus();syncViews();checkSuggestion();refresh();
 }
 async function mutate(action,data){
