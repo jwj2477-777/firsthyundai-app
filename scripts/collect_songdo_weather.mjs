@@ -35,7 +35,9 @@ try{
  const local=new Date(now+9*3600000-40*60000);
  const base={date:local.toISOString().slice(0,10).replace(/-/g,''),time:String(local.getUTCHours()).padStart(2,'0')+'00'};
  observed=fromKma(request('getUltraSrtNcst',base),now);
- console.log('OFFICIAL_SONGDO_OBSERVED_VERIFIED',observed.observed_at,observed.effect);
+ // Temperature comes from measured KMA T1H, not the hourly forecast.
+ console.log('OFFICIAL_SONGDO_OBSERVED_VERIFIED',observed.observed_at,observed.effect,
+  Number.isFinite(observed.temp)?'measured_t1h':'measured_temperature_pending');
 }catch(e){console.log('OFFICIAL_SONGDO_OBSERVED_PENDING');if(/^[a-z_]+$/.test(e.message))console.log('OFFICIAL_WEATHER_REASON',e.message);if(validWeatherSnapshot(previous.observed,'observed',now))observed=previous.observed}
 try{
  const base=forecastBase(now);forecast=parseForecast(request('getVilageFcst',base),base,now);
