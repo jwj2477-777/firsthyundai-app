@@ -21,6 +21,9 @@
   adminTheme:'테마 봄 여름 가을 겨울 기본',
   adminThemeMode:'테마 자동 절기 입춘 입하 입추 입동 수동',
   adminWeatherEffect:'날씨 효과 송도 비 눈 수동 자동',
+  adminThemeIntensity:'테마 강도 선명 또렷 진하게 은은',
+  adminThemeDecor:'테마 장식 꽃잎 낙엽 비 눈 양 효과',
+  adminThemeHeader:'상단 메인 로고 테마',adminThemeIntro:'시작 첫화면 인트로 테마',
   adminTradeAmountStyle:'실거래 금액 가격 매매 전세 월세',
   adminCancelledStyle:'해제 취소 거래 계약',
   adminMemoOrder:'포스트잇 메모 최신',
@@ -119,4 +122,5 @@
   _test:{matches,normalize}};
  draw();
 })();
+
 

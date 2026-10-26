@@ -104,6 +104,7 @@ public class LockActivity extends Activity {
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
             new int[]{Color.rgb(3,33,42),Color.rgb(6,65,70),Color.rgb(10,89,91)}));
+        scroll.setBackground(ThemeAppearance.background(this,true));
         LinearLayout root=new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setGravity(Gravity.CENTER);
@@ -290,6 +291,7 @@ public class LockActivity extends Activity {
         GradientDrawable background = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 new int[]{Color.rgb(3,33,42),Color.rgb(9,91,94)});
         welcomeOverlay.setBackground(background);
+        welcomeOverlay.setBackground(ThemeAppearance.background(this,true));
         welcomeOverlay.setClickable(true);
         welcomeOverlay.setContentDescription("퍼스트현대 시작 화면. 누르면 건너뛰기");
         LinearLayout identity=new LinearLayout(this);

@@ -1,3 +1,5 @@
+export {weatherBriefing} from './weather-forecast.mjs';
+import {normalizeKmaKey} from './kma-key.mjs';
 /* Fixed Songdo grid. Official observed precipitation only; no user location,
    forecasts, customer data or credentials are returned. */
 const HEAD={'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',
@@ -26,7 +28,7 @@ async function collect(secret){
  for(let back=0;back<2;back++){
   const dt=new Date(base.getTime()-back*3600000),date=dt.toISOString().slice(0,10).replace(/-/g,''),time=String(dt.getUTCHours()).padStart(2,'0')+'00';
   const url=new URL('https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst');
-  url.search=new URLSearchParams({serviceKey:secret,pageNo:'1',numOfRows:'20',dataType:'JSON',base_date:date,base_time:time,nx:'55',ny:'123'});
+  url.search=new URLSearchParams({serviceKey:normalizeKmaKey(secret),pageNo:'1',numOfRows:'20',dataType:'JSON',base_date:date,base_time:time,nx:'55',ny:'123'});
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),5000);
   try{
    const r=await fetch(url,{signal:controller.signal});
@@ -52,3 +54,4 @@ export async function themeWeather(env){
   return response({status:'unavailable',reason:'weather_service_unavailable'},503);
  }
 }
+

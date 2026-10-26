@@ -236,6 +236,7 @@ jobs:
           node scripts/test_fcm_push.mjs
           node scripts/test_season_themes.js
           node scripts/test_theme_weather.mjs
+          node scripts/test_weather_briefing.mjs
           node scripts/test_theme_layout_browser.js
           node scripts/test_admin_preferences.js
           node scripts/test_shared_settings.js
@@ -329,23 +330,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.14 season themes and weather overlay APK
+      - name: Publish v2.1.15 adjustable season appearance and weather briefing APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.14.apk
-          unzip -t FirstHyundai-v2.1.14.apk | grep 'No errors detected'
-          if gh release view v2.1.14 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.15.apk
+          unzip -t FirstHyundai-v2.1.15.apk | grep 'No errors detected'
+          if gh release view v2.1.15 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.14 FirstHyundai-v2.1.14.apk \
+            gh release create v2.1.15 FirstHyundai-v2.1.15.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.14 · 계절 테마·비와 눈' \
-              --notes '기본·봄·여름·가을·겨울 5개 테마와 별도 비·눈 효과를 관리자에서 수동 선택할 수 있습니다. 기존 업무화면의 버튼 위치·크기·글꼴·메뉴·조작 순서와 거래유형·경고 색상은 그대로 유지합니다. 절기 당일 한국시간 0시 자동전환, 송도 기상청 초단기실황에 따른 비·눈 자동 효과도 선택할 수 있습니다. 날씨 정보가 없거나 오래되면 계절 테마를 유지합니다. 움직임 최소화·백그라운드 정지·공통설정 동기화와 기존 계정·공유메모·알림을 보존합니다. v2.1.14/build165.'
+              --title '퍼스트현대 v2.1.15 · 테마 세부조정·날씨 브리핑' \
+              --notes '계절 테마를 더 선명한 색감과 풍성한 장식으로 보강했습니다. 관리자에서 테마 강도·장식량·메인 상단 적용·시작 화면 적용을 각각 선택할 수 있습니다. 원본 로고와 기존 메뉴·버튼·글꼴·사용 순서는 유지하며 시작 화면과 상단 색조를 연결합니다. 오늘 브리핑에 기상청 시간대별 예보 기반 비·눈 안내를 추가하고 일정·업무·자료 현황을 정갈하게 정리했습니다. 예보 미연결·과거자료·부분시간대는 비가 없다고 단정하지 않습니다. 기존 5개 테마와 수동 비/눈·절기 자동·설정 동기화·공유메모·계정·알림·계약 기능을 유지합니다. v2.1.15/build166.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.14 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.14 --apk FirstHyundai-v2.1.14.apk
+          gh release upload v2.1.15 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.15 --apk FirstHyundai-v2.1.15.apk
+
 

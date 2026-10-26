@@ -1,0 +1,20 @@
+/* Only today's briefing is reorganized; global navigation and business controls stay put. */
+#overview .overviewWeather{background:linear-gradient(135deg,#EFF6F5,#FCFDF9 72%);border-color:#C7DDDA;padding:17px 18px;margin:12px 0 14px}
+.overviewWeatherHeading{display:flex;justify-content:space-between;gap:10px;color:#4C6D70;font-size:12px;font-weight:700}
+.overviewWeatherHeading time{font-size:11px;font-weight:500;color:#6C8283}
+.overviewWeatherMain{display:flex;align-items:center;gap:13px;margin:11px 0 9px}
+.overviewWeatherMain>div{min-width:0;flex:1}
+#overview .overviewWeatherMain p{margin:0;font-size:16px;line-height:1.6;font-weight:750;color:#234A54;word-break:keep-all;overflow-wrap:anywhere}
+#overview #overviewWeatherExtra{margin-top:4px;font-size:12px;font-weight:500;color:#567277}
+.overviewWeatherIcon{flex:0 0 38px;font-size:30px;line-height:1;color:#547E87;text-align:center}
+#overviewWeatherSource{display:block;font-size:10px;color:#687F80}
+#overview .overviewMemoBriefing,#overview .overviewActionPanel,#overview .overviewStatusPanel{border-color:var(--ui2-line);box-shadow:0 3px 14px #193B4307;margin:14px 0}
+#overview :is(.overviewMemoHead,.overviewActionPanel,.overviewStatusPanel) h3{font-size:15px;letter-spacing:-.3px;color:#2A4C56;margin-top:0}
+#overview .overviewMemoHead p{font-size:11px;color:#718386;margin:4px 0 0}
+#overview .overviewStatusPanel{padding-top:14px;padding-bottom:14px}
+#overview #overviewStatus{display:grid;gap:5px;font-size:11px;color:#627A7F}
+#overview .overviewStats .metric{box-shadow:none;border-color:#DFE7E5;background:#FFFFFF90}
+#overview .overviewStats .metric strong{font-size:22px;letter-spacing:-.5px}
+body[data-app-contrast="high"] #overviewWeatherSource{color:#304C55}
+body[data-season-theme]:not([data-season-theme="default"]) #overview .overviewWeather{background:linear-gradient(135deg,var(--season-haze),var(--season-paper));border-color:var(--season-line)}
+@media(max-width:360px){#overview .overviewWeather{padding:15px}.overviewWeatherMain{gap:9px}#overview .overviewWeatherMain p{font-size:15px}}

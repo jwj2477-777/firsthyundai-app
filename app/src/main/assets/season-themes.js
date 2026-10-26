@@ -6,8 +6,13 @@
  const ENDPOINT='https://firsthyundai-shared-settings.jwj2477.workers.dev/theme-weather';
  const labels={default:'기본',spring:'봄',summer:'여름',autumn:'가을',winter:'겨울'};
  const HOUR=3600000, cache=new Map();
+ const headerBase=['#102D38','#183E49','#23575D'];
+ const headerColors={spring:['#34503C','#4B684A','#4F6840'],summer:['#083D57','#075D79','#126570'],
+  autumn:['#49362F','#6D5039','#735031'],winter:['#263849','#3E526D','#4F5F78']};
+ function blend(a,b,k){return '#'+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)*(1-k)+parseInt(b.slice(i,i+2),16)*k).toString(16).padStart(2,'0')).join('')}
+ function headerPalette(theme,strength){const k={soft:.4,balanced:.8,vivid:1}[strength]??.8;return headerColors[theme]?.map((c,i)=>blend(headerBase[i],c,k))||headerBase}
  let options={theme:'default',themeMode:'manual',weatherEffect:'none',motion:'full'};
- let weather=null,lastAttempt=0,pending=false,generation=0,layer=null,lastScene='',sequence=0;
+ let nativeSnapshot='',weather=null,lastAttempt=0,pending=false,generation=0,layer=null,lastScene='',sequence=0;
  const requests=new Map();
  window.onFirstHyundaiThemeWeatherFetched=result=>{
   const call=requests.get(result?.requestId);if(!call)return;requests.delete(result.requestId);
@@ -66,7 +71,19 @@
   document.body.setAttribute('data-season-theme',base);
   document.body.setAttribute('data-weather-effect',wet);
   document.body.setAttribute('data-theme-paused',document.hidden?'true':'false');
-  const scene=base+'/'+wet;
+  document.body.setAttribute('data-theme-intensity',options.themeIntensity);
+  document.body.setAttribute('data-theme-decor',options.themeDecor);
+  document.body.setAttribute('data-theme-header',options.themeHeader);
+  document.body.setAttribute('data-theme-intro',options.themeIntro);
+  const header=document.querySelector?.('header');
+  document.body.style?.setProperty('--theme-header-bottom',Math.max(0,header?.getBoundingClientRect?.().bottom||0)+'px');
+  const colors=headerPalette(base,options.themeIntensity);
+  document.body.style?.setProperty('--season-header',`linear-gradient(121deg,${colors[0]} 0%,${colors[1]} 57%,${colors[2]} 100%)`);
+  const nativeValue=JSON.stringify({...options,resolvedTheme:base,weatherObserved:weather?.observed_at||'',resolvedWeather:wet});
+  if(nativeValue!==nativeSnapshot){
+   try{window.FirstHyundaiNative?.cacheThemeAppearance?.(nativeValue);nativeSnapshot=nativeValue}catch(e){}
+  }
+  const scene=base+'/'+wet+'/'+options.themeDecor;
   if(scene!==lastScene){
    if(!layer){
     layer=document.createElement('div');layer.id='seasonAtmosphere';
@@ -75,10 +92,11 @@
    }
    layer.replaceChildren();
    const kind=wet!=='none'?wet:base;
-   const count={default:0,spring:10,summer:5,autumn:9,winter:7,rain:22,snow:18}[kind];
+   const amount={default:0,spring:20,summer:12,autumn:18,winter:15,rain:36,snow:30}[kind];
+   const count=options.themeDecor==='off'?0:options.themeDecor==='subtle'?Math.ceil(amount/2):amount;
    for(let i=0;i<count;i++){
     const part=document.createElement('i');part.className='seasonParticle '+kind;
-    part.style.setProperty('--x',(i%2?(96+(i*13%35)/10):(i*17%35)/10)+'vw');
+    part.style.setProperty('--x',(i%2?(84+(i*13%150)/10):(i*17%150)/10)+'vw');
     part.style.setProperty('--delay',-(i*2.7)+'s');
     part.style.setProperty('--duration',(kind==='rain'?1.2+(i%4)*.17:15+(i*7%18))+'s');
     part.style.setProperty('--s',(.65+(i%4)*.17).toFixed(2));
@@ -108,13 +126,19 @@
   const previous=options.weatherEffect;
   options={theme:THEMES.includes(value?.theme)?value.theme:'default',
    themeMode:value?.themeMode==='season'?'season':'manual',
-   weatherEffect:WEATHER.includes(value?.weatherEffect)?value.weatherEffect:'none',motion:value?.motion};
+   weatherEffect:WEATHER.includes(value?.weatherEffect)?value.weatherEffect:'none',motion:value?.motion||'full',
+   themeIntensity:['soft','balanced','vivid'].includes(value?.themeIntensity)?value.themeIntensity:'balanced',
+   themeDecor:['off','subtle','full'].includes(value?.themeDecor)?value.themeDecor:'full',
+   themeHeader:value?.themeHeader==='off'?'off':'on',themeIntro:value?.themeIntro==='off'?'off':'on'};
   if(previous!==options.weatherEffect){generation++;lastAttempt=0}
   paint();refresh();
  }
- window.FirstHyundaiThemes={configure,refresh,_test:{terms,season,fresh,longitude}};
+ window.FirstHyundaiThemes={configure,refresh,_test:{terms,season,fresh,longitude,headerPalette}};
  document.addEventListener('visibilitychange',()=>{paint();if(!document.hidden)refresh()});
  window.addEventListener('focus',()=>{paint();refresh()});
+ window.addEventListener('resize',paint);
+ window.addEventListener('scroll',()=>{if(options.themeHeader==='off')paint()},{passive:true});
  window.setInterval(()=>{paint();refresh()},60000);
  configure(window.FirstHyundaiUIOptions?.get?.());
 })();
+

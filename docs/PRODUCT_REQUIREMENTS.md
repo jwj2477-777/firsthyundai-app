@@ -1,5 +1,17 @@
 # 퍼스트현대 — 승인된 제품 요구사항 / 회귀 방지 체크리스트
 
+## 2026-10-26 · v2.1.15 · 테마 강도·시작/상단 적용·오늘 날씨 브리핑
+- 사용자 요청: 기존 5개 테마를 더 잘 드러내고 시작 화면·메인 상단에도 적용. 업무 인터페이스·원본 브랜드 그림/글꼴/이동 모션은 유지. 오늘 브리핑만 날씨·일정·업무·자료현황 순서와 표면/간격을 정돈.
+- 관리자 공통설정 themeIntensity(soft/balanced/vivid), themeDecor(off/subtle/full), themeHeader(on/off), themeIntro(on/off) 추가. 기존 설정 및 백업은 balanced/full/on/on 기본값으로 역호환. 테마/비/눈 수동·계절 자동·공유설정·직전취소 보존.
+- season-themes.js/css: 보다 뚜렷한 계절 색감·장식량, 상단만 독립 적용, 브랜드 로고/타이포·메뉴/버튼 치수와 기능색 불변. 움직임 최소화·백그라운드 정지 유지.
+- Native ThemeAppearance는 비민감 enum만 MODE_PRIVATE 캐시. 다음 시작 화면/로그인 배경/메인 인계 배경에 같은 계절 색감과 정적 가장자리 장식. SeasonThemeMath는 JS와 같은 KST 절기일 계산 및 색상 보간. 원본 로고·브랜드 글꼴·860ms 인계 애니메이션·인증 순서 보존.
+- /weather-briefing: 기상청 getVilageFcst 고정 송도 55/123, 시간별 PTY/POP/TMP를 검증해 오늘 남은 시간만 반환. 20분 캐시/동시 병합/자정 날짜 경계·발표 7시간 신선도 검사. 예보는 현재 관측 효과를 변경하지 않음.
+- 오늘 날씨: 비/눈/진눈깨비 예상 시작 시간을 한국시간으로 짧게 안내하고 추가 눈/비 시간·예보기온을 선택적으로 표시. 불완전 시간표나 미연결을 '비 없음'으로 표시하지 않음. 0°C 유효값·시각 미확인·어제자료·예보/관측 분리 보존.
+- 기존 날씨의 서비스키를 URLSearchParams로 재인코딩하기 전 1회 decodeURIComponent 처리(기존 공공데이터 수집기의 normalize 규칙과 통일). 원문 키/URL/고객자료 로그 금지. 실조회 승인 성공은 배포 후 별도 확인.
+- 검증: test_season_themes.js, test_theme_weather.mjs, test_weather_briefing.mjs, 확대된 test_theme_layout_browser.js(테마×비눈×강도×상단 적용에 따른 9개 업무화면의 컨트롤 좌표/크기/글꼴/기능색 비교), SeasonThemeMathTest. 기존 브랜드·계정·공유메모·설정·업무 브리핑 회귀검사 유지.
+- 배포 상태: v2.1.15/build166 대상. APK 빌드·서명·Release 및 Worker 관측/시간별예보 실응답 성공 여부는 Actions에서 확인. 실제 삼성 휴대폰 화면은 별도 검증 필요.
+
+
 ## 2026-10-26 · v2.1.14 · 계절 테마와 비·눈 장식
 - 사용자 최종 지정: 7개가 아닌 기본·봄·여름·가을·겨울 5개 기본 테마. 비·눈은 계절과 독립적인 효과(없음/비/눈/송도 자동)이며 관리자만 수동 변경. 테마 직접 선택은 자동을 해제하고 선택 테마로 고정.
 - 기존 업무 인터페이스의 메뉴·버튼 위치/높이/글꼴·탐색/입력 순서, 원본 브랜드 로고·시작 착지·거래유형/경고색 모두 보존. season-themes.css/js는 표면/배경색과 화면 양끝의 inert/aria-hidden/pointer-events:none 장식만 변경. 기존 기본형은 기본값 그대로 유지.
@@ -472,4 +484,5 @@
 
 ## 동기화 의무
 이 명세를 변경하는 기능을 구현하면 **같은 작업에서** 관련 JS/Java/Python 테스트와 [AI_HANDOFF.md](AI_HANDOFF.md), [PROJECT_HISTORY.md](PROJECT_HISTORY.md), [CHANGE_LOG_FOR_AI.md](CHANGE_LOG_FOR_AI.md)를 갱신한다. 다음 AI가 이전 대화를 몰라도 같은 요구를 재현할 수 있어야 한다.
+
 

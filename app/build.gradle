@@ -2,7 +2,7 @@ plugins { id 'com.android.application' }
 android {
  namespace 'kr.co.firsthyundai.app'
  compileSdk 35
- defaultConfig { applicationId 'kr.co.firsthyundai.app'; minSdk 26; targetSdk 35; versionCode 165; versionName '2.1.14' }
+ defaultConfig { applicationId 'kr.co.firsthyundai.app'; minSdk 26; targetSdk 35; versionCode 166; versionName '2.1.15' }
  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }
 
@@ -29,4 +29,5 @@ if([fhdStore,fhdStorePass,fhdAlias,fhdKeyPass].every{it}) {
  }
  android.buildTypes.release.signingConfig=android.signingConfigs.fhdProduction
 }
+
 

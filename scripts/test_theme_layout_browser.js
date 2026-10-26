@@ -20,8 +20,8 @@ async function verify(){
    FirstHyundaiThemes.configure({theme:'default',weatherEffect:'none'});
    const original=JSON.stringify(controlBox());
    const bg=getComputedStyle(document.body).backgroundImage;
-   for(const theme of themes)for(const effect of ['none','rain','snow']){
-    FirstHyundaiThemes.configure({theme,weatherEffect:effect});
+   for(const theme of themes)for(const effect of ['none','rain','snow'])for(const intensity of ['soft','balanced','vivid'])for(const header of ['on','off']){
+    FirstHyundaiThemes.configure({theme,weatherEffect:effect,themeIntensity:intensity,themeHeader:header});
     check(JSON.stringify(controlBox())===original,page+' geometry/text/functional colors changed '+theme+'/'+effect);
     check(getComputedStyle(document.getElementById('seasonAtmosphere')).pointerEvents==='none','decoration intercepts input');
     if(theme!=='default')check(getComputedStyle(document.body).backgroundImage!==bg,'theme has no visible color');
@@ -46,3 +46,4 @@ try{
   assert(m,'Theme browser did not finish: '+r.stdout.slice(-800));assert(m[1].startsWith('PASS'),width+'px '+m[1]);console.log(width+'px '+m[1]);
  }
 }finally{fs.rmSync(dir,{recursive:true,force:true})}
+

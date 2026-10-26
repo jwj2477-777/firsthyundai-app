@@ -54,6 +54,7 @@ final class SharedSettingsClient {
         if(token.length()<60||token.length()>1100)throw new Exception("공통 설정 인증 세션 형식 오류");
         return token;
     }
+    static JSONObject readWeatherBriefing() throws Exception {return call("GET","/weather-briefing",null,null);}
     static JSONObject readWeather() throws Exception {return call("GET","/theme-weather",null,null);}
     static JSONObject read() throws Exception {return call("GET","/settings",null,null);}
     static JSONObject publish(String token,String json) throws Exception {
@@ -63,4 +64,5 @@ final class SharedSettingsClient {
     }
     private SharedSettingsClient(){}
 }
+
 

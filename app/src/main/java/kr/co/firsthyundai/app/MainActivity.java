@@ -137,6 +137,7 @@ public class MainActivity extends Activity {
         web.addJavascriptInterface(new Bridge(), "FirstHyundaiNative");
         FrameLayout stage=new FrameLayout(this);
         stage.setBackgroundColor(android.graphics.Color.rgb(3,33,42));
+        stage.setBackground(ThemeAppearance.background(this,true));
         stage.addView(web,new FrameLayout.LayoutParams(-1,-1));
         nativeHandoff=new SmoothBrandOverlay(this);
         stage.addView(nativeHandoff,new FrameLayout.LayoutParams(-1,-1));
@@ -235,7 +236,7 @@ public class MainActivity extends Activity {
         memoTimer.removeCallbacks(memoCheck);
         memoTimer.post(memoCheck);
         updateNotificationPermissionUI();
-        if(web!=null)web.evaluateJavascript("window.FirstHyundaiSharedSettings?.refresh?.();window.FirstHyundaiOfficeBoard?.onResume?.()",null);
+        if(web!=null)web.evaluateJavascript("window.FirstHyundaiSharedSettings?.refresh?.();window.FirstHyundaiOfficeBoard?.onResume?.();window.FirstHyundaiWeatherBriefing?.refresh?.();window.FirstHyundaiThemes?.refresh?.()",null);
         final String activeAdmin=adminSessionIdentity;
         if(activeAdmin!=null && !activeAdmin.isEmpty()) {
             io.execute(()->{
@@ -610,6 +611,18 @@ public class MainActivity extends Activity {
                 deliver("onFirstHyundaiSharedSettingsFetched",response);
             });
         }
+        @JavascriptInterface public void cacheThemeAppearance(String json) {
+            ThemeAppearance.cache(getApplicationContext(),json);
+        }
+        @JavascriptInterface public void fetchWeatherBriefing(String requestId) {
+            if(requestId==null || !requestId.matches("forecast[0-9]{1,10}"))return;
+            io.execute(() -> {
+                JSONObject response=new JSONObject();
+                try {response.put("requestId",requestId).put("payload",SharedSettingsClient.readWeatherBriefing()).put("ok",true);}
+                catch(Exception e){try{response.put("requestId",requestId).put("ok",false);}catch(Exception ignored){}}
+                deliver("onFirstHyundaiWeatherBriefingFetched",response);
+            });
+        }
         @JavascriptInterface public void fetchThemeWeather(String requestId) {
             if(requestId==null || !requestId.matches("theme[0-9]{1,10}"))return;
             io.execute(() -> {
@@ -884,4 +897,5 @@ public class MainActivity extends Activity {
                 });
     }
 }
+
 

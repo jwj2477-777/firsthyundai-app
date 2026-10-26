@@ -47,6 +47,7 @@ final class SmoothBrandOverlay extends FrameLayout {
         backdrop=new View(activity);
         backdrop.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 new int[]{Color.rgb(3,33,42),Color.rgb(9,91,94)}));
+        backdrop.setBackground(ThemeAppearance.background(activity,true));
         addView(backdrop,new LayoutParams(-1,-1));
 
         LinearLayout identity=new LinearLayout(activity);

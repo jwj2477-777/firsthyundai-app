@@ -21,8 +21,17 @@ for(const t of themeList)for(const w of ['none','rain','snow']){
  assert.equal(body.attrs['data-season-theme'],t);assert.equal(body.attrs['data-weather-effect'],w);
  assert.equal(body.children.length,1,'One inert decoration layer, never duplicate layers');
  assert.equal(body.children[0].attrs['aria-hidden'],'true');
- assert(body.children[0].children.length<=22);
+ assert(body.children[0].children.length<=36);
 }
+for(const key of ['themeHeader','themeIntro']){
+ assert(prefs.set(key,'off'));assert.equal(prefs.get()[key],'off');assert(prefs.set(key,'on'));
+}
+for(const intensity of ['soft','balanced','vivid']){
+ assert(prefs.set('themeIntensity',intensity));assert.equal(body.attrs['data-theme-intensity'],intensity);
+}
+assert(prefs.set('themeDecor','off'));assert.equal(body.children[0].children.length,0);
+assert(prefs.set('themeDecor','full'));assert(body.children[0].children.length>0);
+assert.notDeepEqual(api._test.headerPalette('spring','soft'),api._test.headerPalette('spring','vivid'));
 assert.equal(prefs.set('theme','rain'),false,'Rain is an overlay, not a sixth base theme');
 assert.equal(prefs.set('weatherEffect','lightning'),false);
 assert(prefs.set('themeMode','season'));assert.equal(body.attrs['data-season-theme'],api._test.season());
@@ -62,3 +71,4 @@ for(const block of css.matchAll(/body\[data-season-theme[^{}]*\{([^{}]*)\}/g))
 assert(css.includes('pointer-events:none!important')&&css.includes('prefers-reduced-motion:reduce'));
 const html=asset('index.html');assert.equal((html.match(/id="adminTheme"/g)||[]).length,1);
 console.log('Season themes: 5 bases × 3 overlays, permissions, shared settings, legacy backups, KST term boundaries, stale weather and inert decoration passed.');
+

@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
 import {fromKma,themeWeather} from '../workers/shared-settings/src/theme-weather.mjs';
+import {normalizeKmaKey} from '../workers/shared-settings/src/kma-key.mjs';
+assert.equal(normalizeKmaKey(' synthetic%2Bkey%2F%3D '),'synthetic+key/=');
+assert.equal(normalizeKmaKey('synthetic+key/='),'synthetic+key/=');
 const now=Date.parse('2026-10-26T15:00:00+09:00');
 const doc=(code='0')=>({response:{header:{resultCode:'00'},body:{items:{item:[{category:'PTY',nx:55,ny:123,baseDate:'20261026',baseTime:'1500',obsrValue:code}]}}}});
 for(const [code,effect] of [['0','none'],['1','rain'],['2','snow'],['3','snow'],['5','rain'],['6','snow'],['7','snow']])assert.equal(fromKma(doc(code),now).effect,effect);
@@ -21,3 +24,4 @@ try{
  assert.equal((await themeWeather({DATA_GO_KR_SERVICE_KEY:'synthetic-test-key'})).status,200);assert.equal(calls,1,'Coalesced 10-minute weather cache');
 }finally{globalThis.fetch=original}
 console.log('Official theme weather: fixed Songdo grid, PTY validation, mixed snow, freshness, missing approval fallback and secret-free cache passed.');
+
