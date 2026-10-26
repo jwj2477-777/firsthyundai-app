@@ -77,7 +77,19 @@ function checkSuggestion(){
  if(result)el.textContent='▦ 자동 일정 · '+result.local.slice(0,10).replace(/-/g,'.')+
   (result.all_day?' · 종일':' · '+result.local.slice(11));
 }
-function calendarEntries(){return items.filter(n=>!!dateKey(n.scheduled_at))}
+function annualCalendar(){return window.FirstHyundaiAnnualCalendar}
+function calendarEntries(year,month){
+ const annual=annualCalendar(),prefix=String(year)+'-'+String(month).padStart(2,'0');
+ const regular=items.filter(n=>!annual?.parseNote(n.text)&&dateKey(n.scheduled_at).startsWith(prefix));
+ const recurring=[];
+ if(annual)for(const note of items){
+  const birthday=!note.done&&annual.parseNote(note.text);
+  if(!birthday)continue;
+  for(const day of annual.occurrencesInMonth(birthday,year,month))
+   recurring.push({...note,scheduled_at:annual.isoAllDay(day),all_day:true,recurring:true});
+ }
+ return regular.concat(recurring);
+}
 function drawCalendar(){
  if(!$('officeBoardCalendarDays'))return;
  const today=kstDate(new Date());
@@ -86,7 +98,7 @@ function drawCalendar(){
  const [year,month]=calendarMonth.split('-').map(Number);
  const first=new Date(Date.UTC(year,month-1,1)),start=first.getUTCDay();
  const count=new Date(Date.UTC(year,month,0)).getUTCDate();
- const days=calendarEntries(),byDay=new Map();
+ const days=calendarEntries(year,month),byDay=new Map();
  for(const note of days){
   const key=dateKey(note.scheduled_at);if(!byDay.has(key))byDay.set(key,[]);
   byDay.get(key).push(note);
@@ -242,8 +254,16 @@ function nextDay(date){
  return new Date(Date.UTC(y,m-1,d+1)).toISOString().slice(0,10);
 }
 function briefingRows(day,limit){
- return items.filter(n=>!n.done&&n.scheduled_at&&dateKey(n.scheduled_at)===day)
-  .sort((a,b)=>String(a.scheduled_at).localeCompare(String(b.scheduled_at)))
+ const annual=annualCalendar(),today=[];
+ for(const note of items){
+  if(note.done)continue;
+  const birthday=annual?.parseNote(note.text);
+  if(birthday){
+   if(annual.occursOn(birthday,day))
+    today.push({...note,scheduled_at:annual.isoAllDay(day),all_day:true,recurring:true});
+  }else if(note.scheduled_at&&dateKey(note.scheduled_at)===day)today.push(note);
+ }
+ return today.sort((a,b)=>String(a.scheduled_at).localeCompare(String(b.scheduled_at)))
   .slice(0,limit);
 }
 
@@ -277,8 +297,8 @@ function renderBriefing(){
  if(!$('overviewMemoBriefing'))return;
  const date=kstDate(new Date()),tomorrow=nextDay(date);
  const todayNotes=briefingRows(date,5),tomorrowNotes=briefingRows(tomorrow,2);
- const todayTotal=items.filter(n=>!n.done&&dateKey(n.scheduled_at)===date).length;
- const tomorrowTotal=items.filter(n=>!n.done&&dateKey(n.scheduled_at)===tomorrow).length;
+ const todayTotal=briefingRows(date,9999).length;
+ const tomorrowTotal=briefingRows(tomorrow,9999).length;
  $('overviewMemoCount').textContent=todayTotal+'건';
  $('overviewMemoBriefing').hidden=todayTotal===0;
  const target=$('overviewMemoEntries');if(!target)return;
@@ -365,6 +385,7 @@ function enableNotifications(){
  bridge?.requestOfficeMemoNotifications?.();
 }
 function open(){
+ $('officeBoardBirthdayAdd')?.classList?.toggle?.('hidden',bridge?.getMode?.()!=='admin');
  const account=$('officeBoardCurrentMember');
  if(account)account.textContent=bridge?.getOfficeMemberName?.()||'계정 연결 필요';
  settingsChanged();syncNotificationStatus();syncViews();checkSuggestion();refresh();
@@ -391,6 +412,44 @@ function post(){
  if(value.length>1600){msg('메모는 최대 1600자입니다.');return}
  const parsed=extracted(value);
  mutate('post',{text:value,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false});
+}
+function toggleBirthdayForm(show){
+ if(bridge?.getMode?.()!=='admin'){msg('생일 등록은 관리자만 사용할 수 있습니다.');return}
+ const panel=$('officeBoardBirthdayForm');
+ if(!panel)return;
+ panel.classList.toggle('hidden',!show);
+ if(show)$('officeBoardBirthdayInput')?.focus?.();
+}
+async function addBirthdays(){
+ if(bridge?.getMode?.()!=='admin'){msg('생일 등록은 관리자만 사용할 수 있습니다.');return}
+ const annual=annualCalendar(),el=$('officeBoardBirthdayInput'),button=$('officeBoardBirthdaySave');
+ const lines=String(el?.value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+ if(!lines.length||lines.length>20){msg('생일을 1~20줄 적어 주세요.');return}
+ const rows=lines.map(line=>annual?.parseLine(line));
+ if(rows.some(x=>!x)){msg('이름 양력 1월 3일 형식으로 한 줄씩 입력해 주세요. (음력 가능)');return}
+ const today=startKst();
+ const events=rows.map(b=>({text:annual.textFor(b),day:annual.nextDate(b,today)}));
+ if(events.some(x=>!x.day)){msg('현재 지원하는 음력 변환 기간은 2025~2050년입니다.');return}
+ if(button)button.disabled=true;
+ let added=0,skipped=0;
+ try{
+  const remote=await call('list',{});
+  const base=Array.isArray(remote.notes)?remote.notes:items;
+  const existing=new Set(base.map(x=>String(x.text||'').trim()));
+  const received=[];
+  for(const event of events){
+   if(existing.has(event.text)){skipped++;continue}
+   const result=await call('post',{text:event.text,scheduled_at:annual.isoAllDay(event.day),all_day:true});
+   if(result?.note)received.push(result.note);
+   existing.add(event.text);added++;
+  }
+  el.value='';
+  merge(base.concat(received));
+  toggleBirthdayForm(false);
+  setView('calendar');
+  msg('매년 반복 생일 '+added+'건 등록'+(skipped?' · 중복 '+skipped+'건 제외':'')+' · 사무실 공유 일정에 반영됩니다.');
+ }catch(e){msg('생일 등록을 확인해 주세요: '+(e?.message||'서버 연결 오류'))}
+ finally{if(button)button.disabled=false}
 }
 function edit(id){const note=items.find(x=>x.id===id);if(!note)return;editing=id;editDraft=note.text;draw();
  $('officeBoardList')?.querySelector?.('textarea[data-edit]')?.focus?.();}
@@ -429,12 +488,12 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
  if(action==='delete')remove(id);
 });
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
- setView,chooseDay,changeMonth,today,openCalendarNote,toggleArchive,
+ setView,chooseDay,changeMonth,today,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,
  onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
  onNewNotification(){if(currentPage==='officeBoard')refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
  syncNotificationStatus,enableNotifications,settingsChanged,focusNote,
  openBriefing,openBriefingNote,openBriefingCalendar,renderBriefing,closureDates,
- _test:{phones,merge,scheduleSuggestion,toIso,dateKey,briefingRows,nextDay}};
+ _test:{phones,merge,scheduleSuggestion,toIso,dateKey,briefingRows,nextDay,calendarEntries}};
 })();
