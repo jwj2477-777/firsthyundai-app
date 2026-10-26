@@ -58,3 +58,194 @@ body[data-season-theme]:not([data-season-theme="default"]) #overview .overviewWe
  #overview .overviewBriefLine{padding:9px 10px;font-size:12.5px}
  #overview .overviewBriefTrade{padding:10px 11px}
 }
+
+
+/* v2.1.20 · ONE PHYSICAL GRID FOR SIX TOP-LEVEL NAVIGATION BUTTONS.
+   The existing first row is the dimension reference. Only geometry is shared:
+   per-route selected colors and the smooth selection-flow painter remain intact.
+   This last stylesheet also supersedes old memo/contract heading exceptions. */
+#nav .primaryNav,
+#nav .utilityNav{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ align-items:stretch;
+ gap:8px;
+ width:100%;
+}
+#nav .primaryNav>button,
+#nav .utilityNav>button:not(.adminCenterNav){
+ box-sizing:border-box;
+ width:100%;
+ min-width:0;
+ height:89px;
+ min-height:89px;
+ max-height:89px;
+ padding:10px 4px;
+ border-radius:16px;
+ border-width:2px!important;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ line-height:1.25;
+ text-align:center;
+ white-space:normal;
+ word-break:keep-all;
+ overflow-wrap:break-word;
+ flex-shrink:0;
+}
+#nav .primaryNav>button{
+ flex-direction:column;
+ gap:5px;
+}
+#nav .utilityNav>button:not(.adminCenterNav){
+ flex-direction:column;
+ gap:5px;
+ font-size:clamp(11px,2.9vw,14px);
+ font-weight:800;
+}
+#nav .primaryNav>button:not(.active),
+#nav .utilityNav>button:not(.active):not(.adminCenterNav){
+ box-shadow:0 2px 7px #173B4311;
+}
+#nav .utilityNav>button.officeBoardNav:not(.active){
+ border-left-width:2px;
+}
+@media(max-width:370px){
+ #nav .primaryNav>button,
+ #nav .utilityNav>button:not(.adminCenterNav){
+  height:85px;
+  min-height:85px;
+  max-height:85px;
+  padding:8px 3px;
+  border-radius:16px;
+ }
+ #nav .primaryNav,
+ #nav .utilityNav{gap:8px}
+}
+
+/* Same title-bar height, alignment, spacing and 20px heading as
+   the existing property/news pages; contract guide remains expandable. */
+:is(#overview,#officeBoard).page>.sectionTitle:first-child,
+#contracts.page>.contractHero.contractHeroCompact{
+ box-sizing:border-box;
+ min-height:55px;
+ margin:16px 0 12px;
+ padding:0 0 0 13px;
+ display:flex;
+ align-items:flex-start;
+ justify-content:space-between;
+ gap:9px;
+ position:relative;
+}
+:is(#overview,#officeBoard).page>.sectionTitle:first-child:before,
+#contracts.page>.contractHero.contractHeroCompact:before{
+ content:"";
+ display:block;
+ position:absolute;
+ left:0;
+ top:3px;
+ bottom:3px;
+ width:4px;
+ border-radius:7px;
+ background:var(--ui2-summary,#4B5895);
+}
+#officeBoard.page>.sectionTitle:first-child:before{background:#C49C50}
+#contracts.page>.contractHero.contractHeroCompact:before{background:var(--ui2-contracts,#9C5737)}
+:is(#overview,#officeBoard).page>.sectionTitle:first-child>div{
+ flex:1 1 auto;
+ min-width:0;
+}
+:is(#overview,#officeBoard).page>.sectionTitle:first-child h2,
+#contracts.page>.contractHero.contractHeroCompact h2{
+ margin:0;
+ font-family:inherit;
+ font-size:20px;
+ line-height:1.4;
+ font-weight:820;
+ letter-spacing:-.5px;
+ color:#243B44;
+ word-break:keep-all;
+ overflow-wrap:break-word;
+}
+#officeBoard.page>.officeBoardTitle .tiny{
+ margin:6px 0 0;
+ min-height:21px;
+ font-size:14px;
+ line-height:1.5;
+ font-weight:500;
+ letter-spacing:-.12px;
+ color:#536A71;
+}
+:is(#overview,#officeBoard).page>.sectionTitle:first-child>.refreshAction{
+ box-sizing:border-box;
+ flex:0 0 auto;
+ min-width:74px;
+ min-height:49px;
+ padding:8px 12px;
+ align-self:flex-start;
+ font-size:14px;
+ font-weight:750;
+ border-radius:11px;
+ white-space:nowrap;
+}
+#contracts.page>.contractHero.contractHeroCompact{
+ border:0;
+ border-radius:0;
+ background:transparent;
+ box-shadow:none;
+ flex-wrap:wrap;
+}
+#contracts.page>.contractHero.contractHeroCompact h2{
+ flex:1 1 auto;
+ min-width:0;
+ color:#243B44;
+}
+#contracts.page>.contractHero.contractHeroCompact .contractFirstGuide{
+ flex:0 0 auto;
+ min-width:0;
+ max-width:47%;
+ margin:0;
+}
+#contracts.page>.contractHero.contractHeroCompact .contractFirstGuide summary{
+ box-sizing:border-box;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ min-width:74px;
+ min-height:49px;
+ padding:8px 11px;
+ margin:0;
+ border:1.5px solid #DBC9BA;
+ border-radius:11px;
+ background:#FFFAF5;
+ color:#865944;
+ font-size:13px;
+ font-weight:750;
+ text-decoration:none;
+ white-space:nowrap;
+ cursor:pointer;
+}
+#contracts.page>.contractHero.contractHeroCompact .contractFirstGuide[open]{
+ flex-basis:100%;
+ max-width:100%;
+ width:100%;
+ padding:0 0 8px;
+}
+#contracts.page>.contractHero.contractHeroCompact .contractFirstGuide[open] summary{
+ width:max-content;
+ margin-left:auto;
+}
+@media(max-width:380px){
+ :is(#overview,#officeBoard).page>.sectionTitle:first-child,
+ #contracts.page>.contractHero.contractHeroCompact{min-height:81px}
+ :is(#overview,#officeBoard).page>.sectionTitle:first-child h2,
+ #contracts.page>.contractHero.contractHeroCompact h2{
+  font-size:19px;
+  letter-spacing:-.55px;
+ }
+ #officeBoard.page>.officeBoardTitle .tiny{font-size:13px}
+ #contracts.page>.contractHero.contractHeroCompact .contractFirstGuide summary{
+  font-size:12px;
+  padding:8px;
+ }
+}
