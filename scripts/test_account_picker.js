@@ -103,6 +103,25 @@ assert(worker.includes('function memberIdentity(name)')&&
 assert(html.includes('id="officeFooterMember"')&&
  members.includes("footerLabel.textContent=account?'· '+account:''"),
  'Current account is displayed discreetly beside the footer brand');
+assert(main.includes('"list","add","remove","rename"'),
+ 'Only listed management actions may reach the administrator bridge');
+assert(client.includes('"/board/members/"+id+"/rename')&&
+ client.includes('.putString("member_name",name)'),
+ 'Native rename updates the existing local account label');
+assert(client.includes('JSONObject member=result.optJSONObject("member")')&&
+ client.includes('.putString("member_name",name).apply()'),
+ 'Renamed accounts synchronize onto previously connected devices');
+assert(worker.includes('accountRename&&req.method==="PATCH"')&&
+ worker.includes('if(!await isAdmin())return res({error:"admin_required"},403)'),
+ 'Account rename requires a live administrator token');
+assert(worker.includes('const group=all.filter(v=>memberIdentity(v.name)===oldIdentity)')&&
+ worker.includes('affected:group.length'),
+ 'Legacy administrator duplicates must be renamed together');
+assert(members.includes('function startRename(id)')&&
+ members.includes('async function saveRename(id)')&&
+ members.includes("action('rename',{id,name})"),
+ 'Admin UI provides inline rename controls');
+
 assert(!lock.includes('deleteSharedPreferences('),
  'Do not wipe app data just to reselect an office account');
 console.log('Password-first dedicated member page, existing-device migration, secured reassignment and admin chooser passed.');
