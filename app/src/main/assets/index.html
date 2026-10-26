@@ -806,14 +806,16 @@ body.apartmentSheetActive{overflow:hidden}
    </div>
   </div>
   <div id="ct_selectedComplexContext" class="contractComplexContext hidden" role="status" aria-live="polite"></div>
-  <div class="contractMemoInputArea">
-   <label class="contractMemoLabel" for="ct_rough">✎ 계약 내용 입력</label>
-   <textarea id="ct_rough" rows="10" maxlength="12000" aria-describedby="ct_memoHelp ct_memoWriteTip" placeholder="이 칸을 눌러 계약 내용을 적으세요.&#10;&#10;예) 퍼팍 1502동 3004호&#10;매매 16억 / 계약금 6천&#10;중도금 4억 12월4일&#10;잔금 1월5일"></textarea>
-   <p id="ct_memoWriteTip" class="contractMemoWriteTip adminExplain">한 줄씩 적어도 되고, 말하듯이 이어 적어도 됩니다.</p>
-  </div>
-  <div class="contractSpecialMemoArea">
-   <label for="ct_specialMemo">✎ 특약사항 <small>작성한 내용을 특약으로 인식해 문장별로 정리합니다</small></label>
-   <textarea id="ct_specialMemo" rows="4" maxlength="6000" placeholder="예) 잔금일까지 권리관계 변동 없이 유지합니다.&#10;현 시설물 상태로 인도합니다." oninput="FirstHyundaiContracts.updateSummary()" onchange="FirstHyundaiEasy.updateSpecials()"></textarea>
+  <div class="contractEntryGroup" role="group" aria-label="계약 내용 입력">
+   <div class="contractMemoInputArea">
+    <label class="contractMemoLabel" for="ct_rough">✎ 계약 내용 입력</label>
+    <textarea id="ct_rough" rows="10" maxlength="12000" aria-describedby="ct_memoHelp ct_memoWriteTip" placeholder="예) 퍼팍 1502동 3004호&#10;매매 16억 / 계약금 6천&#10;중도금 4억 12월4일&#10;잔금 1월5일"></textarea>
+    <p id="ct_memoWriteTip" class="contractMemoWriteTip adminExplain">편하게 작성하시면 계약 내용과 특약을 구분해 정리합니다.</p>
+   </div>
+   <div class="contractSpecialMemoArea">
+    <label for="ct_specialMemo">특약 메모 <small>선택 · 놓치기 쉬운 특약을 적어두세요</small></label>
+    <textarea id="ct_specialMemo" rows="4" maxlength="6000" aria-label="특약 메모, 선택사항" placeholder="선택 입력 · 예) 현 시설물 상태로 인도합니다." oninput="FirstHyundaiContracts.updateSummary()" onchange="FirstHyundaiEasy.updateSpecials()"></textarea>
+   </div>
   </div>
   <div class="contractEasyActions">
    <button type="button" class="btn contractOneTap" onclick="FirstHyundaiEasy.compose()">메모 정리하고 다음 단계 →</button>
