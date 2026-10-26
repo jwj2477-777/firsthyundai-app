@@ -455,7 +455,7 @@ public class LockActivity extends Activity {
                     if(needsChoice){
                         if(welcomeElapsed)finishWelcome();
                         restorePasswordPage();
-                        status.setText("비밀번호를 입력하면 관리자 · 엄마 · 아빠 계정을 선택할 수 있습니다.");
+                        status.setText("사무실 보안코드를 입력해 주세요.");
                         return;
                     }
                     if(AccessPolicy.authorized(this,result.policy)&&OfficeBoardClient.enrolled(this)){
