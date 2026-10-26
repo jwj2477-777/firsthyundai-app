@@ -41,9 +41,9 @@ async function verify(){
   const trade=document.getElementById('overviewTodayNewTrade');
   trade.hidden=false;
   document.getElementById('overviewNewQuickCount').textContent='2건';
-  check(trade.getBoundingClientRect().height>=36,'Tap target for today's reported trades');
+  check(trade.getBoundingClientRect().height>=36,'Tap target for newly reported trades');
   trade.click();
-  check(currentPage==='new','One-tap link to today's real newly reported trades');
+  check(currentPage==='new','One-tap link to newly reported trades');
   switchPage('overview');
   check(document.documentElement.scrollWidth<=innerWidth+1,'No sideways scrolling');
   document.body.innerHTML='<pre id="overview-actions-test">PASS single card and conditional notices</pre>';
