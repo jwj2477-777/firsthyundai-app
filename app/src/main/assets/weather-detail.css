@@ -1,0 +1,73 @@
+/* v2.1.29 — dedicated weather detail, separate from compact office briefing. */
+#overview .overviewCurrentWeather{position:relative}
+#overview .overviewWeatherHeading{display:flex;justify-content:space-between;align-items:center;gap:12px}
+#overview .overviewWeatherMore{font-size:11px;color:#6E8581;font-weight:680;white-space:nowrap}
+#overview .overviewWeatherEntry{position:absolute;inset:0;z-index:1;width:100%;height:100%;
+ border:0;border-radius:11px;background:transparent;cursor:pointer}
+#overview .overviewWeatherEntry:focus-visible{outline:2.5px solid #498989;outline-offset:2px}
+body.fhdWeatherDetailOpen{overflow:hidden}
+.fhdWeatherDialog{position:fixed;inset:0;width:100%;height:100%;height:100dvh;z-index:200;
+ overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+ background:#F6F6F1;padding:0;margin:0;color:#23414B}
+.fhdWeatherDialog[hidden]{display:none!important}
+.fhdWeatherDialogInner{width:min(100%,660px);min-height:100%;margin:0 auto;
+ background:linear-gradient(145deg,#F0F6F4 0%,#FBFAF4 50%,#F8F9F6 100%);
+ padding-bottom:max(24px,env(safe-area-inset-bottom,0px));}
+.fhdWeatherNav{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;
+ min-height:66px;padding:10px 20px;background:#F2F7F4F0;backdrop-filter:blur(16px);
+ border-bottom:1px solid #DCE8E2}
+.fhdWeatherNav button{display:inline-flex;align-items:center;gap:4px;min-height:44px;
+ font:inherit;font-size:13px;font-weight:780;padding:7px 11px;color:#315A58;background:#FFFFFFA8;
+ border:1px solid #D8E5E0;border-radius:11px;cursor:pointer}
+.fhdWeatherNav button span{font-size:25px;line-height:1}
+.fhdWeatherNav strong{font-size:15px;letter-spacing:-.3px;color:#345959}
+.fhdWeatherHero{padding:32px 24px 27px;background:linear-gradient(138deg,#DCEDE9 0%,#EEF4EC 60%,#F8F5E9 100%);
+ border-bottom:1px solid #DFEAE5}
+.fhdWeatherDate{font-size:13px;margin:0 0 12px;color:#52706C;font-weight:690;line-height:1.5}
+.fhdWeatherHeroMain{display:flex;align-items:center;gap:18px}
+.fhdWeatherHeroIcon{width:73px;height:73px;display:flex;align-items:center;justify-content:center;
+ flex:0 0 73px;border-radius:24px;background:#FFFFFFB8;border:1px solid #D7E7E0;color:#517B7E}
+.fhdWeatherHeroIcon svg{width:50px;height:50px}
+.fhdWeatherTemp{display:block;font-size:clamp(45px,11vw,70px);line-height:1;letter-spacing:-2.5px;
+ color:#173F4B;font-weight:820;font-variant-numeric:tabular-nums}
+.fhdWeatherCondition{font-size:15px;font-weight:720;color:#476B69;margin:11px 0 0}
+.fhdWeatherStats{display:flex;gap:6px 20px;flex-wrap:wrap;margin-top:25px;
+ font-size:12px;font-weight:640;color:#436A6A;line-height:1.5}
+.fhdWeatherSummary{margin:16px 0 0;line-height:1.6;font-size:13px;color:#416367}
+.fhdWeatherBody{padding:19px 17px 35px;display:grid;gap:13px}
+.fhdWeatherBlock{padding:20px 16px 17px;background:#FFF;border:1px solid #E1EAE4;border-radius:19px;
+ box-shadow:0 4px 20px #213D340B;min-width:0}
+.fhdWeatherBlockHead{display:flex;align-items:baseline;justify-content:space-between;gap:7px;margin-bottom:15px}
+.fhdWeatherBlockHead h3{margin:0;color:#24474F;font-size:17px;letter-spacing:-.4px;font-weight:810}
+.fhdWeatherBlockHead small{font-size:10.5px;color:#78908C;text-align:right;line-height:1.3}
+.fhdWeatherChart{min-height:238px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;
+ scrollbar-width:thin;scrollbar-color:#C5D7D2 transparent;padding-bottom:8px}
+.fhdWeatherChart:focus-visible{outline:2px solid #4B8F8F;outline-offset:2px}
+.fhdWeatherChartRow{display:flex;align-items:stretch;min-width:max-content}
+.fhdWeatherHour{width:68px;flex:0 0 68px;display:flex;flex-direction:column;align-items:center;gap:6px;
+ font-size:11px;color:#617B7A;font-variant-numeric:tabular-nums}
+.fhdWeatherHour strong{font-size:12px;color:#315A60}
+.fhdWeatherHour svg{width:27px;height:27px;margin:5px auto;color:#638688}
+.fhdWeatherHour[data-kind=rain] svg,.fhdWeatherHour[data-kind=mixed] svg{color:#547DA6}
+.fhdWeatherHour[data-kind=snow] svg{color:#7190B1}
+.fhdWeatherHour[data-kind=sun] svg{color:#D2A04B}
+.fhdWeatherHour small{font-size:11px;font-weight:750;color:#4A85A1}
+.fhdWeatherPlot{display:block;height:112px;overflow:visible;max-width:none}
+.fhdWeatherFine{font-size:11px;color:#82918F;margin:8px 1px 0;line-height:1.55}
+.fhdWeatherOfficeAlert{margin:0 0 11px;padding:12px;background:#FFF5EA;border-left:3px solid #D49B56;
+ border-radius:10px;font-size:12px;line-height:1.6;font-weight:700;color:#805630}
+.fhdWeatherOfficeAlert[hidden]{display:none!important}
+.fhdWeatherSchedule{display:grid;gap:7px}
+.fhdWeatherScheduleItem{display:flex;align-items:center;gap:9px;justify-content:space-between;
+ padding:10px 11px;background:#F4F8F6;border-radius:10px;font-size:12px;color:#456767}
+.fhdWeatherScheduleItem strong{color:#365C5F;white-space:nowrap}
+.fhdWeatherScheduleItem span{text-align:right}
+.fhdWeatherScheduleEmpty{padding:10px 2px;font-size:12px;color:#758783;line-height:1.55;margin:0}
+.fhdWeatherCalendar{display:block;width:100%;text-align:center;margin:12px 0 0;padding:12px 10px;
+ border:1px solid #D8E7E0;border-radius:11px;background:#F8FBF9;color:#366A67;
+ font:inherit;font-weight:770;font-size:13px;min-height:44px;cursor:pointer}
+.fhdWeatherAttribution{margin:0 3px;color:#7A8C89;line-height:1.55;font-size:11px}
+@media(max-width:360px){.fhdWeatherHero{padding:26px 18px 23px}.fhdWeatherBody{padding:14px 11px 27px}
+.fhdWeatherBlock{padding:17px 12px}.fhdWeatherHeroIcon{width:63px;height:63px;flex-basis:63px;border-radius:20px}
+.fhdWeatherHeroIcon svg{width:41px;height:41px}.fhdWeatherNav{padding:9px 13px}}
+@media(prefers-reduced-motion:reduce){.fhdWeatherDialog{scroll-behavior:auto}}
