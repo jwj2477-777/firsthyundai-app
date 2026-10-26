@@ -1,4 +1,6 @@
 name: Deploy Shared Office Settings
+# Re-apply already-registered Firebase GitHub Secrets to the existing Worker.
+# This documentation-only change intentionally triggers the push deployment.
 on:
   push:
     paths:
