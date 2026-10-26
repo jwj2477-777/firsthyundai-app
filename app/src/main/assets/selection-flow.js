@@ -2,7 +2,7 @@
  * No overlays, masks, moving shapes, transforms, resized buttons or clones.
  * The ACTUAL button backgrounds are painted in place, behind original text.
  * Skipped peers on the SAME visual row receive a faint, sequential wash.
- * Main Trades ↔ News routes via Apartment Info; Today ↔ Shared Memo routes via Contract.
+ * Trades ↔ Shared Memo routes through BOTH center-column buttons without changing pages.
  */
 (function(){
  'use strict';
@@ -99,6 +99,22 @@
  // Never paint a different visual row, even when DOM indices are adjacent.
  function viaIndices(key,previous,next,peers){
   if(key==='top-five'){
+   // Opposite corners of the 2x3 matrix: two intermediate cards on the
+   // center column, in actual travel order. [Trade, Apartment, Contract, Memo].
+   // Do not simulate navigation or change chosen state of either intermediate.
+   if((previous===0&&next===5)||(previous===5&&next===0)){
+    const through=previous===0?[1,4]:[4,1];
+    const mid=through.map(index=>peers[index]);
+    const A=peers[previous]?.getBoundingClientRect(),
+      B=peers[next]?.getBoundingClientRect();
+    if(!visible(A)||!visible(B)||mid.some(x=>!x||x.disabled||chosen(x)))return [];
+    const x0=center(A).x,x1=center(B).x;
+    if(mid.some(x=>{
+     const rect=x.getBoundingClientRect(),xval=center(rect).x;
+     return !visible(rect)||!(xval>Math.min(x0,x1)&&xval<Math.max(x0,x1));
+    }))return [];
+    return through;
+   }
    const index=viaIndex(key,previous,next);
    if(index<0)return [];
    // The quick actions support administrator-defined visual ordering.
@@ -272,7 +288,7 @@
   lowerClicks.delete(event);
   if(!event.defaultPrevented)start?.();
  });
- window.FirstHyundaiSelectionFlow={version:'14.0.0',
+ window.FirstHyundaiSelectionFlow={version:'14.1.0',
   _test:{buttons,chosen,findGroup,getPaint,fromPaint,toPaint,
    vector,viaIndex,viaIndices,softlyMix,middlePaint,isLowerRow,stop,onClick,stats}};
 })();
