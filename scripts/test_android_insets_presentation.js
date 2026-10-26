@@ -50,7 +50,7 @@ const snippet=script.slice(script.indexOf('function compactTradeCollectedAt('),
  script.indexOf('function number(',script.indexOf('function compactTradeCollectedAt(')));
 const c=vm.createContext({Date,Intl});
 vm.runInContext(snippet,c);
-assert.equal(vm.runInContext("compactTradeCollectedAt('2026-10-23T19:37:10Z')",c),'26.10.24 04:37');
+assert.equal(vm.runInContext("compactTradeCollectedAt('2026-10-23T19:37:10Z')",c),'2026.10.24 04:37');
 assert.equal(vm.runInContext("compactTradeCollectedAt(null)",c),'아직 수집 전');
 assert.equal(vm.runInContext("compactTradeCollectedAt('invalid-date')",c),'수집 시각 확인 필요');
 console.log('Android safe insets, first-screen visual density and timezone timestamp checks passed.');
