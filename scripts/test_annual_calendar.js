@@ -63,6 +63,7 @@ assert.equal(board._test.briefingRows('2027-02-10',99).length,0);
 assert.equal(board._test.calendarEntries(2028,1).filter(x=>x.recurring).length,1,'Calendar switches lunar date each year');
 assert.equal(board._test.calendarEntries(2027,1).length,0);
 assert.equal(board._test.briefingRows('2028-01-29',99).length,0);
+board.chooseDay('2028-01-29');
 assert.equal(board._test.memoItems().length,0,'Birthday is not a shared sticky note');
 assert.equal(el('officeBoardCount').textContent,'0','Birthday does not contribute to incomplete memo count');
 assert(!el('officeBoardList').innerHTML.includes('가족가'),'Birthday never appears as a regular memo');
