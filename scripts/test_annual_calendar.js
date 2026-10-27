@@ -38,7 +38,9 @@ assert.equal(api.isoAllDay('2027-02-09'),'2027-02-08T15:00:00.000Z');
 for(const id of ['officeBoardBirthdayAdd','officeBoardBirthdayForm','officeBoardBirthdayInput','officeBoardBirthdaySave'])
  assert(html.includes('id="'+id+'"'),id);
 assert(html.includes('<script src="annual-calendar.js"></script><script src="office-board.js"></script>'));
-assert(officeSource.includes('annual.occursOn(birthday,day)'));
+assert(officeSource.includes('function memoItems()')&&officeSource.includes('function birthdayOf(note)'));
+assert(officeSource.includes('function editBirthday(id)')&&officeSource.includes('function deleteBirthday(id)'));
+assert(!officeSource.includes('annual.occursOn(birthday,day)'),'Birthdays must never enter today briefing');
 assert(officeSource.includes("call('post',{text:event.text,scheduled_at:annual.isoAllDay(event.day),all_day:true})"));
 assert(!source.includes('fetch(')&&!source.includes('localStorage'),'Private birthdates must remain in existing authenticated storage');
 // Verify the actual board agenda and today briefing produce yearly virtual events.
@@ -56,9 +58,27 @@ const board=boardCtx.window.FirstHyundaiOfficeBoard;
 const fake={id:'postit00-00000000-0000-0000-0000-000000000001',text:api.textFor(b),done:false,
  all_day:true,scheduled_at:api.isoAllDay('2026-02-19'),created_at:'2026-01-01T00:00:00Z'};
 board._test.merge([fake]);
-assert.equal(board._test.briefingRows('2027-02-09',99).length,1,'Birthday repeats after base year');
+assert.equal(board._test.briefingRows('2027-02-09',99).length,0,'Birthdays must not clutter actionable daily briefing');
 assert.equal(board._test.briefingRows('2027-02-10',99).length,0);
 assert.equal(board._test.calendarEntries(2028,1).filter(x=>x.recurring).length,1,'Calendar switches lunar date each year');
 assert.equal(board._test.calendarEntries(2027,1).length,0);
-assert.equal(board._test.briefingRows('2028-01-29',99)[0].all_day,true);
-console.log('Verified annual private birthday recurrence, 2026–2050 Korean lunar calendar, leap-day handling, and office board integration.');
+assert.equal(board._test.briefingRows('2028-01-29',99).length,0);
+assert.equal(board._test.memoItems().length,0,'Birthday is not a shared sticky note');
+assert.equal(el('officeBoardCount').textContent,'0','Birthday does not contribute to incomplete memo count');
+assert(!el('officeBoardList').innerHTML.includes('가족가'),'Birthday never appears as a regular memo');
+assert(el('officeBoardAgendaList').innerHTML.includes('생일'),'Birthday is shown in the calendar');
+assert(!el('officeBoardAgendaList').innerHTML.includes('완료'),'Birthday never has a completed marker');
+const doneBirthday={...fake,done:true};
+board._test.merge([doneBirthday]);
+assert.equal(board._test.calendarEntries(2028,1).filter(n=>n.recurring).length,1,
+ 'A previously completed birthday must still recur every year');
+assert.equal(board._test.memoItems().length,0);
+assert.equal(board._test.briefingRows('2028-01-29',99).length,0);
+assert(!el('officeBoardAgendaList').innerHTML.includes('완료'));
+assert(el('officeBoardAgendaList').innerHTML.includes('수정')&&el('officeBoardAgendaList').innerHTML.includes('삭제'),
+ 'Administrator can manage recurring birthdays only from the calendar');
+assert(api.occurrencesInMonth(b,2051,2).length===1,
+ 'Dangi calendar fallback continues lunar birthday recurrence after 2050');
+assert(api.nextDate(b,'2051-01-01')?.startsWith('2051-'),
+ 'Post-2050 birthday must remain a permanent recurrence rule');
+console.log('Verified permanent calendar-only birthday recurrence, existing completed birthday restore, private notes isolation and Dangi fallback.');
