@@ -299,8 +299,8 @@ body.apartmentSheetActive{overflow:hidden}
     <button type="button" class="officeBoardToday" onclick="FirstHyundaiOfficeBoard.today()">오늘</button></div>
    <button id="officeBoardBirthdayAdd" type="button" class="officeBoardBirthdayAdd hidden" onclick="FirstHyundaiOfficeBoard.toggleBirthdayForm(true)">+ 매년 생일 등록</button>
    <div id="officeBoardBirthdayForm" class="officeBoardBirthdayForm hidden">
-    <label for="officeBoardBirthdayInput">생일 일괄 등록</label>
-    <p class="tiny">한 줄에 한 명씩 입력 · 양력·음력 자동 반복 · 사무실 비공개 공유메모에만 저장됩니다.</p>
+    <label id="officeBoardBirthdayFormTitle" for="officeBoardBirthdayInput">생일 일괄 등록</label>
+    <p class="tiny">한 줄에 한 명씩 입력 · 양력·음력 매년 반복 · 완료 없이 캘린더에만 표시됩니다.</p>
     <textarea id="officeBoardBirthdayInput" rows="5" placeholder="가족1 양력 1월 3일&#10;가족2 음력 11월 11일" autocomplete="off"></textarea>
     <div class="officeBoardBirthdayActions"><button type="button" onclick="FirstHyundaiOfficeBoard.toggleBirthdayForm(false)">취소</button><button type="button" id="officeBoardBirthdaySave" onclick="FirstHyundaiOfficeBoard.addBirthdays()">반복 생일 저장</button></div>
    </div>
