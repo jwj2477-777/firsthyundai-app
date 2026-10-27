@@ -1,5 +1,5 @@
-/* Annual family birthdays are stored only as authenticated private office notes.
- * Korean lunar month starts/lengths: deterministic calendar table, 2025–2050.
+/* Annual family birthdays are kept only in the authenticated private calendar.
+ * Korean lunar dates: deterministic table for 2025–2050, Dangi ICU thereafter.
  * Format per row: lunar year, solar lunar-new-year, leap month (0=none), bitset
  * (bit n = 1 when lunar month n is 30 days; leap month follows its regular month).
  */
@@ -62,9 +62,31 @@
   const b={name:found[1].trim(),kind:found[2],month:Number(found[3]),day:Number(found[4])};
   return validBirthday(b)?b:null;
  }
+ // Beyond the fixed 2025–2050 reference table, use ICU's Korean Dangi
+ // calendar when the runtime supports it. Never approximate a lunar birthday.
+ let dangiFormatter=null;
+ try{
+  const formatter=new Intl.DateTimeFormat('en-u-ca-dangi',{timeZone:'Asia/Seoul',month:'numeric',day:'numeric'});
+  if(formatter.resolvedOptions().calendar==='dangi')dangiFormatter=formatter;
+ }catch(e){}
+ function icuOccurrences(b,year,month){
+  if(!dangiFormatter)return [];
+  const found=[],count=new Date(Date.UTC(year,month,0)).getUTCDate();
+  for(let n=1;n<=count;n++){
+   const candidate=new Date(Date.UTC(year,month-1,n,12));
+   const parts=dangiFormatter.formatToParts(candidate);
+   const get=type=>parts.find(part=>part.type===type)?.value||'';
+   // Leap lunar months carry a suffix such as "6bis"; the stored dates
+   // here are ordinary lunar months, never automatically shift to a leap one.
+   if(get('month')===String(b.month)&&get('day')===String(b.day))
+    found.push(candidate.toISOString().slice(0,10));
+  }
+  return found;
+ }
  function occurrencesInMonth(b,year,month){
   if(!validBirthday(b)||!Number.isInteger(year)||!Number.isInteger(month))return [];
   const found=new Set();
+  if(b.kind==='음력'&&year>2050)return icuOccurrences(b,year,month);
   if(b.kind==='양력'){
    const date=solarDate(year,b.month,b.day);
    if(date&&Number(date.slice(5,7))===month)found.add(date);
@@ -87,7 +109,9 @@
   if(b.kind==='양력'){
    for(let year=y;year<=y+8;year++)dates.push(solarDate(year,b.month,b.day));
   }else{
-   for(let year=y-1;year<=y+2;year++)dates.push(lunarDate(year,b.month,b.day));
+   for(let year=y;year<=y+2;year++)
+    for(let month=1;month<=12;month++)
+     dates.push(...occurrencesInMonth(b,year,month));
   }
   return dates.filter(date=>date&&date>=today).sort()[0]||null;
  }
