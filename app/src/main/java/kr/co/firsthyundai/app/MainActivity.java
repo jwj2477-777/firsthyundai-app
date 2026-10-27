@@ -290,39 +290,25 @@ public class MainActivity extends Activity {
         }
     }
 
-    /** Only pass an APK verified against this exact installed package and signer to Android. */
-    private void beginVerifiedInstallation(File apk){
-        if(isFinishing()||isDestroyed())return;
-        try{
-            AppUpdateInstaller.verifyPackage(this,apk);
-            if(Build.VERSION.SDK_INT>=26 && !getPackageManager().canRequestPackageInstalls()){
+    /** Explicit handoff to an ordinary browser. No APK is downloaded or installed
+     * by this app, so no install-packages permission is required.
+     */
+    private void openOfficialUpdateInBrowser(String url){
+        if(!AppUpdate.allowedDownload(url))return;
+        runOnUiThread(()->{
+            if(isFinishing()||isDestroyed())return;
+            try{
+                Intent open=new Intent(Intent.ACTION_VIEW,Uri.parse(url));
+                startActivity(open);
                 deliver("onFirstHyundaiAppUpdateProgress",
-                    AppUpdateInstaller.event("permission",100,"앱 설치 권한 확인 필요"));
-                new AlertDialog.Builder(this)
-                    .setTitle("퍼스트현대 업데이트 설치 허용")
-                    .setMessage("안드로이드 설정에서 이 앱의 '이 출처 허용'을 켠 뒤 돌아와 업데이트를 다시 눌러 주세요.")
-                    .setNegativeButton("취소",null)
-                    .setPositiveButton("설정 열기",(dialog,which)->{
-                        try{startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                            Uri.parse("package:"+getPackageName())));}
-                        catch(Exception exc){
-                            Toast.makeText(this,"안드로이드 설정을 열지 못했습니다.",Toast.LENGTH_LONG).show();
-                        }
-                    }).show();
-                return;
+                    AppUpdateInstaller.event("external",100,
+                        "공식 GitHub 다운로드를 브라우저에서 엽니다. 보안 경고가 나오면 설치를 중단해 주세요."));
+            }catch(Exception e){
+                deliver("onFirstHyundaiAppUpdateProgress",
+                    AppUpdateInstaller.event("error",-1,
+                        "브라우저를 열지 못했습니다. 공식 배포 페이지를 확인해 주세요."));
             }
-            Intent installer=new Intent(Intent.ACTION_VIEW);
-            installer.setDataAndType(AppUpdateInstaller.shareUri(this,apk),
-                "application/vnd.android.package-archive");
-            installer.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(installer);
-            deliver("onFirstHyundaiAppUpdateProgress",
-                AppUpdateInstaller.event("installing",100,"설치 확인 화면을 표시했습니다."));
-        }catch(Exception exc){
-            deliver("onFirstHyundaiAppUpdateProgress",
-                AppUpdateInstaller.event("error",-1,
-                    "업데이트 설치를 준비하지 못했습니다. 저장공간이나 보안 설정을 확인해 주세요."));
-        }
+        });
     }
 
     @Override protected void onPause() {
@@ -530,22 +516,11 @@ public class MainActivity extends Activity {
             });
         }
         @JavascriptInterface public void downloadAndInstallVerifiedAppUpdate() {
-            if(updateDownloading)return;
+            // Kept for backward compatibility with the existing app UI.
+            // Never download APK bytes, open a package installer, or grant installation privileges.
             String url=verifiedUpdateUrl;
             if(!AppUpdate.allowedDownload(url))return;
-            updateDownloading=true;
-            io.execute(()->{
-                try{
-                    File apk=AppUpdateInstaller.download(MainActivity.this,url,
-                        (phase,percent,message)->deliver("onFirstHyundaiAppUpdateProgress",
-                            AppUpdateInstaller.event(phase,percent,message)));
-                    runOnUiThread(()->beginVerifiedInstallation(apk));
-                }catch(Exception exc){
-                    deliver("onFirstHyundaiAppUpdateProgress",
-                        AppUpdateInstaller.event("error",-1,
-                            "다운로드 또는 APK 검증 실패 · 인터넷 연결과 설치 버전을 확인해 주세요."));
-                }finally{updateDownloading=false;}
-            });
+            openOfficialUpdateInBrowser(url);
         }
         @JavascriptInterface public String getMode() {
             return isAdminDeviceMode() ? "admin" : "family";
