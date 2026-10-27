@@ -48,10 +48,11 @@ assert(main.includes('if(motionOff){')&&main.includes('view.setAlpha(1f);'),
  'Reduced motion must show the page without any travel animation');
 
 assert(main.includes('downloadAndInstallVerifiedAppUpdate()')&&main.includes('AppUpdate.allowedDownload(url)'));
-assert(main.includes('AppUpdateInstaller.download(')&&main.includes('beginVerifiedInstallation(apk)'));
+assert(main.includes('openOfficialUpdateInBrowser(url)')&& !main.includes('beginVerifiedInstallation('));
+assert(!main.includes('AppUpdateInstaller.download('),'No APK downloads from JavaScript bridge');
 const installSrc=read('app/src/main/java/kr/co/firsthyundai/app/AppUpdateInstaller.java');
-assert(installSrc.includes('verifyPackage(context,temp)')&&installSrc.includes('getPackageArchiveInfo'));
-assert(installSrc.includes('newBuild<=oldBuild')&&installSrc.includes('getSigningCertificateHistory'));
+assert(!installSrc.includes('verifyPackage(context,temp)')&&!installSrc.includes('getPackageArchiveInfo'));
+assert(!read('app/src/main/AndroidManifest.xml').includes('REQUEST_INSTALL_PACKAGES'));
 assert(java.includes('https://api.github.com/repos/jwj2477-777/firsthyundai-app/releases/latest')===false);
 assert(java.includes('releases/latest')&&java.includes('allowedDownload'));
 assert(java.includes('comparison>0')&&java.includes('comparison==0?"latest":"stale"'),'Offer only higher versions; distinguish stale feed from same installed version');
@@ -68,7 +69,7 @@ w.onFirstHyundaiAppUpdate({state:'available',available:true,newVersion:'2.0.15'}
 assert.equal(E('appUpdateBanner').hidden,false);
 assert(E('appUpdateBannerText').textContent.includes('2.0.15'));
 E('appUpdateInstall').handlers.click();assert.equal(opens,1);
-assert(E('appUpdateStatus').textContent.includes('준비'));
+assert(E('appUpdateStatus').textContent.includes('브라우저'));
 w.onFirstHyundaiAppUpdateProgress({phase:'downloading',percent:45});
 assert(E('appUpdateStatus').textContent.includes('45%'));
 w.onFirstHyundaiAppUpdateProgress({phase:'verifying'});
@@ -84,4 +85,6 @@ w.onFirstHyundaiAppUpdate({state:'latest',available:false});assert.equal(E('appU
 assert(E('appUpdateStatus').textContent.includes('최신'));
 w.onFirstHyundaiAppUpdate({state:'unavailable'});assert(E('appUpdateStatus').textContent.includes('공식 다운로드 페이지'));
 E('appUpdateCheck').handlers.click();assert.equal(queries,2);
-console.log('Update UI, welcome branding, version and signing source tests passed');
+w.onFirstHyundaiAppUpdateProgress({phase:'external'});
+assert(E('appUpdateStatus').textContent.includes('Play 프로텍트'));
+console.log('Update UI, welcome branding, version and browser-only release handoff passed');
