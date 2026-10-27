@@ -350,6 +350,13 @@ jobs:
             python3 scripts/check_apk_version.py app/build/outputs/apk/release/app-release.apk
             python3 scripts/check_release_signature.py app/build/outputs/apk/release/app-release.apk
           fi
+          echo 'Checking final APK merged manifest for forbidden installer and surveillance privileges'
+          APK_PATH=app/build/outputs/apk/release/app-release.apk
+          if [ "${{ github.event_name }}" = "pull_request" ]; then APK_PATH=app/build/outputs/apk/debug/app-debug.apk; fi
+          if "$ANDROID_HOME/build-tools/35.0.0/aapt" dump permissions "$APK_PATH" | grep -E 'android.permission.(REQUEST_INSTALL_PACKAGES|READ_SMS|RECEIVE_SMS|QUERY_ALL_PACKAGES|SYSTEM_ALERT_WINDOW)'; then
+            echo 'Forbidden privileged permission found in packaged APK'
+            exit 1
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: FirstHyundai-Free-Auto-APK
