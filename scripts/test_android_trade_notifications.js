@@ -19,6 +19,7 @@ assert(native.includes('manager.getNotificationChannel(CHANNEL_ID)'));
 assert(native.includes('new Intent(activity, LockActivity.class)'),'Notification must not bypass family lock');
 assert(!native.includes('new Intent(activity, MainActivity.class)'));
 assert(native.includes('PendingIntent.FLAG_IMMUTABLE'));
+assert(native.includes('safeDetail,snapshotJson'),'Native notification must persist matching trade details');
 assert(activity.includes('@JavascriptInterface public String getTradeNotificationPermissionStatus()'));
 assert(activity.includes('@JavascriptInterface public void requestTradeNotificationPermission()'));
 assert(activity.includes('@JavascriptInterface public void postFavoriteTradeNotification('));
@@ -38,7 +39,7 @@ let requested=0,status='permission_required',notifications=[];
 const window={localStorage:{getItem:key=>cache.get(key)||null,setItem:(key,val)=>cache.set(key,val)},
  FirstHyundaiNative:{getTradeNotificationPermissionStatus:()=>status,
  requestTradeNotificationPermission:()=>{requested++;},
- postFavoriteTradeNotification:(n,t)=>notifications.push({n,t})}};
+ postFavoriteTradeNotification:(n,t,snapshot)=>notifications.push({n,t,snapshot})}};
 const ctx=vm.createContext({window,document:{getElementById:el},console});
 vm.runInContext(js,ctx);
 const a=window.FirstHyundaiTradeAlerts;
@@ -63,6 +64,11 @@ a.process({state:'ok',records:rows},context);
 assert.equal(notifications.length,1);
 assert.equal(notifications[0].n,1);
 assert(notifications[0].t.includes('프라임뷰 20블럭'));
+const historical=JSON.parse(notifications[0].snapshot);
+assert.equal(historical.version,1);
+assert.equal(historical.items.length,1,'Each notification stores only its own newly discovered favorite trades');
+assert.equal(historical.items[0].group.label,'프라임뷰 20블럭');
+assert.equal(historical.items[0].row.id,'new-2');
 a.process({state:'ok',records:rows},context);
 assert.equal(notifications.length,1,'Rechecking unchanged data must not replay OS notification');
 a.setNativeEnabled(false);
