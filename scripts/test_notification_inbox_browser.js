@@ -50,6 +50,29 @@ async function verify(){
   const go=document.querySelector('.inboxItem[data-kind="memo"]');
   go.click();
   check(!dialog.open&&currentPage==='officeBoard','Memo history returns to authenticated note page');
+  data[0].tradeSnapshot={version:1,items:[
+   {key:'saved-1',group:{id:'f15',label:'퍼스트파크 15블럭'},
+    row:{type:'매매',amount_10k:88000,first_seen_date:'2026-10-27',contract_date:'2026-10-24',floor:10,area_m2:84.9}},
+   {key:'saved-2',group:{id:'f15',label:'퍼스트파크 15블럭'},
+    row:{type:'전세',deposit_10k:50000,first_seen_date:'2026-10-27',contract_date:'2026-10-23',floor:5,area_m2:84.9}}
+  ]};
+  window.FirstHyundaiNotificationInbox.open();
+  document.querySelector('.inboxItem[data-kind="trade"]').click();
+  check(!dialog.open,'Tapping trade must close the inbox');
+  const alertDialog=document.getElementById('favoriteTradeAlertDialog');
+  check(alertDialog.open,'Trade history must reopen original detail popup instead of navigating');
+  check(currentPage==='officeBoard','Trade popup must not navigate to all new trades');
+  check(alertDialog.textContent.includes('퍼스트파크 15블럭'),'Saved favorite group shown');
+  check(alertDialog.textContent.includes('8억 8,000만원'),'Saved transaction amount shown');
+  check(document.querySelectorAll('#favoriteTradeAlertRows .alertTransaction').length===2,'Show every saved trade detail');
+  window.FirstHyundaiTradeAlerts.later();
+  delete data[0].tradeSnapshot;
+  data[0].detail='퍼스트파크 15블럭 2건 · 프라임뷰 20블럭 1건';
+  window.FirstHyundaiNotificationInbox.open();
+  document.querySelector('.inboxItem[data-kind="trade"]').click();
+  check(alertDialog.open&&alertDialog.textContent.includes('프라임뷰 20블럭'),'Legacy alert must reopen its saved favorite-complex summary');
+  check(currentPage==='officeBoard','Legacy alert must not navigate to unfiltered trades');
+  window.FirstHyundaiTradeAlerts.later();
   const colors=new Map();
   let coords=null;
   for(const page of ['trades','complexes','news','overview','contracts','officeBoard']){
