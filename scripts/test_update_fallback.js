@@ -19,8 +19,11 @@ assert(java.includes('new URL(freshUrl(address))')&&java.includes('UUID.randomUU
 assert(java.includes('comparison==0?"latest":"stale"'),'Older feed must not claim latest');
 assert(java.includes('allowedDownload(expectedUrl)'),'Do not trust arbitrary release URLs');
 assert(java.includes('asset.optLong("size",0)>100000L'),'Check published APK exists');
-assert(installer.includes('Arrays.equals(a,b)')&&installer.includes('newBuild<=oldBuild'),
- 'Never weaken Android app signing or version checks');
+assert(!installer.includes('HttpURLConnection')&&!installer.includes('getPackageArchiveInfo'),
+ 'Update UI must not embed a package downloader or installer');
+assert(!read('app/src/main/AndroidManifest.xml').includes('REQUEST_INSTALL_PACKAGES'));
+assert(java.includes('allowedDownload(expectedUrl)'),
+ 'Even browser handoff continues to require a pinned official GitHub release asset');
 assert(html.includes('id="appUpdateManual"'));
 assert(html.includes('https://github.com/jwj2477-777/firsthyundai-app/releases/latest'));
 const nodes=new Map();
@@ -63,4 +66,4 @@ window.onFirstHyundaiAppUpdate({available:false,state:'latest',newVersion:'2.0.3
 assert(node('appUpdateStatus').textContent.includes('v2.0.39'));
 node('appUpdateCheck').attrs.click();
 assert(node('appUpdateBanner').hidden&&node('appUpdateCheck').disabled);
-console.log('Two independent verified update feeds, signature guard and direct-link recovery validated.');
+console.log('Independent pinned update feeds and browser-only download fallback validated.');
