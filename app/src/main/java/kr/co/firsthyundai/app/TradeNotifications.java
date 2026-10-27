@@ -61,7 +61,7 @@ final class TradeNotifications {
         }
     }
 
-    static boolean post(Activity activity, int count, String detail) {
+    static boolean post(Activity activity, int count, String detail, String snapshotJson) {
         if (!"enabled".equals(status(activity)) || count < 1 || count > 100) return false;
         ensureChannel(activity);
         NotificationManager manager = (NotificationManager)
@@ -91,7 +91,7 @@ final class TradeNotifications {
         try {
             manager.notify(NOTIFICATION_ID, builder.build());
             NotificationHistory.record(activity,"trade",
-                "관심 단지 새 실거래 "+count+"건",safeDetail);
+                "관심 단지 새 실거래 "+count+"건",safeDetail,snapshotJson);
             return true;
         } catch (SecurityException ignored) {
             // Permission could be revoked between status check and notify().
