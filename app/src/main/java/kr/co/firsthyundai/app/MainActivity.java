@@ -506,9 +506,10 @@ public class MainActivity extends Activity {
                 updateNotificationPermissionUI();
             });
         }
-        @JavascriptInterface public void postFavoriteTradeNotification(int count, String detail) {
-            if (count < 1 || count > 100 || detail == null || detail.length() > 240) return;
-            runOnUiThread(() -> TradeNotifications.post(MainActivity.this, count, detail));
+        @JavascriptInterface public void postFavoriteTradeNotification(int count, String detail, String snapshotJson) {
+            if (count < 1 || count > 100 || detail == null || detail.length() > 240 ||
+                    snapshotJson == null || snapshotJson.length() > 48000) return;
+            runOnUiThread(() -> TradeNotifications.post(MainActivity.this, count, detail, snapshotJson));
         }
         @JavascriptInterface public String getInstalledAppVersion() {
             return AppVersion.name(MainActivity.this);
