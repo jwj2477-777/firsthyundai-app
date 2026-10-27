@@ -354,24 +354,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.30 fix hourly forecast reception APK
+      - name: Publish v2.1.31 favorite-trade inbox detail replay APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.30.apk
-          unzip -t FirstHyundai-v2.1.30.apk | grep 'No errors detected'
-          if gh release view v2.1.30 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.31.apk
+          unzip -t FirstHyundai-v2.1.31.apk | grep 'No errors detected'
+          if gh release view v2.1.31 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.30 FirstHyundai-v2.1.30.apk \
+            gh release create v2.1.31 FirstHyundai-v2.1.31.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.30 · 시간별 날씨 예보 수신 문제 해결' \
-              --notes '송도 시간별 예보가 비어 있던 근본 원인을 해결했습니다. 안드로이드의 모든 응답을 5KB로 제한하던 코드에서 기상청 시간별 예보 엔드포인트만 64KB로 허용하고, 관리자 공통 설정은 기존 5KB 제한을 유지합니다. 기존 GitHub 수집에 실제로 저장된 80개 시간대의 비·눈·기온·강수확률·하늘 상태가 화면에 표시될 수 있도록 했습니다. 예보를 수신하지 못하는 경우 큰 빈 그래프를 만들지 않고 간결한 안내를 제공합니다. 새 API 키는 필요하지 않습니다. v2.1.30/build181.'
+              --title '퍼스트현대 v2.1.31 · 관심 단지 실거래 알림 상세 복원' \
+              --notes '알림함에서 관심 14개 단지 새 실거래 알림을 누르면 전체 새 거래가 아닌 해당 단지별 거래 상세 팝업을 다시 볼 수 있습니다. 새로 받은 알림부터는 알림에 포함된 공개 실거래 상세 내용을 이 휴대폰에만 저장하여 원래 내역을 복원합니다. 이전에 수신한 알림은 당시 기록된 단지별 건수 요약을 표시하고, 현재 자료와 정확히 일치할 때에만 재조회 내역을 구분하여 보여줍니다. 기존 계약·날씨·메모·권한 정책 유지. v2.1.31/build182.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.30 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.30 --apk FirstHyundai-v2.1.30.apk
+          gh release upload v2.1.31 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.31 --apk FirstHyundai-v2.1.31.apk
 
 
