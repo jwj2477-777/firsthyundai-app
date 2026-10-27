@@ -1,4 +1,4 @@
-/* v2.0.17: GitHub-verified APK, in-app download, Android installation consent. */
+/* GitHub-verified release lookup; user-initiated browser handoff only. No in-app APK installer. */
 (function(){
  'use strict';
  const $=id=>document.getElementById(id);
@@ -47,6 +47,8 @@
    working=false;status.textContent='안드로이드 설치 확인창에서 업데이트를 승인해 주세요.';
   }else if(phase==='permission'){
    working=false;status.textContent='설치 허용을 켠 뒤 다시 업데이트를 누르세요.';
+  }else if(phase==='external'){
+   working=false;status.textContent='공식 GitHub 다운로드 페이지를 열었습니다. Play 프로텍트가 차단하면 설치를 진행하지 마세요.';
   }else if(phase==='error'){
    working=false;status.textContent=message||'업데이트에 실패했습니다. 다시 시도해 주세요.';
   }
@@ -61,7 +63,7 @@
    status.textContent='현재 버전은 앱 내부 업데이트를 지원하지 않습니다.';return;
   }
   working=true;install.disabled=true;check.disabled=true;
-  status.textContent='업데이트 다운로드를 준비 중입니다…';
+  status.textContent='공식 배포 파일을 브라우저에서 여는 중…';
   try{native.downloadAndInstallVerifiedAppUpdate();}
   catch(e){working=false;install.disabled=false;check.disabled=false;
    status.textContent='업데이트 요청에 실패했습니다.';}
