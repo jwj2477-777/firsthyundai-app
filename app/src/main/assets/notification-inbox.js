@@ -34,7 +34,7 @@
   if(count)count.textContent=entries.length?'최근 알림 '+entries.length+'건':'아직 받은 알림이 없습니다';
   const list=by('notificationInboxList');
   if(list){
-   list.innerHTML=entries.length?entries.map(x=>'<button type="button" class="inboxItem" data-kind="'+
+   list.innerHTML=entries.length?entries.map((x,index)=>'<button type="button" class="inboxItem" data-index="'+index+'" data-kind="'+
     x.kind+'" aria-label="'+escape(x.title)+' 알림 보기">'+
     '<span class="inboxKind '+x.kind+'" aria-hidden="true">'+(x.kind==='memo'?'▤':'↗')+'</span>'+
     '<span class="inboxInfo"><strong>'+escape(x.title)+'</strong><small>'+
@@ -62,10 +62,17 @@
   bell?.setAttribute('aria-expanded','false');
   bell?.focus?.();
  }
- function go(kind){
+ function go(kind,index){
+  const entry=entries[Number(index)];
   close();
-  if(kind==='memo')window.switchPage?.('officeBoard');
-  if(kind==='trade')window.switchPage?.('new');
+  if(kind==='memo'){window.switchPage?.('officeBoard');return;}
+  if(kind==='trade'){
+   // Open the specific favorite-14 alert, never the unfiltered whole-city feed.
+   if(entry&&window.FirstHyundaiTradeAlerts?.openHistory?.(entry))return;
+   const favorite=document.getElementById('newFavoriteFilter');
+   if(favorite)favorite.value='favorites';
+   window.switchPage?.('new');
+  }
  }
  function clear(){
   if(!entries.length)return;
@@ -79,7 +86,7 @@
  }
  by('notificationInboxList')?.addEventListener('click',e=>{
   const button=e.target?.closest?.('.inboxItem');
-  if(button)go(button.dataset.kind);
+  if(button)go(button.dataset.kind,button.dataset.index);
  });
  by('notificationInboxDialog')?.addEventListener('close',()=>{
   by('favoriteAlertButton')?.setAttribute('aria-expanded','false');
