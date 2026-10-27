@@ -147,7 +147,7 @@ function renderDialog(items,isPreview=false){
  const summary=get('favoriteTradeAlertSummary');
  if(summary)summary.innerHTML=Object.entries(types).filter(([,n])=>n).map(([type,n])=>
   '<span class="alertType '+(type==='매매'?'sale':type==='전세'?'lease':'monthly')+'">'+type+' <b>'+n+'건</b></span>').join('');
- const viewButton=get('favoriteTradeAlertView');if(viewButton)viewButton.textContent=isPreview?'미리보기 닫기':'신규 거래 보기';
+ const viewButton=get('favoriteTradeAlertView');if(viewButton){viewButton.textContent=isPreview?'미리보기 닫기':'신규 거래 보기';viewButton.disabled=false;}
  const body=get('favoriteTradeAlertRows');
  if(body)body.innerHTML=[...groups.values()].map(g=>{
   const sorted=g.rows.slice().sort((a,b)=>String(b.first_seen_date).localeCompare(String(a.first_seen_date)));
@@ -268,7 +268,7 @@ function openHistory(entry){
    '<li class="favoriteTradeAlertItem">'+html(entry.detail||'상세 알림 기록이 없습니다.')+'</li>';
  }
  const button=get('favoriteTradeAlertView');
- if(button)button.textContent=items.length?'해당 거래 보기':'관심 14개 새 거래 보기';
+ if(button){button.textContent=items.length?'해당 거래 보기':'관심 14개 새 거래 보기';button.disabled=!latestContext;button.title=latestContext?'':'거래 자료 불러오는 중';}
  tryPopup(true);
  return true;
 }
@@ -291,6 +291,7 @@ function process(payload,context){
   !context||typeof context.lookup!=='function'||!Array.isArray(context.favorites))return {status:'ignored',newCount:0};
  latestContext=context;
  latestFeedRecords=payload.records;
+ if(historyView){const button=get('favoriteTradeAlertView');if(button){button.disabled=false;button.title='';}}
  syncOption();
  const key=PREFIX+String(context.repository||'default');
  const snapshot=select(payload.records,context);
@@ -313,7 +314,7 @@ function process(payload,context){
  }
  return {status:initialized?'updated':'baseline',newCount:fresh.length};
 }
-get('favoriteTradeAlertDialog')?.addEventListener?.('close',()=>{previewing=false;});
+get('favoriteTradeAlertDialog')?.addEventListener?.('close',()=>{previewing=false;historyView=null;});
 get('favoriteAlertSettingsDialog')?.addEventListener?.('close',()=>{});
 window.FirstHyundaiTradeAlerts={process,setEnabled,enabled,syncOption,syncNativeStatus,setNativeEnabled,open,openHistory,view,dismiss,later,preview,openSettings,closeSettings,previewFromSettings,stableId,
  _test:{stableId,select,formatAmount,hide}};
