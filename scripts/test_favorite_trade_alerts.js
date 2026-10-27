@@ -140,3 +140,24 @@ a.process({state:'ok',records:[older,newer,malicious]},uiContext);
 assert(!element('favoriteTradeAlertRows').innerHTML.includes('<img'));
 assert(element('favoriteTradeAlertRows').innerHTML.includes('&lt;script&gt;'));
 console.log('Popup UX passed: isolated example, later/reopen, no typing interruption, exact multi-day navigation, escaped fields and no false zero.');
+a.later();
+assert(a.openHistory({kind:'trade',title:'관심 단지 새 실거래 2건',detail:'퍼스트파크 15블럭 2건',
+ when:Date.UTC(2026,9,27),tradeSnapshot:{version:1,items:[
+  {key:'saved-1',group:{id:'f15',label:'퍼스트파크 15블럭'},
+   row:{type:'매매',amount_10k:90000,first_seen_date:'2026-10-27',contract_date:'2026-10-26'}},
+  {key:'saved-2',group:{id:'f15',label:'퍼스트파크 15블럭'},
+   row:{type:'월세',deposit_10k:4000,monthly_10k:150,first_seen_date:'2026-10-27'}}
+ ]}}));
+assert(element('favoriteTradeAlertDialog').open,'Stored alert reopens as detail popup');
+assert.equal((element('favoriteTradeAlertRows').innerHTML.match(/alertTransactionTop/g)||[]).length,2,'No truncation in restored popup');
+assert(element('favoriteTradeAlertRows').innerHTML.includes('9억원'));
+a.later();
+assert(a.openHistory({kind:'trade',title:'관심 단지 새 실거래 9건',
+ detail:'센트럴파크푸르지오 4건 · 파크애비뉴 1건 · 퍼스트파크 14블럭 2건 · 마스터뷰 23블럭 1건 · 프라임뷰 20블럭 1건',
+ when:Date.UTC(2026,9,27)}));
+assert(element('favoriteTradeAlertDialog').open,'Legacy notifications still open popup');
+assert(element('favoriteTradeAlertRows').innerHTML.includes('센트럴파크푸르지오'));
+assert(element('favoriteTradeAlertRows').innerHTML.includes('프라임뷰 20블럭'));
+assert(element('favoriteTradeAlertCaption').textContent.includes('이전 버전'),'Legacy details not invented');
+a.later();
+console.log('Historical favorite-trade alerts reopen their original recorded details or honest legacy summary.');
