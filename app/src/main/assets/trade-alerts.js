@@ -10,6 +10,8 @@ const NATIVE_PREF='firsthyundai-favorite-trades-native-alert-enabled-v1';
 let pending=[];
 let previewing=false;
 let latestContext=null;
+let latestFeedRecords=[];
+let historyView=null;
 let memory=new Map();
 let memoryEnabled=true;
 const get=id=>document.getElementById(id);
@@ -52,13 +54,22 @@ function setNativeEnabled(flag){
  }
  syncNativeStatus();
 }
+function tradeSnapshot(items){
+ // Persist only public transaction attributes; never store clients, memos or account data.
+ const allowed=['id','building','type','contract_date','first_seen_date','area_m2','floor',
+  'amount_10k','deposit_10k','monthly_10k','contract_type_raw','status'];
+ return JSON.stringify({version:1,items:items.slice(0,100).map(({key,group,row})=>({
+  key,group:{id:group.id,label:group.label},
+  row:Object.fromEntries(allowed.filter(name=>row[name]!=null).map(name=>[name,row[name]]))
+ }))});
+}
 function notifyPhone(items){
  if(!nativeEnabled()||nativePermissionStatus()!=='enabled'||!items.length)return;
  const grouped=new Map();
  for(const {group} of items)grouped.set(group.id,{label:group.label,n:(grouped.get(group.id)?.n||0)+1});
  const detail=[...grouped.values()].slice(0,5).map(x=>x.label+' '+x.n+'건').join(' · ')+
   (grouped.size>5?' 외 '+(grouped.size-5)+'개 단지':'');
- try{window.FirstHyundaiNative?.postFavoriteTradeNotification?.(Math.min(items.length,100),detail.slice(0,240));}
+ try{window.FirstHyundaiNative?.postFavoriteTradeNotification?.(Math.min(items.length,100),detail.slice(0,240),tradeSnapshot(items));}
  catch(e){/* The in-app popup remains available even without Android permission. */}
 }
 function syncBell(){
@@ -89,8 +100,9 @@ function later(){
  const dialog=get('favoriteTradeAlertDialog');
  if(dialog?.open)dialog.close();
  previewing=false;
+ historyView=null;
 }
-function dismiss(){pending=[];previewing=false;hide();}
+function dismiss(){pending=[];previewing=false;historyView=null;hide();}
 function stableId(r){
  if(r?.id&&typeof r.id==='string'&&r.id.length<160)return r.id;
  // Safe fallback in case a legacy collector omitted a unique record ID.
@@ -141,14 +153,14 @@ function renderDialog(items,isPreview=false){
   const sorted=g.rows.slice().sort((a,b)=>String(b.first_seen_date).localeCompare(String(a.first_seen_date)));
   const byType={매매:0,전세:0,월세:0};for(const row of sorted)if(row.type in byType)byType[row.type]++;
   const breakdown=Object.entries(byType).filter(([,n])=>n).map(([type,n])=>type+' '+n+'건').join(' · ');
-  return '<li class="favoriteTradeAlertItem"><div class="alertComplexHeading"><strong>'+html(g.label)+'</strong><span>'+html(breakdown)+'</span></div>'+sorted.slice(0,3).map(row=>{
+  return '<li class="favoriteTradeAlertItem"><div class="alertComplexHeading"><strong>'+html(g.label)+'</strong><span>'+html(breakdown)+'</span></div>'+sorted.map(row=>{
    const kind=row.type==='매매'?'sale':row.type==='전세'?'lease':'monthly';
    const area=row.area_m2!=null&&Number(row.area_m2)>0?'전용 '+row.area_m2+'㎡':'면적 미기재';
    const floor=row.floor!=null&&String(row.floor).trim()!==''?row.floor+'층':'층 미기재';
    const renewal=['갱신','갱신계약'].includes(row.contract_type_raw)?' · 갱신계약':['신규','신규계약'].includes(row.contract_type_raw)?' · 신규계약':'';
    return '<div class="alertTransaction"><div class="alertTransactionTop"><span class="alertDealLabel '+kind+'">'+html(row.type)+html(renewal)+'</span>'+
     (row.status==='해제'?'<span class="alertCancelled">해제</span>':'')+'</div><p class="alertAmount">'+html(formatAmount(row))+'</p><p class="alertDetails">'+html(area)+' · '+html(floor)+'</p><p class="alertDate">계약 '+html(row.contract_date||'미기재')+' · 확인 '+html(row.first_seen_date)+'</p></div>';
-  }).join('')+(sorted.length>3?'<p class="alertExtra">외 '+(sorted.length-3)+'건은 신규 거래 보기에서 확인하세요.</p>':'')+'</li>';
+  }).join('')+'</li>';
  }).join('');
 }
 function render(){
@@ -160,11 +172,11 @@ function render(){
  const detail=get('favoriteTradeAlertBannerDetail');
  if(detail)detail.textContent=names[0]+(names.length>1?' 외 '+(names.length-1)+'개 단지':'');
  if(banner)banner.classList.remove('hidden');
- if(!previewing)renderDialog(pending);
+ if(!previewing&&!historyView)renderDialog(pending);
 }
 function tryPopup(manual=false){
  const dialog=get('favoriteTradeAlertDialog');
- if(!dialog||(!previewing&&(!pending.length||!enabled()))||dialog.open)return;
+ if(!dialog||(!previewing&&!historyView&&(!pending.length||!enabled()))||dialog.open)return;
  const others=['noteDialog','complexEditor','favoriteAlertSettingsDialog'].some(id=>get(id)?.open);
  if(others)return;
  if(!manual&&(document.activeElement?.matches?.('input,textarea,select,[contenteditable="true"]')||
@@ -172,7 +184,7 @@ function tryPopup(manual=false){
    (typeof currentPage!=='undefined'&&currentPage==='contracts')))return;
  try{if(typeof dialog.showModal==='function')dialog.showModal();}catch(e){/* banner remains actionable */}
 }
-function open(){if(!pending.length)return;previewing=false;render();tryPopup(true);}
+function open(){if(!pending.length)return;previewing=false;historyView=null;render();tryPopup(true);}
 function openSettings(){
  const dialog=get('favoriteAlertSettingsDialog');
  if(!dialog||dialog.open)return;
@@ -198,8 +210,76 @@ function preview(){
  ],true);
  tryPopup(true);
 }
+function historyDate(when){
+ const n=Number(when);
+ return Number.isFinite(n)&&n>0?new Date(n+9*3600000).toISOString().slice(0,10):'';
+}
+function legacyGroups(detail){
+ return String(detail||'').split(/\s*·\s*/).map(piece=>{
+  const match=piece.trim().match(/^(.+?)\s+(\d+)건$/);
+  return match?{label:match[1].trim(),count:Number(match[2])}:null;
+ }).filter(Boolean);
+}
+function openHistory(entry){
+ if(!entry||entry.kind!=='trade')return false;
+ const popup=get('favoriteTradeAlertDialog');
+ if(!popup)return false;
+ if(popup.open)later();
+ const snapshot=entry.tradeSnapshot;
+ let items=snapshot?.version===1&&Array.isArray(snapshot.items)?snapshot.items.filter(x=>
+  x&&typeof x.key==='string'&&x.group&&typeof x.group.id==='string'&&
+  typeof x.group.label==='string'&&x.row&&typeof x.row==='object'&&
+  ['매매','전세','월세'].includes(x.row.type)
+ ).slice(0,100):[];
+ const day=historyDate(entry.when);
+ let reconstructed=false;
+ const groups=legacyGroups(entry.detail);
+ if(!items.length&&groups.length&&day&&latestContext){
+  // Pre-upgrade history had only a summary. Reconstruct exclusively when today's
+  // public feed matches every group count, otherwise show the original summary.
+  const available=[...select(latestFeedRecords,latestContext).values()].filter(x=>x.row.first_seen_date===day);
+  const picked=[];
+  for(const group of groups){
+   const rows=available.filter(x=>x.group.label===group.label);
+   if(rows.length!==group.count){picked.length=0;break;}
+   picked.push(...rows);
+  }
+  const count=Number(String(entry.title||'').match(/(\d+)건/)?.[1]);
+  if(picked.length&&picked.length===count&&groups.length===new Set(picked.map(x=>x.group.id)).size){
+   items=picked;reconstructed=true;
+  }
+ }
+ historyView={date:items.map(x=>x.row.first_seen_date).sort().reverse()[0]||day,
+  ids:items.map(x=>x.key)};
+ previewing=false;
+ if(items.length){
+  renderDialog(items);
+  get('favoriteTradeAlertTitle').textContent=entry.title||'관심 단지 새 실거래';
+  get('favoriteTradeAlertCaption').textContent=reconstructed?
+   '당시 거래별 기록이 없어 현재 공개자료에서 단지별 건수가 일치하는 거래를 다시 조회했습니다.':
+   '알림이 도착했을 때 저장한 관심 14개 단지의 거래 내역입니다.';
+ }else{
+  get('favoriteTradeAlertTitle').textContent=entry.title||'관심 단지 새 실거래';
+  get('favoriteTradeAlertCaption').textContent='이전 버전에서 받은 알림으로 당시 거래별 상세 기록은 보관되지 않았습니다. 저장된 단지별 소식을 보여드립니다.';
+  get('favoriteTradeAlertSummary').innerHTML='';
+  get('favoriteTradeAlertRows').innerHTML=groups.length?groups.map(g=>
+   '<li class="favoriteTradeAlertItem"><div class="alertComplexHeading"><strong>'+
+   html(g.label)+'</strong><span>'+g.count+'건</span></div></li>').join(''):
+   '<li class="favoriteTradeAlertItem">'+html(entry.detail||'상세 알림 기록이 없습니다.')+'</li>';
+ }
+ const button=get('favoriteTradeAlertView');
+ if(button)button.textContent=items.length?'해당 거래 보기':'관심 14개 새 거래 보기';
+ tryPopup(true);
+ return true;
+}
 function view(){
  if(previewing){later();return;}
+ if(historyView){
+  const selection=historyView;
+  later();
+  latestContext?.openNew?.(selection.date,selection.ids.length?selection.ids:null);
+  return;
+ }
  if(!latestContext||!pending.length)return;
  const date=pending.map(x=>x.row.first_seen_date).sort().reverse()[0];
  const ids=pending.map(x=>x.key);
@@ -210,6 +290,7 @@ function process(payload,context){
  if(!payload||!['ok','partial'].includes(payload.state)||!Array.isArray(payload.records)||
   !context||typeof context.lookup!=='function'||!Array.isArray(context.favorites))return {status:'ignored',newCount:0};
  latestContext=context;
+ latestFeedRecords=payload.records;
  syncOption();
  const key=PREFIX+String(context.repository||'default');
  const snapshot=select(payload.records,context);
@@ -234,6 +315,6 @@ function process(payload,context){
 }
 get('favoriteTradeAlertDialog')?.addEventListener?.('close',()=>{previewing=false;});
 get('favoriteAlertSettingsDialog')?.addEventListener?.('close',()=>{});
-window.FirstHyundaiTradeAlerts={process,setEnabled,enabled,syncOption,syncNativeStatus,setNativeEnabled,open,view,dismiss,later,preview,openSettings,closeSettings,previewFromSettings,stableId,
+window.FirstHyundaiTradeAlerts={process,setEnabled,enabled,syncOption,syncNativeStatus,setNativeEnabled,open,openHistory,view,dismiss,later,preview,openSettings,closeSettings,previewFromSettings,stableId,
  _test:{stableId,select,formatAmount,hide}};
 })();
