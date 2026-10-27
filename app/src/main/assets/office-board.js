@@ -8,7 +8,7 @@ let timerMs=45000,pendingFocus='',view='notes',scheduleOpen=false,suggestedDate=
 let archiveOpen=false,archived=[];
 let lastBriefing=0,briefingBusy=false;
 const startKst=()=>kstDate(new Date());
-let selectedDate='',calendarMonth='';
+let selectedDate='',calendarMonth='',editingBirthday='';
 function focusNote(id){
  if(!valid(id))return false;
  pendingFocus=id;
@@ -78,12 +78,14 @@ function checkSuggestion(){
   (result.all_day?' · 종일':' · '+result.local.slice(11));
 }
 function annualCalendar(){return window.FirstHyundaiAnnualCalendar}
+function birthdayOf(note){return annualCalendar()?.parseNote?.(note?.text)||null}
+function memoItems(){return items.filter(note=>!birthdayOf(note))}
 function calendarEntries(year,month){
  const annual=annualCalendar(),prefix=String(year)+'-'+String(month).padStart(2,'0');
- const regular=items.filter(n=>!annual?.parseNote(n.text)&&dateKey(n.scheduled_at).startsWith(prefix));
+ const regular=memoItems().filter(n=>dateKey(n.scheduled_at).startsWith(prefix));
  const recurring=[];
  if(annual)for(const note of items){
-  const birthday=!note.done&&annual.parseNote(note.text);
+  const birthday=annual.parseNote(note.text);
   if(!birthday)continue;
   for(const day of annual.occurrencesInMonth(birthday,year,month))
    recurring.push({...note,scheduled_at:annual.isoAllDay(day),all_day:true,recurring:true});
@@ -111,16 +113,27 @@ function drawCalendar(){
   markup+='<button type="button" class="officeBoardDay'+
    (key===today?' today':'')+(key===selectedDate?' selected':'')+
    '" aria-pressed="'+String(key===selectedDate)+'" onclick="FirstHyundaiOfficeBoard.chooseDay(\''+key+'\')">'+
-   '<span>'+d+'</span>'+(dayNotes.length?'<small>'+dayNotes.length+'건</small>':'')+'</button>';
+   '<span>'+d+'</span>'+(dayNotes.some(n=>birthdayOf(n))?'<i class="officeBoardBirthdayDot" aria-label="생일 일정"></i>':'')+
+   (dayNotes.length?'<small>'+dayNotes.length+'건</small>':'')+'</button>';
  }
  $('officeBoardCalendarDays').innerHTML=markup;
  const matching=days.filter(n=>dateKey(n.scheduled_at)===selectedDate)
   .sort((a,b)=>String(a.scheduled_at).localeCompare(String(b.scheduled_at)));
  $('officeBoardAgendaHeading').textContent=selectedDate.replace(/-/g,'.')+' · 일정 '+matching.length+'건';
  $('officeBoardAgendaList').innerHTML=matching.length?matching.map(note=>{
-  const p=kstParts(note.scheduled_at),intro=String(note.text).split('\n')[0];
+  const p=kstParts(note.scheduled_at),birthday=birthdayOf(note),id=esc(note.id);
+  if(birthday){
+   const annualText=birthday.kind+' '+birthday.month+'월 '+birthday.day+'일 · 매년';
+   const management=bridge?.getMode?.()==='admin'?
+    '<span class="officeBoardBirthdayManage"><button type="button" onclick="FirstHyundaiOfficeBoard.editBirthday(\''+id+'\')">수정</button>'+
+    '<button type="button" onclick="FirstHyundaiOfficeBoard.deleteBirthday(\''+id+'\')">삭제</button></span>':'';
+   return '<div class="officeBoardAgendaItem officeBoardBirthdayEvent"><span class="officeBoardBirthdayMark" aria-hidden="true">🎂</span>'+
+    '<div class="officeBoardBirthdayCopy"><strong>'+esc(birthday.name)+' 생일</strong><small>'+esc(annualText)+'</small></div>'+
+    management+'</div>';
+  }
+  const intro=String(note.text).split('\n')[0];
   return '<button type="button" class="officeBoardAgendaItem'+(note.done?' completed':'')+
-    '" onclick="FirstHyundaiOfficeBoard.openCalendarNote(\''+esc(note.id)+'\')"><strong>'+
+    '" onclick="FirstHyundaiOfficeBoard.openCalendarNote(\''+id+'\')"><strong>'+
     esc(note.all_day?'종일':p?.time||'')+'</strong><span>'+esc(intro)+'</span>'+
     (note.done?'<small>완료</small>':'')+'</button>';
  }).join(''):'<p class="tiny">등록된 일정이 없습니다.</p>';
@@ -156,7 +169,9 @@ function addAtSelectedDay(){
  setView('notes');$('officeBoardDraft')?.focus?.();
 }
 function openCalendarNote(id){
- if(!valid(id))return;showCompleted=true;setView('notes');focusNote(id);
+ if(!valid(id))return;
+ if(birthdayOf(items.find(n=>n.id===id)))return; // Birthdays have no completion workflow.
+ showCompleted=true;setView('notes');focusNote(id);
 }
 async function toggleArchive(){
  if(bridge?.getMode?.()!=='admin'){msg('복구함은 관리자만 열 수 있습니다.');return}
@@ -179,15 +194,16 @@ $('officeBoardArchiveList')?.addEventListener?.('click',e=>{
 $('officeBoardDraft')?.addEventListener?.('input',checkSuggestion);
 function draw(){
  const list=$('officeBoardList');if(!list)return;
- $('officeBoardCount').textContent=String(items.filter(x=>!x.done).length);
- const completedCount=items.filter(x=>x.done).length;
+ const memos=memoItems();
+ $('officeBoardCount').textContent=String(memos.filter(x=>!x.done).length);
+ const completedCount=memos.filter(x=>x.done).length;
  $('officeBoardShowDone').textContent=showCompleted?'완료 숨기기':'완료 '+completedCount+'건 보기';
  $('officeBoardShowDone').setAttribute?.('aria-pressed',showCompleted?'true':'false');
  const admin=bridge?.getMode?.()==='admin';
  $('officeBoardArchiveOpen')?.classList?.toggle?.('hidden',!admin);
- const visible=items.filter(x=>showCompleted||!x.done);
+ const visible=memos.filter(x=>showCompleted||!x.done);
  if(!visible.length){
-  list.innerHTML='<div class="empty">'+(items.length?'표시할 메모가 없습니다. 완료 메모를 열어볼 수 있습니다.':'아직 메모가 없습니다. 첫 포스트잇을 붙여보세요.')+'</div>';
+  list.innerHTML='<div class="empty">'+(memos.length?'표시할 메모가 없습니다. 완료 메모를 열어볼 수 있습니다.':'아직 메모가 없습니다. 첫 포스트잇을 붙여보세요.')+'</div>';
   drawCalendar();syncViews();return;
  }
  list.innerHTML=visible.map(note=>{
@@ -254,17 +270,9 @@ function nextDay(date){
  return new Date(Date.UTC(y,m-1,d+1)).toISOString().slice(0,10);
 }
 function briefingRows(day,limit){
- const annual=annualCalendar(),today=[];
- for(const note of items){
-  if(note.done)continue;
-  const birthday=annual?.parseNote(note.text);
-  if(birthday){
-   if(annual.occursOn(birthday,day))
-    today.push({...note,scheduled_at:annual.isoAllDay(day),all_day:true,recurring:true});
-  }else if(note.scheduled_at&&dateKey(note.scheduled_at)===day)today.push(note);
- }
- return today.sort((a,b)=>String(a.scheduled_at).localeCompare(String(b.scheduled_at)))
-  .slice(0,limit);
+ // Birthdays belong only to the calendar, not to daily actionable tasks.
+ return memoItems().filter(note=>!note.done&&note.scheduled_at&&dateKey(note.scheduled_at)===day)
+  .sort((a,b)=>String(a.scheduled_at).localeCompare(String(b.scheduled_at))).slice(0,limit);
 }
 
 /* Dates explicitly recorded as whole-day closure/holiday in the private shared board.
@@ -424,17 +432,21 @@ function post(){
  mutate('post',{text:value,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false});
 }
 function toggleBirthdayForm(show){
- if(bridge?.getMode?.()!=='admin'){msg('생일 등록은 관리자만 사용할 수 있습니다.');return}
+ if(bridge?.getMode?.()!=='admin'){msg('생일 관리는 관리자만 사용할 수 있습니다.');return}
  const panel=$('officeBoardBirthdayForm');
  if(!panel)return;
+ if(!show)editingBirthday='';
  panel.classList.toggle('hidden',!show);
+ if(!show){$('officeBoardBirthdayInput').value='';}
+ if($('officeBoardBirthdayFormTitle'))$('officeBoardBirthdayFormTitle').textContent=editingBirthday?'생일 수정':'생일 일괄 등록';
+ if($('officeBoardBirthdaySave'))$('officeBoardBirthdaySave').textContent=editingBirthday?'매년 생일 수정':'반복 생일 저장';
  if(show)$('officeBoardBirthdayInput')?.focus?.();
 }
 async function addBirthdays(){
  if(bridge?.getMode?.()!=='admin'){msg('생일 등록은 관리자만 사용할 수 있습니다.');return}
  const annual=annualCalendar(),el=$('officeBoardBirthdayInput'),button=$('officeBoardBirthdaySave');
  const lines=String(el?.value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
- if(!lines.length||lines.length>20){msg('생일을 1~20줄 적어 주세요.');return}
+ if(!lines.length||lines.length>(editingBirthday?1:20)){msg(editingBirthday?'생일 수정은 한 명만 입력해 주세요.':'생일을 1~20줄 적어 주세요.');return}
  const rows=lines.map(line=>annual?.parseLine(line));
  if(rows.some(x=>!x)){msg('이름 양력 1월 3일 형식으로 한 줄씩 입력해 주세요. (음력 가능)');return}
  const today=startKst();
@@ -445,21 +457,44 @@ async function addBirthdays(){
  try{
   const remote=await call('list',{});
   const base=Array.isArray(remote.notes)?remote.notes:items;
-  const existing=new Set(base.map(x=>String(x.text||'').trim()));
+  const existing=new Set(base.filter(n=>n.id!==editingBirthday).map(x=>String(x.text||'').trim()));
   const received=[];
-  for(const event of events){
-   if(existing.has(event.text)){skipped++;continue}
-   const result=await call('post',{text:event.text,scheduled_at:annual.isoAllDay(event.day),all_day:true});
+  if(editingBirthday){
+   const event=events[0],id=editingBirthday;
+   if(existing.has(event.text)){msg('이미 등록된 생일입니다.');return}
+   const result=await call('edit',{id,text:event.text,scheduled_at:annual.isoAllDay(event.day),all_day:true});
    if(result?.note)received.push(result.note);
-   existing.add(event.text);added++;
+   else throw Error('수정 결과 확인 불가');
+   merge(base.filter(n=>n.id!==id).concat(received));
+   msg('생일을 수정했습니다. 모든 해의 캘린더에 반영됩니다.');
+  }else{
+   for(const event of events){
+    if(existing.has(event.text)){skipped++;continue}
+    const result=await call('post',{text:event.text,scheduled_at:annual.isoAllDay(event.day),all_day:true});
+    if(result?.note)received.push(result.note);
+    existing.add(event.text);added++;
+   }
+   merge(base.concat(received));
+   msg('매년 반복 생일 '+added+'건 등록'+(skipped?' · 중복 '+skipped+'건 제외':'')+' · 캘린더 전용으로 표시됩니다.');
   }
   el.value='';
-  merge(base.concat(received));
   toggleBirthdayForm(false);
   setView('calendar');
-  msg('매년 반복 생일 '+added+'건 등록'+(skipped?' · 중복 '+skipped+'건 제외':'')+' · 사무실 공유 일정에 반영됩니다.');
  }catch(e){msg('생일 등록을 확인해 주세요: '+(e?.message||'서버 연결 오류'))}
  finally{if(button)button.disabled=false}
+}
+function editBirthday(id){
+ if(bridge?.getMode?.()!=='admin'||!valid(id))return;
+ const birthday=birthdayOf(items.find(n=>n.id===id));if(!birthday)return;
+ editingBirthday=id;
+ $('officeBoardBirthdayInput').value=birthday.name+' '+birthday.kind+' '+birthday.month+'월 '+birthday.day+'일';
+ toggleBirthdayForm(true);
+}
+async function deleteBirthday(id){
+ if(bridge?.getMode?.()!=='admin'||!valid(id)||!birthdayOf(items.find(n=>n.id===id)))return;
+ if(typeof confirm==='function'&&!confirm('이 생일을 모든 해의 캘린더에서 삭제할까요?'))return;
+ const ok=await mutate('delete',{id});
+ if(ok){editingBirthday='';drawCalendar()}
 }
 function edit(id){const note=items.find(x=>x.id===id);if(!note)return;editing=id;editDraft=note.text;draw();
  $('officeBoardList')?.querySelector?.('textarea[data-edit]')?.focus?.();}
@@ -471,7 +506,7 @@ function saveEdit(id){
  const parsed=extracted(value);
  mutate('edit',{id,text:value,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false});
 }
-function setDone(id,done){if(valid(id))mutate('done',{id,done})}
+function setDone(id,done){if(valid(id)&&!birthdayOf(items.find(n=>n.id===id)))mutate('done',{id,done})}
 function remove(id){
  if(!valid(id))return;
  if(bridge?.getMode?.()!=='admin'){msg('삭제는 관리자만 할 수 있습니다.');return}
@@ -498,12 +533,12 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
  if(action==='delete')remove(id);
 });
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
- setView,chooseDay,changeMonth,today,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,
+ setView,chooseDay,changeMonth,today,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
  onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
  onNewNotification(){if(currentPage==='officeBoard')refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
  syncNotificationStatus,enableNotifications,settingsChanged,focusNote,
  openBriefing,openBriefingNote,openBriefingCalendar,renderBriefing,closureDates,weatherAppointments,
- _test:{phones,merge,scheduleSuggestion,toIso,dateKey,briefingRows,nextDay,calendarEntries}};
+ _test:{phones,merge,scheduleSuggestion,toIso,dateKey,briefingRows,nextDay,calendarEntries,memoItems,birthdayOf}};
 })();
