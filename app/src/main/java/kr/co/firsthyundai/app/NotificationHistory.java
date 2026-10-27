@@ -35,6 +35,9 @@ final class NotificationHistory {
         return out;
     }
     static synchronized void record(Context context,String kind,String title,String description){
+        record(context,kind,title,description,null);
+    }
+    static synchronized void record(Context context,String kind,String title,String description,String snapshotJson){
         if(!"trade".equals(kind)&&!"memo".equals(kind))return;
         // The memo journal intentionally stores only generic fixed strings.
         if("memo".equals(kind)){
@@ -50,6 +53,16 @@ final class NotificationHistory {
             entry.put("detail",description==null?"":description.substring(0,Math.min(180,description.length())));
             entry.put("when",time);
             entry.put("read",false);
+            // Only public favorite-trade fields supplied by the collector are persisted.
+            // Legacy journal records have no snapshot and remain readable.
+            if("trade".equals(kind)&&snapshotJson!=null&&snapshotJson.length()<=48000){
+                try{
+                    JSONObject snapshot=new JSONObject(snapshotJson);
+                    JSONArray items=snapshot.optJSONArray("items");
+                    if(snapshot.optInt("version")==1&&items!=null&&items.length()>0&&items.length()<=100)
+                        entry.put("tradeSnapshot",snapshot);
+                }catch(Exception ignored){}
+            }
             JSONArray source=data(context);
             JSONArray next=new JSONArray();
             next.put(entry);
