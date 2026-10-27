@@ -454,3 +454,16 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 #officeBoard .officeBoardBirthdayActions button:last-child{background:#7D6243;color:#FFF;border-color:#7D6243}
 #officeBoard .officeBoardBirthdayActions button:disabled{opacity:.5}
 #officeBoard .officeBoardBirthdayAdd.hidden,#officeBoard .officeBoardBirthdayForm.hidden{display:none!important}
+
+/* Annual birthdays are calendar events, not finishable sticky-note tasks. */
+#officeBoard .officeBoardDay{position:relative}
+#officeBoard .officeBoardBirthdayDot{display:block;width:5px;height:5px;border-radius:50%;background:#D89872;position:absolute;right:5px;top:6px}
+#officeBoard .officeBoardBirthdayEvent{background:#FFF9F2;border-color:#F0E1D2;gap:9px;min-width:0}
+#officeBoard .officeBoardBirthdayMark{flex:0 0 22px;font-size:19px;line-height:1.1;text-align:center}
+#officeBoard .officeBoardBirthdayCopy{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+#officeBoard .officeBoardBirthdayCopy strong{font-size:13px;color:#755436;overflow-wrap:anywhere}
+#officeBoard .officeBoardBirthdayCopy small{font-size:11px;color:#947B62}
+#officeBoard .officeBoardBirthdayManage{display:flex;gap:5px;flex:0 0 auto}
+#officeBoard .officeBoardBirthdayManage button{min-height:38px;padding:7px 9px;border-radius:8px;border:1px solid #E5D6C5;background:#fff;color:#7B6048;font-size:11px;font-weight:750}
+#officeBoard .officeBoardBirthdayManage button:last-child{color:#A46961}
+#officeBoard .officeBoardBirthdayManage button:focus-visible{outline:2px solid #A57A54;outline-offset:1px}
