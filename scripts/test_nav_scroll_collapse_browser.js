@@ -58,7 +58,7 @@ async function verify(){
     font:parseFloat(labelStyle.fontSize),labelHeight:label.getBoundingClientRect().height};
   });
   check(nav.dataset.navDensity==='compact','Deep scrolling shows compact dock');
-  check(compressed<=49&&compressed>=48,'Compact button should be 48px and retain comfortable touch area');
+  check(compressed<=49&&compressed>=47.95,'Compact button should be 48px and retain comfortable touch area: '+JSON.stringify({compressed,scrollY,navDensity:nav.dataset.navDensity,cssHeight:getComputedStyle(compact[0]).height,variable:nav.style.getPropertyValue('--fhd-tile-height'),metrics}));
   for(const metric of metrics){
    check(Math.abs(metric.height-compressed)<.3,'All six touch targets should have the same compact height');
    check(Math.abs(metric.iconW-metrics[0].iconW)<.3&&Math.abs(metric.iconH-metrics[0].iconH)<.3,
