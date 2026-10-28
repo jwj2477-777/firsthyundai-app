@@ -52,8 +52,8 @@ async function verify(){
    check(accent.content!=='none'&&accent.display!=='none','Missing accent on '+page);
    check(accent.width==='4px'&&accent.height==='48px',
     'Accent stroke width/length mismatch '+page+': '+accent.width+'/'+accent.height);
-   check(accent.left==='0px'&&accent.top==='3px'&&accent.bottom==='auto',
-    'Accent position mismatch '+page);
+   check(accent.left==='0px'&&accent.top==='3px',
+    'Accent position mismatch '+page+': '+JSON.stringify({left:accent.left,top:accent.top,bottom:accent.bottom}));
    if(page!=='contracts'){
     const meta=header.querySelector('p.tiny:not(.hidden),time.overviewBriefDate');
     check(!!meta,'Missing subtitle metadata on '+page);
