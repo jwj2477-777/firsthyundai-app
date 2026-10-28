@@ -366,24 +366,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.39 unified six-page headings APK
+      - name: Publish v2.1.40 priority map-box reminder APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.39.apk
-          unzip -t FirstHyundai-v2.1.39.apk | grep 'No errors detected'
-          if gh release view v2.1.39 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.40.apk
+          unzip -t FirstHyundai-v2.1.40.apk | grep 'No errors detected'
+          if gh release view v2.1.40 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.39 FirstHyundai-v2.1.39.apk \
+            gh release create v2.1.40 FirstHyundai-v2.1.40.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.39 · 메인 6개 화면 제목과 강조선 통일' \
-              --notes '메인 6개 탭(실거래/아파트정보/뉴스/오늘요약/계약문자/공유메모)과 관련 실거래 하위 화면의 제목은 20px(좁은 화면 19px), 보조정보는 14px, 왼쪽 강조선은 4px×48px로 통일했습니다. 각 화면의 고유 강조색과 실거래 수집 시각, 갱신 버튼, 메뉴 스크롤 축소, 계약/뉴스/메모 기능을 그대로 유지합니다. v2.1.39/build190.'
+              --title '퍼스트현대 v2.1.40 · 지도함 실내 이동 알림 우선 강조' \
+              --notes '오늘의 업무브리핑에서 지도함 실내 이동 알림을 날씨보다 앞에 배치했습니다. 기본 날씨와 구분되는 따뜻한 적갈색 강조 박스에 지도함을 실내로 옮겨주세요를 크게 표시하고, 실제 기상청 비·눈 예보 시각 및 다음 영업일 개장 오전 9시까지 강수 가능성은 작은 보조 문구로 분리했습니다. 예보가 없으면 기존처럼 알림은 숨기며 매주 일요일·둘째/넷째 토요일 휴무, 다음 영업일 전날 장시간 예보, 공유 휴무일 규칙을 그대로 유지합니다. 지도함 알림은 완료 체크가 아닌 행동 안내이며 기존 업무·날씨·메모·계약 기능은 그대로 유지됩니다. v2.1.40/build191.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.39 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.39 --apk FirstHyundai-v2.1.39.apk
+          gh release upload v2.1.40 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.40 --apk FirstHyundai-v2.1.40.apk
 
 
