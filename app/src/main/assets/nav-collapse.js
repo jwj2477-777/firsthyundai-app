@@ -22,7 +22,8 @@
   scheduled=false;
   const density=progress(position());
   const rounded=Math.round(density*1000)/1000;
-  if(rounded===last)return rounded;
+  // Navigation buttons are recreated on page changes; even at the same scroll
+  // position, reapply their native height to the new elements.
   last=rounded;
   nav.style.setProperty('--fhd-nav-factor',String(rounded));
   // Older Android WebViews reject multiplication within CSS calc().
@@ -43,6 +44,15 @@
   };
   for(const [name,value] of Object.entries(lengths))
    nav.style.setProperty(name,value.toFixed(2)+'px');
+  // Legacy theme rules impose a larger intrinsic button size on narrow phones.
+  // Explicit important inline bounds win over those inherited rules, while
+  // the visual icons and labels still use the shared CSS variables above.
+  const tileHeight=lengths['--fhd-tile-height'].toFixed(2)+'px';
+  for(const button of nav.querySelectorAll('.primaryNav>button, .utilityNav>button:not(.adminCenterNav)')){
+   button.style.setProperty('height',tileHeight,'important');
+   button.style.setProperty('min-height',tileHeight,'important');
+   button.style.setProperty('max-height',tileHeight,'important');
+  }
   nav.dataset.navDensity=rounded>=.98?'compact':rounded<=.02?'full':'transitioning';
   return rounded;
  }
