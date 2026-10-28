@@ -37,6 +37,13 @@ async function verify(){
    'Three lower-row buttons remain aligned');
   window.scrollTo(0,85);api.update();
   const middle=buttons[0].getBoundingClientRect().height;
+  const middleMetrics=buttons.map(b=>({
+   icon:b.querySelector('.navIcon svg').getBoundingClientRect().height,
+   font:parseFloat(getComputedStyle(b.querySelector('.navLabel')).fontSize)
+  }));
+  check(middleMetrics.every(x=>Math.abs(x.icon-middleMetrics[0].icon)<.3&&
+   Math.abs(x.font-middleMetrics[0].font)<.15),
+   'All 6 icons and labels must shrink together at halfway scroll: '+JSON.stringify(middleMetrics));
   check(middle<original-3,'Partial swipe must begin shrinking smoothly');
   check(middle>60,'Partial swipe must not jump to its smallest height');
   check(nav.dataset.navDensity==='transitioning','Middle scroll must use a continuous density value');
