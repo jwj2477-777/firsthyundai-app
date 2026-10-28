@@ -98,6 +98,7 @@ async function verify(){
    'Repeated scroll updates never restart a completed transition');
   // Re-render replaces elements; controller must only restore sizes once.
   renderMainNavigation(currentPage);
+  finishAnimations(); // New DOM may start inherited CSS transitions in headless Chromium.
   check(tiles().length===6&&tiles().every(b=>Math.abs(b.getBoundingClientRect().height-48)<.2),
    'Newly rendered buttons preserve compact state without size mismatch');
 
