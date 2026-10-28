@@ -60,13 +60,20 @@ try{
  const file=path.join(dir,'index.html');
  fs.writeFileSync(file,html);
  for(const width of [320,360,393,430,600]){
-  const r=child.spawnSync(binary,['--headless=new','--no-sandbox','--disable-gpu',
-   '--disable-dev-shm-usage','--hide-scrollbars','--window-size='+width+',1100',
-   '--virtual-time-budget=20000','--dump-dom','file://'+file],
-   {encoding:'utf8',timeout:35000,maxBuffer:8*1024*1024});
+  let r,m;
+  // Chromium headless occasionally exits with code 0 before --dump-dom is
+  // populated on busy CI runners. Retry that transport failure once, never
+  // waive the actual visual and navigation assertions.
+  for(let attempt=0;attempt<2;attempt++){
+   r=child.spawnSync(binary,['--headless=new','--no-sandbox','--disable-gpu',
+    '--disable-dev-shm-usage','--hide-scrollbars','--window-size='+width+',1100',
+    '--virtual-time-budget=20000','--dump-dom','file://'+file],
+    {encoding:'utf8',timeout:45000,maxBuffer:8*1024*1024});
+   m=r.stdout?.match(/<pre id="overview-actions-test">([\s\S]*?)<\/pre>/);
+   if(m||r.status!==0)break;
+  }
   assert.equal(r.status,0,r.stderr.slice(-900));
-  const m=r.stdout.match(/<pre id="overview-actions-test">([\s\S]*?)<\/pre>/);
-  assert(m,'Briefing browser did not finish '+r.stdout.slice(-900));
+  assert(m,'Briefing browser did not finish after retry '+r.stdout.slice(-900));
   assert(m[1].startsWith('PASS'),width+'px '+m[1]);
   console.log(width+'px '+m[1]);
  }
