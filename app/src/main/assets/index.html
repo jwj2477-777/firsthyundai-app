@@ -1211,7 +1211,7 @@ function renderMainNavigation(id){
   '<button class="officeBoardNav '+(id==='officeBoard'?'active':'')+'" type="button" aria-current="'+(id==='officeBoard'?'page':'false')+'" onclick="switchPage(\'officeBoard\')">'+navTileIcon('officeBoard','공유 메모')+'</button>'+
   admin+'</div>';
  $('nav').innerHTML=primary+tools;
- if(typeof window!=='undefined')window.FirstHyundaiNavCollapse?.update?.();
+ if(typeof window!=='undefined')window.FirstHyundaiNavCollapse?.update?.(true);
 }
 // A detail sheet is its own full-screen view; the scrollable list stays intact.
 let activeApartmentSheet=null, apartmentReturnFocus=null;
