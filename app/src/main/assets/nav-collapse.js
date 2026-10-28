@@ -1,4 +1,4 @@
-/* v2.1.34 · A calm, scroll-linked morph of the existing six-menu grid.
+/* v2.1.35 · A calm, scroll-linked morph of the existing six-menu grid.
  * No DOM replacement, page navigation hooks, transform effects or extra timers.
  * Natural vertical scrolling controls density; reduced-motion uses a direct step.
  */
@@ -28,18 +28,18 @@
   // Older Android WebViews reject multiplication within CSS calc().
   // Supply actual CSS lengths so both rows always retain identical geometry.
   const lengths={
-   '--fhd-dock-gap':9-3*rounded,
-   '--fhd-shell-padding':8-3*rounded,
-   '--fhd-shell-margin':13-4*rounded,
+   '--fhd-dock-gap':9-5*rounded,
+   '--fhd-shell-padding':8-4*rounded,
+   '--fhd-shell-margin':13-6*rounded,
    '--fhd-shell-radius':20-5*rounded,
-   '--fhd-column-gap':9-4*rounded,
-   '--fhd-tile-height':90-32*rounded,
-   '--fhd-tile-padding':8-4*rounded,
-   '--fhd-tile-gap':6-3*rounded,
-   '--fhd-tile-radius':14-3*rounded,
+   '--fhd-column-gap':9-5*rounded,
+   '--fhd-tile-height':90-42*rounded,
+   '--fhd-tile-padding':8-5*rounded,
+   '--fhd-tile-gap':6-5*rounded,
+   '--fhd-tile-radius':14-4*rounded,
    '--fhd-nav-font':15-3*rounded,
-   '--fhd-nav-font-small':14-2.5*rounded,
-   '--fhd-nav-icon':29-11*rounded
+   '--fhd-nav-font-small':14-2*rounded,
+   '--fhd-nav-icon':29-12*rounded
   };
   for(const [name,value] of Object.entries(lengths))
    nav.style.setProperty(name,value.toFixed(2)+'px');
