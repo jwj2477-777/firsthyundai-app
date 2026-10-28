@@ -366,24 +366,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.38 gently eased proportional navigation APK
+      - name: Publish v2.1.39 unified six-page headings APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.38.apk
-          unzip -t FirstHyundai-v2.1.38.apk | grep 'No errors detected'
-          if gh release view v2.1.38 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.39.apk
+          unzip -t FirstHyundai-v2.1.39.apk | grep 'No errors detected'
+          if gh release view v2.1.39 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.38 FirstHyundai-v2.1.38.apk \
+            gh release create v2.1.39 FirstHyundai-v2.1.39.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.38 · 스크롤 메뉴 미세 부드러움 개선' \
-              --notes '사용자가 만족한 0~210px 스크롤 비례 축소 구조는 유지했습니다. 시작과 마지막에만 미세한 이징을 가미한 72% 선형+28% smoothstep 혼합곡선으로 6개 메뉴가 손가락 움직임을 자연스럽게 따르도록 했습니다. 매 프레임 여섯 버튼의 height/min/max를 개별 수정하던 방식 대신 메뉴 재생성 때 한 번만 공유 CSS 변수에 바인딩하여 18회 이상의 불필요한 스타일 쓰기를 줄였습니다. 기존 90px→48px, 모든 아이콘 29px→17px, 글씨 15px→12px, 상하 메뉴 동일성 및 선택 효과, 보안·업무 기능을 그대로 유지합니다. v2.1.38/build189.'
+              --title '퍼스트현대 v2.1.39 · 메인 6개 화면 제목과 강조선 통일' \
+              --notes '메인 6개 탭(실거래/아파트정보/뉴스/오늘요약/계약문자/공유메모)과 관련 실거래 하위 화면의 제목은 20px(좁은 화면 19px), 보조정보는 14px, 왼쪽 강조선은 4px×48px로 통일했습니다. 각 화면의 고유 강조색과 실거래 수집 시각, 갱신 버튼, 메뉴 스크롤 축소, 계약/뉴스/메모 기능을 그대로 유지합니다. v2.1.39/build190.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.38 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.38 --apk FirstHyundai-v2.1.38.apk
+          gh release upload v2.1.39 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.39 --apk FirstHyundai-v2.1.39.apk
 
 

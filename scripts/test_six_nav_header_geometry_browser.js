@@ -48,6 +48,19 @@ async function verify(){
    check(!!header,'Missing heading '+page);
    const h=header.querySelector('h2');
    const styles=getComputedStyle(h),headRect=rect(header);
+   const accent=getComputedStyle(header,'::before');
+   check(accent.content!=='none'&&accent.display!=='none','Missing accent on '+page);
+   check(accent.width==='4px'&&accent.height==='48px',
+    'Accent stroke width/length mismatch '+page+': '+accent.width+'/'+accent.height);
+   check(accent.left==='0px'&&accent.top==='3px'&&accent.bottom==='auto',
+    'Accent position mismatch '+page);
+   if(page!=='contracts'){
+    const meta=header.querySelector('p.tiny:not(.hidden),time.overviewBriefDate');
+    check(!!meta,'Missing subtitle metadata on '+page);
+    const m=getComputedStyle(meta);
+    check(m.fontSize==='14px'&&m.lineHeight==='21px'&&m.fontWeight==='500',
+     'Metadata typography mismatch '+page+': '+m.fontSize+'/'+m.lineHeight+'/'+m.fontWeight);
+   }
    const referenceHeading={font:styles.fontSize,weight:styles.fontWeight,
     height:headRect.h,top:headRect.y,left:headRect.x};
    if(!reference)reference=referenceHeading;

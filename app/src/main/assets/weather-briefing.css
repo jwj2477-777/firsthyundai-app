@@ -339,3 +339,46 @@ body[data-season-theme]:not([data-season-theme="default"]) #overview .overviewWe
 @media(prefers-reduced-motion:reduce){
  #overview .overviewHourlyChevron{transition:none}
 }
+
+
+/* v2.1.39: Final shared heading geometry for all six main tabs and same-tier
+   apartment/officetel pages. Keep page-specific accents and live status intact.
+   Position and length of the accent are independent of metadata wrapping. */
+:is(#trades,#nearby,#new,#officetel,#complexes,#news,#overview,#officeBoard).page>.sectionTitle:first-child,
+#contracts.page>.contractHero.contractHeroCompact{
+ box-sizing:border-box;display:flex;align-items:flex-start;justify-content:space-between;
+ position:relative;gap:9px;min-height:55px;margin:16px 0 12px;padding:0 0 0 13px;
+}
+:is(#trades,#nearby,#new,#officetel,#complexes,#news,#overview,#officeBoard).page>.sectionTitle:first-child::before,
+#contracts.page>.contractHero.contractHeroCompact::before{
+ content:"";display:block;position:absolute;left:0;top:3px;bottom:auto;
+ width:4px;height:48px;border-radius:7px;background:#8794A9;
+}
+:is(#trades,#nearby,#new,#officetel).page>.sectionTitle:first-child::before{background:var(--ui2-trades)}
+#complexes.page>.sectionTitle:first-child::before{background:var(--ui2-homes)}
+#news.page>.sectionTitle:first-child::before{background:var(--ui2-news)}
+#overview.page>.sectionTitle:first-child::before{background:var(--ui2-summary)}
+#officeBoard.page>.sectionTitle:first-child::before{background:#C49C50}
+#contracts.page>.contractHero.contractHeroCompact::before{background:var(--ui2-contracts,#9C5737)}
+:is(#trades,#nearby,#new,#officetel,#complexes,#news,#overview,#officeBoard).page>.sectionTitle:first-child h2,
+#contracts.page>.contractHero.contractHeroCompact h2{
+ margin:0;font-family:inherit;font-size:20px;line-height:1.4;font-weight:820;
+ letter-spacing:-.5px;color:#243B44;word-break:keep-all;overflow-wrap:break-word;
+}
+:is(#trades,#nearby,#new,#officetel,#complexes,#news,#officeBoard).page>.sectionTitle:first-child>div,
+#overview.page>.sectionTitle:first-child>.overviewBriefHeadingCopy{flex:1 1 auto;min-width:0}
+:is(#trades,#nearby,#new,#officetel,#complexes,#news,#officeBoard).page>.sectionTitle:first-child p.tiny,
+#overview.page>.sectionTitle:first-child time.overviewBriefDate{
+ display:block;margin:6px 0 0;min-height:21px;font-family:inherit;
+ font-size:14px;line-height:1.5;font-weight:500;letter-spacing:-.12px;
+ color:#536A71;word-break:keep-all;overflow-wrap:break-word;
+}
+:is(#trades,#nearby,#new,#officetel,#complexes,#news,#overview,#officeBoard).page>.sectionTitle:first-child>.refreshAction{
+ flex:0 0 auto;min-width:74px;min-height:49px;align-self:flex-start;
+}
+@media(max-width:380px){
+ :is(#trades,#nearby,#new,#officetel,#complexes,#news,#overview,#officeBoard).page>.sectionTitle:first-child,
+ #contracts.page>.contractHero.contractHeroCompact{min-height:81px}
+ :is(#trades,#nearby,#new,#officetel,#complexes,#news,#overview,#officeBoard).page>.sectionTitle:first-child h2,
+ #contracts.page>.contractHero.contractHeroCompact h2{font-size:19px;letter-spacing:-.55px}
+}
