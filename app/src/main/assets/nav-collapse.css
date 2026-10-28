@@ -8,21 +8,20 @@
  z-index:45;
  isolation:isolate;
  display:grid;
- gap:calc(9px - 3px * var(--fhd-nav-factor));
- padding:calc(8px - 3px * var(--fhd-nav-factor));
+ gap:var(--fhd-dock-gap,9px);
+ padding:var(--fhd-shell-padding,8px);
  margin-left:-8px;
  margin-right:-8px;
- margin-bottom:calc(13px - 4px * var(--fhd-nav-factor));
+ margin-bottom:var(--fhd-shell-margin,13px);
  border:1px solid rgba(211,225,219,.75);
- border-radius:calc(20px - 5px * var(--fhd-nav-factor));
+ border-radius:var(--fhd-shell-radius,20px);
  background:linear-gradient(160deg,rgba(255,255,252,.99),rgba(250,252,249,.98));
- box-shadow:0 calc(2px + 2px * var(--fhd-nav-factor))
-   calc(10px + 5px * var(--fhd-nav-factor)) rgba(35,64,60,.09);
+ box-shadow:0 3px 14px rgba(35,64,60,.09);
 }
 #nav .primaryNav,#nav .utilityNav{
  display:grid;
  grid-template-columns:repeat(3,minmax(0,1fr));
- gap:calc(9px - 4px * var(--fhd-nav-factor));
+ gap:var(--fhd-column-gap,9px);
  margin:0;
  align-items:stretch;
 }
@@ -35,14 +34,14 @@
  align-items:center;
  min-width:0;
  width:100%;
- height:calc(90px - 32px * var(--fhd-nav-factor));
+ height:var(--fhd-tile-height,90px);
  min-height:0;
  max-height:none;
  margin:0;
- padding:calc(8px - 4px * var(--fhd-nav-factor)) 3px;
- gap:calc(6px - 3px * var(--fhd-nav-factor));
- border-radius:calc(14px - 3px * var(--fhd-nav-factor));
- font-size:calc(15px - 3px * var(--fhd-nav-factor));
+ padding:var(--fhd-tile-padding,8px) 3px;
+ gap:var(--fhd-tile-gap,6px);
+ border-radius:var(--fhd-tile-radius,14px);
+ font-size:var(--fhd-nav-font,15px);
  line-height:1.2;
  overflow:hidden;
  text-align:center;
@@ -54,8 +53,8 @@
  justify-content:center;
  align-items:center;
  flex:0 0 auto;
- width:calc(29px - 11px * var(--fhd-nav-factor));
- height:calc(29px - 11px * var(--fhd-nav-factor));
+ width:var(--fhd-nav-icon,29px);
+ height:var(--fhd-nav-icon,29px);
  font-size:inherit;
  line-height:1;
 }
@@ -86,7 +85,7 @@
 }
 @media(max-width:370px){
  #nav .primaryNav>button,#nav .utilityNav>button{
-  font-size:calc(14px - 2.5px * var(--fhd-nav-factor));
+  font-size:var(--fhd-nav-font-small,14px);
  }
 }
 @media(prefers-reduced-motion:reduce){
