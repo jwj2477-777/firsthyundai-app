@@ -70,6 +70,7 @@ on:
       - 'scripts/test_six_nav_header_geometry_browser.js'
       - 'scripts/test_notification_inbox_browser.js'
       - 'scripts/test_compact_nav_dock_browser.js'
+      - 'scripts/test_nav_scroll_collapse_browser.js'
       - 'scripts/test_officetel_heading_color.js'
       - 'scripts/test_office_on_demand.js'
       - 'scripts/test_public_hub.js'
@@ -220,6 +221,7 @@ jobs:
           node scripts/test_six_nav_header_geometry_browser.js
           node scripts/test_notification_inbox_browser.js
           node scripts/test_compact_nav_dock_browser.js
+          node scripts/test_nav_scroll_collapse_browser.js
           node scripts/test_officetel_heading_color.js
           node scripts/test_scroll_to_top.js
           node scripts/test_contract_broker.js
@@ -363,24 +365,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.33 minimal privileges and browser update APK
+      - name: Publish v2.1.34 fluid compact navigation APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.33.apk
-          unzip -t FirstHyundai-v2.1.33.apk | grep 'No errors detected'
-          if gh release view v2.1.33 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.34.apk
+          unzip -t FirstHyundai-v2.1.34.apk | grep 'No errors detected'
+          if gh release view v2.1.34 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.33 FirstHyundai-v2.1.33.apk \
+            gh release create v2.1.34 FirstHyundai-v2.1.34.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.33 · APK 자체설치 권한 제거 및 업데이트 보안 강화' \
-              --notes 'Google Play 프로텍트 차단 경고에 대응하여 앱이 직접 APK를 내려받거나 설치 권한을 요청하는 기능을 제거했습니다. 앱 업데이트 확인은 기존처럼 제공하고, 검증된 공식 GitHub 배포 파일 링크를 안드로이드 브라우저로 전달합니다. REQUEST_INSTALL_PACKAGES 선언 및 앱 내부 APK 설치·공유 경로를 제거하여 권한을 최소화했습니다. 본 개선만으로 Play 프로텍트 분류가 자동 해제되는 것은 아니며, Google의 앱 보안 심사 및 이의신청을 통한 확인이 별도로 필요합니다. 기존 업무·실거래·계약문자·메모·날씨와 계정 기능을 보존합니다. v2.1.33/build184.'
+              --title '퍼스트현대 v2.1.34 · 스크롤 연동 6개 메뉴 자연스러운 높이 축소' \
+              --notes '메인 화면 최상단에서는 기존 6개 메뉴 크기를 유지하고, 아래로 스크롤하면 메뉴 높이·아이콘·글자가 자연스럽게 줄어듭니다. 상단으로 되돌아오면 즉시 원래 크기로 복귀합니다. 스크롤 시 작아진 메뉴는 화면 상단에 고정되어 하단 내용을 더 쉽게 읽고 메뉴에 접근할 수 있습니다. 6개 버튼의 순서·기능·선택 색상 흐름은 유지하고, 최소 터치 높이 48px와 접근성의 동작 줄이기를 지원합니다. 기존 보안 강화(인앱 APK 설치 권한 제거), 계약문자, 실거래, 날씨, 가족 캘린더 기능은 유지합니다. v2.1.34/build185.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.33 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.33 --apk FirstHyundai-v2.1.33.apk
+          gh release upload v2.1.34 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.34 --apk FirstHyundai-v2.1.34.apk
 
 
