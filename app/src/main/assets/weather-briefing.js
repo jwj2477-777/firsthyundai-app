@@ -49,7 +49,7 @@
   return prefix+(h===0?'자정':h===12?'낮 12시':(h<12?'오전 ':'오후 ')+(h%12||12)+'시');
  }
  function summarize(doc,now=Date.now(),extra=[]){
-  const result={precip:'',mapAlert:'',coverage:false};
+  const result={precip:'',mapAlert:'',mapAlertTitle:'',mapAlertReason:'',coverage:false};
   // An unavailable/partial forecast is simply omitted from the customer-facing
   // office briefing. Only confirmed forecast precipitation produces a map-box action.
   if(!valid(doc,now))return result;
@@ -70,7 +70,9 @@
   result.coverage=complete;
   if(inside){
    const deadline=opening.date===nextDay(today)?'내일 오전 9시':'다음 영업일('+opening.date.slice(5).replace('-','/')+') 오전 9시';
-   result.mapAlert=timeLabel(inside.at,now)+'경 '+kinds[inside.type]+' 예보 · '+deadline+'까지 강수 가능성이 있습니다. 지도함을 실내에 들여놓고 퇴근하세요.';
+   result.mapAlertTitle='지도함을 실내로 옮겨주세요';
+   result.mapAlertReason=timeLabel(inside.at,now)+'경 '+kinds[inside.type]+' 예보 · '+deadline+'까지 강수 가능성이 있습니다.';
+   result.mapAlert=result.mapAlertTitle+' · '+result.mapAlertReason;
   }
   return result;
  }
@@ -197,8 +199,17 @@
   const extra=window.FirstHyundaiOfficeBoard?.closureDates?.()||[];
   const view=summarize(data,now,extra);
   renderHourly();
-  for(const [id,message] of [['overviewPrecipitation',view.mapAlert?'':view.precip],['overviewMapAlert',view.mapAlert]]){
-   const node=$(id);if(!node)continue;node.textContent=message;node.hidden=!message;
+  const mapBox=$('overviewMapAlert');
+  if(mapBox){
+   mapBox.hidden=!view.mapAlert;
+   const title=$('overviewMapAlertTitle'),reason=$('overviewMapAlertReason');
+   if(title)title.textContent=view.mapAlertTitle;
+   if(reason)reason.textContent=view.mapAlertReason;
+  }
+  const precip=$('overviewPrecipitation');
+  if(precip){
+   const message=view.mapAlert?'':view.precip;
+   precip.textContent=message;precip.hidden=!message;
   }
  }
  window.onFirstHyundaiWeatherBriefingFetched=result=>{
