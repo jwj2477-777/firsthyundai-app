@@ -12,11 +12,11 @@ const start=html.indexOf('<div id="overview"'),end=html.indexOf('<div id="office
 assert(start>=0&&end>start,'Unified overview exists before shared notes');
 const overview=html.slice(start,end);
 let previous=-1;
-for(const term of ['id="overviewWeatherMessage"','id="overviewPrecipitation"',
- 'id="overviewMapAlert"','id="overviewMemoBriefing"',
+for(const term of ['id="overviewMapAlert"','id="overviewWeatherMessage"',
+ 'id="overviewPrecipitation"','id="overviewMemoBriefing"',
  'id="overviewSongdoNews"','id="overviewTodayNewTrade"','id="overviewNewQuickCount"']){
  const next=overview.indexOf(term);
- assert(next>previous,'Weather, notices, agenda and trade follow task order: '+term);
+ assert(next>previous,'Priority map-box action, weather, agenda and trade follow task order: '+term);
  previous=next;
 }
 for(const term of ['id="overviewUnified"','id="overviewWeatherDate"',
