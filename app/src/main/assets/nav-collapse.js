@@ -47,6 +47,7 @@
   // to those NEW elements but do not restart CSS transitions on every scroll.
   if(initialized&&next===compact&&!force)return compact?1:0;
   compact=next;initialized=true;
+  nav.classList.toggle('fhdNavReduced',reduced());
   for(const [name,values] of Object.entries(EASED_PROPERTIES))
    nav.style.setProperty(name,values[compact?1:0]+'px');
   const height=(compact?48:90)+'px';
