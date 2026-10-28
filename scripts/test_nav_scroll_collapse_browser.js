@@ -43,10 +43,27 @@ async function verify(){
   window.scrollTo(0,250);api.update();
   const compact=tiles(),compressed=compact[0].getBoundingClientRect().height;
   const iconCompact=compact[0].querySelector('.navIcon svg').getBoundingClientRect().height;
+  const metrics=compact.map(b=>{
+   const glyph=b.querySelector('.navIcon svg').getBoundingClientRect();
+   const label=b.querySelector('.navLabel');
+   const labelStyle=getComputedStyle(label);
+   return {height:b.getBoundingClientRect().height,iconW:glyph.width,iconH:glyph.height,
+    font:parseFloat(labelStyle.fontSize),labelHeight:label.getBoundingClientRect().height};
+  });
   check(nav.dataset.navDensity==='compact','Deep scrolling shows compact dock');
-  check(compressed<=61&&compressed>=48,'Compact button remains at least 48px tap high');
-  check(original-compressed>=24,'Compact dock saves meaningful vertical space');
-  check(iconCompact<iconOriginal-5,'Navigation glyph scales down along with tile height');
+  check(compressed<=49&&compressed>=48,'Compact button should be 48px and retain comfortable touch area');
+  for(const metric of metrics){
+   check(Math.abs(metric.height-compressed)<.3,'All six touch targets should have the same compact height');
+   check(Math.abs(metric.iconW-metrics[0].iconW)<.3&&Math.abs(metric.iconH-metrics[0].iconH)<.3,
+    'Top and bottom rows MUST shrink their SVG graphics to exactly the same size: '+JSON.stringify(metrics));
+   check(Math.abs(metric.font-metrics[0].font)<.15,
+    'Top and bottom rows MUST use the same compact text size: '+JSON.stringify(metrics));
+   check(metric.iconW>=16&&metric.iconW<=18.5,'Icon remains legible at 17px: '+JSON.stringify(metrics));
+   check(metric.font>=11.5&&metric.font<=12.5,'Compact label remains readable around 12px: '+JSON.stringify(metrics));
+  }
+  check(original-compressed>=40,'Extra-compact dock must save more than forty pixels per row');
+  check(iconCompact<iconOriginal-10,'Navigation glyph must shrink more in extra-compact mode');
+  check(metrics[3].iconH<iconOriginal-10,'Lower-row icon must shrink as much as upper-row icon');
   check(Math.abs(nav.getBoundingClientRect().top)<=1.5,'Sticky menu stays at viewport top');
   check(compact.every(b=>Math.abs(b.getBoundingClientRect().height-compressed)<.4),
    'All six buttons are equal height at compact density');
@@ -63,7 +80,7 @@ async function verify(){
   check(api.progress(85)===1&&api.progress(50)===0,
    'Reduced-motion mode switches directly, with no morph');
   window.matchMedia=normal;
-  document.body.innerHTML='<pre id="nav-collapse-browser">PASS top normal → partial fluid → sticky compact → restored; six equal buttons and preserved actions</pre>';
+  document.body.innerHTML='<pre id="nav-collapse-browser">PASS 48px compact with six identically scaled 17px icons/12px labels, reversible scroll and preserved actions</pre>';
  }catch(e){document.body.innerHTML='<pre id="nav-collapse-browser">FAIL '+e.message+'</pre>'}
 }
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'fhd-nav-collapse-'));
