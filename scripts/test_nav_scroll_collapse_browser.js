@@ -12,6 +12,17 @@ async function verify(){
   fetchRemote=async()=>null;
   const check=(valid,msg)=>{if(!valid)throw Error(msg)};
   const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  // Headless Chromium's --virtual-time-budget can advance JS timers without
+  // advancing compositor frames. Finish transitions before checking terminal
+  // geometry; we separately assert that easing was actually configured.
+  const finishAnimations=()=>{
+   for(const element of [nav,...nav.querySelectorAll('*')]){
+    for(const animation of element.getAnimations?.()||[]){
+     if(animation.playState==='running'||animation.playState==='pending')
+      try{animation.finish()}catch(e){}
+    }
+   }
+  };
   const nav=document.getElementById('nav'),controller=window.FirstHyundaiNavCollapse;
   const tiles=()=>[...document.querySelectorAll('#nav .primaryNav>button,#nav .utilityNav>button:not(.adminCenterNav)')];
   const icon=button=>button.querySelector('.navIcon svg').getBoundingClientRect();
@@ -61,6 +72,7 @@ async function verify(){
     'Scroll anchoring must not cause compact/full state oscillation: '+scrollY);
   }
   await pause(300);
+  finishAnimations();
   const compact=tiles(),short=compact[0].getBoundingClientRect().height;
   const metrics=compact.map(b=>({
    height:b.getBoundingClientRect().height,
@@ -92,6 +104,7 @@ async function verify(){
   window.scrollTo(0,0);controller.update();
   check(nav.dataset.navDensity==='full','At top, the six original tiles return');
   await pause(450);
+  finishAnimations();
   check(tiles().every(b=>Math.abs(b.getBoundingClientRect().height-fullHeight)<.3),
    'Full tile height restores smoothly after scrolling to top');
   const originalMatch=window.matchMedia;
