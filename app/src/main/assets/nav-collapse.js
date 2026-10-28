@@ -1,23 +1,20 @@
-/* v2.1.36 · Smooth, stable, two-state navigation.
- * Layout-driven scroll animation caused feedback: changing the dock height
- * shifted scrollY, which then changed the dock height again every frame.
- * Only change size ONCE after crossing a wide hysteresis threshold; let CSS
- * interpolate all six tiles together. Never rebuild DOM or animate positions.
+/* v2.1.37 · Genuine proportional scroll-linked navigation.
+ * The former 140px on/off trigger was the abrupt jump the user observed.
+ * We now map scroll distance continuously to six identical button dimensions.
+ * Disabling native scroll anchoring prevents layout-height feedback/jitter.
  */
 (function(){
  'use strict';
  const nav=document.getElementById('nav');
  if(!nav)return;
- // The gap between thresholds exceeds the dock's entire height reduction.
- // Scroll anchoring cannot immediately reverse a collapse.
- const COLLAPSE_AT=140, RESTORE_AT=8;
- const EASED_PROPERTIES={
+ const RANGE=210,MIN_HEIGHT=48,MAX_HEIGHT=90;
+ const BETWEEN={
   '--fhd-dock-gap':[9,4],
   '--fhd-shell-padding':[8,4],
   '--fhd-shell-margin':[13,7],
   '--fhd-shell-radius':[20,15],
   '--fhd-column-gap':[9,4],
-  '--fhd-tile-height':[90,48],
+  '--fhd-tile-height':[MAX_HEIGHT,MIN_HEIGHT],
   '--fhd-tile-padding':[8,3],
   '--fhd-tile-gap':[6,1],
   '--fhd-tile-radius':[14,10],
@@ -25,39 +22,40 @@
   '--fhd-nav-font-small':[14,12],
   '--fhd-nav-icon':[29,17]
  };
- let compact=false,initialized=false,scheduled=false;
+ let last=-1,scheduled=false;
+ // Scroll anchoring would otherwise adjust scrollTop when the sticky menu
+ // changes the page height. The menu must follow the gesture, not feed back.
+ const scroller=document.scrollingElement||document.documentElement;
+ if(scroller?.style)scroller.style.overflowAnchor='none';
  function scrollPosition(){
   return Math.max(0,Number(window.scrollY)||0,
-   Number(document.scrollingElement?.scrollTop)||0,
+   Number(scroller?.scrollTop)||0,
    Number(document.documentElement?.scrollTop)||0);
  }
  function reduced(){
   return !!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches||
    window.FirstHyundaiUIOptions?.get?.()?.motion==='reduced';
  }
- // Exposed for deterministic regression checks (not an animation frame counter).
  function progress(y){
-  return y>=COLLAPSE_AT?1:0;
+  return Math.max(0,Math.min(1,(Number(y)||0)/RANGE));
  }
  function update(force=false){
   scheduled=false;
-  const pos=scrollPosition();
-  const next=compact?(pos>RESTORE_AT):(pos>=COLLAPSE_AT);
-  // Rendering a different page recreates the six buttons. Reapply dimensions
-  // to those NEW elements but do not restart CSS transitions on every scroll.
-  if(initialized&&next===compact&&!force)return compact?1:0;
-  compact=next;initialized=true;
-  nav.classList.toggle('fhdNavReduced',reduced());
-  for(const [name,values] of Object.entries(EASED_PROPERTIES))
-   nav.style.setProperty(name,values[compact?1:0]+'px');
-  const height=(compact?48:90)+'px';
-  for(const button of nav.querySelectorAll('.primaryNav>button, .utilityNav>button:not(.adminCenterNav)')){
-   button.style.setProperty('height',height,'important');
-   button.style.setProperty('min-height',height,'important');
-   button.style.setProperty('max-height',height,'important');
+  const position=scrollPosition();
+  const density=reduced()?(position>=105?1:0):progress(position);
+  if(!force&&Math.abs(density-last)<0.00015)return density;
+  last=density;
+  for(const [name,[full,small]] of Object.entries(BETWEEN)){
+   nav.style.setProperty(name,(full+(small-full)*density).toFixed(3)+'px');
   }
-  nav.dataset.navDensity=compact?'compact':'full';
-  return compact?1:0;
+  const height=(MAX_HEIGHT+(MIN_HEIGHT-MAX_HEIGHT)*density).toFixed(3)+'px';
+  for(const tile of nav.querySelectorAll('.primaryNav>button,.utilityNav>button:not(.adminCenterNav)')){
+   tile.style.setProperty('height',height,'important');
+   tile.style.setProperty('min-height',height,'important');
+   tile.style.setProperty('max-height',height,'important');
+  }
+  nav.dataset.navDensity=density>=.999?'compact':density<=.001?'full':'transitioning';
+  return density;
  }
  function request(){
   if(scheduled)return;
@@ -68,11 +66,6 @@
  window.addEventListener('scroll',request,{passive:true});
  window.addEventListener('resize',request,{passive:true});
  window.addEventListener('pageshow',request,{passive:true});
- window.FirstHyundaiNavCollapse={update,progress};
- // Initial presentation must not animate into place.
- nav.classList.add('fhdNavInitializing');
+ window.FirstHyundaiNavCollapse={update,progress,range:RANGE};
  update(true);
- if(typeof requestAnimationFrame==='function')
-  requestAnimationFrame(()=>nav.classList.remove('fhdNavInitializing'));
- else nav.classList.remove('fhdNavInitializing');
 })();
