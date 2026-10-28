@@ -12,7 +12,9 @@ for(const id of ['fhdWeatherDialog','weatherDetailEntry','fhdWeatherTemp','fhdWe
  assert(html.includes('id="'+id+'"'),'Missing weather-detail UI: '+id);
 assert(html.includes('aria-modal="true" aria-label="송도 상세 날씨" aria-hidden="true" hidden'));
 assert(html.includes('onclick="FirstHyundaiWeatherDetail.open()"'),'Briefing one-tap route missing');
-assert(html.includes('<script src="weather-detail.js"></script></body>'),'Weather detail must load after office board');
+assert(html.includes('<script src="weather-detail.js"></script>')&&
+ html.indexOf('<script src="office-board.js"></script>')<html.indexOf('<script src="weather-detail.js"></script>'),
+ 'Weather detail must load after office board, before the optional scroll menu controller');
 assert(html.includes('<link rel="stylesheet" href="weather-detail.css">'),'Detail stylesheet missing');
 assert(css.includes('.fhdWeatherPlot')&&css.includes('overflow-x:auto'),'Forecast graph must be touch scrollable');
 assert(css.includes('.fhdWeatherDialog[hidden]'),'Weather detail cannot cover dashboard when closed');
