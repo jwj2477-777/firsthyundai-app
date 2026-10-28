@@ -90,6 +90,10 @@ const result=api.summarize(parsed,now);
 assert(result.precip.includes('오늘 오후 4시')&&result.precip.includes('비 예보'),result.precip);
 assert(result.mapAlert.includes('눈 예보')&&result.mapAlert.includes('지도함'),result.mapAlert);
 assert(result.mapAlert.includes('내일 오전 9시'),result.mapAlert);
+assert.equal(result.mapAlertTitle,'지도함을 실내로 옮겨주세요','Map-box action should lead, not the rain narrative');
+assert(result.mapAlert.startsWith(result.mapAlertTitle),'Accessible advisory leads with the map-box action');
+assert(result.mapAlertReason.includes('눈 예보')&&result.mapAlertReason.includes('내일 오전 9시'),
+ 'The verified rain/snow forecast belongs in a shorter secondary reason');
 assert.equal(result.coverage,false,'Incomplete overnight forecast must be acknowledged');
 assert(!('mapCaution' in result),'Do not render missing-forecast explanations');
 const at=Date.parse('2026-10-26T16:10:00+09:00');
@@ -129,6 +133,22 @@ assert(overview.includes('overviewWeatherThermometer')&&overview.includes('overv
  'Weather icons are condition-specific vector artwork, not the previous large emoji');
 assert(briefingCss.includes('.overviewBriefDate')&&briefingCss.includes('.overviewWeatherGlyph'),
  'Modern heading date and glyph typography styles are present');
+const alertPos=overview.indexOf('id="overviewMapAlert"'),
+ weatherPos=overview.indexOf('id="overviewWeatherMessage"'),
+ hourlyPos=overview.indexOf('id="overviewHourlyToggle"');
+assert(alertPos>0&&alertPos<weatherPos&&alertPos<hourlyPos,
+ 'Map-box instruction must be the FIRST item inside the weather briefing panel');
+assert(overview.includes('id="overviewMapAlertTitle"')&&overview.includes('id="overviewMapAlertReason"'),
+ 'Action heading and forecast reason must be separate text elements');
+assert(overview.includes('aria-labelledby="overviewMapAlertTitle"')&&
+ overview.includes('aria-describedby="overviewMapAlertReason"'),
+ 'The indoor map-box reminder is accessible with action-first emphasis');
+assert(briefingCss.includes('.overviewMapActionCopy strong')&&
+ briefingCss.includes('.overviewMapActionCopy small')&&
+ briefingCss.includes('.overviewMapAction[hidden]'),
+ 'Distinct action styling, quieter forecast reason and hidden state required');
+assert(briefingCss.includes('#BD6039')&&briefingCss.includes('#FFF0E6'),
+ 'Map-box action has distinct brick accent and warm background');
 
 assert(api.weatherDisplay(obs,null,evening).source.includes('기상청 실황'),
  'Measured weather needs a clear observation label');
