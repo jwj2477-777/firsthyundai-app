@@ -365,24 +365,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.34 fluid compact navigation APK
+      - name: Publish v2.1.35 synchronized extra-compact six navigation tiles APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.34.apk
-          unzip -t FirstHyundai-v2.1.34.apk | grep 'No errors detected'
-          if gh release view v2.1.34 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.35.apk
+          unzip -t FirstHyundai-v2.1.35.apk | grep 'No errors detected'
+          if gh release view v2.1.35 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.34 FirstHyundai-v2.1.34.apk \
+            gh release create v2.1.35 FirstHyundai-v2.1.35.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.34 · 스크롤 연동 6개 메뉴 자연스러운 높이 축소' \
-              --notes '메인 화면 최상단에서는 기존 6개 메뉴 크기를 유지하고, 아래로 스크롤하면 메뉴 높이·아이콘·글자가 자연스럽게 줄어듭니다. 상단으로 되돌아오면 즉시 원래 크기로 복귀합니다. 스크롤 시 작아진 메뉴는 화면 상단에 고정되어 하단 내용을 더 쉽게 읽고 메뉴에 접근할 수 있습니다. 6개 버튼의 순서·기능·선택 색상 흐름은 유지하고, 최소 터치 높이 48px와 접근성의 동작 줄이기를 지원합니다. 기존 보안 강화(인앱 APK 설치 권한 제거), 계약문자, 실거래, 날씨, 가족 캘린더 기능은 유지합니다. v2.1.34/build185.'
+              --title '퍼스트현대 v2.1.35 · 위·아래 버튼 동일 축소 · 48px 미니 메뉴' \
+              --notes '6개 메인 메뉴를 스크롤할 때 높이 90px에서 최소 48px까지 부드럽게 줄입니다. 기존에는 위쪽 3개 버튼만 글씨와 아이콘이 작아지고 아래쪽 3개는 다른 크기로 남았으나, 이제 두 줄 모두 동일한 SVG 크기(최소 17px)와 글씨 크기(최소 12px)를 적용합니다. 중간 스크롤 단계에서도 두 줄의 크기가 함께 변하고, 최상단 복귀 시 원래 크기로 되돌아옵니다. 선택 색상 및 버튼 기능 유지, APK 자체 설치 권한 제거 등 보안 강화도 유지합니다. v2.1.35/build186.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.34 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.34 --apk FirstHyundai-v2.1.34.apk
+          gh release upload v2.1.35 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.35 --apk FirstHyundai-v2.1.35.apk
 
 
