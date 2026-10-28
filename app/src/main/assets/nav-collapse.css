@@ -76,6 +76,13 @@
  overflow-wrap:normal;
  word-break:keep-all;
 }
+/* Upper-row selected tiles have no suffix. Lower-row selected tiles should not
+   gain an extra ✓ line that makes only their icon/text appear larger. */
+#nav .primaryNav>button.active::after,
+#nav .utilityNav>button.active::after{
+ content:none!important;
+ display:none!important;
+}
 #nav .utilityNav>.adminCenterNav{
  grid-column:1/-1;
  height:48px;
