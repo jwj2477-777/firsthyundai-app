@@ -1,4 +1,4 @@
-/* v2.1.35 · Six equally scaled, ultra-compact scroll-responsive menu buttons.
+/* v2.1.36 · Six equally scaled, ultra-compact scroll-responsive menu buttons.
    Full-size at the top, compact and accessible as content moves upward.
    All active colors, button order, animation roles and click handlers stay intact. */
 #nav{
@@ -107,4 +107,40 @@
   transition:none!important;
  }
 }
-/* Touch targets are at least 48 CSS pixels, including when minimized.\n * The same pixel variables drive both rows' label and actual SVG bounds. */
+/* Touch targets are at least 48 CSS pixels, including when minimized.
+ * The same pixel variables drive both rows' label and actual SVG bounds. */
+
+/* One smooth transition per direction change, NOT per scroll frame. The old
+   height-to-scroll feedback loop is removed by nav-collapse.js hysteresis. */
+#nav{
+ transition:gap .32s cubic-bezier(.22,1,.36,1),
+  padding .32s cubic-bezier(.22,1,.36,1),
+  margin-bottom .32s cubic-bezier(.22,1,.36,1),
+  border-radius .32s cubic-bezier(.22,1,.36,1);
+}
+#nav .primaryNav,#nav .utilityNav{
+ transition:gap .32s cubic-bezier(.22,1,.36,1);
+}
+#nav .primaryNav>button,#nav .utilityNav>button:not(.adminCenterNav){
+ transition-property:height,min-height,max-height,padding,gap,border-radius,
+  font-size,color,border-color,box-shadow!important;
+ transition-duration:.32s,.32s,.32s,.32s,.32s,.32s,.32s,.18s,.18s,.18s!important;
+ transition-timing-function:cubic-bezier(.22,1,.36,1)!important;
+}
+#nav .primaryNav>button .navIcon,
+#nav .utilityNav>button:not(.adminCenterNav) .navIcon{
+ transition:width .32s cubic-bezier(.22,1,.36,1),
+  height .32s cubic-bezier(.22,1,.36,1),
+  flex-basis .32s cubic-bezier(.22,1,.36,1);
+}
+#nav .primaryNav>button .navLabel,
+#nav .utilityNav>button:not(.adminCenterNav) .navLabel{
+ transition:font-size .32s cubic-bezier(.22,1,.36,1);
+}
+#nav.fhdNavInitializing,#nav.fhdNavInitializing *,
+#nav.fhdNavReduced,#nav.fhdNavReduced *{
+ transition:none!important;
+}
+@media(prefers-reduced-motion:reduce){
+ #nav,#nav *{transition:none!important}
+}
