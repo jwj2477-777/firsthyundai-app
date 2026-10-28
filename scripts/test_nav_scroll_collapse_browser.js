@@ -10,110 +10,84 @@ async function verify(){
  try{
   await document.fonts.ready;
   fetchRemote=async()=>null;
-  const check=(valid,msg)=>{if(!valid)throw Error(msg)};
-  const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-  // Headless Chromium's --virtual-time-budget can advance JS timers without
-  // advancing compositor frames. Finish transitions before checking terminal
-  // geometry; we separately assert that easing was actually configured.
-  const finishAnimations=()=>{
-   for(const element of [nav,...nav.querySelectorAll('*')]){
-    for(const animation of element.getAnimations?.()||[]){
-     if(animation.playState==='running'||animation.playState==='pending')
-      try{animation.finish()}catch(e){}
-    }
-   }
-  };
-  const nav=document.getElementById('nav'),controller=window.FirstHyundaiNavCollapse;
-  const tiles=()=>[...document.querySelectorAll('#nav .primaryNav>button,#nav .utilityNav>button:not(.adminCenterNav)')];
-  const icon=button=>button.querySelector('.navIcon svg').getBoundingClientRect();
-  const font=button=>parseFloat(getComputedStyle(button.querySelector('.navLabel')).fontSize);
-  check(controller&&typeof controller.update==='function','Scroll controller is unavailable');
-  check(tiles().length===6,'All 6 original destinations must stay visible');
-  check(getComputedStyle(nav).position==='sticky','Dock must remain sticky');
-  const spacer=document.createElement('div');
-  spacer.style.height='2500px';document.querySelector('main').appendChild(spacer);
-  window.scrollTo(0,0);controller.update();
-  await pause(30);
-  const initial=tiles();
-  const before=initial.map(button=>({
-   label:button.innerText,action:button.getAttribute('onclick'),
-   active:button.getAttribute('aria-current')
-  }));
-  const fullHeight=initial[0].getBoundingClientRect().height;
-  const fullIcon=icon(initial[0]).height;
-  check(fullHeight>=80&&fullHeight<=95,'Full-sized navigation must stay close to original: '+fullHeight);
-  check(nav.dataset.navDensity==='full','At top menu is full size');
-  check(initial.every(b=>Math.abs(b.getBoundingClientRect().height-fullHeight)<.3),
-   'Both rows must start at exactly the same height');
-  const transition=getComputedStyle(initial[0]).transitionDuration;
-  check(transition.includes('0.32s'),'Tile resize must use a finite CSS easing, not instant frame-by-frame resizing: '+transition);
-
-  // A normal small scroll must not repeatedly reflow button dimensions.
-  window.scrollTo(0,85);controller.update();
-  check(nav.dataset.navDensity==='full','Short scroll does not repeatedly resize the document');
-  check(initial.every(b=>Math.abs(b.getBoundingClientRect().height-fullHeight)<.4),
-   'Small scroll must not induce pixel-by-pixel layout jitter');
-
-  // Trigger exactly one CSS transition. It must not bounce between states,
-  // even if the browser adjusts scrollY while the dock reduces its height.
-  window.scrollTo(0,185);controller.update();
-  check(nav.dataset.navDensity==='compact','Scrolling past trigger starts smooth collapse');
-  await pause(110);
-  const halfway=tiles().map(b=>({height:b.getBoundingClientRect().height,
-   icon:icon(b).height,font:font(b)}));
-  check(halfway.every(x=>Math.abs(x.height-halfway[0].height)<.5),
-   'All six tile heights animate in lockstep: '+JSON.stringify(halfway));
-  check(halfway.every(x=>Math.abs(x.icon-halfway[0].icon)<.5&&
-   Math.abs(x.font-halfway[0].font)<.2),
-   'Both rows share the same easing during animation: '+JSON.stringify(halfway));
-  for(let frame=0;frame<6;frame++){
-   await pause(30);controller.update();
-   check(nav.dataset.navDensity==='compact',
-    'Scroll anchoring must not cause compact/full state oscillation: '+scrollY);
-  }
-  await pause(300);
-  finishAnimations();
-  const compact=tiles(),short=compact[0].getBoundingClientRect().height;
-  const metrics=compact.map(b=>({
+  const check=(ok,message)=>{if(!ok)throw Error(message)};
+  const nav=document.getElementById('nav'),api=window.FirstHyundaiNavCollapse;
+  const buttons=()=>[...nav.querySelectorAll('.primaryNav>button,.utilityNav>button:not(.adminCenterNav)')];
+  const metrics=()=>buttons().map(b=>({
    height:b.getBoundingClientRect().height,
-   width:icon(b).width,icon:icon(b).height,font:font(b)
+   icon:b.querySelector('.navIcon svg').getBoundingClientRect().height,
+   font:parseFloat(getComputedStyle(b.querySelector('.navLabel')).fontSize),
+   onclick:b.getAttribute('onclick'),
+   label:b.innerText,
+   active:b.getAttribute('aria-current')
   }));
-  check(short>=47.95&&short<=48.1,'At rest all tiles must be 48px: '+JSON.stringify(metrics));
-  check(metrics.every(m=>Math.abs(m.height-short)<.2&&
-   Math.abs(m.icon-metrics[0].icon)<.3&&Math.abs(m.width-metrics[0].width)<.3&&
-   Math.abs(m.font-metrics[0].font)<.15),
-   'Six buttons, both rows, use identical compact size: '+JSON.stringify(metrics));
-  check(metrics.every(m=>m.icon>=16&&m.icon<=18.5&&m.font>=11.5&&m.font<=12.5),
-   'Compact graphics and labels are 17px and 12px: '+JSON.stringify(metrics));
-  check(fullHeight-short>38&&fullIcon-metrics[0].icon>=10,
-   'Compact reduces menu content footprint without losing touch size');
-  check(Math.abs(nav.getBoundingClientRect().top)<1.6,'Dock must remain sticky when compressed');
-  check(document.documentElement.scrollWidth<=innerWidth+1,
-   'No sideways scrolling during collapsed state');
-  check(compact.every((b,i)=>b.getAttribute('onclick')===before[i].action&&
-   b.getAttribute('aria-current')===before[i].active&&b.innerText===before[i].label),
-   'Selection styles and six original click routes remain intact');
-  controller.update();controller.update();
-  check(compact.every(b=>Math.abs(b.getBoundingClientRect().height-48)<.15),
-   'Repeated scroll updates never restart a completed transition');
-  // Re-render replaces elements; controller must only restore sizes once.
+  check(api&&api.range===210,'Scroll control must map continuously over 210px');
+  check(buttons().length===6,'Six buttons are required');
+  check(getComputedStyle(nav).position==='sticky','Menu remains reachable while scrolling');
+  check(getComputedStyle(document.scrollingElement).overflowAnchor==='none',
+   'Native scroll anchoring must not fight menu height changes');
+  check(getComputedStyle(nav).transitionDuration==='0s',
+   'Scroll-linked geometry must not have a second timed CSS easing');
+  const filler=document.createElement('div');
+  filler.style.height='2600px';document.querySelector('main').appendChild(filler);
+  window.scrollTo(0,0);api.update(true);
+  const beginning=metrics();
+  check(beginning.every(x=>x.height>=89.8&&x.height<=90.2),
+   'Original six large button sizes are preserved');
+  const signatures=beginning.map(({onclick,label,active})=>({onclick,label,active}));
+  const heights=[];
+  for(const offset of [0,21,42,63,84,105,126,147,168,189,210]){
+   window.scrollTo(0,offset);
+   api.update();
+   const fraction=api.progress(offset);
+   const m=metrics();
+   const expected=90-42*fraction;
+   check(m.every(x=>Math.abs(x.height-expected)<1),
+    'Menu does not follow proportional scroll at '+offset+'px: '+JSON.stringify(m));
+   check(m.every(x=>Math.abs(x.height-m[0].height)<.3),
+    'Top/bottom row heights differ at '+offset+'px');
+   check(m.every(x=>Math.abs(x.icon-m[0].icon)<.3&&Math.abs(x.font-m[0].font)<.15),
+    'Top/bottom SVG or font sizes differ at '+offset+'px: '+JSON.stringify(m));
+   check(Math.abs(window.scrollY-offset)<2,
+    'Menu reflow changed scroll position; feedback detected at '+offset+'px: '+scrollY);
+   heights.push(m[0].height);
+  }
+  check(heights.every((height,i)=>i===0||height<heights[i-1]-2),
+   'There must be no sudden threshold jump, stall or reversed scaling: '+heights.join(','));
+  check(Math.abs(heights[5]-69)<1,'Half scroll must yield half height (~69px), not an all-at-once switch');
+  const compact=metrics();
+  check(compact.every(x=>x.height>=47.95&&x.height<=48.15),'Minimum 48px touch target: '+JSON.stringify(compact));
+  check(compact.every(x=>x.icon>=16&&x.icon<=18.5&&x.font>=11.5&&x.font<=12.5),
+   'All six labels/icons must be equally compact and legible');
+  check(Math.abs(nav.getBoundingClientRect().top)<=1.6,'Compact dock remains sticky');
+  check(document.documentElement.scrollWidth<=innerWidth+1,'Horizontal overflow at compact size');
+  check(compact.every((x,i)=>JSON.stringify({onclick:x.onclick,label:x.label,active:x.active})===JSON.stringify(signatures[i])),
+   'Button actions and selected state must remain unchanged');
+  // Feedback test: unchanged scroll offset must not change sizes on repeated calls.
+  for(let t=0;t<10;t++)api.update();
+  check(metrics().every(x=>Math.abs(x.height-48)<.15),
+   'Repeated scroll callbacks cause height oscillation');
   renderMainNavigation(currentPage);
-  finishAnimations(); // New DOM may start inherited CSS transitions in headless Chromium.
-  check(tiles().length===6&&tiles().every(b=>Math.abs(b.getBoundingClientRect().height-48)<.2),
-   'Newly rendered buttons preserve compact state without size mismatch');
-
-  window.scrollTo(0,0);controller.update();
-  check(nav.dataset.navDensity==='full','At top, the six original tiles return');
-  await pause(450);
-  finishAnimations();
-  check(tiles().every(b=>Math.abs(b.getBoundingClientRect().height-fullHeight)<.3),
-   'Full tile height restores smoothly after scrolling to top');
-  const originalMatch=window.matchMedia;
-  window.matchMedia=q=>q.includes('prefers-reduced-motion')?{matches:true}:originalMatch(q);
-  window.scrollTo(0,190);controller.update();
-  check(nav.classList.contains('fhdNavReduced'),'System reduced motion disables menu transitions');
-  window.matchMedia=originalMatch;
-  document.body.innerHTML='<pre id="nav-collapse-browser">PASS stable hysteresis, eased synchronized 6-button collapse/expand, 48px touch targets and reduced motion</pre>';
+  check(buttons().length===6&&metrics().every(x=>Math.abs(x.height-48)<.15),
+   'Re-render retains correct compact dimensions without jumping');
+  // Returning up must restore continuously, not cross a single threshold.
+  const returning=[];
+  for(const offset of [189,168,147,126,105,84,63,42,21,0]){
+   window.scrollTo(0,offset);api.update();
+   const m=metrics(),expected=90-42*api.progress(offset);
+   check(m.every(x=>Math.abs(x.height-expected)<1),
+    'Menu expands disproportionately during return at '+offset);
+   returning.push(m[0].height);
+  }
+  check(returning.every((height,i)=>i===0||height>returning[i-1]+2),
+   'Returning should expand gradually rather than abruptly: '+returning.join(','));
+  check(nav.dataset.navDensity==='full','Top position restores original full size');
+  const match=window.matchMedia;
+  window.matchMedia=q=>q.includes('prefers-reduced-motion')?{matches:true}:match(q);
+  window.scrollTo(0,105);api.update();
+  check(metrics().every(x=>Math.abs(x.height-48)<.2),'Reduced motion permits instant compact state');
+  window.matchMedia=match;
+  document.body.innerHTML='<pre id="nav-collapse-browser">PASS 11 proportional steps up/down, no feedback loop, six synchronized icons+labels, 48px accessible tiles</pre>';
  }catch(e){document.body.innerHTML='<pre id="nav-collapse-browser">FAIL '+e.message+'</pre>'}
 }
 
