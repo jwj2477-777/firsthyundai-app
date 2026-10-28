@@ -382,3 +382,44 @@ body[data-season-theme]:not([data-season-theme="default"]) #overview .overviewWe
  :is(#trades,#nearby,#new,#officetel,#complexes,#news,#overview,#officeBoard).page>.sectionTitle:first-child h2,
  #contracts.page>.contractHero.contractHeroCompact h2{font-size:19px;letter-spacing:-.55px}
 }
+
+/* v2.1.40 — action FIRST, forecast evidence second.
+   Keep the work reminder distinct from ordinary weather commentary. */
+#overview .overviewMapAction{
+ display:flex;align-items:flex-start;gap:12px;min-width:0;
+ margin:0 0 16px;padding:15px 14px;
+ border:1px solid #DFB398;border-left:5px solid #BD6039;border-radius:14px;
+ background:linear-gradient(120deg,#FFF0E6 0%,#FFF8F0 100%);
+ box-shadow:0 2px 9px rgba(107,61,32,.075);
+ color:#7B3C27;
+}
+#overview .overviewMapAction[hidden]{display:none!important}
+#overview .overviewMapActionIcon{
+ width:39px;height:39px;flex:0 0 39px;
+ display:flex;align-items:center;justify-content:center;
+ background:#F9D9C3;border:1px solid #EBBEA0;border-radius:11px;
+ color:#99502F;
+}
+#overview .overviewMapActionIcon svg{width:25px;height:25px;display:block}
+#overview .overviewMapActionCopy{min-width:0;display:flex;flex-direction:column;gap:4px}
+#overview .overviewMapActionEyebrow{
+ color:#A55736;font-size:10.5px;font-weight:790;letter-spacing:.02em;line-height:1.35;
+}
+#overview .overviewMapActionCopy strong{
+ display:block;color:#773823;font-size:17px;line-height:1.4;
+ font-weight:860;letter-spacing:-.45px;word-break:keep-all;overflow-wrap:break-word;
+}
+#overview .overviewMapActionCopy small{
+ display:block;color:#786153;font-size:12px;line-height:1.55;
+ font-weight:530;word-break:keep-all;overflow-wrap:break-word;
+}
+@media(max-width:370px){
+ #overview .overviewMapAction{padding:12px 10px;gap:9px;margin-bottom:13px}
+ #overview .overviewMapActionIcon{width:35px;height:35px;flex-basis:35px}
+ #overview .overviewMapActionIcon svg{width:22px;height:22px}
+ #overview .overviewMapActionCopy strong{font-size:15.5px}
+ #overview .overviewMapActionCopy small{font-size:11.5px}
+}
+body[data-app-contrast="high"] #overview .overviewMapAction{
+ border-color:#A44A2B;background:#FFF0E4;color:#662E1D;
+}
