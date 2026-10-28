@@ -35,6 +35,11 @@ async function verify(){
   check(beginning.every(x=>x.height>=89.8&&x.height<=90.2),
    'Original six large button sizes are preserved');
   const signatures=beginning.map(({onclick,label,active})=>({onclick,label,active}));
+  const initialTileStyles=buttons().map(tile=>tile.getAttribute('style'));
+  check(api.progress(0)===0&&api.progress(210)===1&&api.progress(105)===.5,
+   'Keep exact top, midpoint and compact heights');
+  check(api.progress(21)>0&&api.progress(21)<.1&&api.progress(189)>.9&&api.progress(189)<1,
+   'Gentle easing must soften only the beginning and end of the proportional drag');
   const heights=[];
   for(const offset of [0,21,42,63,84,105,126,147,168,189,210]){
    window.scrollTo(0,offset);
@@ -52,6 +57,8 @@ async function verify(){
     'Menu reflow changed scroll position; feedback detected at '+offset+'px: '+scrollY);
    heights.push(m[0].height);
   }
+  check(buttons().every((tile,i)=>tile.getAttribute('style')===initialTileStyles[i]),
+   'Scroll frames must never rewrite six separate inline height constraints');
   check(heights.every((height,i)=>i===0||height<heights[i-1]-2),
    'There must be no sudden threshold jump, stall or reversed scaling: '+heights.join(','));
   check(Math.abs(heights[5]-69)<1,'Half scroll must yield half height (~69px), not an all-at-once switch');
@@ -63,10 +70,14 @@ async function verify(){
   check(document.documentElement.scrollWidth<=innerWidth+1,'Horizontal overflow at compact size');
   check(compact.every((x,i)=>JSON.stringify({onclick:x.onclick,label:x.label,active:x.active})===JSON.stringify(signatures[i])),
    'Button actions and selected state must remain unchanged');
+  // No additional DOM changes or layout rebinds when scroll remains steady.
+  const stableStyles=buttons().map(tile=>tile.getAttribute('style'));
   // Feedback test: unchanged scroll offset must not change sizes on repeated calls.
   for(let t=0;t<10;t++)api.update();
   check(metrics().every(x=>Math.abs(x.height-48)<.15),
    'Repeated scroll callbacks cause height oscillation');
+  check(buttons().every((tile,i)=>tile.getAttribute('style')===stableStyles[i]),
+   'Repeated scroll callbacks do not restart tile layout changes');
   renderMainNavigation(currentPage);
   check(buttons().length===6&&metrics().every(x=>Math.abs(x.height-48)<.15),
    'Re-render retains correct compact dimensions without jumping');
@@ -87,7 +98,7 @@ async function verify(){
   window.scrollTo(0,105);api.update();
   check(metrics().every(x=>Math.abs(x.height-48)<.2),'Reduced motion permits instant compact state');
   window.matchMedia=match;
-  document.body.innerHTML='<pre id="nav-collapse-browser">PASS 11 proportional steps up/down, no feedback loop, six synchronized icons+labels, 48px accessible tiles</pre>';
+  document.body.innerHTML='<pre id="nav-collapse-browser">PASS subtle eased 11-step proportional drag, zero repeated tile rewrites, six synchronized icons/labels, 48px touch areas</pre>';
  }catch(e){document.body.innerHTML='<pre id="nav-collapse-browser">FAIL '+e.message+'</pre>'}
 }
 
