@@ -30,7 +30,7 @@ async function verify(){
    check(buttons.length===6,page+' should show exactly six common navigation actions');
    const bounds=buttons.map(rect),shapes=buttons.map(shape);
    for(const [index,b] of bounds.entries()){
-    check(Math.abs(b.h-bounds[0].h)<.2,'Mixed button heights on '+page+': '+index);
+    check(Math.abs(b.h-bounds[0].h)<.2,'Mixed button heights on '+page+': '+index+' '+JSON.stringify({all:bounds,selected:getComputedStyle(buttons[index]).height,base:getComputedStyle(buttons[0]).height,css:getComputedStyle(document.getElementById('nav')).getPropertyValue('--fhd-tile-height')}));
     check(Math.abs(b.w-bounds[0].w)<.2,'Mixed button widths on '+page+': '+index);
     check(shapes[index].r===shapes[0].r,'Mixed corner radius on '+page+': '+index);
     check(shapes[index].b===shapes[0].b,'Border jumps on '+page+': '+index);
