@@ -52,7 +52,10 @@
  display:flex;
  justify-content:center;
  align-items:center;
- flex:0 0 auto;
+ flex:0 0 var(--fhd-nav-icon,29px)!important;
+ flex-basis:var(--fhd-nav-icon,29px)!important;
+ min-width:var(--fhd-nav-icon,29px)!important;
+ max-width:var(--fhd-nav-icon,29px)!important;
  width:var(--fhd-nav-icon,29px)!important;
  height:var(--fhd-nav-icon,29px)!important;
  font-size:var(--fhd-nav-font,15px)!important;
