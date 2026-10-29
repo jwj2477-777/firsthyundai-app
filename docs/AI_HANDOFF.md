@@ -1,3 +1,5 @@
+- 병목 최적화(2026-10-30): 공개 뉴스 스냅샷 131개 중 115개 재사용, 13개 신규 요약·Gemini 18회 중 개별 재시도 14회 확인. 누락 기사 1개씩 재호출 → 2개 묶음으로 복구해 해당 상황에서 최대 약 절반의 추가 요청으로 줄이도록 변경. 관련 오프라인 테스트 추가, 원문 근거 없는 요약 생성 금지. 실제 요청 감소 효과는 다음 수집 통계에서 확인해야 함.
+
 ## 2026-10-30 · v2.1.49 · Gemini/Groq 뉴스 실무 체크포인트 + 무료 구간 Gemini Live 실시간 음성
 
 - 기존 GitHub Actions Secrets `GEMINI_API_KEY` · `GROQ_API_KEY`만 재사용. 기사 본문 기반 3문장 뉴스 요약은 기존 그대로 유지. `scripts/news_intelligence.py`가 **공개 기사 본문 요약만** 사용해 상담 체크포인트 1~3개를 별도로 생성. 기존 스냅샷 입력 지문으로 재사용해 중복 호출 절감. Gemini 실패 시 Groq 1회 보완, 모두 실패하면 **체크포인트만 숨기고 기존 뉴스/업무 기능 유지**. 결과 JSON은 `data/news.json`의 선택형 `ai_office_digest`. GitHub 수집은 `.github/workflows/collect.yml`에서 자동 연동.
