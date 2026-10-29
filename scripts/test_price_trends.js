@@ -62,20 +62,18 @@ assert.equal(t.areaKey(84.949),'84.95');assert.equal(t.areaKey(84.94),'84.94');
 // keys instead of silently resetting the selection to the largest area.
 const selectorHandler=html.match(/function setComplexTrendArea\(area\)\{[\s\S]*?\n\}/)?.[0];
 assert(selectorHandler,'Real index.html missing price-trend area onchange handler');
-let redraws=0,chosen='',latestChart='';
-const selectionCtx=vm.createContext({String,renderComplexes(){
- redraws++;
- latestChart=api.render({rows:records,type:'매매',area:chosen,months:6,snapshot:snap});
-}});
-vm.runInContext('let complexTrendArea="";'+selectorHandler+';'+
- 'function choose(value){setComplexTrendArea(value);return complexTrendArea}',selectionCtx);
+const selectionCtx=vm.createContext({String,api,records,snap});
+vm.runInContext('let complexTrendArea="";let redraws=0;let latestChart="";'+
+ 'function renderComplexes(){redraws++;latestChart=api.render({rows:records,type:"매매",area:complexTrendArea,months:6,snapshot:snap})};'+
+ selectorHandler+';function choose(value){setComplexTrendArea(value);return complexTrendArea}',selectionCtx);
 for(const [area,number] of [['84.90',8],['84.94',1]]){
- chosen=vm.runInContext('choose('+JSON.stringify(area)+')',selectionCtx);
+ const chosen=vm.runInContext('choose('+JSON.stringify(area)+')',selectionCtx);
  assert.equal(chosen,area,'Area selection must not reset: '+area);
  assert.equal(t.prepare({rows:records,type:'매매',area:chosen,months:6,snapshot:snap}).count,number);
- assert(latestChart.includes('전용 '+Number(area)+'㎡'),'Chart must redraw selected area '+area);
+ assert(vm.runInContext('latestChart',selectionCtx).includes('전용 '+Number(area)+'㎡'),
+  'Chart must redraw selected area '+area);
 }
-assert.equal(redraws,2,'Each selection change must trigger render');
+assert.equal(vm.runInContext('redraws',selectionCtx),2,'Each selection change must trigger render');
 assert.equal(vm.runInContext("choose('invalid')",selectionCtx),'');
 
 assert(!api.render({rows:[],snapshot:{state:'not_started'}}).includes('월별 거래건수'));
