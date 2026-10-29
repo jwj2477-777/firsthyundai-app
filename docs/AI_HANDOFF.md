@@ -1,3 +1,9 @@
+## 2026-10-29 · v2.1.47 구성원 마지막 접속 기록 최소화
+
+- 마지막 접속 표시는 workers/shared-settings/src/index.mjs의 계정별 단일 시각 KV(5분 갱신 제한)와 관리자 전용 GET /board/members에 구현. 로그인 횟수, 기기·IP·위치·활동 이력 없음.
+- 레거시 중복 계정에는 현재 유효한 계정 레코드를 기준으로 최근 시각을 1개만 표시. 앱 UI는 office-members.js / office-board.css.
+- Android GET /board/account 검증은 기존 그대로, 기록 실패 때문에 인증이 중단되지 않음. 새 테스트 scripts/test_office_member_last_seen.mjs는 관리자 권한, 갱신 간격, 공개 비노출을 검증. 기존 v2.1.46 메모함 보존.
+
 # 퍼스트현대 앱 — AI 간 완전 인수인계 문서
 
 ## 2026-10-29 · v2.1.40 · 지도함 실내 이동 안내 최우선 강조
