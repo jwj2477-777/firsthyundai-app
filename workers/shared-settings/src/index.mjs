@@ -302,6 +302,16 @@ async function boardCommand(req,env,url,ctx){
   }
   return res({error:"not_found"},404);
  }
+ // Give an already-authenticated handset a short preview when a new note arrives.
+ // The push payload contains only an ID; private text is not sent through FCM.
+ const previewRoute=url.pathname.match(/^\/board\/([a-z0-9-]{45,51})\/preview$/);
+ if(previewRoute&&req.method==="GET"&&validBoardId(previewRoute[1])){
+  const note=await env.SETTINGS.get(BOARD_PREFIX+previewRoute[1],"json");
+  if(!note||typeof note.text!=="string")return res({error:"not_found"},404);
+  const author=typeof note.author?.name==="string"?note.author.name.slice(0,24):"사무실";
+  const snippet=note.text.replace(/[\\r\\n\\t]+/g," ").replace(/\\s+/g," ").trim().slice(0,110);
+  return res({author,preview:snippet,image_count:Array.isArray(note.images)?note.images.length:0});
+ }
  if(url.pathname==="/board"&&req.method==="GET")return res({schema:1,notes:await boardList(env)});
  if(url.pathname==="/board/updates"&&req.method==="GET"){
   const list=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
