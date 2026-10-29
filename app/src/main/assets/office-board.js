@@ -8,6 +8,7 @@ let timerMs=45000,pendingFocus='',view='notes',scheduleOpen=false,suggestedDate=
 let archiveOpen=false,archived=[];
 let composeOpen=false,memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10;
 const PAGE_SIZE=10;
+let historyLoaded=false,historyLoading=false,refreshCycle=0;
 let lastBriefing=0,briefingBusy=false;
 const startKst=()=>kstDate(new Date());
 let selectedDate='',calendarMonth='',editingBirthday='';
@@ -156,13 +157,14 @@ function syncViews(){
  const isCal=view==='calendar';
  // One tab, one job. The free-form composer and its feedback belong to notes,
  // not to the calendar. Keep the typed draft untouched when switching tabs.
- for(const id of ['officeBoardFeedback','officeBoardList','officeBoardListHeading','officeBoardComposeBar','officeBoardFinder','officeBoardMore']){
+ for(const id of ['officeBoardFeedback','officeBoardList','officeBoardListHeading','officeBoardComposeBar','officeBoardFinder']){
   const e=$(id);
   e?.classList?.toggle?.('hidden',isCal);
  }
  $('officeBoardComposer')?.classList?.toggle?.('hidden',isCal||!composeOpen);
  $('officeBoardComposeToggle')?.setAttribute?.('aria-expanded',String(composeOpen&&!isCal));
  $('officeBoardCalendar')?.classList?.toggle?.('hidden',!isCal);
+ $('officeBoardMore')?.classList?.toggle?.('hidden',isCal||filteredMemos().length<=memoLimit);
  for(const [id,selected] of [['officeBoardNotesView',!isCal],['officeBoardCalendarView',isCal]]){
   const e=$(id);if(!e)continue;e.classList?.toggle?.('selected',selected);
   e.setAttribute?.('aria-pressed',String(selected));
@@ -170,7 +172,7 @@ function syncViews(){
  if(isCal)drawCalendar();
 }
 function setView(next){if(next!=='calendar'&&next!=='notes')return;view=next;archiveOpen=false;
- $('officeBoardArchive')?.classList?.add?.('hidden');syncViews();}
+ $('officeBoardArchive')?.classList?.add?.('hidden');draw();}
 function chooseDay(key){if(!/^\d{4}-\d{2}-\d{2}$/.test(key))return;
  selectedDate=key;calendarMonth=key.slice(0,7);drawCalendar();}
 function changeMonth(delta){
@@ -243,8 +245,9 @@ function filteredMemos(){
  }).sort((a,b)=>{
   if(Boolean(a.pinned)!==Boolean(b.pinned))return a.pinned?-1:1;
   if(memoSort==='schedule'){
-   const aa=a.scheduled_at?Date.parse(a.scheduled_at):Infinity;
-   const bb=b.scheduled_at?Date.parse(b.scheduled_at):Infinity;
+   const now=Date.now(),x=a.scheduled_at?Date.parse(a.scheduled_at):Infinity;
+   const y=b.scheduled_at?Date.parse(b.scheduled_at):Infinity;
+   const aa=x>=now?x:Infinity,bb=y>=now?y:Infinity;
    if(aa!==bb)return aa-bb;
   }
   const diff=String(a.created_at).localeCompare(String(b.created_at));
@@ -258,7 +261,7 @@ function syncFinder(memos,filtered){
  setText('officeBoardActiveCount',active);
  setText('officeBoardDoneCount',done);
  setText('officeBoardTotalCount',memos.length);
- setText('officeBoardListResult',filtered.length+'건 중 '+Math.min(filtered.length,memoLimit)+'건 표시');
+ setText('officeBoardListResult',historyLoading?'이전 메모 검색 범위까지 불러오는 중…':filtered.length+'건 중 '+Math.min(filtered.length,memoLimit)+'건 표시');
  for(const [mode,id] of [['active','officeBoardStatusActive'],['done','officeBoardStatusDone'],['all','officeBoardStatusAll']]){
   const e=$(id);if(!e)continue;
   e.classList?.toggle?.('selected',memoStatus===mode);
@@ -469,15 +472,46 @@ $('overviewMemoEntries')?.addEventListener?.('click',e=>{
 });
 async function refresh(silent=false){
  if(busy||currentPage!=='officeBoard')return;
+ const cycle=++refreshCycle;
  if(!silent)msg('메모를 확인하는 중…');
  try{
-  const data=await call('list',{});
-  merge(Array.isArray(data.notes)?data.notes:[]);
-  lastCheck=Date.now();
-  lastBriefing=lastCheck;
+  const first=await call('list',{offset:0});
+  if(cycle!==refreshCycle)return;
+  const recent=Array.isArray(first.notes)?first.notes:[];
+  if(silent&&historyLoaded){
+   // Keep already fetched history when checking recent posts every 45 seconds.
+   const ids=new Set(recent.map(n=>n.id));
+   merge(recent.concat(items.filter(n=>!ids.has(n.id))));
+  }else merge(recent);
+  lastCheck=Date.now();lastBriefing=lastCheck;
   $('officeBoardAuth')?.classList?.add?.('hidden');
-  if(!silent)msg('메모를 확인했습니다.');
- }catch(e){if(!silent)msg(e.message)}
+  if(!first.has_more){historyLoaded=true;historyLoading=false;draw();
+   if(!silent)msg('메모를 확인했습니다.');return}
+  if(silent&&historyLoaded){if(!silent)msg('메모를 확인했습니다.');return}
+  historyLoaded=false;historyLoading=true;draw();
+  const seen=new Map(recent.map(n=>[n.id,n]));
+  let offset=Number(first.next_offset)||25;
+  // A page is at most 25 notes, so no single Android reply exceeds its cap.
+  // Do not send customer memo text to a public website or localStorage.
+  while(cycle===refreshCycle&&offset<=1000){
+   const page=await call('list',{offset});
+   if(cycle!==refreshCycle)return;
+   for(const item of page.notes||[])if(valid(item?.id))seen.set(item.id,item);
+   merge([...seen.values()]);
+   if(!page.has_more)break;
+   const next=Number(page.next_offset);
+   if(!Number.isInteger(next)||next<=offset)break;
+   offset=next;
+  }
+  if(cycle!==refreshCycle)return;
+  historyLoaded=true;historyLoading=false;draw();
+  if(!silent)msg('전체 공유 메모를 불러왔습니다.');
+ }catch(e){
+  if(cycle===refreshCycle){
+   historyLoading=false;draw();
+   if(!silent||!historyLoaded)msg('메모 연결을 확인해 주세요: '+e.message);
+  }
+ }
 }
 function settingsChanged(){
  const p=preferences();
@@ -525,7 +559,7 @@ async function mutate(action,data){
   const result=await call(action,data);
   if(action==='delete')localDeletes.set(data.id,Date.now());
   else if(result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
-  if(action==='post'){$('officeBoardDraft').value='';checkSuggestion();composeOpen=false;}
+  if(action==='post'){$('officeBoardDraft').value='';checkSuggestion();if(!window.FirstHyundaiBoardImages?.pendingCount?.())composeOpen=false;}
   if(action==='restore'&&result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
   editing='';editDraft='';
   merge(items);
@@ -545,8 +579,10 @@ async function post(){
  const text=value||'📷 사진 공유';
  const parsed=extracted(text);
  const result=await mutate('post',{text,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false});
- if(result?.note?.id&&photos?.pendingCount?.())
-  await photos.uploadPending(result.note.id);
+ if(result?.note?.id&&photos?.pendingCount?.()){
+  const saved=await photos.uploadPending(result.note.id);
+  composeOpen=!saved;syncViews();
+ }
 }
 function toggleBirthdayForm(show){
  if(bridge?.getMode?.()!=='admin'){msg('생일 관리는 관리자만 사용할 수 있습니다.');return}
