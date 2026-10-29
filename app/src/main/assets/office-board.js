@@ -29,6 +29,15 @@ function sortItems(){
 }
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const valid=id=>/^[a-z0-9]{8,14}-[0-9a-f-]{36}$/.test(String(id||''));
+function canEditNote(note){
+ if(!note||!valid(note.id))return false;
+ if(bridge?.getMode?.()==='admin')return true;
+ const ownId=String(bridge?.getOfficeMemberId?.()||'');
+ // Do not use display names: they can change and are not unique.
+ return !!ownId&&note.author?.id===ownId;
+}
+function canEditId(id){return canEditNote(items.find(note=>note.id===id))}
+function denied(){msg('이 메모는 최초 작성자 또는 관리자만 수정할 수 있습니다.')}
 function msg(text){if($('officeBoardFeedback'))$('officeBoardFeedback').textContent=text}
 function dateText(value){
  const d=new Date(value);
@@ -207,14 +216,16 @@ function draw(){
   drawCalendar();syncViews();return;
  }
  list.innerHTML=visible.map(note=>{
-  const id=esc(note.id),isEdit=editing===note.id;
+  const id=esc(note.id),editable=canEditNote(note),isEdit=editable&&editing===note.id;
   const body=isEdit?'<textarea class="officeBoardEdit" maxlength="1600" data-edit="'+id+'" aria-label="메모 수정">'+esc(editDraft)+'</textarea>':
    '<div class="officeBoardText">'+(preferences().memoPhones==='off'?esc(note.text):phones(note.text))+'</div>';
   const actions=isEdit?'<button class="officeBoardSave" data-action="save" data-id="'+id+'">저장</button>'+
     '<button data-action="cancel" data-id="'+id+'">취소</button>':
-   '<button class="officeBoardDoneAction" data-action="done" data-id="'+id+'">'+(note.done?'완료 취소':'완료')+'</button>'+
-   '<button data-action="edit" data-id="'+id+'">수정</button>'+
-   (!Array.isArray(note.images)||note.images.length<3?'<button data-action="photoAdd" data-id="'+id+'">사진 추가</button>':'')+
+   (editable?
+    '<button class="officeBoardDoneAction" data-action="done" data-id="'+id+'">'+(note.done?'완료 취소':'완료')+'</button>'+
+    '<button data-action="edit" data-id="'+id+'">수정</button>'+
+    (!Array.isArray(note.images)||note.images.length<3?'<button data-action="photoAdd" data-id="'+id+'">사진 추가</button>':'')
+    :'<span class="officeBoardReadOnly">작성자·관리자만 수정 가능</span>')+
    (admin?'<button data-action="delete" data-id="'+id+'" class="officeBoardDelete">삭제</button>':'');
   return '<article class="officeBoardNote'+(note.done?' completed':'')+'" data-note="'+id+'">'+
    '<div class="officeBoardNoteTop"><span class="officeBoardNoteLabel">'+(note.done?'✓ 완료':'공유 메모')+'</span>'+
@@ -508,17 +519,24 @@ async function deleteBirthday(id){
  const ok=await mutate('delete',{id});
  if(ok){editingBirthday='';drawCalendar()}
 }
-function edit(id){const note=items.find(x=>x.id===id);if(!note)return;editing=id;editDraft=note.text;draw();
+function edit(id){const note=items.find(x=>x.id===id);if(!note)return;
+ if(!canEditNote(note)){denied();return}
+ editing=id;editDraft=note.text;draw();
  $('officeBoardList')?.querySelector?.('textarea[data-edit]')?.focus?.();}
 function cancelEdit(){editing='';editDraft='';draw()}
 function saveEdit(id){
  if(id!==editing)return;
+ if(!canEditId(id)){denied();cancelEdit();return}
  const value=String($('officeBoardList')?.querySelector?.('textarea[data-edit]')?.value||'').trim();
  if(!value||value.length>1600){msg('수정 내용은 1~1600자여야 합니다.');return}
  const parsed=extracted(value);
  mutate('edit',{id,text:value,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false});
 }
-function setDone(id,done){if(valid(id)&&!birthdayOf(items.find(n=>n.id===id)))mutate('done',{id,done})}
+function setDone(id,done){
+ if(!valid(id)||birthdayOf(items.find(n=>n.id===id)))return;
+ if(!canEditId(id)){denied();return}
+ mutate('done',{id,done});
+}
 function remove(id){
  if(!valid(id))return;
  if(bridge?.getMode?.()!=='admin'){msg('삭제는 관리자만 할 수 있습니다.');return}
@@ -545,6 +563,7 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
  if(action==='delete')remove(id);
  if(action==='photoAdd'){
   const note=items.find(n=>n.id===id);
+  if(!canEditNote(note)){denied();return}
   window.FirstHyundaiBoardImages?.selectFor?.(id,Array.isArray(note?.images)?note.images.length:0);
  }
  if(action==='photoView')window.FirstHyundaiBoardImages?.view?.(id,button.dataset.photo);
@@ -555,7 +574,7 @@ function imageUpdate(note){
  merge(items);
 }
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
- imageCall:call,imageUpdate,
+ imageCall:call,imageUpdate,canEdit:canEditId,
  setView,chooseDay,changeMonth,today,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
  onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
@@ -563,5 +582,5 @@ window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDo
   else if(currentPage==='overview')openBriefing(true)},
  syncNotificationStatus,enableNotifications,settingsChanged,focusNote,
  openBriefing,openBriefingNote,openBriefingCalendar,renderBriefing,closureDates,weatherAppointments,
- _test:{phones,merge,scheduleSuggestion,toIso,dateKey,briefingRows,nextDay,calendarEntries,memoItems,birthdayOf}};
+ _test:{phones,merge,scheduleSuggestion,toIso,dateKey,briefingRows,nextDay,calendarEntries,memoItems,birthdayOf,canEditNote}};
 })();
