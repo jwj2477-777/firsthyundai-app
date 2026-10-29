@@ -6,7 +6,7 @@ const requests=new Map(),localUpdates=new Map(),localDeletes=new Map();
 let sequence=0,items=[],busy=false,lastCheck=0,showCompleted=false,editing='',editDraft='',timer=null;
 let timerMs=45000,pendingFocus='',view='notes',scheduleOpen=false,suggestedDate='';
 let archiveOpen=false,archived=[];
-let composeOpen=false,memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10;
+let composeOpen=false,memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10,finderTouched=false;
 const PAGE_SIZE=10;
 const expandedNotes=new Set();
 let historyLoaded=false,historyLoading=false,refreshCycle=0;
@@ -219,16 +219,18 @@ function toggleComposer(force){
 }
 function setStatus(next){
  if(!['active','done','all'].includes(next))return;
- memoStatus=next;memoLimit=PAGE_SIZE;draw();
+ memoStatus=next;finderTouched=true;memoLimit=PAGE_SIZE;draw();
 }
-function setAuthor(value){memoAuthor=String(value||'');memoLimit=PAGE_SIZE;draw()}
-function setQuery(value){memoQuery=String(value||'').trim().toLocaleLowerCase('ko-KR');memoLimit=PAGE_SIZE;draw()}
+function setAuthor(value){memoAuthor=String(value||'');finderTouched=true;memoLimit=PAGE_SIZE;draw()}
+function setQuery(value){memoQuery=String(value||'').trim().toLocaleLowerCase('ko-KR');finderTouched=true;memoLimit=PAGE_SIZE;draw()}
 function setSort(next){
  if(!['newest','oldest','schedule'].includes(next))return;
- memoSort=next;memoLimit=PAGE_SIZE;draw();
+ memoSort=next;finderTouched=true;memoLimit=PAGE_SIZE;draw();
 }
 function clearFilters(){
- memoStatus='active';memoQuery='';memoAuthor='';memoSort='newest';memoLimit=PAGE_SIZE;
+ memoStatus=preferences().memoCompleted==='show'?'all':'active';
+ memoQuery='';memoAuthor='';memoSort=preferences().memoOrder==='oldest'?'oldest':'newest';
+ memoLimit=PAGE_SIZE;finderTouched=false;
  if($('officeBoardSearch'))$('officeBoardSearch').value='';
  draw();
 }
@@ -259,6 +261,8 @@ function filteredMemos(){
 function syncFinder(memos,filtered){
  const active=memos.filter(n=>!n.done).length,done=memos.length-active;
  const setText=(id,text)=>{const x=$(id);if(x)x.textContent=String(text)};
+ const legacy=$('officeBoardShowDone');
+ if(legacy)legacy.textContent=showCompleted?'완료 숨기기':'완료 '+done+'건 보기';
  setText('officeBoardCount',active);
  setText('officeBoardActiveCount',active);
  setText('officeBoardDoneCount',done);
@@ -538,6 +542,10 @@ async function refresh(silent=false){
 function settingsChanged(){
  const p=preferences();
  showCompleted=p.memoCompleted==='show';
+ if(!finderTouched){
+  memoStatus=showCompleted?'all':'active';
+  memoSort=p.memoOrder==='oldest'?'oldest':'newest';
+ }
  sortItems();draw();
  const next=Math.max(30000,Math.min(120000,Number(p.memoRefresh)*1000||45000));
  if(timer&&next!==timerMs){clearInterval(timer);timer=null;}
@@ -694,7 +702,10 @@ function remove(id){
  if(typeof confirm==='function'&&!confirm('이 메모를 복구함으로 이동할까요? 30일 안에 복구할 수 있습니다.'))return;
  mutate('delete',{id});
 }
-function toggleDone(){memoStatus=memoStatus==='done'?'active':'done';memoLimit=PAGE_SIZE;draw()}
+function toggleDone(){
+ memoStatus=memoStatus==='all'?'active':'all';showCompleted=memoStatus==='all';
+ finderTouched=true;memoLimit=PAGE_SIZE;draw();
+}
 function authenticate(){
  if(!bridge?.requestOfficeBoardAccess){msg('보안코드 연결은 안드로이드 앱에서만 지원합니다.');return}
  bridge.requestOfficeBoardAccess();
