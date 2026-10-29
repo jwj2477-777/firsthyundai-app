@@ -1,0 +1,42 @@
+/* Three per-device display modes; standard intentionally preserves all existing UI geometry. */
+.compactAppFooter .appFooterRow{flex-wrap:wrap}
+.compactAppFooter .appFooterControls{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:6px;min-width:0}
+.compactAppFooter #deviceDisplayOpen{min-height:44px;border:1px solid #BFD0CD;border-radius:11px;background:#FFFDF8;color:#29565C;padding:9px 10px;font-size:13px;font-weight:800;cursor:pointer}
+.deviceDisplayDialog{box-sizing:border-box;width:min(420px,calc(100vw - 24px));max-height:min(88dvh,720px);overflow-y:auto;padding:20px;border:1px solid #CCDBD6;border-radius:20px;background:#FFFDF8;color:#244C55;box-shadow:0 24px 70px #152C3840}
+.deviceDisplayDialog::backdrop{background:#142B3699}
+.deviceDisplayTitle{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.deviceDisplayTitle h2{font-size:22px;line-height:1.3;margin:3px 0 9px}
+.deviceDisplayEyebrow{color:#647A7D;font-size:12px;font-weight:800}
+#deviceDisplayExplainer{font-size:14px;line-height:1.7;color:#557075;margin:0 0 16px;overflow-wrap:anywhere}
+#deviceDisplayClose{min-width:44px;min-height:44px;border:0;border-radius:10px;background:#F0F5F3;color:#265560;font-size:27px;cursor:pointer}
+.deviceDisplayChoices{display:grid;grid-template-columns:1fr;gap:9px}
+.deviceDisplayChoices button{box-sizing:border-box;text-align:left;width:100%;min-height:64px;padding:12px 15px;border:1.5px solid #D3DFDB;border-radius:13px;background:#FFF;color:#2F5058;cursor:pointer;white-space:normal}
+.deviceDisplayChoices button[aria-pressed="true"]{border-color:#43637E;background:#F0F4FF;box-shadow:inset 4px 0 #5967A6}
+.deviceDisplayChoices strong{display:block;font-size:16px;line-height:1.4}
+.deviceDisplayChoices small{display:block;color:#5A7077;font-size:12px;line-height:1.6;margin-top:3px}
+.deviceDisplayFeedback{font-size:13px;font-weight:750;color:#426D73;margin:14px 0}
+.deviceDisplayDone{width:100%;min-height:48px;padding:10px;border:0;border-radius:12px;background:#5364A0;color:white;font-size:16px;font-weight:800;cursor:pointer}
+.deviceDisplayDialog button:focus-visible,#deviceDisplayOpen:focus-visible{outline:3px solid #448B91;outline-offset:2px}
+body[data-device-display="large"] #nav .navLabel,
+body[data-device-display="xlarge"] #nav .navLabel{overflow-wrap:anywhere;word-break:keep-all;line-height:1.24}
+body[data-device-display="large"] #nav .primaryNav>button,
+body[data-device-display="large"] #nav .utilityNav>button:not(.adminCenterNav),
+body[data-device-display="xlarge"] #nav .primaryNav>button,
+body[data-device-display="xlarge"] #nav .utilityNav>button:not(.adminCenterNav){overflow:visible}
+body[data-device-display="xlarge"] #nav .primaryNav,
+body[data-device-display="xlarge"] #nav .utilityNav{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:350px){
+ body[data-device-display="large"] #nav .primaryNav,
+ body[data-device-display="large"] #nav .utilityNav{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+body[data-device-display="large"] header .brandWordmark h1,
+body[data-device-display="xlarge"] header .brandWordmark h1{font-size:clamp(18px,5.5vw,26px)!important;white-space:normal;overflow-wrap:anywhere}
+body[data-device-display="large"] header .brandSubtitle,
+body[data-device-display="xlarge"] header .brandSubtitle{white-space:normal;overflow-wrap:anywhere;letter-spacing:0.04em!important}
+body[data-device-display="large"] .brandHeaderText,
+body[data-device-display="xlarge"] .brandHeaderText{min-width:0}
+body[data-device-display="large"] .sectionTitle,
+body[data-device-display="xlarge"] .sectionTitle{flex-wrap:wrap}
+body[data-device-display="large"] :is(.panel,.dealRow,.nearbyCard),
+body[data-device-display="xlarge"] :is(.panel,.dealRow,.nearbyCard){overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){.deviceDisplayDialog *{transition:none!important}}
