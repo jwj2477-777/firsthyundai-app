@@ -22,6 +22,7 @@ async function verify(){
   switchPage('officeBoard');
   await new Promise(resolve=>setTimeout(resolve,150));
   const bar=document.querySelector('#officeBoard .officeBoardViewToggle');
+  const write=document.getElementById('officeBoardComposeView');
   const memo=document.getElementById('officeBoardNotesView');
   const calendar=document.getElementById('officeBoardCalendarView');
   const composer=document.querySelector('#officeBoard .officeBoardComposer');
@@ -29,28 +30,26 @@ async function verify(){
   const list=document.getElementById('officeBoardList');
   const agenda=document.getElementById('officeBoardCalendar');
   const status=document.querySelector('.officeMemoNotificationTools');
-  check(bar&&memo&&calendar&&composer&&draft&&status,'Missing controls');
+  check(bar&&write&&memo&&calendar&&composer&&draft&&status,'Missing controls');
   check(bar.classList.contains('sectionModeSwitch'),'Segmented template not reused');
   check(getComputedStyle(bar).borderTopLeftRadius===newsRadius,'Memo bar radius differs from news');
   const h=e=>Math.round(e.getBoundingClientRect().height);
   const same=e=>Math.abs(h(e)-newsHeight)<=3;
-  check(same(memo)&&same(calendar),'Memo and Calendar height differs from news');
-  check(h(memo)===h(calendar),'Memo and calendar unequal height');
-  check(memo.classList.contains('selected')&&!calendar.classList.contains('selected'),'Initial view should be notes');
-  const openComposer=document.getElementById('officeBoardComposeToggle');
-  check(openComposer&&composer.classList.contains('hidden')&&list.classList.contains('officeBoardList'),
-    'Memo library should be open while composer is collapsed by default');
+  check(same(write)&&same(memo)&&same(calendar),'All three memo buttons must match the news button height');
+  check(h(write)===h(memo)&&h(memo)===h(calendar),'Writing, library and calendar must share equal height');
+  check(write.classList.contains('selected')&&!memo.classList.contains('selected')&&!calendar.classList.contains('selected'),
+   'The writing tab must be selected on initial entry');
+  check(!composer.classList.contains('hidden')&&list.classList.contains('hidden'),
+    'Only composer appears on the initial writing screen');
   check(status.classList.contains('hidden'),'Healthy/pending notification banner should not display');
-  openComposer.click();
-  check(!composer.classList.contains('hidden')&&openComposer.getAttribute('aria-expanded')==='true',
-   'New memo button should open its own composer');
   draft.value='보존할 미발송 메모 초안';
-  const mustard=getComputedStyle(memo).backgroundColor;
-  check(mustard!==getComputedStyle(calendar).backgroundColor,'Active memo tab needs mustard contrast');
+  const mustard=getComputedStyle(write).backgroundColor;
+  check(mustard!==getComputedStyle(calendar).backgroundColor,'Active writing tab needs mustard contrast');
   calendar.click();
   check(calendar.classList.contains('selected')&&!memo.classList.contains('selected'),'Calendar did not activate');
   check(composer.classList.contains('hidden'),'Calendar must hide memo composer');
-  check(document.getElementById('officeBoardFeedback').classList.contains('hidden'),'Calendar must hide memo feedback');
+  check(document.getElementById('officeBoardFeedback').getAttribute('role')==='status',
+   'Shared feedback remains available for calendar permissions and confirmations');
   check(list.classList.contains('hidden')&&document.getElementById('officeBoardListHeading').classList.contains('hidden'),'Calendar must hide note list');
   check(!agenda.classList.contains('hidden'),'Calendar panel missing');
   check(h(calendar)===h(memo)&&same(calendar),'Button sizes changed when selected');
@@ -62,19 +61,21 @@ async function verify(){
   check(getComputedStyle(calendar).backgroundColor===mustard,
     'Memo/calendar active color differs: '+getComputedStyle(calendar).backgroundColor+' vs '+mustard);
   memo.click();
-  check(!composer.classList.contains('hidden')&&!list.classList.contains('hidden'),'Notes controls did not return');
-  openComposer.click();
   check(composer.classList.contains('hidden')&&!list.classList.contains('hidden'),
-   'Closing composer must leave searchable memo library visible');
-  openComposer.click();
-  check(!composer.classList.contains('hidden'),'Composer must reopen with preserved draft');
+   'Memo archive must exclude composer and show searchable list');
   check(agenda.classList.contains('hidden'),'Calendar was not hidden');
+  write.click();
+  check(!composer.classList.contains('hidden')&&list.classList.contains('hidden'),
+   'Writing tab must hide the memo archive');
   check(draft.value==='보존할 미발송 메모 초안','Draft lost after round trip');
+  memo.click();
   const nav=document.querySelector('#nav .officeBoardNav');
   check(nav&&nav.classList.contains('active'),'Main memo nav not selected');
   check(getComputedStyle(nav).backgroundColor===mustard,'Main shared memo uses same mustard tone');
-  const y0=memo.getBoundingClientRect().y,y1=calendar.getBoundingClientRect().y;
-  check(Math.abs(y0-y1)<.2,'Split buttons are misaligned');
+  const y0=write.getBoundingClientRect().y,y1=memo.getBoundingClientRect().y,y2=calendar.getBoundingClientRect().y;
+  check(Math.abs(y0-y1)<.2&&Math.abs(y1-y2)<.2,'All three tabs must remain aligned');
+  const bounds=[write,memo,calendar].map(el=>el.getBoundingClientRect());
+  check(bounds.every(b=>b.width>=70),'Tabs became too narrow to tap');
   // Search-first memo library: rows remain short, filters work on mobile.
   const memos=Array.from({length:17},(_,i)=>({
    id:'mhad4vwu-'+i.toString(16).padStart(36,'0'),
@@ -105,7 +106,7 @@ async function verify(){
   document.getElementById('officeBoardClearFilters').click();
   check(rows()===10,'Reset should return to compact active list');
   check(document.documentElement.scrollWidth<=innerWidth+1,'Horizontal overflow');
-  document.body.innerHTML='<pre id="memo-tab-test">PASS consistent news-sized memo/calendar buttons, mustard, focused calendar and preserved draft</pre>';
+  document.body.innerHTML='<pre id="memo-tab-test">PASS three equal writing, memo library and calendar tabs, default writing, preserved draft and search</pre>';
  }catch(e){
   document.body.innerHTML='<pre id="memo-tab-test">FAIL '+e.message+'</pre>';
  }
