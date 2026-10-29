@@ -32,6 +32,30 @@ for(const intensity of ['soft','balanced','vivid']){
 assert(prefs.set('themeDecor','off'));assert.equal(body.children[0].children.length,0);
 assert(prefs.set('themeDecor','full'));assert(body.children[0].children.length>0);
 assert.notDeepEqual(api._test.headerPalette('spring','soft'),api._test.headerPalette('spring','vivid'));
+// Time-of-day tints use the Korean local clock, not UTC or GPS.
+const local=s=>Date.parse('2026-10-29T'+s+':00+09:00');
+for(const [time,mood] of [['04:59','night'],['05:00','morning'],
+ ['09:59','morning'],['10:00','day'],['16:59','day'],
+ ['17:00','evening'],['19:59','evening'],['20:00','night']])
+ assert.equal(api._test.timeMood(local(time)),mood,time+' Korean seasonal ambient');
+const morning=api._test.ambientPalette('autumn','balanced',local('07:00'));
+const evening=api._test.ambientPalette('autumn','balanced',local('18:00'));
+assert.notDeepEqual(morning,evening,'Warm daylight differs from sunset');
+assert.equal(morning.length,3);
+assert.equal(body.attrs['data-theme-time'],api._test.timeMood());
+const observed=(mm,stamp=Date.now())=>({status:'ok',effect:'rain',
+ observed_at:new Date(stamp).toISOString(),precip_mm:mm});
+assert.equal(api._test.rainStrength('rain',observed(0.1)),'light');
+assert.equal(api._test.rainStrength('rain',observed(1)),'normal');
+assert.equal(api._test.rainStrength('rain',observed(3)),'heavy');
+assert.equal(api._test.rainStrength('rain',observed(null)),'normal');
+assert.equal(api._test.rainStrength('snow',observed(9)),'normal',
+ 'Do not infer snowfall strength from rain-water equivalent');
+assert.equal(api._test.rainStrength('rain',observed(9,Date.now()-7200001)),'normal',
+ 'Stale measurements must not produce exaggerated rain');
+assert(body.attrs['data-weather-strength']==='normal');
+assert(!asset('season-themes.js').includes("className='seasonLogo'"),
+ 'Already implemented logo graphics must not be duplicated');
 assert.equal(prefs.set('theme','rain'),false,'Rain is an overlay, not a sixth base theme');
 assert.equal(prefs.set('weatherEffect','lightning'),false);
 assert(prefs.set('themeMode','season'));assert.equal(body.attrs['data-season-theme'],api._test.season());
