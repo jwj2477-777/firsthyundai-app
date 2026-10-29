@@ -386,6 +386,7 @@ public class MainActivity extends Activity {
                 else startPublicLiveVoice(news);
             }else if(!contractId.isEmpty()){
                 contractLiveEvent(contractId,"error","마이크 권한이 없어 시작하지 않았습니다. 기존 메모 입력을 이용해 주세요.");
+                contractLiveEvent(contractId,"ended","음성 대화를 시작하지 않았습니다.");
             }else liveVoiceEvent("error","마이크 사용 권한이 없어 음성 대화를 시작하지 않았습니다.");
             return;
         }

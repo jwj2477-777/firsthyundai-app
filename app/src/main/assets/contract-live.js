@@ -98,7 +98,7 @@
    if(!p){status('일부 조건을 확인하지 못했습니다. 금액·날짜를 정확히 다시 말씀해 주세요.');return;}
    Object.assign(proposals,p);render();return;
   }
-  if(state==='error'){active=false;stopping=false;failed=true;status(message);buttons();return;}
+  if(state==='error'){active=false;stopping=true;failed=true;status(message);buttons();return;}
   if(state==='ended'){
    active=false;stopping=false;buttons();$('cl_transcript').textContent='';
    if(!failed)status(Object.keys(proposals).length?'대화가 끝났습니다. 조건을 확인하고 반영할 항목을 선택해 주세요.':message);

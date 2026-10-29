@@ -48,7 +48,7 @@ for(const k of ['rough','specialMemo','bank','account','accountHolder','owner','
 assert(!el('cl_dialog').open);
 emit('proposal',JSON.stringify({price:500000000}));assert.equal(el('ct_price').value,'99000','Late events ignored');
 live.open();assert(!el('cl_consent').checked);el('cl_consent').checked=true;live.start();id=requests.at(-1)[0];
-proposal({price:500000000});emit('error','무료 한도 확인');emit('ended','generic');assert.equal(el('cl_status').textContent,'무료 한도 확인');
+proposal({price:500000000});emit('error','무료 한도 확인');assert(el('cl_apply').disabled,'Errors must wait for microphone shutdown');emit('ended','generic');assert.equal(el('cl_status').textContent,'무료 한도 확인');
 assert(!el('cl_apply').disabled,'Partial reviewed candidates survive connection failure');
 live.close();live.open();el('cl_consent').checked=true;live.start();id=requests.at(-1)[0];
 live.onPageChange('news');assert(!el('cl_dialog').open);assert.equal(stopped,2);

@@ -38,7 +38,7 @@ final class PublicLiveVoice {
         if(running){event("error","연결 준비가 지연되어 종료했습니다. 잠시 후 다시 시도해 주세요.");stop();}
     };
     private final Runnable autoStop=()->{
-        if(running){event("ended","7분 체험 시간이 끝나 음성 대화를 종료했습니다.");stop();}
+        if(running){stop();event("ended","7분 체험 시간이 끝나 음성 대화를 종료했습니다.");}
     };
     private volatile WebSocket socket;
     private volatile AudioRecord microphone;
@@ -73,7 +73,7 @@ final class PublicLiveVoice {
         if(android.os.Build.VERSION.SDK_INT>=23&&
                 context.checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED){
             event("error","마이크 권한을 허용한 뒤 다시 시작해 주세요.");
-            return;
+            stop();return;
         }
         running=true;publicBrief=contractMode?"":safePublicBrief(publicNews);
         event("connecting","무료 Gemini Live 연결을 확인하고 있습니다.");
@@ -157,7 +157,7 @@ final class PublicLiveVoice {
                         if(running){event("error","Live 연결이 끊겼습니다. 무료 사용 한도나 네트워크를 확인해 주세요.");stop();}
                     }
                     @Override public void onClosed(WebSocket ws,int code,String reason){
-                        if(running){event("ended","음성 대화가 종료되었습니다.");stop();}
+                        if(running)stop();
                     }
                 });
             }catch(Exception e){
