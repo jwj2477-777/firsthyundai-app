@@ -4,7 +4,7 @@
 (function(){
  'use strict';
  const $=id=>document.getElementById(id),MAX=3,MAX_BYTES=145000;
- let drafts=[],target='',uploading=false;
+ let drafts=[],target='',uploading=false,activePhoto=null;
  const cache=new Map();
  function status(text){const el=$('officeBoardFeedback');if(el)el.textContent=text}
  function renderDrafts(){
@@ -117,6 +117,7 @@
   if(title)title.textContent='사진 불러오는 중…';
   try{if(!dialog.open)dialog.showModal()}catch(e){}
   const key=noteId+':'+imageId;
+  activePhoto={noteId,imageId};
   try{
    let data=cache.get(key);
    if(!data){
@@ -132,6 +133,20 @@
    if(title)title.textContent='';
   }catch(e){if(title)title.textContent='사진을 불러오지 못했습니다. 다시 눌러 주세요.'}
  }
+ async function removeActive(){
+  if(!activePhoto||uploading)return;
+  if(typeof confirm==='function'&&!confirm('이 사진을 공유 메모에서 삭제할까요?'))return;
+  const {noteId,imageId}=activePhoto;
+  try{
+   const result=await window.FirstHyundaiOfficeBoard.imageCall('imageRemove',{id:noteId,image_id:imageId});
+   if(!result?.note)throw Error('사진 삭제 확인 실패');
+   cache.delete(noteId+':'+imageId);
+   window.FirstHyundaiOfficeBoard.imageUpdate(result.note);
+   $('officeBoardImageDialog')?.close();
+   status('첨부 사진을 삭제했습니다.');
+  }catch(e){status('사진 삭제 실패 · 다시 시도해 주세요.')}
+ }
+ $('officeBoardImageRemove')?.addEventListener('click',removeActive);
  $('officeBoardImageInput')?.addEventListener('change',selected);
  $('officeBoardImageRetry')?.addEventListener('click',()=>{if(target)uploadPending(target)});
  $('officeBoardImageClose')?.addEventListener('click',()=>$('officeBoardImageDialog')?.close());
