@@ -30,6 +30,7 @@ on:
       - 'scripts/test_office_board.mjs'
       - 'scripts/test_office_board_images.mjs'
       - 'scripts/test_office_board_ui.js'
+      - 'scripts/test_office_board_find.mjs'
       - 'scripts/test_annual_calendar.js'
       - 'scripts/test_office_board_layout.js'
       - 'scripts/test_office_board_tab_switch_browser.js'
@@ -278,6 +279,7 @@ jobs:
           node scripts/test_office_board.mjs
           node scripts/test_office_board_images.mjs
           node scripts/test_office_board_ui.js
+          node scripts/test_office_board_find.mjs
           node scripts/test_annual_calendar.js
           node scripts/test_office_board_layout.js
           node scripts/test_office_board_tab_switch_browser.js
@@ -372,24 +374,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.45 subtle natural-light theme APK
+      - name: Publish v2.1.46 searchable office memo library APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.45.apk
-          unzip -t FirstHyundai-v2.1.45.apk | grep 'No errors detected'
-          if gh release view v2.1.45 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.46.apk
+          unzip -t FirstHyundai-v2.1.46.apk | grep 'No errors detected'
+          if gh release view v2.1.46 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.45 FirstHyundai-v2.1.45.apk \
+            gh release create v2.1.46 FirstHyundai-v2.1.46.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.45 · 시간대별 자연광과 비·눈 표현 개선' \
-              --notes '계절 테마에 한국시간 아침·낮·저녁·밤의 은은한 자연광 변화를 추가했습니다. 기상청 송도 실황 같은 시각의 강수량(RN1)이 확인될 경우에만 비 장식 개수·속도·선명도가 약/보통/강으로 조정됩니다. 강수량 미확인 시 기본 효과를 유지하고, 눈은 다양한 크기·속도의 부드러운 장식으로 개선했습니다. 기존 계절별 로고 장식, 6개 메인버튼 크기·스크롤 연동 애니메이션, 부모님 글씨모드, 계약·메모·실거래 기능은 그대로 유지합니다. 누르는 버튼에 미세한 시각적 반응과 갱신 성공 시 짧은 페이드 효과를 추가했으며 모션 줄이기를 존중합니다. v2.1.45/build196.'
+              --title '퍼스트현대 v2.1.46 · 공유메모 검색·작성자·진행상태 필터' \
+              --notes '공유메모를 검색 중심 메모함으로 개편했습니다. 새 메모 버튼으로 작성창만 펼치고 기본 화면에는 메모 내용 검색, 진행 중/완료/전체, 작성자 선택, 최근/오래된/일정순 필터를 표시합니다. 긴 내용은 3줄로 접었다 펼치며 10건씩 더 보기로 스크롤 부담을 줄였습니다. 작성자·관리자만 중요 메모 상단 고정/해제할 수 있으며 동일 권한을 서버에서도 검사합니다. 과거 메모는 25건씩 인증된 서버에서 모두 불러 검색하고, Cloudflare KV 목록에 5분 만료·수정시 무효화하는 비공개 캐시를 추가해 과도한 조회와 HTTP 오류 가능성을 줄였습니다. 구버전 APK는 기존 전체 목록 API를 계속 사용합니다. 일정·생일·30분 전 알림·사진·메모 수정권한·계절테마·6개 메인탭은 유지합니다. v2.1.46/build197.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.45 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.45 --apk FirstHyundai-v2.1.45.apk
+          gh release upload v2.1.46 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.46 --apk FirstHyundai-v2.1.46.apk
 
 
