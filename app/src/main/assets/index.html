@@ -2716,7 +2716,7 @@ function renderNews(){
  const payload=remote.news;
  const insightPanel=$('newsAiOfficePanel');
  const insightItems=$('newsAiOfficeItems');
- if(insightPanel)insightPanel.classList.add('hidden');
+ if(insightPanel)insightPanel.classList?.add?.('hidden');
  if(insightItems)insightItems.innerHTML='';
  if(!payload){
   $('newsMeta').textContent='AI 기사 요약 자료 확인 전';
@@ -2749,7 +2749,7 @@ function renderNews(){
     '<p>확인할 점 · '+escapeHtml(item.check)+'</p>'+
     (original?'<a href="'+escapeHtml(original)+'">기사 원문 확인 ›</a>':'')+'</article>').join('');
    if($('newsAiOfficeMeta'))$('newsAiOfficeMeta').textContent=(digest.method==='groq'?'Groq':'Gemini')+' · 공개 기사 기반';
-   insightPanel.classList.remove('hidden');
+   insightPanel.classList?.remove?.('hidden');
   }
  }
  const isAI=b=>['gemini_article','groq_article','openai_article'].includes(b.summary_method)&&
