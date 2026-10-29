@@ -3,6 +3,15 @@ import {themeWeather,weatherBriefing} from './theme-weather.mjs';
 const HEAD={"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store","Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET,OPTIONS","Access-Control-Allow-Headers":"Content-Type","X-Content-Type-Options":"nosniff"};
 const key="office-general-settings-v1", enc=new TextEncoder();
 const BOARD_PREFIX="office-postit-v1:", BOARD_MAX_CHARS=1600;
+const BOARD_IMAGE_PREFIX="office-postit-image-v1:", BOARD_IMAGE_LIMIT=3, BOARD_IMAGE_MAX=195000;
+const BOARD_IMAGE_TTL=400*86400;
+const validImageId=x=>typeof x==="string"&&/^[0-9a-f-]{36}$/.test(x);
+function validImageData(value){
+ if(typeof value!=="string"||value.length<150||value.length>BOARD_IMAGE_MAX||
+    !/^data:image\/jpeg;base64,\/9j\/[A-Za-z0-9+/]+={0,2}$/.test(value))return false;
+ try{return atob(value.slice("data:image/jpeg;base64,".length)).length>=80}catch(e){return false}
+}
+
 const BOARD_LIFETIME_DAYS=365, BOARD_ARCHIVE_PREFIX="office-postit-archive-v1:", BOARD_ARCHIVE_DAYS=30;
 const MEMBER_PREFIX="office-member-v2:", DEVICE_PREFIX="office-member-device-v2:";
 const validMemberId=id=>typeof id==="string"&&/^[0-9a-f-]{36}$/.test(id);
@@ -256,6 +265,42 @@ async function boardCommand(req,env,url,ctx){
  if(url.pathname==="/board/push/config"&&req.method==="GET"){
   const config=fcmPublicConfig(env);
   return res({configured:!!config,push_available:!!fcmConfig(env),config:config||null});
+ }
+ // Authenticated photos: image bytes never enter the public settings endpoint.
+ const imageRoute=url.pathname.match(/^\/board\/([a-z0-9-]{45,51})\/images(?:\/([0-9a-f-]{36}))?$/);
+ if(imageRoute&&validBoardId(imageRoute[1])){
+  const noteId=imageRoute[1],photoId=imageRoute[2],noteKey=BOARD_PREFIX+noteId;
+  const note=await env.SETTINGS.get(noteKey,"json");
+  if(!note)return res({error:"not_found"},404);
+  const images=Array.isArray(note.images)?note.images.filter(validImageId):[];
+  if(req.method==="POST"&&!photoId){
+   if(images.length>=BOARD_IMAGE_LIMIT)return res({error:"image_limit"},409);
+   let data;try{data=await body(req,BOARD_IMAGE_MAX+250)}catch(e){return res({error:"invalid_image"},400)}
+   if(!validImageData(data?.data_url))return res({error:"invalid_image"},400);
+   const imageId=crypto.randomUUID();
+   await env.SETTINGS.put(BOARD_IMAGE_PREFIX+imageId,data.data_url,{expirationTtl:BOARD_IMAGE_TTL});
+   const updated={...note,images:[...images,imageId],updated_at:new Date().toISOString(),
+    edited_by:{id:caller.member.id,name:caller.member.name}};
+   try{
+    await env.SETTINGS.put(noteKey,JSON.stringify(updated),
+      {expirationTtl:BOARD_LIFETIME_DAYS*86400});
+   }catch(e){await env.SETTINGS.delete(BOARD_IMAGE_PREFIX+imageId);throw e}
+   return res({ok:true,note:updated,image_id:imageId},201);
+  }
+  if(photoId&&images.includes(photoId)&&req.method==="GET"){
+   const data=await env.SETTINGS.get(BOARD_IMAGE_PREFIX+photoId);
+   if(!validImageData(data))return res({error:"image_missing"},404);
+   return res({data_url:data});
+  }
+  if(photoId&&images.includes(photoId)&&req.method==="DELETE"){
+   const updated={...note,images:images.filter(id=>id!==photoId),updated_at:new Date().toISOString(),
+    edited_by:{id:caller.member.id,name:caller.member.name}};
+   await env.SETTINGS.put(noteKey,JSON.stringify(updated),
+     {expirationTtl:BOARD_LIFETIME_DAYS*86400});
+   await env.SETTINGS.delete(BOARD_IMAGE_PREFIX+photoId);
+   return res({ok:true,note:updated});
+  }
+  return res({error:"not_found"},404);
  }
  if(url.pathname==="/board"&&req.method==="GET")return res({schema:1,notes:await boardList(env)});
  if(url.pathname==="/board/updates"&&req.method==="GET"){
