@@ -503,3 +503,6 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 #officeBoard .officeBoardReadOnly{grid-column:1 / -1;display:block;min-height:32px;padding:7px 10px;
  border-radius:9px;background:#F2F6F3;color:#657976;font-size:12px;line-height:1.5;text-align:center}
 #officeBoardImageRemove[hidden]{display:none!important}
+
+/* Lightweight reminder hint, without changing the post-it card layout. */
+#officeBoard .officeBoardReminderHint{display:inline-block;margin-left:8px;font-size:11px;font-weight:750;color:#21736B;white-space:normal}
