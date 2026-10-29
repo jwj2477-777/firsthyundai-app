@@ -101,7 +101,7 @@ assert.equal(api._test.filteredMemos().length,samples.filter(n=>n.done).length);
 api.setStatus('all');api.setAuthor(userId);
 assert(api._test.filteredMemos().every(n=>n.author.id===userId));
 api.setAuthor('');
-api.setQuery('1502동 3004호');
+api.setQuery('1502동3004호');
 assert.equal(api._test.filteredMemos().length,1,'Search reaches exact apartment unit text');
 assert.equal(api._test.filteredMemos()[0].text,samples[3].text);
 api.setQuery('');api.setStatus('all');
