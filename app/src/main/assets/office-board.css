@@ -506,3 +506,61 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 
 /* Lightweight reminder hint, without changing the post-it card layout. */
 #officeBoard .officeBoardReminderHint{display:inline-block;margin-left:8px;font-size:11px;font-weight:750;color:#21736B;white-space:normal}
+
+
+/* Search-first shared memo library. Reuse existing mustard/brown office palette. */
+#officeBoard .officeBoardComposeBar{display:flex;align-items:center;justify-content:space-between;
+ gap:10px;margin:12px 0 10px}
+#officeBoard .officeBoardComposeBar strong{font-size:15px;font-weight:830;color:#36575B}
+#officeBoard .officeBoardComposeToggle{min-height:44px;min-width:112px;padding:9px 14px;
+ border:1px solid #705A37;background:#866D40;color:#fff;border-radius:11px;
+ font-weight:800;font-size:13px}
+#officeBoard .officeBoardComposeHeading{display:flex;justify-content:space-between;gap:8px;align-items:center}
+#officeBoard .officeBoardComposeHeading .officeBoardLabel{margin-bottom:7px}
+#officeBoard .officeBoardComposeCancel{min-height:40px;border:0;background:transparent;
+ padding:7px 10px;color:#617571;font-size:12px;font-weight:750}
+#officeBoard .officeBoardComposer.hidden{display:none!important}
+#officeBoard .officeBoardFinder{border:1px solid #DDE6DF;background:#fff;border-radius:14px;
+ padding:12px;display:grid;gap:10px}
+#officeBoard .officeBoardFinder.hidden,#officeBoard .officeBoardComposeBar.hidden{display:none!important}
+#officeBoard .officeBoardSearchLabel{box-sizing:border-box;display:flex;align-items:center;
+ gap:9px;background:#F9FAF7;border:1px solid #DCE5DF;border-radius:11px;
+ min-height:46px;padding:0 11px;color:#657A73;font-size:23px}
+#officeBoard .officeBoardSearchLabel:focus-within{outline:2px solid #A4BBA9}
+#officeBoard #officeBoardSearch{width:100%;min-width:0;height:44px;border:none;outline:none;
+ box-shadow:none!important;background:transparent;color:#2F474A;font-size:14px;font-weight:550}
+#officeBoard #officeBoardSearch::placeholder{color:#84928D}
+#officeBoard .officeBoardStatusFilters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+#officeBoard .officeBoardStatusFilters button{min-width:0;min-height:44px;
+ border-radius:10px;border:1px solid #DBE4DD;background:#FBFBFA;color:#546B68;
+ font-size:13px;font-weight:770;padding:7px 4px;white-space:normal}
+#officeBoard .officeBoardStatusFilters button.selected{background:#E8F2EA;
+ border-color:#91B7A5;color:#285A4A}
+#officeBoard .officeBoardStatusFilters button span{font-variant-numeric:tabular-nums}
+#officeBoard .officeBoardFinderOptions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#officeBoard .officeBoardFinderOptions label{display:flex;flex-direction:column;gap:5px;
+ color:#627671;font-size:11px;font-weight:750;min-width:0}
+#officeBoard .officeBoardFinderOptions select{box-sizing:border-box;width:100%;min-width:0;
+ min-height:43px;border:1px solid #DCE5DF;border-radius:10px;background:#fff;
+ color:#36565B;padding:8px;font-size:13px;font-weight:650}
+#officeBoard .officeBoardFindSummary{display:flex;align-items:center;justify-content:space-between;
+ gap:8px;min-height:23px;font-size:12px;color:#60726D}
+#officeBoard .officeBoardFindSummary strong{font-weight:700}
+#officeBoard #officeBoardClearFilters{min-height:32px;border:none;background:transparent;
+ color:#966E42;font-size:12px;font-weight:780}
+#officeBoard #officeBoardClearFilters[hidden]{display:none!important}
+#officeBoard .officeBoardMore{box-sizing:border-box;width:100%;min-height:47px;
+ margin-top:10px;border:1px solid #D4DFD7;border-radius:12px;
+ background:#fff;color:#43665F;font-size:13px;font-weight:750}
+#officeBoard .officeBoardMore.hidden{display:none!important}
+#officeBoard .officeBoardListHeading{margin-top:11px}
+#officeBoard .officeBoardPin{margin-left:auto;min-height:32px;
+ border:1px solid #EEE3C8;border-radius:8px;background:#FFFCF3;
+ padding:4px 8px;color:#957342;font-size:11px;font-weight:750}
+#officeBoard .officeBoardPin[aria-pressed="true"]{background:#F7EBD1;color:#765724}
+#officeBoard .officeBoardPinned{font-size:11px;color:#8D713F}
+@media(max-width:350px){
+ #officeBoard .officeBoardFinder{padding:10px}
+ #officeBoard .officeBoardStatusFilters button{font-size:12px}
+ #officeBoard .officeBoardFinderOptions select{padding:7px 5px}
+}
