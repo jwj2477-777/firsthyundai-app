@@ -6,12 +6,17 @@ const requests=new Map(),localUpdates=new Map(),localDeletes=new Map();
 let sequence=0,items=[],busy=false,lastCheck=0,showCompleted=false,editing='',editDraft='',timer=null;
 let timerMs=45000,pendingFocus='',view='notes',scheduleOpen=false,suggestedDate='';
 let archiveOpen=false,archived=[];
+let composeOpen=false,memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10;
+const PAGE_SIZE=10;
 let lastBriefing=0,briefingBusy=false;
 const startKst=()=>kstDate(new Date());
 let selectedDate='',calendarMonth='',editingBirthday='';
 function focusNote(id){
  if(!valid(id))return false;
  pendingFocus=id;
+ memoStatus='all';memoAuthor='';memoQuery='';memoLimit=10;
+ if($('officeBoardSearch'))$('officeBoardSearch').value='';
+ if($('officeBoardAuthorFilter'))$('officeBoardAuthorFilter').value='';
  if(typeof currentPage!=='undefined'&&currentPage==='officeBoard'){
   draw();refresh(true);
  }
@@ -151,10 +156,12 @@ function syncViews(){
  const isCal=view==='calendar';
  // One tab, one job. The free-form composer and its feedback belong to notes,
  // not to the calendar. Keep the typed draft untouched when switching tabs.
- for(const id of ['officeBoardComposer','officeBoardFeedback','officeBoardList','officeBoardListHeading']){
-  const e=id==='officeBoardComposer'?document.querySelector?.('#officeBoard .officeBoardComposer'):$(id);
+ for(const id of ['officeBoardFeedback','officeBoardList','officeBoardListHeading','officeBoardComposeBar','officeBoardFinder','officeBoardMore']){
+  const e=$(id);
   e?.classList?.toggle?.('hidden',isCal);
  }
+ $('officeBoardComposer')?.classList?.toggle?.('hidden',isCal||!composeOpen);
+ $('officeBoardComposeToggle')?.setAttribute?.('aria-expanded',String(composeOpen&&!isCal));
  $('officeBoardCalendar')?.classList?.toggle?.('hidden',!isCal);
  for(const [id,selected] of [['officeBoardNotesView',!isCal],['officeBoardCalendarView',isCal]]){
   const e=$(id);if(!e)continue;e.classList?.toggle?.('selected',selected);
@@ -179,7 +186,7 @@ function addAtSelectedDay(){
 }
 function openCalendarNote(id){
  if(!valid(id))return;
- if(birthdayOf(items.find(n=>n.id===id)))return; // Birthdays have no completion workflow.
+ if(birthdayOf(items.find(n=>n.id===id)))return;
  showCompleted=true;setView('notes');focusNote(id);
 }
 async function toggleArchive(){
@@ -201,21 +208,105 @@ $('officeBoardArchiveList')?.addEventListener?.('click',e=>{
  if(valid(id))mutate('restore',{id}).then(result=>{if(result){archived=archived.filter(n=>n.id!==id);drawArchive();refresh(true)}});
 });
 $('officeBoardDraft')?.addEventListener?.('input',checkSuggestion);
+function toggleComposer(force){
+ composeOpen=typeof force==='boolean'?force:!composeOpen;
+ syncViews();
+ if(composeOpen)$('officeBoardDraft')?.focus?.();
+}
+function setStatus(next){
+ if(!['active','done','all'].includes(next))return;
+ memoStatus=next;memoLimit=PAGE_SIZE;draw();
+}
+function setAuthor(value){memoAuthor=String(value||'');memoLimit=PAGE_SIZE;draw()}
+function setQuery(value){memoQuery=String(value||'').trim().toLocaleLowerCase('ko-KR');memoLimit=PAGE_SIZE;draw()}
+function setSort(next){
+ if(!['newest','oldest','schedule'].includes(next))return;
+ memoSort=next;memoLimit=PAGE_SIZE;draw();
+}
+function clearFilters(){
+ memoStatus='active';memoQuery='';memoAuthor='';memoSort='newest';memoLimit=PAGE_SIZE;
+ if($('officeBoardSearch'))$('officeBoardSearch').value='';
+ draw();
+}
+function showMore(){memoLimit+=PAGE_SIZE;draw()}
+function filteredMemos(){
+ const q=memoQuery;
+ return memoItems().filter(note=>{
+  if(memoStatus==='active'&&note.done||memoStatus==='done'&&!note.done)return false;
+  if(memoAuthor&&note.author?.id!==memoAuthor)return false;
+  if(q){
+   const source=[note.text,note.author?.name,dateText(note.created_at),
+    note.scheduled_at?dateText(note.scheduled_at):'',dateKey(note.scheduled_at)].join(' ').toLocaleLowerCase('ko-KR');
+   if(!source.includes(q))return false;
+  }
+  return true;
+ }).sort((a,b)=>{
+  if(Boolean(a.pinned)!==Boolean(b.pinned))return a.pinned?-1:1;
+  if(memoSort==='schedule'){
+   const aa=a.scheduled_at?Date.parse(a.scheduled_at):Infinity;
+   const bb=b.scheduled_at?Date.parse(b.scheduled_at):Infinity;
+   if(aa!==bb)return aa-bb;
+  }
+  const diff=String(a.created_at).localeCompare(String(b.created_at));
+  return memoSort==='oldest'?diff:-diff;
+ });
+}
+function syncFinder(memos,filtered){
+ const active=memos.filter(n=>!n.done).length,done=memos.length-active;
+ const setText=(id,text)=>{const x=$(id);if(x)x.textContent=String(text)};
+ setText('officeBoardCount',active);
+ setText('officeBoardActiveCount',active);
+ setText('officeBoardDoneCount',done);
+ setText('officeBoardTotalCount',memos.length);
+ setText('officeBoardListResult',filtered.length+'건 중 '+Math.min(filtered.length,memoLimit)+'건 표시');
+ for(const [mode,id] of [['active','officeBoardStatusActive'],['done','officeBoardStatusDone'],['all','officeBoardStatusAll']]){
+  const e=$(id);if(!e)continue;
+  e.classList?.toggle?.('selected',memoStatus===mode);
+  e.setAttribute?.('aria-pressed',String(memoStatus===mode));
+ }
+ const picker=$('officeBoardAuthorFilter');
+ if(picker){
+  const names=new Map();
+  for(const n of memos){
+   const key=String(n.author?.id||'legacy');
+   if(!names.has(key))names.set(key,String(n.author?.name||'작성자 미기록'));
+  }
+  const expected='<option value="">전체 작성자</option>'+[...names].sort((a,b)=>a[1].localeCompare(b[1],'ko-KR'))
+   .map(([id,name])=>'<option value="'+esc(id)+'">'+esc(name)+'</option>').join('');
+  if(picker.innerHTML!==expected)picker.innerHTML=expected;
+  picker.value=memoAuthor;
+ }
+ if($('officeBoardSort'))$('officeBoardSort').value=memoSort;
+ const reset=$('officeBoardClearFilters');
+ if(reset)reset.hidden=memoStatus==='active'&&!memoAuthor&&!memoQuery&&memoSort==='newest';
+ const more=$('officeBoardMore');
+ if(more){
+  more.classList?.toggle?.('hidden',filtered.length<=memoLimit||view==='calendar');
+  more.textContent='메모 더 보기 ('+(filtered.length-Math.min(filtered.length,memoLimit))+'건 남음)';
+ }
+}
+$('officeBoardSearch')?.addEventListener?.('input',e=>setQuery(e.target?.value));
+$('officeBoardAuthorFilter')?.addEventListener?.('change',e=>setAuthor(e.target?.value));
+$('officeBoardSort')?.addEventListener?.('change',e=>setSort(e.target?.value));
 function draw(){
  const list=$('officeBoardList');if(!list)return;
  const memos=memoItems();
- $('officeBoardCount').textContent=String(memos.filter(x=>!x.done).length);
- const completedCount=memos.filter(x=>x.done).length;
- $('officeBoardShowDone').textContent=showCompleted?'완료 숨기기':'완료 '+completedCount+'건 보기';
- $('officeBoardShowDone').setAttribute?.('aria-pressed',showCompleted?'true':'false');
  const admin=bridge?.getMode?.()==='admin';
  $('officeBoardArchiveOpen')?.classList?.toggle?.('hidden',!admin);
- const visible=memos.filter(x=>showCompleted||!x.done);
+ const filtered=filteredMemos();
+ if(pendingFocus){
+  const index=filtered.findIndex(n=>n.id===pendingFocus);
+  if(index>=0)memoLimit=Math.max(memoLimit,index+1);
+ }
+ syncFinder(memos,filtered);
+ const visible=filtered.slice(0,memoLimit);
  if(!visible.length){
-  list.innerHTML='<div class="empty">'+(memos.length?'표시할 메모가 없습니다. 완료 메모를 열어볼 수 있습니다.':'아직 메모가 없습니다. 첫 포스트잇을 붙여보세요.')+'</div>';
+  list.innerHTML='<div class="empty">'+
+   (memos.length?'조건에 맞는 메모가 없습니다. 검색어 또는 분류를 바꿔보세요.':
+    '아직 메모가 없습니다. 위의 새 메모 버튼으로 첫 메모를 작성해 보세요.')+'</div>';
   drawCalendar();syncViews();return;
  }
- list.innerHTML=visible.map(note=>{
+  list.innerHTML=visible.map(note=>{
   const id=esc(note.id),editable=canEditNote(note),isEdit=editable&&editing===note.id;
   const body=isEdit?'<textarea class="officeBoardEdit" maxlength="1600" data-edit="'+id+'" aria-label="메모 수정">'+esc(editDraft)+'</textarea>':
    '<div class="officeBoardText">'+(preferences().memoPhones==='off'?esc(note.text):phones(note.text))+'</div>';
@@ -228,7 +319,8 @@ function draw(){
     :'<span class="officeBoardReadOnly">작성자·관리자만 수정 가능</span>')+
    (admin?'<button data-action="delete" data-id="'+id+'" class="officeBoardDelete">삭제</button>':'');
   return '<article class="officeBoardNote'+(note.done?' completed':'')+'" data-note="'+id+'">'+
-   '<div class="officeBoardNoteTop"><span class="officeBoardNoteLabel">'+(note.done?'✓ 완료':'공유 메모')+'</span>'+
+   '<div class="officeBoardNoteTop"><span class="officeBoardNoteLabel">'+(note.done?'✓ 완료':'진행 중')+'</span>'+
+    (editable?'<button type="button" class="officeBoardPin" data-action="pin" data-id="'+id+'" aria-pressed="'+Boolean(note.pinned)+'" aria-label="'+(note.pinned?'중요 메모 고정 해제':'중요 메모 고정')+'">'+(note.pinned?'📌 고정됨':'📌 고정')+'</button>':(note.pinned?'<span class="officeBoardPinned">📌 고정</span>':''))+
    '<span class="officeBoardAuthor">'+esc(note.author?.name||'작성자 미기록')+'</span><time>'+esc(dateText(note.created_at))+'</time></div>'+
    body+(note.scheduled_at?'<div class="officeBoardNoteSchedule">▦ '+esc(note.all_day?kstDate(note.scheduled_at)+' · 종일':dateText(note.scheduled_at))+
      (!note.all_day&&!note.done?'<small class="officeBoardReminderHint">🔔 시작 30분 전 알림</small>':'')+'</div>':'')+
@@ -248,6 +340,7 @@ function draw(){
  }
  drawCalendar();syncViews();
 }
+
 function call(action,payload){
  if(typeof bridge?.officeBoardAction!=='function')return Promise.reject(Error('메모 공유는 최신 안드로이드 앱에서 지원합니다.'));
  const id='postit'+(++sequence);
@@ -432,7 +525,7 @@ async function mutate(action,data){
   const result=await call(action,data);
   if(action==='delete')localDeletes.set(data.id,Date.now());
   else if(result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
-  if(action==='post'){$('officeBoardDraft').value='';checkSuggestion();}
+  if(action==='post'){$('officeBoardDraft').value='';checkSuggestion();composeOpen=false;}
   if(action==='restore'&&result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
   editing='';editDraft='';
   merge(items);
@@ -544,7 +637,7 @@ function remove(id){
  if(typeof confirm==='function'&&!confirm('이 메모를 복구함으로 이동할까요? 30일 안에 복구할 수 있습니다.'))return;
  mutate('delete',{id});
 }
-function toggleDone(){showCompleted=!showCompleted;draw()}
+function toggleDone(){memoStatus=memoStatus==='done'?'active':'done';memoLimit=PAGE_SIZE;draw()}
 function authenticate(){
  if(!bridge?.requestOfficeBoardAccess){msg('보안코드 연결은 안드로이드 앱에서만 지원합니다.');return}
  bridge.requestOfficeBoardAccess();
@@ -568,6 +661,11 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
   window.FirstHyundaiBoardImages?.selectFor?.(id,Array.isArray(note?.images)?note.images.length:0);
  }
  if(action==='photoView')window.FirstHyundaiBoardImages?.view?.(id,button.dataset.photo);
+ if(action==='pin'){
+  if(!canEditId(id)){denied();return}
+  const note=items.find(n=>n.id===id);
+  if(note)mutate('pin',{id,pinned:!note.pinned});
+ }
 });
 function imageUpdate(note){
  if(!note||!valid(note.id))return;
@@ -575,6 +673,7 @@ function imageUpdate(note){
  merge(items);
 }
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
+ toggleComposer,setStatus,setAuthor,setQuery,setSort,showMore,clearFilters,
  imageCall:call,imageUpdate,canEdit:canEditId,
  setView,chooseDay,changeMonth,today,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
  onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true);
@@ -583,5 +682,5 @@ window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDo
   else if(currentPage==='overview')openBriefing(true)},
  syncNotificationStatus,enableNotifications,settingsChanged,focusNote,
  openBriefing,openBriefingNote,openBriefingCalendar,renderBriefing,closureDates,weatherAppointments,
- _test:{phones,merge,scheduleSuggestion,toIso,dateKey,briefingRows,nextDay,calendarEntries,memoItems,birthdayOf,canEditNote}};
+ _test:{phones,merge,scheduleSuggestion,toIso,dateKey,briefingRows,nextDay,calendarEntries,memoItems,birthdayOf,canEditNote,filteredMemos}};
 })();
