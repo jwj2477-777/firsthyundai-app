@@ -128,6 +128,24 @@ function boardSchedule(value){
  return value;
 }
 const validBoardId=x=>typeof x==="string"&&/^([a-z0-9]{8,14})-([0-9a-f-]{36})$/.test(x);
+// Bound every public-facing (authenticated) board response to 25 memos.
+// This avoids one oversized Android response and large bursts of KV lookups.
+// KV names are chronological; offset 0 is the newest page.
+const BOARD_PAGE_SIZE=25;
+async function boardPage(env,offset=0){
+ const keys=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
+ const names=keys.keys.filter(k=>validBoardId(k.name.slice(BOARD_PREFIX.length)));
+ const end=Math.max(0,names.length-offset);
+ const page=names.slice(Math.max(0,end-BOARD_PAGE_SIZE),end);
+ const loaded=await Promise.all(page.map(async k=>{
+  try{return await env.SETTINGS.get(k.name,"json")}catch(e){return null}
+ }));
+ const notes=loaded.filter(n=>n&&validBoardId(n.id)&&
+  typeof n.text==="string"&&typeof n.done==="boolean")
+  .sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));
+ return {schema:1,notes,total:names.length,
+  has_more:offset+BOARD_PAGE_SIZE<names.length,next_offset:offset+BOARD_PAGE_SIZE};
+}
 async function boardList(env){
  const keys=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
  // Each post-it has its own KV key, so simultaneous posts never overwrite one another.
@@ -321,7 +339,12 @@ async function boardCommand(req,env,url,ctx){
    scheduled_at:typeof note.scheduled_at==="string"?note.scheduled_at:null,
    all_day:note.all_day===true,done:note.done===true});
  }
- if(url.pathname==="/board"&&req.method==="GET")return res({schema:1,notes:await boardList(env)});
+ if(url.pathname==="/board"&&req.method==="GET"){
+  const offsetRaw=url.searchParams.get("offset")||"0";
+  if(!/^\d{1,4}$/.test(offsetRaw)||Number(offsetRaw)>1000)
+   return res({error:"invalid_page"},400);
+  return res(await boardPage(env,Number(offsetRaw)));
+ }
  if(url.pathname==="/board/updates"&&req.method==="GET"){
   const list=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
   const items=list.keys.slice(-120).filter(x=>validBoardId(x.name.slice(BOARD_PREFIX.length)))
