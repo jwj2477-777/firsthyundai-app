@@ -222,7 +222,11 @@ function setStatus(next){
  memoStatus=next;finderTouched=true;memoLimit=PAGE_SIZE;draw();
 }
 function setAuthor(value){memoAuthor=String(value||'');finderTouched=true;memoLimit=PAGE_SIZE;draw()}
-function setQuery(value){memoQuery=String(value||'').trim().toLocaleLowerCase('ko-KR');finderTouched=true;memoLimit=PAGE_SIZE;draw()}
+function searchKey(value){
+ // A practical unit search finds both '1502동3004호' and '1502동 3004호'.
+ return String(value||'').toLocaleLowerCase('ko-KR').replace(/[\s·.,\-]+/g,'');
+}
+function setQuery(value){memoQuery=searchKey(value);finderTouched=true;memoLimit=PAGE_SIZE;draw()}
 function setSort(next){
  if(!['newest','oldest','schedule'].includes(next))return;
  memoSort=next;finderTouched=true;memoLimit=PAGE_SIZE;draw();
@@ -243,7 +247,7 @@ function filteredMemos(){
   if(q){
    const source=[note.text,note.author?.name,dateText(note.created_at),
     note.scheduled_at?dateText(note.scheduled_at):'',dateKey(note.scheduled_at)].join(' ').toLocaleLowerCase('ko-KR');
-   if(!source.includes(q))return false;
+   if(!searchKey(source).includes(q))return false;
   }
   return true;
  }).sort((a,b)=>{
