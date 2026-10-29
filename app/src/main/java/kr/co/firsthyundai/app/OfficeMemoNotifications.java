@@ -22,6 +22,8 @@ final class OfficeMemoNotifications {
     static final String CHANNEL="firsthyundai_private_office_notes";
     static final int PERMISSION=1418;
     private static final int JOB_ID=43152;
+    private static final String REMINDER_CHANNEL="firsthyundai_private_schedule_reminders";
+    private static final String LAST_REMINDER="last_reminder_";
     private static final String PREF="firsthyundai-office-note-notify-v1";
     private static final String LAST="last_id";
     private static final String ENABLED="enabled";
@@ -38,6 +40,17 @@ final class OfficeMemoNotifications {
         c.setDescription("새 공유 메모의 첫 문장을 보여줍니다. 잠금화면은 내용이 가려집니다.");
         c.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
         n.createNotificationChannel(c);
+    }
+    static void ensureReminderChannel(Context c){
+        if(Build.VERSION.SDK_INT<26)return;
+        NotificationManager manager=(NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE);
+        if(manager==null||manager.getNotificationChannel(REMINDER_CHANNEL)!=null)return;
+        NotificationChannel channel=new NotificationChannel(REMINDER_CHANNEL,
+            "공유 일정 시작 30분 전",NotificationManager.IMPORTANCE_HIGH);
+        channel.setDescription("시간이 정해진 사무실 공유 일정이 시작되기 30분 전 알림");
+        channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        channel.enableVibration(true);
+        manager.createNotificationChannel(channel);
     }
     static boolean enabled(Context c){return c.getSharedPreferences(PREF,Context.MODE_PRIVATE).getBoolean(ENABLED,true);}
     static void setEnabled(Context c,boolean on){
@@ -115,6 +128,70 @@ final class OfficeMemoNotifications {
         prefs.edit().putString(LAST_PUSH,id)
           .putString(LAST,id.compareTo(last)>0?id:last).apply();
         if(enabled(c))post(c,1,id);
+    }
+    /**
+     * FCM carries only the schedule timestamp and opaque note ID. Before showing
+     * a reminder, fetch the authenticated note from the office server and ensure
+     * it is still scheduled and incomplete. Changes or cancellations invalidate
+     * older queued FCM messages.
+     */
+    static synchronized void receivedReminder(Context context,String id,String eventAt){
+        if(!"enabled".equals(status(context))||!OfficeBoardClient.enrolled(context)||
+           id==null||!id.matches("[a-z0-9]{8,14}-[0-9a-f-]{36}")||
+           eventAt==null||eventAt.length()>30)return;
+        final long startsAt;
+        try{startsAt=java.time.Instant.parse(eventAt).toEpochMilli();}
+        catch(Exception e){return;}
+        long until=startsAt-System.currentTimeMillis();
+        if(until<15*60*1000L||until>33*60*1000L)return;
+        SharedPreferences prefs=context.getSharedPreferences(PREF,Context.MODE_PRIVATE);
+        String lastKey=LAST_REMINDER+id;
+        if(eventAt.equals(prefs.getString(lastKey,"")))return;
+        JSONObject note;
+        try{note=OfficeBoardClient.preview(context,id);}
+        catch(Exception e){return;}
+        if(note.optBoolean("done",true)||note.optBoolean("all_day",true)||
+           !eventAt.equals(note.optString("scheduled_at","")))return;
+        ensureReminderChannel(context);
+        NotificationManager manager=(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if(manager==null)return;
+        if(Build.VERSION.SDK_INT>=26){
+            NotificationChannel channel=manager.getNotificationChannel(REMINDER_CHANNEL);
+            if(channel==null||channel.getImportance()==NotificationManager.IMPORTANCE_NONE)return;
+        }
+        String text=safePreview(note.optString("preview",""));
+        if(text.isEmpty())text="곧 시작하는 공유 일정을 확인해 주세요.";
+        String author=safePreview(note.optString("author",""));
+        String heading="⏰ 30분 후 공유 일정";
+        if(!author.isEmpty())heading+=" · "+author;
+        Intent open=new Intent(context,LockActivity.class);
+        open.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        open.putExtra("office_board_from_notification",true);
+        open.putExtra("office_board_note_id",id);
+        int requestCode=0x60000000|(id.hashCode()&0xffff);
+        PendingIntent tap=PendingIntent.getActivity(context,requestCode,open,
+            PendingIntent.FLAG_IMMUTABLE|PendingIntent.FLAG_UPDATE_CURRENT);
+        Notification.Builder notification=Build.VERSION.SDK_INT>=26
+            ?new Notification.Builder(context,REMINDER_CHANNEL):new Notification.Builder(context);
+        notification.setSmallIcon(R.drawable.ic_stat_trade_notification)
+            .setContentTitle(heading).setContentText(text)
+            .setStyle(new Notification.BigTextStyle().bigText(text))
+            .setVisibility(Notification.VISIBILITY_PRIVATE)
+            .setContentIntent(tap).setAutoCancel(true)
+            .setCategory(Notification.CATEGORY_EVENT)
+            .setWhen(System.currentTimeMillis()).setShowWhen(true);
+        Notification.Builder hidden=Build.VERSION.SDK_INT>=26
+            ?new Notification.Builder(context,REMINDER_CHANNEL):new Notification.Builder(context);
+        hidden.setSmallIcon(R.drawable.ic_stat_trade_notification)
+            .setContentTitle("퍼스트현대 · 공유 일정 알림")
+            .setContentText("잠금을 해제하면 일정을 확인할 수 있습니다.")
+            .setVisibility(Notification.VISIBILITY_PUBLIC);
+        notification.setPublicVersion(hidden.build());
+        try{
+            manager.notify(requestCode,notification.build());
+            prefs.edit().putString(lastKey,eventAt).apply();
+            NotificationHistory.recordReminder(context,id);
+        }catch(SecurityException ignored){}
     }
     private static void post(Context context,int number){post(context,number,"");}
     private static String safePreview(String value) {
