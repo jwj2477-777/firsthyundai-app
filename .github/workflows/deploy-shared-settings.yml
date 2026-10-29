@@ -48,6 +48,8 @@ jobs:
         run: node scripts/test_office_board.mjs
       - name: Test private shared memo photo access
         run: node scripts/test_office_board_images.mjs
+      - name: Test scheduled reminders and FCM privacy
+        run: node scripts/test_office_schedule_reminders.mjs
       - name: Deploy settings Worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
