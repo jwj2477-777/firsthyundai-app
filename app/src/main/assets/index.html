@@ -881,6 +881,8 @@ body.apartmentSheetActive{overflow:hidden}
  </div>
  <section id="newsArticlesPane" role="tabpanel" aria-labelledby="newsTabArticles">
   <div class="panel newsFeedPanel">
+   <div class="newsFilterRow"><select id="newsCategory" aria-label="뉴스 주제" onchange="renderNews()"><option value="">모든 주제</option><option>개발·교통</option><option>분양·입주</option><option>세금·대출</option><option>정책·규제</option></select></div>
+   <details class="newsSourceDetails newsFeedDetails"><summary>AI 도우미 · 원문 안내</summary>
    <section class="newsLiveVoice" aria-label="공개뉴스 실시간 AI 음성 도우미">
     <div class="newsLiveVoiceHeading"><strong>🎙 공개뉴스 AI 음성대화</strong><small>Gemini Live · 무료 한도 내</small></div>
     <p>송도 뉴스에 관해 자연스럽게 질문해 보세요. 화면 조작이나 일정 등록은 하지 않는 참고용 기능입니다.</p>
@@ -894,8 +896,7 @@ body.apartmentSheetActive{overflow:hidden}
     <div id="newsAiOfficeItems"></div>
     <p class="tiny">기사 본문을 바탕으로 정리한 참고사항입니다. 실제 정책·일정·가격 등은 원문·공식 자료를 확인하세요.</p>
    </section>
-   <div class="newsFilterRow"><select id="newsCategory" aria-label="뉴스 주제" onchange="renderNews()"><option value="">모든 주제</option><option>개발·교통</option><option>분양·입주</option><option>세금·대출</option><option>정책·규제</option></select></div>
-   <details class="newsSourceDetails newsFeedDetails"><summary>요약·원문 안내</summary>
+
     <p class="familySimpleNote familyBriefCaution">뉴스 요약은 참고용입니다. 중요한 정보는 원문에서 확인하세요.</p>
     <div class="notice adminExplain">기사를 제목별로 묶은 뒤 <b>원문 본문을 읽을 수 있는 경우에만 Gemini·Groq가 핵심 내용을 요약</b>합니다. 본문 확인이 불가능한 기사는 AI 요약을 표시하지 않습니다. AI 요약은 사실검증이 아니므로 세금·대출·개발 일정은 원문과 공식 발표를 확인하세요.</div>
     <p class="tiny adminExplain" id="newsMeta">AI 기사 본문 요약 현황을 확인 중입니다.</p>
