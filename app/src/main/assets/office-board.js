@@ -314,7 +314,7 @@ function draw(){
   list.innerHTML=visible.map(note=>{
   const id=esc(note.id),editable=canEditNote(note),isEdit=editable&&editing===note.id;
   const expanded=expandedNotes.has(note.id);
-  const needsExpand=!isEdit&&(note.text.length>110||note.text.split('\\n').length>3);
+  const needsExpand=!isEdit&&(note.text.length>110||note.text.split('\n').length>3);
   const body=isEdit?'<textarea class="officeBoardEdit" maxlength="1600" data-edit="'+id+'" aria-label="메모 수정">'+esc(editDraft)+'</textarea>':
    '<div class="officeBoardText'+(needsExpand&&!expanded?' officeBoardTextCollapsed':'')+'">'+
     (preferences().memoPhones==='off'?esc(note.text):phones(note.text))+'</div>'+
