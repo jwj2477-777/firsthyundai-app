@@ -1379,6 +1379,7 @@ function openNewsHome(){
  switchPage('news');
 }
 function switchNewsPane(pane){
+ if(pane!=='articles')window.FirstHyundaiLive?.stop?.();
  if(!['articles','subscriptions'].includes(pane))return;
   newsPane=pane;
  $('newsArticlesPane').classList.toggle('hidden',pane!=='articles');
