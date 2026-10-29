@@ -97,8 +97,8 @@ class TestGeminiNews(unittest.TestCase):
                           "title": "정책 테스트", "publisher": "신문"}]}
             for i in range(5)]}
         calls = []
-        sentence = ("송도 주택정책의 세부 방안을 논의하고 있습니다.\\n"
-                    "적용 대상 지역은 관련 기관과 협의하고 있습니다.\\n"
+        sentence = ("송도 주택정책의 세부 방안을 논의하고 있습니다.\n"
+                    "적용 대상 지역은 관련 기관과 협의하고 있습니다.\n"
                     "확정된 시행 일정은 아직 공개되지 않았습니다.")
         def partial(batch, key):
             calls.append([x["id"] for x in batch])
