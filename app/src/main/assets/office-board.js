@@ -361,6 +361,21 @@ function call(action,payload){
   catch(e){clearTimeout(timeout);requests.delete(id);reject(e)}
  });
 }
+async function readAllBoard(){
+ // Read across older pages for calendar, birthdays and full-text retrieval.
+ // All pages remain inside the authenticated native bridge.
+ const all=new Map();
+ let offset=0;
+ while(offset<=1000){
+  const page=await call('list',{offset});
+  for(const note of page.notes||[])if(valid(note?.id))all.set(note.id,note);
+  if(!page.has_more)break;
+  const next=Number(page.next_offset);
+  if(!Number.isInteger(next)||next<=offset)break;
+  offset=next;
+ }
+ return [...all.values()];
+}
 window.onFirstHyundaiOfficeBoardResult=e=>{
  const result=requests.get(e?.requestId);if(!result)return;
  requests.delete(e.requestId);
@@ -456,8 +471,8 @@ function openBriefing(force=false){
  briefingBusy=true;
  const target=$('overviewMemoEntries');
  if(target&&!lastBriefing)target.textContent='공유 일정을 확인하는 중…';
- call('list',{}).then(data=>{
-  merge(Array.isArray(data.notes)?data.notes:[]);
+ readAllBoard().then(notes=>{
+  merge(notes);
   lastBriefing=Date.now();
  },()=>{if(target&&!lastBriefing){$('overviewMemoBriefing').hidden=false;target.textContent='일정 연결을 확인해 주세요.'}})
  .finally(()=>{briefingBusy=false});
@@ -615,8 +630,7 @@ async function addBirthdays(){
  if(button)button.disabled=true;
  let added=0,skipped=0;
  try{
-  const remote=await call('list',{});
-  const base=Array.isArray(remote.notes)?remote.notes:items;
+  const base=await readAllBoard();
   const existing=new Set(base.filter(n=>n.id!==editingBirthday).map(x=>String(x.text||'').trim()));
   const received=[];
   if(editingBirthday){
