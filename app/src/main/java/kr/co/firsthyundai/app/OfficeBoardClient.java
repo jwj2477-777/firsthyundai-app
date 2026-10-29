@@ -171,7 +171,11 @@ final class OfficeBoardClient {
     static JSONObject perform(Context context,String action,JSONObject payload,String adminToken) throws Exception {
         String auth=token(context);
         if(auth.isEmpty())throw new Exception("최초 한 번 사무실 보안코드 인증이 필요합니다.");
-        if("list".equals(action))return request("GET","/board",null,auth);
+        if("list".equals(action)){
+            int offset=payload.optInt("offset",0);
+            if(offset<0||offset>1000)throw new Exception("메모 조회 범위를 확인해 주세요.");
+            return request("GET","/board?offset="+offset,null,auth);
+        }
         if("archive".equals(action))return request("GET","/board/archive",null,auth,adminToken);
         if("post".equals(action)){
             String text=payload.optString("text","");
