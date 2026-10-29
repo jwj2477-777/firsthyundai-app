@@ -48,6 +48,8 @@ jobs:
         run: node scripts/test_office_board.mjs
       - name: Test authenticated paging, pin rights and private board cache
         run: node scripts/test_office_board_find.mjs
+      - name: Test administrator-only member last connection
+        run: node scripts/test_office_member_last_seen.mjs
       - name: Test private shared memo photo access
         run: node scripts/test_office_board_images.mjs
       - name: Test scheduled reminders and FCM privacy
