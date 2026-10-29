@@ -76,6 +76,9 @@
  function selectFor(noteId='',photosAlready=0){
   if(uploading)return;
   if(noteId&& !/^[a-z0-9]{8,14}-[0-9a-f-]{36}$/.test(noteId))return;
+  if(noteId&&!window.FirstHyundaiOfficeBoard?.canEdit?.(noteId)){
+   status('사진은 최초 작성자 또는 관리자만 추가할 수 있습니다.');return;
+  }
   target=noteId||'';
   existingCount=target?Math.max(0,Math.min(MAX,Number(photosAlready)||0)):0;
   if(target)drafts=[];
@@ -86,6 +89,9 @@
  async function uploadPending(id){
   if(uploading||!drafts.length)return false;
   if(!window.FirstHyundaiOfficeBoard?.imageCall){status('최신 앱으로 업데이트해 주세요.');return false}
+  if(!window.FirstHyundaiOfficeBoard?.canEdit?.(id)){
+   status('이 메모는 최초 작성자 또는 관리자만 수정할 수 있습니다.');return false;
+  }
   uploading=true;target=id;
   const input=$('officeBoardImageInput'),post=$('officeBoardPost');
   if(input)input.disabled=true;if(post)post.disabled=true;
@@ -121,6 +127,8 @@
   try{if(!dialog.open)dialog.showModal()}catch(e){}
   const key=noteId+':'+imageId;
   activePhoto={noteId,imageId};
+  const remove=$('officeBoardImageRemove');
+  if(remove)remove.hidden=!window.FirstHyundaiOfficeBoard?.canEdit?.(noteId);
   try{
    let data=cache.get(key);
    if(!data){
@@ -138,6 +146,9 @@
  }
  async function removeActive(){
   if(!activePhoto||uploading)return;
+  if(!window.FirstHyundaiOfficeBoard?.canEdit?.(activePhoto.noteId)){
+   status('이 사진은 최초 작성자 또는 관리자만 삭제할 수 있습니다.');return;
+  }
   if(typeof confirm==='function'&&!confirm('이 사진을 공유 메모에서 삭제할까요?'))return;
   const {noteId,imageId}=activePhoto;
   try{
