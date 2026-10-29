@@ -47,6 +47,8 @@ final class PublicLiveVoice {
     private OkHttpClient http;
     private String publicBrief="";
     private boolean contractMode=false;
+    // Conditions proposed during this session only; never the pre-existing contract form.
+    private final JSONObject proposedConditions=new JSONObject();
     private volatile int audioGeneration=0;
     PublicLiveVoice(Context context,Events events){this.context=context.getApplicationContext();this.events=events;}
     private void event(String state,String text){events.emit(state,text);}
@@ -171,17 +173,25 @@ final class PublicLiveVoice {
             if(calls==null)return;
             for(int i=0;i<Math.min(calls.length(),20);i++){
                 JSONObject fc=calls.optJSONObject(i);if(fc==null)continue;
-                boolean accepted=false;
+                String result="rejected_invalid_fields";
                 if(contractMode&&ContractLiveProtocol.FUNCTION.equals(fc.optString("name"))){
                     try{
                         JSONObject proposal=ContractLiveProtocol.validated(fc.optJSONObject("args"));
-                        if(running){event("proposal",proposal.toString());accepted=true;}
+                        try{
+                            ContractLiveProtocol.validateConsistency(proposedConditions,proposal);
+                            if(running){
+                                java.util.Iterator<String> keys=proposal.keys();
+                                while(keys.hasNext()){String key=keys.next();proposedConditions.put(key,proposal.get(key));}
+                                event("proposal",proposal.toString());
+                                result="proposed_for_user_review";
+                            }
+                        }catch(Exception conflict){result="rejected_inconsistent_conditions";}
                     }catch(Exception ignored){}
                 }
-                // Only a fixed acknowledgement leaves the device, never local form values.
+                // Only fixed acknowledgements leave the device; no existing form or previous values.
                 responses.put(new JSONObject().put("id",fc.optString("id"))
                     .put("name",fc.optString("name"))
-                    .put("response",new JSONObject().put("result",accepted?"proposed_for_user_review":"rejected_invalid_fields")));
+                    .put("response",new JSONObject().put("result",result)));
             }
             if(running)ws.send(new JSONObject().put("toolResponse",new JSONObject().put("functionResponses",responses)).toString());
         }catch(Exception ignored){}
