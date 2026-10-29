@@ -361,9 +361,9 @@ body.apartmentSheetActive{overflow:hidden}
  <button id="officeBoardMore" type="button" class="officeBoardMore hidden" onclick="FirstHyundaiOfficeBoard.showMore()">메모 더 보기</button>
 </div>
 <div id="adminCenter" class="page hidden">
- <div class="sectionTitle"><div><h2>시스템 관리센터</h2><p class="tiny">앱 진단·운영 · 관리자 전용</p></div><button type="button" class="btn alt refreshAction" onclick="FirstHyundaiAdminCenter.refresh()">전체 점검</button></div>
+ <div class="sectionTitle"><div><h2>관리센터</h2><p class="tiny">사무실 앱 설정 · 관리자 전용</p></div><button type="button" class="btn alt refreshAction adminMasterRefresh" onclick="FirstHyundaiAdminCenter.refresh()">자료 전체 점검</button></div>
  <section class="adminCommandBar" aria-label="관리센터 작업 메뉴">
-  <div class="adminCommandIntro"><strong>관리센터</strong><small>관리할 작업을 선택하거나 설정 이름을 검색하세요.</small></div>
+  <div class="adminCommandIntro"><strong>어떤 항목을 관리하시겠어요?</strong><small>원하는 메뉴를 선택하면 관련 설정만 나타납니다.</small></div>
   <div class="adminSearchBox">
    <label class="srOnly" for="adminControlSearch">관리 항목 검색</label>
    <input id="adminControlSearch" type="search" autocomplete="off" placeholder="설정 검색 · 계정, 테마, 알림, API…" oninput="FirstHyundaiAdminNavigator.search(this.value)">
