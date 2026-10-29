@@ -1,0 +1,208 @@
+package kr.co.firsthyundai.app;
+
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioRecord;
+import android.media.AudioTrack;
+import android.media.MediaRecorder;
+import android.util.Base64;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+/** Explicit user-initiated, public-news-only Gemini Live voice conversation.
+ * Mic and audio are never recorded to disk, logged, or added to office memos.
+ * An office-authenticated short-lived token comes from the Cloudflare Worker.
+ */
+final class PublicLiveVoice {
+    interface Events { void emit(String status,String text); }
+    private static final String ENDPOINT="wss://generativelanguage.googleapis.com/ws/"
+        +"google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained";
+    private final Context context;
+    private final Events events;
+    private final ExecutorService startup=Executors.newSingleThreadExecutor();
+    private final ExecutorService player=Executors.newSingleThreadExecutor();
+    private volatile boolean running=false;
+    private volatile WebSocket socket;
+    private volatile AudioRecord microphone;
+    private volatile AudioTrack speaker;
+    private volatile boolean closed=false;
+    private OkHttpClient http;
+    private String publicBrief="";
+    PublicLiveVoice(Context context,Events events){this.context=context.getApplicationContext();this.events=events;}
+    private void event(String state,String text){events.emit(state,text);}
+    private static String safePublicBrief(String json){
+        if(json==null||json.length()>4200)return "";
+        StringBuilder out=new StringBuilder();
+        try{
+            JSONArray rows=new JSONArray(json);
+            for(int i=0;i<Math.min(4,rows.length());i++){
+                JSONObject item=rows.optJSONObject(i);
+                if(item==null||!("gemini_article".equals(item.optString("method"))||
+                                  "groq_article".equals(item.optString("method"))))continue;
+                String title=item.optString("title","");
+                String summary=item.optString("summary","");
+                if(title.length()>160||summary.length()>320||summary.length()<25)continue;
+                out.append("\\n").append(title).append(" : ").append(summary);
+            }
+        }catch(Exception ignored){}
+        return out.toString();
+    }
+    void start(String publicNews){
+        if(closed||running)return;
+        if(android.os.Build.VERSION.SDK_INT>=23&&
+                context.checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED){
+            event("error","마이크 권한을 허용한 뒤 다시 시작해 주세요.");
+            return;
+        }
+        running=true;publicBrief=safePublicBrief(publicNews);
+        event("connecting","무료 Gemini Live 연결을 확인하고 있습니다.");
+        startup.execute(()->{
+            try{
+                JSONObject token=OfficeBoardClient.liveToken(context);
+                if(!running)return;
+                String name=token.optString("token","");
+                String model=token.optString("model","");
+                if(name.length()<12||name.length()>2048||!model.matches("[a-z0-9.-]{10,80}"))
+                    throw new Exception("실시간 음성 사용권 확인 실패");
+                http=new OkHttpClient.Builder().readTimeout(0,TimeUnit.MILLISECONDS).build();
+                Request req=new Request.Builder().url(ENDPOINT+"?access_token="+name).build();
+                socket=http.newWebSocket(req,new WebSocketListener(){
+                    @Override public void onOpen(WebSocket ws,Response response){
+                        try{
+                            JSONObject setup=new JSONObject();
+                            setup.put("model","models/"+model);
+                            setup.put("generationConfig",new JSONObject()
+                                .put("responseModalities",new JSONArray().put("AUDIO")));
+                            setup.put("systemInstruction",new JSONObject().put("parts",new JSONArray().put(
+                                new JSONObject().put("text",
+                                  "당신은 퍼스트현대의 공개 부동산·송도 뉴스용 한국어 음성 안내입니다. " +
+                                  "제공된 기사 요약만 출처로 활용하고, 없는 최신 거래 숫자나 사업 일정을 지어내지 마세요. " +
+                                  "고객 이름, 전화번호, 계좌, 계약서, 공유 메모를 질문하거나 수집하지 마세요. " +
+                                  "해당 개인정보가 나오면 자세히 다루지 말고 일반적인 안내로 전환하세요. " +
+                                  "메모 저장이나 일정 변경 등 앱 작업을 실행할 권한이 없습니다. " +
+                                  "간결한 존댓말로 응답하세요. 공개 기사 참고 정보:\\n"+publicBrief))));
+                            ws.send(new JSONObject().put("setup",setup).toString());
+                            event("connected","연결됐습니다. 음성 응답을 준비하고 있습니다.");
+                        }catch(Exception e){event("error","Live 대화를 시작하지 못했습니다.");stop();}
+                    }
+                    @Override public void onMessage(WebSocket ws,String raw){
+                        if(!running)return;
+                        try{
+                            JSONObject msg=new JSONObject(raw);
+                            if(msg.has("setupComplete")){startMicrophone();return;}
+                            JSONObject content=msg.optJSONObject("serverContent");
+                            if(content==null)return;
+                            JSONObject transcript=content.optJSONObject("outputTranscription");
+                            if(transcript!=null){
+                                String t=transcript.optString("text","");
+                                if(!t.isEmpty())event("transcript",t.substring(0,Math.min(280,t.length())));
+                            }
+                            JSONObject user=content.optJSONObject("inputTranscription");
+                            if(user!=null){
+                                String t=user.optString("text","");
+                                if(!t.isEmpty())event("heard",t.substring(0,Math.min(200,t.length())));
+                            }
+                            JSONObject turn=content.optJSONObject("modelTurn");
+                            JSONArray parts=turn==null?null:turn.optJSONArray("parts");
+                            if(parts!=null)for(int i=0;i<parts.length();i++){
+                                JSONObject part=parts.optJSONObject(i);
+                                JSONObject data=part==null?null:part.optJSONObject("inlineData");
+                                if(data==null)continue;
+                                String audio=data.optString("data","");
+                                if(audio.isEmpty()||audio.length()>150000)continue;
+                                byte[] pcm=Base64.decode(audio,Base64.DEFAULT);
+                                if(pcm.length>0&&pcm.length<=100000)play(pcm);
+                            }
+                        }catch(Exception ignored){}
+                    }
+                    @Override public void onFailure(WebSocket ws,Throwable t,Response response){
+                        if(running){event("error","Live 연결이 끊겼습니다. 무료 사용 한도나 네트워크를 확인해 주세요.");stop();}
+                    }
+                    @Override public void onClosed(WebSocket ws,int code,String reason){
+                        if(running){event("ended","음성 대화가 종료되었습니다.");stop();}
+                    }
+                });
+            }catch(Exception e){
+                if(running){event("error","Live 연결을 사용할 수 없습니다. 현재 API 한도와 서버 설정을 확인해 주세요.");stop();}
+            }
+        });
+    }
+    private void startMicrophone(){
+        if(!running)return;
+        try{
+            final int minimum=AudioRecord.getMinBufferSize(16000,AudioFormat.CHANNEL_IN_MONO,
+                AudioFormat.ENCODING_PCM_16BIT);
+            if(minimum<=0)throw new Exception("audio unavailable");
+            AudioRecord recorder=new AudioRecord(MediaRecorder.AudioSource.VOICE_COMMUNICATION,
+                16000,AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT,Math.max(minimum,6400));
+            if(recorder.getState()!=AudioRecord.STATE_INITIALIZED){
+                recorder.release();throw new Exception("audio init unavailable");
+            }
+            microphone=recorder;recorder.startRecording();
+            event("listening","말씀하세요. 공개된 뉴스에 대해서만 질문해 주세요.");
+            Thread reader=new Thread(()->{
+                byte[] samples=new byte[3200];
+                while(running&&microphone==recorder){
+                    int n;
+                    try{n=recorder.read(samples,0,samples.length);}catch(Exception e){break;}
+                    if(n<=0)continue;
+                    WebSocket ws=socket;
+                    if(ws==null||ws.queueSize()>256000)continue;
+                    try{
+                        String payload=Base64.encodeToString(samples,0,n,Base64.NO_WRAP);
+                        ws.send(new JSONObject().put("realtimeInput",new JSONObject().put("audio",
+                             new JSONObject().put("data",payload).put("mimeType","audio/pcm;rate=16000"))).toString());
+                    }catch(Exception ignored){}
+                }
+            },"fhd-live-voice-capture");
+            reader.setDaemon(true);reader.start();
+        }catch(Exception e){
+            event("error","음성을 시작할 수 없습니다. 마이크 권한을 확인해 주세요.");
+            stop();
+        }
+    }
+    private void play(byte[] pcm){
+        player.execute(()->{
+            if(!running)return;
+            try{
+                if(speaker==null){
+                    int min=AudioTrack.getMinBufferSize(24000,AudioFormat.CHANNEL_OUT_MONO,
+                                      AudioFormat.ENCODING_PCM_16BIT);
+                    if(min<=0)return;
+                    AudioTrack track=new AudioTrack(AudioManager.STREAM_MUSIC,24000,
+                        AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT,
+                        Math.max(min,9600),AudioTrack.MODE_STREAM);
+                    if(track.getState()!=AudioTrack.STATE_INITIALIZED){track.release();return;}
+                    speaker=track;track.play();
+                }
+                speaker.write(pcm,0,pcm.length);
+            }catch(Exception ignored){}
+        });
+    }
+    synchronized void stop(){
+        if(closed)return;
+        closed=true;running=false;
+        WebSocket ws=socket;socket=null;
+        if(ws!=null)ws.close(1000,"user_closed");
+        AudioRecord mic=microphone;microphone=null;
+        if(mic!=null){try{mic.stop();}catch(Exception ignored){}try{mic.release();}catch(Exception ignored){}}
+        player.execute(()->{
+            AudioTrack t=speaker;speaker=null;
+            if(t!=null){try{t.pause();t.flush();}catch(Exception ignored){}t.release();}
+        });
+        event("ended","음성 대화를 종료했습니다.");
+        startup.shutdownNow();player.shutdown();
+        if(http!=null)http.dispatcher().executorService().shutdown();
+    }
+}
