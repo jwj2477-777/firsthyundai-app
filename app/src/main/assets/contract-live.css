@@ -1,0 +1,21 @@
+.contractLiveEntry{margin:10px 0 2px;text-align:right}
+.contractLiveEntry button{min-height:48px;border:1px solid #bbcec8;border-radius:14px;background:#f2f7f3;color:#225c50;padding:9px 16px;font:inherit;font-weight:700}
+#cl_dialog{box-sizing:border-box;width:min(94vw,560px);max-height:88vh;overflow:auto;border:1px solid #c7d6ce;border-radius:22px;background:#fffdf7;color:#253f37;padding:20px;overscroll-behavior:contain}
+#cl_dialog::backdrop{background:rgba(24,42,35,.48)}
+.contractLiveHeader{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.contractLiveHeader h3{margin:0;font-size:20px}
+#cl_dialog button{min-height:48px;min-width:48px;font:inherit;border-radius:13px;padding:10px 14px;cursor:pointer}
+#cl_dialog button:disabled{opacity:.5;cursor:default}
+#cl_dialog p{font-size:15px;line-height:1.65;overflow-wrap:anywhere}
+.contractLiveConsent{display:flex;align-items:flex-start;gap:10px;padding:14px;background:#f8efdb;border-radius:14px;line-height:1.6;font-size:15px}
+.contractLiveConsent input,.contractLiveProposal input{flex-shrink:0;width:22px;height:22px;margin:3px 0;accent-color:#246653}
+.contractLiveButtons{display:flex;gap:10px;margin:14px 0;flex-wrap:wrap}
+#cl_start,#cl_apply{color:#fff;background:#246653;border:1px solid #246653}
+#cl_stop,#cl_close{background:#fffdf7;color:#6d4631;border:1px solid #cdbda9}
+#cl_status{padding:12px;background:#edf4ef;border-radius:12px;font-weight:600}
+#cl_transcript{white-space:pre-wrap}
+.contractLiveProposal{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #e2e6dc}
+.contractLiveProposal strong,.contractLiveProposal span span{display:block;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
+.contractLiveProposal strong{font-size:14px;color:#57665f}
+#cl_apply{width:100%;margin-top:16px}
+#cl_review[hidden]{display:none}

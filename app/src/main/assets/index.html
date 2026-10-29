@@ -177,6 +177,7 @@ body.apartmentSheetActive{overflow:hidden}
 <link rel="stylesheet" href="contracts.css">
 <link rel="stylesheet" href="ai-news-office.css">
 <link rel="stylesheet" href="public-live.css">
+<link rel="stylesheet" href="contract-live.css">
 <link rel="stylesheet" href="theme.css">
 <link rel="stylesheet" href="ui-v2.css">
 <link rel="stylesheet" href="admin-center.css">
@@ -947,6 +948,7 @@ body.apartmentSheetActive{overflow:hidden}
    <button type="button" class="btn contractOneTap" onclick="FirstHyundaiEasy.compose()">메모 정리하고 다음 단계 →</button>
    <button type="button" class="btn alt contractVoice" onclick="FirstHyundaiContracts.voice()">🎙 음성으로 메모 입력</button>
   </div>
+  <div class="contractLiveEntry"><button id="ct_liveOpen" type="button" onclick="FirstHyundaiContractLive.open()">Live로 작성 · 선택</button></div>
   <label class="contractPolishToggle"><input id="ct_polishTerms" type="checkbox" checked onchange="FirstHyundaiEasy.updateSpecials()"> 특약 문장 자동 정리</label>
   <div id="ct_oneTapSummary" class="contractOneTapStatus" role="status" aria-live="polite">메모 한 번으로 계약문자를 만들어 보세요.</div>
   <details id="ct_reviewDetails" class="contractCompactDetails"><summary>인식한 정보와 추가 확인 내용</summary>
@@ -1204,6 +1206,15 @@ body.apartmentSheetActive{overflow:hidden}
 <label class="inputLabel">직접 확인한 날짜</label><input name="verified" type="date">
 <div style="margin-top:16px"><button type="submit" class="btn">저장</button> <button type="button" class="btn alt" onclick="document.getElementById('noteDialog').close()">취소</button></div>
 </form></dialog>
+<dialog id="cl_dialog" aria-labelledby="cl_title" aria-describedby="cl_intro">
+ <div class="contractLiveHeader"><h3 id="cl_title">Live로 계약 조건 작성</h3><button id="cl_close" type="button" onclick="FirstHyundaiContractLive.close()" aria-label="Live 닫기">닫기</button></div>
+ <p id="cl_intro">금액·지급일·특약을 말로 정리합니다. 기존 메모와 직접 입력한 정보는 보내지 않습니다.</p>
+ <label class="contractLiveConsent"><input id="cl_consent" type="checkbox"><span>음성이 Google로 전송되며 무료 서비스 개선에 사용될 수 있습니다. 이름·주소·동호수·계좌·기밀은 말하지 않고, Live 종료 후 직접 입력하겠습니다.</span></label>
+ <div class="contractLiveButtons"><button id="cl_start" type="button" onclick="FirstHyundaiContractLive.start()">음성 대화 시작</button><button id="cl_stop" type="button" onclick="FirstHyundaiContractLive.stop()" disabled>종료하고 확인</button></div>
+ <p id="cl_status" role="status" aria-live="polite">시작 버튼을 누를 때만 마이크를 사용합니다.</p>
+ <p id="cl_transcript"></p>
+ <section id="cl_review" hidden><h4>반영할 조건 확인</h4><p>인식한 금액·날짜와 특약을 확인해 주세요. 선택한 항목만 반영하며, 기존 특약에는 추가합니다.</p><div id="cl_proposals"></div><button id="cl_apply" type="button" onclick="FirstHyundaiContractLive.apply()" disabled>선택한 조건 반영</button></section>
+</dialog>
 <script>
 'use strict';
 const NOTE_KEY='firsthyundai-local-v04', REPO_KEY='firsthyundai-public-repo';
@@ -1406,6 +1417,7 @@ function switchPage(id){
  if(pageNames[id])document.title='퍼스트현대 · '+pageNames[id];
  currentPage=id;
  window.FirstHyundaiLive?.onPageChange?.(id);
+ window.FirstHyundaiContractLive?.onPageChange?.(id);
  // One stable design token per screen: family and admin share navigation semantics.
  document.body?.setAttribute?.('data-section',id);
  PAGES.forEach(p=>$(p[0]).classList.toggle('hidden',p[0]!==id));
@@ -3264,6 +3276,7 @@ function exportComplexCatalog(){
 }
 window.onCatalogSaved=r=>alert(r.ok?'단지정보 JSON을 저장했습니다. GitHub에 올려야 가족에게 반영됩니다.':'단지정보 파일 저장 실패');
 
-</script><script src="public-live.js"></script><script src="price-trends.js"></script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-image.js"></script><script src="scroll-top.js"></script><script src="admin-preferences.js"></script><script src="season-themes.js"></script><script src="weather-briefing.js"></script><script src="premium-motion.js"></script><script src="selection-flow.js"></script><script src="app-updates.js"></script><script src="admin-center.js"></script><script src="shared-settings.js"></script><script src="memo-dates.js"></script><script src="annual-calendar.js"></script><script src="office-board.js"></script><script src="office-board-images.js"></script><script src="office-members.js"></script><script src="admin-settings-navigator.js"></script><script src="notification-inbox.js"></script><script src="weather-detail.js"></script><script src="device-display.js"></script><script src="nav-collapse.js"></script></body></html>
+</script><script src="public-live.js"></script><script src="price-trends.js"></script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-live.js"></script><script src="contract-image.js"></script><script src="scroll-top.js"></script><script src="admin-preferences.js"></script><script src="season-themes.js"></script><script src="weather-briefing.js"></script><script src="premium-motion.js"></script><script src="selection-flow.js"></script><script src="app-updates.js"></script><script src="admin-center.js"></script><script src="shared-settings.js"></script><script src="memo-dates.js"></script><script src="annual-calendar.js"></script><script src="office-board.js"></script><script src="office-board-images.js"></script><script src="office-members.js"></script><script src="admin-settings-navigator.js"></script><script src="notification-inbox.js"></script><script src="weather-detail.js"></script><script src="device-display.js"></script><script src="nav-collapse.js"></script></body></html>
+
 
 
