@@ -6,12 +6,14 @@ const requests=new Map(),localUpdates=new Map(),localDeletes=new Map();
 let sequence=0,items=[],busy=false,lastCheck=0,showCompleted=false,editing='',editDraft='',timer=null;
 let timerMs=45000,pendingFocus='',view='notes',scheduleOpen=false,suggestedDate='';
 let archiveOpen=false,archived=[];
+let memoStatus='active',memoQuery='',memoAuthor='all',memoLimit=12,composerOpen=false;
 let lastBriefing=0,briefingBusy=false;
 const startKst=()=>kstDate(new Date());
 let selectedDate='',calendarMonth='',editingBirthday='';
 function focusNote(id){
  if(!valid(id))return false;
  pendingFocus=id;
+ memoStatus='all';memoQuery='';memoAuthor='all';memoLimit=Math.max(items.length,12);if($('officeBoardSearch'))$('officeBoardSearch').value='';
  if(typeof currentPage!=='undefined'&&currentPage==='officeBoard'){
   draw();refresh(true);
  }
@@ -151,7 +153,7 @@ function syncViews(){
  const isCal=view==='calendar';
  // One tab, one job. The free-form composer and its feedback belong to notes,
  // not to the calendar. Keep the typed draft untouched when switching tabs.
- for(const id of ['officeBoardComposer','officeBoardFeedback','officeBoardList','officeBoardListHeading']){
+ for(const id of ['officeBoardComposer','officeBoardFeedback','officeBoardList','officeBoardListHeading','officeBoardFindTools','officeBoardNewMemo']){
   const e=id==='officeBoardComposer'?document.querySelector?.('#officeBoard .officeBoardComposer'):$(id);
   e?.classList?.toggle?.('hidden',isCal);
  }
@@ -160,6 +162,7 @@ function syncViews(){
   const e=$(id);if(!e)continue;e.classList?.toggle?.('selected',selected);
   e.setAttribute?.('aria-pressed',String(selected));
  }
+ if(!isCal)document.querySelector?.('#officeBoard .officeBoardComposer')?.classList?.toggle?.('hidden',!composerOpen);
  if(isCal)drawCalendar();
 }
 function setView(next){if(next!=='calendar'&&next!=='notes')return;view=next;archiveOpen=false;
@@ -175,12 +178,12 @@ function changeMonth(delta){
 }
 function today(){selectedDate=kstDate(new Date());calendarMonth=selectedDate.slice(0,7);drawCalendar()}
 function addAtSelectedDay(){
- setView('notes');$('officeBoardDraft')?.focus?.();
+ setView('notes');toggleComposer(true);$('officeBoardDraft')?.focus?.();
 }
 function openCalendarNote(id){
  if(!valid(id))return;
  if(birthdayOf(items.find(n=>n.id===id)))return; // Birthdays have no completion workflow.
- showCompleted=true;setView('notes');focusNote(id);
+ showCompleted=true;memoStatus='all';memoQuery='';memoAuthor='all';memoLimit=Math.max(items.length,12);if($('officeBoardSearch'))$('officeBoardSearch').value='';setView('notes');focusNote(id);
 }
 async function toggleArchive(){
  if(bridge?.getMode?.()!=='admin'){msg('복구함은 관리자만 열 수 있습니다.');return}
@@ -201,18 +204,53 @@ $('officeBoardArchiveList')?.addEventListener?.('click',e=>{
  if(valid(id))mutate('restore',{id}).then(result=>{if(result){archived=archived.filter(n=>n.id!==id);drawArchive();refresh(true)}});
 });
 $('officeBoardDraft')?.addEventListener?.('input',checkSuggestion);
+function toggleComposer(force){
+ composerOpen=typeof force==='boolean'?force:!composerOpen;
+ const panel=document.querySelector?.('#officeBoard .officeBoardComposer');
+ panel?.classList?.toggle?.('hidden',!composerOpen||view==='calendar');
+ $('officeBoardNewMemo')?.setAttribute?.('aria-expanded',String(composerOpen));
+ if(composerOpen)$('officeBoardDraft')?.focus?.();
+}
+function setMemoStatus(status){
+ if(!['active','done','all'].includes(status))return;
+ memoStatus=status;memoLimit=12;draw();
+}
+function searchMemo(value){memoQuery=String(value||'');memoLimit=12;draw()}
+function filterMemoAuthor(value){memoAuthor=String(value||'all');memoLimit=12;draw()}
+function loadMoreMemos(){memoLimit+=12;draw()}
 function draw(){
  const list=$('officeBoardList');if(!list)return;
  const memos=memoItems();
  $('officeBoardCount').textContent=String(memos.filter(x=>!x.done).length);
  const completedCount=memos.filter(x=>x.done).length;
+ const authors=[...new Map(memos.filter(n=>n.author?.id).map(n=>[n.author.id,n.author.name||'작성자'])).entries()];
+ const authorSelect=$('officeBoardAuthorFilter');
+ if(authorSelect){
+  authorSelect.innerHTML='<option value="all">작성자 전체</option>'+authors.map(([id,name])=>
+   '<option value="'+esc(id)+'">'+esc(name)+'</option>').join('');
+  authorSelect.value=authors.some(([id])=>id===memoAuthor)?memoAuthor:'all';
+  if(authorSelect.value==='all')memoAuthor='all';
+ }
+ for(const [id,active] of [['officeBoardActiveFilter',memoStatus==='active'],
+  ['officeBoardCompletedFilter',memoStatus==='done'],['officeBoardAllFilter',memoStatus==='all']]){
+  const el=$(id);el?.classList?.toggle?.('selected',active);el?.setAttribute?.('aria-pressed',String(active));
+ }
+ $('officeBoardActiveFilterCount')&&( $('officeBoardActiveFilterCount').textContent=String(memos.length-completedCount));
+ $('officeBoardCompletedFilterCount')&&( $('officeBoardCompletedFilterCount').textContent=String(completedCount));
+ $('officeBoardAllFilterCount')&&( $('officeBoardAllFilterCount').textContent=String(memos.length));
  $('officeBoardShowDone').textContent=showCompleted?'완료 숨기기':'완료 '+completedCount+'건 보기';
  $('officeBoardShowDone').setAttribute?.('aria-pressed',showCompleted?'true':'false');
  const admin=bridge?.getMode?.()==='admin';
  $('officeBoardArchiveOpen')?.classList?.toggle?.('hidden',!admin);
- const visible=memos.filter(x=>showCompleted||!x.done);
+ const q=memoQuery.trim().toLocaleLowerCase();
+ const matches=memos.filter(n=>(memoStatus==='all'||(memoStatus==='done'?n.done:!n.done))&&
+  (memoAuthor==='all'||n.author?.id===memoAuthor)&&
+  (!q||[n.text,n.author?.name,n.scheduled_at].some(v=>String(v||'').toLocaleLowerCase().includes(q))));
+ const visible=matches.slice(0,memoLimit);
+ $('officeBoardResultCount')&&($('officeBoardResultCount').textContent=matches.length+'건');
+ $('officeBoardLoadMore')?.classList?.toggle?.('hidden',matches.length<=memoLimit);
  if(!visible.length){
-  list.innerHTML='<div class="empty">'+(memos.length?'표시할 메모가 없습니다. 완료 메모를 열어볼 수 있습니다.':'아직 메모가 없습니다. 첫 포스트잇을 붙여보세요.')+'</div>';
+  list.innerHTML='<div class="empty">'+(memos.length?'조건에 맞는 메모가 없습니다. 검색어나 필터를 변경해 보세요.':'아직 메모가 없습니다. 새 메모를 작성해 보세요.')+'</div>';
   drawCalendar();syncViews();return;
  }
  list.innerHTML=visible.map(note=>{
@@ -432,7 +470,7 @@ async function mutate(action,data){
   const result=await call(action,data);
   if(action==='delete')localDeletes.set(data.id,Date.now());
   else if(result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
-  if(action==='post'){$('officeBoardDraft').value='';checkSuggestion();}
+  if(action==='post'){$('officeBoardDraft').value='';checkSuggestion();composerOpen=false;}
   if(action==='restore'&&result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
   editing='';editDraft='';
   merge(items);
@@ -576,7 +614,7 @@ function imageUpdate(note){
 }
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
  imageCall:call,imageUpdate,canEdit:canEditId,
- setView,chooseDay,changeMonth,today,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
+ setView,toggleComposer,setMemoStatus,searchMemo,filterMemoAuthor,loadMoreMemos,chooseDay,changeMonth,today,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
  onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
  onNewNotification(){if(currentPage==='officeBoard')refresh(true);
