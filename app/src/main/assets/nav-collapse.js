@@ -7,14 +7,23 @@
  'use strict';
  const nav=document.getElementById('nav');
  if(!nav)return;
- const RANGE=210,MIN_HEIGHT=48,MAX_HEIGHT=90;
+ const RANGE=210;
+ const MODE_SIZING={
+  standard:{height:[90,48],padding:[8,3],gap:[6,1],font:[15,12],small:[14,12],icon:[29,17]},
+  large:{height:[114,76],padding:[9,5],gap:[6,4],font:[16,14],small:[15,14],icon:[31,22]},
+  xlarge:{height:[134,96],padding:[10,6],gap:[7,4],font:[17,15],small:[16,15],icon:[33,25]}
+ };
+ function sizing(){
+  const mode=document.body?.getAttribute?.('data-device-display')||'standard';
+  return MODE_SIZING[mode]||MODE_SIZING.standard;
+ }
  const BETWEEN={
   '--fhd-dock-gap':[9,4],
   '--fhd-shell-padding':[8,4],
   '--fhd-shell-margin':[13,7],
   '--fhd-shell-radius':[20,15],
   '--fhd-column-gap':[9,4],
-  '--fhd-tile-height':[MAX_HEIGHT,MIN_HEIGHT],
+  '--fhd-tile-height':[90,48],
   '--fhd-tile-padding':[8,3],
   '--fhd-tile-gap':[6,1],
   '--fhd-tile-radius':[14,10],
@@ -66,7 +75,17 @@
   if(force||!boundTiles.length)bindTiles();
   if(!force&&Math.abs(density-last)<0.0008)return density;
   last=density;
-  for(const [name,[full,small]] of Object.entries(BETWEEN)){
+  const cfg=sizing();
+  const values={
+   ...BETWEEN,
+   '--fhd-tile-height':cfg.height,
+   '--fhd-tile-padding':cfg.padding,
+   '--fhd-tile-gap':cfg.gap,
+   '--fhd-nav-font':cfg.font,
+   '--fhd-nav-font-small':cfg.small,
+   '--fhd-nav-icon':cfg.icon
+  };
+  for(const [name,[full,small]] of Object.entries(values)){
    const value=(full+(small-full)*density).toFixed(2)+'px';
    if(nav.style.getPropertyValue(name)!==value)nav.style.setProperty(name,value);
   }
