@@ -214,11 +214,16 @@ function draw(){
     '<button data-action="cancel" data-id="'+id+'">취소</button>':
    '<button class="officeBoardDoneAction" data-action="done" data-id="'+id+'">'+(note.done?'완료 취소':'완료')+'</button>'+
    '<button data-action="edit" data-id="'+id+'">수정</button>'+
+   (!Array.isArray(note.images)||note.images.length<3?'<button data-action="photoAdd" data-id="'+id+'">사진 추가</button>':'')+
    (admin?'<button data-action="delete" data-id="'+id+'" class="officeBoardDelete">삭제</button>':'');
   return '<article class="officeBoardNote'+(note.done?' completed':'')+'" data-note="'+id+'">'+
    '<div class="officeBoardNoteTop"><span class="officeBoardNoteLabel">'+(note.done?'✓ 완료':'공유 메모')+'</span>'+
    '<span class="officeBoardAuthor">'+esc(note.author?.name||'작성자 미기록')+'</span><time>'+esc(dateText(note.created_at))+'</time></div>'+
    body+(note.scheduled_at?'<div class="officeBoardNoteSchedule">▦ '+esc(note.all_day?kstDate(note.scheduled_at)+' · 종일':dateText(note.scheduled_at))+'</div>':'')+
+   (Array.isArray(note.images)&&note.images.length?'<div class="officeBoardPhotoStrip" aria-label="첨부 사진">'+
+    note.images.filter(x=>/^[0-9a-f-]{36}$/.test(x)).map((photo,i)=>
+      '<button type="button" class="officeBoardPhotoTile" data-action="photoView" data-id="'+id+
+      '" data-photo="'+photo+'">▧ 사진 '+(i+1)+' 보기</button>').join('')+'</div>':'')+
    '<div class="officeBoardNoteActions'+(isEdit?' editing':admin?'':' family')+'">'+actions+'</div></article>';
  }).join('');
  if(pendingFocus){
@@ -424,12 +429,19 @@ async function mutate(action,data){
  }catch(e){msg(e.message);return null}
  finally{busy=false;$('officeBoardPost').disabled=false}
 }
-function post(){
+async function post(){
+ const photos=window.FirstHyundaiBoardImages;
  const value=String($('officeBoardDraft')?.value||'').trim();
- if(!value){msg('내용을 적어 주세요.');$('officeBoardDraft')?.focus?.();return}
+ if(!value&&!photos?.pendingCount?.()){msg('메모를 적거나 사진을 첨부해 주세요.');return}
  if(value.length>1600){msg('메모는 최대 1600자입니다.');return}
- const parsed=extracted(value);
- mutate('post',{text:value,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false});
+ if(photos?.pendingTarget?.()&&!value){
+  await photos.uploadPending(photos.pendingTarget());return;
+ }
+ const text=value||'📷 사진 공유';
+ const parsed=extracted(text);
+ const result=await mutate('post',{text,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false});
+ if(result?.note?.id&&photos?.pendingCount?.())
+  await photos.uploadPending(result.note.id);
 }
 function toggleBirthdayForm(show){
  if(bridge?.getMode?.()!=='admin'){msg('생일 관리는 관리자만 사용할 수 있습니다.');return}
@@ -531,8 +543,16 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
  if(action==='cancel')cancelEdit();
  if(action==='save')saveEdit(id);
  if(action==='delete')remove(id);
+ if(action==='photoAdd')window.FirstHyundaiBoardImages?.selectFor?.(id);
+ if(action==='photoView')window.FirstHyundaiBoardImages?.view?.(id,button.dataset.photo);
 });
+function imageUpdate(note){
+ if(!note||!valid(note.id))return;
+ localUpdates.set(note.id,{note,time:Date.now()});
+ merge(items);
+}
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
+ imageCall:call,imageUpdate,
  setView,chooseDay,changeMonth,today,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
  onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
