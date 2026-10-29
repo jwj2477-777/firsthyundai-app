@@ -4,13 +4,19 @@ body[data-season-theme="spring"]{--season-point:url("season-point-spring.svg");-
 body[data-season-theme="summer"]{--season-point:url("season-point-summer.svg");--season-page:#E0F4F5;--season-haze:#BCE5EC;--season-paper:#F2FDFF;--season-line:#9DD1D9;--season-glow:#B9EFDF;--season-edge:#3B91A8;--season-logo:#6ADDE0}
 body[data-season-theme="autumn"]{--season-point:url("season-point-autumn.svg");--season-page:#F6E8D2;--season-haze:#E7C99E;--season-paper:#FFF8EB;--season-line:#D5B37F;--season-glow:#EDB98E;--season-edge:#A86E32;--season-logo:#E9B277}
 body[data-season-theme="winter"]{--season-point:url("season-point-winter.svg");--season-page:#E9EDF9;--season-haze:#CAD6F0;--season-paper:#F6F9FF;--season-line:#B7C8E5;--season-glow:#D9D0EE;--season-edge:#778DC2;--season-logo:#B9D5FF}
+/* Time-of-day lighting is an ambient color wash, never a separate theme. */
+body[data-theme-time="morning"]{--fhd-time-light:rgba(246,177,119,.23)}
+body[data-theme-time="day"]{--fhd-time-light:rgba(194,228,228,.065)}
+body[data-theme-time="evening"]{--fhd-time-light:rgba(238,153,128,.22)}
+body[data-theme-time="night"]{--fhd-time-light:rgba(128,141,193,.13)}
 body[data-season-theme]:not([data-season-theme="default"]){
- background:radial-gradient(ellipse at 100% 80px,var(--season-glow),transparent 390px),
+ background:radial-gradient(ellipse at 90% 65px,var(--fhd-time-light,transparent),transparent 350px),
+  radial-gradient(ellipse at 100% 80px,var(--season-glow),transparent 390px),
   linear-gradient(180deg,var(--season-haze),var(--season-page) 420px);
  --ui2-card:var(--season-paper);--ui2-line:var(--season-line);
 }
-body[data-theme-intensity="soft"]:not([data-season-theme="default"]){background:linear-gradient(#FFFFFF70,#FFFFFF70),linear-gradient(180deg,var(--season-haze),var(--season-page) 420px)}
-body[data-theme-intensity="vivid"]:not([data-season-theme="default"]){background:radial-gradient(ellipse at 100% 120px,var(--season-glow),transparent 500px),linear-gradient(155deg,var(--season-haze),var(--season-page) 550px,var(--season-haze))}
+body[data-theme-intensity="soft"]:not([data-season-theme="default"]){background:linear-gradient(#FFFFFF70,#FFFFFF70),radial-gradient(ellipse at 90% 65px,var(--fhd-time-light,transparent),transparent 350px),linear-gradient(180deg,var(--season-haze),var(--season-page) 420px)}
+body[data-theme-intensity="vivid"]:not([data-season-theme="default"]){background:radial-gradient(ellipse at 90% 65px,var(--fhd-time-light,transparent),transparent 350px),radial-gradient(ellipse at 100% 120px,var(--season-glow),transparent 500px),linear-gradient(155deg,var(--season-haze),var(--season-page) 550px,var(--season-haze))}
 body[data-theme-header="on"]:not([data-season-theme="default"]) header{background:var(--season-header)}
 /* Native splash and web fallback use matching seasonal colors; artwork is untouched. */
 body[data-theme-intro="on"]:not([data-season-theme="default"]) .fhd-bridge-backdrop{background:var(--season-header)}
@@ -59,3 +65,26 @@ body[data-weather-effect="rain"][data-theme-header="on"][data-theme-logo="on"]:n
 body[data-weather-effect="snow"][data-theme-header="on"][data-theme-logo="on"]:not([data-theme-decor="off"]) header .officeMark::after{content:"";position:absolute;right:-5px;top:-5px;width:18px;height:18px;pointer-events:none;background:var(--weather-point) center/contain no-repeat;filter:drop-shadow(0 1px 2px #102D3860)}
 body[data-weather-effect="rain"]{--weather-point:url("season-point-rain.svg")}
 body[data-weather-effect="snow"]{--weather-point:url("season-point-snow.svg")}
+
+/* Rain density follows measured KMA RN1 only. If absent, use standard intensity.
+ * The center remains clear, no extra layout or input interception.
+ */
+body[data-weather-effect="rain"][data-weather-strength="light"] .seasonParticle.rain{opacity:.32;width:1px;height:30px}
+body[data-weather-effect="rain"][data-weather-strength="heavy"] .seasonParticle.rain{opacity:.73;width:2px;height:57px}
+body[data-weather-effect="snow"] .seasonParticle.snow:nth-child(4n){width:7px;height:7px;opacity:.60;filter:none}
+body[data-weather-effect="snow"] .seasonParticle.snow:nth-child(6n){width:13px;height:13px;opacity:.75}
+body[data-theme-paused="true"] .seasonParticle{animation-play-state:paused!important}
+
+/* Tactile feedback only: colors and inset shadows, no scaling of scroll-linked
+ * navigation or movement of buttons/labels. */
+#nav .primaryNav>button:active,#nav .utilityNav>button:active{
+ filter:brightness(.985);
+ box-shadow:inset 0 0 0 2px rgba(44,89,102,.15)!important;
+}
+main .refreshFeedback.success{animation:fhd-refresh-ack .20s ease-out 1}
+@keyframes fhd-refresh-ack{from{opacity:.7}to{opacity:1}}
+body[data-app-motion="reduced"] main .refreshFeedback.success{animation:none!important}
+@media(prefers-reduced-motion:reduce){
+ main .refreshFeedback.success{animation:none!important}
+ #nav .primaryNav>button:active,#nav .utilityNav>button:active{filter:none}
+}
