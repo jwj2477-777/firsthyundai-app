@@ -179,8 +179,7 @@ final class OfficeMemoNotifications {
         notification.setPublicVersion(hidden.build());
         try{
             nm.notify(43153,notification.build());
-            NotificationHistory.record(context,"memo","새 사무실 공유 메모",
-                "사무실 포스트잇이 도착했습니다.");
+            NotificationHistory.recordMemo(context,noteId);
         }catch(SecurityException ignored){}
     }
 }
