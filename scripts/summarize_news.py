@@ -17,6 +17,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from groq_news import generate_fallback, review_important, MODEL as GROQ_MODEL, MAX_FALLBACK_BRIEFS, MAX_REVIEW_BRIEFS
+from news_intelligence import enrich_digest
 
 NEWS=Path(__file__).resolve().parents[1]/"data"/"news.json"
 MODEL="gemini-3.5-flash-lite"
@@ -551,10 +552,13 @@ def main():
             previous=json.loads(Path(args.previous).read_text(encoding="utf-8"))
         except (OSError,ValueError):
             pass
-    enriched=enrich(current,previous,os.environ.get("GEMINI_API_KEY","").strip(),
-                    groq_key=os.environ.get("GROQ_API_KEY","").strip())
+    gemini_key=os.environ.get("GEMINI_API_KEY","").strip()
+    groq_key=os.environ.get("GROQ_API_KEY","").strip()
+    enriched=enrich(current,previous,gemini_key,groq_key=groq_key)
+    enriched=enrich_digest(enriched,previous,gemini_key,groq_key)
     NEWS.write_text(json.dumps(enriched,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("Gemini summary stats:",enriched["ai_summary_stats"],"key_configured:",bool(os.environ.get("GEMINI_API_KEY")))
+    print("Public office digest status:",enriched["ai_office_digest_stats"])
 
 if __name__=="__main__":
     main()
