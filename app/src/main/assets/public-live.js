@@ -31,6 +31,7 @@
  function stop(){
   if(!active)return;
   active=false;buttons();
+  const transcript=$('newsLiveVoiceTranscript');if(transcript){transcript.textContent='';transcript.hidden=true;}
   try{root.FirstHyundaiNative?.stopPublicLiveVoice?.();}catch(e){}
   status('실시간 대화를 종료했습니다.');
  }
