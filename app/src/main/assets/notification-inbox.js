@@ -56,8 +56,8 @@
     const note=await window.FirstHyundaiOfficeBoard?.imageCall?.('preview',{id:row.noteId});
     if(!dialog.open)return;
     if(!note||typeof note.preview!=='string')continue;
-    const safe=note.preview.replace(/\\s+/g,' ').trim()
-     .replace(/01[016789][- .]?\\d{3,4}[- .]?\\d{4}/g,'연락처 확인')
+    const safe=note.preview.replace(/\s+/g,' ').trim()
+     .replace(/01[016789][- .]?\d{3,4}[- .]?\d{4}/g,'연락처 확인')
      .slice(0,110);
     temporaryPreviews.set(row.noteId,(note.author?note.author+' · ':'')+
      (safe||'사진 첨부')+(note.image_count?' · 사진 '+note.image_count+'장':''));
