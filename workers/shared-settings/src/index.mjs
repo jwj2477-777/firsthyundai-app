@@ -179,6 +179,11 @@ async function boardCommand(req,env,url,ctx){
  const adminHeader=req.headers.get("x-fhd-admin-authorization")||"";
  const isAdmin=async()=>!!env.FIRSTHYUNDAI_ADMIN_CODE&&adminHeader.startsWith("Bearer ")&&
   await checkToken(adminHeader.slice(7),env.FIRSTHYUNDAI_ADMIN_CODE);
+ // Author identity is the immutable account ID recorded at creation, not an
+ // editable display name or an arbitrary device ID. Admin override must have
+ // a separate verified administrator session; the family board token alone is
+ // never an administrator credential.
+ const canModifyNote=async note=>note?.author?.id===caller.member.id||await isAdmin();
  if(url.pathname==="/board/accounts"&&req.method==="GET")
   return res({accounts:await memberList(env),current:{id:caller.member.id,name:caller.member.name}});
  if(url.pathname==="/board/account"&&req.method==="GET")
@@ -274,6 +279,7 @@ async function boardCommand(req,env,url,ctx){
   if(!note)return res({error:"not_found"},404);
   const images=Array.isArray(note.images)?note.images.filter(validImageId):[];
   if(req.method==="POST"&&!photoId){
+   if(!await canModifyNote(note))return res({error:"memo_edit_forbidden"},403);
    if(images.length>=BOARD_IMAGE_LIMIT)return res({error:"image_limit"},409);
    let data;try{data=await body(req,BOARD_IMAGE_MAX+250)}catch(e){return res({error:"invalid_image"},400)}
    if(!validImageData(data?.data_url))return res({error:"invalid_image"},400);
@@ -293,6 +299,7 @@ async function boardCommand(req,env,url,ctx){
    return res({data_url:data});
   }
   if(photoId&&images.includes(photoId)&&req.method==="DELETE"){
+   if(!await canModifyNote(note))return res({error:"memo_edit_forbidden"},403);
    const updated={...note,images:images.filter(id=>id!==photoId),updated_at:new Date().toISOString(),
     edited_by:{id:caller.member.id,name:caller.member.name}};
    await env.SETTINGS.put(noteKey,JSON.stringify(updated),
@@ -348,6 +355,7 @@ async function boardCommand(req,env,url,ctx){
    await env.SETTINGS.delete(memoKey);
    return res({ok:true,archived:true});
   }
+  if(!await canModifyNote(saved))return res({error:"memo_edit_forbidden"},403);
   let data;try{data=await body(req,7000)}catch(e){return res({error:"bad_request"},400)}
   if(!data||typeof data!=="object")return res({error:"invalid_note"},400);
   const patchKeys=Object.keys(data);
