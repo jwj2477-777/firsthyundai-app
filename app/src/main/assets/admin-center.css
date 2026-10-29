@@ -92,9 +92,50 @@
 #adminCenter .srOnly{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:385px){#adminCenter .adminCommandShortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}#adminCenter .adminCategoryFilters button{padding:8px 10px}}
 
-/* Compact task-first admin layout: choose one discipline instead of a long scroll. */
-#adminCenter.adminFocusMode > .adminCenterPanel:not(#adminExperiencePanel):not(#adminToolsPanel),
-#adminCenter.adminFocusMode > .officeMemberManager{display:none!important}
+/* Task-first admin center: keep the original actions intact, only reveal the
+   relevant panels after a category is selected. Avoid horizontal filter scrolling. */
+#adminCenter [hidden]{display:none!important}
+#adminCenter .adminCommandBar{padding:15px;background:#FFFEFA;border-color:#E5E4DA}
+#adminCenter .adminCommandIntro strong{font-size:17px;font-weight:850;color:#314E4B}
+#adminCenter .adminCommandIntro small{font-size:12px}
+#adminCenter .adminCategoryGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:13px}
+#adminCenter .adminCategoryGrid>button{display:flex;flex-direction:column;align-items:flex-start;
+ gap:9px;position:relative;min-height:119px;min-width:0;text-align:left;
+ padding:13px 12px;border:1px solid #DFE8E1;border-radius:14px;
+ background:linear-gradient(145deg,#FFFEFC,#F7FAF7);color:#31554E;
+ font:inherit;cursor:pointer;transition:background-color .15s,border-color .15s,box-shadow .15s}
+#adminCenter .adminCategoryGrid>button:active{background:#EEF5EF}
+#adminCenter .adminCategoryGrid>button:focus-visible{outline:3px solid #328779;outline-offset:2px}
+#adminCenter .adminHubIcon{display:flex;align-items:center;justify-content:center;
+ width:34px;height:34px;border-radius:10px;background:#E8F0E8;
+ color:#3C6C5E;font-weight:900;font-size:19px;line-height:1}
+#adminCenter .adminHubCopy{display:flex;flex-direction:column;gap:4px;min-width:0}
+#adminCenter .adminHubCopy strong{font-size:14px;font-weight:850;line-height:1.25;word-break:keep-all}
+#adminCenter .adminHubCopy small{font-size:11px;color:#6A8077;line-height:1.5;word-break:keep-all}
+#adminCenter .adminHubArrow{position:absolute;right:12px;top:12px;color:#829B8E;font-size:20px}
+#adminCenter .adminSectionBar{display:flex;align-items:center;gap:10px;justify-content:space-between;
+ margin-top:12px;border-top:1px solid #E2E9E1;padding-top:12px;flex-wrap:wrap}
+#adminCenter .adminSectionHeader{display:flex;align-items:center;gap:11px;min-width:0}
+#adminCenter .adminSectionHeader strong{font-size:15px;font-weight:850;color:#345B52}
+#adminCenter .adminBackButton{min-height:46px;padding:9px 11px;border:1px solid #CFDFD3;
+ background:#F3F8F3;color:#3B675C;border-radius:10px;font-size:13px;font-weight:750}
+#adminCenter #adminCategorySwitch{min-height:46px;min-width:130px;max-width:100%;
+ padding:8px 10px;border:1px solid #CFDFD3;border-radius:10px;
+ background:#FFF;font-size:12px;font-weight:750;color:#43635E}
 #adminCenter .adminSettingsGroup>.adminSettingsSectionHeading{border-bottom:0}
 #adminCenter .adminSettingsGroup[open]>.adminSettingsSectionHeading{border-bottom:1px solid #E5EEEA}
 #adminCenter .adminSettingsGroup>.adminSettingsSectionHeading strong{font-size:14px}
+#adminCenter .adminCenterPanel{margin:10px 0}
+#adminCenter #adminSearchResult{margin-top:9px}
+#adminCenter .adminMasterRefresh{display:none}
+#adminCenter[data-admin-section="data"] .adminMasterRefresh,
+#adminCenter[data-admin-section="search"] .adminMasterRefresh{display:inline-flex}
+@media(max-width:380px){
+ #adminCenter .adminCategoryGrid{gap:7px}
+ #adminCenter .adminCategoryGrid>button{min-height:110px;padding:11px}
+ #adminCenter .adminSectionBar{align-items:stretch}
+ #adminCenter #adminCategorySwitch{flex:1;min-width:0}
+}
+@media(prefers-reduced-motion:reduce){
+ #adminCenter .adminCategoryGrid>button{transition:none}
+}
