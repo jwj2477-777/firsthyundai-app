@@ -4,7 +4,7 @@
 (function(){
  'use strict';
  const $=id=>document.getElementById(id),MAX=3,MAX_BYTES=145000;
- let drafts=[],target='',uploading=false,activePhoto=null;
+ let drafts=[],target='',uploading=false,activePhoto=null,existingCount=0;
  const cache=new Map();
  function status(text){const el=$('officeBoardFeedback');if(el)el.textContent=text}
  function renderDrafts(){
@@ -59,7 +59,7 @@
   const files=Array.from(ev.target?.files||[]);
   if(ev.target)ev.target.value='';
   if(!files.length)return;
-  const count=target?Math.max(0,MAX-(window.FirstHyundaiOfficeBoardImagesCount?.(target)||0)):MAX-drafts.length;
+  const count=MAX-(target?existingCount:0)-drafts.length;
   if(files.length>count){status('메모당 사진은 최대 3장입니다.');return;}
   try{
    status('사진을 최적화하고 있습니다…');
@@ -73,11 +73,13 @@
    }
   }catch(e){status(e.message||'사진을 처리하지 못했습니다.')}
  }
- function selectFor(noteId=''){
+ function selectFor(noteId='',photosAlready=0){
   if(uploading)return;
   if(noteId&& !/^[a-z0-9]{8,14}-[0-9a-f-]{36}$/.test(noteId))return;
   target=noteId||'';
+  existingCount=target?Math.max(0,Math.min(MAX,Number(photosAlready)||0)):0;
   if(target)drafts=[];
+  if(existingCount>=MAX){status('사진은 메모당 최대 3장입니다.');return;}
   const input=$('officeBoardImageInput');
   if(input)input.click();else status('사진 선택을 사용할 수 없습니다.');
  }
@@ -93,10 +95,11 @@
     const result=await window.FirstHyundaiOfficeBoard.imageCall('imageAdd',{id,data_url:drafts[0]});
     if(!result?.note)throw Error('사진 저장 응답을 확인할 수 없습니다.');
     drafts.shift();
+    existingCount=Array.isArray(result.note.images)?result.note.images.length:existingCount+1;
     window.FirstHyundaiOfficeBoard.imageUpdate(result.note);
     renderDrafts();
    }
-   target='';renderDrafts();
+   target='';existingCount=0;renderDrafts();
    status('사진을 공유했습니다. 다른 휴대전화에서도 볼 수 있습니다.');
    return true;
   }catch(e){
