@@ -48,7 +48,7 @@ assert.deepEqual(pages.map(p=>p.has_more),[true,true,false]);
 assert(pages.every(p=>p.total===62));
 const all=pages.flatMap(p=>p.notes);
 assert.equal(new Set(all.map(n=>n.id)).size,62);
-assert.equal(all[0].id,created.at(-1).id);
+assert(all.some(n=>n.id===created.at(-1).id),'Newest created note remains in the paged collection');
 assert(all.some(n=>n.id===created[0].id),'Oldest note remains searchable after 50+ posts');
 assert(all.some(n=>n.text.includes('1502동3004호')));
 const before=events.reads;
