@@ -14,7 +14,7 @@ assert(html.includes('id="overviewMemoBriefing"')&&
  html.includes('FirstHyundaiOfficeBoard.openBriefingCalendar()'),
  'Today briefing must have a compact list and a direct calendar route');
 assert(js.includes('function openBriefing(')&&
- js.includes("call('list',{})")&&
+ js.includes("readAllBoard().then(notes=>")&&
  js.includes('function briefingRows(')&&
  js.includes('openBriefingNote(button.dataset.briefNote)'),
  'Today briefing must reuse private shared notes and support one-tap memo navigation');
