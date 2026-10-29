@@ -5,6 +5,14 @@ const $=id=>document.getElementById(id),native=window.FirstHyundaiNative;
 let seq=0,members=[],pending=new Map(),busy=false,editing='';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function allowed(){return native?.getMode?.()==='admin'}
+function lastSeenText(value){
+ const date=typeof value==='string'?new Date(value):null;
+ if(!date||!Number.isFinite(date.getTime()))return '접속 기록 없음';
+ return '마지막 접속 · '+new Intl.DateTimeFormat('ko-KR',{
+  timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',
+  hour:'2-digit',minute:'2-digit',hour12:false
+ }).format(date);
+}
 function choose(){
  if(!allowed()||typeof native?.requestOfficeMemberPicker!=='function'){
   status('관리자모드에서 계정을 선택할 수 있습니다.');return;
@@ -44,7 +52,8 @@ function render(){
    '<span class="officeMemberAvatar" aria-hidden="true">'+esc(m.name.slice(0,1))+'</span>'+
    (isEditing?'<input class="officeMemberRenameInput" data-rename-input="'+esc(m.id)+
     '" aria-label="수정할 계정 이름" maxlength="24" value="'+esc(m.name)+'">':
-    '<strong>'+esc(m.name)+'</strong>')+
+    '<span class="officeMemberIdentity"><strong>'+esc(m.name)+'</strong>'+
+    '<small class="officeMemberLastSeen">'+esc(lastSeenText(m.last_seen_at))+'</small></span>')+
    (self&&!isEditing?'<span class="officeMemberSelf">현재</span>':'')+
    (isEditing?'<button type="button" class="officeMemberRenameSave" data-rename-save="'+esc(m.id)+'">저장</button>'+
     '<button type="button" class="officeMemberRenameCancel" data-rename-cancel="'+esc(m.id)+'">취소</button>':

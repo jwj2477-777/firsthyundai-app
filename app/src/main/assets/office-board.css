@@ -295,6 +295,11 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
  width:32px;height:32px;flex-shrink:0;background:#E4EEE7;border-radius:10px;
  color:#456C59;font-size:13px;font-weight:850}
 .officeMemberRow strong{font-size:13px;color:#405851;flex:1}
+.officeMemberIdentity{display:flex;flex:1 1 128px;min-width:120px;
+ flex-direction:column;align-items:flex-start;gap:3px}
+.officeMemberIdentity strong{flex:0 0 auto}
+.officeMemberLastSeen{font-size:11px;color:#71857A;line-height:1.4;
+ font-weight:500;white-space:normal}
 .officeMemberDelete{min-height:37px;padding:7px 11px;background:#FFF;
  color:#95594A;border:1px solid #E9D3CA;border-radius:9px;font-size:12px;font-weight:750}
 .officeMemberSelf{font-size:11px;color:#668277}

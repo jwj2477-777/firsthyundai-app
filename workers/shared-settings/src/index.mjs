@@ -66,6 +66,36 @@ async function memberList(env){
   return (ai>=0?ai:preferred.length)-(bi>=0?bi:preferred.length)||a.name.localeCompare(b.name,"ko");
  });
 }
+// Only the member's last successful connection time is retained: no
+// connection counters, device history, IP addresses or activity timelines.
+const MEMBER_SEEN_PREFIX="office-member-last-seen-v1:";
+const MEMBER_SEEN_THROTTLE_MS=5*60*1000;
+async function touchMemberSeen(env,id,force=false){
+ if(!validMemberId(id))return;
+ const key=MEMBER_SEEN_PREFIX+id,now=Date.now();
+ const previous=await env.SETTINGS.get(key,"json");
+ const at=typeof previous?.at==="string"?Date.parse(previous.at):NaN;
+ if(!force&&Number.isFinite(at)&&now-at>=0&&now-at<MEMBER_SEEN_THROTTLE_MS)return;
+ await env.SETTINGS.put(key,JSON.stringify({at:new Date(now).toISOString()}));
+}
+async function memberListWithLastSeen(env){
+ const members=await memberList(env);
+ const all=await env.SETTINGS.list({prefix:MEMBER_PREFIX,limit:100});
+ const records=(await Promise.all(all.keys.map(k=>env.SETTINGS.get(k.name,"json"))))
+  .filter(v=>v?.active===true&&validMemberId(v.id));
+ const latest=new Map();
+ await Promise.all(records.map(async m=>{
+  const seen=await env.SETTINGS.get(MEMBER_SEEN_PREFIX+m.id,"json");
+  const at=typeof seen?.at==="string"?Date.parse(seen.at):NaN;
+  if(!Number.isFinite(at))return;
+  const key=memberIdentity(m.name),old=latest.get(key)||0;
+  if(at>old)latest.set(key,at);
+ }));
+ return members.map(m=>({...m,
+  last_seen_at:latest.has(memberIdentity(m.name))
+   ?new Date(latest.get(memberIdentity(m.name))).toISOString():null}));
+}
+
 // Bootstrap exactly once, before the first device signs in. Existing members
 // survive upgrades. A removed member is never silently recreated.
 const DEFAULT_MEMBERS_KEY="office-member-defaults-v3";
@@ -212,6 +242,7 @@ async function boardCommand(req,env,url,ctx){
   const binding=changing?crypto.randomUUID():(existing?.binding||crypto.randomUUID());
   await env.SETTINGS.put(DEVICE_PREFIX+deviceId,
    JSON.stringify({member_id:account,binding,created_at:existing?.created_at||new Date().toISOString()}));
+  try{await touchMemberSeen(env,account,true)}catch(e){/* Presence is optional, not an enrollment blocker. */}
   return res({token:await boardToken(env.FIRSTHYUNDAI_ACCESS_CODE,account,deviceId,binding),
    member:{id:member.id,name:member.name},expires_in:5184000});
  }
@@ -228,11 +259,13 @@ async function boardCommand(req,env,url,ctx){
  const canModifyNote=async note=>note?.author?.id===caller.member.id||await isAdmin();
  if(url.pathname==="/board/accounts"&&req.method==="GET")
   return res({accounts:await memberList(env),current:{id:caller.member.id,name:caller.member.name}});
- if(url.pathname==="/board/account"&&req.method==="GET")
+ if(url.pathname==="/board/account"&&req.method==="GET"){
+  try{await touchMemberSeen(env,caller.member.id)}catch(e){/* Keep account validation available if KV presence fails. */}
   return res({member:{id:caller.member.id,name:caller.member.name},active:true});
+ }
  if(url.pathname==="/board/members"&&req.method==="GET"){
   if(!await isAdmin())return res({error:"admin_required"},403);
-  return res({accounts:await memberList(env)});
+  return res({accounts:await memberListWithLastSeen(env)});
  }
  if(url.pathname==="/board/members"&&req.method==="POST"){
   if(!await isAdmin())return res({error:"admin_required"},403);
