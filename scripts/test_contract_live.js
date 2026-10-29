@@ -54,7 +54,27 @@ live.close();live.open();el('cl_consent').checked=true;live.start();id=requests.
 live.onPageChange('news');assert(!el('cl_dialog').open);assert.equal(stopped,2);
 live.open();el('cl_consent').checked=true;live.start();assert.equal(win.firstHyundaiGoBack(),true);assert.equal(stopped,3);
 live.open();el('cl_consent').checked=true;live.start();events.focusin({target:{id:'ct_account'}});assert.equal(stopped,4);
+// Contradictory data must not enter the review list or overwrite valid proposals.
+live.open();el('cl_consent').checked=true;live.start();id=requests.at(-1)[0];
+proposal({price:900000000,contractDeposit:90000000,contractDate:'2027-01-10'});
+const beforeConflict=el('cl_proposals').children.length;
+proposal({contractDeposit:990000000});
+assert.equal(el('cl_proposals').children.length,beforeConflict,'Conflicting deposit is rejected');
+assert.match(el('cl_status').textContent,/거래금액보다 큽니다/);
+proposal({balanceDate:'2027-01-09'});
+assert.equal(el('cl_proposals').children.length,beforeConflict,'Reversed balance date rejected');
+proposal({balanceDate:'2027-04-09',advance:50000000});
+assert(el('cl_proposals').children.length>beforeConflict,'Valid correction accepted');
+proposal({advance:100000000});
+assert.match(el('cl_status').textContent,/계약금보다 큽니다/);
+live.close();assert.equal(stopped,5);
 const valid=live._test.normalize;
+const consistent=live._test.consistency;
+assert.equal(consistent({price:'90000'},{contractDeposit:'90001'}),'계약금이 거래금액보다 큽니다.');
+assert.equal(consistent({price:'90000',contractDeposit:'9000'},{interim:'85001'}),'계약금과 중도금의 합계가 거래금액보다 큽니다.');
+assert.equal(consistent({leaseStart:'2027-10-05'},{leaseEnd:'2027-10-04'}),'임대차 종료일이 입주일보다 빠릅니다.');
+assert.equal(consistent({contractDate:'2027년 1월 협의'},{balanceDate:'2027-01-01'}),'','Unfixed dates do not imply a contradiction');
+assert.equal(consistent({price:'90000'},{contractDeposit:'9000'}),'');
 for(const p of [{price:'9억'},{price:-1},{price:1.2},{price:0},{price:1e13},{owner:'synthetic'},
  {terms:'<img src=x>'},{terms:'예금주 직접 확인'},{balanceDate:'2027-02-30'},{balanceDate:'내년 4월'},
  {dealType:'매각'},{leaseDuration:'연락처 문의'},{balanceTime:'25:00'}])assert.equal(valid(p),null);
