@@ -104,6 +104,7 @@ on:
       - 'scripts/test_refresh_feedback.js'
       - 'scripts/test_public_hub.js'
       - 'scripts/test_news_ai_ui.js'
+      - 'scripts/test_live_voice_ui.js'
       - 'scripts/test_kakao_nearby.mjs'
       - 'data/nearby_config.json'
       - 'scripts/collect_public_services.py'
@@ -251,6 +252,7 @@ jobs:
           node scripts/test_public_hub.js
           node scripts/test_office_on_demand.js
           node scripts/test_news_ai_ui.js
+          node scripts/test_live_voice_ui.js
           node scripts/test_kakao_nearby.mjs
           node scripts/test_family_mode.js
           node scripts/test_admin_guards.js
@@ -376,24 +378,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.48 admin hub and three shared memo tabs APK
+      - name: Publish v2.1.49 free Gemini Live voice and public-news AI briefing APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.48.apk
-          unzip -t FirstHyundai-v2.1.48.apk | grep 'No errors detected'
-          if gh release view v2.1.48 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.49.apk
+          unzip -t FirstHyundai-v2.1.49.apk | grep 'No errors detected'
+          if gh release view v2.1.49 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.48 FirstHyundai-v2.1.48.apk \
+            gh release create v2.1.49 FirstHyundai-v2.1.49.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.48 · 관리센터 메뉴 정리 및 공유메모 3개 탭' \
-              --notes '관리센터를 6개 업무 분야(화면·테마, 메모·일정, 거래·알림, 구성원·권한, 자료·동기화, 운영 도구)의 선택형 카드로 재구성했습니다. 처음에는 카드만 보여주고, 선택한 분야의 설정만 보여주며 다른 분야로 즉시 이동하거나 검색할 수 있습니다. 공유메모는 메모작성/메모함/달력의 3개 동일 규격 버튼으로 개편했습니다. 공유메모 첫 화면은 작성, 메모함에는 검색·작성자·진행상태·정렬·복구함, 달력에는 일정과 반복 생일을 표시합니다. 기존 색상 이동 전환, 작성 중 초안 보존, 메모 알림 상세 이동, 권한·사진·30분 전 알림 및 마지막 접속 표시 기능을 유지합니다. v2.1.48/build199.'
+              --title '퍼스트현대 v2.1.49 · Gemini Live 음성도우미와 Gemini·Groq AI 실무브리핑' \
+              --notes 'Gemini·Groq 공개 기사 AI 요약을 재사용해 뉴스 탭에 중개 실무 체크포인트를 표시합니다. 뉴스 탭에 명시적 동의가 필요한 Gemini Live 음성 대화 버튼을 추가하고, Cloudflare Worker에서 기존 Gemini 키를 재사용해 일회용 임시 토큰을 발급하며, 관리자·가족 계정 인증과 무료 한도/일일 횟수 제한을 적용합니다. 신규 Android RECORD_AUDIO 권한은 버튼을 누를 때만 요청하고 화면 이동·앱 백그라운드에서 즉시 음성을 종료합니다. 계약·고객·메모 데이터는 AI로 전송하지 않으며, 무료 한도 소진·제공자 오류 시 기존 뉴스/계약/메모 앱 기능을 유지합니다. v2.1.49/build200.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.48 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.48 --apk FirstHyundai-v2.1.48.apk
+          gh release upload v2.1.49 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.49 --apk FirstHyundai-v2.1.49.apk
 
 

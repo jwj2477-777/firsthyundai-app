@@ -103,6 +103,17 @@ jobs:
           if [ -n "$DATA_GO_KR_SERVICE_KEY" ]; then
             printf '%s' "$DATA_GO_KR_SERVICE_KEY" | npx --yes wrangler@4 secret put DATA_GO_KR_SERVICE_KEY --config workers/shared-settings/wrangler.toml
           fi
+      - name: Install optional Gemini Live API private key
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -n "$GEMINI_API_KEY" ]; then
+            printf '%s' "$GEMINI_API_KEY" | npx --yes wrangler@4 secret put GEMINI_API_KEY --config workers/shared-settings/wrangler.toml
+          else
+            echo 'Optional Live voice unavailable: Gemini key not configured.'
+          fi
       - name: Check official weather availability without credentials in logs
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}

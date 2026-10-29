@@ -687,6 +687,49 @@ async function body(req,maxBytes=2400){
  if(bytes.byteLength>maxBytes)throw Error("large");
  return JSON.parse(new TextDecoder().decode(bytes));
 }
+/* Optional, quota-limited Gemini Live token issuance for public-news-only voice.
+   Full Gemini key stays ONLY in Worker secret; private notes and contracts are
+   never read or passed to Gemini here. Native device gets a single-use token. */
+const LIVE_MODEL="gemini-3.1-flash-live-preview", LIVE_MAX_DAILY=6;
+async function liveToken(req,env){
+ if(req.method!=="POST")return res({error:"method_not_allowed"},405);
+ if(req.headers.has("origin"))return res({error:"native_only"},403);
+ if(!env.SETTINGS||!env.FIRSTHYUNDAI_ACCESS_CODE||!env.AUTH_LIMITER)
+  return res({error:"office_auth_unavailable"},503);
+ const auth=req.headers.get("authorization")||"";
+ const caller=auth.startsWith("Bearer ")
+  ?await validBoardToken(auth.slice(7),env.FIRSTHYUNDAI_ACCESS_CODE,env):null;
+ if(!caller)return res({error:"account_session_required"},401);
+ if(!env.GEMINI_API_KEY)return res({error:"live_not_configured"},503);
+ if(!(await env.AUTH_LIMITER.limit({key:"gemini-live-"+caller.member.id})).success)
+  return res({error:"rate_limited"},429);
+ const day=new Date().toISOString().slice(0,10),quotaKey="fhd-live-daily-v1:"+caller.member.id+":"+day;
+ const used=Number(await env.SETTINGS.get(quotaKey)||"0");
+ if(used>=LIVE_MAX_DAILY)return res({error:"daily_free_trial_limit"},429);
+ const now=Date.now();
+ const config={
+  uses:1,
+  newSessionExpireTime:new Date(now+45_000).toISOString(),
+  expireTime:new Date(now+8*60_000).toISOString(),
+  liveConnectConstraints:{model:"models/"+LIVE_MODEL,
+    config:{responseModalities:["AUDIO"]}}
+ };
+ try{
+  const response=await fetch("https://generativelanguage.googleapis.com/v1beta/auth_tokens",{
+   method:"POST",
+   headers:{"x-goog-api-key":env.GEMINI_API_KEY,"Content-Type":"application/json"},
+   body:JSON.stringify(config)});
+  if(!response.ok){
+   return res({error:response.status===429?"provider_quota":"live_provider_unavailable"},503);
+  }
+  const data=await response.json();
+  const session=String(data?.name||"");
+  if(!session||session.length>2048)return res({error:"live_token_invalid"},503);
+  await env.SETTINGS.put(quotaKey,String(used+1),{expirationTtl:2*86400});
+  return res({token:session,model:LIVE_MODEL,expires_in_seconds:45,limit_per_day:LIVE_MAX_DAILY});
+ }catch(e){return res({error:"live_provider_unavailable"},503)}
+}
+
 export default {async scheduled(event,env,ctx){
   const now=Number(event?.scheduledTime)||Date.now();
   await deliverDueReminders(env,now);
@@ -701,6 +744,7 @@ export default {async scheduled(event,env,ctx){
   return res({ok:true,storage:true,defaultAccountsReady:!!(await env.SETTINGS.get(DEFAULT_MEMBERS_KEY,"json")),
   authConfigured:!!env.FIRSTHYUNDAI_ADMIN_CODE,boardAuthConfigured:!!env.FIRSTHYUNDAI_ACCESS_CODE,fcmConfigured:!!fcmConfig(env)});
  }
+ if(url.pathname==="/board/ai/live-token")return liveToken(req,env);
  if(url.pathname.startsWith("/board"))return boardCommand(req,env,url,ctx);
  if(url.pathname==="/settings"&&req.method==="GET")return res((await env.SETTINGS.get(key,"json"))||{schema:1,status:"not_configured"});
  if(req.headers.has("origin"))return res({error:"native_only"},403);

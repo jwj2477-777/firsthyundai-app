@@ -17,6 +17,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from groq_news import generate_fallback, review_important, MODEL as GROQ_MODEL, MAX_FALLBACK_BRIEFS, MAX_REVIEW_BRIEFS
+from news_intelligence import enrich_digest
 
 NEWS=Path(__file__).resolve().parents[1]/"data"/"news.json"
 MODEL="gemini-3.5-flash-lite"
@@ -444,18 +445,25 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
                     "summary_version": 3,
                     "verification": "Gemini 기사 본문 요약 · 사실 미검증"})
                 created += 1
-            # Gemini often omits a record in multi-article JSON. Limited
-            # one-item retries recover those without hallucinating headlines.
-            for item in missing:
+            # A large prompt may omit individual records. Retrying each missing
+            # article separately consumed most of yesterday's free requests
+            # (14 of 18 Gemini requests). Recover in smaller 2-item batches;
+            # remaining misses go to the existing Groq fallback, never fabricated.
+            for group_start in range(0, len(missing), 2):
                 if retried >= MAX_EXTRA_RETRIES:
                     break
+                group = missing[group_start:group_start + 2]
                 retried += 1
                 try:
-                    one = generate([item], key)
-                    summary = compact_summary(one.get(str(item["id"]), "")) if isinstance(one,dict) else ""
+                    recovered = generate(group, key)
+                    if not isinstance(recovered, dict):
+                        recovered = {}
                 except (OSError, ValueError, TypeError):
-                    summary = ""
-                if summary:
+                    recovered = {}
+                for item in group:
+                    summary = compact_summary(recovered.get(str(item["id"]), ""))
+                    if not summary:
+                        continue
                     item["brief"].update({
                         "summary": summary, "summary_method": "gemini_article",
                         "summary_model": MODEL, "summary_source_url": item["url"],
@@ -533,6 +541,7 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
         "created": created, "reused": len(cached), "article_fetches": len(resolved),
         "source_links_resolved": len(urlmap), "body_readable": len(article_bodies),
         "gemini_requests": requests + retried, "retry_requests": retried,
+        "retry_strategy": "two_article_batch",
         "candidate_articles": len(candidates),
         "groq_created": groq_created, "groq_requests": groq_requests,
         "groq_reviewed": groq_reviewed,
@@ -551,10 +560,13 @@ def main():
             previous=json.loads(Path(args.previous).read_text(encoding="utf-8"))
         except (OSError,ValueError):
             pass
-    enriched=enrich(current,previous,os.environ.get("GEMINI_API_KEY","").strip(),
-                    groq_key=os.environ.get("GROQ_API_KEY","").strip())
+    gemini_key=os.environ.get("GEMINI_API_KEY","").strip()
+    groq_key=os.environ.get("GROQ_API_KEY","").strip()
+    enriched=enrich(current,previous,gemini_key,groq_key=groq_key)
+    enriched=enrich_digest(enriched,previous,gemini_key,groq_key)
     NEWS.write_text(json.dumps(enriched,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("Gemini summary stats:",enriched["ai_summary_stats"],"key_configured:",bool(os.environ.get("GEMINI_API_KEY")))
+    print("Public office digest status:",enriched["ai_office_digest_stats"])
 
 if __name__=="__main__":
     main()

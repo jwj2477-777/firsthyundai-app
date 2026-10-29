@@ -113,6 +113,12 @@ final class OfficeBoardClient {
         if(auth.isEmpty())throw new Exception("사무실 메모 인증이 필요합니다.");
         return request("GET","/board/"+noteId+"/preview",null,auth);
     }
+    /** Exchange private board auth for one short-lived Gemini Live token. Never expose the board token to JS. */
+    static JSONObject liveToken(Context context) throws Exception {
+        String auth=token(context);
+        if(auth.isEmpty())throw new Exception("사무실 계정 인증이 필요합니다.");
+        return request("POST","/board/ai/live-token",new JSONObject(),auth);
+    }
     static JSONObject activity(Context context) throws Exception {
         String auth=token(context);
         if(auth.isEmpty())throw new Exception("사무실 보안 인증 필요");

@@ -1,3 +1,13 @@
+- 병목 최적화(2026-10-30): 공개 뉴스 스냅샷 131개 중 115개 재사용, 13개 신규 요약·Gemini 18회 중 개별 재시도 14회 확인. 누락 기사 1개씩 재호출 → 2개 묶음으로 복구해 해당 상황에서 최대 약 절반의 추가 요청으로 줄이도록 변경. 관련 오프라인 테스트 추가, 원문 근거 없는 요약 생성 금지. 실제 요청 감소 효과는 다음 수집 통계에서 확인해야 함.
+
+## 2026-10-30 · v2.1.49 · Gemini/Groq 뉴스 실무 체크포인트 + 무료 구간 Gemini Live 실시간 음성
+
+- 기존 GitHub Actions Secrets `GEMINI_API_KEY` · `GROQ_API_KEY`만 재사용. 기사 본문 기반 3문장 뉴스 요약은 기존 그대로 유지. `scripts/news_intelligence.py`가 **공개 기사 본문 요약만** 사용해 상담 체크포인트 1~3개를 별도로 생성. 기존 스냅샷 입력 지문으로 재사용해 중복 호출 절감. Gemini 실패 시 Groq 1회 보완, 모두 실패하면 **체크포인트만 숨기고 기존 뉴스/업무 기능 유지**. 결과 JSON은 `data/news.json`의 선택형 `ai_office_digest`. GitHub 수집은 `.github/workflows/collect.yml`에서 자동 연동.
+- 뉴스 탭에 공개 기사용 `Gemini Live` 음성 대화 UI `public-live.js/css`. 명시적 외부 음성 데이터 제공 동의 후에만 Android 마이크 권한 요청. 휴대폰이 백그라운드로 가거나 뉴스 탭에서 벗어나면 종료. 계약·메모·실명·은행·계좌 데이터는 Live 프롬프트로 **전송하지 않으며**, 음성 사용자가 개인자료를 말하지 않도록 명시적으로 안내. 음성 데이터는 무료 등급에서 공급자 서비스 개선에 사용될 수 있음.
+- 보안: `workers/shared-settings/src/index.mjs`의 `POST /board/ai/live-token`은 네이티브 요청만 허용, 기존 구성원 보안 토큰 검증, 계정별 일일 6회 및 속도제한, Google `v1beta/auth_tokens`에서 45초 내 개시·8분 내 유효 단회 토큰 발급. `GEMINI_API_KEY`는 Cloudflare Secret에만 설치(`.github/workflows/deploy-shared-settings.yml`). 메모 서버/공개 웹페이지/JS에는 기존 기밀키·보드 인증 토큰을 노출하지 않음.
+- Android `PublicLiveVoice.java`: 네이티브 마이크 16k PCM → Gemini WSS 전송, 24k PCM 재생, 화면에는 실시간 상태/전사만, 저장·녹음 파일 없음. `RECORD_AUDIO`는 버튼에서만 요청. Gemini Live 음성/프리뷰 모델·계정별 실제 무료 한도는 공급자 측 제한에 따라 다르며 실기기 연결은 **정식 배포 후 별도 검증 필수**. 오디오/AI 장애 시 앱의 기존 계약·메모·뉴스는 불변. `scripts/test_live_voice_ui.js`, `tests/test_news_intelligence.py` 추가.
+- 현재 계약 내용의 기기 내 파서는 변경하지 않았으며, 고객·계약·공유 메모를 외부 AI에 전송하지 않는다. `app/build.gradle` build200/version2.1.49.
+
 ## 2026-10-29 · v2.1.48 관리센터 6분야 및 공유메모 3탭
 
 - 관리센터 구조는 `index.html`의 `adminCategoryGrid` 6카드 + `admin-settings-navigator.js`의 선택·검색 상태, `admin-center.css`의 2열 카드/48px 탭 접근성. 관리 도구의 기존 클릭 핸들러는 보존.

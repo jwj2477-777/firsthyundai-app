@@ -75,6 +75,9 @@ public class MainActivity extends Activity {
     private static final int SAVE_CATALOG = 1023;
     private static final int DICTATE_CONTRACT = 1024;
     private static final int CHOOSE_MEMO_IMAGES = 1025;
+    private static final int LIVE_MIC_PERMISSION = 1832;
+    private PublicLiveVoice liveSession;
+    private String pendingLivePublicNews="";
     private ValueCallback<Uri[]> pendingMemoImages;
     private static final int LIMIT = 8 * 1024 * 1024;
     private volatile String verifiedUpdateUrl = "";
@@ -348,6 +351,7 @@ public class MainActivity extends Activity {
     }
 
     @Override protected void onPause() {
+        stopPublicLiveVoice();
         memoTimer.removeCallbacks(memoCheck);
         super.onPause();
     }
@@ -360,6 +364,16 @@ public class MainActivity extends Activity {
     @Override public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                                      int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode==LIVE_MIC_PERMISSION){
+            if(grantResults.length>0&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                String context=pendingLivePublicNews;pendingLivePublicNews="";
+                startPublicLiveVoice(context);
+            }else{
+                pendingLivePublicNews="";
+                liveVoiceEvent("error","마이크 사용 권한이 없어 음성 대화를 시작하지 않았습니다.");
+            }
+            return;
+        }
         if (requestCode == TradeNotifications.REQUEST_PERMISSION || requestCode == OfficeMemoNotifications.PERMISSION) {
             updateNotificationPermissionUI();
         }
@@ -493,7 +507,39 @@ public class MainActivity extends Activity {
             }).show();
     }
 
+    private void liveVoiceEvent(String state,String message){
+        try{deliver("onFirstHyundaiLiveStatus",new JSONObject()
+            .put("state",state).put("message",message));}
+        catch(Exception ignored){}
+    }
+    private void startPublicLiveVoice(String news){
+        stopPublicLiveVoice();
+        PublicLiveVoice session=new PublicLiveVoice(this,(state,message)->liveVoiceEvent(state,message));
+        liveSession=session;
+        session.start(news);
+    }
+    private void stopPublicLiveVoice(){
+        PublicLiveVoice previous=liveSession;liveSession=null;
+        if(previous!=null)previous.stop();
+    }
+
     public final class Bridge {
+        @JavascriptInterface public void startPublicLiveVoice(String publicNewsJson){
+            if(publicNewsJson==null||publicNewsJson.length()>4200)return;
+            runOnUiThread(()->{
+                if(isFinishing()||isDestroyed())return;
+                if(android.os.Build.VERSION.SDK_INT>=23&&
+                    checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED){
+                    pendingLivePublicNews=publicNewsJson;
+                    requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},LIVE_MIC_PERMISSION);
+                    return;
+                }
+                MainActivity.this.startPublicLiveVoice(publicNewsJson);
+            });
+        }
+        @JavascriptInterface public void stopPublicLiveVoice(){
+            runOnUiThread(()->MainActivity.this.stopPublicLiveVoice());
+        }
         @JavascriptInterface public String getDeviceDisplayMode() {
             return localDeviceDisplayMode();
         }
@@ -964,6 +1010,7 @@ public class MainActivity extends Activity {
         }
     }
     @Override protected void onDestroy(){
+        stopPublicLiveVoice();
         if(pendingMemoImages!=null){pendingMemoImages.onReceiveValue(null);pendingMemoImages=null;}
         memoTimer.removeCallbacks(memoCheck);io.shutdownNow();if(nativeHandoff!=null){nativeHandoff.finish(null);nativeHandoff=null;}if(web!=null)web.destroy();super.onDestroy();}
     @Override public void onBackPressed() {
