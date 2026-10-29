@@ -289,17 +289,14 @@ body.apartmentSheetActive{overflow:hidden}
   <span id="officeMemoNotificationStatus" class="tiny" role="status">새 메모 알림 확인 중</span>
   <button id="officeMemoNotificationPermission" type="button" class="btn alt hidden" onclick="FirstHyundaiOfficeBoard.enableNotifications()">알림 허용</button>
  </div>
- <div class="officeBoardViewToggle sectionModeSwitch" data-tone="memo" role="group" aria-label="공유 메모 보기 방식">
-  <button id="officeBoardNotesView" type="button" class="selected" aria-pressed="true" onclick="FirstHyundaiOfficeBoard.setView('notes')">▤ 메모</button>
-  <button id="officeBoardCalendarView" type="button" aria-pressed="false" onclick="FirstHyundaiOfficeBoard.setView('calendar')">▦ 일정 캘린더</button>
+ <div class="officeBoardViewToggle sectionModeSwitch" data-tone="memo" role="group" aria-label="공유메모 메뉴">
+  <button id="officeBoardComposeView" type="button" class="selected" aria-pressed="true" onclick="FirstHyundaiOfficeBoard.setView('compose')">✎ 메모작성</button>
+  <button id="officeBoardNotesView" type="button" aria-pressed="false" onclick="FirstHyundaiOfficeBoard.setView('notes')">▤ 메모함</button>
+  <button id="officeBoardCalendarView" type="button" aria-pressed="false" onclick="FirstHyundaiOfficeBoard.setView('calendar')">▦ 달력</button>
  </div>
- <div id="officeBoardComposeBar" class="officeBoardComposeBar">
-  <strong>메모함</strong>
-  <button id="officeBoardComposeToggle" type="button" class="officeBoardComposeToggle" aria-expanded="false" onclick="FirstHyundaiOfficeBoard.toggleComposer()">＋ 새 메모</button>
- </div>
- <section id="officeBoardComposer" class="panel officeBoardComposer hidden" aria-label="새 공유 메모 작성">
-  <div class="officeBoardComposeHeading"><label for="officeBoardDraft" class="officeBoardLabel">새 메모 작성</label>
-   <button type="button" class="officeBoardComposeCancel" onclick="FirstHyundaiOfficeBoard.toggleComposer(false)">닫기 ×</button></div>
+ <section id="officeBoardComposer" class="panel officeBoardComposer" aria-label="새 공유 메모 작성">
+  <div class="officeBoardComposeHeading"><label for="officeBoardDraft" class="officeBoardLabel">전달할 내용</label></div>
+  <p class="officeBoardComposeHelp">메모처럼 자유롭게 적어주세요. 날짜와 시간이 있으면 달력에도 자동으로 표시됩니다.</p>
   <textarea id="officeBoardDraft" maxlength="1600" rows="4" placeholder="전달할 내용을 자유롭게 적어주세요."></textarea>
   <input type="file" id="officeBoardImageInput" accept="image/*" multiple hidden aria-label="공유 메모 사진 선택">
   <div id="officeBoardImagePreview" class="officeBoardImagePreviewList" aria-live="polite"></div>
@@ -334,7 +331,7 @@ body.apartmentSheetActive{overflow:hidden}
   <div class="officeBoardFindSummary"><strong id="officeBoardListResult">메모를 확인하는 중…</strong>
    <button id="officeBoardClearFilters" type="button" hidden onclick="FirstHyundaiOfficeBoard.clearFilters()">초기화</button></div>
  </section>
- <div id="officeBoardListHeading" class="officeBoardListHeading"><strong>메모 목록 <span id="officeBoardCount" aria-label="진행 중 메모 수">—</span></strong>
+ <div id="officeBoardListHeading" class="officeBoardListHeading"><strong>공유 메모 <span id="officeBoardCount" aria-label="진행 중 메모 수">—</span></strong>
   <div class="officeBoardListActions"><button id="officeBoardShowDone" type="button" class="hidden" onclick="FirstHyundaiOfficeBoard.toggleDone()">완료 메모 보기</button>
    <button id="officeBoardArchiveOpen" class="hidden" type="button" onclick="FirstHyundaiOfficeBoard.toggleArchive()">복구함</button></div></div>
  <section id="officeBoardArchive" class="officeBoardArchive hidden" aria-label="관리자 메모 복구함"><p>관리자가 삭제한 메모는 30일 동안 보관됩니다.</p><div id="officeBoardArchiveList"></div></section>
@@ -360,12 +357,54 @@ body.apartmentSheetActive{overflow:hidden}
    <p id="officeBoardImageLoading" role="status"></p>
    <img id="officeBoardImageFull" alt="공유 메모에 첨부된 사진" hidden>
   </dialog>
- <div id="officeBoardList" class="officeBoardList" aria-live="polite"><div class="empty">메모를 불러오는 중입니다.</div></div>
+ <div id="officeBoardList" class="officeBoardList hidden" aria-live="polite"><div class="empty">메모를 불러오는 중입니다.</div></div>
  <button id="officeBoardMore" type="button" class="officeBoardMore hidden" onclick="FirstHyundaiOfficeBoard.showMore()">메모 더 보기</button>
 </div>
 <div id="adminCenter" class="page hidden">
- <div class="sectionTitle"><div><h2>시스템 관리센터</h2><p class="tiny">앱 진단·운영 · 관리자 전용</p></div><button type="button" class="btn alt refreshAction" onclick="FirstHyundaiAdminCenter.refresh()">전체 점검</button></div>
- <section class="panel officeMemberManager" aria-label="사무실 구성원 계정 관리">
+ <div class="sectionTitle"><div><h2>관리센터</h2><p class="tiny">사무실 앱 설정 · 관리자 전용</p></div><button type="button" class="btn alt refreshAction adminMasterRefresh" onclick="FirstHyundaiAdminCenter.refresh()">자료 전체 점검</button></div>
+ <section class="adminCommandBar" aria-label="관리센터 작업 메뉴">
+  <div class="adminCommandIntro"><strong>어떤 항목을 관리하시겠어요?</strong><small>원하는 메뉴를 선택하면 관련 설정만 나타납니다.</small></div>
+  <div class="adminSearchBox">
+   <label class="srOnly" for="adminControlSearch">관리 항목 검색</label>
+   <input id="adminControlSearch" type="search" autocomplete="off" placeholder="설정 검색 · 계정, 테마, 알림, API…" oninput="FirstHyundaiAdminNavigator.search(this.value)">
+   <button type="button" id="adminSearchClear" onclick="FirstHyundaiAdminNavigator.clear()">지우기</button>
+  </div>
+  <div class="adminCategoryGrid" id="adminCategoryGrid" role="group" aria-label="관리할 작업 선택">
+   <button type="button" data-admin-select="view" onclick="FirstHyundaiAdminNavigator.filter('view')">
+    <span class="adminHubIcon" aria-hidden="true">Aa</span><span class="adminHubCopy"><strong>화면 · 테마</strong><small>글씨·버튼·계절 효과</small></span><span class="adminHubArrow" aria-hidden="true">›</span>
+   </button>
+   <button type="button" data-admin-select="memo" onclick="FirstHyundaiAdminNavigator.filter('memo')">
+    <span class="adminHubIcon" aria-hidden="true">✎</span><span class="adminHubCopy"><strong>메모 · 일정</strong><small>공유메모·완료·알림</small></span><span class="adminHubArrow" aria-hidden="true">›</span>
+   </button>
+   <button type="button" data-admin-select="trade" onclick="FirstHyundaiAdminNavigator.filter('trade')">
+    <span class="adminHubIcon" aria-hidden="true">◉</span><span class="adminHubCopy"><strong>거래 · 알림</strong><small>실거래 표시·관심 알림</small></span><span class="adminHubArrow" aria-hidden="true">›</span>
+   </button>
+   <button type="button" data-admin-select="people" onclick="FirstHyundaiAdminNavigator.filter('people')">
+    <span class="adminHubIcon" aria-hidden="true">♧</span><span class="adminHubCopy"><strong>구성원 · 권한</strong><small>계정 관리·마지막 접속</small></span><span class="adminHubArrow" aria-hidden="true">›</span>
+   </button>
+   <button type="button" data-admin-select="data" onclick="FirstHyundaiAdminNavigator.filter('data')">
+    <span class="adminHubIcon" aria-hidden="true">↻</span><span class="adminHubCopy"><strong>자료 · 동기화</strong><small>수집 현황·API·공통 설정</small></span><span class="adminHubArrow" aria-hidden="true">›</span>
+   </button>
+   <button type="button" data-admin-select="tools" onclick="FirstHyundaiAdminNavigator.filter('tools')">
+    <span class="adminHubIcon" aria-hidden="true">⚙</span><span class="adminHubCopy"><strong>운영 도구</strong><small>앱 업데이트·자료 백업</small></span><span class="adminHubArrow" aria-hidden="true">›</span>
+   </button>
+  </div>
+  <div class="adminSectionBar" id="adminSectionBar" hidden>
+   <div class="adminSectionHeader"><button type="button" class="adminBackButton" onclick="FirstHyundaiAdminNavigator.clear()">‹ 전체 메뉴</button><strong id="adminSectionTitle"></strong></div>
+   <label class="srOnly" for="adminCategorySwitch">다른 관리 메뉴 선택</label>
+   <select id="adminCategorySwitch" aria-label="다른 관리 메뉴로 바로 이동" onchange="FirstHyundaiAdminNavigator.filter(this.value)">
+    <option value="">다른 메뉴로 이동</option>
+    <option value="view">화면 · 테마</option>
+    <option value="memo">메모 · 일정</option>
+    <option value="trade">거래 · 알림</option>
+    <option value="people">구성원 · 권한</option>
+    <option value="data">자료 · 동기화</option>
+    <option value="tools">운영 도구</option>
+   </select>
+  </div>
+  <p class="tiny" id="adminSearchResult" role="status" aria-live="polite">작업을 선택하면 해당 설정만 표시합니다.</p>
+ </section>
+ <section class="panel officeMemberManager" id="adminPeoplePanel" aria-label="사무실 구성원 계정 관리">
   <div class="officeMemberTitle"><strong>사무실 계정 관리</strong><button type="button" class="btn alt" onclick="FirstHyundaiOfficeMembers.refresh()">↻ 계정 확인</button></div>
   <p class="tiny">현재 휴대폰: <strong id="officeCurrentMember">연결 확인 중</strong> · 계정을 삭제하면 해당 기기의 접근도 차단됩니다.</p>
   <button type="button" class="btn alt officeMemberChoose" onclick="FirstHyundaiOfficeMembers.choose()">이 휴대폰의 계정 선택</button>
@@ -375,36 +414,14 @@ body.apartmentSheetActive{overflow:hidden}
    <button type="button" class="btn" onclick="FirstHyundaiOfficeMembers.add()">추가</button></div>
   <p id="officeMemberFeedback" class="tiny" role="status"></p>
  </section>
-  <section class="adminCommandBar" aria-label="관리센터 빠른 조작">
-  <div class="adminCommandIntro"><strong>필요한 설정 바로 찾기</strong><small>항목을 검색하거나 자주 쓰는 관리 메뉴로 이동하세요.</small></div>
-  <div class="adminSearchBox">
-   <label class="srOnly" for="adminControlSearch">관리 항목 검색</label>
-   <input id="adminControlSearch" type="search" autocomplete="off" placeholder="설정 검색 · 글씨, 메모, 알림, API…" oninput="FirstHyundaiAdminNavigator.search(this.value)">
-   <button type="button" id="adminSearchClear" onclick="FirstHyundaiAdminNavigator.clear()">지우기</button>
-  </div>
-  <div class="adminCategoryFilters" role="group" aria-label="관리 설정 분야">
-   <button type="button" data-admin-filter="all" aria-pressed="true" onclick="FirstHyundaiAdminNavigator.filter('all')">전체</button>
-   <button type="button" data-admin-filter="view" aria-pressed="false" onclick="FirstHyundaiAdminNavigator.filter('view')">화면·메뉴</button>
-   <button type="button" data-admin-filter="trade" aria-pressed="false" onclick="FirstHyundaiAdminNavigator.filter('trade')">거래·알림</button>
-   <button type="button" data-admin-filter="memo" aria-pressed="false" onclick="FirstHyundaiAdminNavigator.filter('memo')">공유 메모</button>
-   <button type="button" data-admin-filter="tools" aria-pressed="false" onclick="FirstHyundaiAdminNavigator.filter('tools')">운영도구</button>
-  </div>
-  <div class="adminCommandShortcuts" aria-label="주요 관리 바로가기">
-   <button type="button" onclick="FirstHyundaiAdminNavigator.jump('view')">화면 설정</button>
-   <button type="button" onclick="FirstHyundaiAdminNavigator.jump('memo')">메모 운영</button>
-   <button type="button" onclick="FirstHyundaiAdminNavigator.jump('sync')">동기화 상태</button>
-   <button type="button" onclick="FirstHyundaiAdminNavigator.jump('feeds')">수집 점검</button>
-  </div>
-  <p class="tiny" id="adminSearchResult" role="status" aria-live="polite">모든 관리 설정을 표시합니다.</p>
- </section>
- <section class="panel adminCenterPanel">
+ <section class="panel adminCenterPanel" id="adminStatusPanel">
   <div class="adminCenterHead"><h3>운영 현황</h3><span id="adminSystemStatus" class="adminStateBadge">확인 중</span></div>
   <div id="adminSummary" class="adminSummary" aria-live="polite"></div>
   <p id="adminInstalledVersion" class="adminInstalledVersion"></p>
   <p class="tiny" id="adminConnectionState">기기 연결 상태 확인 중</p>
   <p class="tiny" id="adminCheckNote">게시자료 상태를 확인하고 있습니다.</p>
  </section>
- <section class="panel adminCenterPanel">
+ <section class="panel adminCenterPanel" id="adminAttentionPanel">
   <div class="adminCenterHead"><h3>우선 점검할 항목</h3><span class="adminSmallHint">오류·지연·미수집 우선</span></div>
   <div id="adminAttention" class="adminAttention" aria-live="polite"></div>
  </section>
@@ -559,20 +576,20 @@ body.apartmentSheetActive{overflow:hidden}
  </details>
 </section>
  <section class="panel adminCenterPanel" id="adminToolsPanel" data-admin-category="tools"><h3>운영 도구</h3><div class="adminToolGrid">
-  <button type="button" onclick="switchPage('settings')"><b>데이터 연결</b><small>저장소·갱신 주기</small></button>
-  <button type="button" onclick="switchPage('apiGuide')"><b>API 연동</b><small>신청·승인 현황</small></button>
-  <button type="button" onclick="switchPage('security')"><b>보안·권한</b><small>일반모드·관리자 인증</small></button>
-  <button type="button" onclick="switchPage('notes')"><b>내 자료·백업</b><small>기기 내 메모 보관</small></button>
-  <button type="button" onclick="switchPage('complexes')"><b>단지정보 편집</b><small>단지 선택 후 관리</small></button>
-  <button type="button" onclick="FirstHyundaiAdminCenter.checkUpdate()"><b>앱 업데이트</b><small>최신 설치 버전 검사</small></button>
-  <button type="button" onclick="FirstHyundaiAdminCenter.openAlerts()"><b>알림 설정</b><small>관심단지 알림·휴대폰 권한</small></button>
+  <button type="button" data-admin-tool="data" onclick="switchPage('settings')"><b>데이터 연결</b><small>저장소·갱신 주기</small></button>
+  <button type="button" data-admin-tool="data" onclick="switchPage('apiGuide')"><b>API 연동</b><small>신청·승인 현황</small></button>
+  <button type="button" data-admin-tool="people" onclick="switchPage('security')"><b>보안·권한</b><small>일반모드·관리자 인증</small></button>
+  <button type="button" data-admin-tool="tools" onclick="switchPage('notes')"><b>내 자료·백업</b><small>기기 내 메모 보관</small></button>
+  <button type="button" data-admin-tool="tools" onclick="switchPage('complexes')"><b>단지정보 편집</b><small>단지 선택 후 관리</small></button>
+  <button type="button" data-admin-tool="tools" onclick="FirstHyundaiAdminCenter.checkUpdate()"><b>앱 업데이트</b><small>최신 설치 버전 검사</small></button>
+  <button type="button" data-admin-tool="trade" onclick="FirstHyundaiAdminCenter.openAlerts()"><b>알림 설정</b><small>관심단지 알림·휴대폰 권한</small></button>
  </div></section>
- <section class="panel adminCenterPanel">
+ <section class="panel adminCenterPanel" id="adminAuditPanel">
   <div class="adminCenterHead"><h3>최근 관리자 점검</h3><button class="adminSubtleButton" type="button" onclick="FirstHyundaiAdminCenter.clearAudit()">이력만 지우기</button></div>
   <div id="adminAuditHistory" class="adminAuditHistory"></div>
   <p class="tiny">이 휴대폰에 상태 점검 일시와 결과만 최대 24건 저장합니다. 거래·고객 정보는 기록하지 않습니다.</p>
  </section>
- <section class="panel adminCenterPanel">
+ <section class="panel adminCenterPanel" id="adminDeveloperPanel">
   <details id="adminDeveloperDetails" ontoggle="FirstHyundaiAdminCenter.detailsChanged(this.open)">
    <summary>고급 개발자 진단</summary>
    <p class="tiny">게시 건수·상태·시각만 제공합니다. 오류 원문, 고객 정보, 인증키는 복사하지 않습니다.</p>

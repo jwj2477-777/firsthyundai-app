@@ -1,3 +1,10 @@
+## 2026-10-29 · v2.1.48 관리센터 6분야 및 공유메모 3탭
+
+- 관리센터 구조는 `index.html`의 `adminCategoryGrid` 6카드 + `admin-settings-navigator.js`의 선택·검색 상태, `admin-center.css`의 2열 카드/48px 탭 접근성. 관리 도구의 기존 클릭 핸들러는 보존.
+- 공유메모는 `officeBoardComposeView` / `officeBoardNotesView` / `officeBoardCalendarView` 3탭. `office-board.js`의 `view='compose'|'notes'|'calendar'`로 독립 표시, 최초 진입 compose, 알림 대상 메모는 notes, 달력에서 등록 항목 터치 시 notes. 작성 중 draft 유지.
+- `office-board.css`에서 기존 `sectionModeSwitch` 머스터드/크기·색상 전환을 유지하고 열 수만 3으로 확장. 절대 옛날의 2탭/접이식 작성 기본으로 되돌리지 말 것.
+- 검증: `test_office_board_tab_switch_browser.js`, `test_office_board_layout.js`, `test_admin_navigation.js`, 기존 업무브리핑·생일·메모 검색/권한/Android 테스트.
+
 ## 2026-10-29 · v2.1.47 구성원 마지막 접속 기록 최소화
 
 - 마지막 접속 표시는 workers/shared-settings/src/index.mjs의 계정별 단일 시각 KV(5분 갱신 제한)와 관리자 전용 GET /board/members에 구현. 로그인 횟수, 기기·IP·위치·활동 이력 없음.

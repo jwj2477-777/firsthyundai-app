@@ -10,12 +10,17 @@ const page=html.slice(html.indexOf('<div id="officeBoard" class="page hidden">')
  html.indexOf('<div id="adminCenter" class="page hidden">'));
 assert(page.includes('<h2>사무실 메모</h2>'));
 assert(page.includes('id="officeBoardDraft"')&&page.includes('id="officeBoardPost"'));
-for(const id of ['officeBoardComposeToggle','officeBoardComposer','officeBoardSearch',
+for(const id of ['officeBoardComposeView','officeBoardNotesView','officeBoardCalendarView','officeBoardComposer','officeBoardSearch',
  'officeBoardStatusActive','officeBoardStatusDone','officeBoardStatusAll',
  'officeBoardAuthorFilter','officeBoardSort','officeBoardMore'])
  assert(page.includes('id="'+id+'"'),id+' finder control missing');
-assert(page.includes('class="panel officeBoardComposer hidden"'),
- 'Memo library must start visible and composing must be a separate action');
+assert(page.includes('class="panel officeBoardComposer"'),
+ 'Writing must be the first visible view, not a collapsed secondary action');
+assert(page.includes("setView('compose')")&&page.includes("setView('notes')")&&page.includes("setView('calendar')"),
+ 'Three separate shared memo tabs must be wired');
+assert(page.indexOf('officeBoardComposeView')<page.indexOf('officeBoardNotesView')&&
+ page.indexOf('officeBoardNotesView')<page.indexOf('officeBoardCalendarView'),
+ 'Tab order must be write, library, calendar');
 assert(js.includes('function filteredMemos()')&&js.includes('function showMore()')&&
  js.includes("call('list',{offset})"),'Search must reach older server records, not just a tiny visible page');
 assert(page.includes('메모 붙이기'));

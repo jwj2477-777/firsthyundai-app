@@ -351,7 +351,7 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 }
 #officeBoard .officeBoardViewToggle.sectionModeSwitch{
  display:grid;
- grid-template-columns:repeat(2,minmax(0,1fr));
+ grid-template-columns:repeat(3,minmax(0,1fr));
  align-items:stretch;
  gap:5px;
  width:100%;
@@ -416,7 +416,7 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
  }
 }
 @media(max-width:350px){
- #officeBoard .officeBoardViewToggle.sectionModeSwitch>button{font-size:14px}
+ #officeBoard .officeBoardViewToggle.sectionModeSwitch>button{font-size:13px;padding:8px 2px}
 }
 @media(prefers-reduced-motion:reduce){
  #officeBoard .officeBoardViewToggle.sectionModeSwitch>button{transition:none}
@@ -521,6 +521,11 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
  border:1px solid #705A37;background:#866D40;color:#fff;border-radius:11px;
  font-weight:800;font-size:13px}
 #officeBoard .officeBoardComposeHeading{display:flex;justify-content:space-between;gap:8px;align-items:center}
+#officeBoard .officeBoardComposeHelp{margin:0 0 11px;color:#687B75;font-size:12px;line-height:1.55}
+#officeBoard .officeBoardViewToggle.sectionModeSwitch>button{letter-spacing:-.35px}
+#officeBoard .officeBoardViewToggle.sectionModeSwitch>button:active{filter:brightness(.985)}
+#officeBoard .officeBoardViewToggle.sectionModeSwitch>button[aria-pressed="true"]{font-weight:850}
+#officeBoard .officeBoardList.hidden,#officeBoard .officeBoardListHeading.hidden{display:none!important}
 #officeBoard .officeBoardComposeHeading .officeBoardLabel{margin-bottom:7px}
 #officeBoard .officeBoardComposeCancel{min-height:40px;border:0;background:transparent;
  padding:7px 10px;color:#617571;font-size:12px;font-weight:750}
