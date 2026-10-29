@@ -194,6 +194,7 @@ final class OfficeBoardClient {
             return request("imageGet".equals(action)?"GET":"DELETE",
                 "/board/"+id+"/images/"+imageId,null,auth);
         }
+        if("preview".equals(action))return preview(context,id);
         if("delete".equals(action))return request("DELETE","/board/"+id,null,auth,adminToken);
         if("restore".equals(action))return request("POST","/board/archive/"+id+"/restore",null,auth,adminToken);
         if("edit".equals(action)){
