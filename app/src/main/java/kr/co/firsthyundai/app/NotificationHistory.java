@@ -70,6 +70,18 @@ final class NotificationHistory {
             prefs(context).edit().putString(ENTRIES,keepRecent(next).toString()).apply();
         }catch(Exception ignored){}
     }
+    /** Remember only a private note ID; fetch the text after opening the inbox. */
+    static synchronized void recordMemo(Context context,String noteId){
+        record(context,"memo","새 사무실 공유 메모","사무실 포스트잇이 도착했습니다.");
+        if(noteId==null||!noteId.matches("[a-z0-9]{8,14}-[0-9a-f-]{36}"))return;
+        JSONArray records=data(context);
+        JSONObject newest=records.optJSONObject(0);
+        if(newest==null||!"memo".equals(newest.optString("kind","")))return;
+        try{
+            newest.put("noteId",noteId);
+            prefs(context).edit().putString(ENTRIES,keepRecent(records).toString()).apply();
+        }catch(Exception ignored){}
+    }
     static synchronized String list(Context context){
         return keepRecent(data(context)).toString();
     }
