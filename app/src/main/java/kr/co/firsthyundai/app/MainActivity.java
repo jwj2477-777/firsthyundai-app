@@ -630,7 +630,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void officeBoardAction(String action,String payload,String requestId){
             if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
             if(action==null||!java.util.Arrays.asList("list","post","edit","done","schedule","delete","archive","restore",
-                "imageAdd","imageGet","imageRemove","preview").contains(action)||payload==null||
+                "imageAdd","imageGet","imageRemove","preview","pin").contains(action)||payload==null||
                payload.length()>("imageAdd".equals(action)?200000:3000))return;
             final boolean needsAdmin="delete".equals(action)||"restore".equals(action)||"archive".equals(action);
             final String adminIdentity=adminSessionIdentity;
@@ -643,7 +643,7 @@ public class MainActivity extends Activity {
                         throw new Exception("메모 삭제와 복구는 관리자모드에서만 가능합니다. 관리자모드로 로그인해 주세요.");
                     JSONObject incoming=new JSONObject(payload);
                     final boolean editAction=java.util.Arrays.asList(
-                        "edit","done","schedule","imageAdd","imageRemove").contains(action);
+                        "edit","done","schedule","pin","imageAdd","imageRemove").contains(action);
                     final boolean authorizedAdmin=adminIdentity!=null&&!adminIdentity.isEmpty()&&
                         adminIdentity.equals(adminSessionIdentity)&&adminToken!=null&&!adminToken.isEmpty();
                     JSONObject data=OfficeBoardClient.perform(getApplicationContext(),action,incoming,
