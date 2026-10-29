@@ -514,7 +514,7 @@ async function refresh(silent=false){
   const seen=new Map(recent.map(n=>[n.id,n]));
   let offset=Number(first.next_offset)||25;
   // A page is at most 25 notes, so no single Android reply exceeds its cap.
-  // Do not send customer memo text to a public website or localStorage.
+  // Customer memo content stays in memory and on the authenticated native bridge.
   while(cycle===refreshCycle&&offset<=1000){
    const page=await call('list',{offset});
    if(cycle!==refreshCycle)return;
