@@ -1437,7 +1437,11 @@ function setComplexTrendType(type){
  if(!['매매','전세','월세'].includes(type))return;
  complexTrendType=type;complexTrendArea='';complexTrendIncludeRenewals=false;renderComplexes();
 }
-function setComplexTrendArea(area){complexTrendArea=/^d{1,3}.d{2}$/.test(String(area))?String(area):'';renderComplexes();}
+function setComplexTrendArea(area){
+ const value=String(area??'').trim();
+ complexTrendArea=/^\d{1,3}\.\d{2}$/.test(value)?value:'';
+ renderComplexes();
+}
 function setComplexTrendMonths(value){if(value!==6&&value!==12)return;complexTrendMonths=value;renderComplexes();}
 function setComplexTrendRenewals(value){complexTrendIncludeRenewals=!!value;complexTrendArea='';renderComplexes();}
 function baseComplexes(){
