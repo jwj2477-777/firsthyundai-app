@@ -309,7 +309,7 @@ async function boardCommand(req,env,url,ctx){
   const note=await env.SETTINGS.get(BOARD_PREFIX+previewRoute[1],"json");
   if(!note||typeof note.text!=="string")return res({error:"not_found"},404);
   const author=typeof note.author?.name==="string"?note.author.name.slice(0,24):"사무실";
-  const snippet=note.text.replace(/[\\r\\n\\t]+/g," ").replace(/\\s+/g," ").trim().slice(0,110);
+  const snippet=note.text.replace(/[\r\n\t]+/g," ").replace(/\s+/g," ").trim().slice(0,110);
   return res({author,preview:snippet,image_count:Array.isArray(note.images)?note.images.length:0});
  }
  if(url.pathname==="/board"&&req.method==="GET")return res({schema:1,notes:await boardList(env)});
