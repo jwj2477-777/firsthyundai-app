@@ -52,6 +52,7 @@ final class ThemeAppearance {
         if(!"on".equals(enabled))theme="default";
         String intensity=p.getString("themeIntensity","balanced");
         int[] colors="default".equals(theme)&&intro?new int[]{Color.rgb(3,33,42),Color.rgb(9,91,94)}:SeasonThemeMath.palette(theme,intensity);
+        if(!"default".equals(theme))colors=SeasonThemeMath.ambientPalette(colors,System.currentTimeMillis());
         GradientDrawable base=new GradientDrawable(GradientDrawable.Orientation.TL_BR,colors);
         String decor=p.getString("themeDecor","full"),wet=p.getString("weatherEffect","none");
         if("auto".equals(wet)){
