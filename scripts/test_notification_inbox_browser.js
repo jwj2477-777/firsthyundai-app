@@ -19,7 +19,10 @@ assert(history.includes('getSharedPreferences(PREF,Context.MODE_PRIVATE)'),'No p
 assert(history.includes('MAX=80')&&history.includes('RETAIN_MS'),'History capped');
 assert(history.includes('if("memo".equals(kind))'),'Memo title and body must be generic in history');
 assert(trades.includes('NotificationHistory.record(activity,"trade"'));
-assert(memos.includes('NotificationHistory.record(context,"memo"'));
+assert(memos.includes('NotificationHistory.recordMemo(context,noteId)'));
+assert(history.includes('recordMemo(Context context,String noteId)'));
+assert(inbox.includes("imageCall?.('preview'")&&inbox.includes('focusNote?.(entry.noteId)'),
+ 'Inbox requests private previews without storing customer texts');
 const binary=process.env.FHD_CHROME||['google-chrome','google-chrome-stable','chromium','chromium-browser']
  .find(x=>child.spawnSync('which',[x]).status===0);
 assert(binary,'Chromium required for UI regression');

@@ -29,6 +29,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.ValueCallback;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import org.json.JSONArray;
@@ -73,6 +74,8 @@ public class MainActivity extends Activity {
     private static final int OPEN_BACKUP = 1022;
     private static final int SAVE_CATALOG = 1023;
     private static final int DICTATE_CONTRACT = 1024;
+    private static final int CHOOSE_MEMO_IMAGES = 1025;
+    private ValueCallback<Uri[]> pendingMemoImages;
     private static final int LIMIT = 8 * 1024 * 1024;
     private volatile String verifiedUpdateUrl = "";
     private volatile boolean updateDownloading = false;
@@ -152,7 +155,24 @@ public class MainActivity extends Activity {
                 return routeExternal(url);
             }
         });
-        web.setWebChromeClient(new WebChromeClient());
+        web.setWebChromeClient(new WebChromeClient(){
+            @Override public boolean onShowFileChooser(WebView view,ValueCallback<Uri[]> callback,
+                                                         FileChooserParams params){
+                if(pendingMemoImages!=null){pendingMemoImages.onReceiveValue(null);pendingMemoImages=null;}
+                pendingMemoImages=callback;
+                try{
+                    Intent select=new Intent(Intent.ACTION_GET_CONTENT);
+                    select.addCategory(Intent.CATEGORY_OPENABLE);
+                    select.setType("image/*");
+                    select.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
+                    startActivityForResult(Intent.createChooser(select,"공유 메모 사진 선택"),CHOOSE_MEMO_IMAGES);
+                }catch(Exception e){
+                    pendingMemoImages=null;
+                    callback.onReceiveValue(null);
+                }
+                return true;
+            }
+        });
         WebSettings s = web.getSettings();
         // Set before page load. Standard always uses 100%, independent of
         // Android system font scaling. Other modes are per-handset opt-in.
@@ -605,8 +625,9 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public void officeBoardAction(String action,String payload,String requestId){
             if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
-            if(action==null||!java.util.Arrays.asList("list","post","edit","done","schedule","delete","archive","restore").contains(action)||
-               payload==null||payload.length()>3000)return;
+            if(action==null||!java.util.Arrays.asList("list","post","edit","done","schedule","delete","archive","restore",
+                "imageAdd","imageGet","imageRemove","preview").contains(action)||payload==null||
+               payload.length()>("imageAdd".equals(action)?200000:3000))return;
             final boolean needsAdmin="delete".equals(action)||"restore".equals(action)||"archive".equals(action);
             final String adminIdentity=adminSessionIdentity;
             final String adminToken=sharedSettingsToken;
@@ -867,6 +888,25 @@ public class MainActivity extends Activity {
 
     @Override protected void onActivityResult(int request, int result, Intent data) {
         super.onActivityResult(request,result,data);
+        if(request==CHOOSE_MEMO_IMAGES){
+            ValueCallback<Uri[]> callback=pendingMemoImages;
+            pendingMemoImages=null;
+            if(callback!=null){
+                ArrayList<Uri> selected=new ArrayList<>();
+                if(result==RESULT_OK&&data!=null){
+                    if(data.getClipData()!=null){
+                        ClipData clips=data.getClipData();
+                        for(int i=0;i<Math.min(3,clips.getItemCount());i++){
+                            Uri uri=clips.getItemAt(i).getUri();
+                            if(uri!=null&&"content".equals(uri.getScheme()))selected.add(uri);
+                        }
+                    }else if(data.getData()!=null&&"content".equals(data.getData().getScheme()))
+                        selected.add(data.getData());
+                }
+                callback.onReceiveValue(selected.isEmpty()?null:selected.toArray(new Uri[0]));
+            }
+            return;
+        }
         if(request==DICTATE_CONTRACT) {
             JSONObject response=new JSONObject();
             try {
@@ -914,7 +954,9 @@ public class MainActivity extends Activity {
             });
         }
     }
-    @Override protected void onDestroy(){memoTimer.removeCallbacks(memoCheck);io.shutdownNow();if(nativeHandoff!=null){nativeHandoff.finish(null);nativeHandoff=null;}if(web!=null)web.destroy();super.onDestroy();}
+    @Override protected void onDestroy(){
+        if(pendingMemoImages!=null){pendingMemoImages.onReceiveValue(null);pendingMemoImages=null;}
+        memoTimer.removeCallbacks(memoCheck);io.shutdownNow();if(nativeHandoff!=null){nativeHandoff.finish(null);nativeHandoff=null;}if(web!=null)web.destroy();super.onDestroy();}
     @Override public void onBackPressed() {
         if(web==null) {super.onBackPressed();return;}
         // Close the native-feeling apartment detail screen before leaving the app.

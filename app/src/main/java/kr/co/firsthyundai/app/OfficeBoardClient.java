@@ -106,6 +106,13 @@ final class OfficeBoardClient {
         if(auth.isEmpty())throw new Exception("사무실 메모 보안 인증 필요");
         return request("GET","/board/push/status",null,auth);
     }
+    static JSONObject preview(Context context,String noteId) throws Exception {
+        if(noteId==null||!noteId.matches("[a-z0-9]{8,14}-[0-9a-f-]{36}"))
+            throw new Exception("invalid_note_id");
+        String auth=token(context);
+        if(auth.isEmpty())throw new Exception("사무실 메모 인증이 필요합니다.");
+        return request("GET","/board/"+noteId+"/preview",null,auth);
+    }
     static JSONObject activity(Context context) throws Exception {
         String auth=token(context);
         if(auth.isEmpty())throw new Exception("사무실 보안 인증 필요");
@@ -175,6 +182,19 @@ final class OfficeBoardClient {
         }
         String id=payload.optString("id","");
         if(!id.matches("[a-z0-9]{8,14}-[0-9a-f-]{36}"))throw new Exception("메모 번호가 올바르지 않습니다.");
+        if("imageAdd".equals(action)){
+            String image=payload.optString("data_url","");
+            if(!image.matches("data:image/jpeg;base64,/9j/[A-Za-z0-9+/=]+")||
+                    image.length()>195000)throw new Exception("사진 크기를 확인해 주세요.");
+            return request("POST","/board/"+id+"/images",new JSONObject().put("data_url",image),auth);
+        }
+        if("imageGet".equals(action)||"imageRemove".equals(action)){
+            String imageId=payload.optString("image_id","");
+            if(!imageId.matches("[0-9a-f-]{36}"))throw new Exception("사진 번호가 올바르지 않습니다.");
+            return request("imageGet".equals(action)?"GET":"DELETE",
+                "/board/"+id+"/images/"+imageId,null,auth);
+        }
+        if("preview".equals(action))return preview(context,id);
         if("delete".equals(action))return request("DELETE","/board/"+id,null,auth,adminToken);
         if("restore".equals(action))return request("POST","/board/archive/"+id+"/restore",null,auth,adminToken);
         if("edit".equals(action)){
@@ -214,7 +234,8 @@ final class OfficeBoardClient {
             if(adminToken!=null&&!adminToken.isEmpty())connection.setRequestProperty("X-FHD-Admin-Authorization","Bearer "+adminToken);
             if(body!=null){
                 byte[] bytes=body.toString().getBytes(StandardCharsets.UTF_8);
-                if(bytes.length>7000)throw new Exception("메모 크기가 너무 큽니다.");
+                int max=path.endsWith("/images")&&"POST".equals(method)?200000:7000;
+                if(bytes.length>max)throw new Exception("사진 또는 메모 크기가 너무 큽니다.");
                 connection.setDoOutput(true);
                 connection.setRequestProperty("Content-Type","application/json; charset=utf-8");
                 try(OutputStream out=connection.getOutputStream()){out.write(bytes);}
