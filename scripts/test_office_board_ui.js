@@ -112,7 +112,7 @@ assert.equal(api._test.filteredMemos()[0].id,samples[5].id,
 api.clearFilters();
 assert.equal(api._test.filteredMemos().length,samples.filter(n=>!n.done).length);
 assert.equal((el('officeBoardList').innerHTML.match(/data-note=/g)||[]).length,10);
-assert(!/localStorage|sessionStorage|\\bfetch\\(/.test(js),
+assert(!/localStorage|sessionStorage|\bfetch\(/.test(js),
  'Sensitive notes must remain in the authenticated native channel');
 console.log('Office board UX, native bridge, freeform post and escaping passed.');
 })().catch(e=>{console.error(e);process.exitCode=1});
