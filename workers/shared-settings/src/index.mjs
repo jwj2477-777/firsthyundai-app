@@ -131,6 +131,28 @@ const validBoardId=x=>typeof x==="string"&&/^([a-z0-9]{8,14})-([0-9a-f-]{36})$/.
 // Bound every public-facing (authenticated) board response to 25 memos.
 // This avoids one oversized Android response and large bursts of KV lookups.
 // KV names are chronological; offset 0 is the newest page.
+const BOARD_CACHE_REV="office-postit-cache-revision-v1";
+const BOARD_CACHE_PREFIX="office-postit-cache-v1:";
+const BOARD_CACHE_TTL=300;
+async function cachedPrivateBoard(env,key,producer){
+ let revision="";
+ try{
+  revision=await env.SETTINGS.get(BOARD_CACHE_REV)||"initial";
+  const saved=await env.SETTINGS.get(BOARD_CACHE_PREFIX+key,"json");
+  if(saved?.revision===revision&&saved?.stored_at>Date.now()-BOARD_CACHE_TTL*1000&&
+      saved?.payload!==undefined)return saved.payload;
+ }catch(e){/* Read failures must not prevent a direct authorized board read. */}
+ const payload=await producer();
+ try{await env.SETTINGS.put(BOARD_CACHE_PREFIX+key,
+  JSON.stringify({revision,payload,stored_at:Date.now()}),
+  {expirationTtl:BOARD_CACHE_TTL});}
+ catch(e){/* Cache is optional. Never discard a successfully loaded memo list. */}
+ return payload;
+}
+async function invalidateBoardCache(env){
+ try{await env.SETTINGS.put(BOARD_CACHE_REV,crypto.randomUUID());}
+ catch(e){console.warn("office_board_cache_invalidation_deferred");}
+}
 const BOARD_PAGE_SIZE=25;
 async function boardPage(env,offset=0){
  const keys=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
@@ -147,6 +169,7 @@ async function boardPage(env,offset=0){
   has_more:offset+BOARD_PAGE_SIZE<names.length,next_offset:offset+BOARD_PAGE_SIZE};
 }
 async function boardList(env){
+ return cachedPrivateBoard(env,"scheduled",async()=>{
  const keys=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
  // Each post-it has its own KV key, so simultaneous posts never overwrite one another.
  const latest=keys.keys.slice(-100);
@@ -155,6 +178,7 @@ async function boardList(env){
  }));
  return notes.filter(x=>x&&validBoardId(x.id)&&typeof x.text==="string"&&
   typeof x.done==="boolean").sort((a,b)=>b.created_at.localeCompare(a.created_at));
+ });
 }
 async function boardCommand(req,env,url,ctx){
  if(!env.FIRSTHYUNDAI_ACCESS_CODE)return res({error:"board_auth_not_configured"},503);
@@ -281,6 +305,7 @@ async function boardCommand(req,env,url,ctx){
   delete saved.deleted_at;
   await env.SETTINGS.put(BOARD_PREFIX+restoring[1],JSON.stringify(saved),{expirationTtl:BOARD_LIFETIME_DAYS*86400});
   await env.SETTINGS.delete(archiveKey);
+  await invalidateBoardCache(env);
   return res({ok:true,note:saved});
  }
  if(url.pathname==="/board/push/register"&&req.method==="POST")return pushRegister(req,env,caller);
@@ -309,6 +334,7 @@ async function boardCommand(req,env,url,ctx){
     await env.SETTINGS.put(noteKey,JSON.stringify(updated),
       {expirationTtl:BOARD_LIFETIME_DAYS*86400});
    }catch(e){await env.SETTINGS.delete(BOARD_IMAGE_PREFIX+imageId);throw e}
+   await invalidateBoardCache(env);
    return res({ok:true,note:updated,image_id:imageId},201);
   }
   if(photoId&&images.includes(photoId)&&req.method==="GET"){
@@ -323,6 +349,7 @@ async function boardCommand(req,env,url,ctx){
    await env.SETTINGS.put(noteKey,JSON.stringify(updated),
      {expirationTtl:BOARD_LIFETIME_DAYS*86400});
    await env.SETTINGS.delete(BOARD_IMAGE_PREFIX+photoId);
+   await invalidateBoardCache(env);
    return res({ok:true,note:updated});
   }
   return res({error:"not_found"},404);
@@ -343,7 +370,7 @@ async function boardCommand(req,env,url,ctx){
   const offsetRaw=url.searchParams.get("offset")||"0";
   if(!/^\d{1,4}$/.test(offsetRaw)||Number(offsetRaw)>1000)
    return res({error:"invalid_page"},400);
-  return res(await boardPage(env,Number(offsetRaw)));
+  return res(await cachedPrivateBoard(env,"page-"+offsetRaw,()=>boardPage(env,Number(offsetRaw))));
  }
  if(url.pathname==="/board/updates"&&req.method==="GET"){
   const list=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
@@ -359,6 +386,7 @@ async function boardCommand(req,env,url,ctx){
   const record={id,text:content,done:false,pinned:false,scheduled_at:scheduled,all_day:data?.all_day===true,created_at:now,updated_at:now,author:{id:caller.member.id,name:caller.member.name}};
   await env.SETTINGS.put(BOARD_PREFIX+id,JSON.stringify(record),
    {expirationTtl:BOARD_LIFETIME_DAYS*86400,metadata:{device}});
+  await invalidateBoardCache(env);
   // Send after storage succeeds. Failure must never lose the saved memo.
   // Cloudflare waitUntil continues delivery without delaying the writer's screen.
   if(fcmConfig(env)){
@@ -378,6 +406,7 @@ async function boardCommand(req,env,url,ctx){
    const deleted={...saved,deleted_at:new Date().toISOString()};
    await env.SETTINGS.put(BOARD_ARCHIVE_PREFIX+match[1],JSON.stringify(deleted),{expirationTtl:BOARD_ARCHIVE_DAYS*86400});
    await env.SETTINGS.delete(memoKey);
+   await invalidateBoardCache(env);
    return res({ok:true,archived:true});
   }
   if(!await canModifyNote(saved))return res({error:"memo_edit_forbidden"},403);
@@ -400,6 +429,7 @@ async function boardCommand(req,env,url,ctx){
   saved.updated_at=new Date().toISOString();
   await env.SETTINGS.put(memoKey,JSON.stringify(saved),
    {expirationTtl:BOARD_LIFETIME_DAYS*86400});
+  await invalidateBoardCache(env);
   return res({ok:true,note:saved});
  }
  return res({error:"not_found"},404);
