@@ -6,6 +6,7 @@
  const native=()=>window.FirstHyundaiNative;
  const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  let entries=[];
+ const temporaryPreviews=new Map();
  function load(){
   try{
    const raw=native()?.getNotificationHistory?.();
@@ -38,11 +39,31 @@
     x.kind+'" aria-label="'+escape(x.title)+' 알림 보기">'+
     '<span class="inboxKind '+x.kind+'" aria-hidden="true">'+(x.kind==='memo'?'▤':'↗')+'</span>'+
     '<span class="inboxInfo"><strong>'+escape(x.title)+'</strong><small>'+
-    escape(x.detail||'')+'</small></span><time>'+escape(formatTime(x.when))+'</time></button>'
+    escape(temporaryPreviews.get(x.noteId)||x.detail||'')+'</small></span><time>'+escape(formatTime(x.when))+'</time></button>'
    ).join(''):'<div class="inboxEmpty">도착한 알림이 없습니다.<small>새로운 실거래나 공유 메모 알림이 이곳에 모입니다.</small></div>';
   }
   const clear=by('notificationInboxClear');
   if(clear)clear.disabled=entries.length===0;
+ }
+ async function showMemoPreviews(){
+  const dialog=by('notificationInboxDialog');
+  const latest=entries.filter(x=>x.kind==='memo'&&
+    /^[a-z0-9]{8,14}-[0-9a-f-]{36}$/.test(x.noteId||'')).slice(0,6);
+  for(const row of latest){
+   if(!dialog?.open)return;
+   if(temporaryPreviews.has(row.noteId))continue;
+   try{
+    const note=await window.FirstHyundaiOfficeBoard?.imageCall?.('preview',{id:row.noteId});
+    if(!dialog.open)return;
+    if(!note||typeof note.preview!=='string')continue;
+    const safe=note.preview.replace(/\\s+/g,' ').trim()
+     .replace(/01[016789][- .]?\\d{3,4}[- .]?\\d{4}/g,'연락처 확인')
+     .slice(0,110);
+    temporaryPreviews.set(row.noteId,(note.author?note.author+' · ':'')+
+     (safe||'사진 첨부')+(note.image_count?' · 사진 '+note.image_count+'장':''));
+    refresh();
+   }catch(e){/* Keep generic text when offline or no account access. */}
+  }
  }
  function open(){
   const dialog=by('notificationInboxDialog');
@@ -55,8 +76,10 @@
   if(bell)bell.setAttribute('aria-expanded','true');
   // Mark read after opening. The inbox remains browsable.
   refresh();
+  showMemoPreviews();
  }
  function close(){
+  temporaryPreviews.clear();
   by('notificationInboxDialog')?.close?.();
   const bell=by('favoriteAlertButton');
   bell?.setAttribute('aria-expanded','false');
@@ -65,7 +88,7 @@
  function go(kind,index){
   const entry=entries[Number(index)];
   close();
-  if(kind==='memo'){window.switchPage?.('officeBoard');return;}
+  if(kind==='memo'){window.switchPage?.('officeBoard');if(entry?.noteId)window.FirstHyundaiOfficeBoard?.focusNote?.(entry.noteId);return;}
   if(kind==='trade'){
    // Open the specific favorite-14 alert, never the unfiltered whole-city feed.
    if(entry&&window.FirstHyundaiTradeAlerts?.openHistory?.(entry))return;
