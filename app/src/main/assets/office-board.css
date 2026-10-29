@@ -506,3 +506,19 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 
 /* Lightweight reminder hint, without changing the post-it card layout. */
 #officeBoard .officeBoardReminderHint{display:inline-block;margin-left:8px;font-size:11px;font-weight:750;color:#21736B;white-space:normal}
+
+/* Searchable inbox: compact, accessible and independent from the composer. */
+#officeBoard .officeBoardNewMemoRow{margin:12px 0 10px;display:flex}
+#officeBoard .officeBoardNewMemoRow button{width:100%;min-height:46px;border:1px solid #B7D6CA;border-radius:12px;background:#EAF6F0;color:#255C4A;font-weight:800;font-size:14px}
+#officeBoard .officeBoardFindTools{margin:12px 0 10px;padding:12px;border:1px solid #DEE8E1;border-radius:14px;background:#fff}
+#officeBoard .officeBoardSearchLabel{display:block;font-size:12px;color:#506D62;font-weight:800;margin-bottom:7px}
+#officeBoard #officeBoardSearch{width:100%;min-height:44px;box-sizing:border-box;border:1px solid #C9DAD0;border-radius:10px;background:#FAFCFA;padding:10px 12px;font-size:14px;color:#25483C}
+#officeBoard .officeBoardStatusFilters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:10px}
+#officeBoard .officeBoardStatusFilters button{min-width:0;min-height:43px;padding:6px 3px;border:1px solid #E0E8E2;border-radius:9px;background:#F7FAF7;color:#546B5E;font-size:12px;font-weight:750}
+#officeBoard .officeBoardStatusFilters button.selected{background:#DDEFE5;border-color:#93C3A7;color:#235D42}
+#officeBoard .officeBoardFilterRow{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:12px;color:#557166}
+#officeBoard .officeBoardFilterRow select{min-height:42px;min-width:0;max-width:65%;flex:1;border:1px solid #CEDFD5;border-radius:9px;background:#fff;color:#2C5142;font-size:13px;padding:7px}
+#officeBoard #officeBoardResultCount{margin-left:auto;font-variant-numeric:tabular-nums}
+#officeBoard .officeBoardLoadMore{width:100%;min-height:46px;margin:10px 0;border:1px solid #CADBD2;border-radius:10px;background:#F6FAF7;color:#315D4B;font-weight:750}
+#officeBoard .officeBoardLoadMore.hidden{display:none}
+#officeBoard .officeBoardNewMemoRow button:focus-visible,#officeBoard .officeBoardStatusFilters button:focus-visible,#officeBoard #officeBoardSearch:focus-visible,#officeBoard #officeBoardAuthorFilter:focus-visible{outline:2px solid #327F63;outline-offset:2px}
