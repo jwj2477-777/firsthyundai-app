@@ -44,6 +44,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainActivity extends Activity {
+    private static final String DEVICE_DISPLAY_PREF="firsthyundai-device-display-v1";
+    private static final String DEVICE_DISPLAY_KEY="mode";
+    private String localDeviceDisplayMode() {
+        String mode=getSharedPreferences(DEVICE_DISPLAY_PREF,MODE_PRIVATE)
+            .getString(DEVICE_DISPLAY_KEY,"standard");
+        return "large".equals(mode)||"xlarge".equals(mode)?mode:"standard";
+    }
+    private static int deviceTextZoom(String mode) {
+        return "xlarge".equals(mode)?128:"large".equals(mode)?116:100;
+    }
+    private static boolean validDeviceDisplayMode(String mode) {
+        return "standard".equals(mode)||"large".equals(mode)||"xlarge".equals(mode);
+    }
     private static final String INITIAL_PERMISSION_PREF="firsthyundai-initial-notification-request-v1";
     private static final String INITIAL_PERMISSION_ASKED="asked";
     private void requestInitialNotificationPermission(){
@@ -141,6 +154,9 @@ public class MainActivity extends Activity {
         });
         web.setWebChromeClient(new WebChromeClient());
         WebSettings s = web.getSettings();
+        // Set before page load. Standard always uses 100%, independent of
+        // Android system font scaling. Other modes are per-handset opt-in.
+        s.setTextZoom(deviceTextZoom(localDeviceDisplayMode()));
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
         s.setAllowFileAccess(false);
@@ -458,6 +474,22 @@ public class MainActivity extends Activity {
     }
 
     public final class Bridge {
+        @JavascriptInterface public String getDeviceDisplayMode() {
+            return localDeviceDisplayMode();
+        }
+        @JavascriptInterface public boolean setDeviceDisplayMode(String mode) {
+            if(!validDeviceDisplayMode(mode))return false;
+            boolean saved=getSharedPreferences(DEVICE_DISPLAY_PREF,MODE_PRIVATE).edit()
+                .putString(DEVICE_DISPLAY_KEY,mode).commit();
+            if(!saved)return false;
+            runOnUiThread(()->{
+                if(web==null||isFinishing()||isDestroyed())return;
+                web.getSettings().setTextZoom(deviceTextZoom(mode));
+                web.evaluateJavascript(
+                    "requestAnimationFrame(()=>window.FirstHyundaiNavCollapse?.update?.(true))",null);
+            });
+            return true;
+        }
         @JavascriptInterface public String getNotificationHistory(){
             return NotificationHistory.list(getApplicationContext());
         }
