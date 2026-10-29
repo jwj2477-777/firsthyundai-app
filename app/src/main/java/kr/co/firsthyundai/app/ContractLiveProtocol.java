@@ -28,6 +28,7 @@ final class ContractLiveProtocol {
             +"조건을 듣거나 수정할 때마다 "+FUNCTION+" 도구로 해당 변경 항목만 제안하세요. "
             +"금액은 원 단위 정수입니다. 말하지 않은 항목은 생략하세요. 계약금 10% 등 계산 결과를 임의 확정하지 마세요. "
             +"도구 결과가 rejected_invalid_fields이면 반영됐다고 말하지 말고 잘못된 형식이나 불명확한 항목을 다시 확인하세요. "
+            +"도구 결과가 rejected_inconsistent_conditions이면 거래 총액/계약금/이번 송금액/중도금 또는 날짜 순서가 충돌한 것입니다. 반영됐다고 말하지 말고 한 번에 한 항목씩 확인하여 서로 맞는 조건을 함께 다시 제안하세요. "
             +"중도금 없다는 말은 interim=0, interimDate=빈 문자열로 제안하세요. "
             +"특약 변경 시 이번 대화에서 정리한 특약 전체를 terms로 보내세요. "
             +"도구는 화면의 검토 후보만 만들며 실제 계약 저장/공유는 하지 않습니다. "
@@ -51,6 +52,26 @@ final class ContractLiveProtocol {
         if(!value.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}"))return false;
         try{LocalDate d=LocalDate.parse(value);return d.getYear()>=2000&&d.getYear()<=2100;}
         catch(Exception ignored){return false;}
+    }
+    /** Validates cumulative proposals made in this voice session only. Never reads a form. */
+    static void validateConsistency(JSONObject previous,JSONObject change) throws Exception {
+        JSONObject merged=new JSONObject(previous==null?"{}":previous.toString());
+        java.util.Iterator<String> keys=change.keys();
+        while(keys.hasNext()){String key=keys.next();merged.put(key,change.get(key));}
+        long total=merged.has("price")?merged.getLong("price"):-1;
+        long deposit=merged.has("contractDeposit")?merged.getLong("contractDeposit"):-1;
+        long advance=merged.has("advance")?merged.getLong("advance"):-1;
+        long interim=merged.has("interim")?merged.getLong("interim"):-1;
+        if(total>=0&&deposit>=0&&deposit>total)throw new Exception("deposit exceeds total");
+        if(deposit>=0&&advance>=0&&advance>deposit)throw new Exception("advance exceeds deposit");
+        if(total>=0&&interim>=0&&interim>total)throw new Exception("interim exceeds total");
+        if(total>=0&&deposit>=0&&interim>=0&&deposit+interim>total)throw new Exception("scheduled payments exceed total");
+        for(String[] pair:new String[][]{{"contractDate","balanceDate"},{"leaseStart","leaseEnd"}}){
+            String start=merged.optString(pair[0],"");
+            String end=merged.optString(pair[1],"");
+            if(validDate(start)&&validDate(end)&&LocalDate.parse(start).isAfter(LocalDate.parse(end)))
+                throw new Exception("reversed dates");
+        }
     }
     static JSONObject validated(JSONObject args) throws Exception {
         if(args==null||args.length()==0||args.toString().length()>6500)throw new Exception("invalid proposal");

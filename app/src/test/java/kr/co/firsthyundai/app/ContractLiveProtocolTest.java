@@ -31,6 +31,28 @@ public class ContractLiveProtocolTest {
         assertEquals("2028-02-29",ContractLiveProtocol.validated(new JSONObject().put("balanceDate","2028-02-29")).getString("balanceDate"));
         assertEquals("2027년 4월 중 협의",ContractLiveProtocol.validated(new JSONObject().put("contractDate","2027년 4월 중 협의")).getString("contractDate"));
     }
+    @Test public void catchSessionAmountAndDateConflictsWithoutReadingForms() throws Exception {
+        JSONObject prior=new JSONObject().put("price",900000000L).put("contractDeposit",90000000L)
+            .put("contractDate","2027-01-10");
+        ContractLiveProtocol.validateConsistency(prior,new JSONObject().put("interim",100000000L)
+            .put("advance",50000000L).put("balanceDate","2027-04-10"));
+        for(JSONObject bad:new JSONObject[]{
+            new JSONObject().put("contractDeposit",990000000L),
+            new JSONObject().put("advance",95000000L),
+            new JSONObject().put("interim",850000001L),
+            new JSONObject().put("balanceDate","2027-01-09")}) {
+            try{ContractLiveProtocol.validateConsistency(prior,bad);fail("Must catch conflicting amounts or dates");}
+            catch(Exception expected){}
+        }
+        ContractLiveProtocol.validateConsistency(new JSONObject().put("leaseStart","2027-01-01"),
+            new JSONObject().put("leaseEnd","2027-12-31"));
+        try{ContractLiveProtocol.validateConsistency(new JSONObject().put("leaseStart","2027-12-31"),
+            new JSONObject().put("leaseEnd","2027-01-01"));fail("Reversed lease dates");}
+        catch(Exception expected){}
+        // Do not invent a date relation for "to be agreed" wording.
+        ContractLiveProtocol.validateConsistency(new JSONObject().put("contractDate","2027년 1월 중 협의"),
+            new JSONObject().put("balanceDate","2027-01-01"));
+    }
     @Test public void toolsCannotReadFormsOrExecuteSharing() throws Exception {
         JSONObject tool=ContractLiveProtocol.tools().getJSONObject(0).getJSONArray("functionDeclarations").getJSONObject(0);
         assertEquals(ContractLiveProtocol.FUNCTION,tool.getString("name"));

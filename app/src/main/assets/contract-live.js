@@ -42,6 +42,21 @@
   }
   return Object.keys(out).length?out:null;
  }
+ // Local-only cross-field guard. Partial dictation stays allowed; compare only proposed values.
+ function consistency(existing,update){
+  const p={...existing,...update};
+  const num=k=>Object.hasOwn(p,k)&&p[k]!==''?Number(p[k]):null;
+  const total=num('price'),deposit=num('contractDeposit'),send=num('advance'),interim=num('interim');
+  if(total!==null&&deposit!==null&&deposit>total)return '계약금이 거래금액보다 큽니다.';
+  if(deposit!==null&&send!==null&&send>deposit)return '이번 송금액이 계약금보다 큽니다.';
+  if(total!==null&&interim!==null&&interim>total)return '중도금이 거래금액보다 큽니다.';
+  if(total!==null&&deposit!==null&&interim!==null&&deposit+interim>total)return '계약금과 중도금의 합계가 거래금액보다 큽니다.';
+  for(const [first,last,label] of [['contractDate','balanceDate','잔금일이 계약일보다 빠릅니다.'],
+                                    ['leaseStart','leaseEnd','임대차 종료일이 입주일보다 빠릅니다.']]){
+   if(validDate(p[first]||'')&&validDate(p[last]||'')&&p[first]>p[last])return label;
+  }
+  return '';
+ }
  function buttons(){
   $('cl_start').disabled=active||stopping;
   $('cl_stop').disabled=!active||stopping;
@@ -96,6 +111,8 @@
   if(state==='proposal'&&active&&!stopping){
    let p;try{p=normalize(JSON.parse(message));}catch(e){}
    if(!p){status('일부 조건을 확인하지 못했습니다. 금액·날짜를 정확히 다시 말씀해 주세요.');return;}
+   const conflict=consistency(proposals,p);
+   if(conflict){status(conflict+' 정확한 내용을 다시 말씀해 주세요.');return;}
    Object.assign(proposals,p);render();return;
   }
   if(state==='error'){active=false;stopping=true;failed=true;status(message);buttons();return;}
@@ -141,5 +158,5 @@
   return originalBack?originalBack.apply(this,arguments):false;
  };
  root.onFirstHyundaiContractLiveStatus=incoming;
- root.FirstHyundaiContractLive={open,start,stop,close,apply,onPageChange(page){if(page!=='contracts'&&$('cl_dialog').open)close();},_test:{normalize,validDate}};
+ root.FirstHyundaiContractLive={open,start,stop,close,apply,onPageChange(page){if(page!=='contracts'&&$('cl_dialog').open)close();},_test:{normalize,validDate,consistency}};
 })(window);
