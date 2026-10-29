@@ -27,6 +27,7 @@ final class ContractLiveProtocol {
             +"새 의무, 위약금, 합의, 법적 효력을 만들거나 단정하지 마세요. 사용자가 말한 특약의 의미를 보존하세요. "
             +"조건을 듣거나 수정할 때마다 "+FUNCTION+" 도구로 해당 변경 항목만 제안하세요. "
             +"금액은 원 단위 정수입니다. 말하지 않은 항목은 생략하세요. 계약금 10% 등 계산 결과를 임의 확정하지 마세요. "
+            +"도구 결과가 rejected_invalid_fields이면 반영됐다고 말하지 말고 잘못된 형식이나 불명확한 항목을 다시 확인하세요. "
             +"중도금 없다는 말은 interim=0, interimDate=빈 문자열로 제안하세요. "
             +"특약 변경 시 이번 대화에서 정리한 특약 전체를 terms로 보내세요. "
             +"도구는 화면의 검토 후보만 만들며 실제 계약 저장/공유는 하지 않습니다. "
@@ -46,6 +47,11 @@ final class ContractLiveProtocol {
             .put("name",FUNCTION).put("description","사용자가 말한 계약조건을 검토 후보로 제안. 저장/승인/발송 아님.")
             .put("parameters",new JSONObject().put("type","OBJECT").put("properties",properties)))));
     }
+    private static boolean validDate(String value){
+        if(!value.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}"))return false;
+        try{LocalDate d=LocalDate.parse(value);return d.getYear()>=2000&&d.getYear()<=2100;}
+        catch(Exception ignored){return false;}
+    }
     static JSONObject validated(JSONObject args) throws Exception {
         if(args==null||args.length()==0||args.toString().length()>6500)throw new Exception("invalid proposal");
         JSONObject result=new JSONObject();
@@ -63,6 +69,15 @@ final class ContractLiveProtocol {
                 String s=((String)value).trim();
                 if(s.length()>(k.equals("terms")?4000:100)||s.indexOf('<')>=0||s.indexOf('>')>=0)throw new Exception("invalid text");
                 if(k.equals("dealType")&&!s.matches("매매|전세|월세"))throw new Exception("invalid type");
+                if(contains(DATES,k)&&!s.isEmpty()&&!validDate(s)){
+                    if(!(k.equals("contractDate")||k.equals("interimDate"))
+                        ||!s.matches("[0-9\\s년월일초중말순경~～.\\-/협의추후미정예정상호결정까지부터전후사이]+")
+                        ||!java.util.regex.Pattern.compile("협의|미정|추후|초순|중순|하순|월말|월초|전후|사이|~|～").matcher(s).find())
+                        throw new Exception("invalid date");
+                }
+                if(k.equals("leaseDuration")&&!s.isEmpty()&&!s.matches("[0-9]{1,3}\\s*(?:년|개월)(?:\\s*[0-9]{1,2}\\s*개월)?"))throw new Exception("invalid duration");
+                if(k.equals("balanceTime")&&!s.isEmpty()&&!s.matches("(?:[01][0-9]|2[0-3]):[0-5][0-9]"))throw new Exception("invalid time");
+                if(java.util.regex.Pattern.compile("계좌|예금주|주민등록|전화번호|연락처|비밀번호|은행|[0-9]{3,4}\\s*동\\s*[0-9]+\\s*호|[0-9]{2,4}-[0-9]{3,4}-[0-9]{4}|[0-9]{10,}").matcher(s).find())throw new Exception("private text");
                 result.put(k,s);
             }else throw new Exception("field not allowed");
         }
