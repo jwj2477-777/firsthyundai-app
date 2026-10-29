@@ -60,5 +60,24 @@ final class SeasonThemeMath {
         }
         return result;
     }
+    /** Matches the web header's faint Korean-local time-of-day tint. */
+    static int[] ambientPalette(int[] colors,long now){
+        int hour=Instant.ofEpochMilli(now).atOffset(KST).getHour();
+        int tint;double amount;
+        if(hour>=5&&hour<10){tint=0xffE7AD83;amount=.095;}
+        else if(hour>=10&&hour<17){tint=0xffA8D7DC;amount=.025;}
+        else if(hour>=17&&hour<20){tint=0xffDC947A;amount=.105;}
+        else{tint=0xff7885B2;amount=.075;}
+        int[] result=colors.clone();
+        for(int i=0;i<result.length;i++){
+            int mixed=0xff000000;
+            for(int shift:new int[]{16,8,0}){
+                int a=(result[i]>>shift)&255,b=(tint>>shift)&255;
+                mixed|=((int)Math.round(a*(1-amount)+b*amount))<<shift;
+            }
+            result[i]=mixed;
+        }
+        return result;
+    }
     private SeasonThemeMath(){}
 }

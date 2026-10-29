@@ -11,6 +11,25 @@
   autumn:['#51352D','#784E32','#79532B'],winter:['#232F50','#35476D','#4B557E']};
  function blend(a,b,k){return '#'+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)*(1-k)+parseInt(b.slice(i,i+2),16)*k).toString(16).padStart(2,'0')).join('')}
  function headerPalette(theme,strength){const k={soft:.4,balanced:.8,vivid:1}[strength]??.8;return headerColors[theme]?.map((c,i)=>blend(headerBase[i],c,k))||headerBase}
+ // A subtle layer of natural light; intentionally no change to buttons, icon,
+ // business labels or existing seasonal logo art. Local Korean clock, no GPS.
+ function timeMood(now=Date.now()){
+  const hour=new Date(now+9*HOUR).getUTCHours();
+  return hour>=5&&hour<10?'morning':hour>=10&&hour<17?'day':
+   hour>=17&&hour<20?'evening':'night';
+ }
+ const ambientTints={
+  morning:['#E7AD83',.095],day:['#A8D7DC',.025],
+  evening:['#DC947A',.105],night:['#7885B2',.075]
+ };
+ function ambientPalette(theme,strength,now=Date.now()){
+  const [tint,mix]=ambientTints[timeMood(now)];
+  return headerPalette(theme,strength).map(c=>blend(c,tint,mix));
+ }
+ function rainStrength(wet,measured){
+  if(wet!=='rain'||!fresh(measured)||!Number.isFinite(measured.precip_mm))return 'normal';
+  return measured.precip_mm<.5?'light':measured.precip_mm>=3?'heavy':'normal';
+ }
  let options={theme:'default',themeMode:'manual',weatherEffect:'none',motion:'full'};
  let nativeSnapshot='',weather=null,lastAttempt=0,pending=false,generation=0,layer=null,lastScene='',sequence=0;
  const requests=new Map();
@@ -67,7 +86,11 @@
  }
  function paint(){
   if(!document.body)return;
-  const base=options.themeMode==='season'?season():options.theme,wet=effect();
+  const now=Date.now();
+  const base=options.themeMode==='season'?season(now):options.theme,wet=effect();
+  const mood=timeMood(now),strength=options.weatherEffect==='auto'?rainStrength(wet,weather):'normal';
+  document.body.setAttribute('data-theme-time',mood);
+  document.body.setAttribute('data-weather-strength',strength);
   document.body.setAttribute('data-season-theme',base);
   document.body.setAttribute('data-weather-effect',wet);
   document.body.setAttribute('data-theme-paused',document.hidden?'true':'false');
@@ -78,13 +101,13 @@
   document.body.setAttribute('data-theme-logo',options.themeLogo);
   const header=document.querySelector?.('header');
   document.body.style?.setProperty('--theme-header-bottom',Math.max(0,header?.getBoundingClientRect?.().bottom||0)+'px');
-  const colors=headerPalette(base,options.themeIntensity);
+  const colors=ambientPalette(base,options.themeIntensity,now);
   document.body.style?.setProperty('--season-header',`linear-gradient(121deg,${colors[0]} 0%,${colors[1]} 57%,${colors[2]} 100%)`);
   const nativeValue=JSON.stringify({...options,resolvedTheme:base,weatherObserved:weather?.observed_at||'',resolvedWeather:wet});
   if(nativeValue!==nativeSnapshot){
    try{window.FirstHyundaiNative?.cacheThemeAppearance?.(nativeValue);nativeSnapshot=nativeValue}catch(e){}
   }
-  const scene=base+'/'+wet+'/'+options.themeDecor;
+  const scene=base+'/'+wet+'/'+strength+'/'+options.themeDecor;
   if(scene!==lastScene){
    if(!layer){
     layer=document.createElement('div');layer.id='seasonAtmosphere';
@@ -93,13 +116,16 @@
    }
    layer.replaceChildren();
    const kind=wet!=='none'?wet:base;
-   const amount={default:0,spring:20,summer:14,autumn:22,winter:18,rain:48,snow:36}[kind];
+   const amount=kind==='rain'?({light:18,normal:32,heavy:46}[strength]||32):
+    {default:0,spring:20,summer:14,autumn:22,winter:18,snow:30}[kind];
    const count=options.themeDecor==='off'?0:options.themeDecor==='subtle'?Math.ceil(amount/2):amount;
    for(let i=0;i<count;i++){
     const part=document.createElement('i');part.className='seasonParticle '+kind;
     part.style.setProperty('--x',(i%2?(84+(i*13%150)/10):(i*17%150)/10)+'vw');
     part.style.setProperty('--delay',-(i*2.7)+'s');
-    part.style.setProperty('--duration',(kind==='rain'?1.2+(i%4)*.17:15+(i*7%18))+'s');
+    part.style.setProperty('--duration',(kind==='rain'?
+     (strength==='light'?1.85:strength==='heavy'?.9:1.35)+(i%4)*.16:
+     kind==='snow'?13+(i*7%14):15+(i*7%18))+'s');
     part.style.setProperty('--s',(.65+(i%4)*.17).toFixed(2));
     layer.appendChild(part);
    }
@@ -134,7 +160,7 @@
   if(previous!==options.weatherEffect){generation++;lastAttempt=0}
   paint();refresh();
  }
- window.FirstHyundaiThemes={configure,refresh,refreshObserved:()=>refresh(true),currentWeather:()=>fresh(weather)?weather:null,_test:{terms,season,fresh,longitude,headerPalette}};
+ window.FirstHyundaiThemes={configure,refresh,refreshObserved:()=>refresh(true),currentWeather:()=>fresh(weather)?weather:null,_test:{terms,season,fresh,longitude,headerPalette,timeMood,ambientPalette,rainStrength}};
  document.addEventListener('visibilitychange',()=>{paint();if(!document.hidden)refresh()});
  window.addEventListener('focus',()=>{paint();refresh()});
  window.addEventListener('resize',paint);

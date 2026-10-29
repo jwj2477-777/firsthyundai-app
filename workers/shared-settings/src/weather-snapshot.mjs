@@ -9,7 +9,9 @@ export function validWeatherSnapshot(value,kind,now=Date.now()){
   const t=Date.parse(value.observed_at);
   return ['none','rain','snow'].includes(value.effect)&&Number.isFinite(t)&&now-t<=2*HOUR&&t-now<=300000&&
    value.grid?.nx===55&&value.grid?.ny===123&&
-   (value.temp===undefined||value.temp===null||(Number.isFinite(value.temp)&&value.temp>=-70&&value.temp<=70));
+   (value.temp===undefined||value.temp===null||(Number.isFinite(value.temp)&&value.temp>=-70&&value.temp<=70))&&
+   (value.precip_mm===undefined||value.precip_mm===null||
+    (Number.isFinite(value.precip_mm)&&value.precip_mm>=0&&value.precip_mm<=300));
  }
  const t=Date.parse(value.issued_at);
  return value.date===today(now)&&Number.isFinite(t)&&t<=now&&now-t<=7*HOUR&&

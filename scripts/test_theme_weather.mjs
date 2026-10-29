@@ -20,6 +20,21 @@ assert.equal(fromKma(weatherWithTemp('-2.7'),now).temp,-2.7,'Below-freezing obse
 assert.equal(fromKma(weatherWithTemp(''),now).temp,null,'Blank temperature cannot become false 0 °C');
 assert.equal(fromKma(weatherWithTemp('NaN'),now).temp,null,'Invalid T1H cannot contaminate the UI');
 assert.equal(fromKma(weatherWithTemp('12','1400'),now).temp,null,'Do not mix temperatures from other observation hours');
+const withRain=(amount,when='1500')=>{
+ const d=doc('1');
+ d.response.body.items.item.push({category:'RN1',nx:55,ny:123,
+  baseDate:'20261026',baseTime:when,obsrValue:amount});
+ return d;
+};
+for(const [amount,mm] of [['0',0],['0.1',.1],['2.5',2.5],['12',12]])
+ assert.equal(fromKma(withRain(amount),now).precip_mm,mm);
+for(const wrong of ['강수없음','NaN','-1','301','','1mm 미만'])
+ assert.equal(fromKma(withRain(wrong),now).precip_mm,null,
+  'Cannot invent rain intensity from an unverified RN1 value');
+assert.equal(fromKma(withRain('5','1400'),now).precip_mm,null,
+ 'Reject precipitation from another observation time');
+assert.equal(fromKma(doc('1'),now).precip_mm,null,
+ 'Missing measured precipitation must remain unknown');
 for(const value of ['','4','9','NaN'])assert.throws(()=>fromKma(doc(value),now));
 assert.throws(()=>fromKma(doc(),now+7200001));
 assert.throws(()=>fromKma(doc(),now-300001));

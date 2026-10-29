@@ -10,6 +10,11 @@ const forecast={schema:1,status:'ok',date,issued_at:new Date(now-3600000).toISOS
 assert(validWeatherSnapshot(observed,'observed',now));
 assert(validWeatherSnapshot({...observed,temp:0},'observed',now),'Measured zero Celsius should be preserved');
 assert(!validWeatherSnapshot({...observed,temp:'0'},'observed',now),'Measured temperature cannot be a display string');
+assert(validWeatherSnapshot({...observed,precip_mm:.4},'observed',now));
+assert(validWeatherSnapshot({...observed,precip_mm:null},'observed',now));
+assert(!validWeatherSnapshot({...observed,precip_mm:'4'},'observed',now));
+assert(!validWeatherSnapshot({...observed,precip_mm:-1},'observed',now));
+assert(!validWeatherSnapshot({...observed,precip_mm:301},'observed',now));
 assert(!validWeatherSnapshot({...observed,grid:{nx:60,ny:127}},'observed',now));
 assert(!validWeatherSnapshot(observed,'observed',now+2*3600000));
 assert(validWeatherSnapshot(forecast,'forecast',now));
