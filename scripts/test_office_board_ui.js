@@ -14,7 +14,7 @@ assert(html.includes('id="overviewMemoBriefing"')&&
  html.includes('FirstHyundaiOfficeBoard.openBriefingCalendar()'),
  'Today briefing must have a compact list and a direct calendar route');
 assert(js.includes('function openBriefing(')&&
- js.includes("call('list',{})")&&
+ js.includes("readAllBoard().then(notes=>")&&
  js.includes('function briefingRows(')&&
  js.includes('openBriefingNote(button.dataset.briefNote)'),
  'Today briefing must reuse private shared notes and support one-tap memo navigation');
@@ -76,5 +76,43 @@ userMode='family';
 api._test.merge([own]);
 assert(el('officeBoardList').innerHTML.includes('data-action="edit"'),
  'Original author retains edit controls');
+// A searchable library, not an indefinitely tall pile of full post-its.
+const samples=Array.from({length:32},(_,i)=>({
+ id:'mhad4vwu-'+i.toString(16).padStart(36,'0'),
+ text:i===3?'퍼스트파크 1502동 3004호 · 방문예정':'상담 메모 '+i,
+ author:i%2===0?{id:userId,name:'내 계정'}:
+  {id:'22222222-2222-2222-2222-222222222222',name:'아빠'},
+ created_at:new Date(Date.parse('2026-10-25T00:00:00Z')+i*60000).toISOString(),
+ updated_at:new Date(Date.parse('2026-10-25T00:00:00Z')+i*60000).toISOString(),
+ done:i%3===0,pinned:i===5
+}));
+api._test.merge(samples);
+api.setStatus('all');
+assert.equal(api._test.filteredMemos().length,32,'All must include open and completed notes');
+assert.equal((el('officeBoardList').innerHTML.match(/data-note=/g)||[]).length,10,
+ 'Only ten memo cards should render at once');
+api.showMore();
+assert.equal((el('officeBoardList').innerHTML.match(/data-note=/g)||[]).length,20,
+ 'Show more appends ten more memo cards without infinite scroll');
+api.setStatus('active');
+assert.equal(api._test.filteredMemos().length,samples.filter(n=>!n.done).length);
+api.setStatus('done');
+assert.equal(api._test.filteredMemos().length,samples.filter(n=>n.done).length);
+api.setStatus('all');api.setAuthor(userId);
+assert(api._test.filteredMemos().every(n=>n.author.id===userId));
+api.setAuthor('');
+api.setQuery('1502동3004호');
+assert.equal(api._test.filteredMemos().length,1,'Search reaches exact apartment unit text');
+assert.equal(api._test.filteredMemos()[0].text,samples[3].text);
+api.setQuery('');api.setStatus('all');
+assert.equal(api._test.filteredMemos()[0].id,samples[5].id,'Pinned memo is sorted first');
+api.setSort('oldest');
+assert.equal(api._test.filteredMemos()[0].id,samples[5].id,
+ 'Pinned memo stays visible even with chronological sort');
+api.clearFilters();
+assert.equal(api._test.filteredMemos().length,samples.filter(n=>!n.done).length);
+assert.equal((el('officeBoardList').innerHTML.match(/data-note=/g)||[]).length,10);
+assert(!/localStorage|sessionStorage|\bfetch\(/.test(js),
+ 'Sensitive notes must remain in the authenticated native channel');
 console.log('Office board UX, native bridge, freeform post and escaping passed.');
 })().catch(e=>{console.error(e);process.exitCode=1});

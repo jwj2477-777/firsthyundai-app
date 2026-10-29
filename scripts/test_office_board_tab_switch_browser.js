@@ -37,8 +37,13 @@ async function verify(){
   check(same(memo)&&same(calendar),'Memo and Calendar height differs from news');
   check(h(memo)===h(calendar),'Memo and calendar unequal height');
   check(memo.classList.contains('selected')&&!calendar.classList.contains('selected'),'Initial view should be notes');
-  check(!composer.classList.contains('hidden')&&list.classList.contains('officeBoardList'),'Memo composer missing');
+  const openComposer=document.getElementById('officeBoardComposeToggle');
+  check(openComposer&&composer.classList.contains('hidden')&&list.classList.contains('officeBoardList'),
+    'Memo library should be open while composer is collapsed by default');
   check(status.classList.contains('hidden'),'Healthy/pending notification banner should not display');
+  openComposer.click();
+  check(!composer.classList.contains('hidden')&&openComposer.getAttribute('aria-expanded')==='true',
+   'New memo button should open its own composer');
   draft.value='보존할 미발송 메모 초안';
   const mustard=getComputedStyle(memo).backgroundColor;
   check(mustard!==getComputedStyle(calendar).backgroundColor,'Active memo tab needs mustard contrast');
@@ -58,6 +63,11 @@ async function verify(){
     'Memo/calendar active color differs: '+getComputedStyle(calendar).backgroundColor+' vs '+mustard);
   memo.click();
   check(!composer.classList.contains('hidden')&&!list.classList.contains('hidden'),'Notes controls did not return');
+  openComposer.click();
+  check(composer.classList.contains('hidden')&&!list.classList.contains('hidden'),
+   'Closing composer must leave searchable memo library visible');
+  openComposer.click();
+  check(!composer.classList.contains('hidden'),'Composer must reopen with preserved draft');
   check(agenda.classList.contains('hidden'),'Calendar was not hidden');
   check(draft.value==='보존할 미발송 메모 초안','Draft lost after round trip');
   const nav=document.querySelector('#nav .officeBoardNav');
@@ -65,6 +75,35 @@ async function verify(){
   check(getComputedStyle(nav).backgroundColor===mustard,'Main shared memo uses same mustard tone');
   const y0=memo.getBoundingClientRect().y,y1=calendar.getBoundingClientRect().y;
   check(Math.abs(y0-y1)<.2,'Split buttons are misaligned');
+  // Search-first memo library: rows remain short, filters work on mobile.
+  const memos=Array.from({length:17},(_,i)=>({
+   id:'mhad4vwu-'+i.toString(16).padStart(36,'0'),
+   text:i===2?'퍼스트파크 1502동 3004호 · 내일 손님 방문':'일반 상담 메모 '+i,
+   author:{id:i%2===0?'11111111-1111-1111-1111-111111111111':'22222222-2222-2222-2222-222222222222',
+    name:i%2===0?'엄마':'아빠'},
+   done:i%3===0,
+   created_at:new Date(Date.parse('2026-10-25T00:00:00Z')+i*60000).toISOString(),
+   updated_at:new Date(Date.parse('2026-10-25T00:00:00Z')+i*60000).toISOString()
+  }));
+  window.FirstHyundaiOfficeBoard._test.merge(memos);
+  const rows=()=>document.querySelectorAll('#officeBoardList article[data-note]').length;
+  check(rows()===10,'Memo library should initially show at most 10 post-it cards');
+  document.getElementById('officeBoardStatusAll').click();
+  document.getElementById('officeBoardMore').click();
+  check(rows()===17,'Memo library Show More must reveal remaining notes');
+  const search=document.getElementById('officeBoardSearch');
+  search.value='1502동3004호';search.dispatchEvent(new Event('input',{bubbles:true}));
+  check(rows()===1&&document.getElementById('officeBoardList').textContent.includes('퍼스트파크'),
+   'Search should find a specific apartment unit without scrolling');
+  search.value='';search.dispatchEvent(new Event('input',{bubbles:true}));
+  const author=document.getElementById('officeBoardAuthorFilter');
+  author.value='11111111-1111-1111-1111-111111111111';
+  author.dispatchEvent(new Event('change',{bubbles:true}));
+  check(rows()===9,'Author filter must isolate a family account');
+  document.getElementById('officeBoardStatusDone').click();
+  check(rows()===3,'Completion + author filters must combine correctly');
+  document.getElementById('officeBoardClearFilters').click();
+  check(rows()===10,'Reset should return to compact active list');
   check(document.documentElement.scrollWidth<=innerWidth+1,'Horizontal overflow');
   document.body.innerHTML='<pre id="memo-tab-test">PASS consistent news-sized memo/calendar buttons, mustard, focused calendar and preserved draft</pre>';
  }catch(e){

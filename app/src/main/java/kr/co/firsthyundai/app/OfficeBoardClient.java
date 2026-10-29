@@ -171,7 +171,11 @@ final class OfficeBoardClient {
     static JSONObject perform(Context context,String action,JSONObject payload,String adminToken) throws Exception {
         String auth=token(context);
         if(auth.isEmpty())throw new Exception("최초 한 번 사무실 보안코드 인증이 필요합니다.");
-        if("list".equals(action))return request("GET","/board",null,auth);
+        if("list".equals(action)){
+            int offset=payload.optInt("offset",0);
+            if(offset<0||offset>1000)throw new Exception("메모 조회 범위를 확인해 주세요.");
+            return request("GET","/board?offset="+offset,null,auth);
+        }
         if("archive".equals(action))return request("GET","/board/archive",null,auth,adminToken);
         if("post".equals(action)){
             String text=payload.optString("text","");
@@ -208,6 +212,12 @@ final class OfficeBoardClient {
         if("schedule".equals(action)){
             if(!payload.has("scheduled_at"))throw new Exception("일정 날짜가 필요합니다.");
             return request("PATCH","/board/"+id,new JSONObject().put("scheduled_at",payload.opt("scheduled_at")),auth,adminToken);
+        }
+        if("pin".equals(action)){
+            if(!payload.has("pinned")||!(payload.opt("pinned") instanceof Boolean))
+                throw new Exception("중요 메모 고정 값이 올바르지 않습니다.");
+            return request("PATCH","/board/"+id,
+                new JSONObject().put("pinned",payload.getBoolean("pinned")),auth,adminToken);
         }
         if("done".equals(action)){
             if(!payload.has("done")||!(payload.opt("done") instanceof Boolean))throw new Exception("완료 표시 값이 올바르지 않습니다.");

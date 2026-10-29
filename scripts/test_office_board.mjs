@@ -3,7 +3,7 @@ import service from '../workers/shared-settings/src/index.mjs';
 const settings=new Map();
 const env={
  SETTINGS:{
-  async get(k,format){const x=settings.get(k);return x&&format==='json'?JSON.parse(x):null},
+  async get(k,format){const x=settings.get(k);return x===undefined?null:format==='json'?JSON.parse(x):x},
   async put(k,v){settings.set(k,v)},async delete(k){settings.delete(k)},
   async list({prefix,limit}){return {keys:[...settings.keys()].filter(k=>k.startsWith(prefix)).sort().slice(0,limit).map(name=>({name}))}}
  },
