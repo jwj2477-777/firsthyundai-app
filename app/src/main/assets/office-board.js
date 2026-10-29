@@ -8,6 +8,7 @@ let timerMs=45000,pendingFocus='',view='notes',scheduleOpen=false,suggestedDate=
 let archiveOpen=false,archived=[];
 let composeOpen=false,memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10;
 const PAGE_SIZE=10;
+const expandedNotes=new Set();
 let historyLoaded=false,historyLoading=false,refreshCycle=0;
 let lastBriefing=0,briefingBusy=false;
 const startKst=()=>kstDate(new Date());
@@ -15,6 +16,7 @@ let selectedDate='',calendarMonth='',editingBirthday='';
 function focusNote(id){
  if(!valid(id))return false;
  pendingFocus=id;
+ expandedNotes.add(id);
  memoStatus='all';memoAuthor='';memoQuery='';memoLimit=10;
  if($('officeBoardSearch'))$('officeBoardSearch').value='';
  if($('officeBoardAuthorFilter'))$('officeBoardAuthorFilter').value='';
@@ -311,8 +313,13 @@ function draw(){
  }
   list.innerHTML=visible.map(note=>{
   const id=esc(note.id),editable=canEditNote(note),isEdit=editable&&editing===note.id;
+  const expanded=expandedNotes.has(note.id);
+  const needsExpand=!isEdit&&(note.text.length>110||note.text.split('\\n').length>3);
   const body=isEdit?'<textarea class="officeBoardEdit" maxlength="1600" data-edit="'+id+'" aria-label="메모 수정">'+esc(editDraft)+'</textarea>':
-   '<div class="officeBoardText">'+(preferences().memoPhones==='off'?esc(note.text):phones(note.text))+'</div>';
+   '<div class="officeBoardText'+(needsExpand&&!expanded?' officeBoardTextCollapsed':'')+'">'+
+    (preferences().memoPhones==='off'?esc(note.text):phones(note.text))+'</div>'+
+    (needsExpand?'<button type="button" class="officeBoardExpand" data-action="expand" data-id="'+id+
+     '" aria-expanded="'+expanded+'">'+(expanded?'내용 접기':'내용 전체 보기')+'</button>':'');
   const actions=isEdit?'<button class="officeBoardSave" data-action="save" data-id="'+id+'">저장</button>'+
     '<button data-action="cancel" data-id="'+id+'">취소</button>':
    (editable?
@@ -697,6 +704,10 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
   window.FirstHyundaiBoardImages?.selectFor?.(id,Array.isArray(note?.images)?note.images.length:0);
  }
  if(action==='photoView')window.FirstHyundaiBoardImages?.view?.(id,button.dataset.photo);
+ if(action==='expand'){
+  if(expandedNotes.has(id))expandedNotes.delete(id);else expandedNotes.add(id);
+  draw();
+ }
  if(action==='pin'){
   if(!canEditId(id)){denied();return}
   const note=items.find(n=>n.id===id);
