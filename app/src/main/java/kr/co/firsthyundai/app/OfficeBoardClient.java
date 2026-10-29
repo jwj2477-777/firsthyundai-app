@@ -106,6 +106,13 @@ final class OfficeBoardClient {
         if(auth.isEmpty())throw new Exception("사무실 메모 보안 인증 필요");
         return request("GET","/board/push/status",null,auth);
     }
+    static JSONObject preview(Context context,String noteId) throws Exception {
+        if(noteId==null||!noteId.matches("[a-z0-9]{8,14}-[0-9a-f-]{36}"))
+            throw new Exception("invalid_note_id");
+        String auth=token(context);
+        if(auth.isEmpty())throw new Exception("사무실 메모 인증이 필요합니다.");
+        return request("GET","/board/"+noteId+"/preview",null,auth);
+    }
     static JSONObject activity(Context context) throws Exception {
         String auth=token(context);
         if(auth.isEmpty())throw new Exception("사무실 보안 인증 필요");
