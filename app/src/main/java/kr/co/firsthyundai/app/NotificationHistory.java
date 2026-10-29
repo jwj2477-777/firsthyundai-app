@@ -82,6 +82,18 @@ final class NotificationHistory {
             prefs(context).edit().putString(ENTRIES,keepRecent(records).toString()).apply();
         }catch(Exception ignored){}
     }
+    /** Keeps only a note ID and fixed reminder label, never customer memo text. */
+    static synchronized void recordReminder(Context context,String noteId){
+        recordMemo(context,noteId);
+        JSONArray entries=data(context);
+        JSONObject newest=entries.optJSONObject(0);
+        if(newest==null||!"memo".equals(newest.optString("kind","")))return;
+        try{
+            newest.put("title","⏰ 일정 시작 30분 전");
+            newest.put("detail","곧 시작하는 공유 일정이 있습니다.");
+            prefs(context).edit().putString(ENTRIES,keepRecent(entries).toString()).apply();
+        }catch(Exception ignored){}
+    }
     static synchronized String list(Context context){
         return keepRecent(data(context)).toString();
     }
