@@ -317,7 +317,9 @@ async function boardCommand(req,env,url,ctx){
   if(!note||typeof note.text!=="string")return res({error:"not_found"},404);
   const author=typeof note.author?.name==="string"?note.author.name.slice(0,24):"사무실";
   const snippet=note.text.replace(/[\r\n\t]+/g," ").replace(/\s+/g," ").trim().slice(0,110);
-  return res({author,preview:snippet,image_count:Array.isArray(note.images)?note.images.length:0});
+  return res({author,preview:snippet,image_count:Array.isArray(note.images)?note.images.length:0,
+   scheduled_at:typeof note.scheduled_at==="string"?note.scheduled_at:null,
+   all_day:note.all_day===true,done:note.done===true});
  }
  if(url.pathname==="/board"&&req.method==="GET")return res({schema:1,notes:await boardList(env)});
  if(url.pathname==="/board/updates"&&req.method==="GET"){
@@ -449,14 +451,19 @@ async function familyRevision(secret){
  const h=await hkey("board-revision:"+secret);
  return b64(await crypto.subtle.sign("HMAC",h,enc.encode("registered-office-devices-v1")));
 }
-async function sendPush(env,postId,fromDevice){
+async function sendPush(env,postId,fromDevice,options={}){
+ const reminder=options.kind==="office_schedule_reminder"&&
+  typeof options.scheduled_at==="string"&&
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.000Z$/.test(options.scheduled_at);
+ const data=reminder?{kind:"office_schedule_reminder",note_id:postId,
+   scheduled_at:options.scheduled_at}:{kind:"office_note",note_id:postId};
  const config=fcmConfig(env);
  if(!config)return {sent:0,reason:"fcm_unconfigured"};
  // Respect the office-wide new memo notification setting, without exposing notes.
  const office=await env.SETTINGS.get(key,"json");
  if(office?.settings?.preferences?.memoAlerts==="off")return {sent:0,reason:"disabled"};
  const keys=await env.SETTINGS.list({prefix:PUSH_PREFIX,limit:100});
- const recipients=keys.keys.filter(k=>k.name!==PUSH_PREFIX+fromDevice).slice(0,PUSH_LIMIT);
+ const recipients=keys.keys.filter(k=>reminder||k.name!==PUSH_PREFIX+fromDevice).slice(0,PUSH_LIMIT);
  if(!recipients.length)return {sent:0,reason:"no_devices"};
  const version=await familyRevision(env.FIRSTHYUNDAI_ACCESS_CODE);
  const validRecipients=[];
@@ -475,8 +482,8 @@ async function sendPush(env,postId,fromDevice){
   // Data-only message: the Android service owns the private lock-screen notification.
   const response=await fetch("https://fcm.googleapis.com/v1/projects/"+config.project_id+"/messages:send",{
    method:"POST",headers:{"Authorization":"Bearer "+auth,"Content-Type":"application/json; charset=utf-8"},
-   body:JSON.stringify({message:{token:obj.fcm,data:{kind:"office_note",note_id:postId},
-     android:{priority:"HIGH",ttl:"86400s"}}})
+   body:JSON.stringify({message:{token:obj.fcm,data,
+     android:{priority:"HIGH",ttl:reminder?"600s":"86400s"}}})
   });
   if(response.ok){sent++;continue}
   // Permanently invalid registration tokens are deleted; temporary failures are retained.
@@ -489,6 +496,50 @@ async function sendPush(env,postId,fromDevice){
   }
  }
  return {sent};
+}
+/* Server-side 30-minute reminder. Cloudflare cron is independent of users
+ * leaving the Android app open. No customer text, account IDs or phone numbers
+ * are included in Firebase data-only pushes.
+ */
+const REMINDER_KEY_PREFIX="office-postit-reminder-v1:";
+const THIRTY_MINUTES=30*60000;
+function timedMemoDue(note,now){
+ if(!note||!validBoardId(note.id)||note.done===true||note.all_day===true||
+  typeof note.scheduled_at!=="string"||!Number.isFinite(Date.parse(note.scheduled_at))||
+  /^\s*🎂/.test(String(note.text||"")))return false;
+ const until=Date.parse(note.scheduled_at)-now;
+ // Every-minute cron with jitter tolerance; never notify after a past event.
+ return until>=28*60000&&until<=31*60000;
+}
+async function deliverDueReminders(env,now=Date.now()){
+ if(!env?.SETTINGS||!env.FIRSTHYUNDAI_ACCESS_CODE||!fcmConfig(env))
+  return {eligible:0,sent:0,reason:"not_ready"};
+ const notes=await boardList(env);
+ const due=notes.filter(note=>timedMemoDue(note,now)).slice(0,16);
+ let sent=0;
+ for(const note of due){
+  const eventStamp=Date.parse(note.scheduled_at);
+  const reminderKey=REMINDER_KEY_PREFIX+note.id+":"+eventStamp;
+  if(await env.SETTINGS.get(reminderKey))continue;
+  // Re-read before dispatch: another family member may have completed or
+  // rescheduled the event since the initial list fetch.
+  const fresh=await env.SETTINGS.get(BOARD_PREFIX+note.id,"json");
+  if(!fresh||fresh.scheduled_at!==note.scheduled_at||!timedMemoDue(fresh,now))continue;
+  try{
+   const result=await sendPush(env,note.id,"",{kind:"office_schedule_reminder",
+    scheduled_at:note.scheduled_at});
+   if(result.sent>0){
+    await env.SETTINGS.put(reminderKey,JSON.stringify({sent_at:new Date(now).toISOString()}),
+     {expirationTtl:7*86400});
+    sent+=result.sent;
+   }
+  }catch(e){
+   // FCM/network errors can retry on the next cron tick without duplicating
+   // a successfully sent reminder.
+   console.warn("office schedule reminder delivery deferred");
+  }
+ }
+ return {eligible:due.length,sent};
 }
 async function pushRegister(req,env,caller){
  let data;try{data=await body(req,5500)}catch(e){return res({error:"bad_request"},400)}
@@ -544,7 +595,10 @@ async function body(req,maxBytes=2400){
  if(bytes.byteLength>maxBytes)throw Error("large");
  return JSON.parse(new TextDecoder().decode(bytes));
 }
-export default {async fetch(req,env,ctx){
+export default {async scheduled(event,env,ctx){
+  const now=Number(event?.scheduledTime)||Date.now();
+  await deliverDueReminders(env,now);
+ },async fetch(req,env,ctx){
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:HEAD});
  const url=new URL(req.url);
  if(url.pathname==="/theme-weather"&&req.method==="GET")return themeWeather(env);
@@ -574,6 +628,6 @@ export default {async fetch(req,env,ctx){
   await env.SETTINGS.put(key,JSON.stringify(record));return res(record);
  }
  return res({error:"not_found"},404);
-},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,memberList,boardToken,validBoardToken,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision}};
+},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,memberList,boardToken,validBoardToken,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision,timedMemoDue,deliverDueReminders}};
 
 
