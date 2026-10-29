@@ -19,7 +19,7 @@
   const checked=$('newsLiveVoiceConsent');
   if(!checked?.checked){status('외부 AI 음성 전송 안내를 확인하고 체크한 뒤 시작해 주세요.');return;}
   // Whitelist public published news summary fields. No free-text or private memo data.
-  const rows=(root.remote?.news?.briefs||[]).filter(b=>
+  const rows=((typeof remote !== 'undefined' && remote?.news?.briefs)||[]).filter(b=>
    ['gemini_article','groq_article'].includes(b.summary_method)&&b.summary_version===3&&
    typeof b.summary==='string'&&b.summary_source_url?.startsWith('https://'))
    .slice(0,4).map(b=>({method:b.summary_method,title:String(b.title||'').slice(0,160),
