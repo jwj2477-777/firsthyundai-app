@@ -32,6 +32,10 @@ final class PublicLiveVoice {
     private final Events events;
     private final ExecutorService startup=Executors.newSingleThreadExecutor();
     private final ExecutorService player=Executors.newSingleThreadExecutor();
+    private final android.os.Handler durationLimit=new android.os.Handler(android.os.Looper.getMainLooper());
+    private final Runnable autoStop=()->{
+        if(running){event("ended","7분 체험 시간이 끝나 음성 대화를 종료했습니다.");stop();}
+    };
     private volatile boolean running=false;
     private volatile WebSocket socket;
     private volatile AudioRecord microphone;
@@ -94,6 +98,7 @@ final class PublicLiveVoice {
                                   "간결한 존댓말로 응답하세요. 공개 기사 참고 정보:\\n"+publicBrief))));
                             ws.send(new JSONObject().put("setup",setup).toString());
                             event("connected","연결됐습니다. 음성 응답을 준비하고 있습니다.");
+                            durationLimit.postDelayed(autoStop,7*60*1000L);
                         }catch(Exception e){event("error","Live 대화를 시작하지 못했습니다.");stop();}
                     }
                     @Override public void onMessage(WebSocket ws,String raw){
@@ -193,6 +198,7 @@ final class PublicLiveVoice {
     synchronized void stop(){
         if(closed)return;
         closed=true;running=false;
+        durationLimit.removeCallbacks(autoStop);
         WebSocket ws=socket;socket=null;
         if(ws!=null)ws.close(1000,"user_closed");
         AudioRecord mic=microphone;microphone=null;
