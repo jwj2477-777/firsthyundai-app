@@ -175,6 +175,7 @@ body.apartmentSheetActive{overflow:hidden}
 @media(max-width:420px){.complexTabBar button{font-size:13px}.complexQuickLinks a{font-size:12px}}
 </style>
 <link rel="stylesheet" href="contracts.css">
+<link rel="stylesheet" href="ai-news-office.css">
 <link rel="stylesheet" href="theme.css">
 <link rel="stylesheet" href="ui-v2.css">
 <link rel="stylesheet" href="admin-center.css">
@@ -879,6 +880,11 @@ body.apartmentSheetActive{overflow:hidden}
  </div>
  <section id="newsArticlesPane" role="tabpanel" aria-labelledby="newsTabArticles">
   <div class="panel newsFeedPanel">
+   <section id="newsAiOfficePanel" class="newsAiOfficePanel hidden" aria-label="AI 공개뉴스 실무 체크포인트">
+    <div class="newsAiOfficeHead"><strong>AI 실무 체크포인트</strong><small id="newsAiOfficeMeta">공개 기사만 분석</small></div>
+    <div id="newsAiOfficeItems"></div>
+    <p class="tiny">기사 본문을 바탕으로 정리한 참고사항입니다. 실제 정책·일정·가격 등은 원문·공식 자료를 확인하세요.</p>
+   </section>
    <div class="newsFilterRow"><select id="newsCategory" aria-label="뉴스 주제" onchange="renderNews()"><option value="">모든 주제</option><option>개발·교통</option><option>분양·입주</option><option>세금·대출</option><option>정책·규제</option></select></div>
    <details class="newsSourceDetails newsFeedDetails"><summary>요약·원문 안내</summary>
     <p class="familySimpleNote familyBriefCaution">뉴스 요약은 참고용입니다. 중요한 정보는 원문에서 확인하세요.</p>
@@ -2696,6 +2702,10 @@ function renderTrades(){
 }
 function renderNews(){
  const payload=remote.news;
+ const insightPanel=$('newsAiOfficePanel');
+ const insightItems=$('newsAiOfficeItems');
+ if(insightPanel)insightPanel.classList.add('hidden');
+ if(insightItems)insightItems.innerHTML='';
  if(!payload){
   $('newsMeta').textContent='AI 기사 요약 자료 확인 전';
   if($('newsFamilyMeta'))$('newsFamilyMeta').textContent='뉴스 · 수집 확인 중';
@@ -2709,6 +2719,27 @@ function renderNews(){
   return;
  }
  const briefs=Array.isArray(payload.briefs)?payload.briefs:[];
+ if(insightPanel&&insightItems){
+  const digest=payload.ai_office_digest;
+  const checked=new Map(briefs.map(b=>[String(b.id),b]));
+  const rows=digest?.schema_version===1&&Array.isArray(digest.items)?digest.items:[];
+  const visible=rows.slice(0,3).flatMap(item=>{
+   const article=checked.get(String(item?.id||''));
+   if(!article||!['gemini_article','groq_article','openai_article'].includes(article.summary_method)||
+     typeof item.point!=='string'||typeof item.check!=='string'||
+     item.point.length>105||item.check.length>125)return [];
+   const original=safeLink(article.summary_source_url)||safeLink(article.sources?.[0]?.link)||'';
+   return [{item,original}];
+  });
+  if(visible.length){
+   insightItems.innerHTML=visible.map(({item,original})=>
+    '<article class="newsAiOfficeItem"><strong>'+escapeHtml(item.point)+'</strong>'+
+    '<p>확인할 점 · '+escapeHtml(item.check)+'</p>'+
+    (original?'<a href="'+escapeHtml(original)+'">기사 원문 확인 ›</a>':'')+'</article>').join('');
+   if($('newsAiOfficeMeta'))$('newsAiOfficeMeta').textContent=(digest.method==='groq'?'Groq':'Gemini')+' · 공개 기사 기반';
+   insightPanel.classList.remove('hidden');
+  }
+ }
  const isAI=b=>['gemini_article','groq_article','openai_article'].includes(b.summary_method)&&
   typeof b.summary==='string'&&b.summary.trim().length>=20;
  const aiCount=briefs.filter(isAI).length;
