@@ -52,6 +52,26 @@ final class ContractLiveProtocol {
         try{LocalDate d=LocalDate.parse(value);return d.getYear()>=2000&&d.getYear()<=2100;}
         catch(Exception ignored){return false;}
     }
+    /** Validates cumulative proposals made in this voice session only. Never reads a form. */
+    static void validateConsistency(JSONObject previous,JSONObject change) throws Exception {
+        JSONObject merged=new JSONObject(previous==null?"{}":previous.toString());
+        java.util.Iterator<String> keys=change.keys();
+        while(keys.hasNext()){String key=keys.next();merged.put(key,change.get(key));}
+        long total=merged.has("price")?merged.getLong("price"):-1;
+        long deposit=merged.has("contractDeposit")?merged.getLong("contractDeposit"):-1;
+        long advance=merged.has("advance")?merged.getLong("advance"):-1;
+        long interim=merged.has("interim")?merged.getLong("interim"):-1;
+        if(total>=0&&deposit>=0&&deposit>total)throw new Exception("deposit exceeds total");
+        if(deposit>=0&&advance>=0&&advance>deposit)throw new Exception("advance exceeds deposit");
+        if(total>=0&&interim>=0&&interim>total)throw new Exception("interim exceeds total");
+        if(total>=0&&deposit>=0&&interim>=0&&deposit+interim>total)throw new Exception("scheduled payments exceed total");
+        for(String[] pair:new String[][]{{"contractDate","balanceDate"},{"leaseStart","leaseEnd"}}){
+            String start=merged.optString(pair[0],"");
+            String end=merged.optString(pair[1],"");
+            if(validDate(start)&&validDate(end)&&LocalDate.parse(start).isAfter(LocalDate.parse(end)))
+                throw new Exception("reversed dates");
+        }
+    }
     static JSONObject validated(JSONObject args) throws Exception {
         if(args==null||args.length()==0||args.toString().length()>6500)throw new Exception("invalid proposal");
         JSONObject result=new JSONObject();
