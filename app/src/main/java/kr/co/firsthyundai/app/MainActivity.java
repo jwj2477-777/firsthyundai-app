@@ -534,7 +534,7 @@ public class MainActivity extends Activity {
                     requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},LIVE_MIC_PERMISSION);
                     return;
                 }
-                startPublicLiveVoice(publicNewsJson);
+                MainActivity.this.startPublicLiveVoice(publicNewsJson);
             });
         }
         @JavascriptInterface public void stopPublicLiveVoice(){
