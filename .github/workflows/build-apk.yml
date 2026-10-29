@@ -27,6 +27,7 @@ on:
       - 'scripts/test_memo_dates.js'
       - 'scripts/test_account_picker.js'
       - 'scripts/test_office_board.mjs'
+      - 'scripts/test_office_board_images.mjs'
       - 'scripts/test_office_board_ui.js'
       - 'scripts/test_annual_calendar.js'
       - 'scripts/test_office_board_layout.js'
@@ -273,6 +274,7 @@ jobs:
           node scripts/test_memo_dates.js
           node scripts/test_account_picker.js
           node scripts/test_office_board.mjs
+          node scripts/test_office_board_images.mjs
           node scripts/test_office_board_ui.js
           node scripts/test_annual_calendar.js
           node scripts/test_office_board_layout.js
@@ -368,24 +370,24 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.41 device-local display modes APK
+      - name: Publish v2.1.42 shared memo photo attachments APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.41.apk
-          unzip -t FirstHyundai-v2.1.41.apk | grep 'No errors detected'
-          if gh release view v2.1.41 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.42.apk
+          unzip -t FirstHyundai-v2.1.42.apk | grep 'No errors detected'
+          if gh release view v2.1.42 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.41 FirstHyundai-v2.1.41.apk \
+            gh release create v2.1.42 FirstHyundai-v2.1.42.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.41 · 휴대전화별 화면 크기 설정' \
-              --notes '각 휴대전화에 독립 저장하는 표준/큰 글씨/매우 큰 글씨 화면을 추가했습니다. 표준은 시스템 글꼴 확대에 영향받지 않는 기본 앱 글자 크기 100%로 표시합니다. 큰 글씨 모드는 버튼 높이, 아이콘, 글자 크기를 함께 조절하고 매우 큰 글씨는 2열 배치입니다. 앱 하단 Aa 화면에서 누구나 설정하며 관리자 공통 서버와 동기화하지 않습니다. 기존 실거래, 계약, 공유메모, 계절 테마, 6개 메뉴 애니메이션은 보존합니다. v2.1.41/build192.'
+              --title '퍼스트현대 v2.1.42 · 공유메모 사진 첨부' \
+              --notes '공유 메모에 사진 선택과 압축, 작성 전 미리보기, 게시 후 가족 휴대전화 공유, 사진 확대 보기를 추가했습니다. 메모당 최대 3장, JPG로 자동 최적화하여 기존 인증된 Cloudflare KV에만 보관합니다. 사진은 공개 링크와 공개 GitHub에 저장되지 않으며 메모 삭제·복구 시 기존 권한 규칙을 준수합니다. 사진 업로드 실패 시 기존 텍스트 메모는 유지되고 재업로드할 수 있습니다. 기존 화면 설정, 계약문자, 실거래, 계절 테마, 업무브리핑 유지. v2.1.42/build193.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.41 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.41 --apk FirstHyundai-v2.1.41.apk
+          gh release upload v2.1.42 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.42 --apk FirstHyundai-v2.1.42.apk
 
 
