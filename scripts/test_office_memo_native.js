@@ -22,4 +22,20 @@ assert(board.includes('"/board/"+noteId+"/preview"'),'Preview API authenticated 
 assert(activity.includes('postDelayed(this,12000L)')&&activity.includes('memoTimer.removeCallbacks(memoCheck)'));
 assert(activity.includes('getOfficeMemoNotificationStatus')&&activity.includes('requestOfficeMemoNotifications'));
 assert(html.includes('id="officeMemoNotificationPermission"')&&html.includes('id="adminMemoAlerts"'));
+const fcm=read('OfficeMemoFirebaseService.java');
+const history=read('NotificationHistory.java');
+assert(fcm.includes('office_schedule_reminder')&&fcm.includes('receivedReminder('),
+ 'FCM data-only schedule reminders dispatch into native notification handler');
+assert(notify.includes('ensureReminderChannel')&&notify.includes('IMPORTANCE_HIGH')&&
+ notify.includes('channel.enableVibration(true)'),
+ 'Timed reminder has separate high-importance audio/vibration channel');
+assert(notify.includes('note.optBoolean("done",true)')&&
+ notify.includes('note.optBoolean("all_day",true)')&&
+ notify.includes('eventAt.equals(note.optString("scheduled_at",""))'),
+ 'Native must reject completed, all-day or rescheduled events');
+assert(notify.includes('lastKey=LAST_REMINDER+id')&&notify.includes('VISIBILITY_PRIVATE')&&
+ notify.includes('setPublicVersion(hidden.build())'),
+ 'Reminder must be idempotent and private on locked screens');
+assert(history.includes('recordReminder(Context context,String noteId)'),
+ 'Reminder is saved in local notification inbox without the sensitive memo body');
 console.log('Android memo notification privacy/permission, foreground/background and lifecycle source checks passed.');
