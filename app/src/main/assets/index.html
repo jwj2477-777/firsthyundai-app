@@ -882,7 +882,7 @@ body.apartmentSheetActive{overflow:hidden}
  <section id="newsArticlesPane" role="tabpanel" aria-labelledby="newsTabArticles">
   <div class="panel newsFeedPanel">
    <div class="newsFilterRow"><select id="newsCategory" aria-label="뉴스 주제" onchange="renderNews()"><option value="">모든 주제</option><option>개발·교통</option><option>분양·입주</option><option>세금·대출</option><option>정책·규제</option></select></div>
-   <details class="newsSourceDetails newsFeedDetails"><summary>AI 도우미 · 원문 안내</summary>
+   <details class="newsSourceDetails newsFeedDetails" ontoggle="if(!this.open)window.FirstHyundaiLive?.stop?.()"><summary>AI 도우미 · 원문 안내</summary>
    <section class="newsLiveVoice" aria-label="공개뉴스 실시간 AI 음성 도우미">
     <div class="newsLiveVoiceHeading"><strong>🎙 공개뉴스 AI 음성대화</strong><small>Gemini Live · 무료 한도 내</small></div>
     <p>송도 뉴스에 관해 자연스럽게 질문해 보세요. 화면 조작이나 일정 등록은 하지 않는 참고용 기능입니다.</p>
