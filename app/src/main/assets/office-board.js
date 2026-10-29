@@ -585,9 +585,9 @@ function enableNotifications(){
  bridge?.requestOfficeMemoNotifications?.();
 }
 function open(){
- // Every fresh entry opens the writing screen; targeted alerts override this
- // after navigation by selecting the memo library or calendar explicitly.
- view='compose';
+ // A normal entry opens the composer. An alert targeting an existing memo
+ // keeps the library active until the target can be displayed.
+ view=pendingFocus?'notes':'compose';
  $('officeBoardBirthdayAdd')?.classList?.toggle?.('hidden',bridge?.getMode?.()!=='admin');
  const account=$('officeBoardCurrentMember');
  if(account)account.textContent=bridge?.getOfficeMemberName?.()||'계정 연결 필요';
