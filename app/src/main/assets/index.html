@@ -293,8 +293,13 @@ body.apartmentSheetActive{overflow:hidden}
   <button id="officeBoardNotesView" type="button" class="selected" aria-pressed="true" onclick="FirstHyundaiOfficeBoard.setView('notes')">▤ 메모</button>
   <button id="officeBoardCalendarView" type="button" aria-pressed="false" onclick="FirstHyundaiOfficeBoard.setView('calendar')">▦ 일정 캘린더</button>
  </div>
- <section class="panel officeBoardComposer" aria-label="새 공유 메모 작성">
-  <label for="officeBoardDraft" class="officeBoardLabel">새 메모</label>
+ <div id="officeBoardComposeBar" class="officeBoardComposeBar">
+  <strong>메모함</strong>
+  <button id="officeBoardComposeToggle" type="button" class="officeBoardComposeToggle" aria-expanded="false" onclick="FirstHyundaiOfficeBoard.toggleComposer()">＋ 새 메모</button>
+ </div>
+ <section id="officeBoardComposer" class="panel officeBoardComposer hidden" aria-label="새 공유 메모 작성">
+  <div class="officeBoardComposeHeading"><label for="officeBoardDraft" class="officeBoardLabel">새 메모 작성</label>
+   <button type="button" class="officeBoardComposeCancel" onclick="FirstHyundaiOfficeBoard.toggleComposer(false)">닫기 ×</button></div>
   <textarea id="officeBoardDraft" maxlength="1600" rows="4" placeholder="전달할 내용을 자유롭게 적어주세요."></textarea>
   <input type="file" id="officeBoardImageInput" accept="image/*" multiple hidden aria-label="공유 메모 사진 선택">
   <div id="officeBoardImagePreview" class="officeBoardImagePreviewList" aria-live="polite"></div>
@@ -307,8 +312,30 @@ body.apartmentSheetActive{overflow:hidden}
  <p id="officeBoardFeedback" class="tiny officeBoardFeedback" role="status" aria-live="polite"></p>
  <div id="officeBoardAuth" class="panel officeBoardAuth hidden"><p>이 휴대폰에서 최초 한 번만 사무실 보안코드를 확인합니다.</p>
   <button type="button" class="btn" onclick="FirstHyundaiOfficeBoard.authenticate()">사무실 메모 연결하기</button></div>
- <div id="officeBoardListHeading" class="officeBoardListHeading"><strong>공유 메모 <span id="officeBoardCount" aria-label="미완료 메모 수">—</span></strong>
-  <div class="officeBoardListActions"><button id="officeBoardShowDone" type="button" onclick="FirstHyundaiOfficeBoard.toggleDone()">완료 메모 보기</button>
+ <section id="officeBoardFinder" class="officeBoardFinder" aria-label="메모 검색 및 분류">
+  <label class="officeBoardSearchLabel" for="officeBoardSearch"><span aria-hidden="true">⌕</span>
+   <input id="officeBoardSearch" type="search" autocomplete="off" placeholder="아파트명·동호수·메모 내용 검색" aria-label="공유 메모 검색">
+  </label>
+  <div class="officeBoardStatusFilters" role="group" aria-label="메모 진행 상태">
+   <button id="officeBoardStatusActive" type="button" aria-pressed="true" onclick="FirstHyundaiOfficeBoard.setStatus('active')">진행 중 <span id="officeBoardActiveCount">0</span></button>
+   <button id="officeBoardStatusDone" type="button" aria-pressed="false" onclick="FirstHyundaiOfficeBoard.setStatus('done')">완료 <span id="officeBoardDoneCount">0</span></button>
+   <button id="officeBoardStatusAll" type="button" aria-pressed="false" onclick="FirstHyundaiOfficeBoard.setStatus('all')">전체 <span id="officeBoardTotalCount">0</span></button>
+  </div>
+  <div class="officeBoardFinderOptions">
+   <label for="officeBoardAuthorFilter">작성자
+    <select id="officeBoardAuthorFilter" aria-label="작성자별 메모 보기"><option value="">전체</option></select>
+   </label>
+   <label for="officeBoardSort">정렬
+    <select id="officeBoardSort" aria-label="메모 정렬 방식">
+     <option value="newest">최근순</option><option value="oldest">오래된순</option><option value="schedule">일정 가까운순</option>
+    </select>
+   </label>
+  </div>
+  <div class="officeBoardFindSummary"><strong id="officeBoardListResult">메모를 확인하는 중…</strong>
+   <button id="officeBoardClearFilters" type="button" hidden onclick="FirstHyundaiOfficeBoard.clearFilters()">초기화</button></div>
+ </section>
+ <div id="officeBoardListHeading" class="officeBoardListHeading"><strong>메모 목록 <span id="officeBoardCount" aria-label="진행 중 메모 수">—</span></strong>
+  <div class="officeBoardListActions"><button id="officeBoardShowDone" type="button" class="hidden" onclick="FirstHyundaiOfficeBoard.toggleDone()">완료 메모 보기</button>
    <button id="officeBoardArchiveOpen" class="hidden" type="button" onclick="FirstHyundaiOfficeBoard.toggleArchive()">복구함</button></div></div>
  <section id="officeBoardArchive" class="officeBoardArchive hidden" aria-label="관리자 메모 복구함"><p>관리자가 삭제한 메모는 30일 동안 보관됩니다.</p><div id="officeBoardArchiveList"></div></section>
  <section id="officeBoardCalendar" class="officeBoardCalendar hidden" aria-label="사무실 공유 일정">
@@ -334,6 +361,7 @@ body.apartmentSheetActive{overflow:hidden}
    <img id="officeBoardImageFull" alt="공유 메모에 첨부된 사진" hidden>
   </dialog>
  <div id="officeBoardList" class="officeBoardList" aria-live="polite"><div class="empty">메모를 불러오는 중입니다.</div></div>
+ <button id="officeBoardMore" type="button" class="officeBoardMore hidden" onclick="FirstHyundaiOfficeBoard.showMore()">메모 더 보기</button>
 </div>
 <div id="adminCenter" class="page hidden">
  <div class="sectionTitle"><div><h2>시스템 관리센터</h2><p class="tiny">앱 진단·운영 · 관리자 전용</p></div><button type="button" class="btn alt refreshAction" onclick="FirstHyundaiAdminCenter.refresh()">전체 점검</button></div>
