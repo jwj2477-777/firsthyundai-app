@@ -445,18 +445,25 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
                     "summary_version": 3,
                     "verification": "Gemini 기사 본문 요약 · 사실 미검증"})
                 created += 1
-            # Gemini often omits a record in multi-article JSON. Limited
-            # one-item retries recover those without hallucinating headlines.
-            for item in missing:
+            # A large prompt may omit individual records. Retrying each missing
+            # article separately consumed most of yesterday's free requests
+            # (14 of 18 Gemini requests). Recover in smaller 2-item batches;
+            # remaining misses go to the existing Groq fallback, never fabricated.
+            for group_start in range(0, len(missing), 2):
                 if retried >= MAX_EXTRA_RETRIES:
                     break
+                group = missing[group_start:group_start + 2]
                 retried += 1
                 try:
-                    one = generate([item], key)
-                    summary = compact_summary(one.get(str(item["id"]), "")) if isinstance(one,dict) else ""
+                    recovered = generate(group, key)
+                    if not isinstance(recovered, dict):
+                        recovered = {}
                 except (OSError, ValueError, TypeError):
-                    summary = ""
-                if summary:
+                    recovered = {}
+                for item in group:
+                    summary = compact_summary(recovered.get(str(item["id"]), ""))
+                    if not summary:
+                        continue
                     item["brief"].update({
                         "summary": summary, "summary_method": "gemini_article",
                         "summary_model": MODEL, "summary_source_url": item["url"],
@@ -534,6 +541,7 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
         "created": created, "reused": len(cached), "article_fetches": len(resolved),
         "source_links_resolved": len(urlmap), "body_readable": len(article_bodies),
         "gemini_requests": requests + retried, "retry_requests": retried,
+        "retry_strategy": "two_article_batch",
         "candidate_articles": len(candidates),
         "groq_created": groq_created, "groq_requests": groq_requests,
         "groq_reviewed": groq_reviewed,
