@@ -90,6 +90,28 @@ class TestGeminiNews(unittest.TestCase):
         self.assertEqual(result["ai_summary_stats"]["created"],BATCH_SIZE+2)
         self.assertEqual(calls,[BATCH_SIZE,2])
         self.assertTrue(all(len(x["summary"])<=285 for x in data["briefs"]))
+    def test_missing_gemini_articles_retry_as_small_groups(self):
+        articles = {"schema_version": 1, "briefs": [
+            {"id": str(i), "title": "정책 테스트 " + str(i),
+             "sources": [{"link": "https://example.org/" + str(i),
+                          "title": "정책 테스트", "publisher": "신문"}]}
+            for i in range(5)]}
+        calls = []
+        sentence = ("송도 주택정책의 세부 방안을 논의하고 있습니다.\\n"
+                    "적용 대상 지역은 관련 기관과 협의하고 있습니다.\\n"
+                    "확정된 시행 일정은 아직 공개되지 않았습니다.")
+        def partial(batch, key):
+            calls.append([x["id"] for x in batch])
+            if len(batch) == 5:
+                return {batch[0]["id"]: sentence}
+            return {x["id"]: sentence for x in batch}
+        result = enrich(articles, {}, "TEST", lambda u: "확인된 기사 본문입니다. " * 25,
+                        partial, resolve=lambda urls: {url: url for url in urls})
+        self.assertEqual([len(batch) for batch in calls], [5, 2, 2])
+        self.assertEqual(result["ai_summary_stats"]["gemini_requests"], 3)
+        self.assertEqual(result["ai_summary_stats"]["retry_requests"], 2)
+        self.assertEqual(result["ai_summary_stats"]["created"], 5)
+
     def test_summary_must_be_short_and_complete(self):
         self.assertEqual(compact_summary("기사의 내용 중 알맞게 확인할 수 있는 핵심 요지입니다."*5),"")
         self.assertEqual(compact_summary("<script>악성</script>"),"")
