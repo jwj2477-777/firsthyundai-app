@@ -63,7 +63,7 @@ const pinnedPages=await Promise.all([0,25,50].map(async offset=>
   (await (await send('/board?offset='+offset,'GET',undefined,auth)).json()).notes));
 const pinned=pinnedPages.flat().find(n=>n.id===target.id);
 assert.equal(pinned.pinned,true,'Changing pinned flag invalidates private KV memo pages');
-assert.equal((await send('/board/'+target.id,'PATCH',{pinned:false},otherAuth,'',admin)).status,200,
+assert.equal((await send('/board/'+target.id,'PATCH',{pinned:false},otherAuth,admin)).status,200,
  'Verified admin can remove someone else\'s pin');
 assert.equal((await send('/board/'+target.id,'DELETE',undefined,auth,'')).status,403);
 assert.equal((await send('/board/'+target.id,'DELETE',undefined,auth,admin)).status,200);
