@@ -1,3 +1,8 @@
+## v2.1.49 (2026-10-30)
+- Gemini/Groq 공개 기사 요약을 기반으로 실무 확인사항(최대 3개) 추가; 새 `scripts/news_intelligence.py` 및 Python 테스트. 무료 사용량 절감을 위한 입력 기반 캐시, Gemini 오류 시 Groq 예비 호출, 실패 시 기존 뉴스만 정상 표시.
+- 네이티브 안드로이드 Gemini Live 음성(명시 동의/일회성 인증/마이크 런타임 허용/8분 세션/일일 6회)을 뉴스 탭에 제한하여 연결. 개인정보/계약/메모는 AI에 전달하지 않음. 백그라운드·화면 이탈시 중단. 실제 제공자 연결/계정 한도는 실기기 검증 필요.
+- `MainActivity.java`, `OfficeBoardClient.java`, `PublicLiveVoice.java`, `public-live.js/css`, `workers/shared-settings/src/index.mjs`, Cloudflare 배포 자동 Secret 연계, Gradle v2.1.49/build200, CI 추가.
+
 ## 2026-10-29 · v2.1.48 관리자 6개 업무 메뉴와 공유메모 3개 탭
 
 - 관리자 관리센터 긴 화면을 6개 선택형 진입 카드(화면·테마 / 메모·일정 / 거래·알림 / 구성원·권한 / 자료·동기화 / 운영 도구)로 개편. 진입 시 카드를 먼저 표시하고, 선택한 관련 설정만 표시한다. 설정 검색, 전체로 돌아가기, 분야 직접 이동은 유지. 기존 관리 설정·계정 관리·수집·백업·보안 권한 기능을 삭제하지 않는다.
