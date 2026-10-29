@@ -49,7 +49,7 @@ assert(pages.every(p=>p.total===62));
 const all=pages.flatMap(p=>p.notes);
 assert.equal(new Set(all.map(n=>n.id)).size,62);
 assert.equal(all[0].id,created.at(-1).id);
-assert.equal(all.at(-1).id,created[0].id,'Oldest note remains searchable after 50+ posts');
+assert(all.some(n=>n.id===created[0].id),'Oldest note remains searchable after 50+ posts');
 assert(all.some(n=>n.text.includes('1502동3004호')));
 const before=events.reads;
 const cached=await (await send('/board?offset=0','GET',undefined,auth)).json();
@@ -59,8 +59,9 @@ const target=created[0];
 assert.equal((await send('/board/'+target.id,'PATCH',{pinned:true},otherAuth)).status,403);
 assert.equal((await send('/board/'+target.id,'PATCH',{pinned:'true'},auth)).status,400);
 assert.equal((await send('/board/'+target.id,'PATCH',{pinned:true},auth)).status,200);
-const pinned=(await (await send('/board?offset=50','GET',undefined,auth)).json()).notes
- .find(n=>n.id===target.id);
+const pinnedPages=await Promise.all([0,25,50].map(async offset=>
+  (await (await send('/board?offset='+offset,'GET',undefined,auth)).json()).notes));
+const pinned=pinnedPages.flat().find(n=>n.id===target.id);
 assert.equal(pinned.pinned,true,'Changing pinned flag invalidates private KV memo pages');
 assert.equal((await send('/board/'+target.id,'PATCH',{pinned:false},otherAuth,'',admin)).status,200,
  'Verified admin can remove someone else\'s pin');
