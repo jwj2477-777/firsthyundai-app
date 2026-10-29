@@ -454,7 +454,7 @@ async function familyRevision(secret){
 async function sendPush(env,postId,fromDevice,options={}){
  const reminder=options.kind==="office_schedule_reminder"&&
   typeof options.scheduled_at==="string"&&
-  /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.000Z$/.test(options.scheduled_at);
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.000Z$/.test(options.scheduled_at);
  const data=reminder?{kind:"office_schedule_reminder",note_id:postId,
    scheduled_at:options.scheduled_at}:{kind:"office_note",note_id:postId};
  const config=fcmConfig(env);
@@ -506,7 +506,7 @@ const THIRTY_MINUTES=30*60000;
 function timedMemoDue(note,now){
  if(!note||!validBoardId(note.id)||note.done===true||note.all_day===true||
   typeof note.scheduled_at!=="string"||!Number.isFinite(Date.parse(note.scheduled_at))||
-  /^\\s*🎂/.test(String(note.text||"")))return false;
+  /^\s*🎂/.test(String(note.text||"")))return false;
  const until=Date.parse(note.scheduled_at)-now;
  // Every-minute cron with jitter tolerance; never notify after a past event.
  return until>=28*60000&&until<=31*60000;
