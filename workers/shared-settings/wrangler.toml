@@ -3,6 +3,10 @@ main = "src/index.mjs"
 compatibility_date = "2026-10-25"
 workers_dev = true
 
+# One-minute server checks for 30-minute private office schedule reminders.
+[triggers]
+crons = ["* * * * *"]
+
 [[ratelimits]]
 name = "AUTH_LIMITER"
 namespace_id = "872015"
