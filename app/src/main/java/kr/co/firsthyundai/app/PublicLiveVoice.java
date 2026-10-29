@@ -32,11 +32,11 @@ final class PublicLiveVoice {
     private final Events events;
     private final ExecutorService startup=Executors.newSingleThreadExecutor();
     private final ExecutorService player=Executors.newSingleThreadExecutor();
+    private volatile boolean running=false;
     private final android.os.Handler durationLimit=new android.os.Handler(android.os.Looper.getMainLooper());
     private final Runnable autoStop=()->{
         if(running){event("ended","7분 체험 시간이 끝나 음성 대화를 종료했습니다.");stop();}
     };
-    private volatile boolean running=false;
     private volatile WebSocket socket;
     private volatile AudioRecord microphone;
     private volatile AudioTrack speaker;
