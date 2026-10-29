@@ -2741,12 +2741,22 @@ function renderNews(){
      typeof item.point!=='string'||typeof item.check!=='string'||
      item.point.length>105||item.check.length>125)return [];
    const original=safeLink(article.summary_source_url)||safeLink(article.sources?.[0]?.link)||'';
-   return [{item,original}];
+   const grounded=typeof item.evidence==='string'&&item.evidence===item.point&&
+     String(article.summary||'').split(/\n+|(?<=[.!?])\s+/).some(s=>s.trim()===item.evidence);
+   const audiences=grounded&&Array.isArray(item.audiences)?[...new Set(item.audiences.filter(a=>
+     ['매수','매도','임대','임차','공통'].includes(a)))].slice(0,2):[];
+   const questions=grounded&&Array.isArray(item.questions)?item.questions.filter(q=>
+     typeof q==='string'&&q.length>=12&&q.length<=100&&/확인|문의/.test(q)).slice(0,2):[];
+   return [{item,original,audiences,questions}];
   });
   if(visible.length){
-   insightItems.innerHTML=visible.map(({item,original})=>
-    '<article class="newsAiOfficeItem"><strong>'+escapeHtml(item.point)+'</strong>'+
+   insightItems.innerHTML=visible.map(({item,original,audiences,questions})=>
+    '<article class="newsAiOfficeItem">'+
+    (audiences.length?'<div class="newsAiAudience">'+audiences.map(a=>'<span>'+escapeHtml(a)+' 상담</span>').join('')+'</div>':'')+
+    '<strong>'+escapeHtml(item.point)+'</strong>'+
     '<p>확인할 점 · '+escapeHtml(item.check)+'</p>'+
+    (questions.length?'<details class="newsAiQuestions"><summary>상담 준비 질문 '+questions.length+'개</summary><ul>'+
+      questions.map(q=>'<li>'+escapeHtml(q)+'</li>').join('')+'</ul></details>':'')+
     (original?'<a href="'+escapeHtml(original)+'">기사 원문 확인 ›</a>':'')+'</article>').join('');
    if($('newsAiOfficeMeta'))$('newsAiOfficeMeta').textContent=(digest.method==='groq'?'Groq':'Gemini')+' · 공개 기사 기반';
    insightPanel.classList?.remove?.('hidden');

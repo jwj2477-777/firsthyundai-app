@@ -7,6 +7,8 @@ on:
       - 'scripts/collect_news.py'
       - 'scripts/summarize_news.py'
       - 'scripts/news_intelligence.py'
+      - 'scripts/ai_quota.py'
+      - 'tests/test_ai_consultation.py'
       - 'scripts/groq_news.py'
       - 'tests/test_news_gemini.py'
       - 'tests/test_news_intelligence.py'
@@ -119,3 +121,4 @@ jobs:
           done
           echo 'Failed to publish data after four conflict-safe attempts.'
           exit 1
+

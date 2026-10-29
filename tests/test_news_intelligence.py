@@ -32,7 +32,7 @@ class PublicOfficeAIDigest(unittest.TestCase):
         def gemini(prompt,key):
             calls.append(key)
             self.assertNotIn("고객정보",prompt)
-            return {"items":[{"id":"b0","point":"인천에서 주택정책 관련 공식 논의가 이어졌습니다.",
+            return {"items":[{"id":"b0","evidence":"인천에서 공식 논의가 이어지고 있습니다.",
                               "check":"관련 정책의 적용 대상과 공식 발표 시점을 확인하시겠습니까?"}]}
         first=enrich_digest(news,{},"FAKE_KEY","",gemini_call=gemini)
         self.assertEqual(first["ai_office_digest_stats"]["state"],"created")
@@ -43,7 +43,7 @@ class PublicOfficeAIDigest(unittest.TestCase):
     def test_groq_fallback_and_quota(self):
         n=sample()
         def groq(prompt,key,max_tokens):
-            return {"items":[{"id":"b1","point":"인천 송도 주택정책의 추진 상황이 보도됐습니다.",
+            return {"items":[{"id":"b1","evidence":"인천에서 공식 논의가 이어지고 있습니다.",
                               "check":"보도된 추진 상황을 관계 기관에서 확인하시겠습니까?"}]}
         done=enrich_digest(n,{},"GEMINI","GROQ",gemini_call=lambda *_:{},
                            groq_call=groq)
