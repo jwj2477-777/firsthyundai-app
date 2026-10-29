@@ -46,6 +46,8 @@ jobs:
         run: python3 scripts/setup_shared_settings_kv.py
       - name: Test original memo author and admin update permissions
         run: node scripts/test_office_board.mjs
+      - name: Test authenticated paging, pin rights and private board cache
+        run: node scripts/test_office_board_find.mjs
       - name: Test private shared memo photo access
         run: node scripts/test_office_board_images.mjs
       - name: Test scheduled reminders and FCM privacy
