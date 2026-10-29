@@ -78,6 +78,8 @@ public class MainActivity extends Activity {
     private static final int LIVE_MIC_PERMISSION = 1832;
     private PublicLiveVoice liveSession;
     private String pendingLivePublicNews="";
+    private String pendingContractLiveId="";
+    private boolean pendingLivePermission=false;
     private ValueCallback<Uri[]> pendingMemoImages;
     private static final int LIMIT = 8 * 1024 * 1024;
     private volatile String verifiedUpdateUrl = "";
@@ -356,6 +358,16 @@ public class MainActivity extends Activity {
         super.onPause();
     }
 
+    @Override protected void onStop() {
+        if(pendingLivePermission){
+            String id=pendingContractLiveId;
+            pendingLivePermission=false;pendingContractLiveId="";pendingLivePublicNews="";
+            if(!id.isEmpty())contractLiveEvent(id,"ended","화면을 나가 음성 대화를 취소했습니다.");
+            else liveVoiceEvent("ended","화면을 나가 음성 대화를 취소했습니다.");
+        }
+        super.onStop();
+    }
+
     private void updateNotificationPermissionUI() {
         if (web == null || isFinishing() || isDestroyed()) return;
         web.evaluateJavascript("window.FirstHyundaiTradeAlerts?.syncNativeStatus?.();window.FirstHyundaiOfficeBoard?.syncNotificationStatus?.();window.FirstHyundaiNotificationInbox?.refresh?.()", null);
@@ -365,13 +377,16 @@ public class MainActivity extends Activity {
                                                      int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(requestCode==LIVE_MIC_PERMISSION){
+            if(!pendingLivePermission)return;
+            pendingLivePermission=false;
+            String contractId=pendingContractLiveId;pendingContractLiveId="";
+            String news=pendingLivePublicNews;pendingLivePublicNews="";
             if(grantResults.length>0&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
-                String context=pendingLivePublicNews;pendingLivePublicNews="";
-                startPublicLiveVoice(context);
-            }else{
-                pendingLivePublicNews="";
-                liveVoiceEvent("error","마이크 사용 권한이 없어 음성 대화를 시작하지 않았습니다.");
-            }
+                if(!contractId.isEmpty())startContractLiveVoice(contractId);
+                else startPublicLiveVoice(news);
+            }else if(!contractId.isEmpty()){
+                contractLiveEvent(contractId,"error","마이크 권한이 없어 시작하지 않았습니다. 기존 메모 입력을 이용해 주세요.");
+            }else liveVoiceEvent("error","마이크 사용 권한이 없어 음성 대화를 시작하지 않았습니다.");
             return;
         }
         if (requestCode == TradeNotifications.REQUEST_PERMISSION || requestCode == OfficeMemoNotifications.PERMISSION) {
@@ -512,6 +527,17 @@ public class MainActivity extends Activity {
             .put("state",state).put("message",message));}
         catch(Exception ignored){}
     }
+    private void contractLiveEvent(String requestId,String state,String message){
+        try{deliver("onFirstHyundaiContractLiveStatus",new JSONObject()
+            .put("requestId",requestId).put("state",state).put("message",message));}
+        catch(Exception ignored){}
+    }
+    private void startContractLiveVoice(String requestId){
+        stopPublicLiveVoice();
+        PublicLiveVoice session=new PublicLiveVoice(this,(state,message)->contractLiveEvent(requestId,state,message));
+        liveSession=session;
+        session.startContract();
+    }
     private void startPublicLiveVoice(String news){
         stopPublicLiveVoice();
         PublicLiveVoice session=new PublicLiveVoice(this,(state,message)->liveVoiceEvent(state,message));
@@ -524,13 +550,34 @@ public class MainActivity extends Activity {
     }
 
     public final class Bridge {
+        // Only a generated session ID crosses this bridge. No contract/form payload.
+        @JavascriptInterface public void startContractLiveVoice(String requestId){
+            if(requestId==null||!requestId.matches("cl-[0-9-]{1,50}"))return;
+            runOnUiThread(()->{
+                if(isFinishing()||isDestroyed())return;
+                if(checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED){
+                    pendingContractLiveId=requestId;pendingLivePublicNews="";pendingLivePermission=true;
+                    requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},LIVE_MIC_PERMISSION);
+                    return;
+                }
+                MainActivity.this.startContractLiveVoice(requestId);
+            });
+        }
+        @JavascriptInterface public void stopContractLiveVoice(){
+            runOnUiThread(()->{
+                String id=pendingContractLiveId;pendingContractLiveId="";
+                pendingLivePermission=false;pendingLivePublicNews="";
+                MainActivity.this.stopPublicLiveVoice();
+                if(!id.isEmpty())contractLiveEvent(id,"ended","음성 대화를 취소했습니다.");
+            });
+        }
         @JavascriptInterface public void startPublicLiveVoice(String publicNewsJson){
             if(publicNewsJson==null||publicNewsJson.length()>4200)return;
             runOnUiThread(()->{
                 if(isFinishing()||isDestroyed())return;
                 if(android.os.Build.VERSION.SDK_INT>=23&&
                     checkSelfPermission(Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED){
-                    pendingLivePublicNews=publicNewsJson;
+                    pendingLivePublicNews=publicNewsJson;pendingContractLiveId="";pendingLivePermission=true;
                     requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},LIVE_MIC_PERMISSION);
                     return;
                 }
@@ -538,7 +585,7 @@ public class MainActivity extends Activity {
             });
         }
         @JavascriptInterface public void stopPublicLiveVoice(){
-            runOnUiThread(()->MainActivity.this.stopPublicLiveVoice());
+            runOnUiThread(()->{pendingLivePermission=false;pendingLivePublicNews="";pendingContractLiveId="";MainActivity.this.stopPublicLiveVoice();});
         }
         @JavascriptInterface public String getDeviceDisplayMode() {
             return localDeviceDisplayMode();
@@ -1027,5 +1074,6 @@ public class MainActivity extends Activity {
                 });
     }
 }
+
 
 
