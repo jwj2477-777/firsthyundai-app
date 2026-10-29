@@ -18,6 +18,7 @@ from urllib.parse import urlsplit
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from groq_news import generate_fallback, review_important, MODEL as GROQ_MODEL, MAX_FALLBACK_BRIEFS, MAX_REVIEW_BRIEFS
 from news_intelligence import enrich_digest
+import ai_quota
 
 NEWS=Path(__file__).resolve().parents[1]/"data"/"news.json"
 MODEL="gemini-3.5-flash-lite"
@@ -262,7 +263,7 @@ def summarize_batch(items, key, opener=None):
 
     Returns {brief_id: short_summary}. Empty on error (no fabricated fallback).
     """
-    if not key or not items:
+    if not key or not items or ai_quota.blocked():
         return {}
     opener = opener or build_opener()
     source_items = [
@@ -298,6 +299,7 @@ def summarize_batch(items, key, opener=None):
             req = Request(endpoint, data=body, headers={
                 "x-goog-api-key": key, "Content-Type": "application/json"
             }, method="POST")
+            ai_quota.record_request()
             with opener.open(req, timeout=38) as r:
                 raw = json.loads(r.read(50_000).decode("utf-8"))
             chunks = raw.get("candidates", [{}])[0].get("content", {}).get("parts", [])
@@ -324,6 +326,8 @@ def summarize_batch(items, key, opener=None):
             return output
         except HTTPError as e:
             print("Gemini summary HTTP status:", e.code)
+            if ai_quota.reject(e.code):
+                return {}
             if e.code not in (429, 500, 502, 503) or attempt == 2:
                 return {}
             sleep(7 * (attempt + 1))
@@ -358,9 +362,11 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
         else:
             legacy[keypair] = b
     pending = []
+    reused = 0
     for brief in briefs:
         previous_brief = cached.get((brief.get("id"), brief.get("title")))
         if previous_brief:
+            reused += 1
             brief.update({k: previous_brief[k] for k in
                           ("summary", "summary_method", "summary_model",
                            "summary_source_url", "summary_version", "groq_reviewed")
@@ -422,8 +428,10 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
     retried = 0
     if key:
         # Persist successes from each batch. Do not discard an entire batch when
-        # Gemini omits one record; retry missing items individually (budgeted).
+        # Gemini omits one record; retry missing items in pairs (budgeted).
         for offset in range(0, len(candidates), BATCH_SIZE):
+            if ai_quota.blocked():
+                break
             batch = candidates[offset:offset+BATCH_SIZE]
             try:
                 result = generate(batch, key)
@@ -450,7 +458,7 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
             # (14 of 18 Gemini requests). Recover in smaller 2-item batches;
             # remaining misses go to the existing Groq fallback, never fabricated.
             for group_start in range(0, len(missing), 2):
-                if retried >= MAX_EXTRA_RETRIES:
+                if retried >= MAX_EXTRA_RETRIES or ai_quota.blocked():
                     break
                 group = missing[group_start:group_start + 2]
                 retried += 1
@@ -538,10 +546,11 @@ def enrich(current, previous, key, read=read_article, generate=summarize_batch,
         b["summary_method"] = "headline_only"
         b["verification"] = "기사 본문 요약 대기"
     current["ai_summary_stats"] = {
-        "created": created, "reused": len(cached), "article_fetches": len(resolved),
+        "created": created, "reused": reused, "article_fetches": len(resolved),
         "source_links_resolved": len(urlmap), "body_readable": len(article_bodies),
         "gemini_requests": requests + retried, "retry_requests": retried,
         "retry_strategy": "two_article_batch",
+        "gemini_circuit": os.environ.get(ai_quota.GEMINI_BLOCKED, "open"),
         "candidate_articles": len(candidates),
         "groq_created": groq_created, "groq_requests": groq_requests,
         "groq_reviewed": groq_reviewed,
@@ -564,6 +573,7 @@ def main():
     groq_key=os.environ.get("GROQ_API_KEY","").strip()
     enriched=enrich(current,previous,gemini_key,groq_key=groq_key)
     enriched=enrich_digest(enriched,previous,gemini_key,groq_key)
+    enriched["ai_summary_stats"]["gemini_http_requests_total"] = ai_quota.GEMINI_HTTP_REQUESTS
     NEWS.write_text(json.dumps(enriched,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("Gemini summary stats:",enriched["ai_summary_stats"],"key_configured:",bool(os.environ.get("GEMINI_API_KEY")))
     print("Public office digest status:",enriched["ai_office_digest_stats"])

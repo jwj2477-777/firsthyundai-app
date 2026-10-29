@@ -55,3 +55,30 @@ out=render({state:'ok',briefs:[{...data[0],summary:'금리는 3.5%로 발표했�
 assert.equal((out.match(/class="newsAiSentence"/g)||[]).length,3,'Single paragraph is separated into three readable facts');
 assert(out.includes('3.5%'),'Decimal values remain intact');
 assert(out.includes('newsCard')&&out.includes('핵심 요약'));
+
+// Consultation details are optional, escaped and backed by the current public
+// summary; old snapshots still show the original checkpoint without details.
+divs.newsAiOfficePanel={classList:{add(){},remove(){}}};
+divs.newsAiOfficeItems={innerHTML:''};
+divs.newsAiOfficeMeta={textContent:''};
+const evidence='시행 대상과 일정은 아직 확정되지 않았습니다.';
+const article={...data[0],summary:'정부가 공급 방안을 검토하고 있습니다.\n'+evidence+'\n관계 기관이 추가 자료를 발표할 예정입니다.',
+ summary_source_url:'https://example.org/public'};
+const checkpoint={id:'1',point:evidence,evidence,check:'공식 발표 시점을 확인하시겠습니까?',
+ audiences:['매수','매수','임차','<script>'],questions:['사업의 적용 대상을 관계 기관에 확인하시겠습니까?',
+ '<img src=x onerror=alert(1)> 시행 여부를 확인하시겠습니까?']};
+render({state:'ok',briefs:[article],ai_office_digest:{schema_version:1,method:'gemini',items:[checkpoint]}});
+let cards=divs.newsAiOfficeItems.innerHTML;
+assert(cards.includes('매수 상담')&&cards.includes('임차 상담'));
+assert.equal((cards.match(/매수 상담/g)||[]).length,1);
+assert(cards.includes('상담 준비 질문 2개')&&cards.includes('<details'));
+assert(!cards.includes('<img')&&cards.includes('&lt;img'));
+assert(cards.includes('https://example.org/public'));
+render({state:'ok',briefs:[article],ai_office_digest:{schema_version:1,items:[{...checkpoint,evidence:'다른 기사 내용입니다.'}]}});
+cards=divs.newsAiOfficeItems.innerHTML;
+assert(cards.includes(evidence)&&!cards.includes('상담 준비 질문')&&!cards.includes('매수 상담'));
+render({state:'ok',briefs:[article],ai_office_digest:{schema_version:1,items:[{id:'1',point:evidence,check:checkpoint.check}]}});
+assert(divs.newsAiOfficeItems.innerHTML.includes('확인할 점'),'v2.1.49 snapshots stay compatible');
+render({state:'ok',briefs:[article]});
+assert.equal(divs.newsAiOfficeItems.innerHTML,'','Failed/absent digest cannot leave stale cards');
+console.log('Consultation audience, question, evidence and legacy compatibility tests passed.');
