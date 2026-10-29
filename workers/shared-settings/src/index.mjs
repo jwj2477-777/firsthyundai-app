@@ -333,7 +333,7 @@ async function boardCommand(req,env,url,ctx){
   catch(e){return res({error:"invalid_note"},400)}
   const device=caller.deviceId;
   const id=Date.now().toString(36).padStart(9,"0")+"-"+crypto.randomUUID(),now=new Date().toISOString();
-  const record={id,text:content,done:false,scheduled_at:scheduled,all_day:data?.all_day===true,created_at:now,updated_at:now,author:{id:caller.member.id,name:caller.member.name}};
+  const record={id,text:content,done:false,pinned:false,scheduled_at:scheduled,all_day:data?.all_day===true,created_at:now,updated_at:now,author:{id:caller.member.id,name:caller.member.name}};
   await env.SETTINGS.put(BOARD_PREFIX+id,JSON.stringify(record),
    {expirationTtl:BOARD_LIFETIME_DAYS*86400,metadata:{device}});
   // Send after storage succeeds. Failure must never lose the saved memo.
@@ -361,8 +361,9 @@ async function boardCommand(req,env,url,ctx){
   let data;try{data=await body(req,7000)}catch(e){return res({error:"bad_request"},400)}
   if(!data||typeof data!=="object")return res({error:"invalid_note"},400);
   const patchKeys=Object.keys(data);
-  if(!patchKeys.length||patchKeys.some(k=>!["text","done","scheduled_at","all_day"].includes(k))||
-   (data.done!==undefined&&typeof data.done!=="boolean"))return res({error:"invalid_patch"},400);
+  if(!patchKeys.length||patchKeys.some(k=>!["text","done","scheduled_at","all_day","pinned"].includes(k))||
+   (data.done!==undefined&&typeof data.done!=="boolean")||
+   (data.pinned!==undefined&&typeof data.pinned!=="boolean"))return res({error:"invalid_patch"},400);
   if(data.text!==undefined){
    try{saved.text=validBoardText(data.text)}catch(e){return res({error:"invalid_note"},400)}
   }
@@ -371,6 +372,7 @@ async function boardCommand(req,env,url,ctx){
   }
   if(data.all_day!==undefined){if(typeof data.all_day!=="boolean")return res({error:"invalid_all_day"},400);saved.all_day=data.all_day;}
   if(data.done!==undefined)saved.done=data.done;
+  if(data.pinned!==undefined)saved.pinned=data.pinned;
   saved.edited_by={id:caller.member.id,name:caller.member.name};
   saved.updated_at=new Date().toISOString();
   await env.SETTINGS.put(memoKey,JSON.stringify(saved),
