@@ -564,3 +564,14 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
  #officeBoard .officeBoardStatusFilters button{font-size:12px}
  #officeBoard .officeBoardFinderOptions select{padding:7px 5px}
 }
+
+/* Long notes remain readable on demand without making every search result tall. */
+#officeBoard .officeBoardText.officeBoardTextCollapsed{
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
+ line-clamp:3;overflow:hidden;white-space:pre-wrap;
+ max-height:5.1em;margin-bottom:2px
+}
+#officeBoard .officeBoardExpand{min-height:38px;margin:0 0 8px;padding:6px 10px;
+ border:1px solid #DBE5DC;border-radius:9px;background:#FAFBF7;
+ color:#4C6A61;font-size:12px;font-weight:750}
+#officeBoard .officeBoardExpand:focus-visible{outline:3px solid #B98249;outline-offset:2px}
