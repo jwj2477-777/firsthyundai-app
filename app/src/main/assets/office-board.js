@@ -543,7 +543,10 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
  if(action==='cancel')cancelEdit();
  if(action==='save')saveEdit(id);
  if(action==='delete')remove(id);
- if(action==='photoAdd')window.FirstHyundaiBoardImages?.selectFor?.(id);
+ if(action==='photoAdd'){
+  const note=items.find(n=>n.id===id);
+  window.FirstHyundaiBoardImages?.selectFor?.(id,Array.isArray(note?.images)?note.images.length:0);
+ }
  if(action==='photoView')window.FirstHyundaiBoardImages?.view?.(id,button.dataset.photo);
 });
 function imageUpdate(note){
