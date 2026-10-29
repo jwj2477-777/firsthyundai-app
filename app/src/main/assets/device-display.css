@@ -1,6 +1,8 @@
 /* Three per-device display modes; standard intentionally preserves all existing UI geometry. */
-.compactAppFooter .appFooterRow{flex-wrap:wrap}
-.compactAppFooter .appFooterControls{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:6px;min-width:0}
+.compactAppFooter .appFooterDisplayRow{display:flex;align-items:center;gap:9px;margin-top:8px;flex-wrap:wrap}
+.compactAppFooter .appFooterDisplayRow small{color:#677F83;font-size:11px}
+body[data-device-display="large"] .compactAppFooter .appFooterRow,
+body[data-device-display="xlarge"] .compactAppFooter .appFooterRow{flex-wrap:wrap}
 .compactAppFooter #deviceDisplayOpen{min-height:44px;border:1px solid #BFD0CD;border-radius:11px;background:#FFFDF8;color:#29565C;padding:9px 10px;font-size:13px;font-weight:800;cursor:pointer}
 .deviceDisplayDialog{box-sizing:border-box;width:min(420px,calc(100vw - 24px));max-height:min(88dvh,720px);overflow-y:auto;padding:20px;border:1px solid #CCDBD6;border-radius:20px;background:#FFFDF8;color:#244C55;box-shadow:0 24px 70px #152C3840}
 .deviceDisplayDialog::backdrop{background:#142B3699}
