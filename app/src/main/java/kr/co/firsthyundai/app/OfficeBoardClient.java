@@ -186,13 +186,13 @@ final class OfficeBoardClient {
             String image=payload.optString("data_url","");
             if(!image.matches("data:image/jpeg;base64,/9j/[A-Za-z0-9+/=]+")||
                     image.length()>195000)throw new Exception("사진 크기를 확인해 주세요.");
-            return request("POST","/board/"+id+"/images",new JSONObject().put("data_url",image),auth);
+            return request("POST","/board/"+id+"/images",new JSONObject().put("data_url",image),auth,adminToken);
         }
         if("imageGet".equals(action)||"imageRemove".equals(action)){
             String imageId=payload.optString("image_id","");
             if(!imageId.matches("[0-9a-f-]{36}"))throw new Exception("사진 번호가 올바르지 않습니다.");
             return request("imageGet".equals(action)?"GET":"DELETE",
-                "/board/"+id+"/images/"+imageId,null,auth);
+                "/board/"+id+"/images/"+imageId,null,auth,"imageRemove".equals(action)?adminToken:null);
         }
         if("preview".equals(action))return preview(context,id);
         if("delete".equals(action))return request("DELETE","/board/"+id,null,auth,adminToken);
@@ -203,15 +203,15 @@ final class OfficeBoardClient {
             JSONObject patch=new JSONObject().put("text",text);
             if(payload.has("scheduled_at"))patch.put("scheduled_at",payload.opt("scheduled_at"));
             if(payload.has("all_day"))patch.put("all_day",payload.optBoolean("all_day",false));
-            return request("PATCH","/board/"+id,patch,auth);
+            return request("PATCH","/board/"+id,patch,auth,adminToken);
         }
         if("schedule".equals(action)){
             if(!payload.has("scheduled_at"))throw new Exception("일정 날짜가 필요합니다.");
-            return request("PATCH","/board/"+id,new JSONObject().put("scheduled_at",payload.opt("scheduled_at")),auth);
+            return request("PATCH","/board/"+id,new JSONObject().put("scheduled_at",payload.opt("scheduled_at")),auth,adminToken);
         }
         if("done".equals(action)){
             if(!payload.has("done")||!(payload.opt("done") instanceof Boolean))throw new Exception("완료 표시 값이 올바르지 않습니다.");
-            return request("PATCH","/board/"+id,new JSONObject().put("done",payload.getBoolean("done")),auth);
+            return request("PATCH","/board/"+id,new JSONObject().put("done",payload.getBoolean("done")),auth,adminToken);
         }
         throw new Exception("지원하지 않는 게시판 작업입니다.");
     }
@@ -256,7 +256,12 @@ final class OfficeBoardClient {
                     throw new Exception("account_revoked · 관리자에게 계정 상태를 확인해 주세요.");
                 throw new Exception("게시판 보안 인증 만료 · 다시 인증해 주세요.");
             }
-            if(status==403)throw new Exception("요청 권한이 없습니다. 관리자에게 계정 상태를 확인해 주세요.");
+            if(status==403){
+                if("PATCH".equals(method)||("POST".equals(method)&&path.endsWith("/images"))||
+                   ("DELETE".equals(method)&&path.contains("/images/")))
+                    throw new Exception("이 메모는 최초 작성자와 관리자만 수정할 수 있습니다.");
+                throw new Exception("요청 권한이 없습니다. 관리자에게 계정 상태를 확인해 주세요.");
+            }
             if(status<200||status>=300)throw new Exception("게시판 서버에 연결할 수 없습니다. HTTP "+status);
             return new JSONObject(bytes.toString("UTF-8"));
         }finally{if(connection!=null)connection.disconnect();}

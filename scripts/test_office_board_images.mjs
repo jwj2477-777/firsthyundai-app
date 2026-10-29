@@ -8,9 +8,10 @@ const env={SETTINGS:{
 },FIRSTHYUNDAI_ACCESS_CODE:'testimagepassword2026',FIRSTHYUNDAI_ADMIN_CODE:'testAdminPasswordForPictures2026',
  AUTH_LIMITER:{async limit(){return {success:true}}}};
 const base='https://firsthyundai-shared-settings.jwj2477.workers.dev';
-function ask(url,method='GET',body=null,token='',origin=''){
+function ask(url,method='GET',body=null,token='',origin='',adminToken=''){
  const headers={};if(token)headers.Authorization='Bearer '+token;
  if(origin)headers.Origin=origin;
+ if(adminToken)headers['X-FHD-Admin-Authorization']='Bearer '+adminToken;
  if(body)headers['Content-Type']='application/json';
  return service.fetch(new Request(base+url,{method,headers,body:body?JSON.stringify(body):undefined}),env);
 }
@@ -27,10 +28,20 @@ const preview=await (await ask(previewPath,'GET',null,token)).json();
 assert.equal(preview.author,member.name);
 assert.equal(preview.preview,'사진 첨부 테스트');
 assert.equal(preview.image_count,0);
+const other=choice.accounts.find(a=>a.id!==member.id);
+const otherToken=(await (await ask('/board/session','POST',
+ {code:env.FIRSTHYUNDAI_ACCESS_CODE,member_id:other.id,device:'b'.repeat(32)})).json()).token;
+const adminToken=(await (await ask('/session','POST',
+ {code:env.FIRSTHYUNDAI_ADMIN_CODE})).json()).token;
+assert(otherToken&&adminToken);
 const path='/board/'+note.id+'/images';
 const photo='data:image/jpeg;base64,'+Buffer.from([255,216,255,224,...Array(128).fill(31),255,217]).toString('base64');
 assert.match(photo,/^data:image\/jpeg;base64,\/9j\//);
 assert.equal((await ask(path,'POST',{data_url:photo})).status,401,'image upload requires authentication');
+assert.equal((await ask(path,'POST',{data_url:photo},otherToken)).status,403,
+ 'Other family accounts cannot attach to an existing memo');
+assert.equal((await ask(path,'GET',null,otherToken)).status,404,
+ 'There is no photo collection list exposed to other users');
 assert.equal((await ask(path,'POST',{data_url:photo},token,'https://other.invalid')).status,403);
 assert.equal((await ask(path,'POST',{data_url:'data:text/html;base64,AAAA'},token)).status,400,'reject HTML uploads');
 const created=await ask(path,'POST',{data_url:photo},token);
@@ -43,15 +54,28 @@ assert(!JSON.stringify(first.note).includes('data:image'),'never inline bytes in
 assert.equal((await ask(path+'/'+first.image_id)).status,401);
 const view=await ask(path+'/'+first.image_id,'GET',null,token);
 assert.equal(view.status,200);
+assert.equal((await ask(path+'/'+first.image_id,'GET',null,otherToken)).status,200,
+ 'Other family accounts can still view attachments');
+assert.equal((await ask(path+'/'+first.image_id,'DELETE',null,otherToken)).status,403,
+ 'Other family accounts cannot remove an attached photo');
 assert.equal((await view.json()).data_url,photo,'authenticated image download');
 const rows=(await (await ask('/board','GET',null,token)).json()).notes;
 assert.equal(rows[0].images.length,1);
 assert(!JSON.stringify(rows).includes(photo),'board list remains lightweight');
 for(let i=0;i<2;i++)assert.equal((await ask(path,'POST',{data_url:photo},token)).status,201);
 assert.equal((await ask(path,'POST',{data_url:photo},token)).status,409,'at most three photos');
+assert.equal((await ask(path+'/'+first.image_id,'DELETE',null,otherToken)).status,403);
+
 const removed=await ask(path+'/'+first.image_id,'DELETE',null,token);
 assert.equal(removed.status,200);
 assert.equal((await ask(path+'/'+first.image_id,'GET',null,token)).status,404,'deleted image inaccessible');
+const adminAdd=await ask(path,'POST',{data_url:photo},otherToken,'',adminToken);
+assert.equal(adminAdd.status,201,'Admin can add a photo to another member memo');
+const adminImageId=(await adminAdd.json()).image_id;
+assert.equal((await ask(path+'/'+adminImageId,'DELETE',null,otherToken)).status,403,
+ 'Non-author without administrator session cannot delete photo');
+assert.equal((await ask(path+'/'+adminImageId,'DELETE',null,otherToken,'',adminToken)).status,200,
+ 'Verified administrator can delete a photo from another member memo');
 assert.equal((await ask('/board/invalid/images','POST',{data_url:photo},token)).status,404);
 assert.equal((await ask('/settings')).status,200);
 const publicJson=await (await ask('/settings')).text();

@@ -27,12 +27,13 @@ for(const field of ['officeBoard','officeBoardDraft','officeBoardPost','officeBo
 assert(html.includes("['officeBoard','사무실 메모']"));
 assert(css.includes('.officeBoardNote'));
 assert(!/localStorage|sessionStorage|\bfetch\(/.test(js),'Sensitive note content must not go to public storage/fetch');
+let userMode='family',userId='11111111-1111-1111-1111-111111111111';
 const elements=new Map(),calls=[];
 function el(id){if(!elements.has(id))elements.set(id,{innerHTML:'',textContent:'',value:'',disabled:false,
  classList:{add(){},remove(){}},addEventListener(){},querySelector(){return null},focus(){}});return elements.get(id)}
 const ctx=vm.createContext({
  window:{FirstHyundaiNative:{officeBoardAction:(action,data,id)=>calls.push({action,data,id}),
- requestOfficeBoardAccess(){}}},document:{getElementById:el},
+ requestOfficeBoardAccess(){},getMode:()=>userMode,getOfficeMemberId:()=>userId}},document:{getElementById:el},
  currentPage:'officeBoard',Date,Promise,setTimeout,clearTimeout,setInterval:()=>0,confirm:()=>true
 });
 vm.runInContext(dates,ctx);vm.runInContext(js,ctx);
@@ -54,5 +55,26 @@ ctx.window.onFirstHyundaiOfficeBoardResult({requestId:calls[0].id,ok:true,data:{
 await new Promise(done=>setTimeout(done,10));
 assert(el('officeBoardList').innerHTML.includes('3시 30분 방문'));
 assert.equal(el('officeBoardDraft').value,'');
+const own={...note,author:{id:userId,name:'작성자'}};
+const other={...note,id:'mhad4vwu-00000000-0000-0000-0000-000000000002',
+ author:{id:'22222222-2222-2222-2222-222222222222',name:'다른 가족'}};
+assert(api._test.canEditNote(own));
+assert(!api._test.canEditNote(other));
+api._test.merge([other]);
+let readOnly=el('officeBoardList').innerHTML;
+assert(readOnly.includes('작성자·관리자만 수정 가능'));
+assert(!readOnly.includes('data-action="edit"')&&!readOnly.includes('data-action="done"')&&
+ !readOnly.includes('data-action="photoAdd"'),
+ 'Non-owner sees read-only memo without modification controls');
+userMode='admin';
+assert(api._test.canEditNote(other),'Admin mode unlocks non-author controls');
+api._test.merge([other]);
+const adminMarkup=el('officeBoardList').innerHTML;
+assert(adminMarkup.includes('data-action="edit"')&&adminMarkup.includes('data-action="done"')&&
+ adminMarkup.includes('data-action="photoAdd"'),'Admin may edit any shared memo');
+userMode='family';
+api._test.merge([own]);
+assert(el('officeBoardList').innerHTML.includes('data-action="edit"'),
+ 'Original author retains edit controls');
 console.log('Office board UX, native bridge, freeform post and escaping passed.');
 })().catch(e=>{console.error(e);process.exitCode=1});

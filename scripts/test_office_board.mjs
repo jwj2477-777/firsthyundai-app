@@ -80,6 +80,22 @@ const alternateDevice='c'.repeat(32);
 const momSession=(await (await send('/board/session','POST',
  {code:'password8',member_id:momAccount.id,device:alternateDevice})).json()).token;
 assert.equal((await (await send('/board/accounts','GET',null,momSession)).json()).accounts.length,3);
+assert.equal((await send('/board','GET',null,momSession)).status,200,
+ 'All members may continue to read the shared memo');
+const parentNote='/board/'+item.id;
+for(const patch of [{text:'임의 수정 시도'},{done:true},{scheduled_at:null},{all_day:true}]){
+ assert.equal((await send(parentNote,'PATCH',patch,momSession)).status,403,
+  'Non-authors cannot modify contents, completion or scheduling');
+}
+const adminPatch=await send(parentNote,'PATCH',
+ {text:'관리자 승인 수정',done:false},momSession,'',adminToken);
+assert.equal(adminPatch.status,200,'Valid administrator can edit another family member note');
+assert.equal((await adminPatch.json()).note.author.id,member.id,
+ 'Admin edits never transfer original authorship');
+const ownerPatch=await send(parentNote,'PATCH',{text:'최초 작성자 재수정'},token);
+assert.equal(ownerPatch.status,200,'Original author keeps edit permission after admin changes');
+assert.equal((await send(parentNote,'PATCH',{text:'이름만으로 관리자 사칭'},momSession)).status,403);
+
 assert.equal((await send('/board/session','POST',
  {code:'password8',member_id:dadAccount.id,device:alternateDevice,reassign:true})).status,409,
  'A bare shared password cannot reassign an already bound device');

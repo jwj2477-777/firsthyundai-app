@@ -589,6 +589,10 @@ public class MainActivity extends Activity {
         @JavascriptInterface public String getOfficeMemberName(){
             return OfficeBoardClient.memberName(getApplicationContext());
         }
+        @JavascriptInterface public String getOfficeMemberId(){
+            // Expose only this handset's own non-secret account ID, never its board token.
+            return OfficeBoardClient.memberId(getApplicationContext());
+        }
         @JavascriptInterface public void requestOfficeMemberPicker(){
             final String authorized=adminSessionIdentity;
             runOnUiThread(()->{
@@ -638,7 +642,12 @@ public class MainActivity extends Activity {
                          !adminIdentity.equals(adminSessionIdentity)||adminToken==null||adminToken.isEmpty()))
                         throw new Exception("메모 삭제와 복구는 관리자모드에서만 가능합니다. 관리자모드로 로그인해 주세요.");
                     JSONObject incoming=new JSONObject(payload);
-                    JSONObject data=OfficeBoardClient.perform(getApplicationContext(),action,incoming,needsAdmin?adminToken:null);
+                    final boolean editAction=java.util.Arrays.asList(
+                        "edit","done","schedule","imageAdd","imageRemove").contains(action);
+                    final boolean authorizedAdmin=adminIdentity!=null&&!adminIdentity.isEmpty()&&
+                        adminIdentity.equals(adminSessionIdentity)&&adminToken!=null&&!adminToken.isEmpty();
+                    JSONObject data=OfficeBoardClient.perform(getApplicationContext(),action,incoming,
+                        (needsAdmin||editAction)&&authorizedAdmin?adminToken:null);
                     event.put("requestId",requestId).put("ok",true).put("data",data);
                 }catch(Exception e){
                     try{event.put("requestId",requestId).put("ok",false)

@@ -498,3 +498,8 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 
 #officeBoardImageRemove{min-height:44px;padding:9px 12px;background:transparent;color:#FFC5B8;
  border:1px solid #D78A83;border-radius:10px;font-weight:750;margin:0 7px 0 0}
+
+/* Read-only notes belong to everyone, editing belongs to the author/admin. */
+#officeBoard .officeBoardReadOnly{grid-column:1 / -1;display:block;min-height:32px;padding:7px 10px;
+ border-radius:9px;background:#F2F6F3;color:#657976;font-size:12px;line-height:1.5;text-align:center}
+#officeBoardImageRemove[hidden]{display:none!important}
