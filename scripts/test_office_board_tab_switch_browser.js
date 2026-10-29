@@ -92,7 +92,7 @@ async function verify(){
   document.getElementById('officeBoardMore').click();
   check(rows()===17,'Memo library Show More must reveal remaining notes');
   const search=document.getElementById('officeBoardSearch');
-  search.value='1502동 3004호';search.dispatchEvent(new Event('input',{bubbles:true}));
+  search.value='1502동3004호';search.dispatchEvent(new Event('input',{bubbles:true}));
   check(rows()===1&&document.getElementById('officeBoardList').textContent.includes('퍼스트파크'),
    'Search should find a specific apartment unit without scrolling');
   search.value='';search.dispatchEvent(new Event('input',{bubbles:true}));
