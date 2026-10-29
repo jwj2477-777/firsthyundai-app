@@ -28,8 +28,15 @@ export function fromKma(doc,now=Date.now()){
  const raw=String(measured?.obsrValue??'').trim();
  const temp=raw!==''&&Number.isFinite(Number(raw))&&Number(raw)>=-70&&Number(raw)<=70?
   Number(raw):null;
+ // RN1 is measured one-hour precipitation, not forecast probability.
+ // Only trust a same-time numeric value, never interpret missing data as 0mm.
+ const rainfall=rows.find(x=>x.category==='RN1'&&Number(x.nx)===55&&Number(x.ny)===123&&
+  x.baseDate===d&&x.baseTime===t);
+ const rawRain=String(rainfall?.obsrValue??'').trim();
+ const precip_mm=/^(?:\\d{1,3})(?:\\.\\d{1,2})?$/.test(rawRain)&&
+  Number(rawRain)>=0&&Number(rawRain)<=300?Number(rawRain):null;
  return {schema:1,status:'ok',effect:[2,3,6,7].includes(code)?'snow':[1,5].includes(code)?'rain':'none',
-  temp,observed_at:iso,provider:'기상청 초단기실황',area:'송도',grid:{nx:55,ny:123},
+  temp,precip_mm,observed_at:iso,provider:'기상청 초단기실황',area:'송도',grid:{nx:55,ny:123},
   source_url:'https://www.data.go.kr/data/15084084/openapi.do'};
 }
 async function collect(secret){
