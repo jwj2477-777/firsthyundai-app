@@ -4,9 +4,9 @@
 const $=id=>document.getElementById(id),bridge=window.FirstHyundaiNative;
 const requests=new Map(),localUpdates=new Map(),localDeletes=new Map();
 let sequence=0,items=[],busy=false,lastCheck=0,showCompleted=false,editing='',editDraft='',timer=null;
-let timerMs=45000,pendingFocus='',view='notes',scheduleOpen=false,suggestedDate='';
+let timerMs=45000,pendingFocus='',view='compose',scheduleOpen=false,suggestedDate='';
 let archiveOpen=false,archived=[];
-let composeOpen=false,memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10,finderTouched=false;
+let memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10,finderTouched=false;
 const PAGE_SIZE=10;
 const expandedNotes=new Set();
 let historyLoaded=false,historyLoading=false,refreshCycle=0;
@@ -20,8 +20,9 @@ function focusNote(id){
  memoStatus='all';memoAuthor='';memoQuery='';memoLimit=10;
  if($('officeBoardSearch'))$('officeBoardSearch').value='';
  if($('officeBoardAuthorFilter'))$('officeBoardAuthorFilter').value='';
+ // Opening a memo from an alert must select the memo library, never the composer.
  if(typeof currentPage!=='undefined'&&currentPage==='officeBoard'){
-  draw();refresh(true);
+  setView('notes');refresh(true);
  }
  return true;
 }
@@ -156,25 +157,28 @@ function drawCalendar(){
  }).join(''):'<p class="tiny">등록된 일정이 없습니다.</p>';
 }
 function syncViews(){
- const isCal=view==='calendar';
- // One tab, one job. The free-form composer and its feedback belong to notes,
- // not to the calendar. Keep the typed draft untouched when switching tabs.
- for(const id of ['officeBoardFeedback','officeBoardList','officeBoardListHeading','officeBoardComposeBar','officeBoardFinder']){
-  const e=$(id);
-  e?.classList?.toggle?.('hidden',isCal);
+ // Preserve the same tab dimensions / selected-color transitions, but give each
+ // view one clear job. Draft text and selected calendar date survive tab changes.
+ const compose=view==='compose',notes=view==='notes',calendar=view==='calendar';
+ for(const id of ['officeBoardList','officeBoardListHeading','officeBoardFinder']){
+  $(id)?.classList?.toggle?.('hidden',!notes);
  }
- $('officeBoardComposer')?.classList?.toggle?.('hidden',isCal||!composeOpen);
- $('officeBoardComposeToggle')?.setAttribute?.('aria-expanded',String(composeOpen&&!isCal));
- $('officeBoardCalendar')?.classList?.toggle?.('hidden',!isCal);
- $('officeBoardMore')?.classList?.toggle?.('hidden',isCal||filteredMemos().length<=memoLimit);
- for(const [id,selected] of [['officeBoardNotesView',!isCal],['officeBoardCalendarView',isCal]]){
-  const e=$(id);if(!e)continue;e.classList?.toggle?.('selected',selected);
-  e.setAttribute?.('aria-pressed',String(selected));
+ $('officeBoardComposer')?.classList?.toggle?.('hidden',!compose);
+ $('officeBoardCalendar')?.classList?.toggle?.('hidden',!calendar);
+ $('officeBoardArchive')?.classList?.toggle?.('hidden',!notes||!archiveOpen);
+ $('officeBoardMore')?.classList?.toggle?.('hidden',!notes||filteredMemos().length<=memoLimit);
+ for(const [id,selected] of [['officeBoardComposeView',compose],['officeBoardNotesView',notes],['officeBoardCalendarView',calendar]]){
+  const el=$(id);if(!el)continue;
+  el.classList?.toggle?.('selected',selected);
+  el.setAttribute?.('aria-pressed',String(selected));
  }
- if(isCal)drawCalendar();
+ if(calendar)drawCalendar();
 }
-function setView(next){if(next!=='calendar'&&next!=='notes')return;view=next;archiveOpen=false;
- $('officeBoardArchive')?.classList?.add?.('hidden');draw();}
+function setView(next){
+ if(!['compose','notes','calendar'].includes(next))return;
+ view=next;archiveOpen=false;
+ draw();
+}
 function chooseDay(key){if(!/^\d{4}-\d{2}-\d{2}$/.test(key))return;
  selectedDate=key;calendarMonth=key.slice(0,7);drawCalendar();}
 function changeMonth(delta){
@@ -186,7 +190,7 @@ function changeMonth(delta){
 }
 function today(){selectedDate=kstDate(new Date());calendarMonth=selectedDate.slice(0,7);drawCalendar()}
 function addAtSelectedDay(){
- setView('notes');$('officeBoardDraft')?.focus?.();
+ setView('compose');$('officeBoardDraft')?.focus?.();
 }
 function openCalendarNote(id){
  if(!valid(id))return;
@@ -213,9 +217,10 @@ $('officeBoardArchiveList')?.addEventListener?.('click',e=>{
 });
 $('officeBoardDraft')?.addEventListener?.('input',checkSuggestion);
 function toggleComposer(force){
- composeOpen=typeof force==='boolean'?force:!composeOpen;
- syncViews();
- if(composeOpen)$('officeBoardDraft')?.focus?.();
+ // Compatibility with previous app actions: editing now has its own stable tab.
+ const open=typeof force==='boolean'?force:view!=='compose';
+ setView(open?'compose':'notes');
+ if(open)$('officeBoardDraft')?.focus?.();
 }
 function setStatus(next){
  if(!['active','done','all'].includes(next))return;
@@ -492,9 +497,8 @@ function openBriefingNote(id){
  focusNote(id);
 }
 function openBriefingCalendar(){
- setView('calendar');
- today();
  if(typeof switchPage==='function')switchPage('officeBoard');
+ setView('calendar');today();
 }
 $('overviewMemoEntries')?.addEventListener?.('click',e=>{
  const button=e.target?.closest?.('button[data-brief-note]');
@@ -581,6 +585,9 @@ function enableNotifications(){
  bridge?.requestOfficeMemoNotifications?.();
 }
 function open(){
+ // Every fresh entry opens the writing screen; targeted alerts override this
+ // after navigation by selecting the memo library or calendar explicitly.
+ view='compose';
  $('officeBoardBirthdayAdd')?.classList?.toggle?.('hidden',bridge?.getMode?.()!=='admin');
  const account=$('officeBoardCurrentMember');
  if(account)account.textContent=bridge?.getOfficeMemberName?.()||'계정 연결 필요';
@@ -593,11 +600,11 @@ async function mutate(action,data){
   const result=await call(action,data);
   if(action==='delete')localDeletes.set(data.id,Date.now());
   else if(result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
-  if(action==='post'){$('officeBoardDraft').value='';checkSuggestion();if(!window.FirstHyundaiBoardImages?.pendingCount?.())composeOpen=false;}
+  if(action==='post'){$('officeBoardDraft').value='';checkSuggestion();}
   if(action==='restore'&&result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
   editing='';editDraft='';
   merge(items);
-  msg(action==='post'?'포스트잇을 붙였습니다. 다른 휴대폰에도 공유됩니다.':'메모가 반영됐습니다.');
+  msg(action==='post'?'메모를 공유했습니다. 메모함과 해당 날짜의 달력에서 확인할 수 있습니다.':'메모가 반영됐습니다.');
   return result;
  }catch(e){msg(e.message);return null}
  finally{busy=false;$('officeBoardPost').disabled=false}
@@ -615,7 +622,7 @@ async function post(){
  const result=await mutate('post',{text,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false});
  if(result?.note?.id&&photos?.pendingCount?.()){
   const saved=await photos.uploadPending(result.note.id);
-  composeOpen=!saved;syncViews();
+  if(!saved)setView('compose');else syncViews();
  }
 }
 function toggleBirthdayForm(show){
