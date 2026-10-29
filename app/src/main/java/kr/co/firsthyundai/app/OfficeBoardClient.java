@@ -209,6 +209,12 @@ final class OfficeBoardClient {
             if(!payload.has("scheduled_at"))throw new Exception("일정 날짜가 필요합니다.");
             return request("PATCH","/board/"+id,new JSONObject().put("scheduled_at",payload.opt("scheduled_at")),auth,adminToken);
         }
+        if("pin".equals(action)){
+            if(!payload.has("pinned")||!(payload.opt("pinned") instanceof Boolean))
+                throw new Exception("중요 메모 고정 값이 올바르지 않습니다.");
+            return request("PATCH","/board/"+id,
+                new JSONObject().put("pinned",payload.getBoolean("pinned")),auth,adminToken);
+        }
         if("done".equals(action)){
             if(!payload.has("done")||!(payload.opt("done") instanceof Boolean))throw new Exception("완료 표시 값이 올바르지 않습니다.");
             return request("PATCH","/board/"+id,new JSONObject().put("done",payload.getBoolean("done")),auth,adminToken);
