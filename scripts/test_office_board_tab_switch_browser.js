@@ -37,8 +37,13 @@ async function verify(){
   check(same(memo)&&same(calendar),'Memo and Calendar height differs from news');
   check(h(memo)===h(calendar),'Memo and calendar unequal height');
   check(memo.classList.contains('selected')&&!calendar.classList.contains('selected'),'Initial view should be notes');
-  check(!composer.classList.contains('hidden')&&list.classList.contains('officeBoardList'),'Memo composer missing');
+  const openComposer=document.getElementById('officeBoardComposeToggle');
+  check(openComposer&&composer.classList.contains('hidden')&&list.classList.contains('officeBoardList'),
+    'Memo library should be open while composer is collapsed by default');
   check(status.classList.contains('hidden'),'Healthy/pending notification banner should not display');
+  openComposer.click();
+  check(!composer.classList.contains('hidden')&&openComposer.getAttribute('aria-expanded')==='true',
+   'New memo button should open its own composer');
   draft.value='보존할 미발송 메모 초안';
   const mustard=getComputedStyle(memo).backgroundColor;
   check(mustard!==getComputedStyle(calendar).backgroundColor,'Active memo tab needs mustard contrast');
@@ -58,6 +63,11 @@ async function verify(){
     'Memo/calendar active color differs: '+getComputedStyle(calendar).backgroundColor+' vs '+mustard);
   memo.click();
   check(!composer.classList.contains('hidden')&&!list.classList.contains('hidden'),'Notes controls did not return');
+  openComposer.click();
+  check(composer.classList.contains('hidden')&&!list.classList.contains('hidden'),
+   'Closing composer must leave searchable memo library visible');
+  openComposer.click();
+  check(!composer.classList.contains('hidden'),'Composer must reopen with preserved draft');
   check(agenda.classList.contains('hidden'),'Calendar was not hidden');
   check(draft.value==='보존할 미발송 메모 초안','Draft lost after round trip');
   const nav=document.querySelector('#nav .officeBoardNav');
