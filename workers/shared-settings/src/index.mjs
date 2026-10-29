@@ -367,6 +367,10 @@ async function boardCommand(req,env,url,ctx){
    all_day:note.all_day===true,done:note.done===true});
  }
  if(url.pathname==="/board"&&req.method==="GET"){
+  // Older APKs call /board without offset. Preserve their original full-list
+  // response until all four family phones can update, using a private KV cache.
+  if(!url.searchParams.has("offset"))
+   return res({schema:1,notes:await boardList(env)});
   const offsetRaw=url.searchParams.get("offset")||"0";
   if(!/^\d{1,4}$/.test(offsetRaw)||Number(offsetRaw)>1000)
    return res({error:"invalid_page"},400);
