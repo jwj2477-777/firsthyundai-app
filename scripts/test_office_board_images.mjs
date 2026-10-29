@@ -65,13 +65,17 @@ assert(!JSON.stringify(rows).includes(photo),'board list remains lightweight');
 for(let i=0;i<2;i++)assert.equal((await ask(path,'POST',{data_url:photo},token)).status,201);
 assert.equal((await ask(path,'POST',{data_url:photo},token)).status,409,'at most three photos');
 assert.equal((await ask(path+'/'+first.image_id,'DELETE',null,otherToken)).status,403);
-assert.equal((await ask(path+'/'+first.image_id,'DELETE',null,otherToken,'',adminToken)).status,200,
- 'Verified admin can remove photos from other authors');
-assert.equal((await ask(path+'/'+first.image_id,'GET',null,otherToken)).status,404);
 
 const removed=await ask(path+'/'+first.image_id,'DELETE',null,token);
 assert.equal(removed.status,200);
 assert.equal((await ask(path+'/'+first.image_id,'GET',null,token)).status,404,'deleted image inaccessible');
+const adminAdd=await ask(path,'POST',{data_url:photo},otherToken,'',adminToken);
+assert.equal(adminAdd.status,201,'Admin can add a photo to another member memo');
+const adminImageId=(await adminAdd.json()).image_id;
+assert.equal((await ask(path+'/'+adminImageId,'DELETE',null,otherToken)).status,403,
+ 'Non-author without administrator session cannot delete photo');
+assert.equal((await ask(path+'/'+adminImageId,'DELETE',null,otherToken,'',adminToken)).status,200,
+ 'Verified administrator can delete a photo from another member memo');
 assert.equal((await ask('/board/invalid/images','POST',{data_url:photo},token)).status,404);
 assert.equal((await ask('/settings')).status,200);
 const publicJson=await (await ask('/settings')).text();
