@@ -117,7 +117,7 @@ final class OfficeBoardClient {
     static JSONObject liveToken(Context context) throws Exception {
         String auth=token(context);
         if(auth.isEmpty())throw new Exception("사무실 계정 인증이 필요합니다.");
-        return request("POST","/board/ai/live-token",new JSONObject(),auth);
+        return request("POST","/board/ai/live-token",new JSONObject().put("usage_protocol",2),auth);
     }
     /** Usage summary is account-scoped, and never includes private audio or contract data. */
     static JSONObject liveQuotaStatus(Context context) throws Exception {
