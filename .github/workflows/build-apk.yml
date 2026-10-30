@@ -250,6 +250,7 @@ jobs:
           node scripts/test_apartment_detail_navigation.js
           node scripts/test_area_contract_bridge.js
           node scripts/test_refresh_feedback.js
+          python -m unittest discover -s tests -p test_fee_school_gap_coverage.py -v
           node scripts/test_maintenance_trends.js
           node scripts/test_public_hub.js
           node scripts/test_office_on_demand.js
