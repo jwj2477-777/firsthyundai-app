@@ -169,6 +169,32 @@ def build_assignments(zones,points):
               'boundary_clearance_m':int(distance),'reference_date':'2026-09-20'})
     return rows
 
+def review_unmatched_zones(zones, points, catalog, confirmed):
+    """Give each missing site a precise verification *reason*, not an invented school."""
+    by_id={p['id']:p for p in points}
+    confirmed_ids={row['complex_id'] for row in confirmed}
+    reasons=[]
+    for complex_ in catalog:
+        ident=complex_.get('id')
+        if not ident or complex_.get('aggregate_only') or ident in confirmed_ids:
+            continue
+        p=by_id.get(ident)
+        if not p:
+            reason='address_unverified'
+        else:
+            matches=zone_matches(zones,p['lng'],p['lat'])
+            if not matches:reason='outside_official_polygon'
+            elif len(matches)>1:reason='overlapping_zones'
+            elif matches[0][0].get('kind')!='0':reason='joint_zone'
+            elif matches[0][1]<35:reason='near_boundary'
+            else:
+                # A verified normal polygon should have entered confirmed.
+                reason='requires_manual_review'
+        reasons.append({'complex_id':ident,'reason':reason,
+                        'reference_date':'2026-09-20'})
+    return reasons
+
+
 def main():
     zones=json.loads(ZONES.read_text(encoding='utf-8'))
     if len(zones.get('zones',[]))!=34 or zones.get('reference_date')!='2026-09-20':
@@ -202,6 +228,14 @@ def main():
                 updated=True
                 print('공식 도로명주소와 일치 확인된 지번',len(cadastral),'단지')
             assigns=build_assignments(zones['zones'],points)
+            reasons=review_unmatched_zones(zones['zones'],points,catalog,assigns)
+            current['zone_review']={
+              'state':'verification_pending','updated_at':stamp(),
+              'reference_date':zones['reference_date'],
+              'source_url':ZONE_SOURCE,'records':reasons,
+              'note':'아파트 배정학교 정보가 아닙니다. 원본 경계와 주소 검증이 부족한 이유만 나타냅니다.'}
+            updated=True
+            print('초등 통학구역 보류 사유 분류',len(reasons),'단지')
             if assigns:
                 current['elementary_zones']={'state':'verified_partial','updated_at':stamp(),
                   'reference_date':zones['reference_date'],'source_url':ZONE_SOURCE,
