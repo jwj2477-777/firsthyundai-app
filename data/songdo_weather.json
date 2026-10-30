@@ -1,8 +1,22 @@
 {
   "schema": 1,
-  "status": "partial",
-  "checked_at": "2026-10-30T07:33:48.497Z",
-  "observed": null,
+  "status": "ok",
+  "checked_at": "2026-10-30T08:35:35.007Z",
+  "observed": {
+    "schema": 1,
+    "status": "ok",
+    "effect": "none",
+    "temp": 18.6,
+    "precip_mm": 0,
+    "observed_at": "2026-10-30T16:00:00+09:00",
+    "provider": "기상청 초단기실황",
+    "area": "송도",
+    "grid": {
+      "nx": 55,
+      "ny": 123
+    },
+    "source_url": "https://www.data.go.kr/data/15084084/openapi.do"
+  },
   "forecast": {
     "schema": 1,
     "status": "ok",
@@ -10,20 +24,6 @@
     "date": "2026-10-30",
     "issued_at": "2026-10-30T14:00:00+09:00",
     "hours": [
-      {
-        "at": "2026-10-30T15:00:00+09:00",
-        "type": "none",
-        "pop": 0,
-        "temp": 18,
-        "sky": 1
-      },
-      {
-        "at": "2026-10-30T16:00:00+09:00",
-        "type": "none",
-        "pop": 0,
-        "temp": 18,
-        "sky": 1
-      },
       {
         "at": "2026-10-30T17:00:00+09:00",
         "type": "none",
