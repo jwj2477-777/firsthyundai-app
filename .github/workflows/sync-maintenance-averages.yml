@@ -7,6 +7,9 @@ on:
       - 'scripts/collect_maintenance_averages.py'
       - 'scripts/probe_maintenance_three_apis.py'
       - 'scripts/collect_official_maintenance.py'
+      - 'scripts/collect_public_fee_items.py'
+      - 'tests/test_fee_school_gap_coverage.py'
+      - 'data/maintenance_partial.json'
       - 'scripts/maintenance_history.py'
       - 'tests/test_maintenance_history.py'
       - 'tests/test_official_maintenance.py'
@@ -31,6 +34,8 @@ jobs:
           python-version: '3.11'
       - name: Check strict total/unit validation and no fabricated bills
         run: python -m unittest discover -s tests -p test_maintenance_averages.py -v
+      - name: Validate verified-only partial fee and school diagnostic safeguards
+        run: python -m unittest discover -s tests -p test_fee_school_gap_coverage.py -v
       - name: Test strict official fee aggregation and calibration
         run: python -m unittest discover -s tests -p test_official_maintenance.py -v
       - name: Protect verified month history and preserve missing-month gaps
@@ -43,11 +48,15 @@ jobs:
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
         run: python scripts/collect_official_maintenance.py
+      - name: Collect independently verified guard and cleaning fees without claiming a total
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+        run: python scripts/collect_public_fee_items.py
       - name: Publish source-validated public estimates only
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/maintenance_estimates.json
+          git add data/maintenance_estimates.json data/maintenance_partial.json
           if git diff --staged --quiet; then
             echo 'No newly verified total-rate data'; exit 0
           fi
