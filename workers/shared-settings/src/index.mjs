@@ -776,6 +776,10 @@ async function liveToken(req,env){
  if(!env.GEMINI_API_KEY)return res({error:"live_not_configured"},503);
  if(!(await env.AUTH_LIMITER.limit({key:"gemini-live-"+caller.member.id})).success)
   return res({error:"rate_limited"},429);
+ let requestData;try{requestData=await body(req,512)}catch(e){return res({error:"bad_request"},400)}
+ // Older APKs do not send a success callback. Preserve their previous
+ // immediate-charge behavior until each handset updates to usage_protocol 2.
+ const supportsAcknowledgment=requestData?.usage_protocol===2;
  try{
   const now=Date.now(),quota=await liveQuota(env,caller.member.id,now);
   if(quota.remaining<=0)return res({error:"daily_free_trial_limit",...quota},429);
@@ -798,6 +802,16 @@ async function liveToken(req,env){
   // Recheck after the remote call in case another device began in the meantime.
   const again=await liveQuota(env,caller.member.id,Date.now());
   if(again.remaining<=0)return res({error:"daily_free_trial_limit",...again},429);
+  if(!supportsAcknowledgment){
+   // Keep the legacy daily counter for v2.1.54 or earlier clients. This also
+   // prevents old phones bypassing the quota during a staggered APK rollout.
+   const legacyKey="fhd-live-daily-v1:"+caller.member.id+":"+liveDay(now);
+   const legacyUsed=Number(await env.SETTINGS.get(legacyKey)||"0");
+   await env.SETTINGS.put(legacyKey,String(legacyUsed+1),{expirationTtl:2*86400});
+   return res({token,model:LIVE_MODEL,expires_in_seconds:45,
+    limit_per_day:LIVE_MAX_DAILY,remaining:Math.max(0,again.remaining-1),
+    reset_at_kst:again.reset_at_kst});
+  }
   const sessionId=crypto.randomUUID(),ticketKey=livePrefix(caller.member.id,now)+sessionId;
   await env.SETTINGS.put(ticketKey,JSON.stringify({
    state:"pending",expires_at:Date.now()+LIVE_PENDING_MS}),{expirationTtl:2*86400});
