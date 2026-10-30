@@ -54,6 +54,8 @@ jobs:
         run: node scripts/test_office_board_images.mjs
       - name: Test scheduled reminders and FCM privacy
         run: node scripts/test_office_schedule_reminders.mjs
+      - name: Check verified Gemini Live token request format and free limits
+        run: node scripts/test_live_token_config.mjs
       - name: Deploy settings Worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
