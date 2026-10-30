@@ -1,3 +1,11 @@
+## 2026-10-30 · Cloudflare-only Live 토큰 연결 수정 (v2.1.53 APK 유지)
+- 실기기에서 `provider_model_unavailable` 오류 확인. 원인은 Google의 모델 자체가 아니라 Workers `/v1beta/auth_tokens` REST 요청에 포함하던 `liveConnectConstraints` 필드였다.
+- 개인 정보·음성 없이 기존 GitHub Secret으로 Google 인증 토큰 발급만 검증: 현재 모델 + 제한 필드 => HTTP 400 INVALID_ARGUMENT (unknown liveConnectConstraints); 같은 모델 + 기본 임시 토큰(uses=1, 만료/연결 시간만 설정) => HTTP 200. Google 권장 3.8 Live 역시 제한 필드가 있으면 HTTP 400이어서 모델 교체로 해결되지 않음.
+- 두 번째 실제 점검에서는 제한 없는 단기 토큰으로 `gemini-3.1-flash-live-preview` WebSocket setupComplete 응답 확인(마이크·계약·고객정보 미전송). 정확한 한국어 음성 대화 품질은 아직 실기기 별도 테스트 필요.
+- Workers 토큰 발급 요청의 잘못된 `liveConnectConstraints`만 제거. 기존 한 번만 사용, 새 연결 45초 이내, 세션 만료 8분, 서버 보관 API 키, 사무실 계정 인증, 호출 제한, 계정당 일일 6회, 무료 모델 코드, native 앱 자체 모델 고정 유지. 인증 토큰 자체의 **모델별 제한이 빠져 보안 범위는 다소 넓어지므로**, 1회 사용 및 초단기 만료와 서버 인증·비밀키 비노출을 유지한다.
+- `scripts/test_live_token_config.mjs`에서 Google 측 실제 수락된 최소 REST JSON 구조 및 상한 검사. Worker 배포 전에 회귀검사, 기존 음성 화면 검사 갱신.
+- APK 재설치 필요 없는 서버 측 수정. GitHub Actions Worker 배포 성공과 앱에서 새 대화 정상 진행은 반드시 구별한다. 무료 서비스 제공 정책을 변경하지 않았다.
+
 ## 2026-10-30 · v2.1.53 · Gemini Live 오류 구분 및 무료 한도 가시화
 - 사용자 실기기 스크린샷: 최초 음성 시작 단계에 "Live 연결을 사용할 수 없습니다. 현재 API 한도와 서버 설정을 확인해 주세요"라는 포괄 오류. **스크린샷만으로 6회 제한 또는 제공자 무료 한도 초과를 단정할 수 없음.**
 - 원인: `PublicLiveVoice.start()`의 인증 토큰 발급 중 예외가 전부 동일 문장으로 표시되고, `OfficeBoardClient.request()`가 비정상 HTTP 응답의 서버 오류 코드(일일 한도, 제한, 인증, 미설정, Google 인증 토큰 발급 거절)를 읽지 않았음.
