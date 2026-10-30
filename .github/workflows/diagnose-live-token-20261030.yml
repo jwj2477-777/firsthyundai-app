@@ -54,3 +54,36 @@ jobs:
               if status in [401,403,429] or status=='network_error': break
               if label=='current_restricted' and status==200: break
           PY
+      - name: Smoke-test minimal token WebSocket setup without sending voice
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python3 -m pip install --quiet websockets==15.0.1
+          python3 - <<'PY'
+          import os,json,urllib.request,asyncio,websockets
+          key=os.getenv('GEMINI_API_KEY','')
+          if not key:
+              print('NO_KEY')
+              raise SystemExit(0)
+          req=urllib.request.Request('https://generativelanguage.googleapis.com/v1beta/auth_tokens',
+              data=json.dumps({'uses':1}).encode(),method='POST',
+              headers={'x-goog-api-key':key,'Content-Type':'application/json'})
+          with urllib.request.urlopen(req,timeout=15) as res: ephemeral=json.load(res).get('name','')
+          assert len(ephemeral)>12
+          async def check():
+              uri='wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained?access_token='+ephemeral
+              try:
+                  async with websockets.connect(uri,open_timeout=15) as ws:
+                      await ws.send(json.dumps({'setup':{'model':'models/gemini-3.1-flash-live-preview',
+                          'generationConfig':{'responseModalities':['AUDIO']}}}))
+                      for i in range(2):
+                          raw=await asyncio.wait_for(ws.recv(),timeout=15)
+                          data=json.loads(raw)
+                          if 'setupComplete' in data:
+                              print('MINIMAL_TOKEN_WEBSOCKET_SETUP_OK')
+                              return
+                          print('MINIMAL_TOKEN_WEBSOCKET_REPLY',','.join(sorted(data.keys())[:4]))
+              except Exception as exc:
+                  print('MINIMAL_TOKEN_WEBSOCKET_FAILURE_CLASS',type(exc).__name__)
+          asyncio.run(check())
+          PY
