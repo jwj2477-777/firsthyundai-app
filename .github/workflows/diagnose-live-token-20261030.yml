@@ -87,3 +87,53 @@ jobs:
                   print('MINIMAL_TOKEN_WEBSOCKET_FAILURE_CLASS',type(exc).__name__)
           asyncio.run(check())
           PY
+      - name: Check contract-mode setup with tools and transcription, no microphone or customer content
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python3 -m pip install --quiet websockets==15.0.1
+          python3 - <<'PY'
+          import os,json,urllib.request,asyncio,websockets,datetime
+          key=os.getenv('GEMINI_API_KEY','')
+          if not key:
+              print('NO_KEY')
+              raise SystemExit(0)
+          now=datetime.datetime.now(datetime.timezone.utc)
+          def date(seconds): return (now+datetime.timedelta(seconds=seconds)).strftime('%Y-%m-%dT%H:%M:%SZ')
+          payload={'uses':1,'newSessionExpireTime':date(45),'expireTime':date(8*60)}
+          req=urllib.request.Request('https://generativelanguage.googleapis.com/v1beta/auth_tokens',
+              data=json.dumps(payload).encode(),method='POST',
+              headers={'x-goog-api-key':key,'Content-Type':'application/json'})
+          with urllib.request.urlopen(req,timeout=15) as response: token=json.load(response)['name']
+          assert len(token)>12
+          money=['price','contractDeposit','advance','interim','monthlyRent']
+          dates=['contractDate','interimDate','balanceDate','leaseStart','leaseEnd']
+          props={x:{'type':'INTEGER'} for x in money}
+          props.update({x:{'type':'STRING'} for x in dates})
+          props.update({'dealType':{'type':'STRING','enum':['매매','전세','월세']},
+              'leaseDuration':{'type':'STRING'},'balanceTime':{'type':'STRING'},'terms':{'type':'STRING'}})
+          setup={'setup':{'model':'models/gemini-3.1-flash-live-preview',
+             'generationConfig':{'responseModalities':['AUDIO']},
+             'systemInstruction':{'parts':[{'text':'한국어 계약조건을 검토하되 고객 개인정보를 묻지 마세요.'}]},
+             'inputAudioTranscription':{},'outputAudioTranscription':{},
+             'tools':[{'functionDeclarations':[{'name':'propose_contract_conditions',
+                'description':'사용자가 명시한 계약조건 후보만 제안.',
+                'parameters':{'type':'OBJECT','properties':props}}]}]}}
+          async def probe():
+              url='wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained?access_token='+token
+              try:
+                  async with websockets.connect(url,open_timeout=15) as ws:
+                      await ws.send(json.dumps(setup,ensure_ascii=False))
+                      for _ in range(3):
+                          raw=await asyncio.wait_for(ws.recv(),timeout=18)
+                          obj=json.loads(raw)
+                          if 'setupComplete' in obj:
+                              print('CONTRACT_FULL_SETUP_OK_NO_AUDIO')
+                              return
+                          print('CONTRACT_SETUP_SERVER_RESPONSE_KEYS',','.join(sorted(obj.keys())[:5]))
+              except websockets.exceptions.ConnectionClosed as e:
+                  print('CONTRACT_SETUP_CLOSED_CODE',e.rcvd.code if e.rcvd else 'unknown')
+              except Exception as e:
+                  print('CONTRACT_SETUP_EXCEPTION_CLASS',type(e).__name__)
+          asyncio.run(probe())
+          PY
