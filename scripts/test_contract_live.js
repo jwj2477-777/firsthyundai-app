@@ -18,6 +18,12 @@ const c=vm.createContext({window:win,document:{getElementById:el,createElement:e
 for(const name of ['contracts.js','contracts-smart.js','contracts-language.js','contracts-easy.js','contract-live.js'])
  vm.runInContext(read('app/src/main/assets/'+name),c);
 const live=win.FirstHyundaiContractLive;
+win.onFirstHyundaiLiveQuotaStatus({limit:6,used:2,pending:1,remaining:3,reset_at_kst:'2026-10-31 오전 9시'});
+assert(el('cl_quota').textContent.includes('3/6회')&&el('newsLiveVoiceQuota').textContent.includes('3/6회'));
+assert(el('cl_quota').textContent.includes('2026-10-31 오전 9시'));
+assert(!el('cl_quota').hidden&&!el('newsLiveVoiceQuota').hidden);
+win.onFirstHyundaiLiveQuotaStatus({limit:6,used:0,pending:0,remaining:6,reset_at_kst:'not-a-date'});
+assert(el('cl_quota').textContent.includes('3/6회'),'Reject invalid status payload');
 assert.equal(requests.length,0);
 for(const k of ['rough','specialMemo','bank','account','accountHolder','owner','buyer','unit','property','address'])el('ct_'+k).value='SYNTHETIC_PRIVATE_'+k;
 el('ct_terms').value='기존 특약 보존.';el('ct_price').value='80000';el('ct_contractDeposit').value='8000';
