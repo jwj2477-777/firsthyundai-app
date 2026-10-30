@@ -119,6 +119,22 @@ final class OfficeBoardClient {
         if(auth.isEmpty())throw new Exception("사무실 계정 인증이 필요합니다.");
         return request("POST","/board/ai/live-token",new JSONObject(),auth);
     }
+    /** Usage summary is account-scoped, and never includes private audio or contract data. */
+    static JSONObject liveQuotaStatus(Context context) throws Exception {
+        String auth=token(context);
+        if(auth.isEmpty())throw new Exception("사무실 계정 인증이 필요합니다.");
+        return request("GET","/board/ai/live-status",null,auth);
+    }
+    /** Mark microphone-ready or explicitly aborted. A confirmed session cannot be refunded. */
+    static JSONObject liveSession(Context context,String sessionId,String action) throws Exception {
+        if(sessionId==null||!sessionId.matches("[0-9a-f-]{36}")||
+            !("ready".equals(action)||"abort".equals(action)))
+            throw new Exception("Live 세션 확인 정보가 올바르지 않습니다.");
+        String auth=token(context);
+        if(auth.isEmpty())throw new Exception("사무실 계정 인증이 필요합니다.");
+        return request("POST","/board/ai/live-session",
+            new JSONObject().put("session_id",sessionId).put("action",action),auth);
+    }
     static JSONObject activity(Context context) throws Exception {
         String auth=token(context);
         if(auth.isEmpty())throw new Exception("사무실 보안 인증 필요");
