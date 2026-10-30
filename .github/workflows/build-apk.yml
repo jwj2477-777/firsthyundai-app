@@ -382,25 +382,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.52 contract Live consistency APK
+      - name: Publish v2.1.53 Live diagnostics APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.52.apk
-          unzip -t FirstHyundai-v2.1.52.apk | grep 'No errors detected'
-          if gh release view v2.1.52 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.53.apk
+          unzip -t FirstHyundai-v2.1.53.apk | grep 'No errors detected'
+          if gh release view v2.1.53 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.52 FirstHyundai-v2.1.52.apk \
+            gh release create v2.1.53 FirstHyundai-v2.1.53.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.52 · AI 계약조건 금액·날짜 검증 강화' \
-              --notes '기존 선택형 계약조건 Live에 대화 중 금액과 날짜 간 모순 검사를 추가했습니다. 계약금/총액, 송금액/계약금, 중도금 합계, 계약일/잔금일, 입주일/종료일의 상호 충돌을 감지하면 AI가 다시 확인하도록 안내하며 잘못된 후보는 보류합니다. 기존 메모와 직접 입력한 계좌·고객 개인정보는 Live에 보내지 않으며 기본 수동 작성은 유지합니다. 신규 AI나 유료 사용은 추가하지 않았습니다. 실제 삼성 휴대폰 음성 품질은 별도 검증이 필요합니다. v2.1.52/build203.'
+              --title '퍼스트현대 v2.1.53 · Gemini Live 연결 오류 원인 안내 강화' \
+              --notes 'Gemini Live 연결 실패 원인을 사용자에게 구분해서 알려줍니다. 일일 6회 앱 제한, Google 무료 API 사용량 제한, 인증 만료, API 키 설정 및 모델 접근 오류를 각각 안내합니다. 사용량을 조회하거나 추가 요청하지 않으며 기존 계약 작성·뉴스·메모·실거래 기능과 무료 호출 횟수는 그대로 유지합니다. 실제 제공자 원인은 다음 재시도에서 확인할 수 있습니다. v2.1.53/build204.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.52 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.52 --apk FirstHyundai-v2.1.52.apk
+          gh release upload v2.1.53 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.53 --apk FirstHyundai-v2.1.53.apk
 
 
 
