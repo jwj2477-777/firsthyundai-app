@@ -156,14 +156,14 @@ final class PublicLiveVoice {
                         }catch(Exception ignored){}
                     }
                     @Override public void onFailure(WebSocket ws,Throwable t,Response response){
-                        if(running){event("error","Live 연결이 끊겼습니다. 무료 사용 한도나 네트워크를 확인해 주세요.");stop();}
+                        if(running){event("error",LiveFailureReason.websocket(response==null?0:response.code()));stop();}
                     }
                     @Override public void onClosed(WebSocket ws,int code,String reason){
                         if(running)stop();
                     }
                 });
             }catch(Exception e){
-                if(running){event("error","Live 연결을 사용할 수 없습니다. 현재 API 한도와 서버 설정을 확인해 주세요.");stop();}
+                if(running){event("error",LiveFailureReason.display(e));stop();}
             }
         });
     }
