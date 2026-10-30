@@ -1,3 +1,8 @@
+## 2026-10-30 · v2.1.54 · Live 연결 후 멈춤 원인
+- 실제 Gemini Live 서버는 setupComplete를 바이너리 WebSocket 프레임으로 전송. 기존 Android는 String 오버로드만 구현하여 정상 응답을 받지 못하고 마이크 활성화도 안 됨.
+- 바이너리 프레임을 UTF-8 JSON으로 디코딩하여 기존 JSON 파서로 전달. 준비 상태와 실제 청취 상태를 구분하고 예상치 못한 종료를 표시.
+- 기존 계정·계약 메모·무료 API·사용자정보 보호 유지. 자동 테스트 및 APK 릴리스/실기기 확인 필요.
+
 ## 2026-10-30 · Gemini Live 연결 차단 원인 실측 및 서버 수정
 - v2.1.53 APK의 정확한 오류 안내 덕분에 실제 Google ephemeral token 요청의 `liveConnectConstraints` 필드 오류(HTTP 400)를 진단. 기존/새 모델 모두 동일 오류, 필드 없는 임시 토큰은 200 및 실제 WebSocket 설정 성공.
 - 모델 변경이나 APK 변경 없이 Cloudflare 서버 토큰 발급 요청만 간소화. 1회·45초·8분·일일 6회 제한 및 기존 사무실 로그인·API 키 비밀 보관 유지.
