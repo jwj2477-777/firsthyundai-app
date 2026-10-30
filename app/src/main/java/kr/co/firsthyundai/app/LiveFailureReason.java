@@ -5,6 +5,12 @@ import org.json.JSONObject;
 /** Safe, actionable Live error labels. Never exposes tokens, keys, server bodies or client data. */
 final class LiveFailureReason {
     private LiveFailureReason() {}
+    private static String nextResetKst(){
+        java.time.ZonedDateTime now=java.time.ZonedDateTime.now(java.time.ZoneId.of("Asia/Seoul"));
+        java.time.ZonedDateTime reset=now.toLocalTime().isBefore(java.time.LocalTime.of(9,0))
+            ?now:now.plusDays(1);
+        return reset.getMonthValue()+"월 "+reset.getDayOfMonth()+"일 오전 9시";
+    }
 
     private static String codeFor(int status,String responseBody){
         String code="";
@@ -12,6 +18,7 @@ final class LiveFailureReason {
         catch(Exception ignored){}
         switch(code){
             case "daily_free_trial_limit":
+            case "daily_attempt_limit":
             case "rate_limited":
             case "provider_quota":
             case "provider_access_denied":
@@ -34,7 +41,11 @@ final class LiveFailureReason {
         String reason=failure==null?"":String.valueOf(failure.getMessage());
         switch(reason){
             case "FHD_LIVE_daily_free_trial_limit":
-                return "이 사무실 계정은 오늘 Live 6회 제한에 도달했습니다. 한국시간 오전 9시 이후 다시 이용하거나 기존 계약 메모를 사용해 주세요.";
+                return "이 사무실 계정은 오늘 Live 6회 제한에 도달했습니다. 다음 초기화: "
+                    +nextResetKst()+" · 기존 계약 메모는 계속 사용할 수 있습니다.";
+            case "FHD_LIVE_daily_attempt_limit":
+                return "오늘 Live 연결 시도가 매우 많았습니다. 다음 초기화: "
+                    +nextResetKst()+" · 기존 메모 작성은 계속 사용할 수 있습니다.";
             case "FHD_LIVE_rate_limited":
                 return "짧은 시간에 Live 연결 요청이 많았습니다. 잠시 후 다시 시도해 주세요.";
             case "FHD_LIVE_provider_quota":
