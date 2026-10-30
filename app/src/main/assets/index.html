@@ -2060,7 +2060,7 @@ function renderPublicComplexInfo(p){
      x.method==='official_kapt_two_item_only'&&/^20[0-9]{4}$/.test(x.month||'')&&
      Number.isSafeInteger(x.guard_won)&&x.guard_won>=0&&
      Number.isSafeInteger(x.clean_won)&&x.clean_won>=0&&
-     Number.isSafeInteger(x.residential_exclusive_total_m2)&&x.residential_exclusive_total_m2>=300&&
+     Number.isFinite(x.residential_exclusive_total_m2)&&x.residential_exclusive_total_m2>=300&&x.residential_exclusive_total_m2<=1000000&&
      x.guard_won+x.clean_won>0&&safeLink(x.source_url)):null;
  const partialMessage=partial?
   '<div class="apiNotice"><strong>전체 관리비 자료는 아직 검증 중입니다.</strong>'+
