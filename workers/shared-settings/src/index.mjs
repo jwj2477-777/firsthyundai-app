@@ -691,6 +691,17 @@ async function body(req,maxBytes=2400){
    Full Gemini key stays ONLY in Worker secret; private notes and contracts are
    never read or passed to Gemini here. Native device gets a single-use token. */
 const LIVE_MODEL="gemini-3.1-flash-live-preview", LIVE_MAX_DAILY=6;
+/* Google's v1beta/auth_tokens REST backend rejects liveConnectConstraints with
+   INVALID_ARGUMENT even though the public REST example shows it. A one-use,
+   45-second-start / 8-minute lifetime token is accepted and Live setup works.
+   Model is fixed by our native app, and no private app state is sent here. */
+function liveTokenRequestConfig(now){
+ return {
+  uses:1,
+  newSessionExpireTime:new Date(now+45_000).toISOString(),
+  expireTime:new Date(now+8*60_000).toISOString()
+ };
+}
 async function liveToken(req,env){
  if(req.method!=="POST")return res({error:"method_not_allowed"},405);
  if(req.headers.has("origin"))return res({error:"native_only"},403);
@@ -706,14 +717,9 @@ async function liveToken(req,env){
  const day=new Date().toISOString().slice(0,10),quotaKey="fhd-live-daily-v1:"+caller.member.id+":"+day;
  const used=Number(await env.SETTINGS.get(quotaKey)||"0");
  if(used>=LIVE_MAX_DAILY)return res({error:"daily_free_trial_limit"},429);
- const now=Date.now();
- const config={
-  uses:1,
-  newSessionExpireTime:new Date(now+45_000).toISOString(),
-  expireTime:new Date(now+8*60_000).toISOString(),
-  liveConnectConstraints:{model:"models/"+LIVE_MODEL,
-    config:{responseModalities:["AUDIO"]}}
- };
+ // Minimal documented REST token payload: fixed one-use and short expiries.
+ // The client still sends the same allowed Gemini Live model in its setup.
+ const config=liveTokenRequestConfig(Date.now());
  try{
   const response=await fetch("https://generativelanguage.googleapis.com/v1beta/auth_tokens",{
    method:"POST",
@@ -769,6 +775,6 @@ export default {async scheduled(event,env,ctx){
   await env.SETTINGS.put(key,JSON.stringify(record));return res(record);
  }
  return res({error:"not_found"},404);
-},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,memberList,boardToken,validBoardToken,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision,timedMemoDue,deliverDueReminders}};
+},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,memberList,boardToken,validBoardToken,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision,timedMemoDue,deliverDueReminders,liveTokenRequestConfig}};
 
 
