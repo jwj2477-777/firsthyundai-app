@@ -80,6 +80,7 @@
   $('cl_consent').checked=false;$('cl_transcript').textContent='';render();
   status('기존 메모는 보내지 않습니다. 이번 대화에서 말씀하신 조건만 정리합니다.');
   dialog.showModal();$('cl_close').focus();
+  root.FirstHyundaiNative?.requestLiveQuotaStatus?.();
  }
  function start(){
   if(active||stopping)return;
@@ -119,6 +120,7 @@
   if(state==='ended'){
    active=false;stopping=false;buttons();$('cl_transcript').textContent='';
    if(!failed)status(Object.keys(proposals).length?'대화가 끝났습니다. 조건을 확인하고 반영할 항목을 선택해 주세요.':message);
+   root.FirstHyundaiNative?.requestLiveQuotaStatus?.();
    return;
   }
   if(!active||stopping)return;
@@ -157,6 +159,19 @@
   if($('cl_dialog').open){close();return true;}
   return originalBack?originalBack.apply(this,arguments):false;
  };
+ function showQuota(q){
+  if(!q||!Number.isInteger(q.limit)||!Number.isInteger(q.remaining)||!Number.isInteger(q.used)||
+      q.limit<1||q.limit>100||q.remaining<0||q.used<0)return;
+  const pending=Number.isInteger(q.pending)&&q.pending>0?q.pending:0;
+  const reset=String(q.reset_at_kst||'');
+  if(!/^\\d{4}-\\d{2}-\\d{2} 오전 9시$/.test(reset))return;
+  const label='오늘 Live 남은 '+q.remaining+'/'+q.limit+'회'
+    +(pending?' (연결 준비 중 '+pending+'회)':'')+' · 다음 초기화: '+reset;
+  for(const id of ['cl_quota','newsLiveVoiceQuota']){
+   const el=$(id);if(el){el.hidden=false;el.textContent=label;}
+  }
+ }
+ root.onFirstHyundaiLiveQuotaStatus=showQuota;
  root.onFirstHyundaiContractLiveStatus=incoming;
  root.FirstHyundaiContractLive={open,start,stop,close,apply,onPageChange(page){if(page!=='contracts'&&$('cl_dialog').open)close();},_test:{normalize,validDate,consistency}};
 })(window);
