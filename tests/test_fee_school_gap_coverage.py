@@ -28,7 +28,7 @@ class OfficialFeePartials(unittest.TestCase):
    if code==REFERENCE_CODE:return dict(REFERENCE)
    if month=='202608':return {'guard':1200000,'clean':900000}
    return None
-  basic={'kaptCode':'A10027930','privArea':'14000'}
+  basic={'kaptCode':'A10027930','privArea':'14000.25'}
   output=collect([apt],'fake',get_items=items,get_basic=lambda *a:basic,
    match=lambda catalog,row:[apt],target_months=['202608'],pause=0)
   self.assertEqual(output['success_count'],1)
@@ -36,7 +36,7 @@ class OfficialFeePartials(unittest.TestCase):
   self.assertEqual(record['guard_won'],1200000)
   self.assertEqual(record['clean_won'],900000)
   self.assertEqual(record['month'],'202608')
-  self.assertEqual(record['residential_exclusive_total_m2'],14000)
+  self.assertEqual(record['residential_exclusive_total_m2'],14000.25)
   self.assertNotIn('won_per_exclusive_m2',record)
   self.assertNotIn('monthly_total_won',record)
   self.assertIn('일부',record['basis'])
