@@ -37,6 +37,7 @@ assert(native.includes('LiveFailureReason.websocket('));
 const liveErrors=read('app/src/main/java/kr/co/firsthyundai/app/LiveFailureReason.java');
 const client=read('app/src/main/java/kr/co/firsthyundai/app/OfficeBoardClient.java');
 assert(client.includes('LiveFailureReason.fromHttp(status,bytes.toString("UTF-8"))'));
+assert(client.includes('new JSONObject().put("usage_protocol",2)'),'Android must opt in to v2 quota accounting');
 for(const code of ['daily_free_trial_limit','provider_quota','rate_limited','live_not_configured','account_session_required','provider_access_denied','provider_model_unavailable'])
  assert(liveErrors.includes('FHD_LIVE_'+code),'Specific Live error must not disappear: '+code);
 assert(worker.includes('response.status===429?"provider_quota"'));
