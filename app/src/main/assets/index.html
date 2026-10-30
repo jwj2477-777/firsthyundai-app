@@ -1958,7 +1958,7 @@ function renderComplexes(){
  if(role==='admin'&&window.firstHyundaiDraftCount)$('catalogDraftNotice').textContent='이 기기의 미게시 수정: '+number(window.firstHyundaiDraftCount())+'개 단지';
 }
 // Source-backed optional integrations. Never treat an unapproved service as 0 records.
-let publicServices=null,schoolDistrictData=null,maintenanceEstimates=null;
+let publicServices=null,schoolDistrictData=null,maintenanceEstimates=null,maintenancePartial=null;
 const PUBLIC_SRC={
  school:'https://open.neis.go.kr/portal/data/service/selectServicePage.do?infId=OPEN17020190531110010104913&infSeq=2',
  schoolLocation:'https://www.data.go.kr/data/15021148/standard.do',
@@ -2053,6 +2053,22 @@ function renderPublicComplexInfo(p){
    average.won_per_exclusive_m2:null;
  const trend=picked&&typeof FirstHyundaiMaintenance!=='undefined'?FirstHyundaiMaintenance.summarize(
    maintenanceEstimates,p.id,p.kapt_code,Number(picked.exclusive_m2)):null;
+ // Never substitute partial cost items for a complete maintenance estimate.
+ const partial=maintenancePartial?.state==='verified_partial'&&
+   Array.isArray(maintenancePartial.records)?maintenancePartial.records.find(x=>
+     x?.complex_id===p.id&&x.kapt_code===p.kapt_code&&
+     x.method==='official_kapt_two_item_only'&&/^20[0-9]{4}$/.test(x.month||'')&&
+     Number.isSafeInteger(x.guard_won)&&x.guard_won>=0&&
+     Number.isSafeInteger(x.clean_won)&&x.clean_won>=0&&
+     Number.isSafeInteger(x.residential_exclusive_total_m2)&&x.residential_exclusive_total_m2>=300&&
+     x.guard_won+x.clean_won>0&&safeLink(x.source_url)):null;
+ const partialMessage=partial?
+  '<div class="apiNotice"><strong>전체 관리비 자료는 아직 검증 중입니다.</strong>'+
+  '<p class="tiny">공식 K-apt '+escapeHtml(partial.month.slice(0,4)+'년 '+Number(partial.month.slice(4))+'월')+
+  ' 일부 항목만 확인: 단지 전체 경비비 '+escapeHtml(Math.round(partial.guard_won/10000).toLocaleString('ko-KR'))+
+  '만원 · 청소비 '+escapeHtml(Math.round(partial.clean_won/10000).toLocaleString('ko-KR'))+
+  '만원. 이것은 단지 전체의 두 비용 항목으로, 전체 관리비나 세대별 관리비가 아닙니다.</p>'+
+  sourceLink(partial.source_url,'공식 K-apt 공용관리비 API')+'</div>':'';
  const phone=String(p.management_phone||'').replace(/[^0-9+]/g,'');
  const options=types.length?'<div class="neisLevelButtons">'+types.map((t,i)=>{
    const py=typeof supplyPyeong==='function'?supplyPyeong(t.supply_m2,t.market_pyeong):null;
@@ -2070,8 +2086,8 @@ function renderPublicComplexInfo(p){
    sourceLink(average.source_url,'K-apt 기반 공개 원문 확인'):
    item?
    '<p class="practiceNote"><strong>'+escapeHtml(item.monthly_won.toLocaleString('ko-KR'))+'원</strong> · '+escapeHtml(item.month)+'월 직접 확인 고지액</p>'+sourceLink(item.source_url,'고지액 근거 확인'):
-   '<p class="practiceNote">'+escapeHtml(picked.supply_label)+'타입의 월평균 관리비 단가 수집·검증 중입니다.</p>':
-   '<p class="practiceNote">평형·타입 정보 확인 전입니다.</p>';
+   '<p class="practiceNote">'+escapeHtml(picked.supply_label)+'타입의 월평균 관리비 전체 합계는 확인 중입니다.</p>'+partialMessage:
+   '<p class="practiceNote">평형·타입 정보 확인 전입니다.</p>'+partialMessage;
  return '<div class="apiInfoCards"><article><strong>평형별 월 관리비</strong>'+
   '<p class="tiny">평형을 선택하면 월 관리비 수준을 1만원 단위로 확인할 수 있습니다.</p>'+options+bill+
   (phone?'<a class="btn" href="tel:'+escapeHtml(phone)+'">관리사무소 문의 '+escapeHtml(p.management_phone||'')+'</a>':'')+
@@ -2260,11 +2276,15 @@ function renderPublicSubscriptions(){
 }
 async function refreshPublicServices(manual=false){
  try{
-  const [district,averages,doc]=await Promise.all([
+  const [district,averages,partials,doc]=await Promise.all([
     fetchRemote('school_districts').catch(()=>null),
     fetchRemote('maintenance_estimates').catch(()=>null),
+    fetchRemote('maintenance_partial').catch(()=>null),
     fetchRemote('public_services')
   ]);
+  if(partials?.schema_version===1&&
+    ['verified_partial','awaiting_verified_source'].includes(partials.state)&&
+    Array.isArray(partials.records))maintenancePartial=partials;
   if(averages?.schema_version===1&&['verified_partial','awaiting_verified_source'].includes(averages.state)&&Array.isArray(averages.records))maintenanceEstimates=averages;
   if(district?.schema_version===1 && district.elementary_zones && district.schoolinfo)
     schoolDistrictData=district;
