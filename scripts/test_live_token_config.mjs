@@ -26,6 +26,8 @@ assert(worker.includes('LIVE_MAX_ATTEMPTS=48'),'Unsuccessful requests must have 
 assert(worker.includes('liveSession(req,env)'),'Confirm or abort a temporary ticket');
 assert(worker.includes('liveStatus(req,env)'),'Expose account-scoped remaining usage');
 assert(worker.includes('state:"pending"'),'Token issuance must not immediately charge usage');
+assert(worker.includes('const supportsAcknowledgment=requestData?.usage_protocol===2'),'Only updated clients use deferred charging');
+assert(worker.includes('const legacyKey="fhd-live-daily-v1:"'),'Old APKs must not bypass free quota');
 assert(worker.includes('if(!quotaConfirmed)reportQuota("abort")')===false,'Worker and native concerns must stay separate');
 assert(worker.includes('if(!env.GEMINI_API_KEY)'),'API key must stay in Worker Secret');
 console.log('Live REST compatibility: single-use/45s/8min, private key, daily quota and fixed client model passed.');
