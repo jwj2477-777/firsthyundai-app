@@ -126,6 +126,7 @@ jobs:
                       await ws.send(json.dumps(setup,ensure_ascii=False))
                       for _ in range(3):
                           raw=await asyncio.wait_for(ws.recv(),timeout=18)
+                          print('CONTRACT_SETUP_FRAME_TYPE','binary' if isinstance(raw,bytes) else 'text')
                           obj=json.loads(raw)
                           if 'setupComplete' in obj:
                               print('CONTRACT_FULL_SETUP_OK_NO_AUDIO')
