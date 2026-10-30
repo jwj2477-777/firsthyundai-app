@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/collect_schoolinfo.py'
+      - 'tests/test_fee_school_gap_coverage.py'
       - 'data/school_zones_yeonsu.json'
       - 'data/school_districts.json'
       - 'data/complexes.json'
@@ -30,6 +31,8 @@ jobs:
           python-version: '3.11'
       - name: Confirm shapefile-derived zone polygons and provider safeguards
         run: python -m unittest discover -s tests -p test_school_districts.py -v
+      - name: Check unverified-school reason classification
+        run: python -m unittest discover -s tests -p test_fee_school_gap_coverage.py -v
       - name: Retrieve approved Schoolinfo and verify exact address geocoding
         env:
           SCHOOLINFO_API_KEY: ${{ secrets.SCHOOLINFO_API_KEY }}

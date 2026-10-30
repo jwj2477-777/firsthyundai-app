@@ -1915,13 +1915,26 @@ function renderComplexes(){
   const district=schoolDistrictData?.elementary_zones;
   const match=district?.state==='verified_partial' && Array.isArray(district.records)?
     district.records.find(x=>x.complex_id===p.id && x.kind==='elementary_zone_reference'):null;
+  const schoolReview=schoolDistrictData?.zone_review?.state==='verification_pending'&&
+   Array.isArray(schoolDistrictData.zone_review.records)?
+   schoolDistrictData.zone_review.records.find(x=>x.complex_id===p.id):null;
+  const reviewReason=({
+   address_unverified:'해당 단지의 정확한 도로명주소 좌표를 확인하지 못했습니다.',
+   outside_official_polygon:'공식 통학구역 도형 내부로 확인되지 않았습니다.',
+   overlapping_zones:'공식 통학구역 여러 개가 겹쳐 단일 학교를 표시할 수 없습니다.',
+   joint_zone:'공동통학구역으로 단일 배정학교를 확정할 수 없습니다.',
+   near_boundary:'공식 통학구역 경계에서 가까워 단일 학교 판단을 보류했습니다.',
+   requires_manual_review:'공식 학구도와 단지 자료의 추가 대조가 필요합니다.'
+  })[schoolReview?.reason]||'도로명주소 좌표·공식 통학구역 경계를 추가 확인해야 합니다.';
   const zoneCard=match?
     '<div class="complexSchoolRow schoolZoneReference"><span>초등학교 · 공식 통학구역 참고</span>'+
     '<strong>'+escapeHtml(match.zone_name.replace(/통학구역$/,''))+'</strong>'+
     '<span class="tiny">공식 학구도 '+escapeHtml(match.reference_date||'')+
     ' 기준 · 단지 도로명주소 좌표와 경계를 대조한 결과입니다. 실제 입학 배정은 교육지원청에 확인해 주세요.</span>'+
     sourceLink('https://schoolzone.emac.kr/','공식 학구도 원문 확인')+'</div>':
-    '<div class="apiNotice">이 단지의 공식 초등학교 통학구역은 아직 주소 좌표·경계 검증 전입니다. 통학구역은 근처 학교와 다를 수 있습니다.</div>';
+    '<div class="apiNotice"><strong>초등 통학구역 검증 보류</strong> · '+escapeHtml(reviewReason)+
+    ' 인근 학교가 배정학교라는 뜻은 아닙니다. '+
+    sourceLink(PUBLIC_SRC.zone,'공식 학구도 확인')+'</div>';
   const schoolView=schools.length?'<div class="complexSchoolList">'+schools.slice(0,25).map(x=>
     '<div class="complexSchoolRow"><span>'+escapeHtml(x.level)+' · '+(x.classification==='assigned'?'배정학교 확인':'인근 참고학교 (배정 미확인)')+'</span>'+
     '<strong>'+escapeHtml(x.name)+'</strong>'+
@@ -1945,7 +1958,7 @@ function renderComplexes(){
  if(role==='admin'&&window.firstHyundaiDraftCount)$('catalogDraftNotice').textContent='이 기기의 미게시 수정: '+number(window.firstHyundaiDraftCount())+'개 단지';
 }
 // Source-backed optional integrations. Never treat an unapproved service as 0 records.
-let publicServices=null,schoolDistrictData=null,maintenanceEstimates=null;
+let publicServices=null,schoolDistrictData=null,maintenanceEstimates=null,maintenancePartial=null;
 const PUBLIC_SRC={
  school:'https://open.neis.go.kr/portal/data/service/selectServicePage.do?infId=OPEN17020190531110010104913&infSeq=2',
  schoolLocation:'https://www.data.go.kr/data/15021148/standard.do',
@@ -2040,6 +2053,22 @@ function renderPublicComplexInfo(p){
    average.won_per_exclusive_m2:null;
  const trend=picked&&typeof FirstHyundaiMaintenance!=='undefined'?FirstHyundaiMaintenance.summarize(
    maintenanceEstimates,p.id,p.kapt_code,Number(picked.exclusive_m2)):null;
+ // Never substitute partial cost items for a complete maintenance estimate.
+ const partial=maintenancePartial?.state==='verified_partial'&&
+   Array.isArray(maintenancePartial.records)?maintenancePartial.records.find(x=>
+     x?.complex_id===p.id&&x.kapt_code===p.kapt_code&&
+     x.method==='official_kapt_two_item_only'&&/^20[0-9]{4}$/.test(x.month||'')&&
+     Number.isSafeInteger(x.guard_won)&&x.guard_won>=0&&
+     Number.isSafeInteger(x.clean_won)&&x.clean_won>=0&&
+     Number.isFinite(x.residential_exclusive_total_m2)&&x.residential_exclusive_total_m2>=300&&x.residential_exclusive_total_m2<=1000000&&
+     x.guard_won+x.clean_won>0&&safeLink(x.source_url)):null;
+ const partialMessage=partial?
+  '<div class="apiNotice"><strong>전체 관리비 자료는 아직 검증 중입니다.</strong>'+
+  '<p class="tiny">공식 K-apt '+escapeHtml(partial.month.slice(0,4)+'년 '+Number(partial.month.slice(4))+'월')+
+  ' 일부 항목만 확인: 단지 전체 경비비 '+escapeHtml(Math.round(partial.guard_won/10000).toLocaleString('ko-KR'))+
+  '만원 · 청소비 '+escapeHtml(Math.round(partial.clean_won/10000).toLocaleString('ko-KR'))+
+  '만원. 이것은 단지 전체의 두 비용 항목으로, 전체 관리비나 세대별 관리비가 아닙니다.</p>'+
+  sourceLink(partial.source_url,'공식 K-apt 공용관리비 API')+'</div>':'';
  const phone=String(p.management_phone||'').replace(/[^0-9+]/g,'');
  const options=types.length?'<div class="neisLevelButtons">'+types.map((t,i)=>{
    const py=typeof supplyPyeong==='function'?supplyPyeong(t.supply_m2,t.market_pyeong):null;
@@ -2057,8 +2086,8 @@ function renderPublicComplexInfo(p){
    sourceLink(average.source_url,'K-apt 기반 공개 원문 확인'):
    item?
    '<p class="practiceNote"><strong>'+escapeHtml(item.monthly_won.toLocaleString('ko-KR'))+'원</strong> · '+escapeHtml(item.month)+'월 직접 확인 고지액</p>'+sourceLink(item.source_url,'고지액 근거 확인'):
-   '<p class="practiceNote">'+escapeHtml(picked.supply_label)+'타입의 월평균 관리비 단가 수집·검증 중입니다.</p>':
-   '<p class="practiceNote">평형·타입 정보 확인 전입니다.</p>';
+   '<p class="practiceNote">'+escapeHtml(picked.supply_label)+'타입의 월평균 관리비 전체 합계는 확인 중입니다.</p>'+partialMessage:
+   '<p class="practiceNote">평형·타입 정보 확인 전입니다.</p>'+partialMessage;
  return '<div class="apiInfoCards"><article><strong>평형별 월 관리비</strong>'+
   '<p class="tiny">평형을 선택하면 월 관리비 수준을 1만원 단위로 확인할 수 있습니다.</p>'+options+bill+
   (phone?'<a class="btn" href="tel:'+escapeHtml(phone)+'">관리사무소 문의 '+escapeHtml(p.management_phone||'')+'</a>':'')+
@@ -2247,11 +2276,15 @@ function renderPublicSubscriptions(){
 }
 async function refreshPublicServices(manual=false){
  try{
-  const [district,averages,doc]=await Promise.all([
+  const [district,averages,partials,doc]=await Promise.all([
     fetchRemote('school_districts').catch(()=>null),
     fetchRemote('maintenance_estimates').catch(()=>null),
+    fetchRemote('maintenance_partial').catch(()=>null),
     fetchRemote('public_services')
   ]);
+  if(partials?.schema_version===1&&
+    ['verified_partial','awaiting_verified_source'].includes(partials.state)&&
+    Array.isArray(partials.records))maintenancePartial=partials;
   if(averages?.schema_version===1&&['verified_partial','awaiting_verified_source'].includes(averages.state)&&Array.isArray(averages.records))maintenanceEstimates=averages;
   if(district?.schema_version===1 && district.elementary_zones && district.schoolinfo)
     schoolDistrictData=district;
