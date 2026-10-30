@@ -22,7 +22,11 @@ assert(native.includes('onMessage(WebSocket ws,ByteString frame)'),'Handle Googl
 assert(native.includes('GeminiLiveFrame.text(frame)'),'Must decode binary setupComplete');
 assert(native.includes('onMessage(ws,text)'),'Decoded binary frame must use the usual JSON handler');
 assert(native.includes('if(msg.has("setupComplete"))'),'Only start mic after actual Google setupComplete');
-assert(native.includes('startMicrophone();return;'),'Mic must start after setupComplete');
+assert(native.includes('if(startMicrophone()&&running)'),'Mic must start after setupComplete');
+assert(native.includes('quotaConfirmed=true')&&native.includes('reportQuota("ready")'),'Count only microphone-ready sessions');
+assert(native.includes('if(!quotaConfirmed)reportQuota("abort")'),'Unconfirmed setup must not use daily quota');
+assert(html.includes('cl_quota')&&html.includes('newsLiveVoiceQuota'),'Both Live surfaces show balance');
+assert(app.includes('requestLiveQuotaStatus'),'Native must offer read-only quota status');
 assert(native.includes('Google 서버에 연결됐습니다. 음성 사용 준비를 확인하고 있습니다.'),'Do not claim mic ready on socket open');
 const frameDecoder=read('app/src/main/java/kr/co/firsthyundai/app/GeminiLiveFrame.java');
 assert(frameDecoder.includes('frame.utf8()'),'Decode binary bytes as UTF-8');
@@ -45,11 +49,11 @@ assert(!native.includes('GEMINI_API_KEY'));
 assert(worker.includes('validBoardToken(auth.slice(7)'));
 assert(worker.includes('env.AUTH_LIMITER.limit({key:"gemini-live-"'));
 assert(worker.includes('LIVE_MAX_DAILY=6'));
-assert(worker.includes('const config=liveTokenRequestConfig(Date.now())'));
+assert(worker.includes('liveTokenRequestConfig(now)'));
 assert(!/liveConnectConstraints\\s*:\\s*\\{/.test(worker),'Google REST must receive the tested minimal token payload');
 assert(worker.includes('newSessionExpireTime'));
 assert(worker.includes('env.GEMINI_API_KEY'));
-assert(worker.includes('if(req.headers.has("origin"))return res({error:"native_only"},403)'));
+assert(worker.includes('if(req.headers.has("origin"))return {error:res({error:"native_only"},403)}'));
 assert(deploy.includes('wrangler@4 secret put GEMINI_API_KEY'));
 assert(read('app/src/main/AndroidManifest.xml').includes('android.permission.RECORD_AUDIO'));
 // Voice remains a deliberate user action. The WebView must not request mic on load.
