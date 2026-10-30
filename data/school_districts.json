@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "state": "awaiting_verified_sources",
-  "updated_at": "2026-10-27T07:56:10+09:00",
+  "state": "verified_partial",
+  "updated_at": "2026-10-30T17:20:20+09:00",
   "schoolinfo": {
     "state": "verified",
-    "updated_at": "2026-10-27T07:55:17+09:00",
+    "updated_at": "2026-10-30T17:19:38+09:00",
     "source_url": "https://www.schoolinfo.go.kr/ng/go/pnnggo_a01_l0.do",
     "records": [
       {
@@ -432,7 +432,7 @@
   },
   "elementary_zones": {
     "state": "verified_partial",
-    "updated_at": "2026-10-27T07:56:10+09:00",
+    "updated_at": "2026-10-30T17:20:20+09:00",
     "reference_date": "2026-09-20",
     "source_url": "https://schoolzone.emac.kr/publicData/publicDataList.do",
     "geocoded_complex_count": 92,
@@ -1153,7 +1153,7 @@
   },
   "lot_addresses": {
     "state": "verified_partial",
-    "updated_at": "2026-10-27T07:56:10+09:00",
+    "updated_at": "2026-10-30T17:20:20+09:00",
     "records": [
       {
         "complex_id": "f13",
@@ -1710,5 +1710,84 @@
     ],
     "source_url": "https://developers.kakao.com/docs/latest/ko/local/dev-guide#address-coord",
     "note": "도로명주소 완전 일치 후 카카오 주소검색이 같은 건물의 지번을 반환한 경우만 기록."
+  },
+  "zone_review": {
+    "state": "verification_pending",
+    "updated_at": "2026-10-30T17:20:20+09:00",
+    "reference_date": "2026-09-20",
+    "source_url": "https://schoolzone.emac.kr/publicData/publicDataList.do",
+    "records": [
+      {
+        "complex_id": "kapt-a10023361",
+        "reason": "near_boundary",
+        "reference_date": "2026-09-20"
+      },
+      {
+        "complex_id": "kapt-a10024779",
+        "reason": "near_boundary",
+        "reference_date": "2026-09-20"
+      },
+      {
+        "complex_id": "kapt-a10025031",
+        "reason": "near_boundary",
+        "reference_date": "2026-09-20"
+      },
+      {
+        "complex_id": "kapt-a10026038",
+        "reason": "near_boundary",
+        "reference_date": "2026-09-20"
+      },
+      {
+        "complex_id": "kapt-a10027653",
+        "reason": "near_boundary",
+        "reference_date": "2026-09-20"
+      },
+      {
+        "complex_id": "kapt-a40673101",
+        "reason": "near_boundary",
+        "reference_date": "2026-09-20"
+      },
+      {
+        "complex_id": "kapt-a40673906",
+        "reason": "near_boundary",
+        "reference_date": "2026-09-20"
+      },
+      {
+        "complex_id": "kapt-a40673912",
+        "reason": "near_boundary",
+        "reference_date": "2026-09-20"
+      },
+      {
+        "complex_id": "kapt-a40673913",
+        "reason": "near_boundary",
+        "reference_date": "2026-09-20"
+      },
+      {
+        "complex_id": "kapt-a40673917",
+        "reason": "near_boundary",
+        "reference_date": "2026-09-20"
+      },
+      {
+        "complex_id": "kapt-a40673924",
+        "reason": "joint_zone",
+        "reference_date": "2026-09-20"
+      },
+      {
+        "complex_id": "kapt-a40684007",
+        "reason": "near_boundary",
+        "reference_date": "2026-09-20"
+      },
+      {
+        "complex_id": "verified-extra-08",
+        "reason": "near_boundary",
+        "reference_date": "2026-09-20"
+      },
+      {
+        "complex_id": "verified-extra-18",
+        "reason": "address_unverified",
+        "reference_date": "2026-09-20"
+      }
+    ],
+    "note": "아파트 배정학교 정보가 아닙니다. 원본 경계와 주소 검증이 부족한 이유만 나타냅니다."
   }
 }
