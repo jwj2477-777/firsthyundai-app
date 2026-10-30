@@ -18,6 +18,16 @@ assert(app.includes('requestPermissions(new String[]{Manifest.permission.RECORD_
 assert(app.includes('MainActivity.this.startPublicLiveVoice(publicNewsJson)'));
 assert(app.includes('stopPublicLiveVoice();'));
 assert(native.includes('OfficeBoardClient.liveToken(context)'));
+assert(native.includes('onMessage(WebSocket ws,ByteString frame)'),'Handle Google binary WebSocket responses');
+assert(native.includes('GeminiLiveFrame.text(frame)'),'Must decode binary setupComplete');
+assert(native.includes('onMessage(ws,text)'),'Decoded binary frame must use the usual JSON handler');
+assert(native.includes('if(msg.has("setupComplete"))'),'Only start mic after actual Google setupComplete');
+assert(native.includes('startMicrophone();return;'),'Mic must start after setupComplete');
+assert(native.includes('Google 서버에 연결됐습니다. 음성 사용 준비를 확인하고 있습니다.'),'Do not claim mic ready on socket open');
+const frameDecoder=read('app/src/main/java/kr/co/firsthyundai/app/GeminiLiveFrame.java');
+assert(frameDecoder.includes('frame.utf8()'),'Decode binary bytes as UTF-8');
+assert(!frameDecoder.includes('Log.'),'Do not log private audio frames');
+
 assert(native.includes('LiveFailureReason.display(e)'));
 assert(native.includes('LiveFailureReason.websocket('));
 const liveErrors=read('app/src/main/java/kr/co/firsthyundai/app/LiveFailureReason.java');
