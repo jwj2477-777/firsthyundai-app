@@ -31,25 +31,25 @@ assert(worker.includes('if(!env.GEMINI_API_KEY)'),'API key must stay in Worker S
 console.log('Live REST compatibility: single-use/45s/8min, private key, daily quota and fixed client model passed.');
 
 const snapshot=service._test.liveQuota, reset=service._test.liveReset;
-const now=Date.parse('2026-10-30T05:30:00Z'),member='test-member-id';
+const snapshotNow=Date.parse('2026-10-30T05:30:00Z'),member='test-member-id';
 const day='2026-10-30',prefix='fhd-live-usage-v2:'+member+':'+day+':';
 const entries=new Map([
  ['fhd-live-daily-v1:'+member+':'+day,'1'],
- [prefix+'ready',JSON.stringify({state:'confirmed',expires_at:now+60000})],
- [prefix+'pending',JSON.stringify({state:'pending',expires_at:now+60000})],
- [prefix+'expired',JSON.stringify({state:'pending',expires_at:now-1})],
- [prefix+'aborted',JSON.stringify({state:'aborted',expires_at:now+60000})]
+ [prefix+'ready',JSON.stringify({state:'confirmed',expires_at:snapshotNow+60000})],
+ [prefix+'pending',JSON.stringify({state:'pending',expires_at:snapshotNow+60000})],
+ [prefix+'expired',JSON.stringify({state:'pending',expires_at:snapshotNow-1})],
+ [prefix+'aborted',JSON.stringify({state:'aborted',expires_at:snapshotNow+60000})]
 ]);
 const env={SETTINGS:{
  get:async (key,type)=>{const value=entries.get(key);return type==='json'&&value?JSON.parse(value):value??null;},
  list:async ({prefix:base})=>({keys:[...entries.keys()].filter(key=>key.startsWith(base)).map(name=>({name}))})
 }};
-let quota=await snapshot(env,member,now);
+let quota=await snapshot(env,member,snapshotNow);
 assert.equal(quota.used,2,'Only ready sessions plus old usage count');
 assert.equal(quota.pending,1,'Pending credential temporarily reserves capacity');
 assert.equal(quota.remaining,3,'Aborted/expired sessions must not use quota');
 assert.equal(quota.attempts,4,'Even failed attempts count toward anti-abuse request ceiling');
-quota=await snapshot(env,member,now+61000);
+quota=await snapshot(env,member,snapshotNow+61000);
 assert.equal(quota.pending,0,'Failed connection automatically frees capacity after 90 seconds');
 assert.equal(quota.remaining,4,'Old successful sessions remain counted');
 assert.equal(reset(Date.parse('2026-10-30T23:59:59Z')),'2026-10-31 오전 9시');
