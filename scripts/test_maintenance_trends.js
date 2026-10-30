@@ -45,4 +45,8 @@ assert(app.includes('maintenance-trends.js'),'load verified fee trend helper');
 assert(app.includes('FirstHyundaiMaintenance.renderTrend'),'family fee view uses monthly trend');
 assert(app.includes("'약 '+Math.round(rate*picked.exclusive_m2/10000)+'만원'"),
  'single-month legacy estimate must also round to 10,000 KRW');
+assert(app.includes("fetchRemote('maintenance_partial')"),'load independent partial source without inventing a complete bill');
+assert(app.includes('official_kapt_two_item_only'),'only vetted K-apt line items can be shown');
+assert(app.includes('전체 관리비나 세대별 관리비가 아닙니다.'),'prominently distinguish partial costs from full invoices');
+assert(app.includes('zone_review')&&app.includes('schoolReview'),'give a reason for missing school zones');
 console.log('Monthly fee trends: 10k KRW rounding, genuine months only, stale guard, no false yearly average.');
