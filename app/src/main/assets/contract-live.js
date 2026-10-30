@@ -164,7 +164,7 @@
       q.limit<1||q.limit>100||q.remaining<0||q.used<0)return;
   const pending=Number.isInteger(q.pending)&&q.pending>0?q.pending:0;
   const reset=String(q.reset_at_kst||'');
-  if(!/^\\d{4}-\\d{2}-\\d{2} 오전 9시$/.test(reset))return;
+  if(!/^[0-9]{4}-[0-9]{2}-[0-9]{2} 오전 9시$/.test(reset))return;
   const label='오늘 Live 남은 '+q.remaining+'/'+q.limit+'회'
     +(pending?' (연결 준비 중 '+pending+'회)':'')+' · 다음 초기화: '+reset;
   for(const id of ['cl_quota','newsLiveVoiceQuota']){
