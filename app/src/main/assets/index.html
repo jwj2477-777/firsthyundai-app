@@ -1915,13 +1915,26 @@ function renderComplexes(){
   const district=schoolDistrictData?.elementary_zones;
   const match=district?.state==='verified_partial' && Array.isArray(district.records)?
     district.records.find(x=>x.complex_id===p.id && x.kind==='elementary_zone_reference'):null;
+  const schoolReview=schoolDistrictData?.zone_review?.state==='verification_pending'&&
+   Array.isArray(schoolDistrictData.zone_review.records)?
+   schoolDistrictData.zone_review.records.find(x=>x.complex_id===p.id):null;
+  const reviewReason=({
+   address_unverified:'해당 단지의 정확한 도로명주소 좌표를 확인하지 못했습니다.',
+   outside_official_polygon:'공식 통학구역 도형 내부로 확인되지 않았습니다.',
+   overlapping_zones:'공식 통학구역 여러 개가 겹쳐 단일 학교를 표시할 수 없습니다.',
+   joint_zone:'공동통학구역으로 단일 배정학교를 확정할 수 없습니다.',
+   near_boundary:'공식 통학구역 경계에서 가까워 단일 학교 판단을 보류했습니다.',
+   requires_manual_review:'공식 학구도와 단지 자료의 추가 대조가 필요합니다.'
+  })[schoolReview?.reason]||'도로명주소 좌표·공식 통학구역 경계를 추가 확인해야 합니다.';
   const zoneCard=match?
     '<div class="complexSchoolRow schoolZoneReference"><span>초등학교 · 공식 통학구역 참고</span>'+
     '<strong>'+escapeHtml(match.zone_name.replace(/통학구역$/,''))+'</strong>'+
     '<span class="tiny">공식 학구도 '+escapeHtml(match.reference_date||'')+
     ' 기준 · 단지 도로명주소 좌표와 경계를 대조한 결과입니다. 실제 입학 배정은 교육지원청에 확인해 주세요.</span>'+
     sourceLink('https://schoolzone.emac.kr/','공식 학구도 원문 확인')+'</div>':
-    '<div class="apiNotice">이 단지의 공식 초등학교 통학구역은 아직 주소 좌표·경계 검증 전입니다. 통학구역은 근처 학교와 다를 수 있습니다.</div>';
+    '<div class="apiNotice"><strong>초등 통학구역 검증 보류</strong> · '+escapeHtml(reviewReason)+
+    ' 인근 학교가 배정학교라는 뜻은 아닙니다. '+
+    sourceLink(PUBLIC_SRC.zone,'공식 학구도 확인')+'</div>';
   const schoolView=schools.length?'<div class="complexSchoolList">'+schools.slice(0,25).map(x=>
     '<div class="complexSchoolRow"><span>'+escapeHtml(x.level)+' · '+(x.classification==='assigned'?'배정학교 확인':'인근 참고학교 (배정 미확인)')+'</span>'+
     '<strong>'+escapeHtml(x.name)+'</strong>'+
