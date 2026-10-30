@@ -122,11 +122,13 @@ final class PublicLiveVoice {
                     // Gemini returns JSON envelopes in BINARY WebSocket frames as well as text.
                     // Without this callback setupComplete is silently missed and the microphone never starts.
                     @Override public void onMessage(WebSocket ws,ByteString frame){
-                        if(!running||frame==null)return;
-                        if(frame.size()>1_500_000){
-                            event("error","Live 응답이 너무 커서 연결을 종료했습니다.");stop();return;
+                        if(!running)return;
+                        String text=GeminiLiveFrame.text(frame);
+                        if(text.isEmpty()){
+                            event("error","Live 응답 형식 또는 크기를 확인할 수 없습니다.");
+                            stop();return;
                         }
-                        onMessage(ws,frame.utf8());
+                        onMessage(ws,text);
                     }
                     @Override public void onMessage(WebSocket ws,String raw){
                         if(!running)return;
