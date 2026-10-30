@@ -34,7 +34,7 @@ final class LiveFailureReason {
         String reason=failure==null?"":String.valueOf(failure.getMessage());
         switch(reason){
             case "FHD_LIVE_daily_free_trial_limit":
-                return "이 사무실 계정은 오늘 Live 6회 제한에 도달했습니다. 다음 UTC 날짜에 다시 이용하거나 기존 계약 메모를 사용해 주세요.";
+                return "이 사무실 계정은 오늘 Live 6회 제한에 도달했습니다. 한국시간 오전 9시 이후 다시 이용하거나 기존 계약 메모를 사용해 주세요.";
             case "FHD_LIVE_rate_limited":
                 return "짧은 시간에 Live 연결 요청이 많았습니다. 잠시 후 다시 시도해 주세요.";
             case "FHD_LIVE_provider_quota":
