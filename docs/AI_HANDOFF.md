@@ -1,3 +1,8 @@
+## 2026-10-30 · v2.1.54 · 실기기 Live setupComplete 미수신 해결
+- 서버·Google WS은 정상. 별도 Google 실측 결과 `CONTRACT_SETUP_FRAME_TYPE binary` 및 `CONTRACT_FULL_SETUP_OK_NO_AUDIO`로 확인. 실제 Android는 `PublicLiveVoice.onMessage(WebSocket,String)`만 구현해 바이너리 JSON 수신 이벤트를 무시, 화면에 "연결됐습니다. 음성 응답 준비 중"으로 남고 마이크 미시작.
+- `PublicLiveVoice`에 OkHttp `onMessage(WebSocket,ByteString)` 추가, `GeminiLiveFrame.text(ByteString)`의 크기 제한된 UTF-8 변환 후 원래 JSON 처리로 통합. setupComplete 이후 startMicrophone, 정상 종료 전 예기치 않은 close 에러 통지.
+- JUnit `GeminiLiveFrameTest`와 JS UI/네이티브 계약 회귀 추가. 버전 2.1.54/build205. 기본 수동 계약·개인정보 격리·클라이언트 구독/가격·Live 모델·서버 정책 변경 없음. CI 성공/릴리스/삼성 단말 마이크·음성 품질 분리 확인.
+
 ## 2026-10-30 · Google Live 토큰 HTTP 400 원인과 서버 수정
 - `workers/shared-settings/src/index.mjs`의 `liveTokenRequestConfig(now)`는 Google v1beta/auth_tokens에서 실측으로 성공한 uses=1, 시작 45초, 만료 8분의 최소 REST JSON만 구성한다. **이 프로젝트의 현재 Google API는 `liveConnectConstraints` 필드를 포함하면 HTTP 400 INVALID_ARGUMENT을 반환**한다 (3.1/3.8 모델 공통). REST 문서 예시와 실제 서버 호환성이 다름.
 - 테스트용 GitHub Actions는 실제 Google HTTP 400/200 및 단기 토큰 WebSocket setupComplete를 확인했으며 비밀키, 토큰 문자열, 계약/고객/음성 정보는 출력하거나 전송하지 않았다.

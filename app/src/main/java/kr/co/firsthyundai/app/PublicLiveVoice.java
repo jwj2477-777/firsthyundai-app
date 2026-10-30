@@ -16,6 +16,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
+import okio.ByteString;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -114,15 +115,30 @@ final class PublicLiveVoice {
                                 setup.put("tools",ContractLiveProtocol.tools());
                             }
                             ws.send(new JSONObject().put("setup",setup).toString());
-                            event("connected","연결됐습니다. 음성 응답을 준비하고 있습니다.");
+                            event("connected","Google 서버에 연결됐습니다. 음성 사용 준비를 확인하고 있습니다.");
                             durationLimit.postDelayed(autoStop,7*60*1000L);
                         }catch(Exception e){event("error","Live 대화를 시작하지 못했습니다.");stop();}
+                    }
+                    // Gemini returns JSON envelopes in BINARY WebSocket frames as well as text.
+                    // Without this callback setupComplete is silently missed and the microphone never starts.
+                    @Override public void onMessage(WebSocket ws,ByteString frame){
+                        if(!running)return;
+                        String text=GeminiLiveFrame.text(frame);
+                        if(text.isEmpty()){
+                            event("error","Live 응답 형식 또는 크기를 확인할 수 없습니다.");
+                            stop();return;
+                        }
+                        onMessage(ws,text);
                     }
                     @Override public void onMessage(WebSocket ws,String raw){
                         if(!running)return;
                         try{
                             JSONObject msg=new JSONObject(raw);
                             if(msg.has("setupComplete")){durationLimit.removeCallbacks(connectionTimeout);startMicrophone();return;}
+                            if(msg.has("error")){
+                                event("error","Google Live가 음성 준비 요청을 거절했습니다. 모델 및 연결 설정을 확인해 주세요.");
+                                stop();return;
+                            }
                             JSONObject calls=msg.optJSONObject("toolCall");
                             if(calls!=null){handleTools(ws,calls);return;}
                             JSONObject content=msg.optJSONObject("serverContent");
@@ -159,7 +175,10 @@ final class PublicLiveVoice {
                         if(running){event("error",LiveFailureReason.websocket(response==null?0:response.code()));stop();}
                     }
                     @Override public void onClosed(WebSocket ws,int code,String reason){
-                        if(running)stop();
+                        if(running){
+                            event("error","Google Live 연결이 종료됐습니다 (연결 코드 "+code+"). 다시 시도해 주세요.");
+                            stop();
+                        }
                     }
                 });
             }catch(Exception e){
