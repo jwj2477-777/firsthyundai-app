@@ -1,3 +1,10 @@
+## 2026-10-30 · v2.1.54 · Gemini Live 바이너리 프레임 수신·마이크 시작 복구
+- 실기기 제보: 연결 직후 "연결됐습니다. 음성 응답을 준비하고 있습니다."에 정지. 사용자 음성 입력 상태로 이동하지 않음.
+- 원인 실측: 일회용 토큰·계약용 도구/전사 설정을 포함한 Google WebSocket 연결은 setupComplete 성공. 테스트에서 Google 응답 프레임이 **binary**임을 확인. Android `PublicLiveVoice`는 `onMessage(WebSocket,String)`만 재정의하여 바이너리 JSON을 놓치고, 따라서 setupComplete 분기가 실행되지 않아 microphone 시작 불가.
+- 수정: OkHttp `onMessage(WebSocket,ByteString)` 추가, 크기 제한을 적용한 `GeminiLiveFrame.text()`로 UTF-8 JSON 수신 후 기존 처리 함수로 전달. 텍스트 프레임 지원도 보존. 소켓 `onOpen`에서는 준비 완료처럼 표현하지 않고, 정상 setupComplete 수신 후 마이크 시작. 예상 외 `onClosed`와 서버 오류도 화면에 표시.
+- 안전: 원본 음성·전사·고객 정보·토큰을 로깅하지 않으며, 기본 계약 메모/개인정보 분리·무료 한도·서버 임시 토큰·기존 모델·7분 세션 유지. 추가 AI, 유료 결제, 새로운 공개 데이터 전송 없음.
+- 테스트: `GeminiLiveFrameTest.java` 바이너리 setupComplete·전사·크기 제한, `test_live_voice_ui.js`에서 네이티브 프레임 콜백/마이크 시작 분기 검증, 전체 Android Actions, 실제 APK 배포 후 확인 필요. 실기기 실제 한국어 듣기·응답은 별도 확인.
+
 ## 2026-10-30 · Cloudflare-only Live 토큰 연결 수정 (v2.1.53 APK 유지)
 - 실기기에서 `provider_model_unavailable` 오류 확인. 원인은 Google의 모델 자체가 아니라 Workers `/v1beta/auth_tokens` REST 요청에 포함하던 `liveConnectConstraints` 필드였다.
 - 개인 정보·음성 없이 기존 GitHub Secret으로 Google 인증 토큰 발급만 검증: 현재 모델 + 제한 필드 => HTTP 400 INVALID_ARGUMENT (unknown liveConnectConstraints); 같은 모델 + 기본 임시 토큰(uses=1, 만료/연결 시간만 설정) => HTTP 200. Google 권장 3.8 Live 역시 제한 필드가 있으면 HTTP 400이어서 모델 교체로 해결되지 않음.
