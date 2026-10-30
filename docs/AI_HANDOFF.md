@@ -1,3 +1,9 @@
+## 2026-10-30 · Google Live 토큰 HTTP 400 원인과 서버 수정
+- `workers/shared-settings/src/index.mjs`의 `liveTokenRequestConfig(now)`는 Google v1beta/auth_tokens에서 실측으로 성공한 uses=1, 시작 45초, 만료 8분의 최소 REST JSON만 구성한다. **이 프로젝트의 현재 Google API는 `liveConnectConstraints` 필드를 포함하면 HTTP 400 INVALID_ARGUMENT을 반환**한다 (3.1/3.8 모델 공통). REST 문서 예시와 실제 서버 호환성이 다름.
+- 테스트용 GitHub Actions는 실제 Google HTTP 400/200 및 단기 토큰 WebSocket setupComplete를 확인했으며 비밀키, 토큰 문자열, 계약/고객/음성 정보는 출력하거나 전송하지 않았다.
+- 원본 API 키는 Worker Secret에만 유지, Android는 `gemini-3.1-flash-live-preview`를 지정; 미리 설정한 일회성 사용·초단기 수명·사무실 로그인·속도·일일 6회 제한 유지. 토큰에 모델별 제약이 없는 보안상 손실은 초단기 유효기간으로 제한한다.
+- Worker 수정으로 APK v2.1.53 재설치 불필요. `scripts/test_live_token_config.mjs`, 기존 `test_live_voice_ui.js` 및 배포 워크플로가 변경된 형식을 검증한다. 배포·실기기 음성 품질은 별도 확인.
+
 ## 2026-10-30 · v2.1.53 · Live 초기 연결 실패 안전한 원인 표시
 - Worker `liveToken()`은 Google auth_tokens HTTP 응답을 정적 코드로만 구분(`provider_quota`, `provider_access_denied`, `provider_model_unavailable`, 기존 일일 한도·세션 인증 등). 본문·키 미노출.
 - Android `OfficeBoardClient.request()`는 **/board/ai/live-token 에서만** HTTP 오류를 `LiveFailureReason.fromHttp()`로 변환한다. `PublicLiveVoice`는 해당 코드에 따른 한국어 대응 안내 및 WebSocket HTTP 오류를 표시. 기존 호출량·모델·민감정보 처리·일일 제한은 그대로.
