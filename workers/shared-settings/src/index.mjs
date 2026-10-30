@@ -746,14 +746,21 @@ async function liveSession(req,env){
  let data;try{data=await body(req,512)}catch(e){return res({error:"bad_request"},400)}
  if(!liveTicketId(data?.session_id)||!["ready","abort"].includes(data?.action))
   return res({error:"bad_request"},400);
- const ticketKey=livePrefix(caller.member.id,Date.now())+data.session_id;
+ const now=Date.now();
+ let ticketKey=livePrefix(caller.member.id,now)+data.session_id;
  try{
-  const ticket=await env.SETTINGS.get(ticketKey,"json");
+  let ticket=await env.SETTINGS.get(ticketKey,"json");
+  // The UTC 00:00 reset is Korea 09:00: a session can start before reset
+  // and become ready seconds afterwards. Look up yesterday too.
+  if(!ticket){
+   const previousKey=livePrefix(caller.member.id,now-86400000)+data.session_id;
+   ticket=await env.SETTINGS.get(previousKey,"json");
+   if(ticket)ticketKey=previousKey;
+  }
   if(!ticket)return res({error:"live_session_not_found"},404);
   if(ticket.state==="confirmed"||ticket.state==="aborted")
    return res({ok:true,state:ticket.state}); // idempotent; abort never refunds confirmed
   if(ticket.state!=="pending")return res({error:"live_session_invalid"},409);
-  const now=Date.now();
   if(data.action==="ready"&&ticket.expires_at<=now)
    return res({error:"live_session_expired"},409);
   ticket.state=data.action==="ready"?"confirmed":"aborted";
