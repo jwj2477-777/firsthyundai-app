@@ -720,7 +720,12 @@ async function liveToken(req,env){
    headers:{"x-goog-api-key":env.GEMINI_API_KEY,"Content-Type":"application/json"},
    body:JSON.stringify(config)});
   if(!response.ok){
-   return res({error:response.status===429?"provider_quota":"live_provider_unavailable"},503);
+   // Keep provider response body/credentials private, but make root causes actionable.
+   const code=response.status===429?"provider_quota":
+       response.status===401||response.status===403?"provider_access_denied":
+       response.status===400||response.status===404?"provider_model_unavailable":
+       "live_provider_unavailable";
+   return res({error:code},response.status===429?429:503);
   }
   const data=await response.json();
   const session=String(data?.name||"");

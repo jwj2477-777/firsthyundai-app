@@ -267,6 +267,8 @@ final class OfficeBoardClient {
                     if(bytes.size()>250000)throw new Exception("게시판 응답이 너무 큽니다.");
                 }
             }
+            if("/board/ai/live-token".equals(path) && (status<200||status>=300))
+                throw new Exception(LiveFailureReason.fromHttp(status,bytes.toString("UTF-8")));
             if(status==401){
                 if(path.startsWith("/board")&&!path.equals("/board/choices")&&!path.equals("/board/session"))
                     throw new Exception("account_revoked · 관리자에게 계정 상태를 확인해 주세요.");

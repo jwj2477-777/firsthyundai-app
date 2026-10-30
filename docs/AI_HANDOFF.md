@@ -1,3 +1,9 @@
+## 2026-10-30 · v2.1.53 · Live 초기 연결 실패 안전한 원인 표시
+- Worker `liveToken()`은 Google auth_tokens HTTP 응답을 정적 코드로만 구분(`provider_quota`, `provider_access_denied`, `provider_model_unavailable`, 기존 일일 한도·세션 인증 등). 본문·키 미노출.
+- Android `OfficeBoardClient.request()`는 **/board/ai/live-token 에서만** HTTP 오류를 `LiveFailureReason.fromHttp()`로 변환한다. `PublicLiveVoice`는 해당 코드에 따른 한국어 대응 안내 및 WebSocket HTTP 오류를 표시. 기존 호출량·모델·민감정보 처리·일일 제한은 그대로.
+- 실사용자의 현재 API 한도 및 권한은 서버 응답 정보가 없어 이번 작업만으로 판별할 수 없다. 빌드 후 앱에서 한 번 재시도해야 실제 에러가 좁혀진다.
+- 자동 테스트: `LiveFailureReasonTest.java`, `test_live_voice_ui.js`. 작업 시점의 Actions/Release 상태 확인 전 배포 완료라 단정하지 않는다.
+
 ## 2026-10-30 · v2.1.52 · Live 세션 누적 금액·날짜 검증
 - `ContractLiveProtocol.validateConsistency(previous, change)`는 기존 계약 데이터를 읽지 않고 이번 세션의 제안만 합쳐 계약금/송금액/중도금 합계 및 확정 날짜 순서를 검사한다. `PublicLiveVoice.handleTools`는 거부 사유 코드를 모델에 전달하여 다시 질문시키고, JS `contract-live.js`는 표시 전 동일 기준으로 방어한다.
 - 협의 날짜와 부분 제안은 허용한다. AI가 실제 당사자 합의 여부를 판단하거나 고객/계좌 데이터를 읽지는 못한다. 새 AI 제공자/유료 결제/기본 워크플로 변경 없음.

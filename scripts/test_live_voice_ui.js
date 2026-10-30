@@ -18,6 +18,16 @@ assert(app.includes('requestPermissions(new String[]{Manifest.permission.RECORD_
 assert(app.includes('MainActivity.this.startPublicLiveVoice(publicNewsJson)'));
 assert(app.includes('stopPublicLiveVoice();'));
 assert(native.includes('OfficeBoardClient.liveToken(context)'));
+assert(native.includes('LiveFailureReason.display(e)'));
+assert(native.includes('LiveFailureReason.websocket('));
+const liveErrors=read('app/src/main/java/kr/co/firsthyundai/app/LiveFailureReason.java');
+const client=read('app/src/main/java/kr/co/firsthyundai/app/OfficeBoardClient.java');
+assert(client.includes('LiveFailureReason.fromHttp(status,bytes.toString("UTF-8"))'));
+for(const code of ['daily_free_trial_limit','provider_quota','rate_limited','live_not_configured','account_session_required','provider_access_denied','provider_model_unavailable'])
+ assert(liveErrors.includes('FHD_LIVE_'+code),'Specific Live error must not disappear: '+code);
+assert(worker.includes('response.status===429?"provider_quota"'));
+assert(worker.includes('response.status===401||response.status===403?"provider_access_denied"'));
+
 assert(native.includes('BidiGenerateContentConstrained'));
 assert(native.includes('audio/pcm;rate=16000'));
 assert(native.includes('24000'));
