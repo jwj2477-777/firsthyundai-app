@@ -7,6 +7,7 @@ sample calibrates field and unit interpretation before surveying other sites.
 """
 from __future__ import annotations
 import json,os,re,sys,time
+from decimal import Decimal,InvalidOperation
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -79,8 +80,9 @@ def collect(catalog,key,*,get_items=fetch_items,get_basic=fetch_basic,match=upse
    basic=get_basic(key,code)
    verified=match(catalog,basic)
    if not verified or str(basic.get('kaptCode'))!=code:continue
-   area=amount(basic.get('privArea'))
-   if area is None or area<300:continue
+   try:area=Decimal(str(basic.get('privArea')))
+   except (InvalidOperation,ValueError,TypeError):continue
+   if not area.is_finite() or not Decimal(300)<=area<=Decimal(1000000):continue
    checked+=1
    for month in target_months or months():
     items=get_items(code,month,key)
@@ -88,7 +90,7 @@ def collect(catalog,key,*,get_items=fetch_items,get_basic=fetch_basic,match=upse
      continue
     for apt in verified:
      rows.append({'complex_id':apt['id'],'kapt_code':code,'month':month,
-       'guard_won':items['guard'],'clean_won':items['clean'],'residential_exclusive_total_m2':area,
+       'guard_won':items['guard'],'clean_won':items['clean'],'residential_exclusive_total_m2':float(area),
        'source_url':SOURCE,'method':'official_kapt_two_item_only',
        'basis':'공식 단지 경비비 및 청소비 일부 항목. 전체 관리비·세대 고지액 아님.'})
     break
