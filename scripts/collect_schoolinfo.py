@@ -247,6 +247,10 @@ def main():
         else:print('카카오 도로명좌표 검증 실패 · 기존 데이터 보존')
     else:print('KAKAO_REST_API_KEY 미설정 · 단지별 통학구역은 검증 대기')
     if updated:
+        current['state']=('verified_partial' if
+            current.get('schoolinfo',{}).get('state')=='verified' and
+            current.get('elementary_zones',{}).get('state')=='verified_partial' else
+            'awaiting_verified_sources')
         current['updated_at']=stamp()
         tmp=TARGET.with_suffix('.json.tmp')
         tmp.write_text(json.dumps(current,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
