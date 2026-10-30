@@ -45,6 +45,16 @@ final class PublicLiveVoice {
     private volatile AudioRecord microphone;
     private volatile AudioTrack speaker;
     private volatile boolean closed=false;
+    private volatile String quotaSessionId="";
+    private volatile boolean quotaConfirmed=false;
+    private final ExecutorService quotaUpdates=Executors.newSingleThreadExecutor();
+    private void reportQuota(String action){
+        final String id=quotaSessionId;
+        if(id.isEmpty())return;
+        try{quotaUpdates.execute(()->{
+            try{OfficeBoardClient.liveSession(context,id,action);}catch(Exception ignored){}
+        });}catch(java.util.concurrent.RejectedExecutionException ignored){}
+    }
     private OkHttpClient http;
     private String publicBrief="";
     private boolean contractMode=false;
@@ -84,7 +94,10 @@ final class PublicLiveVoice {
         startup.execute(()->{
             try{
                 JSONObject token=OfficeBoardClient.liveToken(context);
-                if(!running)return;
+                quotaSessionId=token.optString("session_id","");
+                if(!quotaSessionId.matches("[0-9a-f-]{36}"))
+                    throw new Exception("실시간 음성 사용권 확인 실패");
+                if(!running){reportQuota("abort");return;}
                 String name=token.optString("token","");
                 String model=token.optString("model","");
                 if(name.length()<12||name.length()>2048||!model.matches("[a-z0-9.-]{10,80}"))
@@ -134,7 +147,14 @@ final class PublicLiveVoice {
                         if(!running)return;
                         try{
                             JSONObject msg=new JSONObject(raw);
-                            if(msg.has("setupComplete")){durationLimit.removeCallbacks(connectionTimeout);startMicrophone();return;}
+                            if(msg.has("setupComplete")){
+                                durationLimit.removeCallbacks(connectionTimeout);
+                                if(startMicrophone()&&running){
+                                    quotaConfirmed=true;
+                                    reportQuota("ready");
+                                }
+                                return;
+                            }
                             if(msg.has("error")){
                                 event("error","Google Live가 음성 준비 요청을 거절했습니다. 모델 및 연결 설정을 확인해 주세요.");
                                 stop();return;
@@ -215,8 +235,8 @@ final class PublicLiveVoice {
             if(running)ws.send(new JSONObject().put("toolResponse",new JSONObject().put("functionResponses",responses)).toString());
         }catch(Exception ignored){}
     }
-    private synchronized void startMicrophone(){
-        if(!running)return;
+    private synchronized boolean startMicrophone(){
+        if(!running)return false;
         try{
             final int minimum=AudioRecord.getMinBufferSize(16000,AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT);
@@ -245,9 +265,11 @@ final class PublicLiveVoice {
                 }
             },"fhd-live-voice-capture");
             reader.setDaemon(true);reader.start();
+            return true;
         }catch(Exception e){
             event("error","음성을 시작할 수 없습니다. 마이크 권한을 확인해 주세요.");
             stop();
+            return false;
         }
     }
     private void play(byte[] pcm){
@@ -273,6 +295,8 @@ final class PublicLiveVoice {
     synchronized void stop(){
         if(closed)return;
         closed=true;running=false;
+        if(!quotaConfirmed)reportQuota("abort");
+        quotaUpdates.shutdown();
         durationLimit.removeCallbacks(autoStop);
         durationLimit.removeCallbacks(connectionTimeout);
         WebSocket ws=socket;socket=null;

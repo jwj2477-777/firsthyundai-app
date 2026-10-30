@@ -24,6 +24,7 @@
    typeof b.summary==='string'&&b.summary_source_url?.startsWith('https://'))
    .slice(0,4).map(b=>({method:b.summary_method,title:String(b.title||'').slice(0,160),
                        summary:b.summary.slice(0,320)}));
+  root.FirstHyundaiNative?.requestLiveQuotaStatus?.();
   active=true;buttons();status('연결하는 중입니다…');
   try{native.startPublicLiveVoice(JSON.stringify(rows));}
   catch(e){active=false;buttons();status('기기에서 음성 대화를 시작할 수 없습니다.');}
@@ -34,11 +35,15 @@
   const transcript=$('newsLiveVoiceTranscript');if(transcript){transcript.textContent='';transcript.hidden=true;}
   try{root.FirstHyundaiNative?.stopPublicLiveVoice?.();}catch(e){}
   status('실시간 대화를 종료했습니다.');
+  root.FirstHyundaiNative?.requestLiveQuotaStatus?.();
  }
  function incoming(event){
   const state=String(event?.state||'');
   const message=String(event?.message||'').slice(0,280);
-  if(['error','ended'].includes(state)){active=false;buttons();}
+  if(['error','ended'].includes(state)){
+   active=false;buttons();
+   root.FirstHyundaiNative?.requestLiveQuotaStatus?.();
+  }
   if(['connecting','connected','listening','error','ended'].includes(state))status(message);
   if(state==='transcript' || state==='heard'){
    const output=$('newsLiveVoiceTranscript');
@@ -46,5 +51,8 @@
   }
  }
  root.onFirstHyundaiLiveStatus=incoming;
- root.FirstHyundaiLive={start,stop,onPageChange(page){if(page!=='news')stop()}};
+ root.FirstHyundaiLive={start,stop,onPageChange(page){
+  if(page!=='news')stop();
+  else root.FirstHyundaiNative?.requestLiveQuotaStatus?.();
+ }};
 })(window);

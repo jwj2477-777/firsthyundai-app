@@ -588,6 +588,18 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void stopPublicLiveVoice(){
             runOnUiThread(()->{pendingLivePermission=false;pendingLivePublicNews="";pendingContractLiveId="";MainActivity.this.stopPublicLiveVoice();});
         }
+        /** Non-blocking account-level Live balance, with no personal data. */
+        @JavascriptInterface public void requestLiveQuotaStatus(){
+            io.execute(()->{
+                try{
+                    JSONObject quota=OfficeBoardClient.liveQuotaStatus(MainActivity.this);
+                    deliver("onFirstHyundaiLiveQuotaStatus",quota);
+                }catch(Exception ignored){
+                    try{deliver("onFirstHyundaiLiveQuotaStatus",
+                        new JSONObject().put("unavailable",true));}catch(Exception ignored2){}
+                }
+            });
+        }
         @JavascriptInterface public String getDeviceDisplayMode() {
             return localDeviceDisplayMode();
         }

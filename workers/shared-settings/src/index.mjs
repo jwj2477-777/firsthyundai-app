@@ -687,57 +687,137 @@ async function body(req,maxBytes=2400){
  if(bytes.byteLength>maxBytes)throw Error("large");
  return JSON.parse(new TextDecoder().decode(bytes));
 }
-/* Optional, quota-limited Gemini Live token issuance for public-news-only voice.
-   Full Gemini key stays ONLY in Worker secret; private notes and contracts are
-   never read or passed to Gemini here. Native device gets a single-use token. */
+/* Optional Gemini Live: issue an ephemeral one-use credential but only count
+   sessions that reach the native microphone-ready stage.  Unconfirmed tickets
+   expire automatically, so a disconnected device does not lose an attempt.
+   No client names, contracts, transcripts, API keys or Google tokens are stored. */
 const LIVE_MODEL="gemini-3.1-flash-live-preview", LIVE_MAX_DAILY=6;
-/* Google's v1beta/auth_tokens REST backend rejects liveConnectConstraints with
-   INVALID_ARGUMENT even though the public REST example shows it. A one-use,
-   45-second-start / 8-minute lifetime token is accepted and Live setup works.
-   Model is fixed by our native app, and no private app state is sent here. */
-function liveTokenRequestConfig(now){
- return {
-  uses:1,
-  newSessionExpireTime:new Date(now+45_000).toISOString(),
-  expireTime:new Date(now+8*60_000).toISOString()
- };
+const LIVE_MAX_ATTEMPTS=48, LIVE_PENDING_MS=90_000;
+const LIVE_USAGE_PREFIX="fhd-live-usage-v2:";
+const liveDay=now=>new Date(now).toISOString().slice(0,10);
+const livePrefix=(memberId,now)=>LIVE_USAGE_PREFIX+memberId+":"+liveDay(now)+":";
+function liveReset(now){
+ // The provider day is UTC; UTC midnight corresponds to 09:00 in Korea.
+ return new Date((Math.floor(now/86400000)+1)*86400000).toISOString().slice(0,10)+" 오전 9시";
 }
-async function liveToken(req,env){
- if(req.method!=="POST")return res({error:"method_not_allowed"},405);
- if(req.headers.has("origin"))return res({error:"native_only"},403);
- if(!env.SETTINGS||!env.FIRSTHYUNDAI_ACCESS_CODE||!env.AUTH_LIMITER)
-  return res({error:"office_auth_unavailable"},503);
+function liveTicketId(id){return typeof id==="string"&&/^[0-9a-f-]{36}$/.test(id)}
+async function liveQuota(env,memberId,now=Date.now()){
+ const day=liveDay(now), prefix=livePrefix(memberId,now);
+ const legacy=Number(await env.SETTINGS.get("fhd-live-daily-v1:"+memberId+":"+day)||"0");
+ const oldCount=Number.isFinite(legacy)?Math.max(0,Math.min(LIVE_MAX_DAILY,legacy)):0;
+ const list=await env.SETTINGS.list({prefix,limit:100});
+ // Each issued ticket is stored for 2 days, but only its issued-day prefix is
+ // consulted.  Pending attempts count provisionally, then expire in 90 seconds.
+ const rows=await Promise.all(list.keys.map(k=>env.SETTINGS.get(k.name,"json")));
+ const confirmed=rows.filter(r=>r?.state==="confirmed").length;
+ const pending=rows.filter(r=>r?.state==="pending"&&Number(r.expires_at)>now).length;
+ const used=oldCount+confirmed;
+ return {limit:LIVE_MAX_DAILY,used,remaining:Math.max(0,LIVE_MAX_DAILY-used-pending),
+  pending,attempts:rows.length,reset_at_kst:liveReset(now)};
+}
+/* Google v1beta/auth_tokens currently accepts only this minimal payload.
+   Do not add liveConnectConstraints: tested API rejects it with HTTP 400. */
+function liveTokenRequestConfig(now){
+ return {uses:1,
+  newSessionExpireTime:new Date(now+45_000).toISOString(),
+  expireTime:new Date(now+8*60_000).toISOString()};
+}
+async function liveAuthorize(req,env){
+ if(req.headers.has("origin"))return {error:res({error:"native_only"},403)};
+ if(!env.SETTINGS||!env.FIRSTHYUNDAI_ACCESS_CODE)
+  return {error:res({error:"office_auth_unavailable"},503)};
  const auth=req.headers.get("authorization")||"";
  const caller=auth.startsWith("Bearer ")
   ?await validBoardToken(auth.slice(7),env.FIRSTHYUNDAI_ACCESS_CODE,env):null;
- if(!caller)return res({error:"account_session_required"},401);
+ if(!caller)return {error:res({error:"account_session_required"},401)};
+ return {caller};
+}
+async function liveStatus(req,env){
+ if(req.method!=="GET")return res({error:"method_not_allowed"},405);
+ const {caller,error}=await liveAuthorize(req,env);
+ if(error)return error;
+ try{return res(await liveQuota(env,caller.member.id))}
+ catch(e){return res({error:"live_status_unavailable"},503)}
+}
+async function liveSession(req,env){
+ if(req.method!=="POST")return res({error:"method_not_allowed"},405);
+ const {caller,error}=await liveAuthorize(req,env);
+ if(error)return error;
+ let data;try{data=await body(req,512)}catch(e){return res({error:"bad_request"},400)}
+ if(!liveTicketId(data?.session_id)||!["ready","abort"].includes(data?.action))
+  return res({error:"bad_request"},400);
+ const now=Date.now();
+ let ticketKey=livePrefix(caller.member.id,now)+data.session_id;
+ try{
+  let ticket=await env.SETTINGS.get(ticketKey,"json");
+  // The UTC 00:00 reset is Korea 09:00: a session can start before reset
+  // and become ready seconds afterwards. Look up yesterday too.
+  if(!ticket){
+   const previousKey=livePrefix(caller.member.id,now-86400000)+data.session_id;
+   ticket=await env.SETTINGS.get(previousKey,"json");
+   if(ticket)ticketKey=previousKey;
+  }
+  if(!ticket)return res({error:"live_session_not_found"},404);
+  if(ticket.state==="confirmed"||ticket.state==="aborted")
+   return res({ok:true,state:ticket.state}); // idempotent; abort never refunds confirmed
+  if(ticket.state!=="pending")return res({error:"live_session_invalid"},409);
+  if(data.action==="ready"&&ticket.expires_at<=now)
+   return res({error:"live_session_expired"},409);
+  ticket.state=data.action==="ready"?"confirmed":"aborted";
+  await env.SETTINGS.put(ticketKey,JSON.stringify(ticket),{expirationTtl:2*86400});
+  return res({ok:true,state:ticket.state});
+ }catch(e){return res({error:"live_session_unavailable"},503)}
+}
+async function liveToken(req,env){
+ if(req.method!=="POST")return res({error:"method_not_allowed"},405);
+ const {caller,error}=await liveAuthorize(req,env);
+ if(error)return error;
+ if(!env.AUTH_LIMITER)return res({error:"office_auth_unavailable"},503);
  if(!env.GEMINI_API_KEY)return res({error:"live_not_configured"},503);
  if(!(await env.AUTH_LIMITER.limit({key:"gemini-live-"+caller.member.id})).success)
   return res({error:"rate_limited"},429);
- const day=new Date().toISOString().slice(0,10),quotaKey="fhd-live-daily-v1:"+caller.member.id+":"+day;
- const used=Number(await env.SETTINGS.get(quotaKey)||"0");
- if(used>=LIVE_MAX_DAILY)return res({error:"daily_free_trial_limit"},429);
- // Minimal documented REST token payload: fixed one-use and short expiries.
- // The client still sends the same allowed Gemini Live model in its setup.
- const config=liveTokenRequestConfig(Date.now());
+ let requestData;try{requestData=await body(req,512)}catch(e){return res({error:"bad_request"},400)}
+ // Older APKs do not send a success callback. Preserve their previous
+ // immediate-charge behavior until each handset updates to usage_protocol 2.
+ const supportsAcknowledgment=requestData?.usage_protocol===2;
  try{
+  const now=Date.now(),quota=await liveQuota(env,caller.member.id,now);
+  if(quota.remaining<=0)return res({error:"daily_free_trial_limit",...quota},429);
+  // Bound unsuccessful credential issuance as well; never pay to bypass quota.
+  if(quota.attempts>=LIVE_MAX_ATTEMPTS)
+   return res({error:"daily_attempt_limit",...quota},429);
   const response=await fetch("https://generativelanguage.googleapis.com/v1beta/auth_tokens",{
    method:"POST",
    headers:{"x-goog-api-key":env.GEMINI_API_KEY,"Content-Type":"application/json"},
-   body:JSON.stringify(config)});
+   body:JSON.stringify(liveTokenRequestConfig(now))});
   if(!response.ok){
-   // Keep provider response body/credentials private, but make root causes actionable.
    const code=response.status===429?"provider_quota":
-       response.status===401||response.status===403?"provider_access_denied":
-       response.status===400||response.status===404?"provider_model_unavailable":
-       "live_provider_unavailable";
+     response.status===401||response.status===403?"provider_access_denied":
+     response.status===400||response.status===404?"provider_model_unavailable":
+     "live_provider_unavailable";
    return res({error:code},response.status===429?429:503);
   }
-  const data=await response.json();
-  const session=String(data?.name||"");
-  if(!session||session.length>2048)return res({error:"live_token_invalid"},503);
-  await env.SETTINGS.put(quotaKey,String(used+1),{expirationTtl:2*86400});
-  return res({token:session,model:LIVE_MODEL,expires_in_seconds:45,limit_per_day:LIVE_MAX_DAILY});
+  const data=await response.json(), token=String(data?.name||"");
+  if(!token||token.length>2048)return res({error:"live_token_invalid"},503);
+  // Recheck after the remote call in case another device began in the meantime.
+  const again=await liveQuota(env,caller.member.id,Date.now());
+  if(again.remaining<=0)return res({error:"daily_free_trial_limit",...again},429);
+  if(!supportsAcknowledgment){
+   // Keep the legacy daily counter for v2.1.54 or earlier clients. This also
+   // prevents old phones bypassing the quota during a staggered APK rollout.
+   const legacyKey="fhd-live-daily-v1:"+caller.member.id+":"+liveDay(now);
+   const legacyUsed=Number(await env.SETTINGS.get(legacyKey)||"0");
+   await env.SETTINGS.put(legacyKey,String(legacyUsed+1),{expirationTtl:2*86400});
+   return res({token,model:LIVE_MODEL,expires_in_seconds:45,
+    limit_per_day:LIVE_MAX_DAILY,remaining:Math.max(0,again.remaining-1),
+    reset_at_kst:again.reset_at_kst});
+  }
+  const sessionId=crypto.randomUUID(),ticketKey=livePrefix(caller.member.id,now)+sessionId;
+  await env.SETTINGS.put(ticketKey,JSON.stringify({
+   state:"pending",expires_at:Date.now()+LIVE_PENDING_MS}),{expirationTtl:2*86400});
+  return res({token,model:LIVE_MODEL,session_id:sessionId,expires_in_seconds:45,
+   limit_per_day:LIVE_MAX_DAILY,remaining:Math.max(0,again.remaining-1),
+   reset_at_kst:quota.reset_at_kst});
  }catch(e){return res({error:"live_provider_unavailable"},503)}
 }
 
@@ -756,6 +836,8 @@ export default {async scheduled(event,env,ctx){
   authConfigured:!!env.FIRSTHYUNDAI_ADMIN_CODE,boardAuthConfigured:!!env.FIRSTHYUNDAI_ACCESS_CODE,fcmConfigured:!!fcmConfig(env)});
  }
  if(url.pathname==="/board/ai/live-token")return liveToken(req,env);
+ if(url.pathname==="/board/ai/live-status")return liveStatus(req,env);
+ if(url.pathname==="/board/ai/live-session")return liveSession(req,env);
  if(url.pathname.startsWith("/board"))return boardCommand(req,env,url,ctx);
  if(url.pathname==="/settings"&&req.method==="GET")return res((await env.SETTINGS.get(key,"json"))||{schema:1,status:"not_configured"});
  if(req.headers.has("origin"))return res({error:"native_only"},403);
@@ -775,6 +857,6 @@ export default {async scheduled(event,env,ctx){
   await env.SETTINGS.put(key,JSON.stringify(record));return res(record);
  }
  return res({error:"not_found"},404);
-},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,memberList,boardToken,validBoardToken,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision,timedMemoDue,deliverDueReminders,liveTokenRequestConfig}};
+},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,memberList,boardToken,validBoardToken,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision,timedMemoDue,deliverDueReminders,liveTokenRequestConfig,liveQuota,liveReset}};
 
 

@@ -1,3 +1,12 @@
+## 2026-10-30 · v2.1.55 · Live 정상 시작 기준 무료 횟수와 사용량 표시
+- 단계적 업데이트 호환성: 새 APK는 usage_protocol=2로 정상 마이크 시작 시 차감하며, 구버전 APK(v2.1.54 이하)는 서버가 이전 방식대로 인증 토큰 발급 즉시 v1 카운터에 차감한다. 두 방식의 횟수를 합산해 같은 6회 한도를 검사한다.
+- 화면에 뜬 일일 6회 제한은 Google 고정 한도가 아니라 기존 Worker 자체 제한이었다. 기존에는 Google 임시 토큰만 발급해도 1회 차감되어, 바이너리 setupComplete를 놓치거나 마이크 연결에 실패하면 사용량이 낭비됐다.
+- Worker: 6회/계정/UTC 1일, 뉴스/계약 Live 합산, 7분 세션, 기존 무료 모델과 1회 사용 토큰 유지. 발급 시 최대 90초 임시 예약을 설정하고, Android의 실제 마이크 시작 이후 /board/ai/live-session ready 응답으로 사용을 확정한다. abort 또는 예약 만료로 실패·취소한 요청은 사용량에서 제외한다. 확정된 대화는 후에 종료되어도 1회로 남는다.
+- 무료 남용을 막기 위해 1분 8회 요청 제한 및 일일 48회 토큰 발급 시도 상한 적용. 기존 6회 확정 사용한 계정은 다음날 9시까지 새 음성 이용 불가. 사전 일일 기록(v1)도 해당 날짜까지 승계한다.
+- 클라이언트: 사무실 계정 인증 후 /board/ai/live-status 조회, 뉴스 Live와 계약 Live에 남은 횟수, 준비 중 예약, 다음 초기화 날짜(한국시간 오전 9시) 표시. 오류 문구도 날짜를 명시한다. 오디오·고객정보·계좌·계약 메모 및 Gemini 비밀키는 추가 API에 전송되지 않는다.
+- 남은 위험: Cloudflare KV의 eventual consistency 때문에 2대 이상 동시 요청에 대해서는 강한 원자적 카운트 보장이 안 된다. Google 공급자 무료 한도와 프로젝트 실측은 별도 확인해야 한다. 이번 수정만으로 무한 무료 이용을 보장하지 않는다.
+- 테스트: scripts/test_live_token_config.mjs에서 pending/confirmed/expired/aborted, 구형 카운터와 한국시간 날짜를 검사하고 UI/native 회귀검사를 추가. APK v2.1.55/build206 및 Worker 배포 후 실기기 검증 필요.
+
 ## 2026-10-30 · v2.1.54 · 실기기 Live setupComplete 미수신 해결
 - 서버·Google WS은 정상. 별도 Google 실측 결과 `CONTRACT_SETUP_FRAME_TYPE binary` 및 `CONTRACT_FULL_SETUP_OK_NO_AUDIO`로 확인. 실제 Android는 `PublicLiveVoice.onMessage(WebSocket,String)`만 구현해 바이너리 JSON 수신 이벤트를 무시, 화면에 "연결됐습니다. 음성 응답 준비 중"으로 남고 마이크 미시작.
 - `PublicLiveVoice`에 OkHttp `onMessage(WebSocket,ByteString)` 추가, `GeminiLiveFrame.text(ByteString)`의 크기 제한된 UTF-8 변환 후 원래 JSON 처리로 통합. setupComplete 이후 startMicrophone, 정상 종료 전 예기치 않은 close 에러 통지.
