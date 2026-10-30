@@ -1,0 +1,56 @@
+name: Diagnose Live token format (no audio, no token printed)
+on:
+  push:
+    branches: ['diagnostic/live-token-20261030']
+    paths: ['.github/workflows/diagnose-live-token-20261030.yml']
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Probe only token issuance with existing private Gemini key
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os, json, datetime, urllib.request, urllib.error, re
+          key=os.getenv('GEMINI_API_KEY','')
+          if not key:
+              print('MISSING_GEMINI_SECRET')
+              raise SystemExit(0)
+          endpoint='https://generativelanguage.googleapis.com/v1beta/auth_tokens'
+          now=datetime.datetime.now(datetime.timezone.utc)
+          ts=lambda seconds:(now+datetime.timedelta(seconds=seconds)).strftime('%Y-%m-%dT%H:%M:%SZ')
+          def req(model,restricted):
+              data={'uses':1,'newSessionExpireTime':ts(45),'expireTime':ts(8*60)}
+              if restricted: data['liveConnectConstraints']={'model':'models/'+model,'config':{'responseModalities':['AUDIO']}}
+              body=json.dumps(data).encode()
+              request=urllib.request.Request(endpoint,data=body,method='POST',
+                  headers={'x-goog-api-key':key,'Content-Type':'application/json'})
+              try:
+                  with urllib.request.urlopen(request,timeout=18) as response:
+                      result=json.load(response)
+                  return (response.status,'OK',bool(result.get('name')))
+              except urllib.error.HTTPError as e:
+                  raw=e.read(8000).decode('utf8','replace')
+                  try: error=json.loads(raw).get('error',{})
+                  except Exception: error={}
+                  reason=str(error.get('status','unknown'))[:60]
+                  msg=str(error.get('message','')).lower()
+                  flags=[token for token in ['model','unknown','invalid','not found','not supported','not available',
+                       'responsemodalities','sessionresumption','liveconnectconstraints','constraint','expire',
+                       'preview','quota','api key','billing','free','project','permission','token','auth_tokens']
+                       if token in msg]
+                  return (e.code,reason,','.join(flags) or 'none')
+              except Exception as e: return ('network_error',type(e).__name__,'')
+          for label,model,restricted in [
+            ('current_restricted','gemini-3.1-flash-live-preview',True),
+            ('current_minimal','gemini-3.1-flash-live-preview',False),
+            ('recommended_restricted','gemini-3.8-live',True)]:
+              status,reason,detail=req(model,restricted)
+              print(label,'http=',status,'reason=',reason,'flags=',detail)
+              if status in [401,403,429] or status=='network_error': break
+              if label=='current_restricted' and status==200: break
+          PY
