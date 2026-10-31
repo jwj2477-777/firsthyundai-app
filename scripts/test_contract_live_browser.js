@@ -10,8 +10,9 @@ async function verify(){
   const live=window.FirstHyundaiContractLive,dialog=get('cl_dialog');
   check(!dialog.open,'Live must be closed by default');
   check(get('ct_rough')&&get('ct_specialMemo'),'Default memo inputs preserved');
-  const privateKeys=['rough','specialMemo','bank','account','accountHolder','owner','buyer','unit'];
+  const privateKeys=['rough','specialMemo','bank','account','accountHolder','owner','buyer'];
   for(const k of privateKeys)get('ct_'+k).value='SYNTHETIC_LOCAL_'+k;
+  get('ct_unit').value='SYNTHETIC_OLD_UNIT';
   get('ct_price').value='80000';get('ct_terms').value='기존 특약 보존.';
   window.confirm=()=>true;let id='',starts=0,stops=0;
   window.FirstHyundaiNative={startContractLiveVoice(...args){check(args.length===1&&/^cl-[0-9-]+$/.test(args[0]),'Only session ID sent');id=args[0];starts++;},
@@ -20,7 +21,8 @@ async function verify(){
   get('ct_liveOpen').click();check(dialog.open,'Optional button opens dialog');
   get('cl_start').click();check(starts===0,'Consent not checked');
   get('cl_consent').checked=true;get('cl_start').click();check(starts===1,'Explicit start');
-  emit('proposal',JSON.stringify({price:980000000,contractDeposit:65000000,balanceDate:'2027-04-18',terms:'관리비는 잔금일까지 정산한다.'}));
+  emit('proposal',JSON.stringify({property:'파크애비뉴',unit:'1604동 2101호',price:980000000,contractDeposit:65000000,balanceDate:'2027-04-18',terms:'관리비는 잔금일까지 정산한다.'}));
+  check(!!get('cl_pick_property')&&!!get('cl_pick_unit'),'Live review includes apartment and unit');
   check(get('ct_price').value==='80000','No automatic writes');
   check(get('cl_apply').disabled,'No apply with mic active');
   check(dialog.scrollWidth<=dialog.clientWidth+1,'Dialog horizontal overflow');
@@ -30,6 +32,8 @@ async function verify(){
   check(get('ct_price').value==='98000','원 to 만원 conversion');
   check(get('ct_contractDeposit').value==='6500','Explicit deposit beats default');
   check(get('ct_balanceDate').value==='2027-04-18','Native date input accepts validated date');
+  check(get('ct_property').value==='파크애비뉴','Spoken apartment flows into contract form');
+  check(get('ct_unit').value==='1604동 2101호','Spoken dong-ho flows into contract form');
   for(const k of privateKeys)check(get('ct_'+k).value==='SYNTHETIC_LOCAL_'+k,'Local field preserved '+k);
   check(get('ct_terms').value.includes('기존 특약 보존.')&&get('ct_terms').value.includes('관리비는 잔금일까지 정산한다.'),'Keep and append terms');
   check(!get('ct_resultPanel').classList.contains('hidden'),'Existing preview flow');

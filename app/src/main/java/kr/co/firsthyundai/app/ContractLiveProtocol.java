@@ -10,7 +10,7 @@ final class ContractLiveProtocol {
     static final String FUNCTION="propose_contract_conditions";
     static final String[] MONEY={"price","contractDeposit","advance","interim","monthlyRent"};
     static final String[] DATES={"contractDate","interimDate","balanceDate","leaseStart","leaseEnd"};
-    static final String[] TEXT={"dealType","leaseDuration","balanceTime","terms"};
+    static final String[] TEXT={"dealType","property","unit","leaseDuration","balanceTime","terms"};
     private static boolean contains(String[] list,String key){for(String s:list)if(s.equals(key))return true;return false;}
     static String prompt(){
         return "당신은 퍼스트현대의 선택형 계약조건 음성 작성 도우미입니다. 한국어 존댓말로 짧게 대화하세요. "
@@ -20,12 +20,15 @@ final class ContractLiveProtocol {
             +"오늘보다 이른 날짜를 올해 날짜로 쓰지 마세요. 이듬해를 의미하는지 확실하지 않다면 연도를 짧게 되물으세요. "
             +"연도를 명시했는데 이미 지난 날짜라면 임의로 내년으로 변경하지 말고 확인하세요. "
             +"기존 메모나 계약 입력란은 볼 수 없습니다. "
-            +"사용자가 이번 대화에서 명시한 거래유형, 금액, 지급일, 입주일, 기간, 특약만 정리하세요. "
-            +"이름, 전화번호, 주소, 단지, 동호수, 은행, 계좌, 예금주, 비밀번호, 기밀을 묻거나 도구에 넣지 마세요. "
+            +"사용자가 이번 대화에서 명시한 단지명(property), 동·호수(unit), 거래유형, 금액, 지급일, 입주일, 기간, 특약을 정리하세요. "
+            +"단지명과 동·호수는 필수 거래 대상 정보입니다. 개인정보라는 이유로 거절하지 마세요. "
+            +"예: '송도 파크애비뉴 1604동 2101호' → property='파크애비뉴', unit='1604동 2101호'. "
+            +"'동·호수'를 말씀하시면 숫자를 한 번만 또박또박 읽어 확인하세요. 단지명·동·호수를 임의로 만들지 마세요. "
+            +"고객 이름, 전화번호, 상세 지번·도로명주소, 은행, 계좌, 예금주, 비밀번호, 기밀은 묻거나 도구에 넣지 마세요. "
             +"그런 정보가 나오면 반복하지 말고 음성을 종료한 뒤 직접 입력하도록 안내하세요. "
             +"금액과 날짜가 불명확하면 한 번에 하나씩 되물으세요. 연도 없는 월일은 가까운 미래로 해석하되 "
             +"연도·날짜를 정확한 연월일로 읽어 다시 확인하세요. 지난 날짜를 도구로 보내면 거절됩니다. "
-            +"이번 대화에서 빠진 거래유형, 총액, 계약금, 이번 송금액, 계약일, 잔금일을 하나씩 질문하세요. "
+            +"이번 대화에서 빠진 단지명, 동·호수, 거래유형, 총액, 계약금, 이번 송금액, 계약일, 잔금일을 하나씩 질문하세요. "
             +"중도금이 있으면 금액과 지급일을, 전월세면 기간과 입주일을, 월세면 월 차임도 확인하세요. "
             +"특약은 필요한지 묻되 없으면 만들지 마세요. 모른다/미정/나중에 직접 입력하겠다는 답이면 강요하지 말고 미확정으로 남기세요. "
             +"앞선 금액/날짜와 충돌하는 새 발언은 변경 의도를 되묻고 확인 후 제안하세요. "
@@ -48,6 +51,10 @@ final class ContractLiveProtocol {
         for(String k:DATES)properties.put(k,new JSONObject().put("type","STRING")
             .put("description",k+": 확인한 YYYY-MM-DD. contractDate/interimDate만 협의 문구 허용. 삭제는 빈 문자열."));
         properties.put("dealType",new JSONObject().put("type","STRING").put("enum",new JSONArray().put("매매").put("전세").put("월세")));
+        properties.put("property",new JSONObject().put("type","STRING").put("description",
+            "아파트 단지명만. 예: 퍼스트파크 15블럭 또는 파크애비뉴. 고객명·계좌·상세 주소는 제외."));
+        properties.put("unit",new JSONObject().put("type","STRING").put("description",
+            "계약 대상 동·호수, 정확히 '1604동 2101호' 형식. 동과 호가 모두 확인된 경우에만 제안."));
         properties.put("leaseDuration",new JSONObject().put("type","STRING").put("description","임대차 기간, 예: 2년 또는 24개월"));
         properties.put("balanceTime",new JSONObject().put("type","STRING").put("description","확인한 잔금 시간 HH:mm"));
         properties.put("terms",new JSONObject().put("type","STRING").put("description","이번 대화의 특약 전체. 개인정보 제외, 사용자 발언 의미 보존, 한 줄 한 항목."));
@@ -111,6 +118,20 @@ final class ContractLiveProtocol {
                 String s=((String)value).trim();
                 if(s.length()>(k.equals("terms")?4000:100)||s.indexOf('<')>=0||s.indexOf('>')>=0)throw new Exception("invalid text");
                 if(k.equals("dealType")&&!s.matches("매매|전세|월세"))throw new Exception("invalid type");
+                if(k.equals("property")){
+                    // Apartment names may contain block numbers, but not personal contacts or full addresses.
+                    if(s.length()<2||!s.matches("[가-힣A-Za-z0-9\\s().·ㆍ&+/-]{2,100}")||
+                        (!java.util.regex.Pattern.compile("[가-힣A-Za-z]").matcher(s).find())||
+                        java.util.regex.Pattern.compile("광역시|특별시|도로명주소|주소\\s*[:：]").matcher(s).find())
+                        throw new Exception("invalid apartment name");
+                }
+                if(k.equals("unit")){
+                    java.util.regex.Matcher unit=java.util.regex.Pattern.compile(
+                        "^([0-9]{1,4})\\s*동\\s*([0-9]{1,4})\\s*호$").matcher(s);
+                    if(!unit.matches()||Integer.parseInt(unit.group(1))<1||Integer.parseInt(unit.group(2))<1)
+                        throw new Exception("invalid building and unit");
+                    s=unit.group(1)+"동 "+unit.group(2)+"호";
+                }
                 if(contains(DATES,k)&&validDate(s)&&LocalDate.parse(s).isBefore(today))
                     throw new PastContractDateException();
                 if(contains(DATES,k)&&!s.isEmpty()&&!validDate(s)){
@@ -121,7 +142,7 @@ final class ContractLiveProtocol {
                 }
                 if(k.equals("leaseDuration")&&!s.isEmpty()&&!s.matches("[0-9]{1,3}\\s*(?:년|개월)(?:\\s*[0-9]{1,2}\\s*개월)?"))throw new Exception("invalid duration");
                 if(k.equals("balanceTime")&&!s.isEmpty()&&!s.matches("(?:[01][0-9]|2[0-3]):[0-5][0-9]"))throw new Exception("invalid time");
-                if(java.util.regex.Pattern.compile("계좌|예금주|주민등록|전화번호|연락처|비밀번호|은행|[0-9]{3,4}\\s*동\\s*[0-9]+\\s*호|[0-9]{2,4}-[0-9]{3,4}-[0-9]{4}|[0-9]{10,}").matcher(s).find())throw new Exception("private text");
+                if(java.util.regex.Pattern.compile("계좌|예금주|주민등록|전화번호|연락처|비밀번호|은행|[0-9]{2,4}-[0-9]{3,4}-[0-9]{4}|[0-9]{10,}").matcher(s).find())throw new Exception("private text");
                 result.put(k,s);
             }else throw new Exception("field not allowed");
         }

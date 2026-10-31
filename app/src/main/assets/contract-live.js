@@ -3,7 +3,7 @@
 (function(root){
  'use strict';
  const $=id=>document.getElementById(id), field=k=>$('ct_'+k);
- const LABELS={dealType:'계약 유형',price:'거래금액 / 보증금',contractDeposit:'계약금',advance:'이번 송금액',
+ const LABELS={property:'아파트명 / 단지명',unit:'동·호수',dealType:'계약 유형',price:'거래금액 / 보증금',contractDeposit:'계약금',advance:'이번 송금액',
   interim:'중도금',monthlyRent:'월세',contractDate:'계약일',interimDate:'중도금 지급일',balanceDate:'잔금일',
   leaseStart:'입주일',leaseEnd:'임대차 종료일',leaseDuration:'임대차 기간',balanceTime:'잔금 시간',terms:'특약 (기존 특약에 추가)'};
  const MONEY=new Set(['price','contractDeposit','advance','interim','monthlyRent']);
@@ -28,6 +28,17 @@
     const s=v.trim();
     if(s.length>(k==='terms'?4000:100)||/[<>\u0000-\u0008]/.test(s))return null;
     if(k==='dealType'&&!['매매','전세','월세'].includes(s))return null;
+    if(k==='property'){
+      if(s.length<2||s.length>100||!/^[가-힣A-Za-z0-9\s().·ㆍ&+\/-]+$/.test(s)||
+         (!/[가-힣A-Za-z]/.test(s))||
+         /광역시|특별시|도로명주소|주소\s*[:：]/.test(s))return null;
+    }
+    if(k==='unit'){
+      const matched=s.match(/^([0-9]{1,4})\s*동\s*([0-9]{1,4})\s*호$/);
+      if(!matched||Number(matched[1])<1||Number(matched[2])<1)return null;
+      out[k]=matched[1]+'동 '+matched[2]+'호';
+      continue;
+    }
     if(DATES.has(k)&&s&&!validDate(s)){
      if(!['contractDate','interimDate'].includes(k)||
         !/^[\d\s년월일초중말순경~～.\-/협의추후미정예정상호결정까지부터전후사이]+$/.test(s)||
@@ -36,7 +47,7 @@
     if(k==='leaseDuration'&&s&&!/^\d{1,3}\s*(?:년|개월)(?:\s*\d{1,2}\s*개월)?$/.test(s))return null;
     if(k==='balanceTime'&&s&&!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(s))return null;
     // Defense in depth on model output; this cannot redact microphone audio already sent.
-    if(/(?:계좌|예금주|주민등록|전화번호|연락처|비밀번호|은행|\d{3,4}\s*동\s*\d+\s*호|\d{2,4}-\d{3,4}-\d{4}|\d{10,})/.test(s))return null;
+    if(/(?:계좌|예금주|주민등록|전화번호|연락처|비밀번호|은행|\d{2,4}-\d{3,4}-\d{4}|\d{10,})/.test(s))return null;
     out[k]=s;
    }
   }
@@ -132,9 +143,12 @@
   if(active||stopping)return false;
   const chosen=Object.entries(proposals).filter(([k])=>$('cl_pick_'+k)?.checked);
   if(!chosen.length){status('반영할 항목을 선택해 주세요.');return false;}
-  if(!root.confirm('선택한 조건을 현재 계약에 반영할까요? 같은 항목의 기존 값은 바뀌며, 특약은 추가됩니다. 금액·날짜와 특약 의미를 확인해 주세요.'))return false;
+  if(!root.confirm('선택한 조건을 현재 계약에 반영할까요? 같은 항목의 기존 값은 바뀌며, 특약은 추가됩니다. 단지명·동·호수·금액·날짜를 확인해 주세요.'))return false;
   // Explicit deposit first prevents the existing 10% helper overwriting it on price edit.
-  chosen.sort(([a],[b])=>(a==='contractDeposit'?-1:b==='contractDeposit'?1:0));
+  // Resolve the catalog apartment first so the verified address is added locally.
+  // Explicit deposit before price preserves the existing 10% auto-calc safeguard.
+  const rank={property:0,unit:1,contractDeposit:2};
+  chosen.sort(([a],[b])=>(rank[a]??3)-(rank[b]??3));
   for(const [k,v] of chosen){
    const target=field(k);if(!target)continue;
    if(k==='terms'){
