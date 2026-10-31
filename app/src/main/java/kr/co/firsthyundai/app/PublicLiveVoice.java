@@ -20,6 +20,7 @@ import okio.ByteString;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /** Explicit user-initiated Gemini Live for public news or isolated contract-condition proposals.
  * Mic and audio are never recorded to disk, logged, or added to office memos.
@@ -61,6 +62,8 @@ final class PublicLiveVoice {
     // Conditions proposed during this session only; never the pre-existing contract form.
     private final JSONObject proposedConditions=new JSONObject();
     private volatile int audioGeneration=0;
+    private final AtomicInteger queuedAudioBytes=new AtomicInteger();
+    private static final int MAX_PENDING_AUDIO_BYTES=24_000*2*4; // 4s at 24kHz PCM16
     PublicLiveVoice(Context context,Events events){this.context=context.getApplicationContext();this.events=events;}
     private void event(String state,String text){events.emit(state,text);}
     private static String safePublicBrief(String json){
@@ -120,6 +123,16 @@ final class PublicLiveVoice {
                                   "해당 개인정보가 나오면 자세히 다루지 말고 일반적인 안내로 전환하세요. " +
                                   "메모 저장이나 일정 변경 등 앱 작업을 실행할 권한이 없습니다. " +
                                   "간결한 존댓말로 응답하세요. 공개 기사 참고 정보:\\n"+publicBrief))));
+                            // The default barge-in setting can interrupt the model when
+                            // its own speaker leaks back into the microphone.
+                            // Contract dictation prioritizes uninterrupted spoken confirmation.
+                            JSONObject vad=new JSONObject()
+                                .put("automaticActivityDetection",new JSONObject()
+                                    .put("startOfSpeechSensitivity","START_SENSITIVITY_LOW")
+                                    .put("endOfSpeechSensitivity","END_SENSITIVITY_LOW")
+                                    .put("silenceDurationMs",700));
+                            if(contractMode)vad.put("activityHandling","NO_INTERRUPTION");
+                            setup.put("realtimeInputConfig",vad);
                             setup.put("inputAudioTranscription",new JSONObject());
                             setup.put("outputAudioTranscription",new JSONObject());
                             if(contractMode){
@@ -225,6 +238,9 @@ final class PublicLiveVoice {
                                 result="proposed_for_user_review";
                             }
                         }catch(Exception conflict){result="rejected_inconsistent_conditions";}
+                    }catch(ContractLiveProtocol.PastContractDateException e){
+                        result="rejected_past_date";
+                        event("date_warning","말씀하신 날짜가 지난 연도로 인식됐습니다. 연도를 정확히 확인해 주세요.");
                     }catch(Exception ignored){}
                 }
                 // Only fixed acknowledgements leave the device; no existing form or previous values.
@@ -249,14 +265,16 @@ final class PublicLiveVoice {
             microphone=recorder;recorder.startRecording();
             event("listening",contractMode?"계약 조건을 말씀하세요. 이름·주소·계좌는 말하지 마세요.":"말씀하세요. 공개된 뉴스에 대해서만 질문해 주세요.");
             Thread reader=new Thread(()->{
-                byte[] samples=new byte[3200];
+                // 40ms of 16kHz mono PCM16; Google's Live guidance recommends 20–40ms.
+                // A 100ms chunk can slow turn detection and feel like clipped speech.
+                byte[] samples=new byte[1280];
                 while(running&&microphone==recorder){
                     int n;
                     try{n=recorder.read(samples,0,samples.length);}catch(Exception e){break;}
                     if(!running||microphone!=recorder)break;
                     if(n<=0)continue;
                     WebSocket ws=socket;
-                    if(ws==null||ws.queueSize()>256000)continue;
+                    if(ws==null||ws.queueSize()>64000)continue;
                     try{
                         String payload=Base64.encodeToString(samples,0,n,Base64.NO_WRAP);
                         ws.send(new JSONObject().put("realtimeInput",new JSONObject().put("audio",
@@ -274,23 +292,52 @@ final class PublicLiveVoice {
     }
     private void play(byte[] pcm){
         final int generation=audioGeneration;
-        if(!running||player.isShutdown())return;
-        player.execute(()->{
-            if(!running||generation!=audioGeneration)return;
-            try{
-                if(speaker==null){
-                    int min=AudioTrack.getMinBufferSize(24000,AudioFormat.CHANNEL_OUT_MONO,
-                                      AudioFormat.ENCODING_PCM_16BIT);
-                    if(min<=0)return;
-                    AudioTrack track=new AudioTrack(AudioManager.STREAM_MUSIC,24000,
-                        AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT,
-                        Math.max(min,9600),AudioTrack.MODE_STREAM);
-                    if(track.getState()!=AudioTrack.STATE_INITIALIZED){track.release();return;}
-                    speaker=track;track.play();
-                }
-                speaker.write(pcm,0,pcm.length);
-            }catch(Exception ignored){}
-        });
+        if(!running||player.isShutdown()||pcm==null||pcm.length==0)return;
+        // Prevent unbounded audio queue buildup on a slow device, which can
+        // otherwise play responses seconds after the conversation advances.
+        int pending=queuedAudioBytes.addAndGet(pcm.length);
+        if(pending>MAX_PENDING_AUDIO_BYTES){
+            queuedAudioBytes.addAndGet(-pcm.length);
+            return;
+        }
+        try{
+            player.execute(()->{
+                try{
+                    if(!running||generation!=audioGeneration)return;
+                    if(speaker==null){
+                        int min=AudioTrack.getMinBufferSize(24000,AudioFormat.CHANNEL_OUT_MONO,
+                            AudioFormat.ENCODING_PCM_16BIT);
+                        if(min<=0)return;
+                        AudioTrack track=new AudioTrack(AudioManager.STREAM_MUSIC,24000,
+                            AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT,
+                            Math.max(min,24000),AudioTrack.MODE_STREAM);
+                        if(track.getState()!=AudioTrack.STATE_INITIALIZED){track.release();return;}
+                        speaker=track;
+                        // Pre-fill up to 80ms before playing to reduce initial underruns.
+                        int priming=Math.min(pcm.length,3840);
+                        int written=track.write(pcm,0,priming,AudioTrack.WRITE_BLOCKING);
+                        if(written<=0){track.release();speaker=null;return;}
+                        track.play();
+                        if(written<priming)return; // Unexpected partial write; don't duplicate samples.
+                        writeRemaining(track,pcm,written,generation);
+                    }else{
+                        writeRemaining(speaker,pcm,0,generation);
+                    }
+                }catch(Exception ignored){}
+                finally{queuedAudioBytes.addAndGet(-pcm.length);}
+            });
+        }catch(java.util.concurrent.RejectedExecutionException ignored){
+            queuedAudioBytes.addAndGet(-pcm.length);
+        }
+    }
+    private void writeRemaining(AudioTrack track,byte[] pcm,int offset,int generation){
+        // Android may write fewer bytes than requested; always write the remainder.
+        // Never replay old model audio after a genuine interruption.
+        while(running&&generation==audioGeneration&&offset<pcm.length){
+            int written=track.write(pcm,offset,pcm.length-offset,AudioTrack.WRITE_BLOCKING);
+            if(written<=0)break;
+            offset+=written;
+        }
     }
     synchronized void stop(){
         if(closed)return;

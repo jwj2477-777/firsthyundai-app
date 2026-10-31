@@ -53,6 +53,30 @@ public class ContractLiveProtocolTest {
         ContractLiveProtocol.validateConsistency(new JSONObject().put("contractDate","2027년 1월 중 협의"),
             new JSONObject().put("balanceDate","2027-01-01"));
     }
+    @Test public void yearlessCalendarDatesMustNotBecomePastYear() throws Exception {
+        java.time.LocalDate today=java.time.LocalDate.of(2026,10,31);
+        for(String date:new String[]{"2026-03-25","2026-07-30","2026-10-30"}){
+            try{
+                ContractLiveProtocol.validated(new JSONObject().put("balanceDate",date),today);
+                fail("Past date must require explicit correction: "+date);
+            }catch(ContractLiveProtocol.PastContractDateException expected){}
+        }
+        for(String date:new String[]{"2027-03-25","2027-07-30","2026-10-31","2028-02-29"}){
+            assertEquals(date,ContractLiveProtocol.validated(
+                new JSONObject().put("balanceDate",date),today).getString("balanceDate"));
+        }
+        try{
+            ContractLiveProtocol.validated(new JSONObject().put("contractDate","2026-03-25"),today);
+            fail("Contract dates must also be checked");
+        }catch(ContractLiveProtocol.PastContractDateException expected){}
+        JSONObject tentative=ContractLiveProtocol.validated(
+            new JSONObject().put("contractDate","2027년 1월 말 협의"),today);
+        assertTrue(tentative.getString("contractDate").contains("협의"));
+        // A user may still enter an explicitly historical contract in the manual form.
+        // The voice tool must not silently roll a named past year forward.
+        assertTrue(ContractLiveProtocol.prompt().contains("가장 가까운 날짜"));
+        assertTrue(ContractLiveProtocol.prompt().contains("rejected_past_date"));
+    }
     @Test public void toolsCannotReadFormsOrExecuteSharing() throws Exception {
         JSONObject tool=ContractLiveProtocol.tools().getJSONObject(0).getJSONArray("functionDeclarations").getJSONObject(0);
         assertEquals(ContractLiveProtocol.FUNCTION,tool.getString("name"));

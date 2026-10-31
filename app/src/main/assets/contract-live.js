@@ -109,6 +109,7 @@
  function incoming(event){
   if(!requestId||event?.requestId!==requestId)return;
   const state=String(event.state||''),message=String(event.message||'');
+  if(state==='date_warning'&&active){status(message||'지난 날짜가 감지됐습니다. 연도를 다시 확인해 주세요.');return;}
   if(state==='proposal'&&active&&!stopping){
    let p;try{p=normalize(JSON.parse(message));}catch(e){}
    if(!p){status('일부 조건을 확인하지 못했습니다. 금액·날짜를 정확히 다시 말씀해 주세요.');return;}
