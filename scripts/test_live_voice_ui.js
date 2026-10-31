@@ -51,6 +51,8 @@ assert(native.includes('NO_INTERRUPTION'),'Contract model voice should not be cu
 assert(native.includes('MAX_PENDING_AUDIO_BYTES'),'Guard slow device playback queue');
 assert(native.includes('pcm.length-offset,AudioTrack.WRITE_BLOCKING'),'Play partial output writes without clipping audio');
 assert(native.includes('rejected_past_date'),'Send a distinct correction request for guessed past years');
+assert(native.includes('event("date_warning"'),'Notify user visibly when a past-year date was rejected');
+assert(read('app/src/main/assets/contract-live.js').includes("state==='date_warning'"),'UI must explain that date needs confirmation');
 assert(native.includes('24000'));
 assert(!native.includes('GEMINI_API_KEY'));
 assert(worker.includes('validBoardToken(auth.slice(7)'));
