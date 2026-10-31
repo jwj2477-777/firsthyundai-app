@@ -120,6 +120,16 @@ final class PublicLiveVoice {
                                   "해당 개인정보가 나오면 자세히 다루지 말고 일반적인 안내로 전환하세요. " +
                                   "메모 저장이나 일정 변경 등 앱 작업을 실행할 권한이 없습니다. " +
                                   "간결한 존댓말로 응답하세요. 공개 기사 참고 정보:\\n"+publicBrief))));
+                            // The default barge-in setting can interrupt the model when
+                            // its own speaker leaks back into the microphone.
+                            // Contract dictation prioritizes uninterrupted spoken confirmation.
+                            JSONObject vad=new JSONObject()
+                                .put("automaticActivityDetection",new JSONObject()
+                                    .put("startOfSpeechSensitivity","START_SENSITIVITY_LOW")
+                                    .put("endOfSpeechSensitivity","END_SENSITIVITY_LOW")
+                                    .put("silenceDurationMs",700));
+                            if(contractMode)vad.put("activityHandling","NO_INTERRUPTION");
+                            setup.put("realtimeInputConfig",vad);
                             setup.put("inputAudioTranscription",new JSONObject());
                             setup.put("outputAudioTranscription",new JSONObject());
                             if(contractMode){
@@ -225,6 +235,8 @@ final class PublicLiveVoice {
                                 result="proposed_for_user_review";
                             }
                         }catch(Exception conflict){result="rejected_inconsistent_conditions";}
+                    }catch(ContractLiveProtocol.PastContractDateException e){
+                        result="rejected_past_date";
                     }catch(Exception ignored){}
                 }
                 // Only fixed acknowledgements leave the device; no existing form or previous values.
@@ -249,14 +261,16 @@ final class PublicLiveVoice {
             microphone=recorder;recorder.startRecording();
             event("listening",contractMode?"계약 조건을 말씀하세요. 이름·주소·계좌는 말하지 마세요.":"말씀하세요. 공개된 뉴스에 대해서만 질문해 주세요.");
             Thread reader=new Thread(()->{
-                byte[] samples=new byte[3200];
+                // 40ms of 16kHz mono PCM16; Google's Live guidance recommends 20–40ms.
+                // A 100ms chunk can slow turn detection and feel like clipped speech.
+                byte[] samples=new byte[1280];
                 while(running&&microphone==recorder){
                     int n;
                     try{n=recorder.read(samples,0,samples.length);}catch(Exception e){break;}
                     if(!running||microphone!=recorder)break;
                     if(n<=0)continue;
                     WebSocket ws=socket;
-                    if(ws==null||ws.queueSize()>256000)continue;
+                    if(ws==null||ws.queueSize()>64000)continue;
                     try{
                         String payload=Base64.encodeToString(samples,0,n,Base64.NO_WRAP);
                         ws.send(new JSONObject().put("realtimeInput",new JSONObject().put("audio",
