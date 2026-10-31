@@ -29,7 +29,7 @@
     if(s.length>(k==='terms'?4000:100)||/[<>\u0000-\u0008]/.test(s))return null;
     if(k==='dealType'&&!['매매','전세','월세'].includes(s))return null;
     if(k==='property'){
-      if(s.length<2||s.length>100||!/^[가-힣A-Za-z0-9\s().·ㆍ&+/-]+$/.test(s)||
+      if(s.length<2||s.length>100||!/^[가-힣A-Za-z0-9\s().·ㆍ&+\/-]+$/.test(s)||
          !/[가-힣A-Za-z]/.test(s))return null;
     }
     if(k==='unit'){
