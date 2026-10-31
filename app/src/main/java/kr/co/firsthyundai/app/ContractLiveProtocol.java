@@ -121,7 +121,8 @@ final class ContractLiveProtocol {
                 if(k.equals("property")){
                     // Apartment names may contain block numbers, but not personal contacts or full addresses.
                     if(s.length()<2||!s.matches("[가-힣A-Za-z0-9\\s().·ㆍ&+/-]{2,100}")||
-                        !java.util.regex.Pattern.compile("[가-힣A-Za-z]").matcher(s).find())
+                        (!java.util.regex.Pattern.compile("[가-힣A-Za-z]").matcher(s).find())||
+                        java.util.regex.Pattern.compile("광역시|특별시|도로명주소|주소\\s*[:：]").matcher(s).find())
                         throw new Exception("invalid apartment name");
                 }
                 if(k.equals("unit")){
