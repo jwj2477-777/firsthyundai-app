@@ -30,7 +30,8 @@
     if(k==='dealType'&&!['매매','전세','월세'].includes(s))return null;
     if(k==='property'){
       if(s.length<2||s.length>100||!/^[가-힣A-Za-z0-9\s().·ㆍ&+\/-]+$/.test(s)||
-         !/[가-힣A-Za-z]/.test(s))return null;
+         (!/[가-힣A-Za-z]/.test(s))||
+         /광역시|특별시|도로명주소|주소\s*[:：]/.test(s))return null;
     }
     if(k==='unit'){
       const matched=s.match(/^([0-9]{1,4})\s*동\s*([0-9]{1,4})\s*호$/);
