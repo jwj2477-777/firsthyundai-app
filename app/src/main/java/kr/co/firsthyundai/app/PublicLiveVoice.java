@@ -20,6 +20,7 @@ import okio.ByteString;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /** Explicit user-initiated Gemini Live for public news or isolated contract-condition proposals.
  * Mic and audio are never recorded to disk, logged, or added to office memos.
@@ -61,6 +62,8 @@ final class PublicLiveVoice {
     // Conditions proposed during this session only; never the pre-existing contract form.
     private final JSONObject proposedConditions=new JSONObject();
     private volatile int audioGeneration=0;
+    private final AtomicInteger queuedAudioBytes=new AtomicInteger();
+    private static final int MAX_PENDING_AUDIO_BYTES=24_000*2*4; // 4s at 24kHz PCM16
     PublicLiveVoice(Context context,Events events){this.context=context.getApplicationContext();this.events=events;}
     private void event(String state,String text){events.emit(state,text);}
     private static String safePublicBrief(String json){
@@ -288,23 +291,52 @@ final class PublicLiveVoice {
     }
     private void play(byte[] pcm){
         final int generation=audioGeneration;
-        if(!running||player.isShutdown())return;
-        player.execute(()->{
-            if(!running||generation!=audioGeneration)return;
-            try{
-                if(speaker==null){
-                    int min=AudioTrack.getMinBufferSize(24000,AudioFormat.CHANNEL_OUT_MONO,
-                                      AudioFormat.ENCODING_PCM_16BIT);
-                    if(min<=0)return;
-                    AudioTrack track=new AudioTrack(AudioManager.STREAM_MUSIC,24000,
-                        AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT,
-                        Math.max(min,9600),AudioTrack.MODE_STREAM);
-                    if(track.getState()!=AudioTrack.STATE_INITIALIZED){track.release();return;}
-                    speaker=track;track.play();
-                }
-                speaker.write(pcm,0,pcm.length);
-            }catch(Exception ignored){}
-        });
+        if(!running||player.isShutdown()||pcm==null||pcm.length==0)return;
+        // Prevent unbounded audio queue buildup on a slow device, which can
+        // otherwise play responses seconds after the conversation advances.
+        int pending=queuedAudioBytes.addAndGet(pcm.length);
+        if(pending>MAX_PENDING_AUDIO_BYTES){
+            queuedAudioBytes.addAndGet(-pcm.length);
+            return;
+        }
+        try{
+            player.execute(()->{
+                try{
+                    if(!running||generation!=audioGeneration)return;
+                    if(speaker==null){
+                        int min=AudioTrack.getMinBufferSize(24000,AudioFormat.CHANNEL_OUT_MONO,
+                            AudioFormat.ENCODING_PCM_16BIT);
+                        if(min<=0)return;
+                        AudioTrack track=new AudioTrack(AudioManager.STREAM_MUSIC,24000,
+                            AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT,
+                            Math.max(min,24000),AudioTrack.MODE_STREAM);
+                        if(track.getState()!=AudioTrack.STATE_INITIALIZED){track.release();return;}
+                        speaker=track;
+                        // Pre-fill up to 80ms before playing to reduce initial underruns.
+                        int priming=Math.min(pcm.length,3840);
+                        int written=track.write(pcm,0,priming,AudioTrack.WRITE_BLOCKING);
+                        if(written<=0){track.release();speaker=null;return;}
+                        track.play();
+                        if(written<priming)return; // Unexpected partial write; don't duplicate samples.
+                        writeRemaining(track,pcm,written,generation);
+                    }else{
+                        writeRemaining(speaker,pcm,0,generation);
+                    }
+                }catch(Exception ignored){}
+                finally{queuedAudioBytes.addAndGet(-pcm.length);}
+            });
+        }catch(java.util.concurrent.RejectedExecutionException ignored){
+            queuedAudioBytes.addAndGet(-pcm.length);
+        }
+    }
+    private void writeRemaining(AudioTrack track,byte[] pcm,int offset,int generation){
+        // Android may write fewer bytes than requested; always write the remainder.
+        // Never replay old model audio after a genuine interruption.
+        while(running&&generation==audioGeneration&&offset<pcm.length){
+            int written=track.write(pcm,offset,pcm.length-offset,AudioTrack.WRITE_BLOCKING);
+            if(written<=0)break;
+            offset+=written;
+        }
     }
     synchronized void stop(){
         if(closed)return;
