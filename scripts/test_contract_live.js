@@ -77,6 +77,16 @@ assert(el('cl_proposals').children.length>beforeConflict,'Valid correction accep
 proposal({advance:100000000});
 assert.match(el('cl_status').textContent,/계약금보다 큽니다/);
 live.close();assert.equal(stopped,5);
+// Apartment and exact dong/ho are transaction essentials, not automatically prohibited fields.
+live.open();el('cl_consent').checked=true;live.start();id=requests.at(-1)[0];
+proposal({property:'파크애비뉴',unit:'1604 동 2101 호'});
+assert(el('cl_pick_property').checked&&el('cl_pick_unit').checked);
+assert.equal(el('cl_proposals').children.length,2,'Apartment and unit appear in review');
+emit('ended','ended');
+assert.equal(live.apply(),true);
+assert.equal(el('ct_property').value,'파크애비뉴');
+assert.equal(el('ct_unit').value,'1604동 2101호');
+assert.equal(el('ct_bank').value,'SYNTHETIC_PRIVATE_bank','Bank remains local only');
 const valid=live._test.normalize;
 const consistent=live._test.consistency;
 assert.equal(consistent({price:'90000'},{contractDeposit:'90001'}),'계약금이 거래금액보다 큽니다.');
@@ -87,6 +97,10 @@ assert.equal(consistent({price:'90000'},{contractDeposit:'9000'}),'');
 for(const p of [{price:'9억'},{price:-1},{price:1.2},{price:0},{price:1e13},{owner:'synthetic'},
  {terms:'<img src=x>'},{terms:'예금주 직접 확인'},{balanceDate:'2027-02-30'},{balanceDate:'내년 4월'},
  {dealType:'매각'},{leaseDuration:'연락처 문의'},{balanceTime:'25:00'}])assert.equal(valid(p),null);
+assert.equal(valid({property:'송도 센트럴파크 3차',unit:'1501 동 1203호'}).unit,'1501동 1203호');
+for(const invalid of [{property:'고객 계좌 111'}, {property:'인천광역시 송도동 103-4'},
+ {unit:'1501동'}, {unit:'1203호'}, {unit:'0동 1203호'}, {unit:'1501동 1203호 010-1234-5678'}])
+ assert.equal(valid(invalid),null,'Invalid property or incomplete unit must not be accepted');
 assert.equal(valid({price:980000000}).price,'98000');
 assert.equal(valid({contractDate:'2027년 4월 중 협의'}).contractDate,'2027년 4월 중 협의');
 assert.equal(valid({balanceDate:'2028-02-29'}).balanceDate,'2028-02-29');
