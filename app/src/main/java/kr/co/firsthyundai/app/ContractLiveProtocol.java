@@ -14,11 +14,17 @@ final class ContractLiveProtocol {
     private static boolean contains(String[] list,String key){for(String s:list)if(s.equals(key))return true;return false;}
     static String prompt(){
         return "당신은 퍼스트현대의 선택형 계약조건 음성 작성 도우미입니다. 한국어 존댓말로 짧게 대화하세요. "
-            +"한국 날짜는 "+LocalDate.now(ZoneId.of("Asia/Seoul"))+"입니다. 기존 메모나 계약 입력란은 볼 수 없습니다. "
+            +"현재 한국 날짜는 "+LocalDate.now(ZoneId.of("Asia/Seoul"))+"입니다. 다음 규칙을 반드시 지키세요: " 
+            +"사용자가 연도를 말하지 않고 월일만 말했다면 오늘보다 뒤에 있는 가장 가까운 날짜를 선택하세요. "
+            +"예를 들어 오늘이 2026-10-31이면 '3월 25일'은 2027-03-25, '7월 30일'은 2027-07-30입니다. "
+            +"오늘보다 이른 날짜를 올해 날짜로 쓰지 마세요. 이듬해를 의미하는지 확실하지 않다면 연도를 짧게 되물으세요. "
+            +"연도를 명시했는데 이미 지난 날짜라면 임의로 내년으로 변경하지 말고 확인하세요. "
+            +"기존 메모나 계약 입력란은 볼 수 없습니다. "
             +"사용자가 이번 대화에서 명시한 거래유형, 금액, 지급일, 입주일, 기간, 특약만 정리하세요. "
             +"이름, 전화번호, 주소, 단지, 동호수, 은행, 계좌, 예금주, 비밀번호, 기밀을 묻거나 도구에 넣지 마세요. "
             +"그런 정보가 나오면 반복하지 말고 음성을 종료한 뒤 직접 입력하도록 안내하세요. "
-            +"금액과 날짜가 불명확하면 한 번에 하나씩 되물으세요. 상대 날짜는 정확한 연월일을 읽어 확인하세요. "
+            +"금액과 날짜가 불명확하면 한 번에 하나씩 되물으세요. 연도 없는 월일은 가까운 미래로 해석하되 "
+            +"연도·날짜를 정확한 연월일로 읽어 다시 확인하세요. 지난 날짜를 도구로 보내면 거절됩니다. "
             +"이번 대화에서 빠진 거래유형, 총액, 계약금, 이번 송금액, 계약일, 잔금일을 하나씩 질문하세요. "
             +"중도금이 있으면 금액과 지급일을, 전월세면 기간과 입주일을, 월세면 월 차임도 확인하세요. "
             +"특약은 필요한지 묻되 없으면 만들지 마세요. 모른다/미정/나중에 직접 입력하겠다는 답이면 강요하지 말고 미확정으로 남기세요. "
@@ -29,6 +35,7 @@ final class ContractLiveProtocol {
             +"금액은 원 단위 정수입니다. 말하지 않은 항목은 생략하세요. 계약금 10% 등 계산 결과를 임의 확정하지 마세요. "
             +"도구 결과가 rejected_invalid_fields이면 반영됐다고 말하지 말고 잘못된 형식이나 불명확한 항목을 다시 확인하세요. "
             +"도구 결과가 rejected_inconsistent_conditions이면 거래 총액/계약금/이번 송금액/중도금 또는 날짜 순서가 충돌한 것입니다. 반영됐다고 말하지 말고 한 번에 한 항목씩 확인하여 서로 맞는 조건을 함께 다시 제안하세요. "
+            +"도구 결과가 rejected_past_date이면 과거 연도 제안이 거절된 것입니다. 사용자에게 실제 의도한 연도를 물어 확인하고, 미래 날짜로 확정한 뒤 다시 제안하세요. 과거 날짜를 반복해서 보내지 마세요. "
             +"중도금 없다는 말은 interim=0, interimDate=빈 문자열로 제안하세요. "
             +"특약 변경 시 이번 대화에서 정리한 특약 전체를 terms로 보내세요. "
             +"도구는 화면의 검토 후보만 만들며 실제 계약 저장/공유는 하지 않습니다. "
@@ -53,7 +60,17 @@ final class ContractLiveProtocol {
         try{LocalDate d=LocalDate.parse(value);return d.getYear()>=2000&&d.getYear()<=2100;}
         catch(Exception ignored){return false;}
     }
-    /** Validates cumulative proposals made in this voice session only. Never reads a form. */
+    /** Contract preview must not silently accept past years when spoken year is ambiguous.
+     * If the caller explicitly wants a historical contract, use the original manual form.
+     * The clock is injectable for rollover/leap-year tests.
+     */
+    static class PastContractDateException extends Exception {
+        PastContractDateException(){super("rejected_past_date");}
+    }
+    static JSONObject validated(JSONObject args,LocalDate today) throws Exception {
+        return validateFields(args,today);
+    }
+        /** Validates cumulative proposals made in this voice session only. Never reads a form. */
     static void validateConsistency(JSONObject previous,JSONObject change) throws Exception {
         JSONObject merged=new JSONObject(previous==null?"{}":previous.toString());
         java.util.Iterator<String> keys=change.keys();
@@ -74,6 +91,10 @@ final class ContractLiveProtocol {
         }
     }
     static JSONObject validated(JSONObject args) throws Exception {
+        return validateFields(args,LocalDate.now(ZoneId.of("Asia/Seoul")));
+    }
+    private static JSONObject validateFields(JSONObject args,LocalDate today) throws Exception {
+        if(today==null)throw new IllegalArgumentException("today required");
         if(args==null||args.length()==0||args.toString().length()>6500)throw new Exception("invalid proposal");
         JSONObject result=new JSONObject();
         java.util.Iterator<String> keys=args.keys();
@@ -90,6 +111,8 @@ final class ContractLiveProtocol {
                 String s=((String)value).trim();
                 if(s.length()>(k.equals("terms")?4000:100)||s.indexOf('<')>=0||s.indexOf('>')>=0)throw new Exception("invalid text");
                 if(k.equals("dealType")&&!s.matches("매매|전세|월세"))throw new Exception("invalid type");
+                if(contains(DATES,k)&&validDate(s)&&LocalDate.parse(s).isBefore(today))
+                    throw new PastContractDateException();
                 if(contains(DATES,k)&&!s.isEmpty()&&!validDate(s)){
                     if(!(k.equals("contractDate")||k.equals("interimDate"))
                         ||!s.matches("[0-9\\s년월일초중말순경~～.\\-/협의추후미정예정상호결정까지부터전후사이]+")
