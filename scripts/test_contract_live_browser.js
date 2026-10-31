@@ -10,8 +10,9 @@ async function verify(){
   const live=window.FirstHyundaiContractLive,dialog=get('cl_dialog');
   check(!dialog.open,'Live must be closed by default');
   check(get('ct_rough')&&get('ct_specialMemo'),'Default memo inputs preserved');
-  const privateKeys=['rough','specialMemo','bank','account','accountHolder','owner','buyer','unit'];
+  const privateKeys=['rough','specialMemo','bank','account','accountHolder','owner','buyer'];
   for(const k of privateKeys)get('ct_'+k).value='SYNTHETIC_LOCAL_'+k;
+  get('ct_unit').value='SYNTHETIC_OLD_UNIT';
   get('ct_price').value='80000';get('ct_terms').value='기존 특약 보존.';
   window.confirm=()=>true;let id='',starts=0,stops=0;
   window.FirstHyundaiNative={startContractLiveVoice(...args){check(args.length===1&&/^cl-[0-9-]+$/.test(args[0]),'Only session ID sent');id=args[0];starts++;},
