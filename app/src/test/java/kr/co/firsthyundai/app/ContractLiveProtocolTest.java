@@ -12,8 +12,32 @@ public class ContractLiveProtocolTest {
             .put("interim",0).put("dealType","매매").put("balanceDate","2027-04-18"));
         assertEquals(980000000L,result.getLong("price"));
         assertEquals(0,result.getLong("interim"));
-        for(String key:new String[]{"account","bank","owner","buyer","address","unit","rough","preview","__proto__"})
+        for(String key:new String[]{"account","bank","owner","buyer","address","rough","preview","__proto__"})
             reject(new JSONObject().put(key,"SYNTHETIC_PRIVATE_SENTINEL"));
+    }
+    @Test public void apartmentNameAndBuildingUnitAreRequiredVoiceEligibleFields() throws Exception {
+        JSONObject result=ContractLiveProtocol.validated(new JSONObject()
+            .put("property","파크애비뉴").put("unit","1604 동 2101 호")
+            .put("dealType","매매").put("price",1440000000L));
+        assertEquals("파크애비뉴",result.getString("property"));
+        assertEquals("1604동 2101호",result.getString("unit"));
+        JSONObject metadata=ContractLiveProtocol.tools().getJSONObject(0)
+            .getJSONArray("functionDeclarations").getJSONObject(0)
+            .getJSONObject("parameters").getJSONObject("properties");
+        assertTrue(metadata.has("property"));
+        assertTrue(metadata.has("unit"));
+        assertTrue(ContractLiveProtocol.prompt().contains("필수 거래 대상 정보"));
+        for(String bad:new String[]{"1604동","2101호","1604동 0호","0동 2101호",
+            "1604동 2101호 고객전화 010-1234-5678","010-1234-5678"}){
+            reject(new JSONObject().put("unit",bad));
+        }
+        for(String bad:new String[]{"01012345678","010-1234-5678","고객 계좌 11111",
+            "인천광역시 송도동 123-45",""}){
+            reject(new JSONObject().put("property",bad));
+        }
+        for(String key:new String[]{"bank","account","accountHolder","owner","buyer","phone","address"}){
+            reject(new JSONObject().put(key,"SYNTHETIC_PRIVATE"));
+        }
     }
     @Test public void rejectMalformedAmountsAndText() throws Exception {
         reject(new JSONObject().put("price","980000000"));
@@ -81,7 +105,7 @@ public class ContractLiveProtocolTest {
         JSONObject tool=ContractLiveProtocol.tools().getJSONObject(0).getJSONArray("functionDeclarations").getJSONObject(0);
         assertEquals(ContractLiveProtocol.FUNCTION,tool.getString("name"));
         JSONObject fields=tool.getJSONObject("parameters").getJSONObject("properties");
-        assertEquals(14,fields.length());
+        assertEquals(16,fields.length());
         for(String k:new String[]{"account","bank","address","owner","buyer","send","save","rough"})assertFalse(fields.has(k));
         assertTrue(ContractLiveProtocol.prompt().contains("기존 메모나 계약 입력란은 볼 수 없습니다"));
     }
