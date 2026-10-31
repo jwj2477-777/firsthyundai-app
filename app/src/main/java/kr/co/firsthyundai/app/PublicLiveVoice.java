@@ -240,6 +240,7 @@ final class PublicLiveVoice {
                         }catch(Exception conflict){result="rejected_inconsistent_conditions";}
                     }catch(ContractLiveProtocol.PastContractDateException e){
                         result="rejected_past_date";
+                        event("date_warning","말씀하신 날짜가 지난 연도로 인식됐습니다. 연도를 정확히 확인해 주세요.");
                     }catch(Exception ignored){}
                 }
                 // Only fixed acknowledgements leave the device; no existing form or previous values.
