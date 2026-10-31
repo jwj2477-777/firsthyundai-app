@@ -45,6 +45,12 @@ assert(worker.includes('response.status===401||response.status===403?"provider_a
 
 assert(native.includes('BidiGenerateContentConstrained'));
 assert(native.includes('audio/pcm;rate=16000'));
+assert(native.includes('byte[] samples=new byte[1280]'),'40ms mic input instead of 100ms avoids laggy turns');
+assert(native.includes('silenceDurationMs",700'),'Do not stop a Korean sentence during natural pauses');
+assert(native.includes('NO_INTERRUPTION'),'Contract model voice should not be cut off by speaker bleed');
+assert(native.includes('MAX_PENDING_AUDIO_BYTES'),'Guard slow device playback queue');
+assert(native.includes('pcm.length-offset,AudioTrack.WRITE_BLOCKING'),'Play partial output writes without clipping audio');
+assert(native.includes('rejected_past_date'),'Send a distinct correction request for guessed past years');
 assert(native.includes('24000'));
 assert(!native.includes('GEMINI_API_KEY'));
 assert(worker.includes('validBoardToken(auth.slice(7)'));
