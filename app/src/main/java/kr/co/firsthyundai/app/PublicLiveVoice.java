@@ -230,7 +230,14 @@ final class PublicLiveVoice {
                                 contractTurnGate.modelTurnComplete();
                                 resumeMicrophoneAfterPlayback();
                             }
-                        }catch(Exception ignored){}
+                        }catch(Exception e){
+                            // Malformed provider content/PCM must not silently
+                            // leave the screen pretending the microphone works.
+                            if(running){
+                                event("error","AI 음성 응답을 처리하지 못해 대화를 종료했습니다. 앞서 들은 계약 조건을 검토해 주세요.");
+                                stop();
+                            }
+                        }
                     }
                     @Override public void onFailure(WebSocket ws,Throwable t,Response response){
                         if(running){event("error",LiveFailureReason.websocket(response==null?0:response.code()));stop();}
