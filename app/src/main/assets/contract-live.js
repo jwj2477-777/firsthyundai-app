@@ -87,7 +87,8 @@
     missing.push('leaseDuration');
   }
   if(type==='월세'&&unanswered('monthlyRent'))missing.push('monthlyRent');
-  if(Number(chosen.interim)>0&&unanswered('interimDate'))missing.push('interimDate');
+  const interim=Object.hasOwn(chosen,'interim')?chosen.interim:proposals.interim;
+  if(Number(interim)>0&&unanswered('interimDate'))missing.push('interimDate');
   return missing;
  }
  function buttons(){
