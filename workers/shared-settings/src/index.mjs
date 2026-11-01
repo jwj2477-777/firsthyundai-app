@@ -16,7 +16,7 @@ const dueIndexKey=note=>note?.scheduled_at&&note?.id?BOARD_DUE_PREFIX+note.sched
 async function syncDueIndex(env,previous,note){
  const a=dueIndexKey(previous),b=note&&!note.done&&!note.all_day&&!recurringBirthday(note)?dueIndexKey(note):"";
  if(a&&a!==b)await env.SETTINGS.delete(a);
- if(b)await env.SETTINGS.put(b,JSON.stringify({id:note.id,at:note.scheduled_at}),{expirationTtl:365*86400});
+ if(b)await env.SETTINGS.put(b,JSON.stringify({id:note.id,at:note.scheduled_at}));
 }
 
 const validImageId=x=>typeof x==="string"&&/^[0-9a-f-]{36}$/.test(x);
@@ -217,11 +217,12 @@ async function migrateOldExpiry(env,now=Date.now()){
  const hour=new Date(now+9*3600000).getUTCHours();
  if(hour>=8&&hour<21)return {state:"office_hours"};
  let changed=0;
- for(const [type,prefix] of [["notes",BOARD_PREFIX],["photos",BOARD_IMAGE_PREFIX]]){
+ for(const [type,prefix] of [["notes",BOARD_PREFIX],["photos",BOARD_IMAGE_PREFIX],["due",BOARD_DUE_PREFIX]]){
   const marker=BOARD_RETENTION_CURSOR_PREFIX+type;
   const cursor=await env.SETTINGS.get(marker);
   if(cursor==="done")continue;
-  const page=await env.SETTINGS.list({prefix,limit:50,...(cursor?{cursor}:{})});
+  // Keep scheduled Worker well below free-tier KV subrequest budgets.
+  const page=await env.SETTINGS.list({prefix,limit:5,...(cursor?{cursor}:{})});
   for(const record of page.keys||[]){
    // Cloudflare KV lists expiry timestamps in Unix seconds.
    if(!Number.isFinite(record.expiration)||record.expiration*1000<=now)continue;
@@ -238,7 +239,8 @@ async function migrateOldExpiry(env,now=Date.now()){
 async function cleanupArchivedPhotos(env,now=Date.now()){
  // A restored memo must retain its images; a permanently deleted one should
  // not leave personal photos forever in the private KV namespace.
- const rows=await boardKeys(env,BOARD_ORPHAN_PREFIX,1000);let removed=0;
+ const page=await env.SETTINGS.list({prefix:BOARD_ORPHAN_PREFIX,limit:5});
+ const rows=page.keys||[];let removed=0;
  for(const row of rows){
   const cleanup=await env.SETTINGS.get(row.name,"json");
   if(!cleanup||!Number.isFinite(cleanup.after)||cleanup.after>now)continue;
@@ -741,7 +743,7 @@ const DUE_BACKFILL_CURSOR="office-postit-due-backfill-v1";
 async function backfillDueNotes(env,now=Date.now()){
  const prior=await env.SETTINGS.get(DUE_BACKFILL_CURSOR);
  if(prior==="done")return;
- const page=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:100,...(prior?{cursor:prior}:{})});
+ const page=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:8,...(prior?{cursor:prior}:{})});
  for(const row of page.keys||[]){
   if(!validBoardId(row.name.slice(BOARD_PREFIX.length)))continue;
   const note=await env.SETTINGS.get(row.name,"json");
