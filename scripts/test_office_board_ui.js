@@ -72,6 +72,13 @@ assert(el('officeBoardList').innerHTML.includes('3시 30분 방문'));
 assert.equal(el('officeBoardDraft').value,'');
 assert.equal(el('officeBoardScheduleClear').hidden,true,'Successful post clears calendar selection');
 assert.equal(api._test.scheduleSuggestion('3시 30분 방문'),'','After post, memo no longer inherits prior calendar date');
+api.chooseDay('2028-01-30');api.addAtSelectedDay();
+el('officeBoardDraft').value='2028년 2월 30일 오후 3시 방문';
+const callCount=calls.length;
+api.post();
+assert.equal(calls.length,callCount,'Invalid explicitly typed date must not be saved as an undated memo');
+assert(el('officeBoardFeedback').textContent.includes('날짜가 올바르지 않습니다'));
+api.clearScheduledDay();
 const own={...note,author:{id:userId,name:'작성자'}};
 const other={...note,id:'mhad4vwu-00000000-0000-0000-0000-000000000002',
  author:{id:'22222222-2222-2222-2222-222222222222',name:'다른 가족'}};
