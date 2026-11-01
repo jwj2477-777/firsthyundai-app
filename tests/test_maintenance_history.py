@@ -46,6 +46,21 @@ class History(unittest.TestCase):
             prior = merge_record(prior, fee(f"{year:04d}{month+1:02d}", 3800+i))
         self.assertEqual(len(prior["monthly_history"]), 24)
 
+    def test_official_total_outranks_same_month_mirror_but_old_months_survive(self):
+        official = fee("202608", 4000, total=280000000,
+            method="official_kapt_three_group_full_total_per_residential_exclusive_m2",
+            components_won={"common":130000000,"individual":140000000,"reserve":10000000})
+        mirror = fee("202608", 3900, total=270000000,
+            method="kapt_published_total_per_residential_exclusive_m2")
+        retained = merge_record(official, mirror)
+        self.assertEqual(retained["monthly_total_won"], 280000000)
+        self.assertEqual(retained["won_per_exclusive_m2"], 4000)
+        self.assertEqual(retained["components_won"]["reserve"], 10000000)
+        new_month = merge_record(retained, fee("202609", 4200, total=294000000,
+            method="kapt_published_total_per_residential_exclusive_m2"))
+        self.assertEqual([m["month"] for m in new_month["monthly_history"]],["202609","202608"])
+        self.assertEqual(new_month["monthly_history"][1]["monthly_total_won"], 280000000)
+
     def test_distinct_complexes_not_mixed(self):
         other = dict(fee("202607", 5000), complex_id="m21", kapt_code="A12345678")
         merged = merge_records([fee("202607", 3831), other],
