@@ -733,6 +733,21 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void requestOfficeBoardAccess() {
             runOnUiThread(()->officeBoardLoginDialog());
         }
+        @JavascriptInterface public boolean saveOfficeMemoDraft(String text,String selectedDay){
+            if(!OfficeBoardClient.enrolled(getApplicationContext()))return false;
+            return OfficeDraftStore.save(getApplicationContext(),
+                OfficeBoardClient.memberId(getApplicationContext()),text,selectedDay);
+        }
+        @JavascriptInterface public String getOfficeMemoDraft(){
+            if(!OfficeBoardClient.enrolled(getApplicationContext()))return "{}";
+            return OfficeDraftStore.read(getApplicationContext(),
+                OfficeBoardClient.memberId(getApplicationContext()));
+        }
+        @JavascriptInterface public void clearOfficeMemoDraft(){
+            if(!OfficeBoardClient.enrolled(getApplicationContext()))return;
+            OfficeDraftStore.clear(getApplicationContext(),
+                OfficeBoardClient.memberId(getApplicationContext()));
+        }
         @JavascriptInterface public void officeBoardAction(String action,String payload,String requestId){
             if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
             if(action==null||!java.util.Arrays.asList("list","post","edit","done","schedule","delete","archive","restore",
