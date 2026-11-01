@@ -8,7 +8,8 @@
   leaseStart:'입주일',leaseEnd:'임대차 종료일',leaseDuration:'임대차 기간',balanceTime:'잔금 시간',terms:'특약 (기존 특약에 추가)'};
  const MONEY=new Set(['price','contractDeposit','advance','interim','monthlyRent']);
  const DATES=new Set(['contractDate','interimDate','balanceDate','leaseStart','leaseEnd']);
- let active=false,stopping=false,requestId='',sequence=0,proposals={},failed=false;
+ let active=false,stopping=false,requestId='',sequence=0,proposals={},reviewStates={},failed=false;
+ const REVIEW_STATES={pending:'미정',discussion:'협의 중',manual:'직접 입력',not_applicable:'해당 없음'};
  function status(text){$('cl_status').textContent=text;}
  function validDate(s){
   if(!/^\d{4}-\d{2}-\d{2}$/.test(s))return false;
@@ -82,12 +83,31 @@
    title.textContent=LABELS[k];value.textContent=v===''?'입력 내용 지우기':MONEY.has(k)?Number(v).toLocaleString('ko-KR')+'만원':v;
    text.append(title,value);row.append(check,text);box.append(row);
   }
-  $('cl_review').hidden=!Object.keys(proposals).length;buttons();
+  $('cl_review').hidden=!Object.keys(proposals).length;
+  const confirmed=Object.keys(proposals).filter(k=>proposals[k]!==''),deferred=Object.entries(reviewStates);
+  const counts={pending:0,discussion:0,manual:0,not_applicable:0};
+  for(const [,state] of deferred)if(Object.hasOwn(counts,state))counts[state]++;
+  const summary=$('cl_reviewProgress');
+  if(summary){
+   summary.hidden=!confirmed.length&&!deferred.length;
+   summary.textContent='이번 음성 확인 '+confirmed.length+'개'
+     +(counts.discussion?' · 협의 중 '+counts.discussion+'개':'')
+     +(counts.pending?' · 미정 '+counts.pending+'개':'')
+     +(counts.manual?' · 직접 입력 '+counts.manual+'개':'')
+     +(counts.not_applicable?' · 해당 없음 '+counts.not_applicable+'개':'');
+  }
+  const details=$('cl_deferred');
+  if(details){
+   details.hidden=!deferred.length;
+   details.textContent=deferred.map(([key,state])=>(LABELS[key]||key)+' · '+REVIEW_STATES[state]).join(' / ')
+      +(deferred.length?' · 미확정 항목은 자동으로 채워지지 않습니다.':'');
+  }
+  buttons();
  }
  function open(){
   const dialog=$('cl_dialog');
   if(dialog.open)return;
-  requestId='';active=false;stopping=false;failed=false;proposals={};
+  requestId='';active=false;stopping=false;failed=false;proposals={};reviewStates={};
   $('cl_consent').checked=false;$('cl_transcript').textContent='';render();
   status('기존 메모는 보내지 않습니다. 이번 대화에서 말씀하신 조건만 정리합니다.');
   dialog.showModal();$('cl_close').focus();
@@ -98,7 +118,7 @@
   if(!$('cl_consent').checked){status('음성 전송 안내를 확인하고 체크해 주세요.');return;}
   if(!root.FirstHyundaiNative?.startContractLiveVoice){status('업데이트된 안드로이드 앱에서 이용해 주세요. 기존 메모 입력은 그대로 사용할 수 있습니다.');return;}
   if(Object.keys(proposals).length&&!root.confirm('새 대화는 이전 Live 검토 후보를 지웁니다. 새로 시작할까요?'))return;
-  proposals={};failed=false;active=true;requestId='cl-'+Date.now()+'-'+(++sequence);render();
+  proposals={};reviewStates={};failed=false;active=true;requestId='cl-'+Date.now()+'-'+(++sequence);render();
   root.FirstHyundaiLive?.stop?.();
   status('Live 연결 중입니다…');
   try{root.FirstHyundaiNative.startContractLiveVoice(requestId);}
@@ -114,12 +134,21 @@
   // Invalidate request before stopping: late native/tool callbacks cannot revive the draft.
   requestId='';
   if(active||stopping){try{root.FirstHyundaiNative?.stopContractLiveVoice?.();}catch(e){}}
-  active=false;stopping=false;proposals={};$('cl_transcript').textContent='';render();
+  active=false;stopping=false;proposals={};reviewStates={};$('cl_transcript').textContent='';render();
   $('cl_dialog').close();$('ct_liveOpen')?.focus?.();
  }
  function incoming(event){
   if(!requestId||event?.requestId!==requestId)return;
   const state=String(event.state||''),message=String(event.message||'');
+  if(state==='review_state'&&active&&!stopping){
+   let change;try{change=JSON.parse(message);}catch(e){return;}
+   if(!change||!Object.hasOwn(LABELS,change.field))return;
+   if(change.status==='confirmed')delete reviewStates[change.field];
+   else if(Object.hasOwn(REVIEW_STATES,change.status)&&!Object.hasOwn(proposals,change.field))
+      reviewStates[change.field]=change.status;
+   else return;
+   render();return;
+  }
   if(state==='date_warning'&&active){status(message||'지난 날짜가 감지됐습니다. 연도를 다시 확인해 주세요.');return;}
   if(state==='proposal'&&active&&!stopping){
    let p;try{p=normalize(JSON.parse(message));}catch(e){}
