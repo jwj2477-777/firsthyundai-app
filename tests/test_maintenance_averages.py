@@ -44,4 +44,26 @@ class FeeImporter(unittest.TestCase):
   out=mod.collect(items,fetch=lambda code:MONTH_HTML,pause=0,limit=datetime(2026,10,23))
   self.assertEqual(len(out['records']),1)
   self.assertEqual(out['records'][0]['complex_id'],'f15')
+ def test_refresh_preserves_verified_monthly_history(self):
+  old_row=dict(complex_id='f15',kapt_code='A10026679',month='202606',
+   won_per_exclusive_m2=3600,monthly_total_won=250000000,
+   source_url='https://www.k-apt.go.kr/')
+  prior={'records':[dict(old_row,monthly_history=[old_row])]}
+  items=[{'id':'f15','address':ADDRESS,'kapt_code':'A10026679'}]
+  out=mod.collect(items,prior,fetch=lambda code:MONTH_HTML,pause=0,limit=datetime(2026,10,23))
+  row=out['records'][0]
+  self.assertEqual(out['success_count'],1)
+  self.assertEqual(row['month'],'202607')
+  self.assertEqual([x['month'] for x in row['monthly_history']],['202607','202606'])
+  self.assertEqual([x['won_per_exclusive_m2'] for x in row['monthly_history']],[3831,3600])
+  self.assertEqual(row['monthly_total_won'],26648000)
+ def test_refresh_older_source_cannot_replace_latest_verified_month(self):
+  old_row=dict(complex_id='f15',kapt_code='A10026679',month='202608',
+   won_per_exclusive_m2=3900,monthly_total_won=26800000,
+   source_url='https://www.k-apt.go.kr/')
+  items=[{'id':'f15','address':ADDRESS,'kapt_code':'A10026679'}]
+  out=mod.collect(items,{'records':[old_row]},fetch=lambda code:MONTH_HTML,pause=0,limit=datetime(2026,10,23))
+  row=out['records'][0]
+  self.assertEqual(row['month'],'202608')
+  self.assertEqual([x['month'] for x in row['monthly_history']],['202608','202607'])
 if __name__=='__main__':unittest.main()

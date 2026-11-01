@@ -19,6 +19,14 @@ assert(renderTrend(one,84.7).includes('약 32만원'));
 assert(!renderTrend(one,84.7).includes('324,500원'),'fee estimates are rounded');
 assert(renderTrend(one,84.7).includes('3개월 이상'));
 assert(!renderTrend(one,84.7).includes('전월 대비'),'no missing-month change claims');
+assert.equal(summarize(snapshot({...row('202607',3831),monthly_total_won:undefined}),'f15','A10026679',84.7,now),null,
+ 'Missing category total must not become a full fee estimate');
+assert.equal(summarize(snapshot({...row('202607',3831),components_won:{common:100,individual:100,reserve:100}}),'f15','A10026679',84.7,now),null,
+ 'Three-group total must reconcile with source before fee output');
+assert.equal(summarize(snapshot(row('202611',3831)),'f15','A10026679',84.7,now),null,
+ 'Future/unpublished months must be rejected');
+assert.equal(summarize(snapshot(row('202613',3831)),'f15','A10026679',84.7,now),null,
+ 'Invalid calendar month must not display');
 const yearHistory=[
  row('202607',3831),row('202608',4100),row('202609',4400),
  row('202509',4400),row('202508',4300)];
@@ -43,8 +51,12 @@ assert.equal(summarize(prior,'f15','A10026679',NaN,now),null);
 const app=fs.readFileSync(path.join(root,'app/src/main/assets/index.html'),'utf8');
 assert(app.includes('maintenance-trends.js'),'load verified fee trend helper');
 assert(app.includes('FirstHyundaiMaintenance.renderTrend'),'family fee view uses monthly trend');
-assert(app.includes("'약 '+Math.round(rate*picked.exclusive_m2/10000)+'만원'"),
- 'single-month legacy estimate must also round to 10,000 KRW');
+assert(!app.includes("'약 '+Math.round(rate*picked.exclusive_m2/10000)+'만원'"),
+ 'No legacy rate fallback can bypass monthly-source validation');
+assert(!app.includes('const rate=average&&'),
+ 'Do not use raw unvalidated fee rates in contract-facing management fee cards');
+assert(app.includes("const bill=picked?trend?")&&app.includes("item?"),
+ 'Use validated summary first and only a separately verified household invoice second');
 assert(app.includes("fetchRemote('maintenance_partial')"),'load independent partial source without inventing a complete bill');
 assert(app.includes('official_kapt_two_item_only'),'only vetted K-apt line items can be shown');
 assert(app.includes('전체 관리비나 세대별 관리비가 아닙니다.'),'prominently distinguish partial costs from full invoices');

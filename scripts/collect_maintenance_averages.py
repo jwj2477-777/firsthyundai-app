@@ -12,6 +12,7 @@ from urllib.request import Request, urlopen
 from pathlib import Path
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from maintenance_history import merge_records
 
 ROOT=Path(__file__).resolve().parents[1]
 CATALOG=ROOT/'data'/'complexes.json'
@@ -104,12 +105,15 @@ def collect(catalog,prior=None,fetch=download,pause=0.6,limit=None):
     fresh.append({'complex_id':apt['id'],**datum})
   else:failed+=1
   if pause:time.sleep(pause)
- # Fail closed, but preserve earlier verified snapshots if upstream is down.
- selected={**old,**{x['complex_id']:x for x in fresh}}
+ # Preserve every previously source-verified month when a newer month arrives.
+ # A direct dictionary overwrite discards monthly_history and makes trends
+ # vanish after a successful refresh. Identity and month validation happen in
+ # maintenance_history.merge_records; an unverified new row must fail closed.
+ selected=merge_records(list(old.values()),fresh)
  return dict(schema_version=1,state='verified_partial' if selected else 'awaiting_verified_source',
   source='K-apt 공공데이터 재게시 월별 합계 단가',
   updated_at=now().isoformat(),checked_codes=scanned,success_count=len(fresh),
-  failed_codes=failed,records=sorted(selected.values(),key=lambda x:x['complex_id']),
+  failed_codes=failed,records=selected,
   note='주거전용면적당 단지 전체 평균 관리비 합계 단가를 해당 타입의 전용면적에 곱한 상담 참고액. 실제 세대별 평균 고지액이 아닙니다.')
 
 def main():
