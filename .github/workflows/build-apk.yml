@@ -384,25 +384,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.64 early audio gate and Live review selection APK
+      - name: Publish v2.1.65 verified maintenance fee and history safe display APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.64.apk
-          unzip -t FirstHyundai-v2.1.64.apk | grep 'No errors detected'
-          if gh release view v2.1.64 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.65.apk
+          unzip -t FirstHyundai-v2.1.65.apk | grep 'No errors detected'
+          if gh release view v2.1.65 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.64 FirstHyundai-v2.1.64.apk \
+            gh release create v2.1.65 FirstHyundai-v2.1.65.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.64 · Live 발화 차단·검토 선택 보존' \
-              --notes 'Live 계약 음성에서 AI 출력 전사가 실제 음성보다 먼저 도착할 때 마이크를 선제적으로 차단하여 되먹임 가능성을 줄였습니다. 기존 AI 오디오 종료·실제 스피커 재생 완료 확인 후 마이크 재개 원칙은 유지합니다. 검토 화면에서 체크 해제한 계약 조건은 AI의 추가 제안과 보류 상태 갱신 이후에도 해제 상태를 보존하며, 반영 선택 개수를 표시합니다. 체크한 항목이 없으면 반영 버튼을 비활성화합니다. 계약 수기 입력·특약·개인정보 보호·무료 Live 한도 및 공유 메모/알림을 유지합니다. 실제 갤럭시 음성 품질은 별도 확인해야 합니다. v2.1.64/build215.'
+              --title '퍼스트현대 v2.1.65 · 관리비 근거 확인·월별 이력 보존' \
+              --notes '아파트 관리비 상담 참고액을 표시할 때 검증된 월별 전체 합계와 전용면적 단가가 일치하는 공개자료만 사용합니다. 오래된 단가의 우회 표시를 제거하고 미래 월·비정상 기준월·합계 누락·세 항목 합계 불일치 데이터는 제외합니다. 과거에 검증된 월별 이력은 신규 수집 후에도 유지하여 기간별 추세가 사라지지 않도록 했습니다. 일부 공식 경비·청소비는 여전히 전체 관리비로 표시하지 않으며, 확인되지 않은 단지의 실제 세대 고지액을 추정 확정하지 않습니다. 학교 배정은 검증 전이면 보류 상태 유지. Live·계약·메모·실거래·관리자 기능 및 무료 AI 한도 변경 없음. v2.1.65/build216.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.64 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.64 --apk FirstHyundai-v2.1.64.apk
+          gh release upload v2.1.65 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.65 --apk FirstHyundai-v2.1.65.apk
 
 
 
