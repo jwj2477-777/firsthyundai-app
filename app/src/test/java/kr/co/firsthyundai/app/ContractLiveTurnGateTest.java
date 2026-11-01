@@ -41,6 +41,20 @@ public class ContractLiveTurnGateTest {
   gate.modelAudioStarted();
   gate.clear();assertTrue(gate.microphoneAllowed());
  }
+ @Test public void lateTranscriptionAfterFinishedPlaybackCannotStallMicrophone(){
+  ContractLiveTurnGate gate=new ContractLiveTurnGate();
+  gate.modelAudioStarted();
+  gate.modelTurnComplete();
+  assertTrue(gate.playbackFinished());
+  assertTrue(gate.microphoneAllowed());
+  gate.modelOutputAnnounced(); // Trailing transcription from the finished AI reply.
+  assertTrue(gate.microphoneAllowed());
+  gate.userSpeechDetected(); // Next actual user turn is transcribed.
+  gate.modelOutputAnnounced();
+  assertFalse(gate.microphoneAllowed());
+  gate.modelTurnComplete();
+  assertTrue(gate.playbackFinished()); // Transcription-only response still recovers.
+ }
  @Test public void reconnectAndNewModelOutputNeverManufactureUserSpeech(){
   ContractLiveTurnGate gate=new ContractLiveTurnGate();
   gate.modelTurnComplete(); // No actual AI speech yet.
