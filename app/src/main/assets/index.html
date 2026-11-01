@@ -1215,6 +1215,8 @@ body.apartmentSheetActive{overflow:hidden}
  <div class="contractLiveButtons"><button id="cl_start" type="button" onclick="FirstHyundaiContractLive.start()">음성 대화 시작</button><button id="cl_stop" type="button" onclick="FirstHyundaiContractLive.stop()" disabled>종료하고 확인</button></div>
  <p id="cl_status" role="status" aria-live="polite">시작 버튼을 누를 때만 마이크를 사용합니다.</p>
  <p id="cl_transcript"></p>
+ <p id="cl_reviewProgress" class="tiny" role="status" aria-live="polite" hidden></p>
+ <p id="cl_deferred" class="tiny" hidden></p>
  <section id="cl_review" hidden><h4>반영할 조건 확인</h4><p>인식한 금액·날짜와 특약을 확인해 주세요. 선택한 항목만 반영하며, 기존 특약에는 추가합니다.</p><div id="cl_proposals"></div><button id="cl_apply" type="button" onclick="FirstHyundaiContractLive.apply()" disabled>선택한 조건 반영</button></section>
 </dialog>
 <script>
