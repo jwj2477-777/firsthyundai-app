@@ -12,7 +12,7 @@ const expandedNotes=new Set();
 let historyLoaded=false,historyLoading=false,refreshCycle=0;
 let lastBriefing=0,briefingBusy=false;
 const startKst=()=>kstDate(new Date());
-let selectedDate='',calendarMonth='',editingBirthday='';
+let selectedDate='',calendarMonth='',editingBirthday='',calendarDraftDay='';
 function focusNote(id){
  if(!valid(id))return false;
  pendingFocus=id;
@@ -87,13 +87,27 @@ function toIso(value){
  return result.toISOString();
 }
 function extracted(text){return window.FirstHyundaiMemoDates?.parse?.(text)||null}
-function scheduleSuggestion(text){return extracted(text)?.local||''}
+function hasDateCue(text){
+ return /오늘|내일|모레|(?:이번|다음)\s*주|(?:이번|다음|다다음)\s*달|(?:올해|내년|내후년)\s*\d|(?:20\d{2}|2\d|3\d)\s*년|\d{1,2}\s*월\s*\d{1,2}\s*일|(?:20\d{2}\s*[.\/-]\s*)?\d{1,2}\s*[.\/-]\s*\d{1,2}/.test(String(text||''));
+}
+function draftSchedule(text){
+ const stated=extracted(text);
+ // Never silently substitute another date when user typed an invalid date.
+ if(stated||!calendarDraftDay||hasDateCue(text))return stated;
+ return extracted(calendarDraftDay+' '+text);
+}
+function scheduleSuggestion(text){return draftSchedule(text)?.local||''}
 function checkSuggestion(){
- const result=extracted($('officeBoardDraft')?.value);
+ const text=String($('officeBoardDraft')?.value||''),result=draftSchedule(text);
  const el=$('officeBoardScheduleSuggestion');if(!el)return;
- el.classList?.toggle?.('hidden',!result);
- if(result)el.textContent='▦ 자동 일정 · '+result.local.slice(0,10).replace(/-/g,'.')+
+ const clear=$('officeBoardScheduleClear');
+ if(clear)clear.hidden=!calendarDraftDay;
+ el.classList?.toggle?.('hidden',!result&&!calendarDraftDay);
+ if(result)el.textContent='▦ '+(calendarDraftDay&&!hasDateCue(text)?'달력에서 선택한 일정':'자동 일정')+
+  ' · '+result.local.slice(0,10).replace(/-/g,'.')+
   (result.all_day?' · 종일':' · '+result.local.slice(11));
+ else if(calendarDraftDay)el.textContent='선택한 날짜 '+calendarDraftDay.replace(/-/g,'.')+
+  ' · 메모에 적힌 날짜가 올바른지 확인해 주세요.';
 }
 function annualCalendar(){return window.FirstHyundaiAnnualCalendar}
 function birthdayOf(note){return annualCalendar()?.parseNote?.(note?.text)||null}
@@ -179,8 +193,11 @@ function setView(next){
  view=next;archiveOpen=false;
  draw();
 }
-function chooseDay(key){if(!/^\d{4}-\d{2}-\d{2}$/.test(key))return;
- selectedDate=key;calendarMonth=key.slice(0,7);drawCalendar();}
+function chooseDay(key){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(key))return;
+ try{toIso(key+'T12:00');}catch(e){return}
+ selectedDate=key;calendarMonth=key.slice(0,7);drawCalendar();
+}
 function changeMonth(delta){
  if(!Number.isInteger(delta)||Math.abs(delta)>1)return;
  const [y,m]=calendarMonth.split('-').map(Number);
@@ -190,8 +207,12 @@ function changeMonth(delta){
 }
 function today(){selectedDate=kstDate(new Date());calendarMonth=selectedDate.slice(0,7);drawCalendar()}
 function addAtSelectedDay(){
- setView('compose');$('officeBoardDraft')?.focus?.();
+ if(!selectedDate)return;
+ try{toIso(selectedDate+'T12:00');}catch(e){return}
+ calendarDraftDay=selectedDate;
+ setView('compose');checkSuggestion();$('officeBoardDraft')?.focus?.();
 }
+function clearScheduledDay(){calendarDraftDay='';checkSuggestion()}
 function openCalendarNote(id){
  if(!valid(id))return;
  if(birthdayOf(items.find(n=>n.id===id)))return;
@@ -600,7 +621,7 @@ async function mutate(action,data){
   const result=await call(action,data);
   if(action==='delete')localDeletes.set(data.id,Date.now());
   else if(result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
-  if(action==='post'){$('officeBoardDraft').value='';checkSuggestion();}
+  if(action==='post'){$('officeBoardDraft').value='';calendarDraftDay='';checkSuggestion();}
   if(action==='restore'&&result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
   editing='';editDraft='';
   merge(items);
@@ -618,7 +639,11 @@ async function post(){
   await photos.uploadPending(photos.pendingTarget());return;
  }
  const text=value||'📷 사진 공유';
- const parsed=extracted(text);
+ const parsed=draftSchedule(text);
+ if(hasDateCue(text)&&!parsed){
+  msg('메모의 날짜가 올바르지 않습니다. 날짜를 다시 확인한 후 등록해 주세요.');
+  return;
+ }
  const result=await mutate('post',{text,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false});
  if(result?.note?.id&&photos?.pendingCount?.()){
   const saved=await photos.uploadPending(result.note.id);
@@ -758,12 +783,12 @@ function imageUpdate(note){
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
  toggleComposer,setStatus,setAuthor,setQuery,setSort,showMore,clearFilters,
  imageCall:call,imageUpdate,canEdit:canEditId,
- setView,chooseDay,changeMonth,today,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
+ setView,chooseDay,changeMonth,today,addAtSelectedDay,clearScheduledDay,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
  onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
  onNewNotification(){if(currentPage==='officeBoard')refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
  syncNotificationStatus,enableNotifications,settingsChanged,focusNote,
  openBriefing,openBriefingNote,openBriefingCalendar,renderBriefing,closureDates,weatherAppointments,
- _test:{phones,merge,scheduleSuggestion,toIso,dateKey,briefingRows,nextDay,calendarEntries,memoItems,birthdayOf,canEditNote,filteredMemos}};
+ _test:{phones,merge,scheduleSuggestion,draftSchedule,toIso,dateKey,briefingRows,nextDay,calendarEntries,memoItems,birthdayOf,canEditNote,filteredMemos}};
 })();

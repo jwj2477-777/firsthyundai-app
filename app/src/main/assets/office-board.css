@@ -585,3 +585,11 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
  border:1px solid #DBE5DC;border-radius:9px;background:#FAFBF7;
  color:#4C6A61;font-size:12px;font-weight:750}
 #officeBoard .officeBoardExpand:focus-visible{outline:3px solid #B98249;outline-offset:2px}
+
+/* One-tap schedule drafting from the selected day, with accessible tap targets. */
+#officeBoard .officeBoardAgendaToolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+#officeBoard .officeBoardAgendaToolbar>strong{color:#395D56;font-size:13px}
+#officeBoard .officeBoardAddDay,#officeBoard .officeBoardScheduleClear{min-height:44px;border-radius:10px;border:1px solid #D0BFA7;background:#F9F4EC;color:#6B4928;padding:9px 12px;font-size:12px;font-weight:800}
+#officeBoard .officeBoardScheduleLine{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#officeBoard .officeBoardScheduleLine .officeBoardAutoSchedule{flex:1;min-width:190px}
+#officeBoard .officeBoardScheduleClear[hidden]{display:none!important}
