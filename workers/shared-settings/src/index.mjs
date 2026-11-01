@@ -224,7 +224,7 @@ async function migrateOldExpiry(env,now=Date.now()){
  {
   const marker=BOARD_RETENTION_CURSOR_PREFIX+type;
   const cursor=await env.SETTINGS.get(marker);
-  if(cursor==="done")continue;
+  if(cursor==="done")return {state:"complete",changed};
   // Keep scheduled Worker well below free-tier KV subrequest budgets.
   const page=await env.SETTINGS.list({prefix,limit:6,...(cursor?{cursor}:{})});
   for(const record of page.keys||[]){
