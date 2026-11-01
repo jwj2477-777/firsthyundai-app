@@ -77,7 +77,9 @@
   const missing=[];
   for(const k of ['property','unit','dealType','price','contractDeposit','contractDate','advance','balanceDate'])
    if(unanswered(k))missing.push(k);
-  const type=chosen.dealType||'';
+  // Even when a user deselects the proposed deal type, warn about its related
+  // required fields rather than silently treating a lease as a sale.
+  const type=chosen.dealType||proposals.dealType||'';
   if(type==='전세'||type==='월세'){
    if(unanswered('leaseStart'))missing.push('leaseStart');
    if(!present('leaseDuration')&&!present('leaseEnd')&&
