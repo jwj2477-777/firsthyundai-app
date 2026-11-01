@@ -199,6 +199,7 @@ final class OfficeBoardClient {
             return request("GET","/board?offset="+offset,null,auth);
         }
         if("archive".equals(action))return request("GET","/board/archive",null,auth,adminToken);
+        if("devices".equals(action))return request("GET","/board/devices",null,auth,adminToken);
         if("post".equals(action)){
             String text=payload.optString("text","");
             if(text.isEmpty()||text.length()>1600)throw new Exception("메모 내용은 1~1600자로 적어 주세요.");
