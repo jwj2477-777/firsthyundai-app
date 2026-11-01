@@ -5,6 +5,18 @@ const key="office-general-settings-v1", enc=new TextEncoder();
 const BOARD_PREFIX="office-postit-v1:", BOARD_MAX_CHARS=1600;
 const BOARD_IMAGE_PREFIX="office-postit-image-v1:", BOARD_IMAGE_LIMIT=3, BOARD_IMAGE_MAX=195000;
 const BOARD_IMAGE_TTL=400*86400;
+const BOARD_DUE_PREFIX="office-postit-due-v1:";
+const BOARD_IMAGE_REQUEST_PREFIX="office-postit-image-request-v1:";
+const recurringBirthday=note=>/^🎂\s*.{1,24}?\s+생일\s*·\s*매년\s*(양력|음력)/u.test(String(note?.text||""));
+const lifetime=note=>note?.pinned===true||recurringBirthday(note)?{}:{expirationTtl:365*86400};
+const imageLifetime=note=>note?.pinned===true||recurringBirthday(note)?{}:{expirationTtl:BOARD_IMAGE_TTL};
+const dueIndexKey=note=>note?.scheduled_at&&note?.id?BOARD_DUE_PREFIX+note.scheduled_at+":"+note.id:"";
+async function syncDueIndex(env,previous,note){
+ const a=dueIndexKey(previous),b=note&&!note.done&&!note.all_day&&!recurringBirthday(note)?dueIndexKey(note):"";
+ if(a&&a!==b)await env.SETTINGS.delete(a);
+ if(b)await env.SETTINGS.put(b,JSON.stringify({id:note.id,at:note.scheduled_at}),{expirationTtl:365*86400});
+}
+
 const validImageId=x=>typeof x==="string"&&/^[0-9a-f-]{36}$/.test(x);
 function validImageData(value){
  if(typeof value!=="string"||value.length<150||value.length>BOARD_IMAGE_MAX||
@@ -184,9 +196,19 @@ async function invalidateBoardCache(env){
  catch(e){console.warn("office_board_cache_invalidation_deferred");}
 }
 const BOARD_PAGE_SIZE=25;
+async function boardKeys(env,prefix,max=5000){
+ const rows=[];let cursor="";
+ for(let turn=0;turn<Math.ceil(max/1000);turn++){
+  const page=await env.SETTINGS.list({prefix,limit:Math.min(1000,max-rows.length),...(cursor?{cursor}:{})});
+  rows.push(...(page.keys||[]));
+  if(rows.length>=max||page.list_complete!==false||!page.cursor||page.cursor===cursor)break;
+  cursor=page.cursor;
+ }
+ return rows;
+}
 async function boardPage(env,offset=0){
- const keys=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
- const names=keys.keys.filter(k=>validBoardId(k.name.slice(BOARD_PREFIX.length)));
+ const keys=await boardKeys(env,BOARD_PREFIX);
+ const names=keys.filter(k=>validBoardId(k.name.slice(BOARD_PREFIX.length)));
  const end=Math.max(0,names.length-offset);
  const page=names.slice(Math.max(0,end-BOARD_PAGE_SIZE),end);
  const loaded=await Promise.all(page.map(async k=>{
@@ -200,9 +222,9 @@ async function boardPage(env,offset=0){
 }
 async function boardList(env){
  return cachedPrivateBoard(env,"scheduled",async()=>{
- const keys=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
- // Each post-it has its own KV key, so simultaneous posts never overwrite one another.
- const latest=keys.keys.slice(-100);
+ const keys=await boardKeys(env,BOARD_PREFIX);
+ // Legacy overview only: due reminders read the separate scheduled-note index.
+ const latest=keys.slice(-100);
  const notes=await Promise.all(latest.map(async item=>{
   try{return await env.SETTINGS.get(item.name,"json")}catch(e){return null}
  }));
@@ -336,7 +358,8 @@ async function boardCommand(req,env,url,ctx){
   if(!saved)return res({error:"not_found"},404);
   if(await env.SETTINGS.get(BOARD_PREFIX+restoring[1]))return res({error:"already_exists"},409);
   delete saved.deleted_at;
-  await env.SETTINGS.put(BOARD_PREFIX+restoring[1],JSON.stringify(saved),{expirationTtl:BOARD_LIFETIME_DAYS*86400});
+  await env.SETTINGS.put(BOARD_PREFIX+restoring[1],JSON.stringify(saved),lifetime(saved));
+  await syncDueIndex(env,null,saved);
   await env.SETTINGS.delete(archiveKey);
   await invalidateBoardCache(env);
   return res({ok:true,note:saved});
@@ -405,13 +428,13 @@ async function boardCommand(req,env,url,ctx){
   if(!url.searchParams.has("offset"))
    return res({schema:1,notes:await boardList(env)});
   const offsetRaw=url.searchParams.get("offset")||"0";
-  if(!/^\d{1,4}$/.test(offsetRaw)||Number(offsetRaw)>1000)
+  if(!/^\d{1,4}$/.test(offsetRaw)||Number(offsetRaw)>5000)
    return res({error:"invalid_page"},400);
   return res(await cachedPrivateBoard(env,"page-"+offsetRaw,()=>boardPage(env,Number(offsetRaw))));
  }
  if(url.pathname==="/board/updates"&&req.method==="GET"){
-  const list=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1000});
-  const items=list.keys.slice(-120).filter(x=>validBoardId(x.name.slice(BOARD_PREFIX.length)))
+  const list=await boardKeys(env,BOARD_PREFIX);
+  const items=list.slice(-120).filter(x=>validBoardId(x.name.slice(BOARD_PREFIX.length)))
    .map(x=>({id:x.name.slice(BOARD_PREFIX.length),device:x.metadata?.device||""}));
   return res({schema:1,items});
  }
@@ -422,7 +445,8 @@ async function boardCommand(req,env,url,ctx){
   const id=Date.now().toString(36).padStart(9,"0")+"-"+crypto.randomUUID(),now=new Date().toISOString();
   const record={id,text:content,done:false,pinned:false,scheduled_at:scheduled,all_day:data?.all_day===true,created_at:now,updated_at:now,author:{id:caller.member.id,name:caller.member.name}};
   await env.SETTINGS.put(BOARD_PREFIX+id,JSON.stringify(record),
-   {expirationTtl:BOARD_LIFETIME_DAYS*86400,metadata:{device}});
+   {...lifetime(record),metadata:{device}});
+  await syncDueIndex(env,null,record);
   await invalidateBoardCache(env);
   // Send after storage succeeds. Failure must never lose the saved memo.
   // Cloudflare waitUntil continues delivery without delaying the writer's screen.
@@ -442,6 +466,7 @@ async function boardCommand(req,env,url,ctx){
    if(!await isAdmin())return res({error:"admin_required"},403);
    const deleted={...saved,deleted_at:new Date().toISOString()};
    await env.SETTINGS.put(BOARD_ARCHIVE_PREFIX+match[1],JSON.stringify(deleted),{expirationTtl:BOARD_ARCHIVE_DAYS*86400});
+   await syncDueIndex(env,saved,null);
    await env.SETTINGS.delete(memoKey);
    await invalidateBoardCache(env);
    return res({ok:true,archived:true});
@@ -449,7 +474,11 @@ async function boardCommand(req,env,url,ctx){
   if(!await canModifyNote(saved))return res({error:"memo_edit_forbidden"},403);
   let data;try{data=await body(req,7000)}catch(e){return res({error:"bad_request"},400)}
   if(!data||typeof data!=="object")return res({error:"invalid_note"},400);
-  const patchKeys=Object.keys(data);
+  // KV compare-and-swap is not atomic; guard sequential stale writes.
+  if(data.expected_updated_at!==undefined&&data.expected_updated_at!==saved.updated_at)
+   return res({error:"edit_conflict",updated_at:saved.updated_at},409);
+  const before={...saved};
+  const patchKeys=Object.keys(data).filter(k=>k!=="expected_updated_at");
   if(!patchKeys.length||patchKeys.some(k=>!["text","done","scheduled_at","all_day","pinned"].includes(k))||
    (data.done!==undefined&&typeof data.done!=="boolean")||
    (data.pinned!==undefined&&typeof data.pinned!=="boolean"))return res({error:"invalid_patch"},400);
@@ -464,8 +493,13 @@ async function boardCommand(req,env,url,ctx){
   if(data.pinned!==undefined)saved.pinned=data.pinned;
   saved.edited_by={id:caller.member.id,name:caller.member.name};
   saved.updated_at=new Date().toISOString();
-  await env.SETTINGS.put(memoKey,JSON.stringify(saved),
-   {expirationTtl:BOARD_LIFETIME_DAYS*86400});
+  await env.SETTINGS.put(memoKey,JSON.stringify(saved),lifetime(saved));
+  await syncDueIndex(env,before,saved);
+  if(saved.pinned===true&&before.pinned!==true)
+   for(const photo of (saved.images||[]).filter(validImageId)){
+    const contents=await env.SETTINGS.get(BOARD_IMAGE_PREFIX+photo);
+    if(contents)await env.SETTINGS.put(BOARD_IMAGE_PREFIX+photo,contents);
+   }
   await invalidateBoardCache(env);
   return res({ok:true,note:saved});
  }
