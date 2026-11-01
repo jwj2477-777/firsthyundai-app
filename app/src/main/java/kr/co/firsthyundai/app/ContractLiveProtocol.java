@@ -19,7 +19,12 @@ final class ContractLiveProtocol {
             +"④ 질문 끝에 반드시 멈추세요. 실제 사용자 답변이 새로 들어오기 전에는 혼자 답하거나, "
             +"스스로 사용자 역할을 연기하거나, 두 번째 질문을 이어 하거나, 빈칸을 상상해서 채우지 마세요. "
             +"질문 뒤에는 침묵하며 기다리세요. 답변을 받았을 때에만 다음 미확인 항목을 확인하세요. "
-            +"한 질문에 대한 답이 '미정·모름·나중에 직접 입력·해당 없음'이면 만들어 채우거나 강요하지 말고 미확인으로 표시해 두고 다음 조건으로 넘어가세요. "
+            +"한 질문에 대한 답이 '미정·모름·나중에 직접 입력·해당 없음·협의 중'이면 만들어 채우거나 강요하지 말고 미확인으로 표시해 두고 다음 조건으로 넘어가세요. "
+            +"이때 다른 금액·날짜와 섞지 않고 도구에 reviewField와 reviewStatus만 별도 전송하세요. "
+            +"reviewStatus는 미정=pending, 협의 중=discussion, 직접 입력=manual, 해당 없음=not_applicable입니다. "
+            +"실제 사용자가 그렇게 말한 항목에만 표시하세요. 이미 값을 확정한 항목을 임의로 미정으로 바꾸지 마세요. "
+            +"거래에 필수인 단지명·동호수·거래금액·계약금·계약일·잔금일 등을 해당 없음으로 취급하지 마세요. "
+            +"나중에 사용자가 확정된 값을 새로 말하면 일반 계약조건 제안으로 다시 보내 상태를 해제하세요. "
             +"모든 조건이 확인돼도 사용자가 '완료' 또는 '이대로 진행' 등 확실한 종료 의사를 보이거나 "
             +"앱의 '종료하고 확인'을 누르기 전에는 일방적으로 완료를 선언하거나 종료하지 마세요. "
             +"계약 조건 확인을 마쳤다면 '빠진 내용은 직접 작성하실 수 있습니다. 이대로 완료하실까요?'처럼 한 번만 물은 뒤 기다리세요. "
@@ -45,7 +50,10 @@ final class ContractLiveProtocol {
             +"실제 합의의 진위를 알 수 없으므로 정확성을 보증하지 마세요. 앱에서도 필수항목과 계산을 검사합니다. "
             +"새 의무, 위약금, 합의, 법적 효력을 만들거나 단정하지 마세요. 사용자가 말한 특약의 의미를 보존하세요. "
             +"조건을 듣거나 수정할 때마다 "+FUNCTION+" 도구로 해당 변경 항목만 제안하세요. "
-            +"도구 응답 dialogue.next_missing은 현재 음성 대화에서 아직 제안되지 않은 다음 확인 항목입니다. "
+            +"도구 응답 dialogue.next_missing은 이번 대화에서 아직 답을 받지도 미정 상태로 남겨두지도 않은 다음 확인 항목입니다. "
+            +"dialogue.deferred_count는 사용자가 직접 미정·협의 중·직접 입력 등으로 남긴 항목 수입니다. "
+            +"dialogue.missing_count가 0이어도 deferred_count가 양수면 확정 완료가 아닙니다. "
+            +"미정인 항목이 남아 있으면 이를 짧게 요약하고 나중에 직접 확인하도록 안내한 뒤 사용자 완료 사인을 기다리세요. "
             +"이미 들은 값이나 사용자가 명시적으로 미정·직접 입력하겠다고 한 내용은 반복해서 묻지 마세요. "
             +"dialogue.await_user_reply=true이면 질문 한 번 후 바로 멈춰 실제 사용자 답변을 기다리세요. "
             +"dialogue.missing_count=0이어도 완료 의사를 추측하거나 임의로 종료하지 마세요. "
@@ -73,6 +81,17 @@ final class ContractLiveProtocol {
         properties.put("leaseDuration",new JSONObject().put("type","STRING").put("description","임대차 기간, 예: 2년 또는 24개월"));
         properties.put("balanceTime",new JSONObject().put("type","STRING").put("description","확인한 잔금 시간 HH:mm"));
         properties.put("terms",new JSONObject().put("type","STRING").put("description","이번 대화의 특약 전체. 개인정보 제외, 사용자 발언 의미 보존, 한 줄 한 항목."));
+        properties.put("reviewField",new JSONObject().put("type","STRING")
+            .put("enum",new JSONArray().put("property").put("unit").put("dealType")
+              .put("price").put("contractDeposit").put("contractDate").put("advance")
+              .put("balanceDate").put("interim").put("interimDate").put("leaseStart")
+              .put("leaseEnd").put("leaseDuration").put("monthlyRent")
+              .put("balanceTime").put("terms"))
+            .put("description","이번 음성 대화 중 사용자 명시적으로 미정/협의/직접입력/해당없음이라 답한 항목만. reviewStatus와 둘만 묶어 제안."));
+        properties.put("reviewStatus",new JSONObject().put("type","STRING")
+            .put("enum",new JSONArray().put("pending").put("discussion")
+               .put("manual").put("not_applicable"))
+            .put("description","사용자가 명시한 미확정 상태: pending 미정, discussion 협의 중, manual 직접 입력, not_applicable 해당 없음(선택항목만). 정확한 값 제안과 동시에 사용하지 말 것."));
         return new JSONArray().put(new JSONObject().put("functionDeclarations",new JSONArray().put(new JSONObject()
             .put("name",FUNCTION).put("description","사용자가 말한 계약조건을 검토 후보로 제안. 저장/승인/발송 아님.")
             .put("parameters",new JSONObject().put("type","OBJECT").put("properties",properties)))));
