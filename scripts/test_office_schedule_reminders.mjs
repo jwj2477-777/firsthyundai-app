@@ -81,7 +81,7 @@ try{
   assert.equal(message.data.kind,'office_schedule_reminder');
   assert.equal(message.data.note_id,valid.id);
   assert.equal(message.data.scheduled_at,valid.scheduled_at);
-  assert.equal(message.android.ttl,'600s');
+  assert.equal(message.android.ttl,'1800s');
  }
  await service.scheduled({scheduledTime:now},env,{});
  assert.equal(requests.length,2,'Cron duplicate is prevented by private KV receipt');
