@@ -43,6 +43,7 @@ proposal({account:'SYNTHETIC_PRIVATE'});assert(el('cl_status').textContent.inclu
 emit('review_state',JSON.stringify({field:'contractDate',status:'discussion'}));
 assert(el('cl_reviewProgress').textContent.includes('협의 중 1개'),'Review states should be shown independently');
 assert.equal(el('cl_pick_terms').checked,false,'Review-status rerender must keep explicit unchecked choice');
+assert(el('cl_selectedCount').textContent.includes('5 / 6개'),'Selected count updates after exclusion');
 assert(el('cl_reviewProgress').textContent.includes('추가 확인'),'List questions still unanswered in this Live session');
 assert(el('cl_deferred').textContent.includes('계약일 (협의 중)'),'Show exact unresolved field');
 assert(!live._test.missingConditions().includes('contractDate'),'Explicit deferral prevents repeated questions');
