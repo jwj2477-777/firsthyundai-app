@@ -115,7 +115,9 @@ public class ContractLiveProtocolTest {
         JSONObject tool=ContractLiveProtocol.tools().getJSONObject(0).getJSONArray("functionDeclarations").getJSONObject(0);
         assertEquals(ContractLiveProtocol.FUNCTION,tool.getString("name"));
         JSONObject fields=tool.getJSONObject("parameters").getJSONObject("properties");
-        assertEquals(16,fields.length());
+        assertEquals(18,fields.length());
+        assertTrue(fields.has("reviewField"));
+        assertTrue(fields.has("reviewStatus"));
         for(String k:new String[]{"account","bank","address","owner","buyer","send","save","rough"})assertFalse(fields.has(k));
         assertTrue(ContractLiveProtocol.prompt().contains("기존 메모나 계약 입력란은 볼 수 없습니다"));
     }
