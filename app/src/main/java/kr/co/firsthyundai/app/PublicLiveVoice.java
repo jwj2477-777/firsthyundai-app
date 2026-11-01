@@ -187,10 +187,6 @@ final class PublicLiveVoice {
                             if(content==null)return;
                             if(content.optBoolean("interrupted")){
                                 interruptPlayback();
-                                if(contractMode){
-                                    contractTurnGate.clear();
-                                    event("listening","음성 응답이 중단됐습니다. 말씀하실 조건을 알려주세요.");
-                                }
                             }
                             JSONObject transcript=content.optJSONObject("outputTranscription");
                             if(transcript!=null){
@@ -461,6 +457,10 @@ final class PublicLiveVoice {
                         track.release();
                     }
                     synchronized(audioLock){playbackResetPending=false;}
+                    if(contractMode&&running){
+                        contractTurnGate.clear(); // speaker is now truly silent.
+                        event("listening","AI 응답이 중단됐습니다. 다시 말씀해 주세요.");
+                    }
                     schedulePlayback();
                 });
             }catch(java.util.concurrent.RejectedExecutionException ignored){
