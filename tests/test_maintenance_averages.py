@@ -19,6 +19,13 @@ MONTH_HTML='''<!doctype html><html><head><title>공동주택 관리비</title></
 <tr><td>합계</td><td>26,648,000</td><td>3,831</td></tr></table>
 </body></html>'''
 class FeeImporter(unittest.TestCase):
+ def test_bound_fallback_to_fourteen_interest_complexes(self):
+  self.assertEqual(len(mod.FAVORITE_IDS),14)
+  self.assertIn('kapt-a10027887',mod.FAVORITE_IDS)
+  catalog=__import__('json').loads(mod.CATALOG.read_text(encoding='utf-8'))['records']
+  selected=[row for row in catalog if row.get('id') in mod.FAVORITE_IDS]
+  self.assertEqual(len(selected),14)
+  self.assertEqual(len({row['kapt_code'] for row in selected}),14)
  def test_verified_per_exclusive_m2_and_link(self):
   d=mod.parse(MONTH_HTML,'A10026679',ADDRESS,datetime(2026,10,23))
   self.assertEqual(d['won_per_exclusive_m2'],3831)

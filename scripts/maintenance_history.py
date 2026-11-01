@@ -63,6 +63,13 @@ def merge_record(old, new=None, history_limit=24):
             continue
         if row.get("kapt_code", code) != code or row.get("complex_id", ident) != ident:
             continue
+        # An official three-group API record is preferred over an independent
+        # public mirror for the *same* month. Either source may add new months,
+        # but a fallback cannot downgrade an already verified official total.
+        prior_month = months.get(row["month"])
+        official = lambda x: x.get("method") == "official_kapt_three_group_full_total_per_residential_exclusive_m2"
+        if prior_month and official(prior_month) and not official(row):
+            continue
         months[row["month"]] = {
             k: row[k] for k in (
                 "month", "won_per_exclusive_m2", "monthly_total_won",
