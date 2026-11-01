@@ -111,6 +111,13 @@ assert.equal(live.apply(),true);
 assert.equal(el('ct_property').value,'파크애비뉴');
 assert.equal(el('ct_unit').value,'1604동 2101호');
 assert.equal(el('ct_bank').value,'SYNTHETIC_PRIVATE_bank','Bank remains local only');
+live.open();el('cl_consent').checked=true;live.start();id=requests.at(-1)[0];
+proposal({dealType:'월세',interim:30000000});
+assert(live._test.missingConditions({price:'80000'}).includes('monthlyRent'),
+ 'Unchecking the proposed deal type cannot hide missing monthly rent');
+assert(live._test.missingConditions({price:'80000'}).includes('interimDate'),
+ 'Unchecking the proposed interim amount cannot hide its due date');
+live.close();
 const valid=live._test.normalize;
 const consistent=live._test.consistency;
 const unanswered=live._test.missingConditions;
