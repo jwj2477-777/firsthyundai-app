@@ -556,8 +556,10 @@ function renderBriefing(){
  const todayNotes=briefingRows(date,5),tomorrowNotes=briefingRows(tomorrow,2);
  const todayTotal=briefingRows(date,9999).length;
  const tomorrowTotal=briefingRows(tomorrow,9999).length;
+ const overdue=memoItems().filter(n=>!n.done&&n.scheduled_at&&dateKey(n.scheduled_at)<date)
+  .sort((a,b)=>String(a.scheduled_at).localeCompare(String(b.scheduled_at)));
  $('overviewMemoCount').textContent=todayTotal+'건';
- $('overviewMemoBriefing').hidden=todayTotal===0;
+ $('overviewMemoBriefing').hidden=todayTotal===0&&!overdue.length;
  const target=$('overviewMemoEntries');if(!target)return;
  const row=(notes)=>notes.map(note=>{
   const t=kstParts(note.scheduled_at),time=note.all_day?'종일':(t?.time||'');
@@ -567,7 +569,9 @@ function renderBriefing(){
    '<span class="overviewMemoCopy">'+esc(title)+'</span>'+
    '<span class="overviewMemoArrow" aria-hidden="true">›</span></button>';
  }).join('');
- target.innerHTML=row(todayNotes);
+ target.innerHTML=(overdue.length?
+   '<div class="officeBoardOverdueHeading">⚠ 지난 미완료 일정 '+overdue.length+'건 · 확인 필요</div>'+
+   row(overdue.slice(0,5)):'')+row(todayNotes);
 }
 function openBriefing(force=false){
  renderBriefing();
