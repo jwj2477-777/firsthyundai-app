@@ -755,7 +755,8 @@ public class MainActivity extends Activity {
             if(action==null||!java.util.Arrays.asList("list","post","edit","done","schedule","delete","archive","restore",
                 "imageAdd","imageGet","imageRemove","preview","pin","devices").contains(action)||payload==null||
                payload.length()>("imageAdd".equals(action)?200000:3000))return;
-            final boolean needsAdmin="delete".equals(action)||"restore".equals(action)||"archive".equals(action);
+            final boolean needsAdmin="delete".equals(action)||"restore".equals(action)||
+                "archive".equals(action)||"devices".equals(action);
             final String adminIdentity=adminSessionIdentity;
             final String adminToken=sharedSettingsToken;
             io.execute(()->{
