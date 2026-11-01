@@ -119,4 +119,18 @@ assert(!source.includes('const footer='),'No bottom footer in the exported contr
 assert(source.includes("fill==='#FF0000'?'#155a66'"),'Recolor only the original company logo');
 
 api.share();assert(env.sent&&env.sent.pages.length===1,'Only one PNG must be handed to native share for an ordinary contract');
-console.log('Premium single-sheet layout and legal text preservation passed.');
+const verifiedShares=env.sent;
+nodes.ct_preview.value=typical.replace('700만원','900만원');
+api.share();
+assert.strictEqual(env.sent,verifiedShares,'A prior customer-approved PNG must never be shared after source text changes');
+assert(alerts.some(message=>String(message).includes('최신 내용으로 이미지를 다시 확인')),
+ 'Changed contract text must require a fresh visual review');
+assert(nodes.ct_imageStatus.textContent.includes('변경되었습니다'),'Explain how to recover from stale PNG');
+api.open();api.share();
+assert.notStrictEqual(env.sent,verifiedShares,'Fresh PNG source may be shared only after reopening image preview');
+const latestShares=env.sent;
+api.close();api.share();
+assert.strictEqual(env.sent,latestShares,'Closed/revoked preview must never be silently shared');
+assert(source.includes("approvedImageSource")&&source.includes("!==approvedImageSource"),
+ 'The checked source must be exactly the text used to render the image');
+console.log('Premium single-sheet layout, stale customer-image invalidation, and legal text preservation passed.');
