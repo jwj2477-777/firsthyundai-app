@@ -637,11 +637,43 @@ function timedMemoDue(note,now){
  // Every-minute cron with jitter tolerance; never notify after a past event.
  return until>=28*60000&&until<=31*60000;
 }
+// One-minute due lookup is independent of note creation order.
+async function indexedDueNotes(env,now){
+ const keys=await boardKeys(env,BOARD_DUE_PREFIX);
+ const due=[];
+ for(const key of keys){
+  const stamp=key.name.slice(BOARD_DUE_PREFIX.length,BOARD_DUE_PREFIX.length+24);
+  const ts=Date.parse(stamp);
+  if(!Number.isFinite(ts))continue;
+  if(ts<now-3600000){await env.SETTINGS.delete(key.name);continue;}
+  if(ts-now>31*60000||ts-now<28*60000)continue;
+  const id=key.name.slice(BOARD_DUE_PREFIX.length+25);
+  if(!validBoardId(id))continue;
+  const note=await env.SETTINGS.get(BOARD_PREFIX+id,"json");
+  if(note&&timedMemoDue(note,now))due.push(note);
+  if(due.length>=16)break;
+ }
+ return due;
+}
+// Backfill older notes incrementally without uploading their text or requiring a
+// reinstall. Cloudflare KV listing cursors allow migration of more than 1000 notes.
+const DUE_BACKFILL_CURSOR="office-postit-due-backfill-v1";
+async function backfillDueNotes(env,now=Date.now()){
+ const prior=await env.SETTINGS.get(DUE_BACKFILL_CURSOR);
+ if(prior==="done")return;
+ const page=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:100,...(prior?{cursor:prior}:{})});
+ for(const row of page.keys||[]){
+  if(!validBoardId(row.name.slice(BOARD_PREFIX.length)))continue;
+  const note=await env.SETTINGS.get(row.name,"json");
+  if(note&&!note.done&&!note.all_day&&!recurringBirthday(note)&&Date.parse(note.scheduled_at)>now)
+   await syncDueIndex(env,null,note);
+ }
+ await env.SETTINGS.put(DUE_BACKFILL_CURSOR,page.list_complete===false&&page.cursor?page.cursor:"done");
+}
 async function deliverDueReminders(env,now=Date.now()){
  if(!env?.SETTINGS||!env.FIRSTHYUNDAI_ACCESS_CODE||!fcmConfig(env))
   return {eligible:0,sent:0,reason:"not_ready"};
- const notes=await boardList(env);
- const due=notes.filter(note=>timedMemoDue(note,now)).slice(0,16);
+ const due=await indexedDueNotes(env,now);
  let sent=0;
  for(const note of due){
   const eventStamp=Date.parse(note.scheduled_at);
@@ -857,6 +889,7 @@ async function liveToken(req,env){
 
 export default {async scheduled(event,env,ctx){
   const now=Number(event?.scheduledTime)||Date.now();
+  await backfillDueNotes(env,now);
   await deliverDueReminders(env,now);
  },async fetch(req,env,ctx){
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:HEAD});
