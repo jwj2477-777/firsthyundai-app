@@ -27,6 +27,7 @@ const ctx=vm.createContext({
 });
 vm.runInContext(javascript.slice(javascript.indexOf('function compactTradeCollectedAt('),javascript.indexOf('function number(')),ctx);
 vm.runInContext(snippet,ctx);
+vm.runInContext(fs.readFileSync(path.join(root,'app/src/main/assets/maintenance-trends.js'),'utf8'),ctx);
 vm.runInContext(javascript.slice(javascript.indexOf('function tradeClass(type)'),javascript.indexOf('function renderTypeButtons(')),ctx);
 const run=q=>vm.runInContext(q,ctx);
 const missing=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13'})");
@@ -34,12 +35,20 @@ assert(missing.includes('평형별 월 관리비'));
 assert(missing.includes('평형·타입 정보 확인 전입니다.'));
 run("maintenanceEstimates="+JSON.stringify({schema_version:1,state:'verified_partial',records:[
  {complex_id:'f13',kapt_code:'A10020000',month:'202607',won_per_exclusive_m2:3831,
+ monthly_total_won:26648000,
  source_url:'https://apt.koreacharts.com/apt/A10020000/contents.html'}]}));
 const feePreview=run("renderPublicComplexInfo("+JSON.stringify({id:'f13',kapt_code:'A10020000',
  area_type_pairs:[{exclusive_m2:59.89,supply_m2:88.08,supply_label:'88A'}]})+")");
 assert(feePreview.includes('약 23만원'),'Estimated K-apt management fee should be rounded to 10,000 KRW');
 assert(feePreview.includes('2026년 7월')&&feePreview.includes('상담 참고액'),
  'Published month and non-invoice estimate label must be present');
+run("maintenanceEstimates="+JSON.stringify({schema_version:1,state:'verified_partial',records:[
+ {complex_id:'f13',kapt_code:'A10020000',month:'202607',won_per_exclusive_m2:3831,
+ source_url:'https://apt.koreacharts.com/apt/A10020000/contents.html'}]}));
+const unverifiedFee=run("renderPublicComplexInfo("+JSON.stringify({id:'f13',kapt_code:'A10020000',
+ area_type_pairs:[{exclusive_m2:59.89,supply_m2:88.08,supply_label:'88A'}]})+")");
+assert(unverifiedFee.includes('확인 중')&&!unverifiedFee.includes('약 23만원'),
+ 'A raw source rate with no validated monthly total cannot enter the family fee card');
 assert(!feePreview.includes('전체 공개 비용'),'Never re-introduce whole-complex partial line items');
 run("maintenanceEstimates=null");
 assert(!missing.includes('건축물대장')&&!missing.includes('단지 전체 공개 비용'),
