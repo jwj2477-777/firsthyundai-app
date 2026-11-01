@@ -929,6 +929,7 @@ function imageUpdate(note){
  merge(items);
 }
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,exportBackup,diagnostics,
+ deviceHealth:()=>call('devices',{}),
  toggleComposer,setStatus,setAuthor,setQuery,setSort,showMore,clearFilters,
  imageCall:call,imageUpdate,canEdit:canEditId,
  setView,chooseDay,changeMonth,today,addAtSelectedDay,clearScheduledDay,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
