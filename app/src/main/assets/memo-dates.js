@@ -10,10 +10,10 @@ function parse(text,now=new Date()){
  const baseDow=(new Date(Date.UTC(y,m-1,d)).getUTCDay()+6)%7;
  // Recognize spoken/written Korean years before matching the yearless month.
  // 2028년 1월 is not the nearest January; a yearless fallback would misfile it.
- const koreanYear=s.match(/(?:^|[^\\d])((?:20\\d{2})|(?:2\\d|3\\d))\\s*년\\s*(\\d{1,2})\\s*월\\s*(\\d{1,2})\\s*일/);
- const relativeYear=s.match(/(올해|내년|내후년)\\s*(\\d{1,2})\\s*월\\s*(\\d{1,2})\\s*일/);
- const relativeMonth=s.match(/(이번|다음|다다음)\\s*달\\s*(\\d{1,2})\\s*일/);
- const full=s.match(/(?:^|[^\\d])(20\\d{2})\\s*[.\\/-]\\s*(\\d{1,2})\\s*[.\\/-]\\s*(\\d{1,2})(?!\\d)/);
+ const koreanYear=s.match(/(?:^|[^\d])((?:20\d{2})|(?:2\d|3\d))\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
+ const relativeYear=s.match(/(올해|내년|내후년)\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
+ const relativeMonth=s.match(/(이번|다음|다다음)\s*달\s*(\d{1,2})\s*일/);
+ const full=s.match(/(?:^|[^\d])(20\d{2})\s*[.\/-]\s*(\d{1,2})\s*[.\/-]\s*(\d{1,2})(?!\d)/);
  const korean=s.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
  const short=s.match(/(?:^|[^\d])(\d{1,2})\s*[.\/-]\s*(\d{1,2})(?!\d)/);
  const week=s.match(/(이번\s*주|다음\s*주)\s*(월요일|화요일|수요일|목요일|금요일|토요일|일요일)/);
