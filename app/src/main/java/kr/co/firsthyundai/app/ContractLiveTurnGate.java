@@ -10,8 +10,12 @@ final class ContractLiveTurnGate {
     private boolean modelSpeaking=false;
     private boolean audioStarted=false;
     private boolean turnFinished=false;
+    // A delayed output transcript after playback must not mute the next reply.
+    private boolean waitingForUser=false;
     synchronized boolean microphoneAllowed(){return !modelSpeaking;}
+    synchronized void userSpeechDetected(){waitingForUser=false;}
     synchronized void modelOutputAnnounced(){
+        if(waitingForUser)return;
         if(!modelSpeaking){
             modelSpeaking=true;
             audioStarted=false;
@@ -21,6 +25,7 @@ final class ContractLiveTurnGate {
     synchronized boolean modelAudioStarted(){
         boolean first=!audioStarted;
         modelSpeaking=true;
+        waitingForUser=false;
         audioStarted=true;
         turnFinished=false;
         return first;
@@ -33,7 +38,8 @@ final class ContractLiveTurnGate {
         modelSpeaking=false;
         audioStarted=false;
         turnFinished=false;
+        waitingForUser=true;
         return true;
     }
-    synchronized void clear(){modelSpeaking=false;audioStarted=false;turnFinished=false;}
+    synchronized void clear(){modelSpeaking=false;audioStarted=false;turnFinished=false;waitingForUser=false;}
 }
