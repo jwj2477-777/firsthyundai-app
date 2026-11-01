@@ -867,6 +867,25 @@ function toggleDone(){
  memoStatus=memoStatus==='all'?'active':'all';showCompleted=memoStatus==='all';
  finderTouched=true;memoLimit=PAGE_SIZE;draw();
 }
+async function exportBackup(){
+ if(bridge?.getMode?.()!=='admin'||typeof bridge?.saveBackup!=='function'){
+  msg('공유 메모 백업은 최신 안드로이드 관리자모드에서만 가능합니다.');return;
+ }
+ if(typeof confirm==='function'&&!confirm('이 휴대전화에 공유 메모 기록을 JSON 파일로 내보낼까요? 고객 연락처 등 개인정보가 포함될 수 있습니다. 사진 원본은 제외되고 첨부 식별자만 기록됩니다.'))return;
+ msg('공유 메모를 백업 파일로 준비하는 중…');
+ try{
+  const notes=await readAllBoard();
+  if(notes.length>=5000){msg('기록이 5,000건 이상입니다. 일부 기록이 빠질 수 있어 백업을 중단했습니다.');return;}
+  const backup=JSON.stringify({schema_version:1,kind:'office_board_backup',
+    exported_at:new Date().toISOString(),photo_originals_included:false,notes});
+  if(backup.length>1900000){msg('백업 크기가 파일 저장 한도를 넘었습니다. 분할 백업 기능이 필요합니다.');return;}
+  bridge.saveBackup(backup);
+  msg('휴대전화의 파일 저장 위치를 선택해 주세요. 사진 원본은 포함되지 않습니다.');
+ }catch(e){msg('공유 메모 백업 실패 · 사무실 연결을 확인해 주세요.');}
+}
+function diagnostics(){
+ return {lastCheck,historyLoaded,historyLoading,memoCount:items.length};
+}
 function authenticate(){
  if(!bridge?.requestOfficeBoardAccess){msg('보안코드 연결은 안드로이드 앱에서만 지원합니다.');return}
  bridge.requestOfficeBoardAccess();
@@ -905,7 +924,7 @@ function imageUpdate(note){
  localUpdates.set(note.id,{note,time:Date.now()});
  merge(items);
 }
-window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
+window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,exportBackup,diagnostics,
  toggleComposer,setStatus,setAuthor,setQuery,setSort,showMore,clearFilters,
  imageCall:call,imageUpdate,canEdit:canEditId,
  setView,chooseDay,changeMonth,today,addAtSelectedDay,clearScheduledDay,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
