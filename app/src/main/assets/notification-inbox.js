@@ -86,9 +86,10 @@
   bell?.focus?.();
  }
  function go(kind,index){
-  const entry=entries[Number(index)];
+  const entry=Number.isInteger(Number(index))?entries[Number(index)]:null;
+  if(!entry||entry.kind!==kind)return;
   close();
-  if(kind==='memo'){window.switchPage?.('officeBoard');if(entry?.noteId)window.FirstHyundaiOfficeBoard?.focusNote?.(entry.noteId);return;}
+  if(kind==='memo'){window.switchPage?.('officeBoard');if(entry.noteId)window.FirstHyundaiOfficeBoard?.focusNote?.(entry.noteId);return;}
   if(kind==='trade'){
    // Open the specific favorite-14 alert, never the unfiltered whole-city feed.
    if(entry&&window.FirstHyundaiTradeAlerts?.openHistory?.(entry))return;

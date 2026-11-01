@@ -51,6 +51,10 @@ async function verify(){
   check(!bell.classList.contains('hasUnreadHistory'),'Reading clears unread marker');
   check(dialog.textContent.includes('사무실 포스트잇이 도착했습니다.'),'Memo generic no contents');
   const go=document.querySelector('.inboxItem[data-kind="memo"]');
+  window.FirstHyundaiNotificationInbox.go('trade',1);
+  check(dialog.open,'Stale or mismatched notification kind must not redirect or close inbox');
+  window.FirstHyundaiNotificationInbox.go('memo',99);
+  check(dialog.open,'Unknown notification index must not close current inbox');
   go.click();
   check(!dialog.open&&currentPage==='officeBoard','Memo history returns to authenticated note page');
   data[0].tradeSnapshot={version:1,items:[
