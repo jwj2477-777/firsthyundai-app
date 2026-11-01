@@ -149,8 +149,25 @@
    (x.errorCount||x.missingCount?'<p>원본 오류 표기 '+x.errorCount+'개 · 수집 누락 표기 '+x.missingCount+'개</p>':'')+
    '<div class="adminFeedActions"><button type="button" onclick="FirstHyundaiAdminCenter.retry(\''+x.key+'\')">게시자료 재확인</button>'+
    '<button type="button" onclick="FirstHyundaiAdminCenter.go(\''+x.key+'\')">해당 화면 열기</button></div></div></details>').join('');
+  // Public freshness is not the same as an authenticated private-office
+  // connection. Display each device permission and memo refresh separately.
+  const native=window.FirstHyundaiNative;
+  let notification='확인 불가',push='확인 불가',member='미연결';
+  try{
+   notification=native?.getOfficeMemoNotificationStatus?.()||notification;
+   push=native?.getOfficeMemoPushStatus?.()||push;
+   member=native?.getOfficeMemberId?.()?'계정 선택됨':'계정 연결 확인 필요';
+  }catch(e){}
+  const memo=window.FirstHyundaiOfficeBoard?.diagnostics?.()||{};
+  const last=Number(memo.lastCheck)||0;
+  const memoFresh=last?Math.round((Date.now()-last)/60000)+'분 전':'조회 이력 없음';
   get('adminDiagnosticDetails').innerHTML=
-   '<p>진단은 읽기 전용이며 공개 데이터의 건수·상태·시각만 사용합니다.</p>'+
+   '<p>게시자료는 마지막 수집본 기준이며, 실제 원천 API 성공과 구분됩니다.</p>'+
+   '<p>사무실 계정: '+safe(member)+' · 메모 마지막 확인: '+safe(memoFresh)+
+   ' · 과거 기록: '+(memo.historyLoaded?'조회 완료':memo.historyLoading?'불러오는 중':'조회 전')+'</p>'+
+   '<p>이 기기 메모 알림: '+safe(notification)+' · 푸시 연결: '+safe(push)+
+   ' (다른 가족 휴대전화의 상태까지 검증한 것은 아닙니다)</p>'+
+   '<p>관리비는 검증 완료 자료만 표시합니다. K-apt 수집 오류 및 미확인 단지는 별도로 점검해야 합니다.</p>'+
    items.map(x=>'<p>'+safe(x.name)+' · '+safe(x.label)+' · '+safe(ageText(x.age))+
    ' · '+safe(x.count===null?'미집계':x.count+'건')+'</p>').join('');
   get('adminAuditHistory').innerHTML=audit.length?audit.slice(0,12).map(x=>
