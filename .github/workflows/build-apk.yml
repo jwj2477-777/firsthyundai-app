@@ -384,25 +384,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.71 memo duplicate and contract image safety APK
+      - name: Publish v2.1.72 old memo alert and safe retry APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.71.apk
-          unzip -t FirstHyundai-v2.1.71.apk | grep 'No errors detected'
-          if gh release view v2.1.71 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.72.apk
+          unzip -t FirstHyundai-v2.1.72.apk | grep 'No errors detected'
+          if gh release view v2.1.72 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.71 FirstHyundai-v2.1.71.apk \
+            gh release create v2.1.72 FirstHyundai-v2.1.72.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.71 · 공유메모 중복 방지·계약 이미지 최신 내용 확인' \
-              --notes '공유메모 새 글 등록과 사진 업로드가 이어지는 동안 중복 클릭을 막아 같은 작업이 겹치지 않도록 개선했습니다. 특히 사진만 첨부하는 경로와 서버 저장 후 사진 전송이 완료되기 전까지 전체 등록 구간을 보호합니다. 계약문자로 만든 PNG 이미지는 생성 당시 검토했던 문자 원문과 연결해 저장합니다. 이미지 미리보기 이후 계약문자가 수정되면 이전 이미지를 공유하지 않고 최신 문자로 이미지를 다시 만들어 확인하도록 안내합니다. 이미지를 닫은 경우에도 이전 캔버스를 새 계약 이미지처럼 재사용하지 않습니다. 새 API 비용이나 고객정보 외부 전송 없이 계약·공유메모·실거래·Live·관리비·학교정보 기존 기능을 유지했습니다. 정식 v2.1.71/build222.'
+              --title '퍼스트현대 v2.1.72 · 오래된 메모 알림·통신 재시도 개선' \
+              --notes '알림함에서 오래된 공유메모를 누르면 최근 메모 25건에만 의존하지 않고 해당 메모를 찾을 때까지 인증된 과거 페이지를 순서대로 조회하도록 개선했습니다. 삭제되거나 조회 범위를 벗어난 메모와 통신 오류는 별도로 안내하며, 다른 알림을 선택하면 이전 알림 조회가 잘못 열리지 않게 합니다. 알림 종류가 실제 항목과 다를 때 이동하지 않습니다. 공유메모 전송 이후 응답 시간 초과·연결 문제로 저장 여부가 불명확하면 다음 등록 버튼에서 먼저 본인 최근 게시글의 내용과 일정, 작성시각을 확인합니다. 이미 등록된 글이면 중복 등록을 막고 기존 글을 확인하며, 확인되지 않으면 재등록 여부를 명시적으로 다시 확인합니다. 네트워크가 불통이면 원문을 보존하고 재등록하지 않습니다. 서버 차원의 원자적 중복 제거를 보증하는 방식은 아닙니다. 기존 계약 Live·안내 이미지·실거래·공유메모·무료 사용 범위 및 개인정보 인증 채널 유지. v2.1.72/build223.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.71 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.71 --apk FirstHyundai-v2.1.71.apk
+          gh release upload v2.1.72 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.72 --apk FirstHyundai-v2.1.72.apk
 
 
 
