@@ -61,6 +61,10 @@ final class PublicLiveVoice {
     private boolean contractMode=false;
     // Conditions proposed during this session only; never the pre-existing contract form.
     private final JSONObject proposedConditions=new JSONObject();
+    private final ContractLiveTurnGate contractTurnGate=new ContractLiveTurnGate();
+    // Bytes are written only by the playback executor, but must be heard on
+    // the speaker before the contract microphone is sent to Google again.
+    private long pcmFramesWritten=0;
     private volatile int audioGeneration=0;
     private final LivePcmQueue audioQueue=new LivePcmQueue();
     private final Object audioLock=new Object();
@@ -183,6 +187,10 @@ final class PublicLiveVoice {
                             if(content==null)return;
                             if(content.optBoolean("interrupted")){
                                 interruptPlayback();
+                                if(contractMode){
+                                    contractTurnGate.clear();
+                                    event("listening","음성 응답이 중단됐습니다. 말씀하실 조건을 알려주세요.");
+                                }
                             }
                             JSONObject transcript=content.optJSONObject("outputTranscription");
                             if(transcript!=null){
@@ -203,7 +211,15 @@ final class PublicLiveVoice {
                                 String audio=data.optString("data","");
                                 if(audio.isEmpty()||audio.length()>150000)continue;
                                 byte[] pcm=Base64.decode(audio,Base64.DEFAULT);
-                                if(pcm.length>0&&pcm.length<=100000)play(pcm);
+                                if(pcm.length>0&&pcm.length<=100000){
+                                    if(contractMode&&contractTurnGate.modelAudioStarted())
+                                        event("ai_speaking","AI가 질문 중입니다. 답변이 끝나면 말씀해 주세요.");
+                                    play(pcm);
+                                }
+                            }
+                            if(contractMode&&content.optBoolean("turnComplete")){
+                                contractTurnGate.modelTurnComplete();
+                                resumeMicrophoneAfterPlayback();
                             }
                         }catch(Exception ignored){}
                     }
@@ -247,9 +263,12 @@ final class PublicLiveVoice {
                     }catch(Exception ignored){}
                 }
                 // Only fixed acknowledgements leave the device; no existing form or previous values.
+                JSONObject acknowledgement=new JSONObject().put("result",result);
+                if(contractMode&&"proposed_for_user_review".equals(result))
+                    acknowledgement.put("dialogue",ContractLiveChecklist.reminder(proposedConditions));
                 responses.put(new JSONObject().put("id",fc.optString("id"))
                     .put("name",fc.optString("name"))
-                    .put("response",new JSONObject().put("result",result)));
+                    .put("response",acknowledgement));
             }
             if(running)ws.send(new JSONObject().put("toolResponse",new JSONObject().put("functionResponses",responses)).toString());
         }catch(Exception ignored){}
@@ -285,6 +304,9 @@ final class PublicLiveVoice {
                     try{n=recorder.read(samples,0,samples.length);}catch(Exception e){break;}
                     if(!running||microphone!=recorder)break;
                     if(n<=0)continue;
+                    // Half-duplex contract speech: a model question cannot be
+                    // echoed back as another imaginary user answer.
+                    if(contractMode&&!contractTurnGate.microphoneAllowed())continue;
                     WebSocket ws=socket;
                     if(ws==null||ws.queueSize()>64000)continue;
                     try{
@@ -354,6 +376,7 @@ final class PublicLiveVoice {
                         track.release();throw new IllegalStateException("audio output unavailable");
                     }
                     speaker=track;
+                    pcmFramesWritten=0;
                 }
                 if(!writePacket(track,frame.pcm,frame.generation,primed))
                     throw new IllegalStateException("audio output write failed");
@@ -384,12 +407,46 @@ final class PublicLiveVoice {
             int written=track.write(pcm,offset,available,AudioTrack.WRITE_BLOCKING);
             if(written<=0)return false;
             offset+=written;
+            pcmFramesWritten+=written/2; // 16-bit mono PCM => 2 bytes per playback frame.
             if(track.getPlayState()!=AudioTrack.PLAYSTATE_PLAYING){
                 primed[0]+=written;
                 if(primed[0]>=PCM_PRIME_BYTES)track.play();
             }
         }
         return true;
+    }
+    /** Do not reopen the mic just because Google finished generating:
+     * AudioTrack may still be speaking, including buffered final syllables.
+     * This is queued after the current speaker drain on the same executor.
+     */
+    private void resumeMicrophoneAfterPlayback(){
+        if(!contractMode||!running)return;
+        final int generation=audioGeneration;
+        try{player.execute(()->{
+            if(!running||generation!=audioGeneration)return;
+            try{
+                AudioTrack track=speaker;
+                if(track!=null){
+                    long expected=pcmFramesWritten;
+                    long deadline=android.os.SystemClock.elapsedRealtime()+5000L;
+                    while(running&&generation==audioGeneration&&speaker==track&&
+                          android.os.SystemClock.elapsedRealtime()<deadline){
+                        long heard=track.getPlaybackHeadPosition()&0xffffffffL;
+                        if(heard+480>=expected)break; // <=20ms tail is effectively silent.
+                        Thread.sleep(30);
+                    }
+                    if(!running||generation!=audioGeneration)return;
+                    if(speaker==track&&
+                       (track.getPlaybackHeadPosition()&0xffffffffL)+480<expected){
+                        event("error","AI 음성 재생이 끝나지 않아 입력을 재개하지 못했습니다. 대화 연결을 종료합니다.");
+                        stop();
+                        return;
+                    }
+                }
+                if(contractTurnGate.playbackFinished())
+                    event("listening","AI 질문이 끝났습니다. 이제 답변을 말씀해 주세요.");
+            }catch(InterruptedException ignored){Thread.currentThread().interrupt();}
+        });}catch(java.util.concurrent.RejectedExecutionException ignored){}
     }
     private void interruptPlayback(){
         synchronized(audioLock){
@@ -414,6 +471,7 @@ final class PublicLiveVoice {
     synchronized void stop(){
         if(closed)return;
         closed=true;running=false;
+        contractTurnGate.clear();
         if(!quotaConfirmed)reportQuota("abort");
         quotaUpdates.shutdown();
         durationLimit.removeCallbacks(autoStop);
