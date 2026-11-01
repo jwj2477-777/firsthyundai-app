@@ -23,11 +23,14 @@ async function verify(){
   get('cl_consent').checked=true;get('cl_start').click();check(starts===1,'Explicit start');
   emit('proposal',JSON.stringify({property:'파크애비뉴',unit:'1604동 2101호',price:980000000,contractDeposit:65000000,balanceDate:'2027-04-18',terms:'관리비는 잔금일까지 정산한다.'}));
   check(!!get('cl_pick_property')&&!!get('cl_pick_unit'),'Live review includes apartment and unit');
+  check(get('cl_reviewProgress').textContent.includes('추가 확인'),'Show remaining unanswered questions');
+  check(get('cl_deferred').textContent.includes('계약일'),'Display missing contract date');
   check(get('ct_price').value==='80000','No automatic writes');
   check(get('cl_apply').disabled,'No apply with mic active');
   check(dialog.scrollWidth<=dialog.clientWidth+1,'Dialog horizontal overflow');
   for(const key of ['cl_start','cl_stop','cl_apply','cl_close'])check(get(key).getBoundingClientRect().height>=48,'Touch target '+key);
   get('cl_stop').click();check(stops===1&&!get('cl_apply').disabled,'Stop before review');
+  window.confirm=message=>{check(message.includes('아직 답하지 않은 항목')&&message.includes('계약일'),'Warning before applying incomplete conditions');return true;};
   get('cl_apply').click();check(!dialog.open,'Close after applying');
   check(get('ct_price').value==='98000','원 to 만원 conversion');
   check(get('ct_contractDeposit').value==='6500','Explicit deposit beats default');
