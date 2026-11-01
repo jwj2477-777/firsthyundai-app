@@ -27,7 +27,7 @@ final class ContractLiveChecklist {
         String s=String.valueOf(p.opt(name)).trim();
         return !s.isEmpty();
     }
-    static JSONObject reminder(JSONObject proposals){
+    static JSONObject reminder(JSONObject proposals) throws org.json.JSONException{
         JSONArray missing=missing(proposals);
         JSONObject result=new JSONObject();
         result.put("missing_count",missing.length());
