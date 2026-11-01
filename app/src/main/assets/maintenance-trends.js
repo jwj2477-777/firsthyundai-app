@@ -17,7 +17,12 @@
   return r&&r.complex_id===complexId&&r.kapt_code===code&&
    validMonth(r.month)&&integer(r.won_per_exclusive_m2,300,20000)&&
    typeof r.source_url==='string'&&/^https:\/\//.test(r.source_url)&&
-   (!('monthly_total_won' in r)||integer(r.monthly_total_won,100000,200000000000));
+   integer(r.monthly_total_won,100000,200000000000)&&
+   (!Object.hasOwn(r,'components_won')||
+    (r.components_won&&typeof r.components_won==='object'&&
+     ['common','individual','reserve'].every(k=>integer(r.components_won[k],0,200000000000))&&
+     Object.keys(r.components_won).length===3&&
+     r.components_won.common+r.components_won.individual+r.components_won.reserve===r.monthly_total_won));
  }
  function summarize(snapshot,complexId,code,exclusive,clock){
   if(snapshot?.schema_version!==1||snapshot?.state!=='verified_partial'||
