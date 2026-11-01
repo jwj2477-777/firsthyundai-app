@@ -379,17 +379,24 @@ async function boardCommand(req,env,url,ctx){
   const images=Array.isArray(note.images)?note.images.filter(validImageId):[];
   if(req.method==="POST"&&!photoId){
    if(!await canModifyNote(note))return res({error:"memo_edit_forbidden"},403);
-   if(images.length>=BOARD_IMAGE_LIMIT)return res({error:"image_limit"},409);
-   let data;try{data=await body(req,BOARD_IMAGE_MAX+250)}catch(e){return res({error:"invalid_image"},400)}
+   let data;try{data=await body(req,BOARD_IMAGE_MAX+350)}catch(e){return res({error:"invalid_image"},400)}
    if(!validImageData(data?.data_url))return res({error:"invalid_image"},400);
+   const uploadId=typeof data?.upload_id==="string"&&/^[A-Za-z0-9_-]{8,80}$/.test(data.upload_id)?data.upload_id:"";
+   const receipt=uploadId?BOARD_IMAGE_REQUEST_PREFIX+noteId+":"+uploadId:"";
+   if(receipt){
+    const prior=await env.SETTINGS.get(receipt,"json");
+    if(prior?.image_id&&images.includes(prior.image_id))
+     return res({ok:true,note,image_id:prior.image_id,already_saved:true});
+   }
+   if(images.length>=BOARD_IMAGE_LIMIT)return res({error:"image_limit"},409);
    const imageId=crypto.randomUUID();
-   await env.SETTINGS.put(BOARD_IMAGE_PREFIX+imageId,data.data_url,{expirationTtl:BOARD_IMAGE_TTL});
+   await env.SETTINGS.put(BOARD_IMAGE_PREFIX+imageId,data.data_url,imageLifetime(note));
    const updated={...note,images:[...images,imageId],updated_at:new Date().toISOString(),
     edited_by:{id:caller.member.id,name:caller.member.name}};
    try{
-    await env.SETTINGS.put(noteKey,JSON.stringify(updated),
-      {expirationTtl:BOARD_LIFETIME_DAYS*86400});
+    await env.SETTINGS.put(noteKey,JSON.stringify(updated),lifetime(updated));
    }catch(e){await env.SETTINGS.delete(BOARD_IMAGE_PREFIX+imageId);throw e}
+   if(receipt)await env.SETTINGS.put(receipt,JSON.stringify({image_id:imageId}),{expirationTtl:BOARD_IMAGE_TTL});
    await invalidateBoardCache(env);
    return res({ok:true,note:updated,image_id:imageId},201);
   }
@@ -402,8 +409,7 @@ async function boardCommand(req,env,url,ctx){
    if(!await canModifyNote(note))return res({error:"memo_edit_forbidden"},403);
    const updated={...note,images:images.filter(id=>id!==photoId),updated_at:new Date().toISOString(),
     edited_by:{id:caller.member.id,name:caller.member.name}};
-   await env.SETTINGS.put(noteKey,JSON.stringify(updated),
-     {expirationTtl:BOARD_LIFETIME_DAYS*86400});
+   await env.SETTINGS.put(noteKey,JSON.stringify(updated),lifetime(updated));
    await env.SETTINGS.delete(BOARD_IMAGE_PREFIX+photoId);
    await invalidateBoardCache(env);
    return res({ok:true,note:updated});
