@@ -152,7 +152,8 @@ final class PublicLiveVoice {
                             }
                             ws.send(new JSONObject().put("setup",setup).toString());
                             event("connected","Google 서버에 연결됐습니다. 음성 사용 준비를 확인하고 있습니다.");
-                            durationLimit.postDelayed(autoStop,7*60*1000L);
+                            // The seven minutes start after usable microphone setup,
+                            // not while Google is still completing its handshake.
                         }catch(Exception e){event("error","Live 대화를 시작하지 못했습니다.");stop();}
                     }
                     // Gemini returns JSON envelopes in BINARY WebSocket frames as well as text.
@@ -171,10 +172,13 @@ final class PublicLiveVoice {
                         try{
                             JSONObject msg=new JSONObject(raw);
                             if(msg.has("setupComplete")){
+                                if(microphone!=null)return; // Avoid a second recorder and duplicate quota.
                                 durationLimit.removeCallbacks(connectionTimeout);
                                 if(startMicrophone()&&running){
                                     quotaConfirmed=true;
                                     reportQuota("ready");
+                                    durationLimit.removeCallbacks(autoStop);
+                                    durationLimit.postDelayed(autoStop,7*60*1000L);
                                 }
                                 return;
                             }
@@ -301,7 +305,7 @@ final class PublicLiveVoice {
         }catch(Exception ignored){}
     }
     private synchronized boolean startMicrophone(){
-        if(!running)return false;
+        if(!running||microphone!=null)return false;
         try{
             final int minimum=AudioRecord.getMinBufferSize(16000,AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT);
