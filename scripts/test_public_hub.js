@@ -62,6 +62,18 @@ const addressed=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13'
 assert(!addressed.includes('도로명·지번주소')&&!addressed.includes('지도에서 주소 확인'),
  'Address is in the cadastral-first detail header, not duplicated in fees');
 assert(run('renderSchoolPublicInfo()').includes('배정학교가 아닙니다'));
+// Review guidance must remain actionable while official school boundaries
+// that fail address/margin checks stay unassigned.
+assert(javascript.includes("단지 도로명주소·필지와 실제 출입구 위치를 확인하고"),
+ 'Near-boundary cases must say what to check next');
+assert(javascript.includes("공동통학구역은 여러 학교 선택 가능 여부가 해마다"),
+ 'Joint catchments must not be presented as one assigned school');
+assert(javascript.includes("x.reference_date===schoolDistrictData.zone_review.reference_date"),
+ 'Never show out-of-date review reason from a mismatched official zone snapshot');
+assert(javascript.includes("schoolReview.min_required_clearance_m===35"),
+ 'Only source-validated 35m safety margin may show a boundary gap');
+assert(javascript.includes("특정 학교 배정은 확인되지 않았습니다."),
+ 'Unverified school must remain explicit');
 const schoolSnapshot=JSON.parse(fs.readFileSync(path.join(root,'data/school_districts.json'),'utf8'));
 run('schoolDistrictData='+JSON.stringify(schoolSnapshot));
 const schoolCoverage=run('verifiedSchoolCoverage()');

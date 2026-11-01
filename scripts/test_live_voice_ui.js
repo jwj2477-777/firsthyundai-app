@@ -20,6 +20,12 @@ assert(app.includes('stopPublicLiveVoice();'));
 assert(native.includes('OfficeBoardClient.liveToken(context)'));
 assert(native.includes('onMessage(WebSocket ws,ByteString frame)'),'Handle Google binary WebSocket responses');
 assert(native.includes('GeminiLiveFrame.text(frame)'),'Must decode binary setupComplete');
+assert(native.includes('AI 음성 응답을 처리하지 못해 대화를 종료했습니다.'),
+ 'Malformed or corrupt Live model response must terminate with an explicit error');
+assert(native.includes('stop();\n                            }\n                        }\n                    }\n                    @Override public void onFailure'),
+ 'Malformed provider frame is never silently ignored and the mic is released');
+assert(read('app/src/main/java/kr/co/firsthyundai/app/ContractLiveProtocol.java').includes('확인 문장 최대 한 문장과 질문 한 가지만'),
+ 'Prompt must enforce one short question per actual user voice turn');
 assert(native.includes('onMessage(ws,text)'),'Decoded binary frame must use the usual JSON handler');
 assert(native.includes('if(msg.has("setupComplete"))'),'Only start mic after actual Google setupComplete');
 assert(native.includes('if(startMicrophone()&&running)'),'Mic must start after setupComplete');

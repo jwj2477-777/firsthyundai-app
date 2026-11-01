@@ -49,6 +49,33 @@ class SchoolZoneSafeguards(unittest.TestCase):
   # A boundary vertex is not a safe apartment centroid.
   point={'id':'edge','lng':ring[0][0]+0.000001,'lat':ring[0][1]+0.000001}
   self.assertFalse(any(v['complex_id']=='edge' for v in m.build_assignments(d['zones'],[point])))
+ def test_review_boundary_never_confirms_a_school_and_includes_measured_gap(self):
+  d=json.loads((R/'data'/'school_zones_yeonsu.json').read_text(encoding='utf8'))
+  z=next(z for z in d['zones'] if z['id']=='Z000101206')
+  ring=m.decode_ring(z['rings'][0][0])
+  # Move toward a polygon boundary from a real verified interior point;
+  # do not hardcode a made-up school or a made-up edge distance.
+  lng,lat=126.63443211409,37.385614333723
+  near=None
+  for x,y in ring:
+   for k in (0.97,0.99,0.995):
+    point={'id':'synthetic-edge','lng':lng*(1-k)+x*k,'lat':lat*(1-k)+y*k}
+    matches=m.zone_matches(d['zones'],point['lng'],point['lat'])
+    if len(matches)==1 and matches[0][0]['kind']=='0' and 0<=matches[0][1]<35:
+     near=point
+     break
+   if near:break
+  self.assertIsNotNone(near,'Must find a genuine geometrically close reference point')
+  pending=m.review_unmatched_zones(d['zones'],[near],[{'id':'synthetic-edge'}],[])
+  self.assertEqual(len(pending),1)
+  self.assertEqual(pending[0]['reason'],'near_boundary')
+  self.assertGreaterEqual(pending[0]['boundary_clearance_m'],0)
+  self.assertLess(pending[0]['boundary_clearance_m'],35)
+  self.assertEqual(pending[0]['min_required_clearance_m'],35)
+  self.assertNotIn('school',pending[0])
+  self.assertNotIn('zone_name',pending[0])
+  self.assertFalse(m.build_assignments(d['zones'],[near]))
+
  def test_schoolinfo_api_requires_yeonsu_sgg_and_three_school_levels(self):
   seen=[]
   def fetch(req):

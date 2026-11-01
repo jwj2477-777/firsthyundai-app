@@ -190,8 +190,14 @@ def review_unmatched_zones(zones, points, catalog, confirmed):
             else:
                 # A verified normal polygon should have entered confirmed.
                 reason='requires_manual_review'
-        reasons.append({'complex_id':ident,'reason':reason,
-                        'reference_date':'2026-09-20'})
+        item={'complex_id':ident,'reason':reason,
+              'reference_date':'2026-09-20'}
+        # When an exactly geocoded address falls within the 35m uncertainty
+        # buffer, record the measured gap without claiming school assignment.
+        if reason=='near_boundary':
+            item['boundary_clearance_m']=int(matches[0][1])
+            item['min_required_clearance_m']=35
+        reasons.append(item)
     return reasons
 
 
