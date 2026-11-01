@@ -1,9 +1,10 @@
 """Published management fee unit extraction is guarded, not a household invoice."""
-import importlib.util,unittest
+import importlib.util,unittest,sys
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'scripts'))
 spec=importlib.util.spec_from_file_location('fee_avg',ROOT/'scripts'/'collect_maintenance_averages.py')
 mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
 ADDRESS='인천광역시 연수구 컨벤시아대로252번길 30'
