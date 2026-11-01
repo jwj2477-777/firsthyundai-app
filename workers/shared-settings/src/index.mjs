@@ -575,7 +575,7 @@ async function sendPush(env,postId,fromDevice,options={}){
   const response=await fetch("https://fcm.googleapis.com/v1/projects/"+config.project_id+"/messages:send",{
    method:"POST",headers:{"Authorization":"Bearer "+auth,"Content-Type":"application/json; charset=utf-8"},
    body:JSON.stringify({message:{token:obj.fcm,data,
-     android:{priority:"HIGH",ttl:reminder?"600s":"86400s"}}})
+     android:{priority:"HIGH",ttl:reminder?"1800s":"86400s"}}})
   });
   if(response.ok){sent++;continue}
   // Permanently invalid registration tokens are deleted; temporary failures are retained.
