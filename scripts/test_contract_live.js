@@ -51,7 +51,8 @@ assert(!el('cl_pick_advance').checked,'Manual-entry field must not be created by
 emit('review_state',JSON.stringify({field:'contractDate',status:'confirmed'}));
 assert(!el('cl_deferred').textContent.includes('계약일 (협의 중)'),'Confirmed field clears old deferral');
 emit('review_state',JSON.stringify({field:'balanceDate',status:'not_applicable'}));
-assert(live._test.missingConditions().includes('balanceDate'),'Required balance date cannot be skipped');
+assert(!el('cl_deferred').textContent.includes('잔금일 (해당 없음)'),
+ 'Required balance date cannot be marked not applicable even if already confirmed');
 emit('review_state',JSON.stringify({field:'invalid_field',status:'pending'}));
 assert(!el('cl_deferred').textContent.includes('invalid_field'),'Reject unknown field status');
 emit('review_state',JSON.stringify({field:'account',status:'manual'}));
