@@ -4,6 +4,7 @@
 const $=id=>document.getElementById(id),bridge=window.FirstHyundaiNative;
 const requests=new Map(),localUpdates=new Map(),localDeletes=new Map();
 let sequence=0,items=[],busy=false,postInFlight=false,lastCheck=0,showCompleted=false,editing='',editDraft='',timer=null;
+let focusLookupSeq=0,ambiguousPost=null;
 let timerMs=45000,pendingFocus='',view='compose',scheduleOpen=false,suggestedDate='';
 let archiveOpen=false,archived=[];
 let memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10,finderTouched=false;
@@ -15,16 +16,50 @@ const startKst=()=>kstDate(new Date());
 let selectedDate='',calendarMonth='',editingBirthday='',calendarDraftDay='';
 function focusNote(id){
  if(!valid(id))return false;
+ ++focusLookupSeq;
  pendingFocus=id;
  expandedNotes.add(id);
  memoStatus='all';memoAuthor='';memoQuery='';memoLimit=10;
  if($('officeBoardSearch'))$('officeBoardSearch').value='';
  if($('officeBoardAuthorFilter'))$('officeBoardAuthorFilter').value='';
- // Opening a memo from an alert must select the memo library, never the composer.
+ // Opening an older notification must not stop at the cached recent 25 notes.
  if(typeof currentPage!=='undefined'&&currentPage==='officeBoard'){
-  setView('notes');refresh(true);
+  setView('notes');
+  if(!items.some(note=>note.id===id))void locateFocusedNote(id);
  }
  return true;
+}
+// Fetch older pages only when a notification points outside the cached list.
+// Keep the latest requested ID as a generation guard: tapping another alert
+// must never scroll back to a previous, now irrelevant note.
+async function locateFocusedNote(id){
+ const generation=++focusLookupSeq;
+ msg('알림의 메모를 찾는 중입니다…');
+ try{
+  for(let offset=0;offset<=1000;){
+   if(generation!==focusLookupSeq||pendingFocus!==id)return;
+   const page=await call('list',{offset});
+   if(generation!==focusLookupSeq||pendingFocus!==id)return;
+   const found=(page.notes||[]).find(n=>n?.id===id&&typeof n.text==='string'&&typeof n.done==='boolean');
+   if(found){
+    merge(items.filter(n=>n.id!==id).concat(found));
+    msg('알림의 메모를 열었습니다.');
+    return;
+   }
+   const next=Number(page.next_offset);
+   if(!page.has_more||!Number.isInteger(next)||next<=offset)break;
+   offset=next;
+  }
+  if(pendingFocus===id){
+   pendingFocus='';
+   msg('이 알림의 메모가 삭제되었거나 조회 가능한 기록에서 찾을 수 없습니다.');
+  }
+ }catch(e){
+  if(generation===focusLookupSeq&&pendingFocus===id){
+   pendingFocus='';
+   msg('알림 메모를 찾지 못했습니다. 연결 상태를 확인한 뒤 알림을 다시 눌러 주세요.');
+  }
+ }
 }
 function preferences(){
  const p=window.FirstHyundaiUIOptions?.get?.()||{};
@@ -621,15 +656,24 @@ async function mutate(action,data){
   const result=await call(action,data);
   if(action==='delete')localDeletes.set(data.id,Date.now());
   else if(result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
-  if(action==='post'){$('officeBoardDraft').value='';calendarDraftDay='';checkSuggestion();}
+  if(action==='post'){$('officeBoardDraft').value='';calendarDraftDay='';ambiguousPost=null;checkSuggestion();}
   if(action==='restore'&&result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
   editing='';editDraft='';
   merge(items);
   msg(action==='post'?'메모를 공유했습니다. 메모함과 해당 날짜의 달력에서 확인할 수 있습니다.':'메모가 반영됐습니다.');
   return result;
- }catch(e){msg(e.message);return null}
+ }catch(e){
+  // A timeout after sending does NOT prove the server rejected the memo.
+  // Retain only volatile text/date metadata for verification on a retry.
+  if(action==='post'&&/시간 초과|연결|HTTP 5\d\d/i.test(String(e.message||'')))
+   ambiguousPost={data:{...data},startedAt:postStartedAt};
+  msg(ambiguousPost&&action==='post'?
+   '전송 결과를 확인하지 못했습니다. 다시 누르면 최근 등록 여부부터 확인합니다.':e.message);
+  return null;
+ }
  finally{busy=false;$('officeBoardPost').disabled=false}
 }
+let postStartedAt=0;
 async function post(){
  // Covers the entire compose -> server post -> optional photo upload flow.
  // The generic mutation lock ends before optional photo upload completes.
@@ -649,7 +693,34 @@ async function post(){
   msg('메모의 날짜가 올바르지 않습니다. 날짜를 다시 확인한 후 등록해 주세요.');
   return;
  }
- const result=await mutate('post',{text,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false});
+ const data={text,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false};
+ let result=null;
+ if(ambiguousPost){
+  const prior=ambiguousPost;
+  const same=prior.data.text===data.text&&
+   prior.data.scheduled_at===data.scheduled_at&&prior.data.all_day===data.all_day;
+  if(same){
+   let recent;
+   try{recent=await call('list',{offset:0})}
+   catch(e){msg('이전 등록 여부를 확인하지 못했습니다. 연결 후 다시 눌러 주세요.');return}
+   const member=String(bridge?.getOfficeMemberId?.()||'');
+   const found=(recent.notes||[]).find(n=>n?.text===data.text&&
+    n?.scheduled_at===data.scheduled_at&&n?.all_day===data.all_day&&
+    n?.author?.id===member&&
+    Number.isFinite(Date.parse(n.created_at))&&
+    Date.parse(n.created_at)>=prior.startedAt-2000);
+   if(found){
+    result={ok:true,note:found};
+    localUpdates.set(found.id,{note:found,time:Date.now()});
+    merge(items.filter(n=>n.id!==found.id).concat(found));
+    $('officeBoardDraft').value='';calendarDraftDay='';checkSuggestion();
+    msg('앞서 등록된 메모를 확인했습니다. 중복으로 등록하지 않았습니다.');
+   }else if(typeof confirm!=='function'||!confirm(
+    '최근 메모에서 이전 등록이 확인되지 않았습니다. 통신 지연으로 이미 등록됐을 수 있습니다. 그래도 다시 등록하시겠습니까?'))return;
+  }
+  ambiguousPost=null;
+ }
+ if(!result){postStartedAt=Date.now();result=await mutate('post',data)}
  if(result?.note?.id&&photos?.pendingCount?.()){
   const saved=await photos.uploadPending(result.note.id);
   if(!saved)setView('compose');else syncViews();
