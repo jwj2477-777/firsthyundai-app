@@ -59,6 +59,8 @@ const target=created[0];
 assert.equal((await send('/board/'+target.id,'PATCH',{pinned:true},otherAuth)).status,403);
 assert.equal((await send('/board/'+target.id,'PATCH',{pinned:'true'},auth)).status,400);
 assert.equal((await send('/board/'+target.id,'PATCH',{pinned:true},auth)).status,200);
+assert.equal((await send('/board/'+target.id,'PATCH',
+ {text:'stale update',expected_updated_at:'2020-01-01T00:00:00.000Z'},auth)).status,409);
 const pinnedPages=await Promise.all([0,25,50].map(async offset=>
   (await (await send('/board?offset='+offset,'GET',undefined,auth)).json()).notes));
 const pinned=pinnedPages.flat().find(n=>n.id===target.id);
