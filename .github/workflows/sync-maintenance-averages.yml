@@ -48,6 +48,11 @@ jobs:
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
         run: python scripts/collect_official_maintenance.py
+      - name: Check separately published total for the fourteen interested complexes
+        # Only verified K-apt mirrors with matching code, road address, month
+        # and complete total may enrich the snapshot; unavailable pages preserve
+        # the last verified values. Independent from reserve API approval.
+        run: python scripts/collect_maintenance_averages.py --favorite-only
       - name: Collect independently verified guard and cleaning fees without claiming a total
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
