@@ -102,24 +102,7 @@
   $('cl_stop').disabled=!active||stopping;
   $('cl_apply').disabled=active||stopping||!Object.keys(proposals).some(k=>selected[k]!==false);
  }
- function render(){
-  // Save the user's unchecked choices before rebuilding rows for another AI
-  // proposal/status event. A later utterance must never silently reselect them.
-  for(const k of Object.keys(selected)){
-   const previous=$('cl_pick_'+k);
-   if(previous)selected[k]=previous.checked;
-  }
-  const box=$('cl_proposals');box.replaceChildren();
-  for(const [k,v] of Object.entries(proposals)){
-   if(!Object.hasOwn(selected,k))selected[k]=true; // Only genuinely new fields default on.
-   const row=document.createElement('label'),check=document.createElement('input');
-   row.className='contractLiveProposal';check.type='checkbox';check.checked=selected[k];check.id='cl_pick_'+k;
-   check.addEventListener('change',()=>{selected[k]=check.checked;buttons();});
-   const text=document.createElement('span'),title=document.createElement('strong'),value=document.createElement('span');
-   title.textContent=LABELS[k];value.textContent=v===''?'입력 내용 지우기':MONEY.has(k)?Number(v).toLocaleString('ko-KR')+'만원':v;
-   text.append(title,value);row.append(check,text);box.append(row);
-  }
-  $('cl_review').hidden=!Object.keys(proposals).length;
+ function updateReviewProgress(){
   // A user may uncheck an AI candidate. Progress must reflect only the fields
   // that will actually be applied, not every value the model proposed.
   const chosen=Object.fromEntries(Object.entries(proposals).filter(([k])=>selected[k]!==false));
@@ -148,6 +131,26 @@
       +' · 기존 입력란에서 확인해도 됩니다.':'';
    details.textContent=[deferredText,missingText].filter(Boolean).join('\n');
   }
+ }
+ function render(){
+  // Save the user's unchecked choices before rebuilding rows for another AI
+  // proposal/status event. A later utterance must never silently reselect them.
+  for(const k of Object.keys(selected)){
+   const previous=$('cl_pick_'+k);
+   if(previous)selected[k]=previous.checked;
+  }
+  const box=$('cl_proposals');box.replaceChildren();
+  for(const [k,v] of Object.entries(proposals)){
+   if(!Object.hasOwn(selected,k))selected[k]=true; // Only genuinely new fields default on.
+   const row=document.createElement('label'),check=document.createElement('input');
+   row.className='contractLiveProposal';check.type='checkbox';check.checked=selected[k];check.id='cl_pick_'+k;
+   check.addEventListener('change',()=>{selected[k]=check.checked;updateReviewProgress();buttons();});
+   const text=document.createElement('span'),title=document.createElement('strong'),value=document.createElement('span');
+   title.textContent=LABELS[k];value.textContent=v===''?'입력 내용 지우기':MONEY.has(k)?Number(v).toLocaleString('ko-KR')+'만원':v;
+   text.append(title,value);row.append(check,text);box.append(row);
+  }
+  $('cl_review').hidden=!Object.keys(proposals).length;
+  updateReviewProgress();
   buttons();
  }
  function open(){
