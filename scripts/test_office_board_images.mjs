@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import service from '../workers/shared-settings/src/index.mjs';
-const store=new Map();
+const store=new Map(),expiryOptions=new Map();
 const env={SETTINGS:{
  async get(k,format){const v=store.get(k);return v===undefined?null:format==='json'?JSON.parse(v):v},
- async put(k,v){store.set(k,v)},async delete(k){store.delete(k)},
+ async put(k,v,options={}){store.set(k,v);expiryOptions.set(k,options)},async delete(k){store.delete(k)},
  async list({prefix='',limit=1000}){return {keys:[...store.keys()].filter(k=>k.startsWith(prefix)).slice(0,limit).map(name=>({name}))}}
 },FIRSTHYUNDAI_ACCESS_CODE:'testimagepassword2026',FIRSTHYUNDAI_ADMIN_CODE:'testAdminPasswordForPictures2026',
  AUTH_LIMITER:{async limit(){return {success:true}}}};
@@ -48,6 +48,8 @@ const created=await ask(path,'POST',{data_url:photo},token);
 assert.equal(created.status,201);
 const first=await created.json();
 assert.equal(first.note.images.length,1);
+assert.equal(expiryOptions.get('office-postit-image-v1:'+first.image_id)?.expirationTtl,undefined,
+ 'New photos have no silent 400-day expiration');
 const previewWithPhoto=await (await ask(previewPath,'GET',null,token)).json();
 assert.equal(previewWithPhoto.image_count,1);
 assert(!JSON.stringify(first.note).includes('data:image'),'never inline bytes into note');
@@ -90,4 +92,15 @@ assert.equal((await ask('/board/invalid/images','POST',{data_url:photo},token)).
 assert.equal((await ask('/settings')).status,200);
 const publicJson=await (await ask('/settings')).text();
 assert(!publicJson.includes(photo),'public settings cannot leak images');
-console.log('PASS authenticated memo photos, inline data isolation, max count, unauthorized access, and deletion');
+const preserved=await ask(path,'POST',{data_url:photo},token);
+assert.equal(preserved.status,201,'Photo may be added before deleting note');
+const keptPhoto=(await preserved.json()).image_id;
+assert(store.has('office-postit-image-v1:'+keptPhoto));
+assert.equal((await ask('/board/'+note.id,'DELETE',null,token,'',adminToken)).status,200);
+assert(store.has('office-postit-image-v1:'+keptPhoto),
+ 'Archived notes retain their photos during 30-day recovery');
+const future=Date.now()+32*86400000;
+await service.scheduled({scheduledTime:future},env,{});
+assert(!store.has('office-postit-image-v1:'+keptPhoto),
+ 'Photos are removed when their archived memo recovery period ends');
+console.log('PASS authenticated memo photo privacy, permanent active images, retry idempotency and archive cleanup');
