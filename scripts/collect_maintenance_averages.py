@@ -19,6 +19,11 @@ CATALOG=ROOT/'data'/'complexes.json'
 DEST=ROOT/'data'/'maintenance_estimates.json'
 BASE='https://apt.koreacharts.com/apt/'
 KAPT='https://www.k-apt.go.kr/'
+# Same immutable names as the application's fourteen interest complexes.
+# Only a narrow, bounded public-source fallback; all other K-apt data remains
+# available via approved official API collectors without mirror probing.
+FAVORITE_IDS=frozenset(('f13','f14','f15','m21','m22','m23','avenue',
+ 'centennial','prime20','prime25','skcentral','artwin','central3','kapt-a10027887'))
 KST=ZoneInfo('Asia/Seoul')
 def now():return datetime.now(KST)
 def address_key(s):return re.sub(r'[^가-힣0-9]', '',str(s or '').replace('인천광역시','인천'))
@@ -118,6 +123,11 @@ def collect(catalog,prior=None,fetch=download,pause=0.6,limit=None):
 
 def main():
  catalog=json.loads(CATALOG.read_text(encoding='utf8'))['records']
+ # Run after the official three-group API attempt. Its reserve API may return
+ # HTTP 400; do not guess the missing category. This independent public
+ # mirror is queried only for specifically approved favorite complexes.
+ if '--favorite-only' in sys.argv:
+  catalog=[r for r in catalog if r.get('id') in FAVORITE_IDS]
  prev=json.loads(DEST.read_text(encoding='utf8')) if DEST.exists() else {}
  out=collect(catalog,prev)
  if not out['success_count']:
