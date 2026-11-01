@@ -54,6 +54,20 @@ assert(worker.includes('response.status===401||response.status===403?"provider_a
 assert(native.includes('BidiGenerateContentConstrained'));
 assert(native.includes('audio/pcm;rate=16000'));
 assert(native.includes('byte[] samples=new byte[1280]'),'40ms mic input instead of 100ms avoids laggy turns');
+assert(native.includes('LiveMicBuffer pending=new LiveMicBuffer()'),
+ 'Short network congestion must buffer actual user PCM rather than silently losing contract details');
+assert(native.includes('pending.offer(samples,n)')&&native.includes('pending.poll()'),
+ 'Mic PCM must be buffered and sent in order, with no dropped 40ms segments');
+assert(native.includes('pending.clear();continue;'),
+ 'Half-duplex gate must drop unsent earlier user PCM after model speech starts');
+assert(!native.includes('if(ws==null||ws.queueSize()>64000)continue;'),
+ 'Do not silently discard user speech when WebSocket is slow');
+assert(native.includes('if(n<0)')&&native.includes('if(!accepted)failed=true;'),
+ 'Unrecoverable microphone and WebSocket failures must not appear as normal listening');
+const micBuffer=read('app/src/main/java/kr/co/firsthyundai/app/LiveMicBuffer.java');
+assert(micBuffer.includes('MAX_BYTES=16_000*2')&&micBuffer.includes('Arrays.copyOf(samples,n)'),
+ 'One-second upper bound and defensive copy before reusing AudioRecord buffer');
+assert(!micBuffer.includes('Log.'),'Never log user audio');
 assert(native.includes('silenceDurationMs",700'),'Do not stop a Korean sentence during natural pauses');
 assert(native.includes('NO_INTERRUPTION'),'Contract model voice should not be cut off by speaker bleed');
 assert(native.includes('LivePcmQueue audioQueue=new LivePcmQueue()'),'Route Live output through a bounded ordered jitter queue');
