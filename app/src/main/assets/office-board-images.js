@@ -3,8 +3,8 @@
  */
 (function(){
  'use strict';
- const $=id=>document.getElementById(id),MAX=3,MAX_BYTES=145000;
- let drafts=[],target='',uploading=false,activePhoto=null,existingCount=0;
+ const $=id=>document.getElementById(id),MAX=3,MAX_BYTES=185000;
+ let drafts=[],target='',uploading=false,activePhoto=null,existingCount=0,uploadRequestId='';
  const cache=new Map();
  function status(text){const el=$('officeBoardFeedback');if(el)el.textContent=text}
  function renderDrafts(){
@@ -32,7 +32,7 @@
     img.onerror=()=>reject(Error('지원하지 않는 사진 형식입니다.'));
     img.onload=()=>{
      try{
-      let max=1200,quality=.78,url='';
+      let max=1600,quality=.84,url='';
       const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
       if(!ctx)throw Error('사진 변환을 사용할 수 없습니다.');
       for(let i=0;i<12;i++){
@@ -43,7 +43,7 @@
        ctx.drawImage(img,0,0,canvas.width,canvas.height);
        url=canvas.toDataURL('image/jpeg',quality);
        if(url.length<=MAX_BYTES)break;
-       if(quality>.48)quality-=.1;else{max=Math.max(440,Math.round(max*.78));quality=.65}
+       if(quality>.48)quality-=.1;else{max=Math.max(560,Math.round(max*.78));quality=.65}
       }
       if(url.length>MAX_BYTES||!/^data:image\/jpeg;base64,\/9j\//.test(url))
        throw Error('사진 용량을 줄이지 못했습니다. 다른 사진을 선택해 주세요.');
@@ -66,7 +66,7 @@
    const converted=[];
    for(const file of files)converted.push(await compress(file));
    if(target){
-    drafts=converted;renderDrafts();await uploadPending(target);
+    drafts=converted;uploadRequestId='';renderDrafts();await uploadPending(target);
    }else{
     drafts.push(...converted);renderDrafts();
     status('사진 '+drafts.length+'장 준비 완료 · 메모 붙이기를 누르면 공유됩니다.');
@@ -81,7 +81,7 @@
   }
   target=noteId||'';
   existingCount=target?Math.max(0,Math.min(MAX,Number(photosAlready)||0)):0;
-  if(target)drafts=[];
+  if(target){drafts=[];uploadRequestId='';}
   if(existingCount>=MAX){status('사진은 메모당 최대 3장입니다.');return;}
   const input=$('officeBoardImageInput');
   if(input)input.click();else status('사진 선택을 사용할 수 없습니다.');
@@ -98,9 +98,12 @@
   try{
    while(drafts.length){
     status('사진 업로드 중 · 남은 사진 '+drafts.length+'장');
-    const result=await window.FirstHyundaiOfficeBoard.imageCall('imageAdd',{id,data_url:drafts[0]});
+    // This upload ID stays unchanged after a network timeout; the server
+    // returns the previous photo instead of creating a duplicate.
+    if(!uploadRequestId)uploadRequestId='photo_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,14);
+    const result=await window.FirstHyundaiOfficeBoard.imageCall('imageAdd',{id,data_url:drafts[0],upload_id:uploadRequestId});
     if(!result?.note)throw Error('사진 저장 응답을 확인할 수 없습니다.');
-    drafts.shift();
+    drafts.shift();uploadRequestId='';
     existingCount=Array.isArray(result.note.images)?result.note.images.length:existingCount+1;
     window.FirstHyundaiOfficeBoard.imageUpdate(result.note);
     renderDrafts();

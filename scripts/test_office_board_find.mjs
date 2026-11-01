@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import service from '../workers/shared-settings/src/index.mjs';
-const store=new Map();
+const store=new Map(),expiryOptions=new Map();
 const events={reads:0};
 const env={SETTINGS:{
  async get(k,format){events.reads++;const v=store.get(k);
   return v===undefined?null:format==='json'?JSON.parse(v):v},
- async put(k,v){store.set(k,v)},async delete(k){store.delete(k)},
+ async put(k,v,options={}){store.set(k,v);expiryOptions.set(k,options)},async delete(k){store.delete(k)},
  async list({prefix,limit=1000}){return {keys:[...store.keys()].filter(k=>k.startsWith(prefix)).sort().slice(0,limit).map(name=>({name}))}}
  },FIRSTHYUNDAI_ACCESS_CODE:'SharedNotesFindTest2026',
  FIRSTHYUNDAI_ADMIN_CODE:'SharedNotesAdminTest2026',
@@ -59,6 +59,10 @@ const target=created[0];
 assert.equal((await send('/board/'+target.id,'PATCH',{pinned:true},otherAuth)).status,403);
 assert.equal((await send('/board/'+target.id,'PATCH',{pinned:'true'},auth)).status,400);
 assert.equal((await send('/board/'+target.id,'PATCH',{pinned:true},auth)).status,200);
+assert.equal(expiryOptions.get('office-postit-v1:'+target.id)?.expirationTtl,undefined,
+ 'Pinned notes are not given the old 365-day expiration');
+assert.equal((await send('/board/'+target.id,'PATCH',
+ {text:'stale update',expected_updated_at:'2020-01-01T00:00:00.000Z'},auth)).status,409);
 const pinnedPages=await Promise.all([0,25,50].map(async offset=>
   (await (await send('/board?offset='+offset,'GET',undefined,auth)).json()).notes));
 const pinned=pinnedPages.flat().find(n=>n.id===target.id);

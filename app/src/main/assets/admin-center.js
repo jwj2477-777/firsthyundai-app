@@ -149,8 +149,25 @@
    (x.errorCount||x.missingCount?'<p>원본 오류 표기 '+x.errorCount+'개 · 수집 누락 표기 '+x.missingCount+'개</p>':'')+
    '<div class="adminFeedActions"><button type="button" onclick="FirstHyundaiAdminCenter.retry(\''+x.key+'\')">게시자료 재확인</button>'+
    '<button type="button" onclick="FirstHyundaiAdminCenter.go(\''+x.key+'\')">해당 화면 열기</button></div></div></details>').join('');
+  // Public freshness is not the same as an authenticated private-office
+  // connection. Display each device permission and memo refresh separately.
+  const native=window.FirstHyundaiNative;
+  let notification='확인 불가',push='확인 불가',member='미연결';
+  try{
+   notification=native?.getOfficeMemoNotificationStatus?.()||notification;
+   push=native?.getOfficeMemoPushStatus?.()||push;
+   member=native?.getOfficeMemberId?.()?'계정 선택됨':'계정 연결 확인 필요';
+  }catch(e){}
+  const memo=window.FirstHyundaiOfficeBoard?.diagnostics?.()||{};
+  const last=Number(memo.lastCheck)||0;
+  const memoFresh=last?Math.round((Date.now()-last)/60000)+'분 전':'조회 이력 없음';
   get('adminDiagnosticDetails').innerHTML=
-   '<p>진단은 읽기 전용이며 공개 데이터의 건수·상태·시각만 사용합니다.</p>'+
+   '<p>게시자료는 마지막 수집본 기준이며, 실제 원천 API 성공과 구분됩니다.</p>'+
+   '<p>사무실 계정: '+safe(member)+' · 메모 마지막 확인: '+safe(memoFresh)+
+   ' · 과거 기록: '+(memo.historyLoaded?'조회 완료':memo.historyLoading?'불러오는 중':'조회 전')+'</p>'+
+   '<p>이 기기 메모 알림: '+safe(notification)+' · 푸시 연결: '+safe(push)+
+   ' (다른 가족 휴대전화의 상태까지 검증한 것은 아닙니다)</p>'+
+   '<p>관리비는 검증 완료 자료만 표시합니다. K-apt 수집 오류 및 미확인 단지는 별도로 점검해야 합니다.</p>'+
    items.map(x=>'<p>'+safe(x.name)+' · '+safe(x.label)+' · '+safe(ageText(x.age))+
    ' · '+safe(x.count===null?'미집계':x.count+'건')+'</p>').join('');
   get('adminAuditHistory').innerHTML=audit.length?audit.slice(0,12).map(x=>
@@ -202,6 +219,20 @@
   checkNote=(success?'전체 게시자료 확인 작업 완료':'일부 게시자료 재확인 실패')+
    ' · '+new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour12:false});
   render();
+ }
+ async function checkDevices(){
+  if(!permitted())return;
+  const target=get('adminDeviceHealth');if(!target)return;
+  target.textContent='서버에 등록된 가족 휴대전화 연결 상태를 조회하는 중…';
+  try{
+   const data=await window.FirstHyundaiOfficeBoard?.deviceHealth?.();
+   if(!permitted())return;
+   if(!data||data.kind!=='push_registration'||!Array.isArray(data.accounts))
+    throw Error('unexpected');
+   target.textContent='현재 서버 등록 '+data.total_devices+'대 · '+
+    data.accounts.map(x=>x.account+' '+x.push_registered+'/'+x.devices+'대 푸시 토큰 등록').join(' · ')+
+    ' · 실제 휴대전화 알림 권한·수신 성공 여부는 각 기기에서 확인해야 합니다.';
+  }catch(e){target.textContent='휴대전화 등록 상태를 확인하지 못했습니다. 관리자 인증과 서버 연결을 확인해 주세요.';}
  }
  function checkUpdate(){
   if(!permitted())return;
@@ -275,7 +306,7 @@
  }
  function publicError(text){publicIssue=String(text||'').slice(0,90);render();}
  window.FirstHyundaiAdminCenter={
-  render,refresh,retry,expand,go,detailToggled,checkUpdate,openAlerts,
+  render,refresh,retry,expand,go,detailToggled,checkUpdate,openAlerts,checkDevices,
   levelChanged,resetLevel,detailsChanged,selfTest,copyReport,clearAudit,publicError,
   _test:{classify,rows,ageHours,qualityIssues,reportText}
  };

@@ -371,6 +371,24 @@ function edited(){
  E('ct_status').textContent='미리보기를 직접 수정했습니다. 복사·공유하려면 ‘내용 확인 완료’ 버튼으로 다시 검토해 주세요.';
  syncReviewButton();
 }
+// Check the actual customer-facing notice, not just form completeness.
+// This catches accidental deletion of a bank account or unit during manual edits.
+function previewReviewWarnings(){
+ const text=String(E('ct_preview')?.value||'');
+ const compact=text.replace(/[\s,]/g,'');
+ const warnings=[];
+ const unit=field('unit').replace(/\s/g,'');
+ if(unit&&!compact.includes(unit))warnings.push('동·호수');
+ const bankAccount=field('account').replace(/\D/g,'');
+ if(bankAccount.length>=7&&!text.replace(/\D/g,'').includes(bankAccount))
+  warnings.push('입금 계좌번호');
+ const data=collect();
+ for(const [name,value] of [['총액',data.price],['계약금',data.deposit],['이번 송금액',data.advance]]){
+  if(value!==null&&value>0&&!compact.includes(money(value).replace(/[\s,]/g,'')))
+   warnings.push(name);
+ }
+ return warnings;
+}
 function approve(){
  syncReviewButton();
  const d=collect();
@@ -381,6 +399,9 @@ function approve(){
  }
  if(d.errors.length){E('ct_status').textContent='다음 필수 항목을 먼저 보완하세요: '+d.errors.join(' · ');E('ct_status').className='contractReview bad';return;}
  if(!created||!field('property')||!E('ct_preview').value.trim()){alert('먼저 문자 초안을 생성해 주세요.');return;}
+ const warnings=previewReviewWarnings();
+ if(warnings.length&&typeof confirm==='function'&&!confirm(
+  '최종 안내문에서 '+warnings.join('·')+' 항목이 원래 입력값과 동일하게 확인되지 않습니다. 직접 수정한 표현까지 검토하셨습니까?'))return;
  approved=true;
  E('ct_status').className='contractReview ok';E('ct_status').textContent='직접 확인 완료 · 다음 단계: 안내 이미지 확인·공유';
  syncReviewButton();
@@ -494,6 +515,6 @@ window.FirstHyundaiContracts={
   try{complexSelected=r.id;return fromSelectedComplex();}
   finally{if(before!==null)complexSelected=before;}
  },
- _test:{contractValue,normalizeDate,collect,clearForNewMemo,previewSpecialTerms,DEFAULT_DETAIL_TERM,highlightedNoticeHtml,previewContainsMissing}
+ _test:{contractValue,normalizeDate,collect,clearForNewMemo,previewSpecialTerms,DEFAULT_DETAIL_TERM,highlightedNoticeHtml,previewContainsMissing,previewReviewWarnings}
 };
 })();

@@ -195,10 +195,11 @@ final class OfficeBoardClient {
         if(auth.isEmpty())throw new Exception("최초 한 번 사무실 보안코드 인증이 필요합니다.");
         if("list".equals(action)){
             int offset=payload.optInt("offset",0);
-            if(offset<0||offset>1000)throw new Exception("메모 조회 범위를 확인해 주세요.");
+            if(offset<0||offset>5000)throw new Exception("메모 조회 범위를 확인해 주세요.");
             return request("GET","/board?offset="+offset,null,auth);
         }
         if("archive".equals(action))return request("GET","/board/archive",null,auth,adminToken);
+        if("devices".equals(action))return request("GET","/board/devices",null,auth,adminToken);
         if("post".equals(action)){
             String text=payload.optString("text","");
             if(text.isEmpty()||text.length()>1600)throw new Exception("메모 내용은 1~1600자로 적어 주세요.");
@@ -212,7 +213,10 @@ final class OfficeBoardClient {
             String image=payload.optString("data_url","");
             if(!image.matches("data:image/jpeg;base64,/9j/[A-Za-z0-9+/=]+")||
                     image.length()>195000)throw new Exception("사진 크기를 확인해 주세요.");
-            return request("POST","/board/"+id+"/images",new JSONObject().put("data_url",image),auth,adminToken);
+            JSONObject upload=new JSONObject().put("data_url",image);
+            String uploadId=payload.optString("upload_id","");
+            if(uploadId.matches("[A-Za-z0-9_-]{8,80}"))upload.put("upload_id",uploadId);
+            return request("POST","/board/"+id+"/images",upload,auth,adminToken);
         }
         if("imageGet".equals(action)||"imageRemove".equals(action)){
             String imageId=payload.optString("image_id","");
@@ -229,23 +233,33 @@ final class OfficeBoardClient {
             JSONObject patch=new JSONObject().put("text",text);
             if(payload.has("scheduled_at"))patch.put("scheduled_at",payload.opt("scheduled_at"));
             if(payload.has("all_day"))patch.put("all_day",payload.optBoolean("all_day",false));
-            return request("PATCH","/board/"+id,patch,auth,adminToken);
+            return request("PATCH","/board/"+id,withExpected(payload,patch),auth,adminToken);
         }
         if("schedule".equals(action)){
             if(!payload.has("scheduled_at"))throw new Exception("일정 날짜가 필요합니다.");
-            return request("PATCH","/board/"+id,new JSONObject().put("scheduled_at",payload.opt("scheduled_at")),auth,adminToken);
+            return request("PATCH","/board/"+id,withExpected(payload,
+                new JSONObject().put("scheduled_at",payload.opt("scheduled_at"))),auth,adminToken);
         }
         if("pin".equals(action)){
             if(!payload.has("pinned")||!(payload.opt("pinned") instanceof Boolean))
                 throw new Exception("중요 메모 고정 값이 올바르지 않습니다.");
             return request("PATCH","/board/"+id,
-                new JSONObject().put("pinned",payload.getBoolean("pinned")),auth,adminToken);
+                withExpected(payload,new JSONObject().put("pinned",payload.getBoolean("pinned"))),auth,adminToken);
         }
         if("done".equals(action)){
             if(!payload.has("done")||!(payload.opt("done") instanceof Boolean))throw new Exception("완료 표시 값이 올바르지 않습니다.");
-            return request("PATCH","/board/"+id,new JSONObject().put("done",payload.getBoolean("done")),auth,adminToken);
+            return request("PATCH","/board/"+id,withExpected(payload,new JSONObject().put("done",payload.getBoolean("done"))),auth,adminToken);
         }
         throw new Exception("지원하지 않는 게시판 작업입니다.");
+    }
+    private static JSONObject withExpected(JSONObject request,JSONObject patch) throws Exception {
+        if(request.has("expected_updated_at")){
+            String expected=request.optString("expected_updated_at","");
+            if(!expected.matches("20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9:.]{12,17}Z"))
+                throw new Exception("메모의 수정 시각을 다시 확인해 주세요.");
+            patch.put("expected_updated_at",expected);
+        }
+        return patch;
     }
     private static JSONObject request(String method,String path,JSONObject body,String token) throws Exception {
         return request(method,path,body,token,null);

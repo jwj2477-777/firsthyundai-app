@@ -63,6 +63,15 @@ try{
  const done=await create('완료한 일정',30);
  const birthday=await create('🎂 가족 생일 · 매년',30);
  assert.equal((await req('/board/'+done.id,'PATCH',{done:true},tokens[0])).status,200);
+ // The appointment must survive being older than the latest 100 post-its.
+ for(let i=0;i<115;i++){
+  const id='zzzzzzzzzz-'+i.toString(16).padStart(36,'0');
+  await env.SETTINGS.put('office-postit-v1:'+id,JSON.stringify({
+   id,text:'sample memo '+i,done:false,scheduled_at:null,
+   created_at:new Date(now+i*1000).toISOString(),
+   updated_at:new Date(now+i*1000).toISOString()
+  }));
+ }
  await Promise.all(pending.splice(0));
  requests.length=0;
  const due=service._test.timedMemoDue;

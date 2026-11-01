@@ -10,10 +10,41 @@ let archiveOpen=false,archived=[];
 let memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10,finderTouched=false;
 const PAGE_SIZE=10;
 const expandedNotes=new Set();
-let historyLoaded=false,historyLoading=false,refreshCycle=0;
+let historyLoaded=false,historyLoading=false,refreshCycle=0,lastFullHistory=0;
 let lastBriefing=0,briefingBusy=false;
 const startKst=()=>kstDate(new Date());
 let selectedDate='',calendarMonth='',editingBirthday='',calendarDraftDay='';
+let draftTimer=null,draftRestoredMember=''; 
+function saveDraftNow(){
+ if(draftTimer){clearTimeout(draftTimer);draftTimer=null;}
+ const input=$('officeBoardDraft');
+ if(!input||typeof bridge?.saveOfficeMemoDraft!=='function')return;
+ try{bridge.saveOfficeMemoDraft(String(input.value||'').slice(0,1600),calendarDraftDay||'');}catch(e){}
+}
+function saveDraftSoon(){
+ if(typeof bridge?.saveOfficeMemoDraft!=='function')return;
+ if(draftTimer)clearTimeout(draftTimer);
+ draftTimer=setTimeout(saveDraftNow,700);
+}
+function clearDraft(){
+ if(draftTimer){clearTimeout(draftTimer);draftTimer=null;}
+ try{bridge?.clearOfficeMemoDraft?.()}catch(e){}
+}
+function restoreDraft(){
+ const account=String(bridge?.getOfficeMemberId?.()||'');
+ if(!account||account===draftRestoredMember||!bridge?.getOfficeMemoDraft)return;
+ draftRestoredMember=account;
+ if(String($('officeBoardDraft')?.value||''))return;
+ try{
+  const draft=JSON.parse(bridge.getOfficeMemoDraft()||'{}');
+  if(typeof draft.text==='string'&&draft.text.length<=1600&&
+     (/^20\d{2}-\d{2}-\d{2}$/.test(draft.day||'')||!draft.day)){
+   if(draft.text){$('officeBoardDraft').value=draft.text;msg('이 휴대전화에 안전하게 보관된 작성 중 메모를 복구했습니다.');}
+   if(draft.day){calendarDraftDay=draft.day;checkSuggestion();}
+  }
+ }catch(e){}
+}
+$('officeBoardDraft')?.addEventListener?.('input',saveDraftSoon);
 function focusNote(id){
  if(!valid(id))return false;
  ++focusLookupSeq;
@@ -36,7 +67,7 @@ async function locateFocusedNote(id){
  const generation=++focusLookupSeq;
  msg('알림의 메모를 찾는 중입니다…');
  try{
-  for(let offset=0;offset<=1000;){
+  for(let offset=0;offset<=5000;){
    if(generation!==focusLookupSeq||pendingFocus!==id)return;
    const page=await call('list',{offset});
    if(generation!==focusLookupSeq||pendingFocus!==id)return;
@@ -244,10 +275,10 @@ function today(){selectedDate=kstDate(new Date());calendarMonth=selectedDate.sli
 function addAtSelectedDay(){
  if(!selectedDate)return;
  try{toIso(selectedDate+'T12:00');}catch(e){return}
- calendarDraftDay=selectedDate;
+ calendarDraftDay=selectedDate;saveDraftSoon();
  setView('compose');checkSuggestion();$('officeBoardDraft')?.focus?.();
 }
-function clearScheduledDay(){calendarDraftDay='';checkSuggestion()}
+function clearScheduledDay(){calendarDraftDay='';checkSuggestion();saveDraftSoon()}
 function openCalendarNote(id){
  if(!valid(id))return;
  if(birthdayOf(items.find(n=>n.id===id)))return;
@@ -313,6 +344,8 @@ function filteredMemos(){
   return true;
  }).sort((a,b)=>{
   if(Boolean(a.pinned)!==Boolean(b.pinned))return a.pinned?-1:1;
+  const overdue=n=>n.scheduled_at&&!n.done&&!n.all_day&&Date.parse(n.scheduled_at)<Date.now();
+  if(Boolean(overdue(a))!==Boolean(overdue(b)))return overdue(a)?-1:1;
   if(memoSort==='schedule'){
    const now=Date.now(),x=a.scheduled_at?Date.parse(a.scheduled_at):Infinity;
    const y=b.scheduled_at?Date.parse(b.scheduled_at):Infinity;
@@ -383,6 +416,7 @@ function draw(){
   list.innerHTML=visible.map(note=>{
   const id=esc(note.id),editable=canEditNote(note),isEdit=editable&&editing===note.id;
   const expanded=expandedNotes.has(note.id);
+  const overdue=!note.done&&!note.all_day&&note.scheduled_at&&Date.parse(note.scheduled_at)<Date.now();
   const needsExpand=!isEdit&&(note.text.length>110||note.text.split('\n').length>3);
   const body=isEdit?'<textarea class="officeBoardEdit" maxlength="1600" data-edit="'+id+'" aria-label="메모 수정">'+esc(editDraft)+'</textarea>':
    '<div class="officeBoardText'+(needsExpand&&!expanded?' officeBoardTextCollapsed':'')+'">'+
@@ -394,15 +428,17 @@ function draw(){
    (editable?
     '<button class="officeBoardDoneAction" data-action="done" data-id="'+id+'">'+(note.done?'완료 취소':'완료')+'</button>'+
     '<button data-action="edit" data-id="'+id+'">수정</button>'+
+    (note.scheduled_at?'<button data-action="scheduleClear" data-id="'+id+'">일정 해제</button>':'')+
     (!Array.isArray(note.images)||note.images.length<3?'<button data-action="photoAdd" data-id="'+id+'">사진 추가</button>':'')
     :'<span class="officeBoardReadOnly">작성자·관리자만 수정 가능</span>')+
    (admin?'<button data-action="delete" data-id="'+id+'" class="officeBoardDelete">삭제</button>':'');
   return '<article class="officeBoardNote'+(note.done?' completed':'')+'" data-note="'+id+'">'+
-   '<div class="officeBoardNoteTop"><span class="officeBoardNoteLabel">'+(note.done?'✓ 완료':'진행 중')+'</span>'+
+   '<div class="officeBoardNoteTop"><span class="officeBoardNoteLabel">'+(note.done?'✓ 완료':overdue?'⚠ 일정 지남':'진행 중')+'</span>'+
     (editable?'<button type="button" class="officeBoardPin" data-action="pin" data-id="'+id+'" aria-pressed="'+Boolean(note.pinned)+'" aria-label="'+(note.pinned?'중요 메모 고정 해제':'중요 메모 고정')+'">'+(note.pinned?'📌 고정됨':'📌 고정')+'</button>':(note.pinned?'<span class="officeBoardPinned">📌 고정</span>':''))+
    '<span class="officeBoardAuthor">'+esc(note.author?.name||'작성자 미기록')+'</span><time>'+esc(dateText(note.created_at))+'</time></div>'+
    body+(note.scheduled_at?'<div class="officeBoardNoteSchedule">▦ '+esc(note.all_day?kstDate(note.scheduled_at)+' · 종일':dateText(note.scheduled_at))+
      (!note.all_day&&!note.done?'<small class="officeBoardReminderHint">🔔 시작 30분 전 알림</small>':'')+'</div>':'')+
+   (overdue?'<small class="officeBoardOverdueHint">예정 시간이 지났습니다 · 완료 또는 일정 변경을 확인하세요.</small>':'')+
    (Array.isArray(note.images)&&note.images.length?'<div class="officeBoardPhotoStrip" aria-label="첨부 사진">'+
     note.images.filter(x=>/^[0-9a-f-]{36}$/.test(x)).map((photo,i)=>
       '<button type="button" class="officeBoardPhotoTile" data-action="photoView" data-id="'+id+
@@ -435,7 +471,7 @@ async function readAllBoard(){
  // All pages remain inside the authenticated native bridge.
  const all=new Map();
  let offset=0;
- while(offset<=1000){
+ while(offset<=5000){
   const page=await call('list',{offset});
   for(const note of page.notes||[])if(valid(note?.id))all.set(note.id,note);
   if(!page.has_more)break;
@@ -521,8 +557,10 @@ function renderBriefing(){
  const todayNotes=briefingRows(date,5),tomorrowNotes=briefingRows(tomorrow,2);
  const todayTotal=briefingRows(date,9999).length;
  const tomorrowTotal=briefingRows(tomorrow,9999).length;
+ const overdue=memoItems().filter(n=>!n.done&&n.scheduled_at&&dateKey(n.scheduled_at)<date)
+  .sort((a,b)=>String(a.scheduled_at).localeCompare(String(b.scheduled_at)));
  $('overviewMemoCount').textContent=todayTotal+'건';
- $('overviewMemoBriefing').hidden=todayTotal===0;
+ $('overviewMemoBriefing').hidden=todayTotal===0&&!overdue.length;
  const target=$('overviewMemoEntries');if(!target)return;
  const row=(notes)=>notes.map(note=>{
   const t=kstParts(note.scheduled_at),time=note.all_day?'종일':(t?.time||'');
@@ -532,7 +570,9 @@ function renderBriefing(){
    '<span class="overviewMemoCopy">'+esc(title)+'</span>'+
    '<span class="overviewMemoArrow" aria-hidden="true">›</span></button>';
  }).join('');
- target.innerHTML=row(todayNotes);
+ target.innerHTML=(overdue.length?
+   '<div class="officeBoardOverdueHeading">⚠ 지난 미완료 일정 '+overdue.length+'건 · 확인 필요</div>'+
+   row(overdue.slice(0,5)):'')+row(todayNotes);
 }
 function openBriefing(force=false){
  renderBriefing();
@@ -568,22 +608,22 @@ async function refresh(silent=false){
   const first=await call('list',{offset:0});
   if(cycle!==refreshCycle)return;
   const recent=Array.isArray(first.notes)?first.notes:[];
-  if(silent&&historyLoaded){
+  if(silent&&historyLoaded&&Date.now()-lastFullHistory<5*60000){
    // Keep already fetched history when checking recent posts every 45 seconds.
    const ids=new Set(recent.map(n=>n.id));
    merge(recent.concat(items.filter(n=>!ids.has(n.id))));
   }else merge(recent);
   lastCheck=Date.now();lastBriefing=lastCheck;
   $('officeBoardAuth')?.classList?.add?.('hidden');
-  if(!first.has_more){historyLoaded=true;historyLoading=false;draw();
+  if(!first.has_more){historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;draw();
    if(!silent)msg('메모를 확인했습니다.');return}
-  if(silent&&historyLoaded){if(!silent)msg('메모를 확인했습니다.');return}
+  if(silent&&historyLoaded&&Date.now()-lastFullHistory<5*60000)return;
   historyLoaded=false;historyLoading=true;draw();
   const seen=new Map(recent.map(n=>[n.id,n]));
   let offset=Number(first.next_offset)||25;
   // A page is at most 25 notes, so no single Android reply exceeds its cap.
   // Customer memo content stays in memory and on the authenticated native bridge.
-  while(cycle===refreshCycle&&offset<=1000){
+  while(cycle===refreshCycle&&offset<=5000){
    const page=await call('list',{offset});
    if(cycle!==refreshCycle)return;
    for(const item of page.notes||[])if(valid(item?.id))seen.set(item.id,item);
@@ -594,7 +634,7 @@ async function refresh(silent=false){
    offset=next;
   }
   if(cycle!==refreshCycle)return;
-  historyLoaded=true;historyLoading=false;draw();
+  historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;draw();
   if(!silent)msg('전체 공유 메모를 불러왔습니다.');
  }catch(e){
   if(cycle===refreshCycle){
@@ -647,16 +687,19 @@ function open(){
  $('officeBoardBirthdayAdd')?.classList?.toggle?.('hidden',bridge?.getMode?.()!=='admin');
  const account=$('officeBoardCurrentMember');
  if(account)account.textContent=bridge?.getOfficeMemberName?.()||'계정 연결 필요';
- settingsChanged();syncNotificationStatus();syncViews();checkSuggestion();refresh();
+ settingsChanged();syncNotificationStatus();syncViews();restoreDraft();checkSuggestion();refresh();
 }
 async function mutate(action,data){
  if(busy)return null;
  busy=true;$('officeBoardPost').disabled=true;
  try{
-  const result=await call(action,data);
+  const current=items.find(note=>note.id===data?.id);
+  const guarded=['edit','done','pin','schedule'].includes(action)&&current?.updated_at
+   ?{...data,expected_updated_at:current.updated_at}:data;
+  const result=await call(action,guarded);
   if(action==='delete')localDeletes.set(data.id,Date.now());
   else if(result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
-  if(action==='post'){$('officeBoardDraft').value='';calendarDraftDay='';ambiguousPost=null;checkSuggestion();}
+  if(action==='post'){$('officeBoardDraft').value='';calendarDraftDay='';ambiguousPost=null;clearDraft();checkSuggestion();}
   if(action==='restore'&&result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
   editing='';editDraft='';
   merge(items);
@@ -667,8 +710,11 @@ async function mutate(action,data){
   // Retain only volatile text/date metadata for verification on a retry.
   if(action==='post'&&/시간 초과|연결|HTTP 5\d\d/i.test(String(e.message||'')))
    ambiguousPost={data:{...data},startedAt:postStartedAt};
+  const conflict=action!=='post'&&/HTTP 409|edit_conflict/.test(String(e.message||''));
   msg(ambiguousPost&&action==='post'?
-   '전송 결과를 확인하지 못했습니다. 다시 누르면 최근 등록 여부부터 확인합니다.':e.message);
+   '전송 결과를 확인하지 못했습니다. 다시 누르면 최근 등록 여부부터 확인합니다.':
+   conflict?'다른 휴대전화에서 먼저 수정했습니다. 최신 메모를 다시 불러온 뒤 변경해 주세요.':e.message);
+  if(conflict){editing='';editDraft='';setTimeout(()=>refresh(true),0);}
   return null;
  }
  finally{busy=false;$('officeBoardPost').disabled=false}
@@ -713,7 +759,7 @@ async function post(){
     result={ok:true,note:found};
     localUpdates.set(found.id,{note:found,time:Date.now()});
     merge(items.filter(n=>n.id!==found.id).concat(found));
-    $('officeBoardDraft').value='';calendarDraftDay='';checkSuggestion();
+    $('officeBoardDraft').value='';calendarDraftDay='';clearDraft();checkSuggestion();
     msg('앞서 등록된 메모를 확인했습니다. 중복으로 등록하지 않았습니다.');
    }else if(typeof confirm!=='function'||!confirm(
     '최근 메모에서 이전 등록이 확인되지 않았습니다. 통신 지연으로 이미 등록됐을 수 있습니다. 그래도 다시 등록하시겠습니까?'))return;
@@ -801,8 +847,15 @@ function saveEdit(id){
  if(!canEditId(id)){denied();cancelEdit();return}
  const value=String($('officeBoardList')?.querySelector?.('textarea[data-edit]')?.value||'').trim();
  if(!value||value.length>1600){msg('수정 내용은 1~1600자여야 합니다.');return}
- const parsed=extracted(value);
- mutate('edit',{id,text:value,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false});
+ // Text-only edits preserve a separately selected calendar date.
+ const payload={id,text:value};
+ if(hasDateCue(value)){
+  const parsed=extracted(value);
+  if(!parsed){msg('수정한 날짜를 확인해 주세요. 기존 일정은 변경되지 않았습니다.');return}
+  payload.scheduled_at=parsed.scheduled_at;
+  payload.all_day=parsed.all_day;
+ }
+ mutate('edit',payload);
 }
 function setDone(id,done){
  if(!valid(id)||birthdayOf(items.find(n=>n.id===id)))return;
@@ -818,6 +871,25 @@ function remove(id){
 function toggleDone(){
  memoStatus=memoStatus==='all'?'active':'all';showCompleted=memoStatus==='all';
  finderTouched=true;memoLimit=PAGE_SIZE;draw();
+}
+async function exportBackup(){
+ if(bridge?.getMode?.()!=='admin'||typeof bridge?.saveBackup!=='function'){
+  msg('공유 메모 백업은 최신 안드로이드 관리자모드에서만 가능합니다.');return;
+ }
+ if(typeof confirm==='function'&&!confirm('이 휴대전화에 공유 메모 기록을 JSON 파일로 내보낼까요? 고객 연락처 등 개인정보가 포함될 수 있습니다. 사진 원본은 제외되고 첨부 식별자만 기록됩니다.'))return;
+ msg('공유 메모를 백업 파일로 준비하는 중…');
+ try{
+  const notes=await readAllBoard();
+  if(notes.length>=5000){msg('기록이 5,000건 이상입니다. 일부 기록이 빠질 수 있어 백업을 중단했습니다.');return;}
+  const backup=JSON.stringify({schema_version:1,kind:'office_board_backup',
+    exported_at:new Date().toISOString(),photo_originals_included:false,notes});
+  if(backup.length>1900000){msg('백업 크기가 파일 저장 한도를 넘었습니다. 분할 백업 기능이 필요합니다.');return;}
+  bridge.saveBackup(backup);
+  msg('휴대전화의 파일 저장 위치를 선택해 주세요. 사진 원본은 포함되지 않습니다.');
+ }catch(e){msg('공유 메모 백업 실패 · 사무실 연결을 확인해 주세요.');}
+}
+function diagnostics(){
+ return {lastCheck,historyLoaded,historyLoading,memoCount:items.length};
 }
 function authenticate(){
  if(!bridge?.requestOfficeBoardAccess){msg('보안코드 연결은 안드로이드 앱에서만 지원합니다.');return}
@@ -836,6 +908,10 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
  if(action==='cancel')cancelEdit();
  if(action==='save')saveEdit(id);
  if(action==='delete')remove(id);
+ if(action==='scheduleClear'&&canEditId(id)){
+  if(typeof confirm!=='function'||confirm('이 메모를 달력에서 제외할까요? 메모 내용은 그대로 유지됩니다.'))
+   mutate('schedule',{id,scheduled_at:null});
+ }
  if(action==='photoAdd'){
   const note=items.find(n=>n.id===id);
   if(!canEditNote(note)){denied();return}
@@ -857,10 +933,12 @@ function imageUpdate(note){
  localUpdates.set(note.id,{note,time:Date.now()});
  merge(items);
 }
-window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,
+window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,exportBackup,diagnostics,
+ deviceHealth:()=>call('devices',{}),
  toggleComposer,setStatus,setAuthor,setQuery,setSort,showMore,clearFilters,
  imageCall:call,imageUpdate,canEdit:canEditId,
  setView,chooseDay,changeMonth,today,addAtSelectedDay,clearScheduledDay,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
+ saveDraftNow,
  onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
  onNewNotification(){if(currentPage==='officeBoard')refresh(true);

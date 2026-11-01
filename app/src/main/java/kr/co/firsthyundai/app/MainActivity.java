@@ -353,6 +353,8 @@ public class MainActivity extends Activity {
     }
 
     @Override protected void onPause() {
+        // Flush the encrypted per-member draft before Android may reclaim WebView.
+        if(web!=null)web.evaluateJavascript("window.FirstHyundaiOfficeBoard?.saveDraftNow?.()",null);
         stopPublicLiveVoice();
         memoTimer.removeCallbacks(memoCheck);
         super.onPause();
@@ -733,12 +735,28 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void requestOfficeBoardAccess() {
             runOnUiThread(()->officeBoardLoginDialog());
         }
+        @JavascriptInterface public boolean saveOfficeMemoDraft(String text,String selectedDay){
+            if(!OfficeBoardClient.enrolled(getApplicationContext()))return false;
+            return OfficeDraftStore.save(getApplicationContext(),
+                OfficeBoardClient.memberId(getApplicationContext()),text,selectedDay);
+        }
+        @JavascriptInterface public String getOfficeMemoDraft(){
+            if(!OfficeBoardClient.enrolled(getApplicationContext()))return "{}";
+            return OfficeDraftStore.read(getApplicationContext(),
+                OfficeBoardClient.memberId(getApplicationContext()));
+        }
+        @JavascriptInterface public void clearOfficeMemoDraft(){
+            if(!OfficeBoardClient.enrolled(getApplicationContext()))return;
+            OfficeDraftStore.clear(getApplicationContext(),
+                OfficeBoardClient.memberId(getApplicationContext()));
+        }
         @JavascriptInterface public void officeBoardAction(String action,String payload,String requestId){
             if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
             if(action==null||!java.util.Arrays.asList("list","post","edit","done","schedule","delete","archive","restore",
-                "imageAdd","imageGet","imageRemove","preview","pin").contains(action)||payload==null||
+                "imageAdd","imageGet","imageRemove","preview","pin","devices").contains(action)||payload==null||
                payload.length()>("imageAdd".equals(action)?200000:3000))return;
-            final boolean needsAdmin="delete".equals(action)||"restore".equals(action)||"archive".equals(action);
+            final boolean needsAdmin="delete".equals(action)||"restore".equals(action)||
+                "archive".equals(action)||"devices".equals(action);
             final String adminIdentity=adminSessionIdentity;
             final String adminToken=sharedSettingsToken;
             io.execute(()->{
