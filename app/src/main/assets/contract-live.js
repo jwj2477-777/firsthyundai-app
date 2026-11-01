@@ -120,8 +120,11 @@
    text.append(title,value);row.append(check,text);box.append(row);
   }
   $('cl_review').hidden=!Object.keys(proposals).length;
-  const confirmed=Object.keys(proposals).filter(k=>proposals[k]!==''),deferred=Object.entries(reviewStates);
-  const missing=missingConditions(),hasReview=confirmed.length||deferred.length;
+  // A user may uncheck an AI candidate. Progress must reflect only the fields
+  // that will actually be applied, not every value the model proposed.
+  const chosen=Object.fromEntries(Object.entries(proposals).filter(([k])=>selected[k]!==false));
+  const confirmed=Object.keys(chosen).filter(k=>chosen[k]!==''),deferred=Object.entries(reviewStates);
+  const missing=missingConditions(chosen),hasReview=Object.keys(proposals).length>0||deferred.length>0;
   const counts={pending:0,discussion:0,manual:0,not_applicable:0};
   for(const [,state] of deferred)if(Object.hasOwn(counts,state))counts[state]++;
   const summary=$('cl_reviewProgress');
@@ -199,6 +202,9 @@
    if(!p){status('일부 조건을 확인하지 못했습니다. 금액·날짜를 정확히 다시 말씀해 주세요.');return;}
    const conflict=consistency(proposals,p);
    if(conflict){status(conflict+' 정확한 내용을 다시 말씀해 주세요.');return;}
+   // A subsequent concrete answer supersedes an earlier 'pending',
+   // 'discussion' or 'manual' status for that exact field.
+   for(const key of Object.keys(p))delete reviewStates[key];
    Object.assign(proposals,p);render();return;
   }
   if(state==='error'){active=false;stopping=true;failed=true;status(message);buttons();return;}
