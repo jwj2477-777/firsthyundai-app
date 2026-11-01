@@ -71,6 +71,7 @@ public class MainActivity extends Activity {
         TradeNotifications.requestPermission(this);
     }
     private static final int SAVE_BACKUP = 1021;
+    private static final int SAVE_OFFICE_ARCHIVE = 1031;
     private static final int OPEN_BACKUP = 1022;
     private static final int SAVE_CATALOG = 1023;
     private static final int DICTATE_CONTRACT = 1024;
@@ -105,6 +106,7 @@ public class MainActivity extends Activity {
         }
     };
     private String pendingBackup = "";
+    private String pendingOfficeArchive = "";
     private String pendingCatalog = "";
     private static final String ADMIN_TRIES = "firsthyundai-admin-attempts";
     // Administrator privilege is deliberately session-only; legacy saved
@@ -979,6 +981,24 @@ public class MainActivity extends Activity {
             });
         }
 
+        @JavascriptInterface public void saveOfficeMemoZipBackup(String json) {
+            if(!isAdminDeviceMode()||json==null||json.length()>1_900_000)return;
+            try {
+                JSONObject value=new JSONObject(json);
+                if(value.optInt("schema_version")!=1||
+                   !"office_board_backup_with_photos".equals(value.optString("kind"))||
+                   value.optJSONArray("notes")==null||value.getJSONArray("notes").length()>5000)return;
+            }catch(Exception e){return;}
+            runOnUiThread(()->{
+                if(!pendingOfficeArchive.isEmpty())return;
+                pendingOfficeArchive=json;
+                Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                intent.setType("application/zip");
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.putExtra(Intent.EXTRA_TITLE,"firsthyundai-shared-memos-photos.zip");
+                startActivityForResult(intent,SAVE_OFFICE_ARCHIVE);
+            });
+        }
         @JavascriptInterface public void saveCatalog(String json) {
             // Only an authenticated administrator can export public catalog data.
             // No GitHub write token, personal notes or passwords are included.
@@ -1052,9 +1072,27 @@ public class MainActivity extends Activity {
             deliver("firstHyundaiContractSpeech",response);
             return;
         }
+        if(request==SAVE_OFFICE_ARCHIVE&&result!=RESULT_OK){
+            pendingOfficeArchive="";
+            return;
+        }
         if(result!=RESULT_OK || data==null || data.getData()==null)return;
         Uri uri=data.getData();
-        if(request==SAVE_BACKUP) {
+        if(request==SAVE_OFFICE_ARCHIVE){
+            String archive=pendingOfficeArchive;pendingOfficeArchive="";
+            io.execute(()->{
+                JSONObject response=new JSONObject();
+                try(OutputStream os=getContentResolver().openOutputStream(uri)){
+                    if(os==null)throw new Exception("백업 파일 저장을 시작하지 못했습니다.");
+                    int count=OfficeMemoZipBackup.write(getApplicationContext(),new JSONObject(archive),os);
+                    response.put("ok",true).put("photos",count);
+                }catch(Exception e){
+                    try{response.put("ok",false).put("error","메모나 사진을 모두 저장하지 못했습니다. 파일을 삭제하고 다시 실행해 주세요.");}
+                    catch(Exception ignored){}
+                }
+                deliver("onOfficeMemoArchiveSaved",response);
+            });
+        }else if(request==SAVE_BACKUP) {
             String backup=pendingBackup;pendingBackup="";
             io.execute(() -> {
                 try(OutputStream os=getContentResolver().openOutputStream(uri)) {

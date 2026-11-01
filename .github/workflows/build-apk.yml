@@ -384,25 +384,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.74 clearer Live review and resolved deferrals APK
+      - name: Publish v2.1.75 permanent memo and full photo archive APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.74.apk
-          unzip -t FirstHyundai-v2.1.74.apk | grep 'No errors detected'
-          if gh release view v2.1.74 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.75.apk
+          unzip -t FirstHyundai-v2.1.75.apk | grep 'No errors detected'
+          if gh release view v2.1.75 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.74 FirstHyundai-v2.1.74.apk \
+            gh release create v2.1.75 FirstHyundai-v2.1.75.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.74 · 메모 보존·알림·안전성 개선' \
-              --notes '사무실 중요 고정 메모와 매년 반복 생일이 일반 365일 만료에 따라 사라지지 않도록 보호했습니다. 일정 전용 서버 인덱스와 기존 메모 점진 이관으로 오래전에 등록한 약속도 시작 30분 전 알림에 포함합니다. 공유메모 전체 이력을 주기적으로 재조회하여 다른 휴대전화의 옛 메모 수정·삭제를 반영합니다. 날짜를 쓰지 않은 메모 문구 수정은 달력 일정을 보존하고 지난 미완료 업무를 오늘 브리핑과 메모함에서 강조합니다. 안드로이드 Keystore 기반 기기 내 암호화 초안 복구, 관리자 수동 메모 JSON 백업(사진 원본 별도), 사진 압축 품질과 재전송 중복 방지, 서버 수정 버전 충돌 확인, 최종 계약 안내문 핵심값 비교 경고, 관리자 연결 진단이 추가되었습니다. K-apt API 승인 및 Live 실기기 품질은 별도 검증이 필요합니다. v2.1.74/build225.'
+              --title '퍼스트현대 v2.1.75 · 메모·사진 장기보존 및 ZIP 백업' \
+              --notes '일반 공유메모와 첨부 사진을 자동 만료 없이 보존하도록 서버를 개선하고, 구버전에서 저장된 메모·사진·일정 인덱스의 남은 유효기간을 비영업시간에 단계적으로 제거합니다. 삭제한 메모는 기존 30일 복구를 유지하며 복구 기간이 지난 첨부 사진은 안전하게 정리합니다. 관리자모드에서 공유메모 JSON 백업과 별도로 사진 JPEG 원본까지 포함하는 ZIP 백업을 직접 저장할 수 있습니다. ZIP은 개인정보가 포함된 암호화되지 않은 파일이므로 안전한 개인 저장소에 보관해야 합니다. ZIP 완성 전에는 외부 저장장치에 작성하지 않고 누락된 사진이 있으면 오류를 안내합니다. 기존 계약·실거래·뉴스·테마·가족모드 기능은 유지합니다. Cloudflare KV의 진정한 원자적 동시 수정을 보장하는 구조, 일부 관리비·초등 통학구역 공식 확인, Gemini Live 실기기 마이크·스피커 확인은 아직 별도 과제입니다. v2.1.75/build226.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.74 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.74 --apk FirstHyundai-v2.1.74.apk
+          gh release upload v2.1.75 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.75 --apk FirstHyundai-v2.1.75.apk
 
 
 

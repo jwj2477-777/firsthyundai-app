@@ -8,13 +8,15 @@ const BOARD_IMAGE_TTL=400*86400;
 const BOARD_DUE_PREFIX="office-postit-due-v1:";
 const BOARD_IMAGE_REQUEST_PREFIX="office-postit-image-request-v1:";
 const recurringBirthday=note=>/^🎂\s*.{1,24}?\s+생일\s*·\s*매년\s*(양력|음력)/u.test(String(note?.text||""));
-const lifetime=note=>note?.pinned===true||recurringBirthday(note)?{}:{expirationTtl:365*86400};
-const imageLifetime=note=>note?.pinned===true||recurringBirthday(note)?{}:{expirationTtl:BOARD_IMAGE_TTL};
+// New live notes and their original photos must not silently expire.
+// Only explicit admin deletion (with the documented recovery window) removes them.
+const lifetime=()=>({});
+const imageLifetime=()=>({});
 const dueIndexKey=note=>note?.scheduled_at&&note?.id?BOARD_DUE_PREFIX+note.scheduled_at+":"+note.id:"";
 async function syncDueIndex(env,previous,note){
  const a=dueIndexKey(previous),b=note&&!note.done&&!note.all_day&&!recurringBirthday(note)?dueIndexKey(note):"";
  if(a&&a!==b)await env.SETTINGS.delete(a);
- if(b)await env.SETTINGS.put(b,JSON.stringify({id:note.id,at:note.scheduled_at}),{expirationTtl:365*86400});
+ if(b)await env.SETTINGS.put(b,JSON.stringify({id:note.id,at:note.scheduled_at}));
 }
 
 const validImageId=x=>typeof x==="string"&&/^[0-9a-f-]{36}$/.test(x);
@@ -25,6 +27,8 @@ function validImageData(value){
 }
 
 const BOARD_LIFETIME_DAYS=365, BOARD_ARCHIVE_PREFIX="office-postit-archive-v1:", BOARD_ARCHIVE_DAYS=30;
+const BOARD_ORPHAN_PREFIX="office-postit-photo-cleanup-v1:", BOARD_ORPHAN_DELAY=31*86400;
+const BOARD_RETENTION_CURSOR_PREFIX="office-postit-retention-cursor-v1:";
 const MEMBER_PREFIX="office-member-v2:", DEVICE_PREFIX="office-member-device-v2:";
 const validMemberId=id=>typeof id==="string"&&/^[0-9a-f-]{36}$/.test(id);
 const validDeviceId=id=>typeof id==="string"&&/^[a-f0-9]{32}$/.test(id);
@@ -206,6 +210,51 @@ async function boardKeys(env,prefix,max=5000){
  }
  return rows;
 }
+// Legacy KV entries previously had 365/400 day expirations. Convert their
+// existing metadata in small bounded batches during off-hours, preserving
+// device metadata and never exposing note/photo content to a public endpoint.
+async function migrateOldExpiry(env,now=Date.now()){
+ const hour=new Date(now+9*3600000).getUTCHours();
+ if(hour>=8&&hour<21)return {state:"office_hours"};
+ let changed=0;
+ for(const [type,prefix] of [["notes",BOARD_PREFIX],["photos",BOARD_IMAGE_PREFIX],["due",BOARD_DUE_PREFIX]]){
+  const marker=BOARD_RETENTION_CURSOR_PREFIX+type;
+  const cursor=await env.SETTINGS.get(marker);
+  if(cursor==="done")continue;
+  // Keep scheduled Worker well below free-tier KV subrequest budgets.
+  const page=await env.SETTINGS.list({prefix,limit:5,...(cursor?{cursor}:{})});
+  for(const record of page.keys||[]){
+   // Cloudflare KV lists expiry timestamps in Unix seconds.
+   if(!Number.isFinite(record.expiration)||record.expiration*1000<=now)continue;
+   const data=await env.SETTINGS.get(record.name);
+   if(data==null)continue;
+   const options=record.metadata?{metadata:record.metadata}:{};
+   await env.SETTINGS.put(record.name,data,options);
+   changed++;
+  }
+  await env.SETTINGS.put(marker,page.list_complete===false&&page.cursor?page.cursor:"done");
+ }
+ return {state:"migrating",changed};
+}
+async function cleanupArchivedPhotos(env,now=Date.now()){
+ // A restored memo must retain its images; a permanently deleted one should
+ // not leave personal photos forever in the private KV namespace.
+ const page=await env.SETTINGS.list({prefix:BOARD_ORPHAN_PREFIX,limit:5});
+ const rows=page.keys||[];let removed=0;
+ for(const row of rows){
+  const cleanup=await env.SETTINGS.get(row.name,"json");
+  if(!cleanup||!Number.isFinite(cleanup.after)||cleanup.after>now)continue;
+  const id=row.name.slice(BOARD_ORPHAN_PREFIX.length);
+  if(!validBoardId(id)){await env.SETTINGS.delete(row.name);continue;}
+  const active=await env.SETTINGS.get(BOARD_PREFIX+id,"json");
+  if(active){await env.SETTINGS.delete(row.name);continue;}
+  for(const photoId of (cleanup.images||[]).filter(validImageId))
+   await env.SETTINGS.delete(BOARD_IMAGE_PREFIX+photoId);
+  await env.SETTINGS.delete(row.name);
+  removed++;
+ }
+ return removed;
+}
 async function boardPage(env,offset=0){
  const keys=await boardKeys(env,BOARD_PREFIX);
  const names=keys.filter(k=>validBoardId(k.name.slice(BOARD_PREFIX.length)));
@@ -382,6 +431,7 @@ async function boardCommand(req,env,url,ctx){
   delete saved.deleted_at;
   await env.SETTINGS.put(BOARD_PREFIX+restoring[1],JSON.stringify(saved),lifetime(saved));
   await syncDueIndex(env,null,saved);
+  await env.SETTINGS.delete(BOARD_ORPHAN_PREFIX+restoring[1]);
   await env.SETTINGS.delete(archiveKey);
   await invalidateBoardCache(env);
   return res({ok:true,note:saved});
@@ -495,6 +545,10 @@ async function boardCommand(req,env,url,ctx){
    const deleted={...saved,deleted_at:new Date().toISOString()};
    await env.SETTINGS.put(BOARD_ARCHIVE_PREFIX+match[1],JSON.stringify(deleted),{expirationTtl:BOARD_ARCHIVE_DAYS*86400});
    await syncDueIndex(env,saved,null);
+   const photos=(saved.images||[]).filter(validImageId);
+   if(photos.length)await env.SETTINGS.put(BOARD_ORPHAN_PREFIX+match[1],
+    JSON.stringify({after:Date.now()+BOARD_ORPHAN_DELAY*1000,images:photos}),
+    {expirationTtl:BOARD_ORPHAN_DELAY+7*86400});
    await env.SETTINGS.delete(memoKey);
    await invalidateBoardCache(env);
    return res({ok:true,archived:true});
@@ -689,7 +743,7 @@ const DUE_BACKFILL_CURSOR="office-postit-due-backfill-v1";
 async function backfillDueNotes(env,now=Date.now()){
  const prior=await env.SETTINGS.get(DUE_BACKFILL_CURSOR);
  if(prior==="done")return;
- const page=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:100,...(prior?{cursor:prior}:{})});
+ const page=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:8,...(prior?{cursor:prior}:{})});
  for(const row of page.keys||[]){
   if(!validBoardId(row.name.slice(BOARD_PREFIX.length)))continue;
   const note=await env.SETTINGS.get(row.name,"json");
@@ -918,6 +972,8 @@ async function liveToken(req,env){
 export default {async scheduled(event,env,ctx){
   const now=Number(event?.scheduledTime)||Date.now();
   await backfillDueNotes(env,now);
+  await migrateOldExpiry(env,now);
+  await cleanupArchivedPhotos(env,now);
   await deliverDueReminders(env,now);
  },async fetch(req,env,ctx){
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:HEAD});

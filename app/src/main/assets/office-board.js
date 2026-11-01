@@ -872,6 +872,26 @@ function toggleDone(){
  memoStatus=memoStatus==='all'?'active':'all';showCompleted=memoStatus==='all';
  finderTouched=true;memoLimit=PAGE_SIZE;draw();
 }
+async function exportBackupWithPhotos(){
+ if(bridge?.getMode?.()!=='admin'||typeof bridge?.saveOfficeMemoZipBackup!=='function'){
+  msg('사진 포함 백업은 최신 안드로이드 관리자모드에서만 지원합니다.');return;
+ }
+ if(typeof confirm==='function'&&!confirm('고객 연락처와 첨부 사진 원본이 포함된 ZIP 백업을 휴대전화에 저장할까요? 백업 파일은 암호화되지 않으므로 안전한 개인 저장소에 보관해 주세요.'))return;
+ msg('전체 공유메모와 사진 목록을 확인하는 중…');
+ try{
+  const notes=await readAllBoard();
+  if(notes.length>=5000){msg('메모가 5,000건 이상이라 완전한 백업을 보장할 수 없습니다. 저장을 중단했습니다.');return;}
+  const payload=JSON.stringify({schema_version:1,kind:'office_board_backup_with_photos',
+   exported_at:new Date().toISOString(),notes});
+  if(payload.length>1800000){msg('메모 본문이 너무 많아 단일 ZIP 백업을 시작할 수 없습니다. 분할 내보내기가 필요합니다.');return;}
+  bridge.saveOfficeMemoZipBackup(payload);
+  msg('ZIP 파일의 저장 위치를 선택해 주세요. 사진 원본 확인 후 저장을 완료합니다.');
+ }catch(e){msg('사진 포함 백업을 시작하지 못했습니다. 다시 확인해 주세요.');}
+}
+window.onOfficeMemoArchiveSaved=e=>{
+ msg(e?.ok?'공유메모와 사진 '+Number(e.photos||0)+'장을 ZIP 파일에 저장했습니다. 파일을 안전하게 보관해 주세요.':
+ '사진 포함 백업이 완료되지 않았습니다. 불완전한 파일을 삭제하고 다시 실행해 주세요.');
+};
 async function exportBackup(){
  if(bridge?.getMode?.()!=='admin'||typeof bridge?.saveBackup!=='function'){
   msg('공유 메모 백업은 최신 안드로이드 관리자모드에서만 가능합니다.');return;
@@ -933,7 +953,7 @@ function imageUpdate(note){
  localUpdates.set(note.id,{note,time:Date.now()});
  merge(items);
 }
-window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,exportBackup,diagnostics,
+window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,exportBackup,exportBackupWithPhotos,diagnostics,
  deviceHealth:()=>call('devices',{}),
  toggleComposer,setStatus,setAuthor,setQuery,setSort,showMore,clearFilters,
  imageCall:call,imageUpdate,canEdit:canEditId,
