@@ -59,8 +59,10 @@ assert.equal(el('officeBoardScheduleClear').hidden,false,'Selected date can be r
 el('officeBoardDraft').value='3시 30분 방문';
 api.post();
 assert.equal(calls[0].action,'post');
-assert.equal(calls[0].data.scheduled_at,'2028-01-30T06:30:00.000Z');
-assert.equal(calls[0].data.all_day,false);
+const scheduledPayload=JSON.parse(calls[0].data);
+assert.equal(scheduledPayload.scheduled_at,'2028-01-30T06:30:00.000Z');
+assert.equal(scheduledPayload.all_day,false);
+assert.equal(scheduledPayload.text,'3시 30분 방문','Existing authenticated JSON-only memo channel retained');
 const note={id:'mhad4vwu-00000000-0000-0000-0000-000000000001',text:'3시 30분 방문',
  created_at:'2026-10-25T01:00:00Z',updated_at:'2026-10-25T01:00:00Z',done:false};
 ctx.window.onFirstHyundaiOfficeBoardResult({requestId:calls[0].id,ok:true,data:{ok:true,note}});
