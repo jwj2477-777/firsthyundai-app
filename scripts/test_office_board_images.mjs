@@ -62,7 +62,17 @@ assert.equal((await view.json()).data_url,photo,'authenticated image download');
 const rows=(await (await ask('/board','GET',null,token)).json()).notes;
 assert.equal(rows[0].images.length,1);
 assert(!JSON.stringify(rows).includes(photo),'board list remains lightweight');
-for(let i=0;i<2;i++)assert.equal((await ask(path,'POST',{data_url:photo},token)).status,201);
+// Retrying after a lost HTTP reply must return the same image, not use a slot.
+const attempt=await ask(path,'POST',{data_url:photo,upload_id:'safeRetryToken01'},token);
+assert.equal(attempt.status,201);
+const savedAttempt=await attempt.json();
+const duplicate=await ask(path,'POST',{data_url:photo,upload_id:'safeRetryToken01'},token);
+assert.equal(duplicate.status,200);
+const replay=await duplicate.json();
+assert.equal(replay.image_id,savedAttempt.image_id);
+assert.equal(replay.note.images.length,2);
+assert.equal(replay.already_saved,true);
+for(let i=0;i<1;i++)assert.equal((await ask(path,'POST',{data_url:photo},token)).status,201);
 assert.equal((await ask(path,'POST',{data_url:photo},token)).status,409,'at most three photos');
 assert.equal((await ask(path+'/'+first.image_id,'DELETE',null,otherToken)).status,403);
 
