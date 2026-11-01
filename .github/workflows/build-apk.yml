@@ -384,25 +384,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.65 verified maintenance fee and history safe display APK
+      - name: Publish v2.1.66 fee coverage, school reference and usable Live timer APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.65.apk
-          unzip -t FirstHyundai-v2.1.65.apk | grep 'No errors detected'
-          if gh release view v2.1.65 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.66.apk
+          unzip -t FirstHyundai-v2.1.66.apk | grep 'No errors detected'
+          if gh release view v2.1.66 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.65 FirstHyundai-v2.1.65.apk \
+            gh release create v2.1.66 FirstHyundai-v2.1.66.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.65 · 관리비 근거 확인·월별 이력 보존' \
-              --notes '아파트 관리비 상담 참고액을 표시할 때 검증된 월별 전체 합계와 전용면적 단가가 일치하는 공개자료만 사용합니다. 오래된 단가의 우회 표시를 제거하고 미래 월·비정상 기준월·합계 누락·세 항목 합계 불일치 데이터는 제외합니다. 과거에 검증된 월별 이력은 신규 수집 후에도 유지하여 기간별 추세가 사라지지 않도록 했습니다. 일부 공식 경비·청소비는 여전히 전체 관리비로 표시하지 않으며, 확인되지 않은 단지의 실제 세대 고지액을 추정 확정하지 않습니다. 학교 배정은 검증 전이면 보류 상태 유지. Live·계약·메모·실거래·관리자 기능 및 무료 AI 한도 변경 없음. v2.1.65/build216.'
+              --title '퍼스트현대 v2.1.66 · 관리비 확인 확대·학구도·Live 안정화' \
+              --notes 'K-apt 세 그룹 공식 API 중 장기수선충당금 HTTP 400 미승인 상태에 대응해, 관심 14개 단지의 공개 월별 합계 자료만 독립 재게시 원문·단지코드·도로명주소·월·금액으로 교차 검증하는 보조 수집 경로를 추가했습니다. 공식 세 그룹 검증 자료가 같은 월에 존재하면 공식 자료를 우선하고 신규 자료 확인 실패 시 이전 값과 월별 이력을 유지합니다. 학교 화면은 관심 14단지의 공식 통학구역 참고 확인 수와 경계 이격·정확 지오코딩·기준일 검증을 보여주며 실제 배정 확정은 하지 않습니다. Gemini Live는 구글 접속 준비시간이 아니라 마이크가 실제 켜진 시점부터 7분을 계산하고 중복 준비 응답으로 마이크를 두 번 시작하지 않습니다. 기존 음성 대화·계약·메모·실거래·관리자 및 무료 제공 범위 유지. Galaxy 실사용 품질 별도 검증 필요. v2.1.66/build217.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.65 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.65 --apk FirstHyundai-v2.1.65.apk
+          gh release upload v2.1.66 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.66 --apk FirstHyundai-v2.1.66.apk
 
 
 
