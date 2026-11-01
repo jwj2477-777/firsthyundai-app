@@ -56,6 +56,21 @@ assert.equal(el('ct_advance').value,'');
 const p=transfer.packet('계좌 111-222-333333 계좌 444-555-666666 국민은행 홍길동 500');
 assert.equal(p.account,null,'Ambiguous multiple accounts cannot be auto-confirmed');
 assert(p.warning.includes('계좌번호'));
+// Manual edits take priority over any later automatic analysis. This path
+// used to replace an already verified account or deposit even if the parser
+// did not populate that field in the current recognition pass.
+const manuallyChecked={bank:'하나은행',account:'999-888-777777',accountHolder:'김가람',advance:'650'};
+for(const [key,value] of Object.entries(manuallyChecked))el('ct_'+key).value=value;
+el('ct_rough').value='신한은행 123-456-789012 예금주 홍길동 오늘 500만원 송금';
+const checked=ctx.window.FirstHyundaiLanguage.parse();
+for(const [key,value] of Object.entries(manuallyChecked))
+ assert.equal(el('ct_'+key).value,value,'Confirmed manual '+key+' must survive later parser suggestions');
+assert(checked.review.some(x=>x.includes('기존 계좌번호와 메모에서 찾은 계좌번호가 다릅니다')),
+ 'A conflicting account candidate must be shown for review, not overwrite the field');
+assert(checked.review.some(x=>x.includes('기존 이번 송금액과 메모에서 찾은 송금액')),
+ 'A conflicting transfer amount must be shown for review, not overwrite the field');
+assert(checked.review.some(x=>x.includes('기존 은행명과 메모에서 찾은 은행명')),
+ 'A conflicting bank name must keep the human-selected bank');
 const snap=JSON.parse(fs.readFileSync(path.join(root,'data/public_services.json'),'utf8'));
 assert(['awaiting_key','verified'].includes(snap.schools.state));
 assert(snap.school_zones.records.length===0);

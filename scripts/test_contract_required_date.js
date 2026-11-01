@@ -38,6 +38,20 @@ for(const date of ['2026-10-22','10월중 협의']){
  assert(!E('ct_missing').textContent.includes('확인할 정보'));
  app.approve();assert.equal(app.canShare(),true);
 }
+// Exact confirmed dates must not approve an impossible payment order.
+E('ct_contractDate').value='2027-02-01';
+assert(app._test.collect().errors.some(e=>e.includes('잔금일이 계약일보다 빠름')));
+app.makePreview();app.approve();assert.equal(app.canShare(),false);
+E('ct_contractDate').value='2026.11.02~11.06 중 상호 협의';
+assert(!app._test.collect().errors.some(e=>e.includes('잔금일이 계약일보다 빠름')),
+ 'A negotiated contract date range must not be flattened into a fictitious exact day');
+E('ct_interim').value='1000';E('ct_interimDate').value='2027-01-06';
+assert(app._test.collect().errors.some(e=>e.includes('중도금 지급일이 잔금일보다 늦음')));
+E('ct_interimDate').value='2027년 1월 4일';
+assert(!app._test.collect().errors.some(e=>e.includes('중도금 지급일이 잔금일보다 늦음')));
+E('ct_leaseStart').value='2027-02-01';E('ct_leaseEnd').value='2027-01-15';
+assert(app._test.collect().errors.some(e=>e.includes('임대차 종료일이 시작일보다 빠름')));
+E('ct_leaseStart').value='';E('ct_leaseEnd').value='';E('ct_interim').value='';E('ct_interimDate').value='';
 E('ct_contractDate').value='';
 app.updateSummary();workflow.refreshMissing();
 assert.equal(app.canShare(),false,'Removing contract date revokes approval');

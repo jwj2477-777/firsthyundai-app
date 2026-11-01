@@ -69,6 +69,14 @@ function normalizeDate(raw){
  return date.getFullYear()===y&&date.getMonth()===mo-1&&date.getDate()===d?
   String(y)+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0'):'';
 }
+// Only an exact calendar date is suitable for ordering checks. A proposal
+// such as "11월 초순 협의" or a date range is meaningful contract text but
+// must never be treated as one mathematically confirmed signing day.
+function exactContractDate(raw){
+ const s=String(raw||'').trim();
+ if(!/^20\d{2}\s*(?:[.\/-]\s*\d{1,2}\s*[.\/-]\s*\d{1,2}|년\s*\d{1,2}\s*월\s*\d{1,2}\s*일)$/.test(s))return null;
+ return normalizeDate(s)||null;
+}
 function safeLines(v){return String(v||'').replace(/\r/g,'').split('\n').map(x=>x.trim()).filter(Boolean);}
 const DEFAULT_DETAIL_TERM='기타 상세한 특약사항은 본계약서 작성 시 협의하여 기재한다.';
 function previewSpecialTerms(raw){
@@ -154,7 +162,16 @@ function collect(){
  if(!field('bank')||!field('account')||!field('accountHolder'))errors.push('송금 은행·계좌·예금주');
  if(type==='월세'&&(amount('monthlyRent')===null||amount('monthlyRent')<=0))errors.push('월세 금액');
  if(type!=='매매'&&!field('leaseDuration')&&!(field('leaseStart')&&field('leaseEnd')))errors.push('임대차 기간');
- if(field('balanceDate')&&field('leaseStart')&&field('leaseStart')<field('balanceDate'))errors.push('입주일이 잔금일보다 빠름(재확인)');
+ const signing=exactContractDate(field('contractDate')),balanceDay=exactContractDate(field('balanceDate'));
+ const interimDay=exactContractDate(field('interimDate'));
+ const leaseStartDay=exactContractDate(field('leaseStart')),leaseEndDay=exactContractDate(field('leaseEnd'));
+ if(signing&&balanceDay&&signing>balanceDay)errors.push('잔금일이 계약일보다 빠름(날짜 재확인)');
+ if(interim>0&&interimDay&&balanceDay&&interimDay>balanceDay)
+  errors.push('중도금 지급일이 잔금일보다 늦음(날짜 재확인)');
+ if(leaseStartDay&&leaseEndDay&&leaseStartDay>leaseEndDay)
+  errors.push('임대차 종료일이 시작일보다 빠름(날짜 재확인)');
+ if(balanceDay&&leaseStartDay&&leaseStartDay<balanceDay)
+  errors.push('입주일이 잔금일보다 빠름(재확인)');
  return {type,price,deposit,advance,interim,errors,balance:price!==null&&deposit!==null&&interim!==null?price-deposit-interim:null,
   remainder:deposit!==null&&advance!==null?deposit-advance:null};
 }

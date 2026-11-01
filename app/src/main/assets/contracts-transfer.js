@@ -172,23 +172,32 @@ function packet(text){
 }
 function merge(result){
  const found=result?.found||[],review=result?.review||[],p=packet(v('rough'));
+ // Only fields created by the immediately preceding parser pass may be
+ // corrected automatically. Values already present before the parser ran
+ // might be deliberately entered or confirmed by an agent.
+ const automaticallyFilled=new Set(found.map(item=>item.id));
  const set=(id,value,label)=>{
   if(value==null||String(value)==='')return;
   const field=E(id);if(!field)return;
   if(!v(id)){field.value=String(value);found.push({id,value:String(value),source:'송금정보 순서무관 분석'});}
  };
  set('bank',p.bank,'은행');set('account',p.account,'계좌번호');
- if(p.account&&v('account')!==p.account){
-  // An old positional parse may have accidentally joined 500 or another standalone amount to the account.
-  E('account').value=p.account;
-  found.push({id:'account',value:p.account,source:'계좌번호 독립 추출'});
-  review.push('계좌번호가 다른 숫자와 붙어 인식되어 다시 분리했습니다. 실제 계좌를 확인하세요.');
+ if(p.account&&v('account')&&v('account')!==p.account){
+  if(automaticallyFilled.has('account')){
+   // Repair a guess made by the parser in THIS call only.
+   E('account').value=p.account;
+   found.push({id:'account',value:p.account,source:'계좌번호 독립 추출'});
+   review.push('이번 분석에서 계좌번호가 다른 숫자와 붙어 인식되어 다시 분리했습니다. 실제 계좌를 확인하세요.');
+  }else review.push('기존 계좌번호와 메모에서 찾은 계좌번호가 다릅니다. 기존 입력을 유지했으니 실제 계좌를 직접 확인해 주세요.');
  }
+ if(p.bank&&v('bank')&&v('bank')!==p.bank&&!automaticallyFilled.has('bank'))
+  review.push('기존 은행명과 메모에서 찾은 은행명이 다릅니다. 기존 입력을 유지하고 확인해 주세요.');
  const previousHolder=v('accountHolder');
  if(p.holder&&(previousHolder===''||previousHolder===p.holder)){
   set('accountHolder',p.holder,'예금주');
  }else if(p.holder&&previousHolder!==p.holder){
-  if(/^(?:잔금일|금일|오늘|예금주|계좌|은행|계약금|매도인|매수인|입금|송금)$/.test(previousHolder)){
+  if(automaticallyFilled.has('accountHolder')&&
+     /^(?:잔금일|금일|오늘|예금주|계좌|은행|계약금|매도인|매수인|입금|송금)$/.test(previousHolder)){
    E('accountHolder').value=p.holder;
    found.push({id:'accountHolder',value:p.holder,source:'예금주 독립 추출'});
    review.push('계좌 주변의 계약 용어를 예금주로 오인식하여 정정했습니다. 예금주를 확인하세요.');
@@ -199,9 +208,11 @@ function merge(result){
   const old=v('advance'),wanted=String(p.amount);
   if(!old){set('advance',wanted,'이번 송금액');}
   else if(old!==wanted&&p.confidence==='context'){
-   E('advance').value=wanted;
-   found.push({id:'advance',value:wanted,source:'명시된 송금 문맥'});
-   review.push('송금액이 다른 금액과 혼동되어 '+wanted+'만원으로 다시 분석했습니다. 실제 송금액을 확인하세요.');
+   if(automaticallyFilled.has('advance')){
+    E('advance').value=wanted;
+    found.push({id:'advance',value:wanted,source:'명시된 송금 문맥'});
+    review.push('이번 분석에서 송금액이 다른 금액과 혼동되어 '+wanted+'만원으로 다시 분리했습니다. 실제 송금액을 확인하세요.');
+   }else review.push('기존 이번 송금액과 메모에서 찾은 송금액 '+wanted+'만원이 다릅니다. 기존 입력을 유지했으니 금액을 직접 확인해 주세요.');
   }
  }
  if(p.confidence==='inferred')review.push('송금액 '+p.amount+'만원은 네 항목 중 유일한 독립 금액으로 추정했습니다. 입금 전에 확인하세요.');
