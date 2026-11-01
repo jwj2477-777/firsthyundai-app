@@ -56,6 +56,16 @@ assert(native.includes('stop(); // Report failure'),'Overload must report a reco
 assert(native.includes('pcm,offset,available,AudioTrack.WRITE_BLOCKING'),'Keep writing partial AudioTrack frames');
 assert(native.includes('interruptPlayback()'),'Handle genuine server interruptions on playback executor');
 assert(native.includes('AcousticEchoCanceler.create'),'Enable supported device echo cancellation during microphone capture');
+assert(native.includes('ContractLiveTurnGate contractTurnGate=new ContractLiveTurnGate()'),'Contract voice must use an explicit model/user turn gate');
+assert(native.includes('contractTurnGate.microphoneAllowed()'),'Block mic echo while the AI is speaking');
+assert(native.includes('contractTurnGate.modelAudioStarted()'),'Lock input from first actual AI audio frame');
+assert(native.includes('content.optBoolean("turnComplete")'),'Do not resume input until server turn is complete');
+assert(native.includes('resumeMicrophoneAfterPlayback()'),'Wait for actual speaker playback completion');
+assert(native.includes('getPlaybackHeadPosition()'),'Do not trust a finished network stream while the speaker is still speaking');
+assert(native.includes('ContractLiveChecklist.reminder(proposedConditions)'),'Propose the next missing field without sharing local form data');
+assert(read('app/src/main/assets/contract-live.js').includes("'ai_speaking'"),'UI displays AI speaking vs user listening states');
+assert(!native.includes('GEMINI_API_KEY'));
+assert(!native.includes('android.util.Log'),'No logging of private voice content');
 const pcmBuffer=read('app/src/main/java/kr/co/firsthyundai/app/LivePcmQueue.java');
 assert(pcmBuffer.includes('MAX_BYTES=24_000*2*12'),'Allow short network bursts without corrupting AI speech');
 assert(!native.includes('queuedAudioBytes'),'Old 4-second silent-drop path must be removed');

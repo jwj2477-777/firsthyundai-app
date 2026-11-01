@@ -136,7 +136,7 @@
    return;
   }
   if(!active||stopping)return;
-  if(['connecting','connected','listening'].includes(state))status(message.slice(0,300));
+  if(['connecting','connected','listening','ai_speaking'].includes(state))status(message.slice(0,300));
   if(['heard','transcript'].includes(state))$('cl_transcript').textContent=(state==='heard'?'내 말: ':'AI: ')+message.slice(0,500);
  }
  function apply(){

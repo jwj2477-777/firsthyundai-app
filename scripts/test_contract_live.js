@@ -38,6 +38,10 @@ proposal({price:980000000,contractDeposit:65000000,interim:0,interimDate:'',bala
 assert.equal(el('ct_price').value,'80000','Tool call cannot mutate form');
 assert.equal(live.apply(),false,'Cannot apply with microphone active');
 proposal({account:'SYNTHETIC_PRIVATE'});assert(el('cl_status').textContent.includes('확인하지 못했습니다'));
+emit('ai_speaking','AI가 질문 중입니다. 답변이 끝나면 말씀해 주세요.');
+assert(el('cl_status').textContent.includes('질문 중'),'Live must indicate AI voice is speaking');
+emit('listening','AI 질문이 끝났습니다. 이제 답변을 말씀해 주세요.');
+assert(el('cl_status').textContent.includes('이제 답변'),'Live must clearly invite an actual user reply');
 emit('date_warning','말씀하신 날짜가 지난 연도로 인식됐습니다. 연도를 정확히 확인해 주세요.');
 assert(el('cl_status').textContent.includes('지난 연도로 인식'),'A past-year proposal must be visibly blocked');
 assert(!el('cl_pick_balanceDate').disabled,'A valid earlier proposal is retained while correcting date');
