@@ -79,6 +79,24 @@ run("schoolDistrictData.elementary_zones.reference_date='2026-11-01'");
 assert.equal(run('verifiedSchoolCoverage().confirmed'),0,'Mismatched source reference date must not falsely claim current coverage');
 run('schoolDistrictData='+JSON.stringify(schoolSnapshot));
 
+// Official Schoolinfo names are a real fallback if both independent NEIS and
+// school-location services fail; they never imply a geolocated/assigned school.
+const schoolinfoOnly=run('renderSchoolPublicInfo()');
+assert(schoolinfoOnly.includes('연수구 학교 기본정보'),'Avoid calling a Yeonsu-wide directory a Songdo-only listing');
+assert(schoolinfoOnly.includes('학교알리미 연수구 학교기본정보'));
+assert(schoolinfoOnly.includes(schoolSnapshot.schoolinfo.records[0].name));
+assert(schoolinfoOnly.includes('위치 별도 확인 필요')&&!schoolinfoOnly.includes('지도에서 학교 위치 보기'),
+ 'No geolocation or school assignment without an independently verified coordinate');
+assert(schoolinfoOnly.includes('초등 통학구역 참고 14곳 확인'),
+ 'Keep separate official boundary coverage status');
+assert(!schoolinfoOnly.includes('배정학교 확인'));
+run("selectNeisSchoolLevel('중학교')");
+assert(!run('renderSchoolPublicInfo()').includes('levelNotInDirectory'),
+ 'Grade filter must not invent school records');
+const sourceSchoolCount=run("schoolDistrictData.schoolinfo.records.filter(x=>x.level==='중학교').length");
+assert(run('renderSchoolPublicInfo()').includes('중등 '+sourceSchoolCount));
+run("selectNeisSchoolLevel('all')");
+
 assert(run('renderSchoolPublicInfo()').includes('schoolzone.emac.kr'));
 assert(!run('renderSchoolPublicInfo()').includes('NEIS_EDU_KEY를 등록'),'Absent verified data must not falsely claim the stored NEIS key is missing');
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('공식 자료 확인 중')&&!nodes.officeRentContent.innerHTML.includes('조회 0건'),'Pending access is not an empty official result');

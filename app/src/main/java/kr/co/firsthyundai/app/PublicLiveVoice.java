@@ -330,22 +330,53 @@ final class PublicLiveVoice {
                 // 40ms of 16kHz mono PCM16; Google's Live guidance recommends 20–40ms.
                 // A 100ms chunk can slow turn detection and feel like clipped speech.
                 byte[] samples=new byte[1280];
+                LiveMicBuffer pending=new LiveMicBuffer();
                 while(running&&microphone==recorder){
                     int n;
-                    try{n=recorder.read(samples,0,samples.length);}catch(Exception e){break;}
+                    try{n=recorder.read(samples,0,samples.length);}catch(Exception e){n=-1;}
                     if(!running||microphone!=recorder)break;
-                    if(n<=0)continue;
-                    // Half-duplex contract speech: a model question cannot be
-                    // echoed back as another imaginary user answer.
-                    if(contractMode&&!contractTurnGate.microphoneAllowed())continue;
+                    if(n<0){
+                        event("error","마이크에서 음성을 읽지 못해 종료했습니다. 마이크 권한과 연결을 확인해 주세요.");
+                        stop();break;
+                    }
+                    if(n==0)continue;
+                    // Contract mode never forwards buffered user audio after the
+                    // AI starts talking; that would become a stale imaginary reply.
+                    if(contractMode&&!contractTurnGate.microphoneAllowed()){
+                        pending.clear();continue;
+                    }
+                    // Keep short, real user speech in memory while OkHttp is
+                    // congested; silently throwing away PCM can lose an amount
+                    // or date and lead to a mistaken contract proposal.
+                    if(!pending.offer(samples,n)){
+                        event("error","네트워크 지연으로 음성이 누락될 수 있어 대화를 종료했습니다. 검토 후보는 유지됩니다.");
+                        stop();break;
+                    }
                     WebSocket ws=socket;
-                    if(ws==null||ws.queueSize()>64000)continue;
-                    try{
-                        String payload=Base64.encodeToString(samples,0,n,Base64.NO_WRAP);
-                        ws.send(new JSONObject().put("realtimeInput",new JSONObject().put("audio",
-                             new JSONObject().put("data",payload).put("mimeType","audio/pcm;rate=16000"))).toString());
-                    }catch(Exception ignored){}
+                    if(ws==null){
+                        event("error","음성 연결이 끊겼습니다. 계약 조건을 확인한 뒤 다시 시작해 주세요.");
+                        stop();break;
+                    }
+                    boolean failed=false;
+                    while(running&&!pending.isEmpty()&&ws.queueSize()<=64000){
+                        if(contractMode&&!contractTurnGate.microphoneAllowed()){
+                            pending.clear();break;
+                        }
+                        byte[] packet=pending.poll();
+                        try{
+                            String payload=Base64.encodeToString(packet,Base64.NO_WRAP);
+                            boolean accepted=ws.send(new JSONObject().put("realtimeInput",new JSONObject().put("audio",
+                                new JSONObject().put("data",payload).put("mimeType","audio/pcm;rate=16000"))).toString());
+                            if(!accepted)failed=true;
+                        }catch(Exception ignored){failed=true;}
+                        if(failed)break;
+                    }
+                    if(failed){
+                        event("error","음성 전송 연결이 종료됐습니다. 검토 후보를 확인하고 다시 연결해 주세요.");
+                        stop();break;
+                    }
                 }
+                pending.clear();
             },"fhd-live-voice-capture");
             reader.setDaemon(true);reader.start();
             return true;
