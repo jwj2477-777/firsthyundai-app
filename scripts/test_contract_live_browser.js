@@ -31,6 +31,7 @@ async function verify(){
   check(!get('cl_pick_contractDeposit').checked,'Deferred-state update must preserve unchecked deposit');
   emit('proposal',JSON.stringify({price:990000000}));
   check(!get('cl_pick_contractDeposit').checked,'New proposal must preserve unchecked deposit');
+  check(get('cl_selectedCount').textContent.includes('5 / 6개'),'Selection count follows checkbox in real DOM');
   get('cl_pick_contractDeposit').checked=true;
   get('cl_pick_contractDeposit').dispatchEvent(new Event('change',{bubbles:true}));
   check(get('ct_price').value==='80000','No automatic writes');
