@@ -27,6 +27,10 @@ const ctx=vm.createContext({
 });
 vm.runInContext(javascript.slice(javascript.indexOf('function compactTradeCollectedAt('),javascript.indexOf('function number(')),ctx);
 vm.runInContext(snippet,ctx);
+const fav=javascript.match(/const FAVORITE_APTS=\[([\s\S]*?)\];/);
+assert(fav,'Fourteen curated interest complexes defined');
+vm.runInContext('const FAVORITE_APTS=['+fav[1]+'];',ctx);
+
 vm.runInContext(fs.readFileSync(path.join(root,'app/src/main/assets/maintenance-trends.js'),'utf8'),ctx);
 vm.runInContext(javascript.slice(javascript.indexOf('function tradeClass(type)'),javascript.indexOf('function renderTypeButtons(')),ctx);
 const run=q=>vm.runInContext(q,ctx);
@@ -58,6 +62,23 @@ const addressed=run("renderPublicComplexInfo({id:'f13',label:'퍼스트파크13'
 assert(!addressed.includes('도로명·지번주소')&&!addressed.includes('지도에서 주소 확인'),
  'Address is in the cadastral-first detail header, not duplicated in fees');
 assert(run('renderSchoolPublicInfo()').includes('배정학교가 아닙니다'));
+const schoolSnapshot=JSON.parse(fs.readFileSync(path.join(root,'data/school_districts.json'),'utf8'));
+run('schoolDistrictData='+JSON.stringify(schoolSnapshot));
+const schoolCoverage=run('verifiedSchoolCoverage()');
+assert.equal(schoolCoverage.total,14,'School reference must include all fourteen interested complexes');
+assert.equal(schoolCoverage.confirmed,14,'Existing verified official geometry covers fourteen interested complexes');
+assert(run('renderSchoolPublicInfo()').includes('초등 통학구역 참고 14곳 확인'),
+ 'Show exact official boundary reference coverage, not fabricated school assignment');
+run("schoolDistrictData.elementary_zones.records[0].method='unverified_source'");
+assert(run("verifiedSchoolZoneReference(schoolDistrictData.elementary_zones.records[0],schoolDistrictData.elementary_zones.reference_date)")===false,
+ 'No zone reference without verified geocode method');
+run("schoolDistrictData.elementary_zones.records[1].boundary_clearance_m=0");
+assert(run("verifiedSchoolZoneReference(schoolDistrictData.elementary_zones.records[1],schoolDistrictData.elementary_zones.reference_date)")===false,
+ 'Do not accept points next to school zone boundary');
+run("schoolDistrictData.elementary_zones.reference_date='2026-11-01'");
+assert.equal(run('verifiedSchoolCoverage().confirmed'),0,'Mismatched source reference date must not falsely claim current coverage');
+run('schoolDistrictData='+JSON.stringify(schoolSnapshot));
+
 assert(run('renderSchoolPublicInfo()').includes('schoolzone.emac.kr'));
 assert(!run('renderSchoolPublicInfo()').includes('NEIS_EDU_KEY를 등록'),'Absent verified data must not falsely claim the stored NEIS key is missing');
 run('renderOfficeRentals()');assert(nodes.officeRentContent.innerHTML.includes('공식 자료 확인 중')&&!nodes.officeRentContent.innerHTML.includes('조회 0건'),'Pending access is not an empty official result');
