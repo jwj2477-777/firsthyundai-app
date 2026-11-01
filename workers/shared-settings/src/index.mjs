@@ -217,12 +217,16 @@ async function migrateOldExpiry(env,now=Date.now()){
  const hour=new Date(now+9*3600000).getUTCHours();
  if(hour>=8&&hour<21)return {state:"office_hours"};
  let changed=0;
- for(const [type,prefix] of [["notes",BOARD_PREFIX],["photos",BOARD_IMAGE_PREFIX],["due",BOARD_DUE_PREFIX]]){
+ // Scan one namespace per minute; stagger key rewrites so a scheduled FCM
+ // reminder never competes with a high-volume TTL migration.
+ const sources=[["notes",BOARD_PREFIX],["photos",BOARD_IMAGE_PREFIX],["due",BOARD_DUE_PREFIX]];
+ const [type,prefix]=sources[Math.floor(now/60000)%sources.length];
+ {
   const marker=BOARD_RETENTION_CURSOR_PREFIX+type;
   const cursor=await env.SETTINGS.get(marker);
   if(cursor==="done")continue;
   // Keep scheduled Worker well below free-tier KV subrequest budgets.
-  const page=await env.SETTINGS.list({prefix,limit:5,...(cursor?{cursor}:{})});
+  const page=await env.SETTINGS.list({prefix,limit:6,...(cursor?{cursor}:{})});
   for(const record of page.keys||[]){
    // Cloudflare KV lists expiry timestamps in Unix seconds.
    if(!Number.isFinite(record.expiration)||record.expiration*1000<=now)continue;
@@ -239,7 +243,7 @@ async function migrateOldExpiry(env,now=Date.now()){
 async function cleanupArchivedPhotos(env,now=Date.now()){
  // A restored memo must retain its images; a permanently deleted one should
  // not leave personal photos forever in the private KV namespace.
- const page=await env.SETTINGS.list({prefix:BOARD_ORPHAN_PREFIX,limit:5});
+ const page=await env.SETTINGS.list({prefix:BOARD_ORPHAN_PREFIX,limit:2});
  const rows=page.keys||[];let removed=0;
  for(const row of rows){
   const cleanup=await env.SETTINGS.get(row.name,"json");
@@ -743,7 +747,7 @@ const DUE_BACKFILL_CURSOR="office-postit-due-backfill-v1";
 async function backfillDueNotes(env,now=Date.now()){
  const prior=await env.SETTINGS.get(DUE_BACKFILL_CURSOR);
  if(prior==="done")return;
- const page=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:8,...(prior?{cursor:prior}:{})});
+ const page=await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:4,...(prior?{cursor:prior}:{})});
  for(const row of page.keys||[]){
   if(!validBoardId(row.name.slice(BOARD_PREFIX.length)))continue;
   const note=await env.SETTINGS.get(row.name,"json");
