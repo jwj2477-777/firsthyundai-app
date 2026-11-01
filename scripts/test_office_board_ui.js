@@ -160,6 +160,86 @@ for(const day of ['2028-01-30','2028-01-31','2028-02-01','2028-02-02'])
  assert(api.closureDates().includes(day),'Rain/snow map-box window honors shared holiday '+day);
 api.chooseDay('2028-02-30');
 assert(!el('officeBoardCalendarMonth').textContent.includes('02-30'),'Invalid calendar day rejected');
+// Old push entries are not restricted to the currently loaded 25 or 32 notes.
+// Fetch additional pages only for the clicked target, without pulling every
+// customer memo into a notification history or a public endpoint.
+const oldNote={...samples[2],id:'mhad4vwu-00000000-0000-0000-0000-00000000fade',
+ text:'오래된 알림에서 찾아온 메모',done:true};
+assert(api.focusNote(oldNote.id));
+let pageReq=calls.at(-1);
+assert.equal(pageReq.action,'list');
+assert.equal(JSON.parse(pageReq.data).offset,0);
+ctx.window.onFirstHyundaiOfficeBoardResult({requestId:pageReq.id,ok:true,
+ data:{notes:samples.slice(-25),has_more:true,next_offset:25}});
+await new Promise(done=>setTimeout(done,5));
+pageReq=calls.at(-1);
+assert.equal(JSON.parse(pageReq.data).offset,25,'Deep link must paginate beyond recent posts');
+ctx.window.onFirstHyundaiOfficeBoardResult({requestId:pageReq.id,ok:true,
+ data:{notes:[oldNote],has_more:false}});
+await new Promise(done=>setTimeout(done,5));
+assert(api._test.memoItems().some(n=>n.id===oldNote.id),
+ 'Old completed memo must become visible after notification deep link');
+assert(el('officeBoardFeedback').textContent.includes('알림의 메모를 열었습니다.'));
+
+// An alert can refer to a deleted post. State that explicitly rather than
+// continuing to scroll toward a note that will never be found.
+const gone='mhad4vwu-00000000-0000-0000-0000-00000000abcd';
+assert(api.focusNote(gone));
+pageReq=calls.at(-1);
+ctx.window.onFirstHyundaiOfficeBoardResult({requestId:pageReq.id,ok:true,
+ data:{notes:[],has_more:false}});
+await new Promise(done=>setTimeout(done,5));
+assert(el('officeBoardFeedback').textContent.includes('삭제되었거나'));
+
+// Test the actual ambiguous network response case: server stored the note
+// but client's POST response was lost. Retry must query the authenticated
+// recent board and must NOT send the same post twice.
+api.clearFilters();el('officeBoardDraft').value='서버 응답 유실 확인 메모';
+const postedBefore=calls.filter(x=>x.action==='post').length;
+api.post();
+const submitted=calls.at(-1);
+assert.equal(submitted.action,'post');
+assert.equal(calls.filter(x=>x.action==='post').length,postedBefore+1);
+ctx.window.onFirstHyundaiOfficeBoardResult({requestId:submitted.id,ok:false,
+ error:'서버 응답 시간 초과'});
+await new Promise(done=>setTimeout(done,5));
+assert.equal(el('officeBoardDraft').value,'서버 응답 유실 확인 메모',
+ 'Uncertain post must preserve draft until server state is confirmed');
+api.post();
+pageReq=calls.at(-1);
+assert.equal(pageReq.action,'list','Retry after timeout must query before creating another post');
+assert.equal(calls.filter(x=>x.action==='post').length,postedBefore+1);
+const recovered={...oldNote,
+ id:'mhad4vwu-00000000-0000-0000-0000-00000000dcba',
+ text:'서버 응답 유실 확인 메모',done:false,all_day:false,scheduled_at:null,
+ author:{id:userId,name:'내 계정'},created_at:new Date().toISOString(),
+ updated_at:new Date().toISOString()};
+ctx.window.onFirstHyundaiOfficeBoardResult({requestId:pageReq.id,ok:true,
+ data:{notes:[recovered],has_more:false}});
+await new Promise(done=>setTimeout(done,5));
+assert.equal(el('officeBoardDraft').value,'','Recovered submission clears draft');
+assert.equal(calls.filter(x=>x.action==='post').length,postedBefore+1,
+ 'Already saved memo is not sent a second time');
+assert(api._test.memoItems().some(n=>n.id===recovered.id));
+assert(el('officeBoardFeedback').textContent.includes('중복으로 등록하지 않았습니다'));
+
+// If a successful recent-list check cannot prove the earlier server result,
+// ask for explicit consent instead of silently duplicating a possible post.
+el('officeBoardDraft').value='저장 여부 불명확한 새 메모';
+api.post();
+const uncertain=calls.at(-1);
+ctx.window.onFirstHyundaiOfficeBoardResult({requestId:uncertain.id,ok:false,
+ error:'서버 응답 시간 초과'});
+await new Promise(done=>setTimeout(done,5));
+api.post();
+pageReq=calls.at(-1);
+ctx.confirm=()=>false;
+ctx.window.onFirstHyundaiOfficeBoardResult({requestId:pageReq.id,ok:true,
+ data:{notes:[],has_more:false}});
+await new Promise(done=>setTimeout(done,5));
+assert.equal(calls.filter(x=>x.action==='post').length,postedBefore+2,
+ 'No repost when duplicate-risk confirmation is declined');
+assert.equal(el('officeBoardDraft').value,'저장 여부 불명확한 새 메모');
 assert(!/localStorage|sessionStorage|\bfetch\(/.test(js),
  'Sensitive notes must remain in the authenticated native channel');
 console.log('Office board UX, native bridge, freeform post and escaping passed.');
