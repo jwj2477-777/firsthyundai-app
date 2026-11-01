@@ -303,7 +303,7 @@ body.apartmentSheetActive{overflow:hidden}
   <textarea id="officeBoardDraft" maxlength="1600" rows="4" placeholder="전달할 내용을 자유롭게 적어주세요."></textarea>
   <input type="file" id="officeBoardImageInput" accept="image/*" multiple hidden aria-label="공유 메모 사진 선택">
   <div id="officeBoardImagePreview" class="officeBoardImagePreviewList" aria-live="polite"></div>
-  <p id="officeBoardScheduleSuggestion" class="officeBoardAutoSchedule hidden" role="status"></p>
+  <div class="officeBoardScheduleLine"><p id="officeBoardScheduleSuggestion" class="officeBoardAutoSchedule hidden" role="status"></p><button type="button" id="officeBoardScheduleClear" class="officeBoardScheduleClear" hidden onclick="FirstHyundaiOfficeBoard.clearScheduledDay()">날짜 선택 해제</button></div>
   <div class="officeBoardComposerFooter">
    <button id="officeBoardImageAdd" class="officeBoardImageAdd" type="button" onclick="FirstHyundaiBoardImages.selectFor()">▧ 사진 첨부</button>
    <button id="officeBoardImageRetry" class="officeBoardImageRetry" type="button" hidden>사진 다시 올리기</button>
@@ -351,7 +351,7 @@ body.apartmentSheetActive{overflow:hidden}
    </div>
    <div class="officeBoardCalendarWeekdays"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
    <div id="officeBoardCalendarDays" class="officeBoardCalendarDays" role="group" aria-label="날짜 선택"></div>
-   <div class="officeBoardCalendarAgenda"><strong id="officeBoardAgendaHeading"></strong><div id="officeBoardAgendaList"></div>
+   <div class="officeBoardCalendarAgenda"><div class="officeBoardAgendaToolbar"><strong id="officeBoardAgendaHeading"></strong><button type="button" id="officeBoardAddSelectedDay" class="officeBoardAddDay" onclick="FirstHyundaiOfficeBoard.addAtSelectedDay()">+ 이 날짜에 일정 작성</button></div><div id="officeBoardAgendaList"></div>
 </div>
  </section>
  <dialog id="officeBoardImageDialog" class="officeBoardImageDialog" aria-label="공유 메모 첨부 사진">
