@@ -192,7 +192,12 @@ final class PublicLiveVoice {
                             JSONObject transcript=content.optJSONObject("outputTranscription");
                             if(transcript!=null){
                                 String t=transcript.optString("text","");
-                                if(!t.isEmpty())event("transcript",t.substring(0,Math.min(280,t.length())));
+                                if(!t.isEmpty()){
+                                    // Output transcription can precede the first playback PCM.
+                                    // Close the half-duplex gate before that first syllable.
+                                    if(contractMode)contractTurnGate.modelOutputAnnounced();
+                                    event("transcript",t.substring(0,Math.min(280,t.length())));
+                                }
                             }
                             JSONObject user=content.optJSONObject("inputTranscription");
                             if(user!=null){
