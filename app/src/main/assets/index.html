@@ -2047,12 +2047,6 @@ function renderPublicComplexInfo(p){
    x.status==='verified_invoice'&&Number.isSafeInteger(x.monthly_won)&&
    x.monthly_won>0&&x.monthly_won<=2000000&&/^20[0-9]{2}-[0-9]{2}$/.test(x.month||'')&&
    safeLink(x.source_url)):null;
- const average=maintenanceEstimates?.state==='verified_partial'&&Array.isArray(maintenanceEstimates.records)?
-   maintenanceEstimates.records.find(x=>x.complex_id===p.id&&x.kapt_code===p.kapt_code):null;
- const rate=average&&Number.isInteger(average.won_per_exclusive_m2)&&
-   average.won_per_exclusive_m2>=300&&average.won_per_exclusive_m2<=20000&&
-   /^20[0-9]{4}$/.test(average.month||'')&&safeLink(average.source_url)?
-   average.won_per_exclusive_m2:null;
  const trend=picked&&typeof FirstHyundaiMaintenance!=='undefined'?FirstHyundaiMaintenance.summarize(
    maintenanceEstimates,p.id,p.kapt_code,Number(picked.exclusive_m2)):null;
  // Never substitute partial cost items for a complete maintenance estimate.
@@ -2082,18 +2076,14 @@ function renderPublicComplexInfo(p){
  const bill=picked?trend?
    FirstHyundaiMaintenance.renderTrend(trend,picked.exclusive_m2)+
    sourceLink(trend.latestSource,'K-apt 기반 공개 원문 확인'):
-   rate!==null?
-   '<p class="practiceNote"><strong>'+escapeHtml('약 '+Math.round(rate*picked.exclusive_m2/10000)+'만원')+'</strong> · 전용 '+escapeHtml(picked.exclusive_m2)+'㎡</p>'+
-   '<p class="tiny">K-apt '+escapeHtml(average.month.slice(0,4)+'년 '+Number(average.month.slice(4))+'월')+' 공개 단지 평균을 전용면적에 적용한 상담 참고액</p>'+
-   sourceLink(average.source_url,'K-apt 기반 공개 원문 확인'):
    item?
    '<p class="practiceNote"><strong>'+escapeHtml(item.monthly_won.toLocaleString('ko-KR'))+'원</strong> · '+escapeHtml(item.month)+'월 직접 확인 고지액</p>'+sourceLink(item.source_url,'고지액 근거 확인'):
    '<p class="practiceNote">'+escapeHtml(picked.supply_label)+'타입의 월평균 관리비 전체 합계는 확인 중입니다.</p>'+partialMessage:
    '<p class="practiceNote">평형·타입 정보 확인 전입니다.</p>'+partialMessage;
  return '<div class="apiInfoCards"><article><strong>평형별 월 관리비</strong>'+
-  '<p class="tiny">평형을 선택하면 월 관리비 수준을 1만원 단위로 확인할 수 있습니다.</p>'+options+bill+
+  '<p class="tiny">검증된 월별 자료가 있으면 전용면적 기준 상담 참고액을 1만원 단위로 표시합니다.</p>'+options+bill+
   (phone?'<a class="btn" href="tel:'+escapeHtml(phone)+'">관리사무소 문의 '+escapeHtml(p.management_phone||'')+'</a>':'')+
-  (rate===null?'<p class="tiny">'+sourceLink('https://www.k-apt.go.kr/','K-apt에서 단지명으로 관리비 조회')+'</p>':'')+
+  (trend===null?'<p class="tiny">'+sourceLink('https://www.k-apt.go.kr/','K-apt에서 단지명으로 관리비 조회')+'</p>':'')+
   '<p class="tiny">공개 단지 전체 관리비 합계의 전용㎡당 평균 단가를 해당 평형 전용면적에 적용합니다. 해당 평형 세대들의 실제 평균 고지서가 아니며 계절·사용량·부과면적 기준에 따라 달라집니다.</p></article></div>';
 }
 // Officetel is separate from apartment transactions, but has matching controls.
