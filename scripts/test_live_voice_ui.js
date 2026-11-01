@@ -59,6 +59,7 @@ assert(native.includes('AcousticEchoCanceler.create'),'Enable supported device e
 assert(native.includes('ContractLiveTurnGate contractTurnGate=new ContractLiveTurnGate()'),'Contract voice must use an explicit model/user turn gate');
 assert(native.includes('contractTurnGate.microphoneAllowed()'),'Block mic echo while the AI is speaking');
 assert(native.includes('contractTurnGate.modelAudioStarted()'),'Lock input from first actual AI audio frame');
+assert(native.includes('contractTurnGate.modelOutputAnnounced()'),'Block mic from AI output transcript before first PCM can leak');
 assert(native.includes('content.optBoolean("turnComplete")'),'Do not resume input until server turn is complete');
 assert(native.includes('resumeMicrophoneAfterPlayback()'),'Wait for actual speaker playback completion');
 assert(native.includes('getPlaybackHeadPosition()'),'Do not trust a finished network stream while the speaker is still speaking');
