@@ -19,7 +19,7 @@ const specs={
  notice:{size:30,line:51,before:22,after:12},
  'notice-body':{size:26,line:42,before:5,after:9}
 };
-let canvases=[];
+let canvases=[],approvedImageSource='';
 function kindFor(line){
  if(/^\s*●/.test(line))return 'title';
  if(/^\s*※/.test(line))return 'notice';
@@ -260,12 +260,17 @@ function ready(){
 function close(){
  const d=$('ct_imageDialog');
  if(d?.open&&typeof d.close==='function')d.close();
+ canvases=[];approvedImageSource='';
 }
 function open(){
+ // Never reuse a prior customer's canvases after another preview opens.
+ canvases=[];approvedImageSource='';
  if(!ready())return;
  try{
-  const pages=plan($('ct_preview').value);
-  canvases=pages.map((p,i)=>draw(p,i,pages.length));
+  const source=String($('ct_preview')?.value||'');
+  const pages=plan(source);
+  const next=pages.map((p,i)=>draw(p,i,pages.length));
+  canvases=next;approvedImageSource=source;
   const target=$('ct_imagePages');target.replaceChildren();
   canvases.forEach((canvas,i)=>{
    const outer=document.createElement('div');outer.className='contractImageSheet';
@@ -280,11 +285,20 @@ function open(){
   const dialog=$('ct_imageDialog');
   if(typeof dialog.showModal==='function')dialog.showModal();
   else dialog.setAttribute('open','');
- }catch(e){canvases=[];alert(e.message||'이미지 생성에 실패했습니다.');}
+ }catch(e){canvases=[];approvedImageSource='';alert(e.message||'이미지 생성에 실패했습니다.');}
 }
 async function share(){
  if(!ready())return;
- if(!canvases.length){alert('이미지 미리보기를 먼저 확인해 주세요.');return;}
+ if(!canvases.length||!$('ct_imageDialog')?.open){
+  alert('계약 이미지를 다시 열어 내용을 확인해 주세요.');return;
+ }
+ if(!approvedImageSource||String($('ct_preview')?.value||'')!==approvedImageSource){
+  canvases=[];approvedImageSource='';
+  const status=$('ct_imageStatus');
+  if(status)status.textContent='계약문자가 변경되었습니다. 이미지를 다시 생성하고 확인해 주세요.';
+  alert('계약문자가 변경되었습니다. 최신 내용으로 이미지를 다시 확인해 주세요.');
+  return;
+ }
  const status=$('ct_imageStatus');
  status.textContent='PNG 이미지 공유를 준비하고 있습니다.';
  try{

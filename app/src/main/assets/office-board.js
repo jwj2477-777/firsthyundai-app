@@ -3,7 +3,7 @@
 'use strict';
 const $=id=>document.getElementById(id),bridge=window.FirstHyundaiNative;
 const requests=new Map(),localUpdates=new Map(),localDeletes=new Map();
-let sequence=0,items=[],busy=false,lastCheck=0,showCompleted=false,editing='',editDraft='',timer=null;
+let sequence=0,items=[],busy=false,postInFlight=false,lastCheck=0,showCompleted=false,editing='',editDraft='',timer=null;
 let timerMs=45000,pendingFocus='',view='compose',scheduleOpen=false,suggestedDate='';
 let archiveOpen=false,archived=[];
 let memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10,finderTouched=false;
@@ -631,6 +631,11 @@ async function mutate(action,data){
  finally{busy=false;$('officeBoardPost').disabled=false}
 }
 async function post(){
+ // Covers the entire compose -> server post -> optional photo upload flow.
+ // The generic mutation lock ends before optional photo upload completes.
+ if(postInFlight||busy){msg('메모 등록이 진행 중입니다. 중복으로 올리지 않도록 잠시 확인해 주세요.');return}
+ postInFlight=true;
+ try{
  const photos=window.FirstHyundaiBoardImages;
  const value=String($('officeBoardDraft')?.value||'').trim();
  if(!value&&!photos?.pendingCount?.()){msg('메모를 적거나 사진을 첨부해 주세요.');return}
@@ -649,6 +654,7 @@ async function post(){
   const saved=await photos.uploadPending(result.note.id);
   if(!saved)setView('compose');else syncViews();
  }
+ }finally{postInFlight=false}
 }
 function toggleBirthdayForm(show){
  if(bridge?.getMode?.()!=='admin'){msg('생일 관리는 관리자만 사용할 수 있습니다.');return}

@@ -57,7 +57,8 @@ assert.equal(api._test.draftSchedule('2028년 2월 30일 방문'),null,
  'Invalid user date must never be silently replaced with the calendar date');
 assert.equal(el('officeBoardScheduleClear').hidden,false,'Selected date can be removed');
 el('officeBoardDraft').value='3시 30분 방문';
-api.post();
+api.post();api.post();
+assert.equal(calls.length,1,'Repeated tap before server acknowledgement must not post a second memo');
 assert.equal(calls[0].action,'post');
 const scheduledPayload=JSON.parse(calls[0].data);
 assert.equal(scheduledPayload.scheduled_at,'2028-01-30T06:30:00.000Z');
@@ -79,6 +80,21 @@ api.post();
 assert.equal(calls.length,callCount,'Invalid explicitly typed date must not be saved as an undated memo');
 assert(el('officeBoardFeedback').textContent.includes('날짜가 올바르지 않습니다'));
 api.clearScheduledDay();
+// Photo-only upload does not call the post endpoint, but must still reject
+// overlapping taps until the asynchronous image upload has completed.
+let finishPhotoUpload;
+ctx.window.FirstHyundaiBoardImages={
+ pendingCount:()=>1,pendingTarget:()=>note.id,
+ uploadPending:()=>new Promise(done=>{finishPhotoUpload=done})
+};
+el('officeBoardDraft').value='';
+const beforePhoto=calls.length;
+api.post();api.post();
+assert.equal(calls.length,beforePhoto,'Photo-only repeated taps may not create two note requests');
+assert.equal(typeof finishPhotoUpload,'function','First photo-only upload started');
+finishPhotoUpload(true);
+await new Promise(done=>setTimeout(done,5));
+ctx.window.FirstHyundaiBoardImages=undefined;
 const own={...note,author:{id:userId,name:'작성자'}};
 const other={...note,id:'mhad4vwu-00000000-0000-0000-0000-000000000002',
  author:{id:'22222222-2222-2222-2222-222222222222',name:'다른 가족'}};
