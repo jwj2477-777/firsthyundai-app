@@ -47,7 +47,7 @@ assert(el('cl_selectedCount').textContent.includes('5 / 6개'),'Selected count u
 // Unchecked essential values are not confirmed, even if the AI heard them.
 el('cl_pick_price').checked=false;el('cl_pick_price').onchange();
 assert(el('cl_deferred').textContent.includes('거래금액 / 보증금'),'Unchecked price remains visibly unanswered');
-assert(el('cl_reviewProgress').textContent.includes('이번 음성 확인 4개'),'Progress counts only selected confirmed values');
+assert(el('cl_reviewProgress').textContent.includes('이번 음성 확인 3개'),'Only three selected nonempty fields remain; the blank interim date is not confirmed');
 el('cl_pick_price').checked=true;el('cl_pick_price').onchange();
 assert(!el('cl_deferred').textContent.includes('거래금액 / 보증금'),'Rechecked price becomes confirmed');
 assert(el('cl_reviewProgress').textContent.includes('추가 확인'),'List questions still unanswered in this Live session');
