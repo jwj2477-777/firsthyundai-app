@@ -640,6 +640,10 @@ async function post(){
  }
  const text=value||'📷 사진 공유';
  const parsed=draftSchedule(text);
+ if(hasDateCue(text)&&!parsed){
+  msg('메모의 날짜가 올바르지 않습니다. 날짜를 다시 확인한 후 등록해 주세요.');
+  return;
+ }
  const result=await mutate('post',{text,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false});
  if(result?.note?.id&&photos?.pendingCount?.()){
   const saved=await photos.uploadPending(result.note.id);
