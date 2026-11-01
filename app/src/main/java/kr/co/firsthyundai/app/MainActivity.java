@@ -353,6 +353,8 @@ public class MainActivity extends Activity {
     }
 
     @Override protected void onPause() {
+        // Flush the encrypted per-member draft before Android may reclaim WebView.
+        if(web!=null)web.evaluateJavascript("window.FirstHyundaiOfficeBoard?.saveDraftNow?.()",null);
         stopPublicLiveVoice();
         memoTimer.removeCallbacks(memoCheck);
         super.onPause();
