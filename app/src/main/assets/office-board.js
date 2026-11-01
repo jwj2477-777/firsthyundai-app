@@ -713,7 +713,7 @@ async function mutate(action,data){
   msg(ambiguousPost&&action==='post'?
    '전송 결과를 확인하지 못했습니다. 다시 누르면 최근 등록 여부부터 확인합니다.':
    conflict?'다른 휴대전화에서 먼저 수정했습니다. 최신 메모를 다시 불러온 뒤 변경해 주세요.':e.message);
-  if(conflict){editing='';editDraft='';await refresh(true);}
+  if(conflict){editing='';editDraft='';setTimeout(()=>refresh(true),0);}
   return null;
  }
  finally{busy=false;$('officeBoardPost').disabled=false}
