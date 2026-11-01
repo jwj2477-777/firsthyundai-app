@@ -17,6 +17,30 @@ public class ContractLiveTurnGateTest {
   assertTrue(gate.microphoneAllowed());
   assertFalse(gate.playbackFinished()); // Idempotent.
  }
+ @Test public void transcriptBeforePcmBlocksEchoAndReopensOnlyAfterPlayback(){
+  ContractLiveTurnGate gate=new ContractLiveTurnGate();
+  assertTrue(gate.microphoneAllowed());
+  gate.modelOutputAnnounced(); // Google may send output text before first PCM.
+  assertFalse(gate.microphoneAllowed());
+  gate.modelOutputAnnounced(); // Partial transcript must not unlock or restart the turn.
+  assertTrue(gate.modelAudioStarted()); // First real sound still emits "AI speaking".
+  assertFalse(gate.modelAudioStarted());
+  gate.modelTurnComplete();
+  assertFalse(gate.microphoneAllowed());
+  assertTrue(gate.playbackFinished());
+  assertTrue(gate.microphoneAllowed());
+ }
+ @Test public void transcriptOnlyTurnCannotPermanentlyMuteInput(){
+  ContractLiveTurnGate gate=new ContractLiveTurnGate();
+  gate.modelOutputAnnounced();
+  assertFalse(gate.microphoneAllowed());
+  gate.modelTurnComplete();
+  // With no PCM, the playback task can reopen immediately after turn completion.
+  assertTrue(gate.playbackFinished());
+  assertTrue(gate.microphoneAllowed());
+  gate.modelAudioStarted();
+  gate.clear();assertTrue(gate.microphoneAllowed());
+ }
  @Test public void reconnectAndNewModelOutputNeverManufactureUserSpeech(){
   ContractLiveTurnGate gate=new ContractLiveTurnGate();
   gate.modelTurnComplete(); // No actual AI speech yet.
