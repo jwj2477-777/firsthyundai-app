@@ -220,6 +220,20 @@
    ' · '+new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour12:false});
   render();
  }
+ async function checkDevices(){
+  if(!permitted())return;
+  const target=get('adminDeviceHealth');if(!target)return;
+  target.textContent='서버에 등록된 가족 휴대전화 연결 상태를 조회하는 중…';
+  try{
+   const data=await window.FirstHyundaiOfficeBoard?.deviceHealth?.();
+   if(!permitted())return;
+   if(!data||data.kind!=='push_registration'||!Array.isArray(data.accounts))
+    throw Error('unexpected');
+   target.textContent='현재 서버 등록 '+data.total_devices+'대 · '+
+    data.accounts.map(x=>x.account+' '+x.push_registered+'/'+x.devices+'대 푸시 토큰 등록').join(' · ')+
+    ' · 실제 휴대전화 알림 권한·수신 성공 여부는 각 기기에서 확인해야 합니다.';
+  }catch(e){target.textContent='휴대전화 등록 상태를 확인하지 못했습니다. 관리자 인증과 서버 연결을 확인해 주세요.';}
+ }
  function checkUpdate(){
   if(!permitted())return;
   get('appUpdateCheck')?.click?.();
@@ -292,7 +306,7 @@
  }
  function publicError(text){publicIssue=String(text||'').slice(0,90);render();}
  window.FirstHyundaiAdminCenter={
-  render,refresh,retry,expand,go,detailToggled,checkUpdate,openAlerts,
+  render,refresh,retry,expand,go,detailToggled,checkUpdate,openAlerts,checkDevices,
   levelChanged,resetLevel,detailsChanged,selfTest,copyReport,clearAudit,publicError,
   _test:{classify,rows,ageHours,qualityIssues,reportText}
  };
