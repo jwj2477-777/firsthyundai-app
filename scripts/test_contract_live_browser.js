@@ -27,6 +27,8 @@ async function verify(){
   check(get('cl_deferred').textContent.includes('계약일'),'Display missing contract date');
   get('cl_pick_contractDeposit').checked=false;
   get('cl_pick_contractDeposit').dispatchEvent(new Event('change',{bubbles:true}));
+  check(get('cl_deferred').textContent.includes('계약금'),'Unchecked required deposit must be shown as unanswered');
+  check(get('cl_reviewProgress').textContent.includes('이번 음성 확인 5개'),'Visible progress excludes unchecked deposit');
   emit('review_state',JSON.stringify({field:'balanceTime',status:'manual'}));
   check(!get('cl_pick_contractDeposit').checked,'Deferred-state update must preserve unchecked deposit');
   emit('proposal',JSON.stringify({price:990000000}));

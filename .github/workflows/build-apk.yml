@@ -384,25 +384,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.72 old memo alert and safe retry APK
+      - name: Publish v2.1.73 clearer Live review and resolved deferrals APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.72.apk
-          unzip -t FirstHyundai-v2.1.72.apk | grep 'No errors detected'
-          if gh release view v2.1.72 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.73.apk
+          unzip -t FirstHyundai-v2.1.73.apk | grep 'No errors detected'
+          if gh release view v2.1.73 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.72 FirstHyundai-v2.1.72.apk \
+            gh release create v2.1.73 FirstHyundai-v2.1.73.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.72 · 오래된 메모 알림·통신 재시도 개선' \
-              --notes '알림함에서 오래된 공유메모를 누르면 최근 메모 25건에만 의존하지 않고 해당 메모를 찾을 때까지 인증된 과거 페이지를 순서대로 조회하도록 개선했습니다. 삭제되거나 조회 범위를 벗어난 메모와 통신 오류는 별도로 안내하며, 다른 알림을 선택하면 이전 알림 조회가 잘못 열리지 않게 합니다. 알림 종류가 실제 항목과 다를 때 이동하지 않습니다. 공유메모 전송 이후 응답 시간 초과·연결 문제로 저장 여부가 불명확하면 다음 등록 버튼에서 먼저 본인 최근 게시글의 내용과 일정, 작성시각을 확인합니다. 이미 등록된 글이면 중복 등록을 막고 기존 글을 확인하며, 확인되지 않으면 재등록 여부를 명시적으로 다시 확인합니다. 네트워크가 불통이면 원문을 보존하고 재등록하지 않습니다. 서버 차원의 원자적 중복 제거를 보증하는 방식은 아닙니다. 기존 계약 Live·안내 이미지·실거래·공유메모·무료 사용 범위 및 개인정보 인증 채널 유지. v2.1.72/build223.'
+              --title '퍼스트현대 v2.1.73 · 음성계약 확인 진행상태 개선' \
+              --notes '선택한 Live 음성 계약 조건에만 확인 완료 건수를 표시하고, 사용자가 체크 해제한 금액·동호수 등 필수 조건은 아직 확인되지 않은 항목으로 명확히 안내합니다. 협의 중·미정·직접 입력으로 분류했던 조건도 같은 Live 세션에서 구체적인 조건을 다시 받아 확인하면 이전 보류 표기를 해제합니다. 확정하기 전 필수 조건 안내·사용자 최종 승인·기존 계약정보 및 개인정보 비전송·기존 공유메모/실거래/관리비 기능을 유지합니다. 정식 삼성 실기기 연속 음성 턴 동작, K-apt 관리비 공급자 오류, 학구도 보류 검증은 아직 남아 있습니다. v2.1.73/build224.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.72 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.72 --apk FirstHyundai-v2.1.72.apk
+          gh release upload v2.1.73 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.73 --apk FirstHyundai-v2.1.73.apk
 
 
 

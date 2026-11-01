@@ -44,6 +44,12 @@ emit('review_state',JSON.stringify({field:'contractDate',status:'discussion'}));
 assert(el('cl_reviewProgress').textContent.includes('협의 중 1개'),'Review states should be shown independently');
 assert.equal(el('cl_pick_terms').checked,false,'Review-status rerender must keep explicit unchecked choice');
 assert(el('cl_selectedCount').textContent.includes('5 / 6개'),'Selected count updates after exclusion');
+// Unchecked essential values are not confirmed, even if the AI heard them.
+el('cl_pick_price').checked=false;el('cl_pick_price').onchange();
+assert(el('cl_deferred').textContent.includes('거래금액 / 보증금'),'Unchecked price remains visibly unanswered');
+assert(el('cl_reviewProgress').textContent.includes('이번 음성 확인 3개'),'Only three selected nonempty fields remain; the blank interim date is not confirmed');
+el('cl_pick_price').checked=true;el('cl_pick_price').onchange();
+assert(!el('cl_deferred').textContent.includes('거래금액 / 보증금'),'Rechecked price becomes confirmed');
 assert(el('cl_reviewProgress').textContent.includes('추가 확인'),'List questions still unanswered in this Live session');
 assert(el('cl_deferred').textContent.includes('계약일 (협의 중)'),'Show exact unresolved field');
 assert(!live._test.missingConditions().includes('contractDate'),'Explicit deferral prevents repeated questions');
@@ -52,6 +58,12 @@ assert(!el('cl_pick_contractDate').checked,'No fake contract date created for de
 emit('review_state',JSON.stringify({field:'advance',status:'manual'}));
 assert(el('cl_reviewProgress').textContent.includes('직접 입력 1개'),'Show manual future entry');
 assert(!el('cl_pick_advance').checked,'Manual-entry field must not be created by AI');
+// The user can finish a previously deferred item later in the same conversation.
+proposal({advance:5000000});
+assert(!el('cl_deferred').textContent.includes('이번 송금액 (직접 입력)'),
+ 'Concrete proposal must supersede stale manual review state');
+assert(!el('cl_reviewProgress').textContent.includes('직접 입력 1개'),'Summary clears stale manual state');
+assert.equal(el('cl_pick_terms').checked,false,'Confirming another field never reselects excluded terms');
 emit('review_state',JSON.stringify({field:'contractDate',status:'confirmed'}));
 assert(!el('cl_deferred').textContent.includes('계약일 (협의 중)'),'Confirmed field clears old deferral');
 emit('review_state',JSON.stringify({field:'balanceDate',status:'not_applicable'}));
@@ -81,7 +93,7 @@ confirmed=true;assert.equal(live.apply(),true);
 assert(confirmMessages.some(message=>message.includes('아직 답하지 않은 항목')&&message.includes('동·호수')),
  'Before applying partial Live conditions, warn about unanswered essentials');
 assert.equal(el('ct_price').value,'99000');assert.equal(el('ct_contractDeposit').value,'8000');
-assert.equal(el('ct_interim').value,'0');assert.equal(el('ct_balanceDate').value,'2027-04-18');
+assert.equal(el('ct_interim').value,'0');assert.equal(el('ct_advance').value,'500');assert.equal(el('ct_balanceDate').value,'2027-04-18');
 assert.equal(el('ct_terms').value,'기존 특약 보존.\n잔금일까지 관리비를 정산한다.');
 for(const k of ['rough','specialMemo','bank','account','accountHolder','owner','buyer','unit','property','address'])
  assert.equal(el('ct_'+k).value,'SYNTHETIC_PRIVATE_'+k,'Preserve '+k);

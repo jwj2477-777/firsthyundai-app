@@ -102,26 +102,12 @@
   $('cl_stop').disabled=!active||stopping;
   $('cl_apply').disabled=active||stopping||!Object.keys(proposals).some(k=>selected[k]!==false);
  }
- function render(){
-  // Save the user's unchecked choices before rebuilding rows for another AI
-  // proposal/status event. A later utterance must never silently reselect them.
-  for(const k of Object.keys(selected)){
-   const previous=$('cl_pick_'+k);
-   if(previous)selected[k]=previous.checked;
-  }
-  const box=$('cl_proposals');box.replaceChildren();
-  for(const [k,v] of Object.entries(proposals)){
-   if(!Object.hasOwn(selected,k))selected[k]=true; // Only genuinely new fields default on.
-   const row=document.createElement('label'),check=document.createElement('input');
-   row.className='contractLiveProposal';check.type='checkbox';check.checked=selected[k];check.id='cl_pick_'+k;
-   check.addEventListener('change',()=>{selected[k]=check.checked;buttons();});
-   const text=document.createElement('span'),title=document.createElement('strong'),value=document.createElement('span');
-   title.textContent=LABELS[k];value.textContent=v===''?'입력 내용 지우기':MONEY.has(k)?Number(v).toLocaleString('ko-KR')+'만원':v;
-   text.append(title,value);row.append(check,text);box.append(row);
-  }
-  $('cl_review').hidden=!Object.keys(proposals).length;
-  const confirmed=Object.keys(proposals).filter(k=>proposals[k]!==''),deferred=Object.entries(reviewStates);
-  const missing=missingConditions(),hasReview=confirmed.length||deferred.length;
+ function updateReviewProgress(){
+  // A user may uncheck an AI candidate. Progress must reflect only the fields
+  // that will actually be applied, not every value the model proposed.
+  const chosen=Object.fromEntries(Object.entries(proposals).filter(([k])=>selected[k]!==false));
+  const confirmed=Object.keys(chosen).filter(k=>chosen[k]!==''),deferred=Object.entries(reviewStates);
+  const missing=missingConditions(chosen),hasReview=Object.keys(proposals).length>0||deferred.length>0;
   const counts={pending:0,discussion:0,manual:0,not_applicable:0};
   for(const [,state] of deferred)if(Object.hasOwn(counts,state))counts[state]++;
   const summary=$('cl_reviewProgress');
@@ -145,6 +131,26 @@
       +' · 기존 입력란에서 확인해도 됩니다.':'';
    details.textContent=[deferredText,missingText].filter(Boolean).join('\n');
   }
+ }
+ function render(){
+  // Save the user's unchecked choices before rebuilding rows for another AI
+  // proposal/status event. A later utterance must never silently reselect them.
+  for(const k of Object.keys(selected)){
+   const previous=$('cl_pick_'+k);
+   if(previous)selected[k]=previous.checked;
+  }
+  const box=$('cl_proposals');box.replaceChildren();
+  for(const [k,v] of Object.entries(proposals)){
+   if(!Object.hasOwn(selected,k))selected[k]=true; // Only genuinely new fields default on.
+   const row=document.createElement('label'),check=document.createElement('input');
+   row.className='contractLiveProposal';check.type='checkbox';check.checked=selected[k];check.id='cl_pick_'+k;
+   check.addEventListener('change',()=>{selected[k]=check.checked;updateReviewProgress();buttons();});
+   const text=document.createElement('span'),title=document.createElement('strong'),value=document.createElement('span');
+   title.textContent=LABELS[k];value.textContent=v===''?'입력 내용 지우기':MONEY.has(k)?Number(v).toLocaleString('ko-KR')+'만원':v;
+   text.append(title,value);row.append(check,text);box.append(row);
+  }
+  $('cl_review').hidden=!Object.keys(proposals).length;
+  updateReviewProgress();
   buttons();
  }
  function open(){
@@ -199,6 +205,9 @@
    if(!p){status('일부 조건을 확인하지 못했습니다. 금액·날짜를 정확히 다시 말씀해 주세요.');return;}
    const conflict=consistency(proposals,p);
    if(conflict){status(conflict+' 정확한 내용을 다시 말씀해 주세요.');return;}
+   // A subsequent concrete answer supersedes an earlier 'pending',
+   // 'discussion' or 'manual' status for that exact field.
+   for(const key of Object.keys(p))delete reviewStates[key];
    Object.assign(proposals,p);render();return;
   }
   if(state==='error'){active=false;stopping=true;failed=true;status(message);buttons();return;}
