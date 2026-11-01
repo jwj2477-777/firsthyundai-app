@@ -8,13 +8,27 @@ function parse(text,now=new Date()){
  const val=n=>+parts.find(p=>p.type===n).value;
  let y=val('year'),m=val('month'),d=val('day'),matched=false;
  const baseDow=(new Date(Date.UTC(y,m-1,d)).getUTCDay()+6)%7;
- const full=s.match(/(?:^|[^\d])(20\d{2})\s*[.\/-]\s*(\d{1,2})\s*[.\/-]\s*(\d{1,2})(?!\d)/);
+ // Recognize spoken/written Korean years before matching the yearless month.
+ // 2028년 1월 is not the nearest January; a yearless fallback would misfile it.
+ const koreanYear=s.match(/(?:^|[^\\d])((?:20\\d{2})|(?:2\\d|3\\d))\\s*년\\s*(\\d{1,2})\\s*월\\s*(\\d{1,2})\\s*일/);
+ const relativeYear=s.match(/(올해|내년|내후년)\\s*(\\d{1,2})\\s*월\\s*(\\d{1,2})\\s*일/);
+ const relativeMonth=s.match(/(이번|다음|다다음)\\s*달\\s*(\\d{1,2})\\s*일/);
+ const full=s.match(/(?:^|[^\\d])(20\\d{2})\\s*[.\\/-]\\s*(\\d{1,2})\\s*[.\\/-]\\s*(\\d{1,2})(?!\\d)/);
  const korean=s.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
  const short=s.match(/(?:^|[^\d])(\d{1,2})\s*[.\/-]\s*(\d{1,2})(?!\d)/);
  const week=s.match(/(이번\s*주|다음\s*주)\s*(월요일|화요일|수요일|목요일|금요일|토요일|일요일)/);
  const rel=s.match(/오늘|내일|모레/);
  const dayIndex={'월요일':0,'화요일':1,'수요일':2,'목요일':3,'금요일':4,'토요일':5,'일요일':6};
- if(full){y=+full[1];m=+full[2];d=+full[3];matched=true}
+ if(koreanYear){y=+koreanYear[1];if(y<100)y+=2000;
+  m=+koreanYear[2];d=+koreanYear[3];matched=true}
+ else if(relativeYear){y+=relativeYear[1]==='내년'?1:relativeYear[1]==='내후년'?2:0;
+  m=+relativeYear[2];d=+relativeYear[3];matched=true}
+ else if(full){y=+full[1];m=+full[2];d=+full[3];matched=true}
+ else if(relativeMonth){
+  const increment=relativeMonth[1]==='다다음'?2:relativeMonth[1]==='다음'?1:0;
+  const first=new Date(Date.UTC(y,m-1+increment,1));
+  y=first.getUTCFullYear();m=first.getUTCMonth()+1;d=+relativeMonth[2];matched=true;
+ }
  else if(korean||short){let x=korean||short;m=+x[1];d=+x[2];matched=true;
   if(m<val('month')||(m===val('month')&&d<val('day')))y++;
  }else if(week){
