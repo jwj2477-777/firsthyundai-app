@@ -80,7 +80,8 @@ assert(!JSON.stringify(await (await send('/settings','GET')).json()).includes('í
  'Never expose user content in public settings even when caching');
 // Existing KV entries from previous APKs had expiration timestamps. During
 // off-hours the scheduled migration must remove their TTL without changing text.
-const legacy=created[2],legacyKey='office-postit-v1:'+legacy.id;
+const legacyKey=[...store.keys()].filter(k=>k.startsWith('office-postit-v1:')).sort()[0];
+const legacyText=JSON.parse(store.get(legacyKey)).text;
 expiryOptions.set(legacyKey,{expirationTtl:365*86400});
 const originalList=env.SETTINGS.list;
 env.SETTINGS.list=async args=>{
@@ -94,6 +95,6 @@ env.SETTINGS.list=async args=>{
 await service.scheduled({scheduledTime:Date.parse('2026-11-01T14:00:00Z')},env,{});
 assert.equal(expiryOptions.get(legacyKey)?.expirationTtl,undefined,
  'Legacy note TTL should be cleared during quiet-time migration');
-assert.equal(JSON.parse(store.get(legacyKey)).text,legacy.text,
+assert.equal(JSON.parse(store.get(legacyKey)).text,legacyText,
  'Migration must preserve original customer memo content');
 console.log('PASS 62-note authenticated paging, old TTL migration, stale-write guard and memo privacy');
