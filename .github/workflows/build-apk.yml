@@ -384,25 +384,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.58 contract Live apartment and building-unit recognition APK
+      - name: Publish v2.1.59 stable Gemini Live PCM playback APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.58.apk
-          unzip -t FirstHyundai-v2.1.58.apk | grep 'No errors detected'
-          if gh release view v2.1.58 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.59.apk
+          unzip -t FirstHyundai-v2.1.59.apk | grep 'No errors detected'
+          if gh release view v2.1.59 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.58 FirstHyundai-v2.1.58.apk \
+            gh release create v2.1.59 FirstHyundai-v2.1.59.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.58 · 계약 Live 단지명·동·호수 음성 작성' \
-              --notes '계약 Live에서 기존에 개인정보로 잘못 제외하던 단지명과 동·호수를 거래 대상 필수 정보로 인식합니다. 단지명과 1604동 2101호 같은 값을 음성으로 말하면 각각 계약 필드에 제안하고, 기존 단지 검색을 통해 주소는 앱에서 자체 확인합니다. 고객명·전화·상세 주소·은행·계좌·예금주는 계속 Live에서 제외합니다. Google로 음성 전송 안내, 본인 선택 후 반영, 무료 6회 제한 및 기존 기능을 유지합니다. v2.1.58/build209.'
+              --title '퍼스트현대 v2.1.59 · Live 음성 끊김 개선·재생 버퍼 안정화' \
+              --notes '계약·뉴스 Gemini Live에서 재생 대기 음성이 4초 이상 쌓이면 일부를 버리던 문제를 개선했습니다. 12초 분량 한도의 순서 보장 버퍼, 약 120ms 최초 프리버퍼 및 1초 AudioTrack 버퍼를 적용해 음성 끊김을 줄이고, 초과 상태는 말이 조용히 누락되지 않도록 사용자에게 명확히 알립니다. 기기 지원 시 음향 에코 제거를 활성화하며, 실제 서버 중단 신호와 재생 버퍼 처리는 단일 재생 스레드에서 안전하게 순서대로 실행합니다. 기존 일반 계약·Live 동호수·날짜·무료 6회·7분·개인정보 보호 방식은 유지합니다. v2.1.59/build210.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.58 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.58 --apk FirstHyundai-v2.1.58.apk
+          gh release upload v2.1.59 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.59 --apk FirstHyundai-v2.1.59.apk
 
 
 
