@@ -101,6 +101,16 @@ public class ContractLiveProtocolTest {
         assertTrue(ContractLiveProtocol.prompt().contains("가장 가까운 날짜"));
         assertTrue(ContractLiveProtocol.prompt().contains("rejected_past_date"));
     }
+    @Test public void modelMustWaitForRealUserAfterEverySingleQuestion() throws Exception {
+        String prompt=ContractLiveProtocol.prompt();
+        assertTrue(prompt.contains("질문 끝에 반드시 멈추세요"));
+        assertTrue(prompt.contains("실제 사용자 답변"));
+        assertTrue(prompt.contains("스스로 사용자 역할을 연기"));
+        assertTrue(prompt.contains("이미 들은 정보는 다시 묻지 마세요"));
+        assertTrue(prompt.contains("완료 의사를"));
+        assertTrue(prompt.contains("dialogue.next_missing"));
+        assertTrue(prompt.contains("미정"));
+    }
     @Test public void toolsCannotReadFormsOrExecuteSharing() throws Exception {
         JSONObject tool=ContractLiveProtocol.tools().getJSONObject(0).getJSONArray("functionDeclarations").getJSONObject(0);
         assertEquals(ContractLiveProtocol.FUNCTION,tool.getString("name"));
