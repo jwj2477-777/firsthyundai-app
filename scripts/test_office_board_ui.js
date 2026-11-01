@@ -45,9 +45,22 @@ assert(api._test.scheduleSuggestion('내일 오전 9시 출발').endsWith('T09:0
 assert.equal(api._test.scheduleSuggestion('그냥 전달하는 일반 메모'),'');
 assert.equal(api._test.toIso('2026-10-26T15:30'),'2026-10-26T06:30:00.000Z');
 assert.equal(api._test.dateKey('2026-10-26T06:30:00.000Z'),'2026-10-26');
+// Calendar date tap must carry the selected day into a simple freeform memo.
+assert(html.includes('id="officeBoardAddSelectedDay"')&&html.includes('id="officeBoardScheduleClear"'),
+ 'Add selected date and cancel actions must be reachable in family UI');
+api.chooseDay('2028-01-30');
+api.addAtSelectedDay();
+assert.equal(api._test.scheduleSuggestion('3시 30분 방문'),'2028-01-30T15:30');
+assert.equal(api._test.draftSchedule('2028년 2월 1일 오전 10시').local,'2028-02-01T10:00',
+ 'Explicit date in text wins over the calendar selection');
+assert.equal(api._test.draftSchedule('2028년 2월 30일 방문'),null,
+ 'Invalid user date must never be silently replaced with the calendar date');
+assert.equal(el('officeBoardScheduleClear').hidden,false,'Selected date can be removed');
 el('officeBoardDraft').value='3시 30분 방문';
 api.post();
 assert.equal(calls[0].action,'post');
+assert.equal(calls[0].data.scheduled_at,'2028-01-30T06:30:00.000Z');
+assert.equal(calls[0].data.all_day,false);
 const note={id:'mhad4vwu-00000000-0000-0000-0000-000000000001',text:'3시 30분 방문',
  created_at:'2026-10-25T01:00:00Z',updated_at:'2026-10-25T01:00:00Z',done:false};
 ctx.window.onFirstHyundaiOfficeBoardResult({requestId:calls[0].id,ok:true,data:{ok:true,note}});
@@ -55,6 +68,8 @@ ctx.window.onFirstHyundaiOfficeBoardResult({requestId:calls[0].id,ok:true,data:{
 await new Promise(done=>setTimeout(done,10));
 assert(el('officeBoardList').innerHTML.includes('3시 30분 방문'));
 assert.equal(el('officeBoardDraft').value,'');
+assert.equal(el('officeBoardScheduleClear').hidden,true,'Successful post clears calendar selection');
+assert.equal(api._test.scheduleSuggestion('3시 30분 방문'),'','After post, memo no longer inherits prior calendar date');
 const own={...note,author:{id:userId,name:'작성자'}};
 const other={...note,id:'mhad4vwu-00000000-0000-0000-0000-000000000002',
  author:{id:'22222222-2222-2222-2222-222222222222',name:'다른 가족'}};
@@ -112,6 +127,14 @@ assert.equal(api._test.filteredMemos()[0].id,samples[5].id,
 api.clearFilters();
 assert.equal(api._test.filteredMemos().length,samples.filter(n=>!n.done).length);
 assert.equal((el('officeBoardList').innerHTML.match(/data-note=/g)||[]).length,10);
+const closure={id:'mhad4vwu-00000000-0000-0000-0000-00000000beef',
+ text:'2028년 1월 30일~2월 2일 휴무',done:false,all_day:true,
+ scheduled_at:'2028-01-29T15:00:00.000Z',created_at:'2026-10-01T00:00:00Z'};
+api._test.merge([...samples,closure]);
+for(const day of ['2028-01-30','2028-01-31','2028-02-01','2028-02-02'])
+ assert(api.closureDates().includes(day),'Rain/snow map-box window honors shared holiday '+day);
+api.chooseDay('2028-02-30');
+assert(!el('officeBoardCalendarMonth').textContent.includes('02-30'),'Invalid calendar day rejected');
 assert(!/localStorage|sessionStorage|\bfetch\(/.test(js),
  'Sensitive notes must remain in the authenticated native channel');
 console.log('Office board UX, native bridge, freeform post and escaping passed.');
