@@ -19,3 +19,7 @@
 .contractLiveProposal strong{font-size:14px;color:#57665f}
 #cl_apply{width:100%;margin-top:16px}
 #cl_review[hidden]{display:none}
+
+/* Keep unanswered and explicitly deferred conditions readable on narrow family phones. */
+#cl_deferred{white-space:pre-wrap;line-height:1.6;padding:10px 12px;border-left:3px solid #b78b56;background:#fcf7ec;border-radius:8px}
+#cl_reviewProgress{font-weight:700}

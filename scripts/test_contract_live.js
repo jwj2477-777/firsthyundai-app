@@ -11,10 +11,10 @@ function element(tag='div'){
   addEventListener(k,f){this['on'+k]=f;},setAttribute(){}};
 }
 function el(id){if(!elements.has(id)){const e=element();e.id=id;elements.set(id,e);}return elements.get(id);}
-const requests=[],alerts=[];let stopped=0,confirmed=true;
-const win={confirm:()=>confirmed,FirstHyundaiNative:{startContractLiveVoice(...args){requests.push(args);},stopContractLiveVoice(){stopped++;}},FirstHyundaiLive:{stop(){}},firstHyundaiGoBack:()=>false};
+const requests=[],alerts=[],confirmMessages=[];let stopped=0,confirmed=true;
+const win={confirm:message=>{confirmMessages.push(message);return confirmed;},FirstHyundaiNative:{startContractLiveVoice(...args){requests.push(args);},stopContractLiveVoice(){stopped++;}},FirstHyundaiLive:{stop(){}},firstHyundaiGoBack:()=>false};
 const c=vm.createContext({window:win,document:{getElementById:el,createElement:element,addEventListener:(k,f)=>events[k]=f},
- confirm:()=>confirmed,alert:x=>alerts.push(x),catalogRows:()=>[],console,Date,Number,String,navigator:{}});
+ confirm:message=>{confirmMessages.push(message);return confirmed;},alert:x=>alerts.push(x),catalogRows:()=>[],console,Date,Number,String,navigator:{}});
 for(const name of ['contracts.js','contracts-smart.js','contracts-language.js','contracts-easy.js','contract-live.js'])
  vm.runInContext(read('app/src/main/assets/'+name),c);
 const live=win.FirstHyundaiContractLive;
@@ -40,13 +40,19 @@ assert.equal(live.apply(),false,'Cannot apply with microphone active');
 proposal({account:'SYNTHETIC_PRIVATE'});assert(el('cl_status').textContent.includes('확인하지 못했습니다'));
 emit('review_state',JSON.stringify({field:'contractDate',status:'discussion'}));
 assert(el('cl_reviewProgress').textContent.includes('협의 중 1개'),'Review states should be shown independently');
-assert(el('cl_deferred').textContent.includes('계약일 · 협의 중'),'Show exact unresolved field');
+assert(el('cl_reviewProgress').textContent.includes('추가 확인'),'List questions still unanswered in this Live session');
+assert(el('cl_deferred').textContent.includes('계약일 (협의 중)'),'Show exact unresolved field');
+assert(!live._test.missingConditions().includes('contractDate'),'Explicit deferral prevents repeated questions');
+assert(el('cl_deferred').textContent.includes('아직 답하지 않은 항목'),'Unanswered mandatory fields are separated');
 assert(!el('cl_pick_contractDate').checked,'No fake contract date created for deferred item');
 emit('review_state',JSON.stringify({field:'advance',status:'manual'}));
 assert(el('cl_reviewProgress').textContent.includes('직접 입력 1개'),'Show manual future entry');
 assert(!el('cl_pick_advance').checked,'Manual-entry field must not be created by AI');
 emit('review_state',JSON.stringify({field:'contractDate',status:'confirmed'}));
-assert(!el('cl_deferred').textContent.includes('계약일 · 협의 중'),'Confirmed field clears old deferral');
+assert(!el('cl_deferred').textContent.includes('계약일 (협의 중)'),'Confirmed field clears old deferral');
+emit('review_state',JSON.stringify({field:'balanceDate',status:'not_applicable'}));
+assert(!el('cl_deferred').textContent.includes('잔금일 (해당 없음)'),
+ 'Required balance date cannot be marked not applicable even if already confirmed');
 emit('review_state',JSON.stringify({field:'invalid_field',status:'pending'}));
 assert(!el('cl_deferred').textContent.includes('invalid_field'),'Reject unknown field status');
 emit('review_state',JSON.stringify({field:'account',status:'manual'}));
@@ -66,6 +72,8 @@ emit('ended','ended');assert(!el('cl_apply').disabled);
 el('cl_pick_contractDeposit').checked=false; // Explicitly excluded field must survive.
 confirmed=false;assert.equal(live.apply(),false);assert.equal(el('ct_price').value,'80000');
 confirmed=true;assert.equal(live.apply(),true);
+assert(confirmMessages.some(message=>message.includes('아직 답하지 않은 항목')&&message.includes('동·호수')),
+ 'Before applying partial Live conditions, warn about unanswered essentials');
 assert.equal(el('ct_price').value,'99000');assert.equal(el('ct_contractDeposit').value,'8000');
 assert.equal(el('ct_interim').value,'0');assert.equal(el('ct_balanceDate').value,'2027-04-18');
 assert.equal(el('ct_terms').value,'기존 특약 보존.\n잔금일까지 관리비를 정산한다.');
@@ -104,8 +112,22 @@ assert.equal(live.apply(),true);
 assert.equal(el('ct_property').value,'파크애비뉴');
 assert.equal(el('ct_unit').value,'1604동 2101호');
 assert.equal(el('ct_bank').value,'SYNTHETIC_PRIVATE_bank','Bank remains local only');
+live.open();el('cl_consent').checked=true;live.start();id=requests.at(-1)[0];
+proposal({dealType:'월세',interim:30000000});
+assert(live._test.missingConditions({price:'80000'}).includes('monthlyRent'),
+ 'Unchecking the proposed deal type cannot hide missing monthly rent');
+assert(live._test.missingConditions({price:'80000'}).includes('interimDate'),
+ 'Unchecking the proposed interim amount cannot hide its due date');
+live.close();
 const valid=live._test.normalize;
 const consistent=live._test.consistency;
+const unanswered=live._test.missingConditions;
+assert(unanswered({dealType:'월세',interim:'3000'}).includes('monthlyRent'),'월세 needs rent');
+assert(unanswered({dealType:'월세',interim:'3000'}).includes('leaseStart'),'전월세 needs occupancy date');
+assert(unanswered({dealType:'월세',interim:'3000'}).includes('leaseDuration'),'Lease needs duration or end date');
+assert(unanswered({dealType:'월세',interim:'3000'}).includes('interimDate'),'Positive interim needs a due date');
+assert(!unanswered({dealType:'전세',leaseEnd:'2027-12-31'}).includes('leaseDuration'),'Lease end date satisfies duration question');
+assert(!unanswered({dealType:'매매',interim:'0'}).includes('interimDate'),'No interim payment needs no interim date');
 assert.equal(consistent({price:'90000'},{contractDeposit:'90001'}),'계약금이 거래금액보다 큽니다.');
 assert.equal(consistent({price:'90000',contractDeposit:'9000'},{interim:'85001'}),'계약금과 중도금의 합계가 거래금액보다 큽니다.');
 assert.equal(consistent({leaseStart:'2027-10-05'},{leaseEnd:'2027-10-04'}),'임대차 종료일이 입주일보다 빠릅니다.');
@@ -125,6 +147,7 @@ const html=read('app/src/main/assets/index.html');
 assert(html.includes('FirstHyundaiEasy.compose()')&&html.includes('FirstHyundaiContracts.voice()'));
 assert(!/<dialog id="cl_dialog"[^>]*\sopen/.test(html));
 assert(html.includes('Live로 작성 · 선택')&&html.includes('FirstHyundaiContractLive?.onPageChange?.(id)'));
+assert(html.includes('id="cl_deferred" class="tiny" role="status"'),'Checklist is announced accessibly');
 const source=read('app/src/main/assets/contract-live.js');
 assert(!/\b(fetch|XMLHttpRequest|localStorage|sessionStorage)\b/.test(source));
 const native=read('app/src/main/java/kr/co/firsthyundai/app/PublicLiveVoice.java');

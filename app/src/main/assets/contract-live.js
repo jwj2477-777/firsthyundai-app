@@ -69,6 +69,28 @@
   }
   return '';
  }
+ // Match the native per-session checklist, without reading local contract fields.
+ // A user-explicit deferral removes a repeated AI question, but is not a confirmed value.
+ function missingConditions(chosen=proposals){
+  const present=k=>Object.hasOwn(chosen,k)&&String(chosen[k]).trim()!=='';
+  const unanswered=k=>!present(k)&&!Object.hasOwn(reviewStates,k);
+  const missing=[];
+  for(const k of ['property','unit','dealType','price','contractDeposit','contractDate','advance','balanceDate'])
+   if(unanswered(k))missing.push(k);
+  // Even when a user deselects the proposed deal type, warn about its related
+  // required fields rather than silently treating a lease as a sale.
+  const type=chosen.dealType||proposals.dealType||'';
+  if(type==='전세'||type==='월세'){
+   if(unanswered('leaseStart'))missing.push('leaseStart');
+   if(!present('leaseDuration')&&!present('leaseEnd')&&
+      !Object.hasOwn(reviewStates,'leaseDuration')&&!Object.hasOwn(reviewStates,'leaseEnd'))
+    missing.push('leaseDuration');
+  }
+  if(type==='월세'&&unanswered('monthlyRent'))missing.push('monthlyRent');
+  const interim=Object.hasOwn(chosen,'interim')?chosen.interim:proposals.interim;
+  if(Number(interim)>0&&unanswered('interimDate'))missing.push('interimDate');
+  return missing;
+ }
  function buttons(){
   $('cl_start').disabled=active||stopping;
   $('cl_stop').disabled=!active||stopping;
@@ -85,12 +107,14 @@
   }
   $('cl_review').hidden=!Object.keys(proposals).length;
   const confirmed=Object.keys(proposals).filter(k=>proposals[k]!==''),deferred=Object.entries(reviewStates);
+  const missing=missingConditions(),hasReview=confirmed.length||deferred.length;
   const counts={pending:0,discussion:0,manual:0,not_applicable:0};
   for(const [,state] of deferred)if(Object.hasOwn(counts,state))counts[state]++;
   const summary=$('cl_reviewProgress');
   if(summary){
-   summary.hidden=!confirmed.length&&!deferred.length;
+   summary.hidden=!hasReview;
    summary.textContent='이번 음성 확인 '+confirmed.length+'개'
+     +' · 추가 확인 '+missing.length+'개'
      +(counts.discussion?' · 협의 중 '+counts.discussion+'개':'')
      +(counts.pending?' · 미정 '+counts.pending+'개':'')
      +(counts.manual?' · 직접 입력 '+counts.manual+'개':'')
@@ -98,9 +122,14 @@
   }
   const details=$('cl_deferred');
   if(details){
-   details.hidden=!deferred.length;
-   details.textContent=deferred.map(([key,state])=>(LABELS[key]||key)+' · '+REVIEW_STATES[state]).join(' / ')
-      +(deferred.length?' · 미확정 항목은 자동으로 채워지지 않습니다.':'');
+   details.hidden=!hasReview||(!deferred.length&&!missing.length);
+   const deferredText=deferred.length?'보류/직접 입력: '
+      +deferred.map(([key,state])=>LABELS[key]+' ('+REVIEW_STATES[state]+')').join(', ')
+      +' · 이 항목은 자동 입력되지 않습니다.':'';
+   const missingText=missing.length?'아직 답하지 않은 항목: '
+      +missing.map(k=>LABELS[k]).join(', ')
+      +' · 기존 입력란에서 확인해도 됩니다.':'';
+   details.textContent=[deferredText,missingText].filter(Boolean).join('\n');
   }
   buttons();
  }
@@ -144,7 +173,8 @@
    let change;try{change=JSON.parse(message);}catch(e){return;}
    if(!change||!Object.hasOwn(LABELS,change.field))return;
    if(change.status==='confirmed')delete reviewStates[change.field];
-   else if(Object.hasOwn(REVIEW_STATES,change.status)&&!Object.hasOwn(proposals,change.field))
+   else if(Object.hasOwn(REVIEW_STATES,change.status)&&!Object.hasOwn(proposals,change.field)&&
+      (change.status!=='not_applicable'||['interim','interimDate','balanceTime','terms'].includes(change.field)))
       reviewStates[change.field]=change.status;
    else return;
    render();return;
@@ -172,7 +202,11 @@
   if(active||stopping)return false;
   const chosen=Object.entries(proposals).filter(([k])=>$('cl_pick_'+k)?.checked);
   if(!chosen.length){status('반영할 항목을 선택해 주세요.');return false;}
-  if(!root.confirm('선택한 조건을 현재 계약에 반영할까요? 같은 항목의 기존 값은 바뀌며, 특약은 추가됩니다. 단지명·동·호수·금액·날짜를 확인해 주세요.'))return false;
+  const selected=Object.fromEntries(chosen),missing=missingConditions(selected);
+  const incomplete=missing.length?'이번 Live에서 아직 답하지 않은 항목: '
+   +missing.map(k=>LABELS[k]).join(', ')+'. 기존 계약 입력란에서 반드시 확인해 주세요.\n\n':'';
+  const deferred=Object.keys(reviewStates).length?'미정·협의·직접 입력으로 보류한 항목도 자동으로 채워지지 않습니다.\n\n':'';
+  if(!root.confirm(incomplete+deferred+'선택한 조건을 현재 계약에 반영할까요? 같은 항목의 기존 값은 바뀌며, 특약은 추가됩니다. 단지명·동·호수·금액·날짜를 확인해 주세요.'))return false;
   // Explicit deposit first prevents the existing 10% helper overwriting it on price edit.
   // Resolve the catalog apartment first so the verified address is added locally.
   // Explicit deposit before price preserves the existing 10% auto-calc safeguard.
@@ -217,5 +251,5 @@
  }
  root.onFirstHyundaiLiveQuotaStatus=showQuota;
  root.onFirstHyundaiContractLiveStatus=incoming;
- root.FirstHyundaiContractLive={open,start,stop,close,apply,onPageChange(page){if(page!=='contracts'&&$('cl_dialog').open)close();},_test:{normalize,validDate,consistency}};
+ root.FirstHyundaiContractLive={open,start,stop,close,apply,onPageChange(page){if(page!=='contracts'&&$('cl_dialog').open)close();},_test:{normalize,validDate,consistency,missingConditions}};
 })(window);
