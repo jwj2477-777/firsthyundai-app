@@ -142,8 +142,9 @@ final class OfficeMemoNotifications {
         final long startsAt;
         try{startsAt=java.time.Instant.parse(eventAt).toEpochMilli();}
         catch(Exception e){return;}
-        long until=startsAt-System.currentTimeMillis();
-        if(until<15*60*1000L||until>33*60*1000L)return;
+        // A T-30 FCM reminder may be delivered late by Android.
+        // Preserve an upcoming reminder rather than silently discarding it.
+        if(!ScheduleReminderTiming.shouldNotify(System.currentTimeMillis(),startsAt))return;
         SharedPreferences prefs=context.getSharedPreferences(PREF,Context.MODE_PRIVATE);
         String lastKey=LAST_REMINDER+id;
         if(eventAt.equals(prefs.getString(lastKey,"")))return;
@@ -152,6 +153,7 @@ final class OfficeMemoNotifications {
         catch(Exception e){return;}
         if(note.optBoolean("done",true)||note.optBoolean("all_day",true)||
            !eventAt.equals(note.optString("scheduled_at","")))return;
+        if(!ScheduleReminderTiming.shouldNotify(System.currentTimeMillis(),startsAt))return;
         ensureReminderChannel(context);
         NotificationManager manager=(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
         if(manager==null)return;
@@ -162,7 +164,7 @@ final class OfficeMemoNotifications {
         String text=safePreview(note.optString("preview",""));
         if(text.isEmpty())text="곧 시작하는 공유 일정을 확인해 주세요.";
         String author=safePreview(note.optString("author",""));
-        String heading="⏰ 30분 후 공유 일정";
+        String heading=ScheduleReminderTiming.title(System.currentTimeMillis(),startsAt);
         if(!author.isEmpty())heading+=" · "+author;
         Intent open=new Intent(context,LockActivity.class);
         open.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
