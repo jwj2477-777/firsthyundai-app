@@ -10,7 +10,7 @@ let archiveOpen=false,archived=[];
 let memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10,finderTouched=false;
 const PAGE_SIZE=10;
 const expandedNotes=new Set();
-let historyLoaded=false,historyLoading=false,refreshCycle=0;
+let historyLoaded=false,historyLoading=false,refreshCycle=0,lastFullHistory=0;
 let lastBriefing=0,briefingBusy=false;
 const startKst=()=>kstDate(new Date());
 let selectedDate='',calendarMonth='',editingBirthday='',calendarDraftDay='';
@@ -36,7 +36,7 @@ async function locateFocusedNote(id){
  const generation=++focusLookupSeq;
  msg('알림의 메모를 찾는 중입니다…');
  try{
-  for(let offset=0;offset<=1000;){
+  for(let offset=0;offset<=5000;){
    if(generation!==focusLookupSeq||pendingFocus!==id)return;
    const page=await call('list',{offset});
    if(generation!==focusLookupSeq||pendingFocus!==id)return;
@@ -313,6 +313,8 @@ function filteredMemos(){
   return true;
  }).sort((a,b)=>{
   if(Boolean(a.pinned)!==Boolean(b.pinned))return a.pinned?-1:1;
+  const overdue=n=>n.scheduled_at&&!n.done&&!n.all_day&&Date.parse(n.scheduled_at)<Date.now();
+  if(Boolean(overdue(a))!==Boolean(overdue(b)))return overdue(a)?-1:1;
   if(memoSort==='schedule'){
    const now=Date.now(),x=a.scheduled_at?Date.parse(a.scheduled_at):Infinity;
    const y=b.scheduled_at?Date.parse(b.scheduled_at):Infinity;
@@ -383,6 +385,7 @@ function draw(){
   list.innerHTML=visible.map(note=>{
   const id=esc(note.id),editable=canEditNote(note),isEdit=editable&&editing===note.id;
   const expanded=expandedNotes.has(note.id);
+  const overdue=!note.done&&!note.all_day&&note.scheduled_at&&Date.parse(note.scheduled_at)<Date.now();
   const needsExpand=!isEdit&&(note.text.length>110||note.text.split('\n').length>3);
   const body=isEdit?'<textarea class="officeBoardEdit" maxlength="1600" data-edit="'+id+'" aria-label="메모 수정">'+esc(editDraft)+'</textarea>':
    '<div class="officeBoardText'+(needsExpand&&!expanded?' officeBoardTextCollapsed':'')+'">'+
@@ -398,11 +401,12 @@ function draw(){
     :'<span class="officeBoardReadOnly">작성자·관리자만 수정 가능</span>')+
    (admin?'<button data-action="delete" data-id="'+id+'" class="officeBoardDelete">삭제</button>':'');
   return '<article class="officeBoardNote'+(note.done?' completed':'')+'" data-note="'+id+'">'+
-   '<div class="officeBoardNoteTop"><span class="officeBoardNoteLabel">'+(note.done?'✓ 완료':'진행 중')+'</span>'+
+   '<div class="officeBoardNoteTop"><span class="officeBoardNoteLabel">'+(note.done?'✓ 완료':overdue?'⚠ 일정 지남':'진행 중')+'</span>'+
     (editable?'<button type="button" class="officeBoardPin" data-action="pin" data-id="'+id+'" aria-pressed="'+Boolean(note.pinned)+'" aria-label="'+(note.pinned?'중요 메모 고정 해제':'중요 메모 고정')+'">'+(note.pinned?'📌 고정됨':'📌 고정')+'</button>':(note.pinned?'<span class="officeBoardPinned">📌 고정</span>':''))+
    '<span class="officeBoardAuthor">'+esc(note.author?.name||'작성자 미기록')+'</span><time>'+esc(dateText(note.created_at))+'</time></div>'+
    body+(note.scheduled_at?'<div class="officeBoardNoteSchedule">▦ '+esc(note.all_day?kstDate(note.scheduled_at)+' · 종일':dateText(note.scheduled_at))+
      (!note.all_day&&!note.done?'<small class="officeBoardReminderHint">🔔 시작 30분 전 알림</small>':'')+'</div>':'')+
+   (overdue?'<small class="officeBoardOverdueHint">예정 시간이 지났습니다 · 완료 또는 일정 변경을 확인하세요.</small>':'')+
    (Array.isArray(note.images)&&note.images.length?'<div class="officeBoardPhotoStrip" aria-label="첨부 사진">'+
     note.images.filter(x=>/^[0-9a-f-]{36}$/.test(x)).map((photo,i)=>
       '<button type="button" class="officeBoardPhotoTile" data-action="photoView" data-id="'+id+
@@ -435,7 +439,7 @@ async function readAllBoard(){
  // All pages remain inside the authenticated native bridge.
  const all=new Map();
  let offset=0;
- while(offset<=1000){
+ while(offset<=5000){
   const page=await call('list',{offset});
   for(const note of page.notes||[])if(valid(note?.id))all.set(note.id,note);
   if(!page.has_more)break;
@@ -568,22 +572,22 @@ async function refresh(silent=false){
   const first=await call('list',{offset:0});
   if(cycle!==refreshCycle)return;
   const recent=Array.isArray(first.notes)?first.notes:[];
-  if(silent&&historyLoaded){
+  if(silent&&historyLoaded&&Date.now()-lastFullHistory<5*60000){
    // Keep already fetched history when checking recent posts every 45 seconds.
    const ids=new Set(recent.map(n=>n.id));
    merge(recent.concat(items.filter(n=>!ids.has(n.id))));
   }else merge(recent);
   lastCheck=Date.now();lastBriefing=lastCheck;
   $('officeBoardAuth')?.classList?.add?.('hidden');
-  if(!first.has_more){historyLoaded=true;historyLoading=false;draw();
+  if(!first.has_more){historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;draw();
    if(!silent)msg('메모를 확인했습니다.');return}
-  if(silent&&historyLoaded){if(!silent)msg('메모를 확인했습니다.');return}
+  if(silent&&historyLoaded&&Date.now()-lastFullHistory<5*60000)return;
   historyLoaded=false;historyLoading=true;draw();
   const seen=new Map(recent.map(n=>[n.id,n]));
   let offset=Number(first.next_offset)||25;
   // A page is at most 25 notes, so no single Android reply exceeds its cap.
   // Customer memo content stays in memory and on the authenticated native bridge.
-  while(cycle===refreshCycle&&offset<=1000){
+  while(cycle===refreshCycle&&offset<=5000){
    const page=await call('list',{offset});
    if(cycle!==refreshCycle)return;
    for(const item of page.notes||[])if(valid(item?.id))seen.set(item.id,item);
@@ -594,7 +598,7 @@ async function refresh(silent=false){
    offset=next;
   }
   if(cycle!==refreshCycle)return;
-  historyLoaded=true;historyLoading=false;draw();
+  historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;draw();
   if(!silent)msg('전체 공유 메모를 불러왔습니다.');
  }catch(e){
   if(cycle===refreshCycle){
@@ -653,7 +657,10 @@ async function mutate(action,data){
  if(busy)return null;
  busy=true;$('officeBoardPost').disabled=true;
  try{
-  const result=await call(action,data);
+  const current=items.find(note=>note.id===data?.id);
+  const guarded=['edit','done','pin','schedule'].includes(action)&&current?.updated_at
+   ?{...data,expected_updated_at:current.updated_at}:data;
+  const result=await call(action,guarded);
   if(action==='delete')localDeletes.set(data.id,Date.now());
   else if(result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
   if(action==='post'){$('officeBoardDraft').value='';calendarDraftDay='';ambiguousPost=null;checkSuggestion();}
@@ -667,8 +674,11 @@ async function mutate(action,data){
   // Retain only volatile text/date metadata for verification on a retry.
   if(action==='post'&&/시간 초과|연결|HTTP 5\d\d/i.test(String(e.message||'')))
    ambiguousPost={data:{...data},startedAt:postStartedAt};
+  const conflict=action!=='post'&&/HTTP 409|edit_conflict/.test(String(e.message||''));
   msg(ambiguousPost&&action==='post'?
-   '전송 결과를 확인하지 못했습니다. 다시 누르면 최근 등록 여부부터 확인합니다.':e.message);
+   '전송 결과를 확인하지 못했습니다. 다시 누르면 최근 등록 여부부터 확인합니다.':
+   conflict?'다른 휴대전화에서 먼저 수정했습니다. 최신 메모를 다시 불러온 뒤 변경해 주세요.':e.message);
+  if(conflict){editing='';editDraft='';await refresh(true);}
   return null;
  }
  finally{busy=false;$('officeBoardPost').disabled=false}
@@ -801,8 +811,15 @@ function saveEdit(id){
  if(!canEditId(id)){denied();cancelEdit();return}
  const value=String($('officeBoardList')?.querySelector?.('textarea[data-edit]')?.value||'').trim();
  if(!value||value.length>1600){msg('수정 내용은 1~1600자여야 합니다.');return}
- const parsed=extracted(value);
- mutate('edit',{id,text:value,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false});
+ // Text-only edits preserve a separately selected calendar date.
+ const payload={id,text:value};
+ if(hasDateCue(value)){
+  const parsed=extracted(value);
+  if(!parsed){msg('수정한 날짜를 확인해 주세요. 기존 일정은 변경되지 않았습니다.');return}
+  payload.scheduled_at=parsed.scheduled_at;
+  payload.all_day=parsed.all_day;
+ }
+ mutate('edit',payload);
 }
 function setDone(id,done){
  if(!valid(id)||birthdayOf(items.find(n=>n.id===id)))return;
