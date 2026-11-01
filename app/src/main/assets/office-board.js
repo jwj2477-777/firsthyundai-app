@@ -14,6 +14,37 @@ let historyLoaded=false,historyLoading=false,refreshCycle=0,lastFullHistory=0;
 let lastBriefing=0,briefingBusy=false;
 const startKst=()=>kstDate(new Date());
 let selectedDate='',calendarMonth='',editingBirthday='',calendarDraftDay='';
+let draftTimer=null,draftRestoredMember=''; 
+function saveDraftNow(){
+ if(draftTimer){clearTimeout(draftTimer);draftTimer=null;}
+ const input=$('officeBoardDraft');
+ if(!input||typeof bridge?.saveOfficeMemoDraft!=='function')return;
+ try{bridge.saveOfficeMemoDraft(String(input.value||'').slice(0,1600),calendarDraftDay||'');}catch(e){}
+}
+function saveDraftSoon(){
+ if(typeof bridge?.saveOfficeMemoDraft!=='function')return;
+ if(draftTimer)clearTimeout(draftTimer);
+ draftTimer=setTimeout(saveDraftNow,700);
+}
+function clearDraft(){
+ if(draftTimer){clearTimeout(draftTimer);draftTimer=null;}
+ try{bridge?.clearOfficeMemoDraft?.()}catch(e){}
+}
+function restoreDraft(){
+ const account=String(bridge?.getOfficeMemberId?.()||'');
+ if(!account||account===draftRestoredMember||!bridge?.getOfficeMemoDraft)return;
+ draftRestoredMember=account;
+ if(String($('officeBoardDraft')?.value||''))return;
+ try{
+  const draft=JSON.parse(bridge.getOfficeMemoDraft()||'{}');
+  if(typeof draft.text==='string'&&draft.text.length<=1600&&
+     (/^20\d{2}-\d{2}-\d{2}$/.test(draft.day||'')||!draft.day)){
+   if(draft.text){$('officeBoardDraft').value=draft.text;msg('이 휴대전화에 안전하게 보관된 작성 중 메모를 복구했습니다.');}
+   if(draft.day){calendarDraftDay=draft.day;checkSuggestion();}
+  }
+ }catch(e){}
+}
+$('officeBoardDraft')?.addEventListener?.('input',saveDraftSoon);
 function focusNote(id){
  if(!valid(id))return false;
  ++focusLookupSeq;
@@ -244,10 +275,10 @@ function today(){selectedDate=kstDate(new Date());calendarMonth=selectedDate.sli
 function addAtSelectedDay(){
  if(!selectedDate)return;
  try{toIso(selectedDate+'T12:00');}catch(e){return}
- calendarDraftDay=selectedDate;
+ calendarDraftDay=selectedDate;saveDraftSoon();
  setView('compose');checkSuggestion();$('officeBoardDraft')?.focus?.();
 }
-function clearScheduledDay(){calendarDraftDay='';checkSuggestion()}
+function clearScheduledDay(){calendarDraftDay='';checkSuggestion();saveDraftSoon()}
 function openCalendarNote(id){
  if(!valid(id))return;
  if(birthdayOf(items.find(n=>n.id===id)))return;
@@ -651,7 +682,7 @@ function open(){
  $('officeBoardBirthdayAdd')?.classList?.toggle?.('hidden',bridge?.getMode?.()!=='admin');
  const account=$('officeBoardCurrentMember');
  if(account)account.textContent=bridge?.getOfficeMemberName?.()||'계정 연결 필요';
- settingsChanged();syncNotificationStatus();syncViews();checkSuggestion();refresh();
+ settingsChanged();syncNotificationStatus();syncViews();restoreDraft();checkSuggestion();refresh();
 }
 async function mutate(action,data){
  if(busy)return null;
@@ -663,7 +694,7 @@ async function mutate(action,data){
   const result=await call(action,guarded);
   if(action==='delete')localDeletes.set(data.id,Date.now());
   else if(result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
-  if(action==='post'){$('officeBoardDraft').value='';calendarDraftDay='';ambiguousPost=null;checkSuggestion();}
+  if(action==='post'){$('officeBoardDraft').value='';calendarDraftDay='';ambiguousPost=null;clearDraft();checkSuggestion();}
   if(action==='restore'&&result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
   editing='';editDraft='';
   merge(items);
@@ -723,7 +754,7 @@ async function post(){
     result={ok:true,note:found};
     localUpdates.set(found.id,{note:found,time:Date.now()});
     merge(items.filter(n=>n.id!==found.id).concat(found));
-    $('officeBoardDraft').value='';calendarDraftDay='';checkSuggestion();
+    $('officeBoardDraft').value='';calendarDraftDay='';clearDraft();checkSuggestion();
     msg('앞서 등록된 메모를 확인했습니다. 중복으로 등록하지 않았습니다.');
    }else if(typeof confirm!=='function'||!confirm(
     '최근 메모에서 이전 등록이 확인되지 않았습니다. 통신 지연으로 이미 등록됐을 수 있습니다. 그래도 다시 등록하시겠습니까?'))return;
@@ -878,6 +909,7 @@ window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDo
  toggleComposer,setStatus,setAuthor,setQuery,setSort,showMore,clearFilters,
  imageCall:call,imageUpdate,canEdit:canEditId,
  setView,chooseDay,changeMonth,today,addAtSelectedDay,clearScheduledDay,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
+ saveDraftNow,
  onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
  onNewNotification(){if(currentPage==='officeBoard')refresh(true);
