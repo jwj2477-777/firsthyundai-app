@@ -343,6 +343,28 @@ async function boardCommand(req,env,url,ctx){
   }
   return res({ok:true});
  }
+ if(url.pathname==="/board/devices"&&req.method==="GET"){
+  if(!await isAdmin())return res({error:"admin_required"},403);
+  const rows=await boardKeys(env,DEVICE_PREFIX,1000);
+  const groups=new Map();
+  for(const row of rows){
+   const device=await env.SETTINGS.get(row.name,"json");
+   if(!device?.member_id||device.revoked===true)continue;
+   const member=await env.SETTINGS.get(MEMBER_PREFIX+device.member_id,"json");
+   if(member?.active!==true)continue;
+   // Report registration only. A token does NOT prove the phone has OS
+   // permission or that Firebase actually delivered an alert.
+   const push=await env.SETTINGS.get(PUSH_PREFIX+row.name.slice(DEVICE_PREFIX.length),"json");
+   const name=memberIdentity(member.name);
+   const result=groups.get(name)||{account:name,devices:0,push_registered:0};
+   result.devices++;
+   if(push)result.push_registered++;
+   groups.set(name,result);
+  }
+  return res({schema:1,kind:"push_registration",accounts:[...groups.values()],
+   total_devices:[...groups.values()].reduce((n,x)=>n+x.devices,0),
+   last_checked_at:new Date().toISOString(),delivery_confirmed:false});
+ }
  if(url.pathname==="/board/archive"&&req.method==="GET"){
   if(!await isAdmin())return res({error:"admin_required"},403);
   const keys=await env.SETTINGS.list({prefix:BOARD_ARCHIVE_PREFIX,limit:200});
