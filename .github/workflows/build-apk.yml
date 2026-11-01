@@ -384,25 +384,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.63 Live contract checklist review APK
+      - name: Publish v2.1.64 early audio gate and Live review selection APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.63.apk
-          unzip -t FirstHyundai-v2.1.63.apk | grep 'No errors detected'
-          if gh release view v2.1.63 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.64.apk
+          unzip -t FirstHyundai-v2.1.64.apk | grep 'No errors detected'
+          if gh release view v2.1.64 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.63 FirstHyundai-v2.1.63.apk \
+            gh release create v2.1.64 FirstHyundai-v2.1.64.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.63 · Live 계약 미응답 항목 확인' \
-              --notes 'Live 계약 작성에서 아직 답하지 않은 필수 항목과 미정·협의 중·직접 입력으로 보류한 항목을 구분해 보여줍니다. 월세·전세·중도금 조건에 따라 누락된 질문을 표시하고, 사용자가 일부 항목을 선택 해제해 반영할 때도 확인을 안내합니다. 기존 계약 메모·수기 입력·특약·개인정보 보호·순서제 대화·무료 Live 한도 및 공유 메모/알림은 그대로 유지합니다. 새 개인정보 전송이나 유료 서비스는 없습니다. v2.1.63/build214.'
+              --title '퍼스트현대 v2.1.64 · Live 발화 차단·검토 선택 보존' \
+              --notes 'Live 계약 음성에서 AI 출력 전사가 실제 음성보다 먼저 도착할 때 마이크를 선제적으로 차단하여 되먹임 가능성을 줄였습니다. 기존 AI 오디오 종료·실제 스피커 재생 완료 확인 후 마이크 재개 원칙은 유지합니다. 검토 화면에서 체크 해제한 계약 조건은 AI의 추가 제안과 보류 상태 갱신 이후에도 해제 상태를 보존하며, 반영 선택 개수를 표시합니다. 체크한 항목이 없으면 반영 버튼을 비활성화합니다. 계약 수기 입력·특약·개인정보 보호·무료 Live 한도 및 공유 메모/알림을 유지합니다. 실제 갤럭시 음성 품질은 별도 확인해야 합니다. v2.1.64/build215.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.63 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.63 --apk FirstHyundai-v2.1.63.apk
+          gh release upload v2.1.64 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.64 --apk FirstHyundai-v2.1.64.apk
 
 
 

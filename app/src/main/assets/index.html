@@ -1217,7 +1217,7 @@ body.apartmentSheetActive{overflow:hidden}
  <p id="cl_transcript"></p>
  <p id="cl_reviewProgress" class="tiny" role="status" aria-live="polite" hidden></p>
  <p id="cl_deferred" class="tiny" role="status" aria-live="polite" hidden></p>
- <section id="cl_review" hidden><h4>반영할 조건 확인</h4><p>인식한 금액·날짜와 특약을 확인해 주세요. 선택한 항목만 반영하며, 기존 특약에는 추가합니다.</p><div id="cl_proposals"></div><button id="cl_apply" type="button" onclick="FirstHyundaiContractLive.apply()" disabled>선택한 조건 반영</button></section>
+ <section id="cl_review" hidden><h4>반영할 조건 확인</h4><p>인식한 금액·날짜와 특약을 확인해 주세요. 체크를 해제한 항목은 반영하지 않으며, 기존 특약은 보존합니다.</p><p id="cl_selectedCount" class="tiny" role="status" aria-live="polite" hidden></p><div id="cl_proposals"></div><button id="cl_apply" type="button" onclick="FirstHyundaiContractLive.apply()" disabled>선택한 조건 반영</button></section>
 </dialog>
 <script>
 'use strict';

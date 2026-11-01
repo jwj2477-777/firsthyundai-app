@@ -8,7 +8,7 @@
   leaseStart:'입주일',leaseEnd:'임대차 종료일',leaseDuration:'임대차 기간',balanceTime:'잔금 시간',terms:'특약 (기존 특약에 추가)'};
  const MONEY=new Set(['price','contractDeposit','advance','interim','monthlyRent']);
  const DATES=new Set(['contractDate','interimDate','balanceDate','leaseStart','leaseEnd']);
- let active=false,stopping=false,requestId='',sequence=0,proposals={},reviewStates={},failed=false;
+ let active=false,stopping=false,requestId='',sequence=0,proposals={},reviewStates={},selected={},failed=false;
  const REVIEW_STATES={pending:'미정',discussion:'협의 중',manual:'직접 입력',not_applicable:'해당 없음'};
  function status(text){$('cl_status').textContent=text;}
  function validDate(s){
@@ -92,15 +92,29 @@
   return missing;
  }
  function buttons(){
+  const candidates=Object.keys(proposals),chosen=candidates.filter(k=>selected[k]!==false).length;
+  const count=$('cl_selectedCount');
+  if(count){
+   count.hidden=!candidates.length;
+   count.textContent='계약에 반영할 항목 '+chosen+' / '+candidates.length+'개';
+  }
   $('cl_start').disabled=active||stopping;
   $('cl_stop').disabled=!active||stopping;
-  $('cl_apply').disabled=active||stopping||!Object.keys(proposals).length;
+  $('cl_apply').disabled=active||stopping||!Object.keys(proposals).some(k=>selected[k]!==false);
  }
  function render(){
+  // Save the user's unchecked choices before rebuilding rows for another AI
+  // proposal/status event. A later utterance must never silently reselect them.
+  for(const k of Object.keys(selected)){
+   const previous=$('cl_pick_'+k);
+   if(previous)selected[k]=previous.checked;
+  }
   const box=$('cl_proposals');box.replaceChildren();
   for(const [k,v] of Object.entries(proposals)){
+   if(!Object.hasOwn(selected,k))selected[k]=true; // Only genuinely new fields default on.
    const row=document.createElement('label'),check=document.createElement('input');
-   row.className='contractLiveProposal';check.type='checkbox';check.checked=true;check.id='cl_pick_'+k;
+   row.className='contractLiveProposal';check.type='checkbox';check.checked=selected[k];check.id='cl_pick_'+k;
+   check.addEventListener('change',()=>{selected[k]=check.checked;buttons();});
    const text=document.createElement('span'),title=document.createElement('strong'),value=document.createElement('span');
    title.textContent=LABELS[k];value.textContent=v===''?'입력 내용 지우기':MONEY.has(k)?Number(v).toLocaleString('ko-KR')+'만원':v;
    text.append(title,value);row.append(check,text);box.append(row);
@@ -136,7 +150,7 @@
  function open(){
   const dialog=$('cl_dialog');
   if(dialog.open)return;
-  requestId='';active=false;stopping=false;failed=false;proposals={};reviewStates={};
+  requestId='';active=false;stopping=false;failed=false;proposals={};reviewStates={};selected={};
   $('cl_consent').checked=false;$('cl_transcript').textContent='';render();
   status('기존 메모는 보내지 않습니다. 이번 대화에서 말씀하신 조건만 정리합니다.');
   dialog.showModal();$('cl_close').focus();
@@ -147,7 +161,7 @@
   if(!$('cl_consent').checked){status('음성 전송 안내를 확인하고 체크해 주세요.');return;}
   if(!root.FirstHyundaiNative?.startContractLiveVoice){status('업데이트된 안드로이드 앱에서 이용해 주세요. 기존 메모 입력은 그대로 사용할 수 있습니다.');return;}
   if(Object.keys(proposals).length&&!root.confirm('새 대화는 이전 Live 검토 후보를 지웁니다. 새로 시작할까요?'))return;
-  proposals={};reviewStates={};failed=false;active=true;requestId='cl-'+Date.now()+'-'+(++sequence);render();
+  proposals={};reviewStates={};selected={};failed=false;active=true;requestId='cl-'+Date.now()+'-'+(++sequence);render();
   root.FirstHyundaiLive?.stop?.();
   status('Live 연결 중입니다…');
   try{root.FirstHyundaiNative.startContractLiveVoice(requestId);}
@@ -163,7 +177,7 @@
   // Invalidate request before stopping: late native/tool callbacks cannot revive the draft.
   requestId='';
   if(active||stopping){try{root.FirstHyundaiNative?.stopContractLiveVoice?.();}catch(e){}}
-  active=false;stopping=false;proposals={};reviewStates={};$('cl_transcript').textContent='';render();
+  active=false;stopping=false;proposals={};reviewStates={};selected={};$('cl_transcript').textContent='';render();
   $('cl_dialog').close();$('ct_liveOpen')?.focus?.();
  }
  function incoming(event){
@@ -200,7 +214,7 @@
  }
  function apply(){
   if(active||stopping)return false;
-  const chosen=Object.entries(proposals).filter(([k])=>$('cl_pick_'+k)?.checked);
+  const chosen=Object.entries(proposals).filter(([k])=>$('cl_pick_'+k)?.checked===true);
   if(!chosen.length){status('반영할 항목을 선택해 주세요.');return false;}
   const selected=Object.fromEntries(chosen),missing=missingConditions(selected);
   const incomplete=missing.length?'이번 Live에서 아직 답하지 않은 항목: '

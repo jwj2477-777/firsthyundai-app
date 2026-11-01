@@ -37,9 +37,13 @@ const proposal=p=>emit('proposal',JSON.stringify(p));
 proposal({price:980000000,contractDeposit:65000000,interim:0,interimDate:'',balanceDate:'2027-04-18',terms:'잔금일까지 관리비를 정산한다.'});
 assert.equal(el('ct_price').value,'80000','Tool call cannot mutate form');
 assert.equal(live.apply(),false,'Cannot apply with microphone active');
+// A newly heard condition or status must not silently reselect an excluded term.
+el('cl_pick_terms').checked=false;el('cl_pick_terms').onchange();
 proposal({account:'SYNTHETIC_PRIVATE'});assert(el('cl_status').textContent.includes('확인하지 못했습니다'));
 emit('review_state',JSON.stringify({field:'contractDate',status:'discussion'}));
 assert(el('cl_reviewProgress').textContent.includes('협의 중 1개'),'Review states should be shown independently');
+assert.equal(el('cl_pick_terms').checked,false,'Review-status rerender must keep explicit unchecked choice');
+assert(el('cl_selectedCount').textContent.includes('5 / 6개'),'Selected count updates after exclusion');
 assert(el('cl_reviewProgress').textContent.includes('추가 확인'),'List questions still unanswered in this Live session');
 assert(el('cl_deferred').textContent.includes('계약일 (협의 중)'),'Show exact unresolved field');
 assert(!live._test.missingConditions().includes('contractDate'),'Explicit deferral prevents repeated questions');
@@ -66,6 +70,8 @@ assert(el('cl_status').textContent.includes('지난 연도로 인식'),'A past-y
 assert(!el('cl_pick_balanceDate').disabled,'A valid earlier proposal is retained while correcting date');
 proposal({price:990000000});
 assert(el('cl_pick_price').checked);
+assert.equal(el('cl_pick_terms').checked,false,'New AI proposal must not reselect an excluded contract clause');
+el('cl_pick_terms').checked=true;el('cl_pick_terms').onchange();
 live.stop();assert.equal(stopped,1);assert(el('cl_apply').disabled,'Wait for native mic-stop acknowledgement');
 proposal({price:1000000000}); // Late call while stopping must be ignored.
 emit('ended','ended');assert(!el('cl_apply').disabled);
@@ -84,6 +90,10 @@ emit('proposal',JSON.stringify({price:500000000}));assert.equal(el('ct_price').v
 live.open();assert(!el('cl_consent').checked);el('cl_consent').checked=true;live.start();id=requests.at(-1)[0];
 proposal({price:500000000});emit('error','무료 한도 확인');assert(el('cl_apply').disabled,'Errors must wait for microphone shutdown');emit('ended','generic');assert.equal(el('cl_status').textContent,'무료 한도 확인');
 assert(!el('cl_apply').disabled,'Partial reviewed candidates survive connection failure');
+el('cl_pick_price').checked=false;el('cl_pick_price').onchange();
+assert(el('cl_apply').disabled,'No candidate selected means apply cannot be tapped');
+el('cl_pick_price').checked=true;el('cl_pick_price').onchange();
+assert(!el('cl_apply').disabled,'Re-selecting candidate re-enables review');
 live.close();live.open();el('cl_consent').checked=true;live.start();id=requests.at(-1)[0];
 live.onPageChange('news');assert(!el('cl_dialog').open);assert.equal(stopped,2);
 live.open();el('cl_consent').checked=true;live.start();assert.equal(win.firstHyundaiGoBack(),true);assert.equal(stopped,3);
