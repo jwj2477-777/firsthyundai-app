@@ -6,7 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class ContractLiveChecklistTest {
- @Test public void onlyUndisclosedContractFieldsAreAsked(){
+ @Test public void onlyUndisclosedContractFieldsAreAsked() throws Exception {
   JSONObject p=new JSONObject().put("property","파크애비뉴").put("unit","1604동 2101호")
    .put("dealType","매매").put("price",1440000000L).put("contractDeposit",144000000L)
    .put("contractDate","2026-11-01").put("advance",144000000L).put("balanceDate","2027-07-30");
@@ -17,7 +17,7 @@ public class ContractLiveChecklistTest {
   assertTrue(info.getBoolean("completion_requires_explicit_user_approval"));
   assertTrue(info.getBoolean("await_user_reply"));
  }
- @Test public void nextQuestionFollowsActualKnownFieldsNotAnAiGuess(){
+ @Test public void nextQuestionFollowsActualKnownFieldsNotAnAiGuess() throws Exception {
   JSONObject partial=new JSONObject().put("property","퍼스트파크 15블럭");
   JSONArray missing=ContractLiveChecklist.missing(partial);
   assertEquals("unit",missing.getString(0));
@@ -28,7 +28,7 @@ public class ContractLiveChecklistTest {
   assertFalse(json.contains("계좌"));
   assertFalse(json.contains("고객"));
  }
- @Test public void saleVersusRentalAndConditionalInterim(){
+ @Test public void saleVersusRentalAndConditionalInterim() throws Exception {
   JSONObject p=new JSONObject().put("dealType","월세")
      .put("interim",20000000).put("leaseStart","2027-01-05");
   String all=ContractLiveChecklist.missing(p).toString();
