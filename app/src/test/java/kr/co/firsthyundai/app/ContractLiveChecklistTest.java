@@ -28,6 +28,21 @@ public class ContractLiveChecklistTest {
   assertFalse(json.contains("계좌"));
   assertFalse(json.contains("고객"));
  }
+ @Test public void deferOneTermAndStillRequireApproval() throws Exception {
+  JSONObject known=new JSONObject().put("property","파크애비뉴")
+    .put("dealType","매매").put("unit","1604동 2101호");
+  JSONObject deferred=new JSONObject().put("price","discussion").put("balanceDate","manual");
+  JSONArray list=ContractLiveChecklist.missing(known,deferred);
+  assertEquals("contractDeposit",list.optString(0));
+  assertFalse(list.toString().contains("price"));
+  assertFalse(list.toString().contains("balanceDate"));
+  JSONObject info=ContractLiveChecklist.reminder(known,deferred);
+  assertEquals(2,info.getInt("deferred_count"));
+  assertFalse(info.getBoolean("all_required_confirmed"));
+  assertTrue(info.getBoolean("completion_requires_explicit_user_approval"));
+  String json=info.toString();
+  assertFalse(json.contains("파크애비뉴"));
+ }
  @Test public void saleVersusRentalAndConditionalInterim() throws Exception {
   JSONObject p=new JSONObject().put("dealType","월세")
      .put("interim",20000000).put("leaseStart","2027-01-05");
