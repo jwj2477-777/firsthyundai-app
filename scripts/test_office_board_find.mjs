@@ -61,6 +61,8 @@ assert.equal((await send('/board/'+target.id,'PATCH',{pinned:'true'},auth)).stat
 assert.equal((await send('/board/'+target.id,'PATCH',{pinned:true},auth)).status,200);
 assert.equal(expiryOptions.get('office-postit-v1:'+target.id)?.expirationTtl,undefined,
  'Pinned notes are not given the old 365-day expiration');
+assert.equal(expiryOptions.get('office-postit-v1:'+created[1].id)?.expirationTtl,undefined,
+ 'Ordinary active notes must no longer expire after 365 days');
 assert.equal((await send('/board/'+target.id,'PATCH',
  {text:'stale update',expected_updated_at:'2020-01-01T00:00:00.000Z'},auth)).status,409);
 const pinnedPages=await Promise.all([0,25,50].map(async offset=>
@@ -76,4 +78,22 @@ assert(!deleted.some(n=>n.id===target.id),'Deleted memo must not survive cache i
 assert.equal((await send('/settings','GET')).status,200);
 assert(!JSON.stringify(await (await send('/settings','GET')).json()).includes('퍼스트파크'),
  'Never expose user content in public settings even when caching');
-console.log('PASS 62-note authenticated paging, oldest-note search reachability, rev-cache freshness, owner/admin pin rights and privacy');
+// Existing KV entries from previous APKs had expiration timestamps. During
+// off-hours the scheduled migration must remove their TTL without changing text.
+const legacy=created[2],legacyKey='office-postit-v1:'+legacy.id;
+expiryOptions.set(legacyKey,{expirationTtl:365*86400});
+const originalList=env.SETTINGS.list;
+env.SETTINGS.list=async args=>{
+ const page=await originalList(args);
+ for(const key of page.keys){
+  const expires=expiryOptions.get(key.name)?.expirationTtl;
+  if(expires)key.expiration=Math.floor(Date.now()/1000)+expires;
+ }
+ return page;
+};
+await service.scheduled({scheduledTime:Date.parse('2026-11-01T14:00:00Z')},env,{});
+assert.equal(expiryOptions.get(legacyKey)?.expirationTtl,undefined,
+ 'Legacy note TTL should be cleared during quiet-time migration');
+assert.equal(JSON.parse(store.get(legacyKey)).text,legacy.text,
+ 'Migration must preserve original customer memo content');
+console.log('PASS 62-note authenticated paging, old TTL migration, stale-write guard and memo privacy');
