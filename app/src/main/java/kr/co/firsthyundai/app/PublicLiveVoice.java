@@ -7,6 +7,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
+import android.media.audiofx.AcousticEchoCanceler;
 import android.media.MediaRecorder;
 import android.util.Base64;
 import org.json.JSONArray;
@@ -20,7 +21,6 @@ import okio.ByteString;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /** Explicit user-initiated Gemini Live for public news or isolated contract-condition proposals.
  * Mic and audio are never recorded to disk, logged, or added to office memos.
@@ -62,8 +62,13 @@ final class PublicLiveVoice {
     // Conditions proposed during this session only; never the pre-existing contract form.
     private final JSONObject proposedConditions=new JSONObject();
     private volatile int audioGeneration=0;
-    private final AtomicInteger queuedAudioBytes=new AtomicInteger();
-    private static final int MAX_PENDING_AUDIO_BYTES=24_000*2*4; // 4s at 24kHz PCM16
+    private final LivePcmQueue audioQueue=new LivePcmQueue();
+    private final Object audioLock=new Object();
+    private boolean playbackDrainScheduled=false;
+    private boolean playbackResetPending=false;
+    private volatile AcousticEchoCanceler echoCanceler;
+    private static final int PCM_PRIME_BYTES=24_000*2*120/1000; // 120ms of 24kHz mono PCM16
+    private static final int PCM_OUTPUT_BUFFER_BYTES=24_000*2; // 1-second hardware buffer
     PublicLiveVoice(Context context,Events events){this.context=context.getApplicationContext();this.events=events;}
     private void event(String state,String text){events.emit(state,text);}
     private static String safePublicBrief(String json){
@@ -177,9 +182,7 @@ final class PublicLiveVoice {
                             JSONObject content=msg.optJSONObject("serverContent");
                             if(content==null)return;
                             if(content.optBoolean("interrupted")){
-                                audioGeneration++;
-                                AudioTrack t=speaker;
-                                if(t!=null){try{t.pause();t.flush();t.play();}catch(Exception ignored){}}
+                                interruptPlayback();
                             }
                             JSONObject transcript=content.optJSONObject("outputTranscription");
                             if(transcript!=null){
@@ -262,6 +265,15 @@ final class PublicLiveVoice {
             if(recorder.getState()!=AudioRecord.STATE_INITIALIZED){
                 recorder.release();throw new Exception("audio init unavailable");
             }
+            if(AcousticEchoCanceler.isAvailable()){
+                try{
+                    AcousticEchoCanceler echo=AcousticEchoCanceler.create(recorder.getAudioSessionId());
+                    if(echo!=null){
+                        if(echo.getEnabled()||echo.setEnabled(true)==0)echoCanceler=echo;
+                        else echo.release();
+                    }
+                }catch(Exception ignored){ /* Existing VOICE_COMMUNICATION capture still works. */ }
+            }
             microphone=recorder;recorder.startRecording();
             event("listening",contractMode?"계약 조건을 말씀하세요. 이름·주소·계좌는 말하지 마세요.":"말씀하세요. 공개된 뉴스에 대해서만 질문해 주세요.");
             Thread reader=new Thread(()->{
@@ -290,53 +302,113 @@ final class PublicLiveVoice {
             return false;
         }
     }
+    /** Google can deliver many audio frames in one burst. Never silently discard
+     * the middle of a spoken sentence: use an ordered 12s bounded jitter queue.
+     */
     private void play(byte[] pcm){
-        final int generation=audioGeneration;
-        if(!running||player.isShutdown()||pcm==null||pcm.length==0)return;
-        // Prevent unbounded audio queue buildup on a slow device, which can
-        // otherwise play responses seconds after the conversation advances.
-        int pending=queuedAudioBytes.addAndGet(pcm.length);
-        if(pending>MAX_PENDING_AUDIO_BYTES){
-            queuedAudioBytes.addAndGet(-pcm.length);
-            return;
+        if(!running||pcm==null||pcm.length==0)return;
+        synchronized(audioLock){
+            if(!audioQueue.offer(pcm,audioGeneration)){
+                event("error","AI 음성 재생 처리량이 부족해 중간 내용이 누락될 수 있습니다. 대화를 종료했습니다. 휴대전화 성능과 네트워크를 확인해 주세요.");
+                stop(); // Report failure instead of silently chopping the contract reply.
+                return;
+            }
         }
-        try{
-            player.execute(()->{
-                try{
-                    if(!running||generation!=audioGeneration)return;
-                    if(speaker==null){
-                        int min=AudioTrack.getMinBufferSize(24000,AudioFormat.CHANNEL_OUT_MONO,
-                            AudioFormat.ENCODING_PCM_16BIT);
-                        if(min<=0)return;
-                        AudioTrack track=new AudioTrack(AudioManager.STREAM_MUSIC,24000,
-                            AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT,
-                            Math.max(min,24000),AudioTrack.MODE_STREAM);
-                        if(track.getState()!=AudioTrack.STATE_INITIALIZED){track.release();return;}
-                        speaker=track;
-                        // Pre-fill up to 80ms before playing to reduce initial underruns.
-                        int priming=Math.min(pcm.length,3840);
-                        int written=track.write(pcm,0,priming,AudioTrack.WRITE_BLOCKING);
-                        if(written<=0){track.release();speaker=null;return;}
-                        track.play();
-                        if(written<priming)return; // Unexpected partial write; don't duplicate samples.
-                        writeRemaining(track,pcm,written,generation);
-                    }else{
-                        writeRemaining(speaker,pcm,0,generation);
-                    }
-                }catch(Exception ignored){}
-                finally{queuedAudioBytes.addAndGet(-pcm.length);}
-            });
-        }catch(java.util.concurrent.RejectedExecutionException ignored){
-            queuedAudioBytes.addAndGet(-pcm.length);
+        schedulePlayback();
+    }
+    private void schedulePlayback(){
+        synchronized(audioLock){
+            if(playbackDrainScheduled||playbackResetPending||!running||player.isShutdown()
+                ||audioQueue.isEmpty())return;
+            playbackDrainScheduled=true;
+            try{player.execute(this::drainPlayback);}
+            catch(java.util.concurrent.RejectedExecutionException ignored){
+                playbackDrainScheduled=false;
+            }
         }
     }
-    private void writeRemaining(AudioTrack track,byte[] pcm,int offset,int generation){
-        // Android may write fewer bytes than requested; always write the remainder.
-        // Never replay old model audio after a genuine interruption.
+    /** Speaker is touched only by the single playback executor, including flush.
+     * A short prebuffer avoids underflow when Google sends small frames unevenly.
+     */
+    private void drainPlayback(){
+        try{
+            if(speaker==null)Thread.sleep(120);
+            int[] primed={0};
+            while(running){
+                LivePcmQueue.Frame frame;
+                synchronized(audioLock){
+                    if(playbackResetPending)break;
+                    frame=audioQueue.poll();
+                }
+                if(frame==null)break;
+                if(frame.generation!=audioGeneration)continue;
+                AudioTrack track=speaker;
+                if(track==null){
+                    int min=AudioTrack.getMinBufferSize(24000,AudioFormat.CHANNEL_OUT_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT);
+                    if(min<=0)throw new IllegalStateException("audio output unavailable");
+                    track=new AudioTrack(AudioManager.STREAM_MUSIC,24000,
+                        AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT,
+                        Math.max(min,PCM_OUTPUT_BUFFER_BYTES),AudioTrack.MODE_STREAM);
+                    if(track.getState()!=AudioTrack.STATE_INITIALIZED){
+                        track.release();throw new IllegalStateException("audio output unavailable");
+                    }
+                    speaker=track;
+                }
+                if(!writePacket(track,frame.pcm,frame.generation,primed))
+                    throw new IllegalStateException("audio output write failed");
+            }
+            // A very short spoken response might contain under 120ms in total.
+            AudioTrack track=speaker;
+            if(running&&!playbackResetPending&&track!=null&&
+                track.getPlayState()!=AudioTrack.PLAYSTATE_PLAYING)
+                track.play();
+        }catch(InterruptedException ignored){Thread.currentThread().interrupt();}
+        catch(Exception ignored){
+            if(running){
+                event("error","휴대전화에서 AI 음성을 정상적으로 재생하지 못했습니다. 연결을 종료합니다.");
+                stop();
+            }
+        }finally{
+            synchronized(audioLock){playbackDrainScheduled=false;}
+            schedulePlayback();
+        }
+    }
+    /** Write all bytes; Android's blocking write may still return a partial count. */
+    private boolean writePacket(AudioTrack track,byte[] pcm,int generation,int[] primed){
+        int offset=0;
         while(running&&generation==audioGeneration&&offset<pcm.length){
-            int written=track.write(pcm,offset,pcm.length-offset,AudioTrack.WRITE_BLOCKING);
-            if(written<=0)break;
+            int available=pcm.length-offset;
+            if(track.getPlayState()!=AudioTrack.PLAYSTATE_PLAYING)
+                available=Math.min(available,Math.max(1,PCM_PRIME_BYTES-primed[0]));
+            int written=track.write(pcm,offset,available,AudioTrack.WRITE_BLOCKING);
+            if(written<=0)return false;
             offset+=written;
+            if(track.getPlayState()!=AudioTrack.PLAYSTATE_PLAYING){
+                primed[0]+=written;
+                if(primed[0]>=PCM_PRIME_BYTES)track.play();
+            }
+        }
+        return true;
+    }
+    private void interruptPlayback(){
+        synchronized(audioLock){
+            audioGeneration++;
+            audioQueue.clear();
+            playbackResetPending=true;
+            try{
+                player.execute(()->{
+                    AudioTrack track=speaker;speaker=null;
+                    if(track!=null){
+                        try{track.pause();track.flush();}catch(Exception ignored){}
+                        track.release();
+                    }
+                    synchronized(audioLock){playbackResetPending=false;}
+                    schedulePlayback();
+                });
+            }catch(java.util.concurrent.RejectedExecutionException ignored){
+                playbackResetPending=false;
+            }
         }
     }
     synchronized void stop(){
@@ -348,8 +420,11 @@ final class PublicLiveVoice {
         durationLimit.removeCallbacks(connectionTimeout);
         WebSocket ws=socket;socket=null;
         if(ws!=null)ws.close(1000,"user_closed");
+        audioQueue.clear();
         AudioRecord mic=microphone;microphone=null;
         if(mic!=null){try{mic.stop();}catch(Exception ignored){}try{mic.release();}catch(Exception ignored){}}
+        AcousticEchoCanceler echo=echoCanceler;echoCanceler=null;
+        if(echo!=null){try{echo.release();}catch(Exception ignored){}}
         player.execute(()->{
             AudioTrack t=speaker;speaker=null;
             if(t!=null){try{t.pause();t.flush();}catch(Exception ignored){}t.release();}
