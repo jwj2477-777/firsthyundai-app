@@ -428,6 +428,7 @@ function draw(){
    (editable?
     '<button class="officeBoardDoneAction" data-action="done" data-id="'+id+'">'+(note.done?'완료 취소':'완료')+'</button>'+
     '<button data-action="edit" data-id="'+id+'">수정</button>'+
+    (note.scheduled_at?'<button data-action="scheduleClear" data-id="'+id+'">일정 해제</button>':'')+
     (!Array.isArray(note.images)||note.images.length<3?'<button data-action="photoAdd" data-id="'+id+'">사진 추가</button>':'')
     :'<span class="officeBoardReadOnly">작성자·관리자만 수정 가능</span>')+
    (admin?'<button data-action="delete" data-id="'+id+'" class="officeBoardDelete">삭제</button>':'');
@@ -907,6 +908,10 @@ $('officeBoardList')?.addEventListener?.('click',event=>{
  if(action==='cancel')cancelEdit();
  if(action==='save')saveEdit(id);
  if(action==='delete')remove(id);
+ if(action==='scheduleClear'&&canEditId(id)){
+  if(typeof confirm!=='function'||confirm('이 메모를 달력에서 제외할까요? 메모 내용은 그대로 유지됩니다.'))
+   mutate('schedule',{id,scheduled_at:null});
+ }
  if(action==='photoAdd'){
   const note=items.find(n=>n.id===id);
   if(!canEditNote(note)){denied();return}
