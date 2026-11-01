@@ -24,6 +24,14 @@ assert(native.includes('onMessage(ws,text)'),'Decoded binary frame must use the 
 assert(native.includes('if(msg.has("setupComplete"))'),'Only start mic after actual Google setupComplete');
 assert(native.includes('if(startMicrophone()&&running)'),'Mic must start after setupComplete');
 assert(native.includes('quotaConfirmed=true')&&native.includes('reportQuota("ready")'),'Count only microphone-ready sessions');
+assert(native.includes('if(microphone!=null)return; // Avoid a second recorder and duplicate quota.'),
+ 'Repeated Google setupComplete cannot start a second microphone');
+assert(native.includes('if(!running||microphone!=null)return false;'),
+ 'Native microphone creation must be idempotent');
+const readyAt=native.indexOf('if(startMicrophone()&&running){');
+const limitAt=native.indexOf('durationLimit.postDelayed(autoStop,7*60*1000L)');
+assert(readyAt>=0&&limitAt>readyAt&&limitAt<native.indexOf('if(msg.has("error"))'),
+ 'Seven-minute Live clock must start only after real microphone readiness');
 assert(native.includes('if(!quotaConfirmed)reportQuota("abort")'),'Unconfirmed setup must not use daily quota');
 assert(html.includes('cl_quota')&&html.includes('newsLiveVoiceQuota'),'Both Live surfaces show balance');
 assert(app.includes('requestLiveQuotaStatus'),'Native must offer read-only quota status');
