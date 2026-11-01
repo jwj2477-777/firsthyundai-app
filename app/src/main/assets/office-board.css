@@ -593,3 +593,8 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 #officeBoard .officeBoardScheduleLine{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 #officeBoard .officeBoardScheduleLine .officeBoardAutoSchedule{flex:1;min-width:190px}
 #officeBoard .officeBoardScheduleClear[hidden]{display:none!important}
+
+/* Reliable office agenda: overdue work is visible without a full-screen alert. */
+.officeBoardOverdueHint{display:block;margin:6px 0;color:#9e481f;font-weight:650;font-size:.82rem}
+.officeBoardNote:has(.officeBoardOverdueHint){border-left:3px solid #c17a45}
+.officeBoardOverdueHeading{padding:10px 12px;margin:5px 0 8px;border-radius:10px;background:#fff1e5;color:#89451e;font-weight:750;font-size:.86rem}
