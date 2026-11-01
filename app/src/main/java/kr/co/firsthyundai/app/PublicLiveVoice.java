@@ -61,6 +61,7 @@ final class PublicLiveVoice {
     private boolean contractMode=false;
     // Conditions proposed during this session only; never the pre-existing contract form.
     private final JSONObject proposedConditions=new JSONObject();
+    private final JSONObject deferredConditions=new JSONObject(); // session-only status keys, no customer values
     private final ContractLiveTurnGate contractTurnGate=new ContractLiveTurnGate();
     // Bytes are written only by the playback executor, but must be heard on
     // the speaker before the contract microphone is sent to Google again.
@@ -242,26 +243,48 @@ final class PublicLiveVoice {
                 JSONObject fc=calls.optJSONObject(i);if(fc==null)continue;
                 String result="rejected_invalid_fields";
                 if(contractMode&&ContractLiveProtocol.FUNCTION.equals(fc.optString("name"))){
-                    try{
-                        JSONObject proposal=ContractLiveProtocol.validated(fc.optJSONObject("args"));
+                    JSONObject args=fc.optJSONObject("args");
+                    if(ContractLiveReview.isStatusCall(args)){
                         try{
-                            ContractLiveProtocol.validateConsistency(proposedConditions,proposal);
+                            String[] state=ContractLiveReview.validate(args);
                             if(running){
-                                java.util.Iterator<String> keys=proposal.keys();
-                                while(keys.hasNext()){String key=keys.next();proposedConditions.put(key,proposal.get(key));}
-                                event("proposal",proposal.toString());
-                                result="proposed_for_user_review";
+                                ContractLiveReview.record(deferredConditions,proposedConditions,state);
+                                event("review_state",ContractLiveReview.publicState(state[0],state[1]).toString());
+                                result="review_status_recorded";
                             }
-                        }catch(Exception conflict){result="rejected_inconsistent_conditions";}
-                    }catch(ContractLiveProtocol.PastContractDateException e){
-                        result="rejected_past_date";
-                        event("date_warning","말씀하신 날짜가 지난 연도로 인식됐습니다. 연도를 정확히 확인해 주세요.");
-                    }catch(Exception ignored){}
+                        }catch(Exception ignored){result="rejected_invalid_fields";}
+                    }else{
+                        try{
+                            JSONObject proposal=ContractLiveProtocol.validated(args);
+                            try{
+                                ContractLiveProtocol.validateConsistency(proposedConditions,proposal);
+                                if(running){
+                                    java.util.Iterator<String> keys=proposal.keys();
+                                    while(keys.hasNext()){
+                                        String key=keys.next();
+                                        proposedConditions.put(key,proposal.get(key));
+                                    }
+                                    ContractLiveReview.clearResolved(deferredConditions,proposal);
+                                    event("proposal",proposal.toString());
+                                    java.util.Iterator<String> changed=proposal.keys();
+                                    while(changed.hasNext())
+                                        event("review_state",ContractLiveReview.publicState(
+                                            changed.next(),"confirmed").toString());
+                                    result="proposed_for_user_review";
+                                }
+                            }catch(Exception conflict){result="rejected_inconsistent_conditions";}
+                        }catch(ContractLiveProtocol.PastContractDateException e){
+                            result="rejected_past_date";
+                            event("date_warning","말씀하신 날짜가 지난 연도로 인식됐습니다. 연도를 정확히 확인해 주세요.");
+                        }catch(Exception ignored){}
+                    }
                 }
-                // Only fixed acknowledgements leave the device; no existing form or previous values.
+                // Only field names, counts and fixed acknowledgement leave this device.
                 JSONObject acknowledgement=new JSONObject().put("result",result);
-                if(contractMode&&"proposed_for_user_review".equals(result))
-                    acknowledgement.put("dialogue",ContractLiveChecklist.reminder(proposedConditions));
+                if(contractMode&&("proposed_for_user_review".equals(result)||
+                                  "review_status_recorded".equals(result)))
+                    acknowledgement.put("dialogue",ContractLiveChecklist.reminder(
+                        proposedConditions,deferredConditions));
                 responses.put(new JSONObject().put("id",fc.optString("id"))
                     .put("name",fc.optString("name"))
                     .put("response",acknowledgement));

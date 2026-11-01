@@ -62,7 +62,10 @@ assert(native.includes('contractTurnGate.modelAudioStarted()'),'Lock input from 
 assert(native.includes('content.optBoolean("turnComplete")'),'Do not resume input until server turn is complete');
 assert(native.includes('resumeMicrophoneAfterPlayback()'),'Wait for actual speaker playback completion');
 assert(native.includes('getPlaybackHeadPosition()'),'Do not trust a finished network stream while the speaker is still speaking');
-assert(native.includes('ContractLiveChecklist.reminder(proposedConditions)'),'Propose the next missing field without sharing local form data');
+assert(native.includes('ContractLiveChecklist.reminder(')&&native.includes('proposedConditions,deferredConditions'),'Ask only truly unanswered items; keep deferrals in session state');
+assert(native.includes('ContractLiveReview.record(deferredConditions,proposedConditions,state)'),'Only explicit user status can be deferred');
+assert(native.includes('ContractLiveReview.clearResolved(deferredConditions,proposal)'),'New confirmed value must clear old defer state');
+assert(native.includes('event("review_state"'),'Status changes shown in review without modifying contract form');
 assert(read('app/src/main/assets/contract-live.js').includes("'ai_speaking'"),'UI displays AI speaking vs user listening states');
 assert(!native.includes('GEMINI_API_KEY'));
 assert(!native.includes('android.util.Log'),'No logging of private voice content');
