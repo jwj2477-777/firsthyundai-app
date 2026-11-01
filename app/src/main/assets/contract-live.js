@@ -92,6 +92,12 @@
   return missing;
  }
  function buttons(){
+  const candidates=Object.keys(proposals),chosen=candidates.filter(k=>selected[k]!==false).length;
+  const count=$('cl_selectedCount');
+  if(count){
+   count.hidden=!candidates.length;
+   count.textContent='계약에 반영할 항목 '+chosen+' / '+candidates.length+'개';
+  }
   $('cl_start').disabled=active||stopping;
   $('cl_stop').disabled=!active||stopping;
   $('cl_apply').disabled=active||stopping||!Object.keys(proposals).some(k=>selected[k]!==false);
