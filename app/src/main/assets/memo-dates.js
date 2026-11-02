@@ -14,6 +14,8 @@ function parse(text,now=new Date()){
  const relativeYear=s.match(/(올해|내년|내후년)\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
  const relativeMonth=s.match(/(이번|다음|다다음)\s*달\s*(\d{1,2})\s*일/);
  const full=s.match(/(?:^|[^\d])(20\d{2})\s*[.\/-]\s*(\d{1,2})\s*[.\/-]\s*(\d{1,2})(?!\d)/);
+ // A short leading year (27.1.30) must not become a yearless January.
+ const shortYear=s.match(/(?:^|[^\d])(2\d|3\d)\s*[.\/-]\s*(\d{1,2})\s*[.\/-]\s*(\d{1,2})(?!\d)/);
  const korean=s.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
  const short=s.match(/(?:^|[^\d])(\d{1,2})\s*[.\/-]\s*(\d{1,2})(?!\d)/);
  const week=s.match(/(이번\s*주|다음\s*주)\s*(월요일|화요일|수요일|목요일|금요일|토요일|일요일)/);
@@ -24,6 +26,7 @@ function parse(text,now=new Date()){
  else if(relativeYear){y+=relativeYear[1]==='내년'?1:relativeYear[1]==='내후년'?2:0;
   m=+relativeYear[2];d=+relativeYear[3];matched=true}
  else if(full){y=+full[1];m=+full[2];d=+full[3];matched=true}
+ else if(shortYear){y=2000+Number(shortYear[1]);m=+shortYear[2];d=+shortYear[3];matched=true}
  else if(relativeMonth){
   const increment=relativeMonth[1]==='다다음'?2:relativeMonth[1]==='다음'?1:0;
   const first=new Date(Date.UTC(y,m-1+increment,1));
@@ -46,10 +49,13 @@ function parse(text,now=new Date()){
  // Unqualified times favor normal office hours (09-20), extended 08-21.
  const clock=s.match(/(새벽|아침|오전|정오|점심|낮|오후|저녁|밤)?\s*(\d{1,2})\s*시\s*(반|\d{1,2}\s*분?)?/);
  const digital=clock?null:s.match(/(?:^|[^\d])([01]?\d|2[0-3]):([0-5]\d)(?!\d)/);
- let h=12,min=0,allDay=!clock&&!digital;
+ const digital24=clock||digital?null:s.match(/(?:^|[^\d])24:00(?!\d)/);
+ // Never turn an invalid clock such as 24:30 or 15:90 into a noon all-day event.
+ if(!clock&&!digital&&!digital24&&/(?:^|[^\d])\d{1,2}:\d{2}(?!\d)/.test(s))return null;
+ let h=12,min=0,allDay=!clock&&!digital&&!digital24,dayRollover=!!digital24;
  if(!allDay){
-  h=clock?+clock[2]:+digital[1];
-  min=clock?(clock[3]?.includes('반')?30:parseInt(clock[3]||'0',10)):+digital[2];
+  h=clock?+clock[2]:digital?+digital[1]:0;
+  min=clock?(clock[3]?.includes('반')?30:parseInt(clock[3]||'0',10)):digital?+digital[2]:0;
   const part=clock?.[1]||'';
   if(part==='오후'||part==='저녁'||part==='밤'){
    if(h>=1&&h<=11)h+=12;
@@ -64,7 +70,13 @@ function parse(text,now=new Date()){
    const extended=options.filter(x=>x>=8&&x<=21);
    h=(core.length===1?core:extended.length===1?extended:options)[0];
   }
+  // 밤 12시 means the end of the stated day; 오전/새벽 12시 stays that morning.
+  if(part==='밤'&&h===12){h=0;dayRollover=true;}
   if(h>23||min>59||!Number.isFinite(min))return null;
+ }
+ if(dayRollover){
+  const next=new Date(Date.UTC(y,m-1,d+1));
+  y=next.getUTCFullYear();m=next.getUTCMonth()+1;d=next.getUTCDate();
  }
  const local=[y,String(m).padStart(2,'0'),String(d).padStart(2,'0')].join('-')+
   'T'+String(h).padStart(2,'0')+':'+String(min).padStart(2,'0');
