@@ -25,3 +25,17 @@
 #cl_reviewProgress{font-weight:700}
 
 #cl_selectedCount{font-weight:700;color:#24594f;margin:4px 0;padding:8px 12px;background:#eff5ef;border-radius:10px}
+
+/* Clear, separate second step: a stop acknowledgement never silently applies data. */
+#cl_dialog[data-live-stage="review"] #cl_intro,
+#cl_dialog[data-live-stage="review"] .contractLiveConsent,
+#cl_dialog[data-live-stage="review"] .contractLiveButtons,
+#cl_dialog[data-live-stage="review"] #cl_transcript{display:none}
+#cl_finished[hidden]{display:none}
+.contractLiveFinished{background:#f1f7f1;border:1px solid #c3d8cd;border-radius:16px;padding:14px;outline-offset:4px}
+.contractLiveFinished h4{font-size:18px;margin:0 0 6px;color:#244f40}
+.contractLiveFinished p{margin:0 0 10px}
+.contractLiveFinishActions{display:flex;flex-wrap:wrap;gap:8px}
+#cl_retry,#cl_leave{flex:1 1 180px;border:1px solid #b4cabb;background:#fffdf7;color:#265b4a}
+#cl_dialog[data-live-stage="review"] #cl_review{margin-top:14px}
+#cl_dialog[data-live-stage="review"] #cl_review h4{font-size:17px;margin-bottom:6px}
