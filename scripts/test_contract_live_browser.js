@@ -41,6 +41,12 @@ async function verify(){
   check(dialog.scrollWidth<=dialog.clientWidth+1,'Dialog horizontal overflow');
   for(const key of ['cl_start','cl_stop','cl_apply','cl_close'])check(get(key).getBoundingClientRect().height>=48,'Touch target '+key);
   get('cl_stop').click();check(stops===1&&!get('cl_apply').disabled,'Stop before review');
+  check(dialog.open&&dialog.dataset.liveStage==='review','Mic stop opens final review instead of closing dialog');
+  check(!get('cl_finished').hidden&&get('cl_finishedHint').textContent.includes('아직 계약서에 반영되지 않았습니다'),
+   'Review completion must be visible and state that data is not saved');
+  check(get('cl_finished').getBoundingClientRect().top>=dialog.getBoundingClientRect().top-2,
+   'Review header must be visible after automatic scrolling');
+  check(get('cl_intro').getBoundingClientRect().height===0,'Conversation-only explanation hidden at review step');
   window.confirm=message=>{check(message.includes('아직 답하지 않은 항목')&&message.includes('계약일'),'Warning before applying incomplete conditions');return true;};
   get('cl_apply').click();check(!dialog.open,'Close after applying');
   check(get('ct_price').value==='99000','Corrected proposed price applied, not the earlier value');
@@ -53,7 +59,13 @@ async function verify(){
   check(!get('ct_resultPanel').classList.contains('hidden'),'Existing preview flow');
   live.open();get('cl_consent').checked=true;live.start();check(firstHyundaiGoBack(),'Android Back handled');check(!dialog.open&&stops===2,'Back stops mic');
   live.open();get('cl_consent').checked=true;live.start();switchPage('news');check(!dialog.open&&stops===3,'Page change stops mic');
-  document.body.innerHTML='<pre id="contract-live-test">PASS optional Live, consent, privacy, review, dates, existing fields, back and tab exit</pre>';
+  live.open();get('cl_consent').checked=true;live.start();
+  get('cl_stop').click();
+  check(dialog.dataset.liveStage==='review'&&get('cl_finishedHint').textContent.includes('정리된 계약조건이 없습니다'),
+   'Empty provider session must explain nothing was captured, rather than ending silently');
+  check(get('cl_review').hidden&&get('cl_apply').disabled,'No fake suggestions from empty session');
+  get('cl_leave').click();check(!dialog.open,'Direct entry action closes empty review');
+  document.body.innerHTML='<pre id="contract-live-test">PASS optional Live, visible stop-to-review, empty-result explanation, manual confirmation, privacy and back/tab exit</pre>';
  }catch(e){document.body.innerHTML='<pre id="contract-live-test">FAIL '+e.message+'</pre>';}
 }
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'fhd-contract-live-'));
