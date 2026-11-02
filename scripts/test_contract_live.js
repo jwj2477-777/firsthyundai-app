@@ -4,7 +4,7 @@ const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p
 const elements=new Map(),events={};
 function element(tag='div'){
  const classes=new Set();
- return {tag,id:'',value:'',checked:false,disabled:false,hidden:false,open:false,textContent:'',children:[],
+ return {tag,id:'',value:'',checked:false,disabled:false,hidden:false,open:false,textContent:'',children:[],dataset:{},
   classList:{add:k=>classes.add(k),remove:k=>classes.delete(k),contains:k=>classes.has(k),toggle:(k,v)=>v?classes.add(k):classes.delete(k)},
   append(...xs){for(const x of xs){this.children.push(x);if(x.id)elements.set(x.id,x);}},replaceChildren(){this.children=[];},
   showModal(){this.open=true;},close(){this.open=false;},focus(){},scrollIntoView(){},closest(){return null;},
@@ -87,6 +87,15 @@ el('cl_pick_terms').checked=true;el('cl_pick_terms').onchange();
 live.stop();assert.equal(stopped,1);assert(el('cl_apply').disabled,'Wait for native mic-stop acknowledgement');
 proposal({price:1000000000}); // Late call while stopping must be ignored.
 emit('ended','ended');assert(!el('cl_apply').disabled);
+assert.equal(el('cl_dialog').dataset.liveStage,'review','Native stop must switch to a separate review stage');
+assert.equal(el('cl_finished').hidden,false,'Always show final review instructions');
+assert(el('cl_finishedHint').textContent.includes('아직 계약서에 반영되지 않았습니다'),'User must explicitly approve applying');
+assert(el('cl_review').hidden===false,'Collected terms appear in final review');
+assert(el('cl_dialog').open,'Stopping mic must not dismiss the review dialog');
+confirmed=false;
+assert.equal(live.close(),false,'Dismissal of unapplied proposals must be confirmed');
+assert(el('cl_dialog').open,'Declining dismissal preserves all proposals');
+confirmed=true;
 el('cl_pick_contractDeposit').checked=false; // Explicitly excluded field must survive.
 confirmed=false;assert.equal(live.apply(),false);assert.equal(el('ct_price').value,'80000');
 confirmed=true;assert.equal(live.apply(),true);
@@ -141,7 +150,30 @@ assert(live._test.missingConditions({price:'80000'}).includes('monthlyRent'),
 assert(live._test.missingConditions({price:'80000'}).includes('interimDate'),
  'Unchecking the proposed interim amount cannot hide its due date');
 live.close();
-const valid=live._test.normalize;
+// No proposals: the stop action must still show a truthful empty-result review,
+ // never leave the user at a silent ended-microphone status.
+ live.open();el('cl_consent').checked=true;live.start();id=requests.at(-1)[0];
+ assert.equal(el('cl_dialog').dataset.liveStage,'talk');
+ live.stop();emit('ended','end with no proposals');
+ assert.equal(el('cl_dialog').dataset.liveStage,'review');
+ assert.equal(el('cl_finished').hidden,false);
+ assert(el('cl_finishedHint').textContent.includes('정리된 계약조건이 없습니다'));
+ assert(el('cl_review').hidden,'No fabricated contract terms');
+ assert(el('cl_apply').disabled,'Do not apply non-existent conditions');
+ live.close();
+ // Retrying from review must explicitly clear prior un-applied suggestions,
+ // only after the user confirms discarding them.
+ live.open();el('cl_consent').checked=true;live.start();id=requests.at(-1)[0];
+ proposal({price:500000000});
+ live.stop();emit('ended','ended');
+ confirmed=false;live.start();
+ assert.equal(requests.length,6,'Declined retry must not open another audio session');
+ assert.equal(el('cl_dialog').dataset.liveStage,'review','Declined retry retains review stage');
+ confirmed=true;live.start();id=requests.at(-1)[0];
+ assert.equal(el('cl_dialog').dataset.liveStage,'talk');
+ assert(el('cl_review').hidden,'Reconnecting after confirmation resets prior suggestions');
+ live.close();
+ const valid=live._test.normalize;
 const consistent=live._test.consistency;
 const unanswered=live._test.missingConditions;
 assert(unanswered({dealType:'월세',interim:'3000'}).includes('monthlyRent'),'월세 needs rent');
