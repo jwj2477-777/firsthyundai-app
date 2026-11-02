@@ -14,11 +14,17 @@ let historyLoaded=false,historyLoading=false,refreshCycle=0,lastFullHistory=0;
 let lastBriefing=0,briefingBusy=false;
 const startKst=()=>kstDate(new Date());
 let selectedDate='',calendarMonth='',editingBirthday='',calendarDraftDay='';
-let draftTimer=null,draftRestoredMember=''; 
+let draftTimer=null,draftRestoredMember='',draftRevision=0;
+function draftMember(){
+ try{return String(bridge?.getOfficeMemberId?.()||'')}catch(e){return ''}
+}
 function saveDraftNow(){
  if(draftTimer){clearTimeout(draftTimer);draftTimer=null;}
  const input=$('officeBoardDraft');
  if(!input||typeof bridge?.saveOfficeMemoDraft!=='function')return;
+ // onPause also runs before the composer has ever been opened. Its empty
+ // DOM must not erase a previous session's encrypted draft, or another member's.
+ if(!draftRestoredMember||draftMember()!==draftRestoredMember)return;
  try{bridge.saveOfficeMemoDraft(String(input.value||'').slice(0,1600),calendarDraftDay||'');}catch(e){}
 }
 function saveDraftSoon(){
@@ -28,15 +34,19 @@ function saveDraftSoon(){
 }
 function clearDraft(){
  if(draftTimer){clearTimeout(draftTimer);draftTimer=null;}
+ if(!draftRestoredMember||draftMember()!==draftRestoredMember)return;
  try{bridge?.clearOfficeMemoDraft?.()}catch(e){}
 }
 function restoreDraft(){
- const account=String(bridge?.getOfficeMemberId?.()||'');
+ const account=draftMember();
  if(!account||account===draftRestoredMember||!bridge?.getOfficeMemoDraft)return;
- draftRestoredMember=account;
- if(String($('officeBoardDraft')?.value||''))return;
+ if(draftRestoredMember&&draftRestoredMember!==account){
+  $('officeBoardDraft').value='';calendarDraftDay='';ambiguousPost=null;++draftRevision;
+ }
+ if(String($('officeBoardDraft')?.value||'')||calendarDraftDay){draftRestoredMember=account;return;}
  try{
   const draft=JSON.parse(bridge.getOfficeMemoDraft()||'{}');
+  draftRestoredMember=account;
   if(typeof draft.text==='string'&&draft.text.length<=1600&&
      (/^20\d{2}-\d{2}-\d{2}$/.test(draft.day||'')||!draft.day)){
    if(draft.text){$('officeBoardDraft').value=draft.text;msg('이 휴대전화에 안전하게 보관된 작성 중 메모를 복구했습니다.');}
@@ -44,7 +54,17 @@ function restoreDraft(){
   }
  }catch(e){}
 }
-$('officeBoardDraft')?.addEventListener?.('input',saveDraftSoon);
+$('officeBoardDraft')?.addEventListener?.('input',()=>{++draftRevision;saveDraftSoon()});
+function finishPostedDraft(snapshot){
+ const input=$('officeBoardDraft');
+ if(!input||snapshot.member!==draftMember())return false;
+ // A successful response acknowledges only the submitted snapshot. Text or
+ // calendar edits made while waiting remain available for the next memo.
+ if(snapshot.revision!==draftRevision||snapshot.text!==String(input.value||'')||
+    snapshot.day!==calendarDraftDay){saveDraftNow();return false;}
+ input.value='';calendarDraftDay='';clearDraft();checkSuggestion();
+ return true;
+}
 function focusNote(id){
  if(!valid(id))return false;
  ++focusLookupSeq;
@@ -275,10 +295,10 @@ function today(){selectedDate=kstDate(new Date());calendarMonth=selectedDate.sli
 function addAtSelectedDay(){
  if(!selectedDate)return;
  try{toIso(selectedDate+'T12:00');}catch(e){return}
- calendarDraftDay=selectedDate;saveDraftSoon();
+ calendarDraftDay=selectedDate;++draftRevision;saveDraftSoon();
  setView('compose');checkSuggestion();$('officeBoardDraft')?.focus?.();
 }
-function clearScheduledDay(){calendarDraftDay='';checkSuggestion();saveDraftSoon()}
+function clearScheduledDay(){calendarDraftDay='';++draftRevision;checkSuggestion();saveDraftSoon()}
 function openCalendarNote(id){
  if(!valid(id))return;
  if(birthdayOf(items.find(n=>n.id===id)))return;
@@ -699,7 +719,7 @@ async function mutate(action,data){
   const result=await call(action,guarded);
   if(action==='delete')localDeletes.set(data.id,Date.now());
   else if(result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
-  if(action==='post'){$('officeBoardDraft').value='';calendarDraftDay='';ambiguousPost=null;clearDraft();checkSuggestion();}
+  if(action==='post')ambiguousPost=null;
   if(action==='restore'&&result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
   editing='';editDraft='';
   merge(items);
@@ -727,7 +747,9 @@ async function post(){
  postInFlight=true;
  try{
  const photos=window.FirstHyundaiBoardImages;
- const value=String($('officeBoardDraft')?.value||'').trim();
+ const snapshot={text:String($('officeBoardDraft')?.value||''),day:calendarDraftDay,
+  revision:draftRevision,member:draftMember()};
+ const value=snapshot.text.trim();
  if(!value&&!photos?.pendingCount?.()){msg('메모를 적거나 사진을 첨부해 주세요.');return}
  if(value.length>1600){msg('메모는 최대 1600자입니다.');return}
  if(photos?.pendingTarget?.()&&!value){
@@ -759,7 +781,6 @@ async function post(){
     result={ok:true,note:found};
     localUpdates.set(found.id,{note:found,time:Date.now()});
     merge(items.filter(n=>n.id!==found.id).concat(found));
-    $('officeBoardDraft').value='';calendarDraftDay='';clearDraft();checkSuggestion();
     msg('앞서 등록된 메모를 확인했습니다. 중복으로 등록하지 않았습니다.');
    }else if(typeof confirm!=='function'||!confirm(
     '최근 메모에서 이전 등록이 확인되지 않았습니다. 통신 지연으로 이미 등록됐을 수 있습니다. 그래도 다시 등록하시겠습니까?'))return;
@@ -767,6 +788,8 @@ async function post(){
   ambiguousPost=null;
  }
  if(!result){postStartedAt=Date.now();result=await mutate('post',data)}
+ if(result?.note?.id&&!finishPostedDraft(snapshot))
+  msg('등록한 메모는 저장됐습니다. 기다리는 동안 바꾼 내용은 작성란에 남겨두었습니다.');
  if(result?.note?.id&&photos?.pendingCount?.()){
   const saved=await photos.uploadPending(result.note.id);
   if(!saved)setView('compose');else syncViews();

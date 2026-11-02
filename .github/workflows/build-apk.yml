@@ -30,6 +30,7 @@ on:
       - 'scripts/test_office_board.mjs'
       - 'scripts/test_office_board_images.mjs'
       - 'scripts/test_office_board_ui.js'
+      - 'scripts/test_office_draft_lifecycle.js'
       - 'scripts/test_office_board_find.mjs'
       - 'scripts/test_office_member_last_seen.mjs'
       - 'scripts/test_annual_calendar.js'
@@ -288,6 +289,7 @@ jobs:
           node scripts/test_office_board.mjs
           node scripts/test_office_board_images.mjs
           node scripts/test_office_board_ui.js
+          node scripts/test_office_draft_lifecycle.js
           node scripts/test_office_board_find.mjs
           node scripts/test_office_member_last_seen.mjs
           node scripts/test_annual_calendar.js
@@ -384,25 +386,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.75 permanent memo and full photo archive APK
+      - name: Publish v2.1.76 memo draft preservation APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.75.apk
-          unzip -t FirstHyundai-v2.1.75.apk | grep 'No errors detected'
-          if gh release view v2.1.75 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.76.apk
+          unzip -t FirstHyundai-v2.1.76.apk | grep 'No errors detected'
+          if gh release view v2.1.76 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.75 FirstHyundai-v2.1.75.apk \
+            gh release create v2.1.76 FirstHyundai-v2.1.76.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.75 · 메모·사진 장기보존 및 ZIP 백업' \
-              --notes '일반 공유메모와 첨부 사진을 자동 만료 없이 보존하도록 서버를 개선하고, 구버전에서 저장된 메모·사진·일정 인덱스의 남은 유효기간을 비영업시간에 단계적으로 제거합니다. 삭제한 메모는 기존 30일 복구를 유지하며 복구 기간이 지난 첨부 사진은 안전하게 정리합니다. 관리자모드에서 공유메모 JSON 백업과 별도로 사진 JPEG 원본까지 포함하는 ZIP 백업을 직접 저장할 수 있습니다. ZIP은 개인정보가 포함된 암호화되지 않은 파일이므로 안전한 개인 저장소에 보관해야 합니다. ZIP 완성 전에는 외부 저장장치에 작성하지 않고 누락된 사진이 있으면 오류를 안내합니다. 기존 계약·실거래·뉴스·테마·가족모드 기능은 유지합니다. Cloudflare KV의 진정한 원자적 동시 수정을 보장하는 구조, 일부 관리비·초등 통학구역 공식 확인, Gemini Live 실기기 마이크·스피커 확인은 아직 별도 과제입니다. v2.1.75/build226.'
+              --title '퍼스트현대 v2.1.76 · 작성 중 메모 유실 방지' \
+              --notes '공유메모 등록 응답을 기다리는 동안 추가로 작성하거나 달력 날짜를 바꿔도 입력 내용이 지워지지 않도록 개선했습니다. 통신 오류 후 기존 등록 여부를 확인하는 중에 수정한 내용도 보존합니다. 앱을 다시 연 뒤 공유메모 화면을 열기 전에 화면을 끄거나 다른 앱으로 이동해도 이전에 암호화 저장한 초안을 빈 내용으로 덮어쓰지 않습니다. 계정 변경 시 다른 계정의 초안에 이전 작성 내용을 저장하지 않도록 보호했습니다. 기존 메모·사진 백업과 계약·Live·실거래 기능은 유지합니다. v2.1.76/build227. 갤럭시 실기기 확인은 별도입니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.75 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.75 --apk FirstHyundai-v2.1.75.apk
+          gh release upload v2.1.76 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.76 --apk FirstHyundai-v2.1.76.apk
 
 
 
