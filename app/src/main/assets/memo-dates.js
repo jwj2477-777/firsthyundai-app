@@ -48,22 +48,24 @@ function parse(text,now=new Date()){
  if(date.getUTCFullYear()!==y||date.getUTCMonth()+1!==m||date.getUTCDate()!==d)return null;
  // Unqualified times favor normal office hours (09-20), extended 08-21.
  const clock=s.match(/(새벽|아침|오전|정오|점심|낮|오후|저녁|밤)?\s*(\d{1,2})\s*시\s*(반|\d{1,2}\s*분?)?/);
- const digital=clock?null:s.match(/(?:^|[^\d])([01]?\d|2[0-3]):([0-5]\d)(?!\d)/);
+ // Digital time must honor Korean AM/PM words, just like "3시 반".
+ const digital=clock?null:s.match(/(?:^|[^\d])(새벽|아침|오전|정오|점심|낮|오후|저녁|밤)?\s*([01]?\d|2[0-3]):([0-5]\d)(?!\d)/);
  const digital24=clock||digital?null:s.match(/(?:^|[^\d])24:00(?!\d)/);
  // Never turn an invalid clock such as 24:30 or 15:90 into a noon all-day event.
- if(!clock&&!digital&&!digital24&&/(?:^|[^\d])\d{1,2}:\d{2}(?!\d)/.test(s))return null;
+ if(!clock&&!digital&&!digital24&&/(?:^|[^\d])\d{1,2}:\d+(?!\d)/.test(s))return null;
  let h=12,min=0,allDay=!clock&&!digital&&!digital24,dayRollover=!!digital24;
  if(!allDay){
-  h=clock?+clock[2]:digital?+digital[1]:0;
-  min=clock?(clock[3]?.includes('반')?30:parseInt(clock[3]||'0',10)):digital?+digital[2]:0;
-  const part=clock?.[1]||'';
+  h=clock?+clock[2]:digital?+digital[2]:0;
+  min=clock?(clock[3]?.includes('반')?30:parseInt(clock[3]||'0',10)):digital?+digital[3]:0;
+  const part=clock?.[1]||digital?.[1]||'';
   if(part==='오후'||part==='저녁'||part==='밤'){
    if(h>=1&&h<=11)h+=12;
   }else if(part==='새벽'||part==='아침'||part==='오전'){
    if(h===12)h=0;
   }else if(part==='정오'||part==='점심'||part==='낮'){
    if(h>=1&&h<=11)h+=12;
-  }else if(clock&&h>=1&&h<=12){
+  }else if((clock||(digital&&digital[2].length===1))&&h>=1&&h<=12){
+   // "3:30" follows office-hour speech, but "03:30" stays a literal 24h clock.
    // Core business hours are unambiguous for everyday appointment times.
    const options=[h===12?12:h,h===12?0:h+12];
    const core=options.filter(x=>x>=9&&x<=20);
