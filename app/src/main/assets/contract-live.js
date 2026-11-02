@@ -8,7 +8,7 @@
   leaseStart:'입주일',leaseEnd:'임대차 종료일',leaseDuration:'임대차 기간',balanceTime:'잔금 시간',terms:'특약 (기존 특약에 추가)'};
  const MONEY=new Set(['price','contractDeposit','advance','interim','monthlyRent']);
  const DATES=new Set(['contractDate','interimDate','balanceDate','leaseStart','leaseEnd']);
- let active=false,stopping=false,requestId='',sequence=0,proposals={},reviewStates={},selected={},failed=false;
+ let active=false,stopping=false,reviewing=false,requestId='',sequence=0,proposals={},reviewStates={},selected={},failed=false;
  const REVIEW_STATES={pending:'미정',discussion:'협의 중',manual:'직접 입력',not_applicable:'해당 없음'};
  function status(text){$('cl_status').textContent=text;}
  function validDate(s){
@@ -153,10 +153,34 @@
   updateReviewProgress();
   buttons();
  }
+ // Stopping the microphone is NOT approval. The user must see a separate
+ // review step and explicitly choose which proposed terms enter the form.
+ function showReview(){
+  reviewing=true;
+  const count=Object.keys(proposals).length;
+  const hint=$('cl_finishedHint');
+  if(hint)hint.textContent=count
+   ?'인식한 조건 '+count+'개를 아래에서 확인해 주세요. 아직 계약서에 반영되지 않았습니다. 누락·보류 내용은 따로 확인해야 합니다.'
+   :'음성에서 정리된 계약조건이 없습니다. 계약 입력란은 변경되지 않았습니다. 다시 음성으로 말씀하시거나 직접 입력해 주세요.';
+  const finished=$('cl_finished');
+  const dialog=$('cl_dialog');
+  if(dialog)dialog.dataset.liveStage='review';
+  if(finished){
+   finished.hidden=false;
+   finished.focus?.({preventScroll:true});
+   finished.scrollIntoView?.({behavior:'auto',block:'start'});
+  }
+ }
+ function showTalk(){
+  reviewing=false;
+  const dialog=$('cl_dialog');
+  if(dialog)dialog.dataset.liveStage='talk';
+  const finished=$('cl_finished');if(finished)finished.hidden=true;
+ }
  function open(){
   const dialog=$('cl_dialog');
   if(dialog.open)return;
-  requestId='';active=false;stopping=false;failed=false;proposals={};reviewStates={};selected={};
+  requestId='';active=false;stopping=false;failed=false;proposals={};reviewStates={};selected={};showTalk();
   $('cl_consent').checked=false;$('cl_transcript').textContent='';render();
   status('기존 메모는 보내지 않습니다. 이번 대화에서 말씀하신 조건만 정리합니다.');
   dialog.showModal();$('cl_close').focus();
@@ -167,7 +191,7 @@
   if(!$('cl_consent').checked){status('음성 전송 안내를 확인하고 체크해 주세요.');return;}
   if(!root.FirstHyundaiNative?.startContractLiveVoice){status('업데이트된 안드로이드 앱에서 이용해 주세요. 기존 메모 입력은 그대로 사용할 수 있습니다.');return;}
   if(Object.keys(proposals).length&&!root.confirm('새 대화는 이전 Live 검토 후보를 지웁니다. 새로 시작할까요?'))return;
-  proposals={};reviewStates={};selected={};failed=false;active=true;requestId='cl-'+Date.now()+'-'+(++sequence);render();
+  proposals={};reviewStates={};selected={};failed=false;active=true;requestId='cl-'+Date.now()+'-'+(++sequence);showTalk();render();
   root.FirstHyundaiLive?.stop?.();
   status('Live 연결 중입니다…');
   try{root.FirstHyundaiNative.startContractLiveVoice(requestId);}
@@ -175,16 +199,19 @@
  }
  function stop(){
   if(!active||stopping)return;
-  stopping=true;buttons();status('마이크를 종료하고 있습니다…');
+  stopping=true;buttons();status('마이크를 종료하고 계약조건 확인 화면으로 이동합니다…');
   try{root.FirstHyundaiNative.stopContractLiveVoice();}
   catch(e){status('연결 상태를 확인해 주세요. 앱을 나가면 음성이 종료됩니다.');}
  }
- function close(){
+ function close(force=false){
+  if(!force&&(Object.keys(proposals).length||Object.keys(reviewStates).length)&&
+     !root.confirm('음성으로 정리한 조건이 아직 계약에 반영되지 않았습니다. 반영하지 않고 닫을까요?'))return false;
   // Invalidate request before stopping: late native/tool callbacks cannot revive the draft.
   requestId='';
   if(active||stopping){try{root.FirstHyundaiNative?.stopContractLiveVoice?.();}catch(e){}}
-  active=false;stopping=false;proposals={};reviewStates={};selected={};$('cl_transcript').textContent='';render();
+  active=false;stopping=false;proposals={};reviewStates={};selected={};$('cl_transcript').textContent='';showTalk();render();
   $('cl_dialog').close();$('ct_liveOpen')?.focus?.();
+  return true;
  }
  function incoming(event){
   if(!requestId||event?.requestId!==requestId)return;
@@ -212,8 +239,12 @@
   }
   if(state==='error'){active=false;stopping=true;failed=true;status(message);buttons();return;}
   if(state==='ended'){
+   if(reviewing)return; // Late/duplicate stop acknowledgements cannot reset review.
    active=false;stopping=false;buttons();$('cl_transcript').textContent='';
-   if(!failed)status(Object.keys(proposals).length?'대화가 끝났습니다. 조건을 확인하고 반영할 항목을 선택해 주세요.':message);
+   if(!failed)status(Object.keys(proposals).length
+    ?'음성 대화가 종료됐습니다. 아래 계약조건을 검토한 뒤 반영 여부를 결정해 주세요.'
+    :'음성 대화는 종료됐지만 인식해 정리한 조건이 없습니다.');
+   showReview();
    root.FirstHyundaiNative?.requestLiveQuotaStatus?.();
    return;
   }
@@ -246,7 +277,7 @@
   }
   root.FirstHyundaiContracts.updateSummary();
   root.FirstHyundaiEasy.afterManualEdit();
-  close();
+  close(true); // Already applied by an explicit user confirmation.
   $('ct_resultPanel')?.scrollIntoView?.({behavior:'smooth',block:'start'});
   return true;
  }
@@ -274,5 +305,7 @@
  }
  root.onFirstHyundaiLiveQuotaStatus=showQuota;
  root.onFirstHyundaiContractLiveStatus=incoming;
- root.FirstHyundaiContractLive={open,start,stop,close,apply,onPageChange(page){if(page!=='contracts'&&$('cl_dialog').open)close();},_test:{normalize,validDate,consistency,missingConditions}};
+ root.FirstHyundaiContractLive={open,start,stop,close,apply,
+  onPageChange(page){if(page!=='contracts'&&$('cl_dialog').open)close(true);},
+  _test:{normalize,validDate,consistency,missingConditions}};
 })(window);
