@@ -391,25 +391,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.82 realty tax provider diagnostics APK
+      - name: Publish v2.1.83 offline single-home acquisition tax APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.82.apk
-          unzip -t FirstHyundai-v2.1.82.apk | grep 'No errors detected'
-          if gh release view v2.1.82 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.83.apk
+          unzip -t FirstHyundai-v2.1.83.apk | grep 'No errors detected'
+          if gh release view v2.1.83 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.82 FirstHyundai-v2.1.82.apk \
+            gh release create v2.1.83 FirstHyundai-v2.1.83.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.82 · 세금 API 접근 거부 진단' \
-              --notes '부동산계산기 API 공급업체의 응답 상태를 실제 확인했을 때 HTTP 403이 반환되는 경우를 일반 연결 장애와 분리하여 명확하게 안내합니다. 가입 키는 서버의 Cloudflare 비공개 Secret에만 보관하고, 앱은 요청이 거부되면 외부 계산기에서 직접 확인하도록 안내합니다. 일반모드 세금 계산기는 긴 설명을 숨기고 금액/선택조건/계산/결과를 중심으로 간결하게 유지합니다. 제공업체 출처 계산기 제공: 부동산계산기.com은 이용약관의 최소 글씨 크기 0.9rem 이상으로 표시합니다. 실제 업체 접근거부의 원인은 공급업체 계정/접속 경로/방화벽 등 추가 검증이 필요하며 본 버전에서 정상 세액 API 동작이 확정되었다고 주장하지 않습니다. 기존 계약·Live·메모 기능 유지. v2.1.82/build233. 갤럭시 실기기 확인은 별도입니다.'
+              --title '퍼스트현대 v2.1.83 · 1주택 취득세 자체 계산' \
+              --notes '수도권 일반 1주택(생애최초 감면 미해당) 취득세는 외부 API 서비스 장애와 무관하게 앱에서 세목별 예상액을 계산합니다. 사진의 5억원·85㎡ 이하 조건은 취득세 500만원, 지방교육세 50만원, 합계 550만원입니다. 다주택·감면·비수도권 등 복잡한 조건과 양도세는 기존 외부 API를 사용하며 장애 시 대체 확인을 안내합니다. 일반모드의 불필요한 문구를 줄이고 외부 계산 시에만 조건을 전송함을 명확하게 표시합니다. 법령 특례와 신고 전 확인이 필요하며 실제 갤럭시 실기기 검증은 별도입니다. 기존 계약·Live·메모 기능을 유지합니다. v2.1.83/build234.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.82 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.82 --apk FirstHyundai-v2.1.82.apk
+          gh release upload v2.1.83 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.83 --apk FirstHyundai-v2.1.83.apk
 
 
 
