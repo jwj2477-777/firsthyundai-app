@@ -285,6 +285,78 @@ async function boardList(env){
   typeof x.done==="boolean").sort((a,b)=>b.created_at.localeCompare(a.created_at));
  });
 }
+/* Private, account-authenticated tax proxy. No API key or tax calculation is
+   exposed to WebView, persisted in KV, written to a log, or cached. */
+function validTaxDate(value){
+ if(typeof value!=="string"||!/^[0-9]{8}$/.test(value))return false;
+ const y=+value.slice(0,4),m=+value.slice(4,6),d=+value.slice(6,8);
+ if(y<1900||y>2100||m<1||m>12||d<1||d>31)return false;
+ const date=new Date(Date.UTC(y,m-1,d));
+ return date.getUTCFullYear()===y&&date.getUTCMonth()===m-1&&date.getUTCDate()===d;
+}
+function validTaxBody(raw){
+ if(!raw||typeof raw!=="object"||Array.isArray(raw))throw Error("bad_tax_body");
+ const keys=Object.keys(raw);
+ const money=x=>typeof x==="number"&&Number.isSafeInteger(x)&&x>=100000&&x<=500000000000;
+ const yn=x=>x==="Y"||x==="N";
+ if(raw.kind==="acquisition"){
+  if(keys.some(k=>!["kind","amount","own","areaType","conArea","firstOfLife","metro"].includes(k))||
+   !money(raw.amount)||!["one","two","three","more"].includes(raw.own)||
+   !["85","big"].includes(raw.areaType)||!yn(raw.conArea)||!yn(raw.firstOfLife)||!yn(raw.metro))
+   throw Error("bad_tax_conditions");
+  return {amount:raw.amount,realEstateType:"house",how:"buy",own:raw.own,
+   areaType:raw.areaType,conArea:raw.conArea,firstOfLife:raw.firstOfLife,
+   metro:raw.metro,temp1221:"N"};
+ }
+ if(raw.kind==="transfer"){
+  if(keys.some(k=>!["kind","buyAmt","sellAmt","buyDate","sellDate","own","conArea","liveYear","cost"].includes(k))||
+   !money(raw.buyAmt)||!money(raw.sellAmt)||!validTaxDate(raw.buyDate)||!validTaxDate(raw.sellDate)||
+   raw.buyDate>raw.sellDate||!["one","two","more"].includes(raw.own)||!yn(raw.conArea)||
+   typeof raw.liveYear!=="number"||!Number.isInteger(raw.liveYear)||raw.liveYear<0||raw.liveYear>100||
+   (raw.cost!==undefined&&(!Number.isSafeInteger(raw.cost)||raw.cost<0||raw.cost>raw.sellAmt)))
+   throw Error("bad_tax_conditions");
+  const out={buyAmt:raw.buyAmt,sellAmt:raw.sellAmt,buyDate:raw.buyDate,sellDate:raw.sellDate,
+   realEstateType:"house",own:raw.own,conArea:raw.conArea,liveYear:raw.liveYear,
+   baseDeduct:"Y",temp1221:"N",taxReform2026:"N"};
+  if(raw.cost!==undefined)out.cost=raw.cost;
+  return out;
+ }
+ throw Error("bad_tax_kind");
+}
+async function calculatePrivateTax(req,env,caller){
+ if(req.method!=="POST")return res({error:"method_not_allowed"},405);
+ if(!env.CALC_API_KEY)return res({error:"tax_api_not_configured"},503);
+ if(!env.AUTH_LIMITER)return res({error:"rate_limit_unavailable"},503);
+ if(!(await env.AUTH_LIMITER.limit({key:"office-tax-"+caller.deviceId})).success)
+  return res({error:"rate_limited"},429);
+ let data,kind;
+ try{
+  const raw=await body(req,1200);
+  kind=raw?.kind;data=validTaxBody(raw);
+ }catch(e){return res({error:"invalid_tax_conditions"},400)}
+ try{
+  const result=await fetch("https://calcapi.fran.kr/v1/"+(kind==="acquisition"?"acquisition":"transfer"),{
+   method:"POST",headers:{"Authorization":"Bearer "+env.CALC_API_KEY,
+    "Content-Type":"application/json","Accept":"application/json","Cache-Control":"no-store"},
+   body:JSON.stringify(data),signal:AbortSignal.timeout(12000)
+  });
+  if(result.status===429)return res({error:"provider_rate_limited"},429);
+  if(!result.ok)return res({error:"tax_provider_unavailable"},502);
+  const payload=await result.text();
+  if(payload.length>16000)return res({error:"tax_provider_format"},502);
+  const parsed=JSON.parse(payload);
+  if(parsed?.success!==true||!Array.isArray(parsed.data)||parsed.data.length<1||parsed.data.length>80)
+   return res({error:"tax_provider_format"},502);
+  const clean=x=>typeof x==="string"?x.slice(0,160):typeof x==="number"?String(x):"";
+  const rows=parsed.data.map(item=>({
+   label:clean(item?.["적요"]),value:clean(item?.["값"]),detail:clean(item?.["비고"])
+  })).filter(item=>item.label&&item.value);
+  if(!rows.length)return res({error:"tax_provider_format"},502);
+  return res({ok:true,kind,rows,source:"부동산계산기.com",
+   source_url:"https://xn--989a00af8jnslv3dba.com/developers/"});
+ }catch(e){return res({error:"tax_provider_unavailable"},502)}
+}
+
 async function boardCommand(req,env,url,ctx){
  if(!env.FIRSTHYUNDAI_ACCESS_CODE)return res({error:"board_auth_not_configured"},503);
  // All board data (including phone numbers) is private, on GET as well as writes.
@@ -332,6 +404,7 @@ async function boardCommand(req,env,url,ctx){
  // a separate verified administrator session; the family board token alone is
  // never an administrator credential.
  const canModifyNote=async note=>note?.author?.id===caller.member.id||await isAdmin();
+ if(url.pathname==="/board/calculator/tax")return calculatePrivateTax(req,env,caller);
  if(url.pathname==="/board/accounts"&&req.method==="GET")
   return res({accounts:await memberList(env),current:{id:caller.member.id,name:caller.member.name}});
  if(url.pathname==="/board/account"&&req.method==="GET"){
@@ -1012,6 +1085,6 @@ export default {async scheduled(event,env,ctx){
   await env.SETTINGS.put(key,JSON.stringify(record));return res(record);
  }
  return res({error:"not_found"},404);
-},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,memberList,boardToken,validBoardToken,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision,timedMemoDue,deliverDueReminders,liveTokenRequestConfig,liveQuota,liveReset}};
+},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,memberList,boardToken,validBoardToken,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision,timedMemoDue,deliverDueReminders,liveTokenRequestConfig,liveQuota,liveReset,validTaxBody,validTaxDate,calculatePrivateTax}};
 
 
