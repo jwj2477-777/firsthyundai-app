@@ -968,7 +968,7 @@ body.apartmentSheetActive{overflow:hidden}
    <div class="fhcResult" role="status" aria-live="polite"><small id="fhc_loanCaption">월 납입 예상액</small><strong id="fhc_loanPrimary">대출 조건을 입력해 주세요</strong><p id="fhc_loanDetail"></p></div>
    <p class="fhcHint">매월 말 상환·고정금리 가정. 실제 이자, 수수료 및 상환 일정은 금융기관 약정에 따라 달라질 수 있습니다.</p>
   </section>
-  <section class="fhcPane" id="fhc_taxPane" hidden>
+  <section class="fhcPane" id="fhc_taxPane" hidden oninput="FirstHyundaiCalculators.invalidateTax()" onchange="FirstHyundaiCalculators.invalidateTax()">
    <p id="fhc_taxIntro" class="fhcHint"></p>
    <div class="fhcTaxInputs" id="fhc_acquisitionInputs" hidden>
     <label for="fhc_acqAmount">취득금액 (만원)</label>
