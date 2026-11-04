@@ -8,7 +8,7 @@ function element(id){if(!elements.has(id))elements.set(id,{
  append(...items){this.children.push(...items);},replaceChildren(){this.children=[];},addEventListener(){},
  scrollIntoView(){}
 });return elements.get(id);}
-const win={},doc={getElementById:element};
+const win={},doc={getElementById:element,createElement:()=>({textContent:'',className:'',children:[],append(...xs){this.children.push(...xs);}})};
 vm.runInNewContext(read('app/src/main/assets/realty-calculators.js'),{window:win,document:doc,Intl,Number,String,Math,Object,Set,Error});
 const calc=win.FirstHyundaiCalculators,fn=calc._test;
 const approx=(a,b,t=1e-7)=>assert(Math.abs(a-b)<=t,`expected ${a} ≈ ${b}`);
