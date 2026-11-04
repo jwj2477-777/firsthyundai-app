@@ -356,7 +356,7 @@
    $('fhc_taxIntro').textContent=type==='acquisition'
      ?'취득금액·주택 수·면적·규제지역·감면 여부를 확인해야 합니다.'
      :'취득/양도가액·날짜·거주기간·주택 수·필요경비 등을 확인해야 합니다.';
-   $('fhc_taxExternal').href='https://xn--989a00af8jnslv3dba.com/'+(type==='acquisition'?'acquisition':'transfer');
+   $('fhc_taxExternal').href='https://xn--989a00af8jnslv3dba.com/'+(type==='acquisition'?'취득세':'transfer');
    $('fhc_taxOfficial').href=type==='acquisition'?'https://www.wetax.go.kr':'https://www.hometax.go.kr';
    clearTax();
    $('fhc_taxAcquisition').hidden=type!=='acquisition';
