@@ -89,7 +89,7 @@
      '거래금액 '+WON.format(result.baseWan)+'만원'];
     if(result.cap!==null)pieces.push('보수 상한액 적용');
     if(result.vatWon>0)pieces.push('가정 부가세 '+money(result.vatWon));
-    output('fhc_fee',money(result.total),pieces.join(' · ')+(result.vatWon>0?' · 부가세 포함 합계':' · 부가세 제외'));
+    output('fhc_fee',money(result.total),pieces.join(' · ')+(result.vatWon>0?' · 부가세 포함 합계':' · 부가세 제외'),result.vatWon>0?'부가세 포함 예상 합계':'예상 중개보수 상한');
    }catch(e){output('fhc_fee','금액을 확인해 주세요',e.message);}
   }else if(chosen==='conversion'){
    try{
@@ -184,8 +184,7 @@
     :(rate>=8?'중과 배제 주택·공시가격 예외·주택 수 산정 특례는 미반영':'법정 기본세율이며 별도 감면·중과 제외·과세표준 예외는 미반영');
   return {ok:true,totalWon,source:'local_basic',
    rows:[{label:'예상 합계',value:money(totalWon)},
-     {label:'취득세 ('+rate.toFixed(2)+'%)',value:money(acquisition)},
-     ...(discount?[{label:'생애최초 취득세 감면',value:'-'+money(discount)}]:[]),
+     {label:'취득세 ('+rate.toFixed(2)+'%'+(discount?' · 감면 '+money(discount):'')+')',value:money(acquisition)},
      {label:'지방교육세',value:money(education)},{label:'농어촌특별세',value:money(rural)}],
    basis:'앱 자체 계산 · 외부 API 전송 없음. 2026년 11월 기준 주택 유상취득 세율. '+caution+'. 신고 전 위택스·관할 지자체에서 확인해 주세요.'};
  }
