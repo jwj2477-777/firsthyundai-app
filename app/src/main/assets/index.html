@@ -1489,6 +1489,7 @@ function switchPage(id){
  currentPage=id;
  window.FirstHyundaiLive?.onPageChange?.(id);
  window.FirstHyundaiContractLive?.onPageChange?.(id);
+ window.FirstHyundaiCalculators?.onPageChange?.(id);
  // One stable design token per screen: family and admin share navigation semantics.
  document.body?.setAttribute?.('data-section',id);
  PAGES.forEach(p=>$(p[0]).classList.toggle('hidden',p[0]!==id));
