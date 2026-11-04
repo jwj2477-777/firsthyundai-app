@@ -1,4 +1,4 @@
-/* Server-only Korean realty tax estimates. No key, customer, account or result persistence. */
+/* Server-only Korean realty tax estimates. Reject invalid numbers; accept valid numeric result fields. No key, customer, account or result persistence. */
 const provider='https://calcapi.fran.kr/v1/';
 const allowedTypes=new Set(['acquisition','transfer']);
 function own(type,s){const values=type==='acquisition'?['one','two','three','more']:['one','two','more'];return values.includes(s)?s:null;}
