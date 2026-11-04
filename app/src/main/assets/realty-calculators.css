@@ -1,19 +1,49 @@
 /* 퍼스트현대 부동산 계산기 — six main tabs remain unchanged. */
-.fhcQuickAccess{display:flex;justify-content:flex-end;margin:-4px 0 11px}
-#fhc_quickOpen{min-height:45px;border:1px solid #b6cfc2;border-radius:13px;background:#edf6f0;color:#245d4a;font-weight:800;font-size:14px;padding:8px 15px}
-body[data-section="calculators"] #fhc_quickOpen{background:#226651;color:#fff;border-color:#226651}
+/* Occasional office tool: located with device/display controls, never under the six primary tabs. */
+.compactAppFooter .appFooterDisplayRow #fhc_quickOpen{
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ min-width:108px;min-height:44px;box-sizing:border-box;padding:9px 13px;
+ border:1px solid #c9d7cf;border-radius:11px;background:#fffdf8;
+ color:#305c57;font-family:inherit;font-size:13px;font-weight:800;line-height:1.2;
+ box-shadow:0 1px 4px #213e3610;cursor:pointer;white-space:nowrap;
+ transition:background-color .16s ease,border-color .16s ease,color .16s ease
+}
+.compactAppFooter .appFooterDisplayRow #fhc_quickOpen svg{width:19px;height:19px;flex:none}
+.compactAppFooter .appFooterDisplayRow #fhc_quickOpen:active{background:#eaf3ee}
+.compactAppFooter .appFooterDisplayRow #fhc_quickOpen[aria-current="page"]{
+ border-color:#719f90;background:#edf4ec;color:#20584c
+}
+.compactAppFooter .appFooterDisplayRow #fhc_quickOpen:focus-visible{
+ outline:3px solid #d6aa72;outline-offset:3px
+}
+.compactAppFooter .appFooterDisplayRow>small{flex-basis:100%;margin-top:-3px}
 .fhcContractEntry{border:1px solid #d5bb9c;background:#fffaef;color:#76512d;border-radius:11px;min-height:44px;font-weight:750;padding:8px 14px;font-size:14px;align-self:flex-start}
 #calculators{max-width:760px;margin:0 auto}
 #calculators .sectionTitle{margin:5px 0 8px}
 .fhcLead{margin:0 0 14px;color:#52647a;font-size:15px}
-.fhcModeGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.fhcMode{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;text-align:left;min-height:104px;padding:15px;border-radius:18px;border:1.5px solid #d4dfd8;background:#fff;color:#1d3e43;box-shadow:0 2px 12px #2a5f4d10;font:inherit;cursor:pointer}
-.fhcMode span{font-size:25px;color:#327364;line-height:1.1}
-.fhcMode strong{font-size:17px;line-height:1.35}
-.fhcMode small{font-size:13px;color:#577069}
-.fhcMode.fhcTax{background:#f7faf6;border-color:#c9dacf}
-.fhcMode.fhcWide{grid-column:span 2;min-height:82px}
-.fhcMode:active{background:#eef6ed}
+/* Calm, uniform list: all five calculators retain equal touch targets and hierarchy. */
+.fhcModeGrid{display:grid;grid-template-columns:minmax(0,1fr);gap:9px}
+.fhcMode{
+ display:grid;grid-template-columns:42px minmax(0,1fr) 14px;align-items:center;
+ gap:12px;text-align:left;width:100%;min-height:72px;box-sizing:border-box;padding:10px 14px;
+ border:1px solid #d5ded8;border-radius:15px;
+ background:linear-gradient(115deg,#fffdf8 0%,#ffffff 68%);
+ color:#24484c;box-shadow:0 2px 7px #374e4210;
+ font:inherit;cursor:pointer;transition:border-color .15s ease,background-color .15s ease
+}
+.fhcMode.fhcTax{border-color:#d3dfd6}
+.fhcModeIcon{
+ width:40px;height:40px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+ color:#31685e;background:#edf5f1;border:1px solid #d8e8e0;border-radius:12px
+}
+.fhcMode.fhcTax .fhcModeIcon{color:#476c53;background:#f1f5ea;border-color:#e0e9d8}
+.fhcModeIcon svg{width:23px;height:23px;display:block}
+.fhcModeCopy{min-width:0;display:flex;flex-direction:column;gap:2px}
+.fhcModeCopy strong{font-size:16px;line-height:1.3;font-weight:850;color:#254649;word-break:keep-all}
+.fhcModeCopy small{font-size:12px;line-height:1.4;color:#697975;font-weight:650;word-break:keep-all}
+.fhcModeChevron{color:#91a69d;font-size:25px;line-height:1;justify-self:end;align-self:center}
+.fhcMode:active{background:#f1f7f1;border-color:#a5c8b6}
+.fhcMode:focus-visible{outline:3px solid #d6aa72;outline-offset:3px}
 .fhcDetail{margin:6px 0 18px}
 .fhcDetailTitle{font-size:21px;margin:10px 0 16px;color:#284d45}
 .fhcBack{border:0;background:none;color:#27614e;min-height:46px;font-size:15px;font-weight:800;padding:6px 4px}
@@ -38,7 +68,7 @@ body[data-section="calculators"] #fhc_quickOpen{background:#226651;color:#fff;bo
 .fhcTaxLink{display:block;text-decoration:none;line-height:1.5;text-align:center;padding:12px 9px}
 .fhcAttribution{font-size:15px;color:#465b55}
 .fhcAttribution a{font-size:15px;color:#276454;text-decoration:underline}
-@media(max-width:360px){.fhcMode strong{font-size:15px}.fhcMode{padding:12px}.fhcMode small{font-size:12px}.fhcDetail{padding:14px}.fhcResult strong{font-size:20px}}
+@media(max-width:360px){.fhcMode{padding:10px 11px;gap:9px}.fhcModeCopy strong{font-size:15px}.fhcModeCopy small{font-size:12px}.fhcDetail{padding:14px}.fhcResult strong{font-size:20px}}
 
 /* Tax inputs and text-only estimates: use the same visual rhythm as office tools. */
 .fhcTaxInputs{display:flex;flex-direction:column;gap:8px}
