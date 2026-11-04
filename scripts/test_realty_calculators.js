@@ -56,6 +56,15 @@ assert.equal(bullet.totalInterest,300000000*.045/12*360);
 assert.throws(()=>loan(30000,4.5,0,'equal'));
 assert.throws(()=>loan(30000,4.5,601,'equal'));
 assert.throws(()=>loan(30000,4.5,360,'unrecognized'));
+const localTax=(amount,areaType='85')=>fn.simpleAcquisitionTax({amount,areaType,own:'one',conArea:'N',firstOfLife:'N',metro:'Y'});
+assert.equal(localTax(50000).totalWon,5500000,'5억 1주택 85㎡ 이하 = 550만원');
+assert.equal(localTax(60000).totalWon,6600000);
+assert.equal(localTax(70000).totalWon,12859000,'7억원 1.67% 중간세율 반올림');
+assert.equal(localTax(100000,'big').totalWon,35000000,'10억 85㎡ 초과 농어촌특별세');
+for(const changed of [{own:'two'},{firstOfLife:'Y'},{metro:'N'}]){
+ const basic={amount:50000,areaType:'85',own:'one',conArea:'N',firstOfLife:'N',metro:'Y'};
+ assert.equal(fn.simpleAcquisitionTax({...basic,...changed}),null,'특례 여부 불확실한 조건의 임의계산 금지');
+}
 const ids=['fhc_modes','fhc_detail','fhc_detailTitle','fhc_feePane','fhc_conversionPane',
  'fhc_loanPane','fhc_taxPane','fhc_taxIntro','fhc_taxExternal','fhc_taxOfficial',
  'fhc_feeDeal','fhc_feeKind','fhc_feeAmount','fhc_feeRent','fhc_feeAmountLabel','fhc_feeRentWrap','fhc_officeNote',
@@ -86,7 +95,7 @@ assert.match(element('fhc_taxOfficial').href,/wetax/);
 assert.equal(calc.calculateTax(),false,'Missing conditions must block tax request');
 element('fhc_taxAmount').value='140000';
 element('fhc_taxArea').value='85';
-element('fhc_taxOwn').value='one';
+element('fhc_taxOwn').value='two';
 element('fhc_taxConArea').value='N';
 element('fhc_taxFirstLife').value='N';
 element('fhc_taxMetro').value='Y';
@@ -102,6 +111,15 @@ win.onFirstHyundaiRealtyTaxResult({requestId,ok:true,data:{ok:true,rows:[{label:
 assert.equal(element('fhc_taxResult').hidden,false);
 assert.equal(element('fhc_taxRows').children.length,1);
 assert.equal(element('fhc_taxCalculate').disabled,false);
+// Field regression: straightforward 5억원 1주택 must calculate without external service.
+calc.select('acquisition');
+element('fhc_taxAmount').value='50000';element('fhc_taxOwn').value='one';
+assert.equal(calc.calculateTax(),true);
+assert.equal(taxRequests.length,1,'Local basic tax must never call provider');
+assert.equal(element('fhc_taxResult').hidden,false);
+assert.equal(element('fhc_taxRows').children[0].children[1].textContent,'5,500,000원');
+assert.match(element('fhc_taxBasis').textContent,/외부 API 전송 없음/);
+assert.equal(element('fhc_taxFallback').hidden,true);
 
 calc.select('transfer');
 assert.match(element('fhc_taxExternal').href,/\/transfer$/);
@@ -147,7 +165,7 @@ assert(page.includes('class="fhcTaxField"'),'Group paired fields into compact ca
 assert(page.includes('<details class="fhcMore"><summary>계산 기준 · 공식 확인</summary>'));
 assert(page.includes('계산기 제공: <a href="https://eznm.me/realestate">부동산계산기.com</a>'),
  'Attribution must stay visible for family users');
-assert(page.includes('입력 조건이 업체에 전달됩니다'),'Keep concise data-use notice in family mode');
+assert(page.includes('외부 계산 시에만 조건 전송'),'Disclose only external API transmission');
 const styles=read('app/src/main/assets/realty-calculators.css');
 assert(styles.includes('.fhcTaxInputs{display:grid;grid-template-columns:repeat(2'),
  'Use two-column compact fields on supported devices');
