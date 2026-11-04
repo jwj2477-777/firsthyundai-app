@@ -58,6 +58,19 @@ const forbidden=async()=>new Response(JSON.stringify({success:false}),{status:40
 response=await call({type:'acquisition',values:{amount:140000,areaType:'85',own:'one',conArea:'N',firstOfLife:'N',metro:'Y'}},env,forbidden);
 assert.equal(response.status,503);
 assert.equal((await response.json()).error,'provider_forbidden','Distinguish a real provider HTTP 403');
+let tries=0;
+const alternate=async(url,options)=>{
+ tries++;
+ if(tries===1){assert.equal(options.headers.Authorization,'Bearer rck_FAKE_TEST_ONLY');return new Response('',{status:403})}
+ assert.equal(options.headers['X-Api-Key'],'rck_FAKE_TEST_ONLY');
+ assert(!Object.hasOwn(options.headers,'Authorization'));
+ return new Response(JSON.stringify({success:true,data:[{적요:'세액',값:'5,500,000',비고:'검증'}]}),{status:200});
+};
+response=await call({type:'acquisition',values:{amount:50000,areaType:'85',own:'one',conArea:'N',firstOfLife:'N',metro:'Y'}},env,alternate);
+assert.equal(response.status,200,'Official alternate auth header should recover from one 403');
+assert.equal(tries,2);
+assert.equal((await response.json()).rows[0].value,'5,500,000');
+
 const worker=fs.readFileSync(new URL('../workers/shared-settings/src/index.mjs',import.meta.url),'utf8');
 const native=fs.readFileSync(new URL('../app/src/main/java/kr/co/firsthyundai/app/MainActivity.java',import.meta.url),'utf8');
 const client=fs.readFileSync(new URL('../app/src/main/java/kr/co/firsthyundai/app/OfficeBoardClient.java',import.meta.url),'utf8');
