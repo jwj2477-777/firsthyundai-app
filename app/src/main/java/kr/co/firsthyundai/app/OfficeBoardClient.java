@@ -113,6 +113,15 @@ final class OfficeBoardClient {
         if(auth.isEmpty())throw new Exception("사무실 메모 인증이 필요합니다.");
         return request("GET","/board/"+noteId+"/preview",null,auth);
     }
+    /** Only minimum tax condition fields are forwarded to the authenticated Worker.
+     *  Never include names, property addresses, bank details, contracts or raw notes. */
+    static JSONObject calculateTax(Context context,JSONObject conditions) throws Exception {
+        String authorization=token(context);
+        if(authorization.isEmpty())throw new Exception("사무실 계정 연결이 필요합니다.");
+        if(conditions==null||conditions.toString().length()>1200)
+            throw new Exception("세금 계산 조건을 확인해 주세요.");
+        return request("POST","/board/calculator/tax",conditions,authorization);
+    }
     /** Exchange private board auth for one short-lived Gemini Live token. Never expose the board token to JS. */
     static JSONObject liveToken(Context context) throws Exception {
         String auth=token(context);
