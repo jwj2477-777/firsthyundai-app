@@ -299,7 +299,11 @@
   $('fhc_taxCalculate').disabled=true;
   $('fhc_taxCalculate').textContent='계산 확인 중…';
   taxStatus('계산 중…');
-  try{root.FirstHyundaiNative.calculateRealtyTax(JSON.stringify({type:chosen,values}),requestId);}
+  const providerValues={...values};
+  delete providerValues.tempTwo;
+  delete providerValues.exemptionVerified;
+  delete providerValues.firstHomeType;
+  try{root.FirstHyundaiNative.calculateRealtyTax(JSON.stringify({type:chosen,values:providerValues}),requestId);}
   catch(e){clearTax();taxStatus('계산 요청을 시작하지 못했습니다.');$('fhc_taxFallback').hidden=false;return false;}
   return true;
  }
