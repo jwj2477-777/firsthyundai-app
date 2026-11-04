@@ -157,6 +157,7 @@
    case 'account_session_required': return '사무실 계정에 다시 로그인해 주세요.';
    case 'tax_api_not_configured': return '계산 서비스 설정을 확인해 주세요.';
    case 'provider_auth_error': return '계산 서비스 인증에 문제가 있습니다.';
+   case 'provider_forbidden': return '계산 서비스가 요청을 거절했습니다. 외부 계산기를 이용해 주세요.';
    case 'invalid_request':
    case 'invalid_amount':
    case 'invalid_housing_condition':
