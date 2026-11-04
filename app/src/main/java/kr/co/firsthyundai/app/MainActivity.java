@@ -603,8 +603,18 @@ public class MainActivity extends Activity {
                     JSONObject data=OfficeBoardClient.calculateRealtyTax(getApplicationContext(),new JSONObject(payload));
                     event.put("requestId",requestId).put("ok",true).put("data",data);
                 }catch(Exception e){
+                    String detail=e.getMessage()==null?"":e.getMessage();
+                    String code="network_error";
+                    int http=0;
+                    if(detail.startsWith("tax_error:")){
+                        String[] parts=detail.split(":",3);
+                        try{http=Integer.parseInt(parts[1]);}catch(Exception ignored){}
+                        if(parts.length==3 && parts[2].matches("[a-z_]{3,64}"))code=parts[2];
+                    }else if(detail.contains("사무실 계정 인증"))code="account_session_required";
+                    else if(detail.contains("계산 입력값"))code="invalid_request";
+                    else if(e instanceof java.net.SocketTimeoutException)code="connection_timeout";
                     try{event.put("requestId",requestId).put("ok",false)
-                        .put("error","세금 계산 연결을 확인해 주세요. API 키 설정 또는 서버 연결 상태를 점검해 주세요.");}
+                        .put("errorCode",code).put("httpStatus",http);}
                     catch(Exception ignored){}
                 }
                 deliver("onFirstHyundaiRealtyTaxResult",event);
