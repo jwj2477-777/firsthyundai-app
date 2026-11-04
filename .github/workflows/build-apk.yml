@@ -405,7 +405,7 @@ jobs:
             gh release create v2.1.82 FirstHyundai-v2.1.82.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
               --title '퍼스트현대 v2.1.82 · 세금 API 접근 거부 진단' \
-              --notes '부동산계산기 API 공급업체의 응답 상태를 실제 확인했을 때 HTTP 403이 반환되는 경우를 일반 연결 장애와 분리하여 명확하게 안내합니다. 가입 키는 서버의 Cloudflare 비공개 Secret에만 보관하고, 앱은 요청이 거부되면 외부 계산기에서 직접 확인하도록 안내합니다. 일반모드 세금 계산기는 긴 설명을 숨기고 금액/선택조건/계산/결과를 중심으로 간결하게 유지합니다. 제공업체 출처 '계산기 제공: 부동산계산기.com'은 이용약관의 최소 글씨 크기 0.9rem 이상으로 표시합니다. 실제 업체 접근거부의 원인은 공급업체 계정/접속 경로/방화벽 등 추가 검증이 필요하며 본 버전에서 정상 세액 API 동작이 확정되었다고 주장하지 않습니다. 기존 계약·Live·메모 기능 유지. v2.1.82/build233. 갤럭시 실기기 확인은 별도입니다.'
+              --notes '부동산계산기 API 공급업체의 응답 상태를 실제 확인했을 때 HTTP 403이 반환되는 경우를 일반 연결 장애와 분리하여 명확하게 안내합니다. 가입 키는 서버의 Cloudflare 비공개 Secret에만 보관하고, 앱은 요청이 거부되면 외부 계산기에서 직접 확인하도록 안내합니다. 일반모드 세금 계산기는 긴 설명을 숨기고 금액/선택조건/계산/결과를 중심으로 간결하게 유지합니다. 제공업체 출처 계산기 제공: 부동산계산기.com은 이용약관의 최소 글씨 크기 0.9rem 이상으로 표시합니다. 실제 업체 접근거부의 원인은 공급업체 계정/접속 경로/방화벽 등 추가 검증이 필요하며 본 버전에서 정상 세액 API 동작이 확정되었다고 주장하지 않습니다. 기존 계약·Live·메모 기능 유지. v2.1.82/build233. 갤럭시 실기기 확인은 별도입니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
           gh release upload v2.1.82 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
