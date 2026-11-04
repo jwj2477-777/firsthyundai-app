@@ -130,6 +130,11 @@ jobs:
           else
             echo 'Realty tax API key has not been set. Existing local calculators remain available.'
           fi
+      - name: Verify tax provider with synthetic examples (no private data)
+        continue-on-error: true
+        env:
+          CALC_API_KEY: ${{ secrets.CALC_API_KEY }}
+        run: python3 scripts/probe_realty_tax_api.py
       - name: Check official weather availability without credentials in logs
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
