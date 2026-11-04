@@ -37,8 +37,9 @@
    else if(tradeWan<150000)rate=sale?.006:.005;
    else rate=sale?.007:.006;
   }
-  const maximum=Math.min(tradeWan*10000*rate,cap??Infinity);
-  const additional=vat?maximum*.1:0;
+  // Korean won is integral. Round floating-point percentage arithmetic once.
+  const maximum=Math.round(Math.min(tradeWan*10000*rate,cap??Infinity));
+  const additional=vat?Math.round(maximum*.1):0;
   return {baseWan:tradeWan,rate,maximum,vatWon:additional,total:maximum+additional,cap};
  }
  function conversion({oldWan,newWan,ratePct}){
