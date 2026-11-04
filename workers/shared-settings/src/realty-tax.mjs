@@ -48,8 +48,9 @@ function cleanRows(value){
   if(!row||typeof row!=='object')throw Error('invalid_provider_response');
   const take=(key,max)=>{
    const value=row[key];
+   if(typeof value==='number'&&!Number.isFinite(value))throw Error('invalid_provider_response');
    return typeof value==='string'?value.slice(0,max):
-    typeof value==='number'&&Number.isFinite(value)?String(value).slice(0,max):'';
+    typeof value==='number'?String(value).slice(0,max):'';
   };
   return {label:take('적요',100),value:take('값',140),note:take('비고',240)};
  }).filter(row=>row.label);
