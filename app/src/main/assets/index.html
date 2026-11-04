@@ -198,7 +198,6 @@ body.apartmentSheetActive{overflow:hidden}
 </div></div></header>
 <main>
 <nav class="tabs" id="nav" aria-label="업무 주요 메뉴"></nav>
-<div class="fhcQuickAccess"><button type="button" id="fhc_quickOpen" onclick="switchPage('calculators')">▤ 부동산 계산기</button></div>
 <div id="appUpdateBanner" class="appUpdateBanner" role="status" aria-live="polite" hidden>
   <span id="appUpdateBannerText">새 버전이 있습니다.</span>
   <button id="appUpdateInstall" class="btn" type="button">업데이트</button>
@@ -930,11 +929,26 @@ body.apartmentSheetActive{overflow:hidden}
  <div class="sectionTitle"><h2>부동산 계산기</h2></div>
  <p class="fhcLead adminExplain">필요한 계산을 선택하면 바로 입력할 수 있습니다.</p>
  <div id="fhc_modes" class="fhcModeGrid" aria-label="계산기 선택">
-  <button type="button" class="fhcMode fhcTax" onclick="FirstHyundaiCalculators.select('acquisition')"><span aria-hidden="true">⌂</span><strong>취득세</strong><small>살 때 내는 세금</small></button>
-  <button type="button" class="fhcMode fhcTax" onclick="FirstHyundaiCalculators.select('transfer')"><span aria-hidden="true">↗</span><strong>양도소득세</strong><small>팔 때 내는 세금</small></button>
-  <button type="button" class="fhcMode" onclick="FirstHyundaiCalculators.select('fee')"><span aria-hidden="true">₩</span><strong>중개보수</strong><small>거래금액별 상한</small></button>
-  <button type="button" class="fhcMode" onclick="FirstHyundaiCalculators.select('conversion')"><span aria-hidden="true">⇄</span><strong>전월세 전환</strong><small>보증금·월세 비교</small></button>
-  <button type="button" class="fhcMode fhcWide" onclick="FirstHyundaiCalculators.select('loan')"><span aria-hidden="true">▤</span><strong>대출이자</strong><small>상환방식별 월 납입액</small></button>
+  <button type="button" class="fhcMode fhcTax" onclick="FirstHyundaiCalculators.select('acquisition')">
+   <span class="fhcModeIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5v-9.5Z"/><path d="M9 20v-7h6v7"/><path d="M8 9h8"/></svg></span>
+   <span class="fhcModeCopy"><strong>취득세</strong><small>집을 살 때의 예상 세금</small></span><span class="fhcModeChevron" aria-hidden="true">›</span>
+  </button>
+  <button type="button" class="fhcMode fhcTax" onclick="FirstHyundaiCalculators.select('transfer')">
+   <span class="fhcModeIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16M6 15l5-5 3.5 3.5L20 7"/><path d="M15.5 7H20v4.5"/></svg></span>
+   <span class="fhcModeCopy"><strong>양도소득세</strong><small>집을 팔 때의 예상 세금</small></span><span class="fhcModeChevron" aria-hidden="true">›</span>
+  </button>
+  <button type="button" class="fhcMode" onclick="FirstHyundaiCalculators.select('fee')">
+   <span class="fhcModeIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 8 4 8 4-8M9 12h6"/></svg></span>
+   <span class="fhcModeCopy"><strong>중개보수</strong><small>매매·전월세 상한액</small></span><span class="fhcModeChevron" aria-hidden="true">›</span>
+  </button>
+  <button type="button" class="fhcMode" onclick="FirstHyundaiCalculators.select('conversion')">
+   <span class="fhcModeIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M16 3l4 4-4 4M20 17H4m4-4-4 4 4 4"/></svg></span>
+   <span class="fhcModeCopy"><strong>전월세 전환</strong><small>보증금·월세 비교</small></span><span class="fhcModeChevron" aria-hidden="true">›</span>
+  </button>
+  <button type="button" class="fhcMode" onclick="FirstHyundaiCalculators.select('loan')">
+   <span class="fhcModeIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8.5 11h2m3 0h2M8.5 15h2m3 0h2"/></svg></span>
+   <span class="fhcModeCopy"><strong>대출이자</strong><small>상환 방식별 월 납입액</small></span><span class="fhcModeChevron" aria-hidden="true">›</span>
+  </button>
  </div>
  <div id="fhc_detail" class="panel fhcDetail" hidden>
   <button type="button" class="fhcBack" onclick="FirstHyundaiCalculators.home()">‹ 계산 목록으로</button>
@@ -1229,7 +1243,14 @@ body.apartmentSheetActive{overflow:hidden}
    <button type="button" id="appUpdateCheck" class="btn alt">업데이트 확인</button>
   </div>
  </div>
- <div class="appFooterDisplayRow"><button type="button" id="deviceDisplayOpen" class="deviceDisplayOpen" aria-haspopup="dialog" aria-controls="deviceDisplayDialog" onclick="FirstHyundaiDeviceDisplay.open()">Aa 화면 크기</button><small>이 휴대전화만 변경</small></div>
+ <div class="appFooterDisplayRow" role="group" aria-label="기타 편의 도구">
+  <button type="button" id="deviceDisplayOpen" class="deviceDisplayOpen" aria-haspopup="dialog" aria-controls="deviceDisplayDialog" onclick="FirstHyundaiDeviceDisplay.open()">Aa 화면 크기</button>
+  <button type="button" id="fhc_quickOpen" class="fhcFooterTool" onclick="switchPage('calculators')" aria-label="부동산 계산기 열기" aria-current="false">
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 7h7M8.5 11h2M13.5 11h2M8.5 15h2M13.5 15h2"/></svg>
+   <span>계산기</span>
+  </button>
+  <small>화면 크기는 이 기기에만 적용</small>
+ </div>
  <div class="appUpdateActions"><span id="appUpdateStatus" role="status" aria-live="polite"></span>
   <a id="appUpdateManual" class="appUpdateManual hidden" href="https://github.com/jwj2477-777/firsthyundai-app/releases/latest"
     rel="noopener noreferrer">공식 업데이트 페이지 열기 ↗</a></div>
