@@ -112,7 +112,7 @@
  function taxValue(id){return String($(id)?.value||'').trim();}
  function taxWon(id,allowZero=false){
   const raw=taxValue(id);
-  if(!/^\\d+$/.test(raw))throw Error('금액을 만원 단위 정수로 입력해 주세요.');
+  if(!/^\d+$/.test(raw))throw Error('금액을 만원 단위 정수로 입력해 주세요.');
   const n=Number(raw);
   if(!Number.isSafeInteger(n)||n>1000000000||(!allowZero&&n<1))throw Error('금액을 확인해 주세요.');
   return n;
@@ -124,7 +124,7 @@
  }
  function taxDate(id){
   const v=taxValue(id);
-  if(!/^(?:19|20)\\d{2}-\\d{2}-\\d{2}$/.test(v))throw Error('취득일과 양도일을 정확히 선택해 주세요.');
+  if(!/^(?:19|20)\d{2}-\d{2}-\d{2}$/.test(v))throw Error('취득일과 양도일을 정확히 선택해 주세요.');
   const d=new Date(v+'T00:00:00Z');
   if(!Number.isFinite(d.getTime())||d.toISOString().slice(0,10)!==v)throw Error('날짜를 확인해 주세요.');
   return v.replace(/-/g,'');
@@ -140,7 +140,7 @@
   const buyDate=taxDate('fhc_taxBuyDate'),sellDate=taxDate('fhc_taxSellDate');
   if(sellDate<buyDate)throw Error('양도일은 취득일보다 빠를 수 없습니다.');
   const v=taxValue('fhc_taxLiving');
-  if(!/^\\d+(?:\\.\\d+)?$/.test(v)||Number(v)>100)throw Error('실제 거주기간을 연 단위로 입력해 주세요.');
+  if(!/^\d+(?:\\.\d+)?$/.test(v)||Number(v)>100)throw Error('실제 거주기간을 연 단위로 입력해 주세요.');
   const values={buyAmt:taxWon('fhc_taxBuyAmt'),sellAmt:taxWon('fhc_taxSellAmt'),buyDate,sellDate,
    own:taxChoice('fhc_taxTransferOwn',['one','two','more'],'주택 수'),
    conArea:taxChoice('fhc_taxTransferConArea',['Y','N'],'조정대상지역'),liveYear:Number(v)};
