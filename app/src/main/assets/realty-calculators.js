@@ -5,7 +5,7 @@
  const WON=new Intl.NumberFormat('ko-KR',{maximumFractionDigits:0});
  const types=new Set(['acquisition','transfer','fee','conversion','loan']);
  const names={acquisition:'취득세',transfer:'양도소득세',fee:'중개보수',conversion:'전월세 전환',loan:'대출이자'};
- let chosen='';
+ let chosen='',taxPending='',taxSequence=0;
  function num(value,max,allowFraction=false){
   const raw=String(value??'').trim();
   if(!/^\d+(?:\.\d+)?$/.test(raw))return null;
@@ -109,8 +109,101 @@
    }catch(e){output('fhc_loan','조건을 확인해 주세요',e.message,'월 납입 예상액');}
   }
  }
+ function taxValue(id){return String($(id)?.value||'').trim();}
+ function taxWon(id,allowZero=false){
+  const raw=taxValue(id);
+  if(!/^\d+$/.test(raw))throw Error('금액을 만원 단위 정수로 입력해 주세요.');
+  const n=Number(raw);
+  if(!Number.isSafeInteger(n)||n>1000000000||(!allowZero&&n<1))throw Error('금액을 확인해 주세요.');
+  return n;
+ }
+ function taxChoice(id,values,label){
+  const value=taxValue(id);
+  if(!values.includes(value))throw Error(label+' 항목을 확인하고 선택해 주세요.');
+  return value;
+ }
+ function taxDate(id){
+  const v=taxValue(id);
+  if(!/^(?:19|20)\d{2}-\d{2}-\d{2}$/.test(v))throw Error('취득일과 양도일을 정확히 선택해 주세요.');
+  const d=new Date(v+'T00:00:00Z');
+  if(!Number.isFinite(d.getTime())||d.toISOString().slice(0,10)!==v)throw Error('날짜를 확인해 주세요.');
+  return v.replace(/-/g,'');
+ }
+ function taxInputs(type){
+  if(type==='acquisition')return {amount:taxWon('fhc_taxAmount'),
+    areaType:taxChoice('fhc_taxArea',['40','60','85','big'],'전용면적'),
+    own:taxChoice('fhc_taxOwn',['one','two','three','more'],'주택 수'),
+    conArea:taxChoice('fhc_taxConArea',['Y','N'],'조정대상지역'),
+    firstOfLife:taxChoice('fhc_taxFirstLife',['Y','N'],'생애최초 감면 대상'),
+    metro:taxChoice('fhc_taxMetro',['Y','N'],'수도권 여부')};
+  if(type!=='transfer')throw Error('세금 종류를 선택해 주세요.');
+  const buyDate=taxDate('fhc_taxBuyDate'),sellDate=taxDate('fhc_taxSellDate');
+  if(sellDate<buyDate)throw Error('양도일은 취득일보다 빠를 수 없습니다.');
+  const v=taxValue('fhc_taxLiving');
+  if(!/^\d+(?:\\.\d+)?$/.test(v)||Number(v)>100)throw Error('실제 거주기간을 연 단위로 입력해 주세요.');
+  const values={buyAmt:taxWon('fhc_taxBuyAmt'),sellAmt:taxWon('fhc_taxSellAmt'),buyDate,sellDate,
+   own:taxChoice('fhc_taxTransferOwn',['one','two','more'],'주택 수'),
+   conArea:taxChoice('fhc_taxTransferConArea',['Y','N'],'조정대상지역'),liveYear:Number(v)};
+  if(taxValue('fhc_taxCost')!=='')values.cost=taxWon('fhc_taxCost',true);
+  return values;
+ }
+ function taxStatus(message){$('fhc_taxStatus').textContent=message;}
+ function clearTax(){
+  taxPending='';
+  $('fhc_taxResult').hidden=true;
+  $('fhc_taxRows').replaceChildren();
+  $('fhc_taxBasis').textContent='';
+  const button=$('fhc_taxCalculate');button.disabled=false;button.textContent='예상 세액 계산하기';
+ }
+ function onTaxEdit(){
+  if(!['acquisition','transfer'].includes(chosen))return;
+  clearTax();taxStatus('조건이 변경됐습니다. 예상 세액을 다시 계산해 주세요.');
+ }
+ function calculateTax(){
+  if(!['acquisition','transfer'].includes(chosen))return false;
+  let values;
+  try{values=taxInputs(chosen);}catch(e){taxStatus(e.message);return false;}
+  if(!root.FirstHyundaiNative?.calculateRealtyTax){
+   taxStatus('최신 퍼스트현대 앱 설치 후 이용할 수 있습니다. 아래 외부 계산 서비스를 이용해 주세요.');return false;
+  }
+  const requestId='tax-'+Date.now()+'-'+(++taxSequence);
+  clearTax();taxPending=requestId;
+  $('fhc_taxCalculate').disabled=true;
+  $('fhc_taxCalculate').textContent='계산 확인 중…';
+  taxStatus('확인된 조건으로 예상 세액을 계산하고 있습니다.');
+  try{root.FirstHyundaiNative.calculateRealtyTax(JSON.stringify({type:chosen,values}),requestId);}
+  catch(e){clearTax();taxStatus('서버 연결을 시작하지 못했습니다. 다시 시도해 주세요.');return false;}
+  return true;
+ }
+ function onTaxResult(event){
+  if(!taxPending||event?.requestId!==taxPending)return;
+  clearTax();
+  const response=event?.data;
+  if(event.ok!==true||response?.ok!==true||!Array.isArray(response.rows)){
+   taxStatus('세금 계산 서버에 연결하지 못했습니다. 아래 외부 계산 서비스에서 확인해 주세요.');
+   return;
+  }
+  const items=response.rows;
+  if(!items.length){taxStatus('계산 결과 항목을 받지 못했습니다. 외부 계산 서비스를 이용해 주세요.');return;}
+  const container=$('fhc_taxRows');
+  for(const item of items.slice(0,100)){
+   if(typeof item.label!=='string'||typeof item.value!=='string')continue;
+   const row=document.createElement('div');
+   row.className='fhcTaxRow';
+   const label=document.createElement('span'),value=document.createElement('strong');
+   label.textContent=item.label.slice(0,100);value.textContent=item.value.slice(0,140);
+   row.append(label,value);
+   if(item.note){const note=document.createElement('small');note.textContent=String(item.note).slice(0,240);row.append(note);}
+   container.append(row);
+  }
+  $('fhc_taxBasis').textContent=String(response.basis||'').slice(0,1500);
+  $('fhc_taxResult').hidden=false;
+  taxStatus('예상 세액 계산 결과입니다. 신고 전 적용 조건을 확인해 주세요.');
+  $('fhc_taxResult').scrollIntoView?.({behavior:'smooth',block:'start'});
+ }
  function select(type){
   if(!types.has(type))return false;
+  if(taxPending)clearTax(); // A different calculator must never receive a late result.
   chosen=type;
   $('fhc_modes').hidden=true;
   $('fhc_detail').hidden=false;
@@ -126,12 +219,17 @@
      :'취득/양도가액·날짜·거주기간·주택 수·필요경비 등을 확인해야 합니다.';
    $('fhc_taxExternal').href='https://xn--989a00af8jnslv3dba.com/'+(type==='acquisition'?'acquisition':'transfer');
    $('fhc_taxOfficial').href=type==='acquisition'?'https://www.wetax.go.kr':'https://www.hometax.go.kr';
+   clearTax();
+   $('fhc_taxAcquisition').hidden=type!=='acquisition';
+   $('fhc_taxTransfer').hidden=type!=='transfer';
+   taxStatus('계산할 조건을 입력해 주세요.');
   }
   update();
   $('fhc_detail').scrollIntoView?.({behavior:'smooth',block:'start'});
   return true;
  }
  function home(){
+  if(taxPending)clearTax();
   chosen='';
   $('fhc_detail').hidden=true;
   $('fhc_modes').hidden=false;
@@ -147,6 +245,9 @@
   update();
   return true;
  }
- root.FirstHyundaiCalculators={select,home,update,onOpen,onPageChange,useContractAmount,
+ root.onFirstHyundaiRealtyTaxResult=onTaxResult;
+ $('fhc_taxPane')?.addEventListener?.('input',onTaxEdit);
+ $('fhc_taxPane')?.addEventListener?.('change',onTaxEdit);
+ root.FirstHyundaiCalculators={select,home,update,onOpen,onPageChange,useContractAmount,calculateTax,
   _test:{commission,conversion,loan,num}};
 })(window);

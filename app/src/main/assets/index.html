@@ -970,11 +970,34 @@ body.apartmentSheetActive{overflow:hidden}
   </section>
   <section class="fhcPane" id="fhc_taxPane" hidden>
    <p id="fhc_taxIntro" class="fhcHint"></p>
-   <div class="fhcTaxNotice"><strong>세액은 추정하지 않습니다</strong><p>세율·규제지역·보유주택 수·감면 또는 거주 요건에 따라 달라집니다. 부정확한 금액 대신 외부 계산 서비스로 안내합니다.</p></div>
+   <div class="fhcTaxNotice"><strong>세금 예상액 계산</strong><p>입력한 조건으로 계산 API에 요청합니다. 실제 신고 금액 및 비과세·감면 적용은 별도로 확인해 주세요.</p></div>
+   <div id="fhc_taxAcquisition" class="fhcTaxInputs" hidden>
+    <label for="fhc_taxAmount">취득금액 (만원)</label><input id="fhc_taxAmount" type="number" min="1" max="1000000000" inputmode="numeric" placeholder="예: 140000 → 14억원">
+    <label for="fhc_taxArea">전용면적</label><select id="fhc_taxArea"><option value="">선택해 주세요</option><option value="40">40㎡ 이하</option><option value="60">40㎡ 초과 ~ 60㎡ 이하</option><option value="85">60㎡ 초과 ~ 85㎡ 이하</option><option value="big">85㎡ 초과</option></select>
+    <label for="fhc_taxOwn">취득 후 주택 수</label><select id="fhc_taxOwn"><option value="">선택해 주세요</option><option value="one">1주택</option><option value="two">2주택</option><option value="three">3주택</option><option value="more">4주택 이상</option></select>
+    <label for="fhc_taxConArea">조정대상지역 여부</label><select id="fhc_taxConArea"><option value="">확인 후 선택</option><option value="N">아니요</option><option value="Y">예</option></select>
+    <label for="fhc_taxFirstLife">생애최초 주택구입 감면 대상</label><select id="fhc_taxFirstLife"><option value="">확인 후 선택</option><option value="N">아니요</option><option value="Y">예</option></select>
+    <label for="fhc_taxMetro">수도권 소재</label><select id="fhc_taxMetro"><option value="">확인 후 선택</option><option value="Y">예</option><option value="N">아니요</option></select>
+   </div>
+   <div id="fhc_taxTransfer" class="fhcTaxInputs" hidden>
+    <label for="fhc_taxBuyAmt">취득가액 (만원)</label><input id="fhc_taxBuyAmt" type="number" min="1" max="1000000000" inputmode="numeric" placeholder="예: 70000">
+    <label for="fhc_taxSellAmt">양도가액 (만원)</label><input id="fhc_taxSellAmt" type="number" min="1" max="1000000000" inputmode="numeric" placeholder="예: 95000">
+    <label for="fhc_taxBuyDate">취득일</label><input id="fhc_taxBuyDate" type="date">
+    <label for="fhc_taxSellDate">양도일</label><input id="fhc_taxSellDate" type="date">
+    <label for="fhc_taxTransferOwn">양도 당시 주택 수</label><select id="fhc_taxTransferOwn"><option value="">선택해 주세요</option><option value="one">1주택</option><option value="two">2주택</option><option value="more">3주택 이상</option></select>
+    <label for="fhc_taxTransferConArea">조정대상지역 여부</label><select id="fhc_taxTransferConArea"><option value="">확인 후 선택</option><option value="N">아니요</option><option value="Y">예</option></select>
+    <label for="fhc_taxLiving">실제 거주기간 (년)</label><input id="fhc_taxLiving" type="number" min="0" max="100" inputmode="decimal" step="0.1" placeholder="예: 2">
+    <label for="fhc_taxCost">필요경비 (만원)</label><input id="fhc_taxCost" type="number" min="0" max="1000000000" inputmode="numeric" placeholder="선택, 확인된 금액만 입력">
+   </div>
+   <p class="fhcHint">입력한 계산 조건과 결과는 부동산계산기.com API로 전송되고 서비스 제공업체의 운영 로그에 최대 1년 보관될 수 있습니다. 개인 이름·연락처·계좌는 입력하지 마세요.</p>
+   <button id="fhc_taxCalculate" type="button" class="btn fhcTaxCalculate" onclick="FirstHyundaiCalculators.calculateTax()">예상 세액 계산하기</button>
+   <p class="fhcAttribution">계산기 제공: <a href="https://eznm.me/realestate">부동산계산기.com</a></p>
+   <p id="fhc_taxStatus" class="fhcTaxStatus" role="status" aria-live="polite">계산할 조건을 입력해 주세요.</p>
+   <section id="fhc_taxResult" class="fhcTaxResult" hidden aria-label="세금 계산 결과"><h4>예상 세액 및 계산 근거</h4><div id="fhc_taxRows"></div><p id="fhc_taxBasis"></p><p class="fhcHint">결과는 참고용입니다. 임대사업자·특례·공동명의·추가주택 등 복잡한 조건은 외부 상세 계산에서 재확인해 주세요.</p></section>
    <a id="fhc_taxExternal" class="btn fhcTaxLink" href="https://xn--989a00af8jnslv3dba.com/acquisition">부동산계산기.com에서 계산하기 ↗</a>
    <a id="fhc_taxOfficial" class="fhcSource" href="https://www.wetax.go.kr">공식 세금 안내에서 확인하기 ↗</a>
    <p class="fhcHint">외부 서비스는 브라우저로 열립니다. 계약서 내용·고객정보·은행/계좌정보는 자동 전달하지 않습니다. 외부 사이트에는 필요한 조건만 직접 입력해 주세요.</p>
-   <p class="fhcAttribution">외부 계산 서비스: <a href="https://eznm.me/realestate">부동산계산기.com</a> (퍼스트현대와 별도 운영)</p>
+
   </section>
  </div>
 </div>

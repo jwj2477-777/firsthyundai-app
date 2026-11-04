@@ -3,11 +3,12 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const dir=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(dir,p),'utf8');
 const elements=new Map();
 function element(id){if(!elements.has(id))elements.set(id,{
- id,value:'',hidden:true,checked:false,textContent:'',href:'',attributes:{},
+ id,value:'',hidden:true,disabled:false,checked:false,textContent:'',href:'',attributes:{},children:[],
  setAttribute(name,value){this.attributes[name]=value;},
+ append(...items){this.children.push(...items);},replaceChildren(){this.children=[];},addEventListener(){},
  scrollIntoView(){}
 });return elements.get(id);}
-const win={},doc={getElementById:element};
+const win={},doc={getElementById:element,createElement:()=>({textContent:'',className:'',children:[],append(...xs){this.children.push(...xs);}})};
 vm.runInNewContext(read('app/src/main/assets/realty-calculators.js'),{window:win,document:doc,Intl,Number,String,Math,Object,Set,Error});
 const calc=win.FirstHyundaiCalculators,fn=calc._test;
 const approx=(a,b,t=1e-7)=>assert(Math.abs(a-b)<=t,`expected ${a} ≈ ${b}`);
@@ -74,14 +75,50 @@ assert.equal(element('fhc_feeRentWrap').hidden,false);
 assert.match(element('fhc_feeDetail').textContent,/3,100만원/);
 element('ct_price').value='140000';assert(calc.useContractAmount());
 assert.equal(element('fhc_feeAmount').value,'140000');
+// Tax entry validates mandatory conditions; missing/unknown is never guessed.
+let taxRequests=[];
+win.FirstHyundaiNative={calculateRealtyTax:(body,id)=>taxRequests.push([JSON.parse(body),id])};
 calc.select('acquisition');
 assert.equal(element('fhc_taxPane').hidden,false);
 assert.equal(element('fhc_feePane').hidden,true);
 assert.match(element('fhc_taxExternal').href,/\/acquisition$/);
 assert.match(element('fhc_taxOfficial').href,/wetax/);
+assert.equal(calc.calculateTax(),false,'Missing conditions must block tax request');
+element('fhc_taxAmount').value='140000';
+element('fhc_taxArea').value='85';
+element('fhc_taxOwn').value='one';
+element('fhc_taxConArea').value='N';
+element('fhc_taxFirstLife').value='N';
+element('fhc_taxMetro').value='Y';
+assert.equal(calc.calculateTax(),true);
+assert.equal(taxRequests.length,1);
+assert.equal(taxRequests[0][0].values.amount,140000);
+assert.equal(taxRequests[0][0].values.metro,'Y');
+assert.equal(element('fhc_taxCalculate').disabled,true);
+const [request,requestId]=taxRequests[0];
+win.onFirstHyundaiRealtyTaxResult({requestId:'tax-outdated',ok:true,data:{ok:true,rows:[{label:'오류',value:'0'}]}});
+assert.equal(element('fhc_taxResult').hidden,true,'Ignore late/outdated tax response');
+win.onFirstHyundaiRealtyTaxResult({requestId,ok:true,data:{ok:true,rows:[{label:'취득세',value:'42,000,000',note:'계산 예시'}],basis:'요율 참조'}});
+assert.equal(element('fhc_taxResult').hidden,false);
+assert.equal(element('fhc_taxRows').children.length,1);
+assert.equal(element('fhc_taxCalculate').disabled,false);
+
 calc.select('transfer');
 assert.match(element('fhc_taxExternal').href,/\/transfer$/);
 assert.match(element('fhc_taxOfficial').href,/hometax/);
+assert.equal(calc.calculateTax(),false,'No default capital gains data');
+element('fhc_taxBuyAmt').value='70000';
+element('fhc_taxSellAmt').value='95000';
+element('fhc_taxBuyDate').value='2020-01-15';
+element('fhc_taxSellDate').value='2026-06-28';
+element('fhc_taxTransferOwn').value='one';
+element('fhc_taxTransferConArea').value='N';
+element('fhc_taxLiving').value='2';
+assert.equal(calc.calculateTax(),true);
+assert.equal(taxRequests[1][0].type,'transfer');
+assert.equal(taxRequests[1][0].values.buyDate,'20200115');
+assert.equal(taxRequests[1][0].values.liveYear,2);
+
 calc.home();assert.equal(element('fhc_detail').hidden,true);
 assert.equal(element('fhc_modes').hidden,false);
 calc.onOpen();assert.equal(element('fhc_quickOpen').attributes['aria-current'],'page');

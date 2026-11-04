@@ -120,6 +120,13 @@ final class OfficeBoardClient {
         return request("POST","/board/ai/live-token",new JSONObject().put("usage_protocol",2),auth);
     }
     /** Usage summary is account-scoped, and never includes private audio or contract data. */
+    /** Trusted native-only route: the client never sees the office board token or tax API key. */
+    static JSONObject calculateRealtyTax(Context context,JSONObject payload) throws Exception {
+        String auth=token(context);
+        if(auth.isEmpty())throw new Exception("사무실 계정 인증 후 이용해 주세요.");
+        if(payload==null||payload.toString().length()>1400)throw new Exception("계산 입력값을 다시 확인해 주세요.");
+        return request("POST","/board/tax/calculate",payload,auth);
+    }
     static JSONObject liveQuotaStatus(Context context) throws Exception {
         String auth=token(context);
         if(auth.isEmpty())throw new Exception("사무실 계정 인증이 필요합니다.");

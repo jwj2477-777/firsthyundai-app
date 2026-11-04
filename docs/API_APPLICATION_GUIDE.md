@@ -50,3 +50,6 @@
 - 사업자/업무용 이용 조건과 출처 표시 정책은 https://xn--989a00af8jnslv3dba.com/developers/guide 및 https://xn--989a00af8jnslv3dba.com/developers/terms 확인; 무료 한도(등록형): 500회/시간, 3천회/일, 5만회/월. 제공자와 제휴한 것처럼 표현하거나 출처를 숨기지 않음.
 - **키 보안:** 이 저장소는 공개 저장소이고 app/assets는 사용자에게 배포됩니다. 키를 WebView JavaScript, 앱 내부 APK, URL, 사용자의 채팅, GitHub 이슈/PR/CI 로그, 공유 메모에 기재하거나 붙여넣지 말 것. 향후 인증된 Cloudflare Worker의 **비공개 secret** (예: `CALC_API_KEY`)에 직접 등록해야 함. 기존 키 덮어쓰기 금지.
 - **현재 v2.1.79 상태:** 중개보수·대출이자·전월세 전환은 앱 내 로컬 계산 완료. 세금은 공식/민간 외부 링크로 열고, 계산 결과를 앱이 받아오거나 세금 API 호출은 하지 않음. 키 발급 후 API 응답 검증, 요청 필수조건(주택수, 조정지역, 면적, 취득일/양도일, 필요경비/공동명의 등), 고객 정보 최소화, 출처 링크 표시, 한도/오류 대응과 비공개 API 프록시 인증을 완성한 다음 연결.
+
+- **v2.1.80 구현 추가:** GitHub Actions `CALC_API_KEY`를 `.github/workflows/deploy-shared-settings.yml`에서 Cloudflare Worker 비공개 Secret에 배포하고, `/board/tax/calculate`로 인증된 4대 사무실 기기만 호출합니다. v2.1.80 앱에는 취득세·양도소득세 입력·결과 화면이 있으며 provider 응답에서 금액과 근거를 텍스트로 보여줍니다. API 호출은 실인증/무료쿼터 확인에 성공해야 실제 사용 가능합니다. 배포 확인 전에는 키 작동을 단정하지 마세요.
+- **개발자 점검:** GitHub Actions `Deploy Shared Office Settings` 실행 이력의 `Install optional private realty calculator API key` 성공 확인. 키 내용은 로그에 남기지 않습니다. Worker's `CALC_API_KEY`는 기존 `DATA_GO_KR_SERVICE_KEY`와 다른 별도 비밀입니다.

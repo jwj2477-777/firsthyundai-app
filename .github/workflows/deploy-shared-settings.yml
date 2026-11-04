@@ -56,6 +56,8 @@ jobs:
         run: node scripts/test_office_schedule_reminders.mjs
       - name: Check verified Gemini Live token request format and free limits
         run: node scripts/test_live_token_config.mjs
+      - name: Verify free realty tax proxy and private-key boundaries
+        run: node scripts/test_realty_tax_proxy.mjs
       - name: Deploy settings Worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -115,6 +117,18 @@ jobs:
             printf '%s' "$GEMINI_API_KEY" | npx --yes wrangler@4 secret put GEMINI_API_KEY --config workers/shared-settings/wrangler.toml
           else
             echo 'Optional Live voice unavailable: Gemini key not configured.'
+          fi
+      - name: Install optional private realty calculator API key
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CALC_API_KEY: ${{ secrets.CALC_API_KEY }}
+        run: |
+          if [ -n "$CALC_API_KEY" ]; then
+            printf '%s' "$CALC_API_KEY" | npx --yes wrangler@4 secret put CALC_API_KEY --config workers/shared-settings/wrangler.toml
+            echo 'Realty tax API key installed in private Worker Secret (value hidden).'
+          else
+            echo 'Realty tax API key has not been set. Existing local calculators remain available.'
           fi
       - name: Check official weather availability without credentials in logs
         env:
