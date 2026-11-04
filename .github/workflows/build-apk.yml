@@ -106,6 +106,7 @@ on:
       - 'scripts/test_public_hub.js'
       - 'scripts/test_news_ai_ui.js'
       - 'scripts/test_live_voice_ui.js'
+      - 'scripts/test_realty_tax.mjs'
       - 'scripts/test_realty_calculators.js'
       - 'scripts/test_contract_live.js'
       - 'scripts/test_contract_live_browser.js'
@@ -261,6 +262,7 @@ jobs:
           node scripts/test_live_voice_ui.js
           node --check app/src/main/assets/realty-calculators.js
           node scripts/test_realty_calculators.js
+          node scripts/test_realty_tax.mjs
           node scripts/test_contract_live.js
           node scripts/test_contract_live_browser.js
           node scripts/test_kakao_nearby.mjs
