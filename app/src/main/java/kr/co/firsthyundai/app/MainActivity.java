@@ -593,6 +593,23 @@ public class MainActivity extends Activity {
             runOnUiThread(()->{pendingLivePermission=false;pendingLivePublicNews="";pendingContractLiveId="";MainActivity.this.stopPublicLiveVoice();});
         }
         /** Non-blocking account-level Live balance, with no personal data. */
+        /** Only a validated small JSON request goes to the authenticated private proxy. */
+        @JavascriptInterface public void calculateRealtyTax(String payload,String requestId){
+            if(requestId==null||!requestId.matches("tax-[0-9-]{1,48}")||
+                payload==null||payload.length()>1400)return;
+            io.execute(()->{
+                JSONObject event=new JSONObject();
+                try{
+                    JSONObject data=OfficeBoardClient.calculateRealtyTax(getApplicationContext(),new JSONObject(payload));
+                    event.put("requestId",requestId).put("ok",true).put("data",data);
+                }catch(Exception e){
+                    try{event.put("requestId",requestId).put("ok",false)
+                        .put("error","세금 계산 연결을 확인해 주세요. API 키 설정 또는 서버 연결 상태를 점검해 주세요.");}
+                    catch(Exception ignored){}
+                }
+                deliver("onFirstHyundaiRealtyTaxResult",event);
+            });
+        }
         @JavascriptInterface public void requestLiveQuotaStatus(){
             io.execute(()->{
                 try{
