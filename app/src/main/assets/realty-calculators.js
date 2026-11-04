@@ -79,7 +79,7 @@
  }
  function taxDate(id){
   const value=String($(id)?.value||'');
-  if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(value))throw Error('취득일과 양도일을 입력해 주세요.');
+  if(!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(value))throw Error('취득일과 양도일을 입력해 주세요.');
   const [year,month,day]=value.split('-').map(Number);
   const check=new Date(Date.UTC(year,month-1,day));
   if(year<1900||year>2100||check.getUTCFullYear()!==year||
@@ -256,6 +256,6 @@
   return true;
  }
  root.onFirstHyundaiRealtyTaxResult=receiveTax;
- root.FirstHyundaiCalculators={select,home,update,onOpen,onPageChange,useContractAmount,calculateTax,
+ root.FirstHyundaiCalculators={select,home,update,onOpen,onPageChange,useContractAmount,calculateTax,invalidateTax:clearTax,
   _test:{commission,conversion,loan,num,taxRequest,receiveTax}};
 })(window);
