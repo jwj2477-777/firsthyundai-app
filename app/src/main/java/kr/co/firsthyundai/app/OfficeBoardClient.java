@@ -277,7 +277,9 @@ final class OfficeBoardClient {
             connection=(HttpURLConnection)new URL(URL_ROOT+path).openConnection();
             connection.setInstanceFollowRedirects(false);
             connection.setConnectTimeout(9000);
-            connection.setReadTimeout(9000);
+            // The Worker allows up to 10 seconds for the remote tax API.
+            // A 9s mobile read timeout cuts off legitimate in-flight estimates.
+            connection.setReadTimeout("/board/tax/calculate".equals(path)?20000:9000);
             connection.setRequestMethod(method);
             connection.setUseCaches(false);
             connection.setRequestProperty("Accept","application/json");
@@ -303,6 +305,16 @@ final class OfficeBoardClient {
                     bytes.write(temp,0,n);
                     if(bytes.size()>250000)throw new Exception("게시판 응답이 너무 큽니다.");
                 }
+            }
+            if("/board/tax/calculate".equals(path) && (status<200||status>=300)){
+                String code="tax_server_error";
+                try{
+                    JSONObject error=new JSONObject(bytes.toString("UTF-8"));
+                    String candidate=error.optString("error","");
+                    if(candidate.matches("[a-z_]{3,64}"))code=candidate;
+                }catch(Exception ignored){}
+                // Only a short machine-readable reason, never provider/raw response or keys.
+                throw new Exception("tax_error:"+status+":"+code);
             }
             if("/board/ai/live-token".equals(path) && (status<200||status>=300))
                 throw new Exception(LiveFailureReason.fromHttp(status,bytes.toString("UTF-8")));
