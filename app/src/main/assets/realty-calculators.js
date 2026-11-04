@@ -140,7 +140,7 @@
   const buyDate=taxDate('fhc_taxBuyDate'),sellDate=taxDate('fhc_taxSellDate');
   if(sellDate<buyDate)throw Error('양도일은 취득일보다 빠를 수 없습니다.');
   const v=taxValue('fhc_taxLiving');
-  if(!/^\d+(?:\\.\d+)?$/.test(v)||Number(v)>100)throw Error('실제 거주기간을 연 단위로 입력해 주세요.');
+  if(!/^\d+(?:\.\d+)?$/.test(v)||Number(v)>100)throw Error('실제 거주기간을 연 단위로 입력해 주세요.');
   const values={buyAmt:taxWon('fhc_taxBuyAmt'),sellAmt:taxWon('fhc_taxSellAmt'),buyDate,sellDate,
    own:taxChoice('fhc_taxTransferOwn',['one','two','more'],'주택 수'),
    conArea:taxChoice('fhc_taxTransferConArea',['Y','N'],'조정대상지역'),liveYear:Number(v)};
