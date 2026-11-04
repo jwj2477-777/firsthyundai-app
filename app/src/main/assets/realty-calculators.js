@@ -136,6 +136,7 @@
    const data={amount:taxWon('fhc_taxAmount'),areaType:taxChoice('fhc_taxArea',['40','60','85','big'],'전용면적'),
     own,conArea,firstOfLife:taxChoice('fhc_taxFirstLife',['Y','N'],'생애최초 감면 대상'),
     metro:taxChoice('fhc_taxMetro',['Y','N'],'수도권 여부')};
+   if(data.firstOfLife==='Y')data.firstHomeType=taxChoice('fhc_taxFirstHomeType',['general','small'],'생애최초 감면 구분');
    if(own==='two'&&conArea==='Y')data.tempTwo=taxChoice('fhc_taxTemporaryTwo',['Y','N'],'일시적 2주택 여부');
    return data;
   }
@@ -152,13 +153,17 @@
   return values;
  }
  function simpleAcquisitionTax(v){
-  if(!v||!['one','two','three','more'].includes(v.own)||v.firstOfLife!=='N'||!['Y','N'].includes(v.metro)||
+  if(!v||!['one','two','three','more'].includes(v.own)||!['Y','N'].includes(v.firstOfLife)||!['Y','N'].includes(v.metro)||
      !['Y','N'].includes(v.conArea)||!['40','60','85','big'].includes(v.areaType))return null;
   if(v.areaType==='big'&&v.metro==='N')return null;
   if(v.own==='two'&&v.conArea==='Y'&&!['Y','N'].includes(v.tempTwo))return null;
   if(v.own==='two'&&v.tempTwo==='Y'&&v.conArea!=='Y')return null;
   const man=v.amount;
   if(!Number.isSafeInteger(man)||man<1||man>1000000000)return null;
+  if(v.firstOfLife==='Y'){
+   if(v.own!=='one'||man>120000||v.areaType==='big'||!['general','small'].includes(v.firstHomeType))return null;
+   if(v.firstHomeType==='small'&&(!['40','60'].includes(v.areaType)||man>(v.metro==='Y'?60000:30000)))return null;
+  }
   const general=man<=60000?1:man>90000?3:Math.round((man/10000*2/3-3)*100)/100;
   let rate=general,educationRate=general/10,ruralRate=v.areaType==='big'?.2:0;
   if(v.own==='two'&&v.conArea==='Y'&&v.tempTwo==='N')rate=8;
@@ -166,14 +171,21 @@
   if(v.own==='more')rate=12;
   if(rate===8){educationRate=.4;ruralRate=v.areaType==='big'?.6:0;}
   if(rate===12){educationRate=.4;ruralRate=v.areaType==='big'?1:0;}
-  const base=man*10000,acquisition=Math.round(base*rate/100),
-    education=Math.round(base*educationRate/100),rural=Math.round(base*ruralRate/100);
+  const base=man*10000,grossAcquisition=Math.round(base*rate/100);
+  const discount=v.firstOfLife==='Y'?Math.min(grossAcquisition,v.firstHomeType==='small'?3000000:2000000):0;
+  const acquisition=grossAcquisition-discount;
+  const education=v.firstOfLife==='Y'?Math.round(acquisition*.1):Math.round(base*educationRate/100);
+  const rural=Math.round(base*ruralRate/100);
   const totalWon=acquisition+education+rural;
-  const caution=v.own==='two'&&v.tempTwo==='Y'
+  const caution=v.firstOfLife==='Y'
+    ?'생애최초 요건을 확인한 취득자에 한한 감면 가정. 실제 거주·주택 유형·추징 사유에 따라 달라질 수 있음'
+    :v.own==='two'&&v.tempTwo==='Y'
     ?'일시적 2주택의 처분 기한과 요건이 충족된 것으로 가정. 미충족 시 추징 가능'
     :(rate>=8?'중과 배제 주택·공시가격 예외·주택 수 산정 특례는 미반영':'법정 기본세율이며 별도 감면·중과 제외·과세표준 예외는 미반영');
   return {ok:true,totalWon,source:'local_basic',
-   rows:[{label:'예상 합계',value:money(totalWon)},{label:'취득세 ('+rate.toFixed(2)+'%)',value:money(acquisition)},
+   rows:[{label:'예상 합계',value:money(totalWon)},
+     {label:'취득세 ('+rate.toFixed(2)+'%)',value:money(acquisition)},
+     ...(discount?[{label:'생애최초 취득세 감면',value:'-'+money(discount)}]:[]),
      {label:'지방교육세',value:money(education)},{label:'농어촌특별세',value:money(rural)}],
    basis:'앱 자체 계산 · 외부 API 전송 없음. 2026년 11월 기준 주택 유상취득 세율. '+caution+'. 신고 전 위택스·관할 지자체에서 확인해 주세요.'};
  }
@@ -256,6 +268,8 @@
   if(chosen==='acquisition'){
    const el=$('fhc_taxTempTwoField');
    if(el)el.hidden=!(taxValue('fhc_taxOwn')==='two'&&taxValue('fhc_taxConArea')==='Y');
+   const first=$('fhc_taxFirstHomeField');
+   if(first)first.hidden=taxValue('fhc_taxFirstLife')!=='Y';
   }else if(chosen==='transfer'){
    const el=$('fhc_taxExemptionField');
    if(el)el.hidden=taxValue('fhc_taxTransferOwn')!=='one';
@@ -272,7 +286,7 @@
   const local=chosen==='acquisition'?simpleAcquisitionTax(values):simpleTransferTax(values);
   if(local){clearTax();showTaxResult(local);return true;}
   if(chosen==='acquisition'&&values.firstOfLife==='Y'){
-   taxStatus('생애최초 감면은 주택 유형에 따라 200만~300만원 등 차이가 있습니다. 상세 계산이 필요합니다.');
+   taxStatus('해당 조건은 생애최초 감면의 일반 산식 범위를 벗어납니다. 상세 확인이 필요합니다.');
    $('fhc_taxFallback').hidden=false;return false;
   }
   if(!root.FirstHyundaiNative?.calculateRealtyTax){
