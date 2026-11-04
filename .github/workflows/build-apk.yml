@@ -107,6 +107,7 @@ on:
       - 'scripts/test_news_ai_ui.js'
       - 'scripts/test_live_voice_ui.js'
       - 'scripts/test_realty_calculators.js'
+      - 'scripts/test_realty_calculators_layout_browser.js'
       - 'scripts/test_realty_tax_proxy.mjs'
       - 'scripts/test_contract_live.js'
       - 'scripts/test_contract_live_browser.js'
@@ -262,6 +263,7 @@ jobs:
           node scripts/test_live_voice_ui.js
           node --check app/src/main/assets/realty-calculators.js
           node scripts/test_realty_calculators.js
+          node scripts/test_realty_calculators_layout_browser.js
           node scripts/test_realty_tax_proxy.mjs
           node scripts/test_contract_live.js
           node scripts/test_contract_live_browser.js
@@ -391,25 +393,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.85 complete calculator regression APK
+      - name: Publish v2.1.86 refined calculator utility APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.85.apk
-          unzip -t FirstHyundai-v2.1.85.apk | grep 'No errors detected'
-          if gh release view v2.1.85 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.86.apk
+          unzip -t FirstHyundai-v2.1.86.apk | grep 'No errors detected'
+          if gh release view v2.1.86 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; preserving the published APK."
             exit 1
           else
-            gh release create v2.1.85 FirstHyundai-v2.1.85.apk \
+            gh release create v2.1.86 FirstHyundai-v2.1.86.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.85 · 계산기 5종 검증·연결 오류 수정' \
-              --notes '부동산 계산기 5종에 대해 주택 취득세 주택 수·조정지역·면적·생애최초·일시적 2주택 검증 분기를 추가하고, 양도소득세는 사용자가 1세대1주택 비과세 조건을 명확히 확인한 2023~2026년 양도에 한해 보수적인 자체 계산을 제공합니다. 법정 요건이 불확실한 경우 근거 없는 금액을 만들지 않으며 외부 계산기를 안내합니다. 중개보수 VAT 포함 합계를 명확히 표시하고, 대출의 극저금리 수치 안정성을 개선했습니다. 원격 API HTTP 403은 공급업체가 공식 지원하는 대체 인증 헤더 1회 재시도를 추가했으나 접근 제한 해제 여부는 실제 서버 시험이 필요합니다. 2026년 시행 세법 기준의 예시 계산이며 실제 세금 신고 전 전문가 검증이 필요합니다. 기존 계약/메모/Live 기능 유지, APK v2.1.85/build236. 외부 취득세 계산 링크를 공식 제공업체의 확인된 취득세 페이지로 수정하고, 필수 출처 문구를 원복했습니다.'
+              --title '퍼스트현대 v2.1.86 · 계산기 버튼 정리·입력 안전성 개선' \
+              --notes '계산기 바로가기를 메인 6개 메뉴 아래에서 제거하고 앱 하단의 화면 크기 옆 기타 편의 도구로 옮겼습니다. 아이보리·민트 브랜드 색상과 선형 아이콘을 적용한 작은 계산기 버튼, 5가지 계산 종류의 동일한 높이·간격·한눈에 읽히는 줄형 선택 화면을 제공합니다. 세금 계산에서 주택 수·조정지역·생애최초 감면 여부가 바뀌면 이전 거래의 감면·일시적 2주택 선택을 자동 해제합니다. 중개보수의 한도액이 실제 적용되지 않았는데 적용으로 표기하던 오류를 수정하고, 외부 계산 제공업체가 숫자형 세액을 반환하는 경우에도 결과 누락 없이 처리합니다. 계산식과 입력 보호 테스트, 모바일 브라우저 실제 버튼 크기·정렬 검증을 강화했습니다. 외부 제공업체 API 자체가 정상 인증되지 않은 일부 특수 세금 계산은 여전히 공식 확인이 필요하며 임의 추정액은 만들지 않습니다. 기존 계약·Live·공유메모, 상단 6개 메뉴는 유지합니다. v2.1.86/build237.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.85 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.85 --apk FirstHyundai-v2.1.85.apk
+          gh release upload v2.1.86 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.86 --apk FirstHyundai-v2.1.86.apk
 
 
 
