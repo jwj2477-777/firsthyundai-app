@@ -37,6 +37,9 @@ assert.equal(fee('office','sale',140000).maximum,7000000,'요건충족 오피스
 assert.equal(fee('office','lease',80000).maximum,3200000,'요건충족 오피스텔 임대차 0.4%');
 assert.equal(fee('other','sale',140000).maximum,12600000,'기타 0.9%');
 assert.equal(fn.commission({kind:'house',deal:'sale',amountWan:140000,vat:true}).total,9240000);
+assert.equal(fn.commission({kind:'house',deal:'sale',amountWan:4000}).capApplied,false,'Do not describe unused cap as applied');
+assert.equal(fn.commission({kind:'house',deal:'sale',amountWan:19999}).capApplied,true,'Enforced 80만원 cap');
+assert.equal(fn.commission({kind:'house',deal:'lease',amountWan:9000}).capApplied,true,'Enforced 30만원 cap');
 for(const bad of [0,-1,'1e6','','abc'])assert.throws(()=>fee('house','sale',bad));
 assert.throws(()=>fee('house','rent',1000,''),'No fake monthly zero');
 assert.throws(()=>fee('guess','sale',10000));
@@ -170,6 +173,14 @@ element('fhc_taxFirstLife').value='Y';element('fhc_taxFirstHomeType').value='gen
 assert.equal(calc.calculateTax(),true);
 assert.equal(element('fhc_taxRows').children[0].children[1].textContent,'3,300,000원');
 assert.equal(taxRequests.length,1);
+// Reusing a form for another client must not retain tax-relief eligibility.
+fn.onTaxEdit({target:{id:'fhc_taxFirstLife'}});
+assert.equal(element('fhc_taxFirstHomeType').value,'','Changing first-home status clears stale relief class');
+element('fhc_taxOwn').value='two';element('fhc_taxConArea').value='Y';
+element('fhc_taxTemporaryTwo').value='Y';
+fn.onTaxEdit({target:{id:'fhc_taxOwn'}});
+assert.equal(element('fhc_taxTemporaryTwo').value,'','Reconsidering house count clears temporary-2-home declaration');
+assert.equal(element('fhc_taxTempTwoField').hidden,false,'Temporary-two field appears only for regulated second home');
 
 calc.select('transfer');
 assert.match(element('fhc_taxExternal').href,/\/transfer$/);
@@ -205,6 +216,9 @@ assert.equal(taxRequests.length,3,'Not exempt => keep external specialized calcu
 assert(!Object.hasOwn(taxRequests[2][0].values,'exemptionVerified'),'Never send local eligibility flag to Worker');
 assert(!Object.hasOwn(taxRequests[2][0].values,'tempTwo'));
 assert(!Object.hasOwn(taxRequests[2][0].values,'firstHomeType'));
+element('fhc_taxExemptionVerified').value='Y';
+fn.onTaxEdit({target:{id:'fhc_taxTransferOwn'}});
+assert.equal(element('fhc_taxExemptionVerified').value,'','New ownership context cannot inherit 1-home exemption declaration');
 
 calc.home();assert.equal(element('fhc_detail').hidden,true);
 assert.equal(element('fhc_modes').hidden,false);
@@ -214,6 +228,16 @@ const html=read('app/src/main/assets/index.html');
 const page=html.split('<div id="calculators"')[1]?.split('<div id="contracts"')[0]||'';
 assert(page.length>1000,'Calculator page must be in main app');
 assert(/id="fhc_quickOpen"/.test(html),'Always accessible without changing six main tabs');
+const footerAt=html.indexOf('<footer class="foot compactAppFooter"');
+const quickAt=html.indexOf('id="fhc_quickOpen"');
+assert(footerAt>=0&&quickAt>footerAt,'Rare-use calculator shortcut belongs to footer utility row, not below main navigation');
+assert.equal((html.match(/id="fhc_quickOpen"/g)||[]).length,1,'Only one calculator shortcut');
+assert(html.slice(0,footerAt).includes('id="nav"')&&!html.slice(0,footerAt).includes('id="fhc_quickOpen"'),
+ 'Main six tabs must not carry a dedicated calculator row');
+assert(html.slice(footerAt).includes('aria-label="기타 편의 도구"'),'Calculator and display size grouped as utility tools');
+const chooser=page.slice(page.indexOf('id="fhc_modes"'),page.indexOf('id="fhc_detail"'));
+assert.equal((chooser.match(/class="fhcModeCopy"/g)||[]).length,5,'Five balanced calculator choices');
+assert.equal((chooser.match(/class="fhcModeIcon"/g)||[]).length,5,'Every calculator has a consistent line icon');
 for(const id of ids.filter(x=>x!=='ct_price'))assert(html.includes('id="'+id+'"'),'Missing UI id: '+id);
 assert(!page.includes('<iframe')&&!page.includes('addJavascriptInterface'),
  'Never iframe untrusted calculator domains inside privileged Android WebView');
@@ -235,6 +259,9 @@ assert(page.includes('id="fhc_taxExemptionVerified"'),'Verified exemption requir
 assert(page.includes('id="fhc_taxFirstHomeField" hidden'),'First-home eligibility options only when relevant');
 assert(page.includes('id="fhc_taxFirstHomeType"'),'Distinguish general and small-house tax relief');
 const styles=read('app/src/main/assets/realty-calculators.css');
+assert(styles.includes('.compactAppFooter .appFooterDisplayRow #fhc_quickOpen'),'Footer calculator chip uses scoped brand styles');
+assert(styles.includes('.fhcModeGrid{display:grid;grid-template-columns:minmax(0,1fr)'),'Calculator chooser is a uniform list');
+assert(!styles.includes('.fhcQuickAccess{'),'Old priority shortcut row should not remain in CSS');
 assert(styles.includes('.fhcTaxInputs{display:grid;grid-template-columns:repeat(2'),
  'Use two-column compact fields on supported devices');
 assert(styles.includes('.fhcAttribution a{font-size:15px;'), 'Official provider attribution must be readable at ≥0.9rem');
