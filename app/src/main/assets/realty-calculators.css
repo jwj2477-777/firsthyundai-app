@@ -81,3 +81,6 @@ body:not([data-office-role="admin"]) #calculators #fhc_taxIntro{display:none!imp
 body:not([data-office-role="admin"]) #calculators .fhcDetailTitle{margin:4px 0 12px}
 body:not([data-office-role="admin"]) #calculators .fhcDetail{padding-top:12px}
 @media(max-width:370px){.fhcTaxInputs{grid-template-columns:1fr}.fhcTaxField.fhcWide{grid-column:auto}}
+
+.fhcFamilyResultNote{margin:7px 0;font-size:12px;color:#65776e}
+body[data-office-role="admin"] .fhcFamilyResultNote{display:none}
