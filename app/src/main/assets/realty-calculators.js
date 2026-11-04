@@ -135,9 +135,10 @@
   $('fhc_detail').hidden=true;
   $('fhc_modes').hidden=false;
  }
- function onOpen(){
-  const quick=$('fhc_quickOpen');if(quick)quick.setAttribute('aria-current','page');
+ function onPageChange(id){
+  const quick=$('fhc_quickOpen');if(quick)quick.setAttribute('aria-current',id==='calculators'?'page':'false');
  }
+ function onOpen(){onPageChange('calculators');}
  function useContractAmount(){
   const price=amount($('ct_price')?.value);
   if(price===null||price===0){output('fhc_fee','계약금액이 없습니다','계약 작성 화면에 매매금액을 먼저 입력해 주세요.');return false;}
@@ -145,6 +146,6 @@
   update();
   return true;
  }
- root.FirstHyundaiCalculators={select,home,update,onOpen,useContractAmount,
+ root.FirstHyundaiCalculators={select,home,update,onOpen,onPageChange,useContractAmount,
   _test:{commission,conversion,loan,num}};
 })(window);
