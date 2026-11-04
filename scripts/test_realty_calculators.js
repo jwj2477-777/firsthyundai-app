@@ -134,7 +134,7 @@ win.FirstHyundaiNative={calculateRealtyTax:(body,id)=>taxRequests.push([JSON.par
 calc.select('acquisition');
 assert.equal(element('fhc_taxPane').hidden,false);
 assert.equal(element('fhc_feePane').hidden,true);
-assert.match(element('fhc_taxExternal').href,/\/acquisition$/);
+assert.match(element('fhc_taxExternal').href,/\/취득세$/,'Fallback must open verified official acquisition calculator page');
 assert.match(element('fhc_taxOfficial').href,/wetax/);
 assert.equal(calc.calculateTax(),false,'Missing conditions must block tax request');
 element('fhc_taxAmount').value='140000';
@@ -225,7 +225,7 @@ assert(page.includes('id="fhc_taxFallback" class="fhcTaxFallback" hidden'),'Fall
 assert(page.includes('id="fhc_taxDiag" class="fhcTaxDiagnostic adminExplain"'),'Technical status admin-only');
 assert(page.includes('class="fhcTaxField"'),'Group paired fields into compact cards');
 assert(page.includes('<details class="fhcMore"><summary>계산 기준 · 공식 확인</summary>'));
-assert(page.includes('외부 계산기: <a href="https://eznm.me/realestate">부동산계산기.com</a>'),
+assert(page.includes('계산기 제공: <a href="https://eznm.me/realestate">부동산계산기.com</a>'),
  'Attribution must stay visible for family users');
 assert(page.includes('외부 계산 시에만 조건 전송'),'Disclose only external API transmission');
 assert(page.includes('id="fhc_taxTempTwoField" hidden'),'Two-home transition condition is conditional');
