@@ -38,9 +38,11 @@
    else rate=sale?.007:.006;
   }
   // Korean won is integral. Round floating-point percentage arithmetic once.
-  const maximum=Math.round(Math.min(tradeWan*10000*rate,cap??Infinity));
+  const rawFee=Math.round(tradeWan*10000*rate);
+  const maximum=Math.min(rawFee,cap??Infinity);
   const additional=vat?Math.round(maximum*.1):0;
-  return {baseWan:tradeWan,rate,maximum,vatWon:additional,total:maximum+additional,cap};
+  return {baseWan:tradeWan,rate,maximum,vatWon:additional,total:maximum+additional,cap,
+   capApplied:cap!==null&&rawFee>cap};
  }
  function conversion({oldWan,newWan,ratePct}){
   const old=amount(oldWan),next=amount(newWan),rate=percent(ratePct);
@@ -87,10 +89,10 @@
      rentWan:deal==='rent' ? $('fhc_feeRent').value :0,vat:$('fhc_feeVat').checked});
     const pieces=['적용 요율 상한 '+(result.rate*100).toFixed(1)+'%',
      '거래금액 '+WON.format(result.baseWan)+'만원'];
-    if(result.cap!==null)pieces.push('보수 상한액 적용');
+    if(result.capApplied)pieces.push('보수 한도액 적용');
     if(result.vatWon>0)pieces.push('가정 부가세 '+money(result.vatWon));
     output('fhc_fee',money(result.total),pieces.join(' · ')+(result.vatWon>0?' · 부가세 포함 합계':' · 부가세 제외'),result.vatWon>0?'부가세 포함 예상 합계':'예상 중개보수 상한');
-   }catch(e){output('fhc_fee','금액을 확인해 주세요',e.message);}
+   }catch(e){output('fhc_fee','금액을 확인해 주세요',e.message,'예상 중개보수 상한');}
   }else if(chosen==='conversion'){
    try{
     const result=conversion({oldWan:$('fhc_oldDeposit').value,newWan:$('fhc_newDeposit').value,ratePct:$('fhc_conversionRate').value});
@@ -274,8 +276,20 @@
    if(el)el.hidden=taxValue('fhc_taxTransferOwn')!=='one';
   }
  }
- function onTaxEdit(){
+ function onTaxEdit(event){
   if(!['acquisition','transfer'].includes(chosen))return;
+  const changed=event?.target?.id||'';
+  // Never silently reuse a special-tax eligibility answer from a different property scenario.
+  if(chosen==='acquisition'){
+   if(changed==='fhc_taxOwn'||changed==='fhc_taxConArea'){
+    const temporary=$('fhc_taxTemporaryTwo');if(temporary)temporary.value='';
+   }
+   if(changed==='fhc_taxFirstLife'){
+    const firstHome=$('fhc_taxFirstHomeType');if(firstHome)firstHome.value='';
+   }
+  }else if(changed==='fhc_taxTransferOwn'){
+   const verified=$('fhc_taxExemptionVerified');if(verified)verified.value='';
+  }
   clearTax();updateTaxFields();
  }
  function calculateTax(){
@@ -388,5 +402,5 @@
  $('fhc_taxPane')?.addEventListener?.('input',onTaxEdit);
  $('fhc_taxPane')?.addEventListener?.('change',onTaxEdit);
  root.FirstHyundaiCalculators={select,home,update,onOpen,onPageChange,useContractAmount,calculateTax,
-  _test:{commission,conversion,loan,num,simpleAcquisitionTax,simpleTransferTax,standardTaxByBase,heldFullYears}};
+  _test:{commission,conversion,loan,num,simpleAcquisitionTax,simpleTransferTax,standardTaxByBase,heldFullYears,onTaxEdit}};
 })(window);
