@@ -56,7 +56,7 @@
   let first,last,totalInterest;
   if(method==='equal'){
    // Stable annuity denominator near zero; zero rate has no interest.
-   first=r===0?p/n:p*r/(1-Math.pow(1+r,-n));
+   first=r===0?p/n:p*r/(-Math.expm1(-n*Math.log1p(r)));
    last=first;
    totalInterest=Math.max(0,first*n-p);
   }else if(method==='principal'){
@@ -89,7 +89,7 @@
      '거래금액 '+WON.format(result.baseWan)+'만원'];
     if(result.cap!==null)pieces.push('보수 상한액 적용');
     if(result.vatWon>0)pieces.push('가정 부가세 '+money(result.vatWon));
-    output('fhc_fee',money(result.maximum),pieces.join(' · ')+(result.vatWon>0?' · 합계 '+money(result.total):''));
+    output('fhc_fee',money(result.total),pieces.join(' · ')+(result.vatWon>0?' · 부가세 포함 합계':' · 부가세 제외'));
    }catch(e){output('fhc_fee','금액을 확인해 주세요',e.message);}
   }else if(chosen==='conversion'){
    try{
@@ -130,12 +130,15 @@
   return v.replace(/-/g,'');
  }
  function taxInputs(type){
-  if(type==='acquisition')return {amount:taxWon('fhc_taxAmount'),
-    areaType:taxChoice('fhc_taxArea',['40','60','85','big'],'전용면적'),
-    own:taxChoice('fhc_taxOwn',['one','two','three','more'],'주택 수'),
-    conArea:taxChoice('fhc_taxConArea',['Y','N'],'조정대상지역'),
-    firstOfLife:taxChoice('fhc_taxFirstLife',['Y','N'],'생애최초 감면 대상'),
+  if(type==='acquisition'){
+   const own=taxChoice('fhc_taxOwn',['one','two','three','more'],'주택 수');
+   const conArea=taxChoice('fhc_taxConArea',['Y','N'],'조정대상지역');
+   const data={amount:taxWon('fhc_taxAmount'),areaType:taxChoice('fhc_taxArea',['40','60','85','big'],'전용면적'),
+    own,conArea,firstOfLife:taxChoice('fhc_taxFirstLife',['Y','N'],'생애최초 감면 대상'),
     metro:taxChoice('fhc_taxMetro',['Y','N'],'수도권 여부')};
+   if(own==='two'&&conArea==='Y')data.tempTwo=taxChoice('fhc_taxTemporaryTwo',['Y','N'],'일시적 2주택 여부');
+   return data;
+  }
   if(type!=='transfer')throw Error('세금 종류를 선택해 주세요.');
   const buyDate=taxDate('fhc_taxBuyDate'),sellDate=taxDate('fhc_taxSellDate');
   if(sellDate<buyDate)throw Error('양도일은 취득일보다 빠를 수 없습니다.');
@@ -145,29 +148,71 @@
    own:taxChoice('fhc_taxTransferOwn',['one','two','more'],'주택 수'),
    conArea:taxChoice('fhc_taxTransferConArea',['Y','N'],'조정대상지역'),liveYear:Number(v)};
   if(taxValue('fhc_taxCost')!=='')values.cost=taxWon('fhc_taxCost',true);
+  if(values.own==='one'&&taxValue('fhc_taxExemptionVerified'))values.exemptionVerified=taxChoice('fhc_taxExemptionVerified',['Y','N'],'1주택 비과세 확인');
   return values;
  }
- function simpleAcquisitionTax(values){
-  // Conservative ordinary residential purchase only: no multi-home or relief estimates.
-  // Restrict to metropolitan homes to avoid rural national-size exceptions.
-  if(!values||values.own!=='one'||values.firstOfLife!=='N'||values.metro!=='Y'||
-     !['Y','N'].includes(values.conArea)||!['40','60','85','big'].includes(values.areaType))return null;
-  const man=values.amount;
+ function simpleAcquisitionTax(v){
+  if(!v||!['one','two','three','more'].includes(v.own)||v.firstOfLife!=='N'||!['Y','N'].includes(v.metro)||
+     !['Y','N'].includes(v.conArea)||!['40','60','85','big'].includes(v.areaType))return null;
+  if(v.areaType==='big'&&v.metro==='N')return null;
+  if(v.own==='two'&&v.conArea==='Y'&&!['Y','N'].includes(v.tempTwo))return null;
+  if(v.own==='two'&&v.tempTwo==='Y'&&v.conArea!=='Y')return null;
+  const man=v.amount;
   if(!Number.isSafeInteger(man)||man<1||man>1000000000)return null;
-  // Verified general 2026 rates: <=6억 1%, 6~9억 1~3%, >9억 3%.
-  const rate=man<=60000?1:man>90000?3:Math.round((man/10000*2/3-3)*100)/100;
-  const base=man*10000;
-  const purchase=Math.round(base*rate/100);
-  const education=Math.round(base*rate/1000);
-  const rural=values.areaType==='big'?Math.round(base*.002):0;
-  const totalWon=purchase+education+rural;
-  return {ok:true,source:'local_basic',totalWon,
-   rows:[{label:'예상 합계',value:money(totalWon)},
-    {label:'취득세',value:money(purchase)},
-    {label:'지방교육세',value:money(education)},
-    {label:'농어촌특별세',value:money(rural)}],
-   basis:'앱 자체 계산 · 외부 API 전송 없음. 2026년 11월 확인한 일반 주택매매 기본세율('+rate.toFixed(2)+'%) 적용. 고급주택·특례·감면·과세표준 예외는 반영되지 않습니다. 최종 신고 전 관할 지자체와 위택스에서 확인해 주세요.'};
+  const general=man<=60000?1:man>90000?3:Math.round((man/10000*2/3-3)*100)/100;
+  let rate=general,educationRate=general/10,ruralRate=v.areaType==='big'?.2:0;
+  if(v.own==='two'&&v.conArea==='Y'&&v.tempTwo==='N')rate=8;
+  if(v.own==='three')rate=v.conArea==='Y'?12:8;
+  if(v.own==='more')rate=12;
+  if(rate===8){educationRate=.4;ruralRate=v.areaType==='big'?.6:0;}
+  if(rate===12){educationRate=.4;ruralRate=v.areaType==='big'?1:0;}
+  const base=man*10000,acquisition=Math.round(base*rate/100),
+    education=Math.round(base*educationRate/100),rural=Math.round(base*ruralRate/100);
+  const totalWon=acquisition+education+rural;
+  const caution=v.own==='two'&&v.tempTwo==='Y'
+    ?'일시적 2주택의 처분 기한과 요건이 충족된 것으로 가정. 미충족 시 추징 가능'
+    :(rate>=8?'중과 배제 주택·공시가격 예외·주택 수 산정 특례는 미반영':'법정 기본세율이며 별도 감면·중과 제외·과세표준 예외는 미반영');
+  return {ok:true,totalWon,source:'local_basic',
+   rows:[{label:'예상 합계',value:money(totalWon)},{label:'취득세 ('+rate.toFixed(2)+'%)',value:money(acquisition)},
+     {label:'지방교육세',value:money(education)},{label:'농어촌특별세',value:money(rural)}],
+   basis:'앱 자체 계산 · 외부 API 전송 없음. 2026년 11월 기준 주택 유상취득 세율. '+caution+'. 신고 전 위택스·관할 지자체에서 확인해 주세요.'};
  }
+ function heldFullYears(buyDate,sellDate){
+  const by=Number(buyDate.slice(0,4)),bm=buyDate.slice(4),sy=Number(sellDate.slice(0,4)),sm=sellDate.slice(4);
+  return sy-by-(sm<bm?1:0);
+ }
+ function standardTaxByBase(base){
+  const bands=[[14000000,.06,0],[50000000,.15,1260000],[88000000,.24,5760000],
+   [150000000,.35,15440000],[300000000,.38,19940000],
+   [500000000,.40,25940000],[1000000000,.42,35940000],[Infinity,.45,65940000]];
+  for(const [limit,rate,deduct] of bands)if(base<=limit)return Math.max(0,Math.round(base*rate-deduct));
+  throw Error('invalid_tax_bracket');
+ }
+ function simpleTransferTax(v){
+  // Only the tax regime of an explicitly VERIFIED qualifying one-house sale.
+  if(!v||v.own!=='one'||v.exemptionVerified!=='Y'||!['Y','N'].includes(v.conArea)||
+     !/^[0-9]{8}$/.test(String(v.buyDate))||!/^[0-9]{8}$/.test(String(v.sellDate))||
+     v.sellDate<'20230101'||v.sellDate>'20261231')return null;
+  const held=heldFullYears(v.buyDate,v.sellDate);
+  if(held<2||!Number.isFinite(v.liveYear)||v.liveYear<2||v.liveYear>held+1)return null;
+  if(!Number.isSafeInteger(v.buyAmt)||!Number.isSafeInteger(v.sellAmt)||v.buyAmt<1||v.sellAmt<1)return null;
+  const cost=v.cost===undefined?0:v.cost;
+  if(!Number.isSafeInteger(cost)||cost<0)return null;
+  const sell=v.sellAmt*10000,buy=v.buyAmt*10000,gain=Math.max(0,sell-buy-cost*10000);
+  const taxableGain=Math.round(gain*Math.max(0,(sell-1200000000)/sell));
+  const holdingRate=held>=3?Math.min(held*4,40):0,residenceRate=held>=3?Math.min(Math.floor(v.liveYear)*4,40):0;
+  const longDeduction=Math.round(taxableGain*(holdingRate+residenceRate)/100);
+  const taxBase=Math.max(0,taxableGain-longDeduction-2500000),incomeTax=standardTaxByBase(taxBase),
+   localTax=Math.round(incomeTax*.1),totalWon=incomeTax+localTax;
+  return {ok:true,source:'local_qualified_one_home',totalWon,
+   rows:[{label:'예상 합계',value:money(totalWon)},{label:'양도차익',value:money(gain)},
+    {label:'과세대상 양도차익',value:money(taxableGain)},
+    {label:'장기보유특별공제 ('+(holdingRate+residenceRate)+'%)',value:money(longDeduction)},
+    {label:'과세표준 (기본공제 250만원 가정)',value:money(taxBase)},
+    {label:'양도소득세',value:money(incomeTax)},{label:'지방소득세',value:money(localTax)}],
+   basis:'앱 자체 계산 · 외부 API 전송 없음. 사용자가 1세대1주택 비과세 요건을 직접 확인한 2023~2026년 양도 가정. 고가주택 12억원 초과분만 과세, 보유·거주 연4%(각 최대40%) 및 기본공제 250만원 가정. 다른 양도·공동명의·취득 당시 조정지역·세금 특례는 미반영. 반드시 세무전문가에게 확인해 주세요.'};
+ }
+
  function taxStatus(message){
   const box=$('fhc_taxStatus');
   box.textContent=message||'';
@@ -207,16 +252,29 @@
   taxStatus('');
   const button=$('fhc_taxCalculate');button.disabled=false;button.textContent='예상 세액 계산하기';
  }
+ function updateTaxFields(){
+  if(chosen==='acquisition'){
+   const el=$('fhc_taxTempTwoField');
+   if(el)el.hidden=!(taxValue('fhc_taxOwn')==='two'&&taxValue('fhc_taxConArea')==='Y');
+  }else if(chosen==='transfer'){
+   const el=$('fhc_taxExemptionField');
+   if(el)el.hidden=taxValue('fhc_taxTransferOwn')!=='one';
+  }
+ }
  function onTaxEdit(){
   if(!['acquisition','transfer'].includes(chosen))return;
-  clearTax();
+  clearTax();updateTaxFields();
  }
  function calculateTax(){
   if(!['acquisition','transfer'].includes(chosen))return false;
   let values;
   try{values=taxInputs(chosen);}catch(e){taxStatus(e.message);return false;}
-  const local=chosen==='acquisition'?simpleAcquisitionTax(values):null;
+  const local=chosen==='acquisition'?simpleAcquisitionTax(values):simpleTransferTax(values);
   if(local){clearTax();showTaxResult(local);return true;}
+  if(chosen==='acquisition'&&values.firstOfLife==='Y'){
+   taxStatus('생애최초 감면은 주택 유형에 따라 200만~300만원 등 차이가 있습니다. 상세 계산이 필요합니다.');
+   $('fhc_taxFallback').hidden=false;return false;
+  }
   if(!root.FirstHyundaiNative?.calculateRealtyTax){
    taxStatus('앱 업데이트 후 계산하실 수 있습니다.');
    $('fhc_taxFallback').hidden=false;
@@ -286,7 +344,7 @@
    clearTax();
    $('fhc_taxAcquisition').hidden=type!=='acquisition';
    $('fhc_taxTransfer').hidden=type!=='transfer';
-   taxStatus('');
+   updateTaxFields();taxStatus('');
   }
   update();
   $('fhc_detail').scrollIntoView?.({behavior:'smooth',block:'start'});
@@ -313,5 +371,5 @@
  $('fhc_taxPane')?.addEventListener?.('input',onTaxEdit);
  $('fhc_taxPane')?.addEventListener?.('change',onTaxEdit);
  root.FirstHyundaiCalculators={select,home,update,onOpen,onPageChange,useContractAmount,calculateTax,
-  _test:{commission,conversion,loan,num,simpleAcquisitionTax}};
+  _test:{commission,conversion,loan,num,simpleAcquisitionTax,simpleTransferTax,standardTaxByBase,heldFullYears}};
 })(window);
