@@ -970,6 +970,45 @@ body.apartmentSheetActive{overflow:hidden}
   </section>
   <section class="fhcPane" id="fhc_taxPane" hidden>
    <p id="fhc_taxIntro" class="fhcHint"></p>
+   <div class="fhcTaxInputs" id="fhc_acquisitionInputs" hidden>
+    <label for="fhc_acqAmount">취득금액 (만원)</label>
+    <input id="fhc_acqAmount" type="number" inputmode="numeric" min="10" max="50000000" step="1" placeholder="예: 140000 → 14억원">
+    <label for="fhc_acqOwn">취득에 적용되는 주택 수</label>
+    <select id="fhc_acqOwn"><option value="">선택하세요</option><option value="one">1주택</option><option value="two">2주택</option><option value="three">3주택</option><option value="more">4주택 이상</option></select>
+    <label for="fhc_acqArea">주택 전용면적</label>
+    <select id="fhc_acqArea"><option value="">선택하세요</option><option value="85">85㎡ 이하</option><option value="big">85㎡ 초과</option></select>
+    <label for="fhc_acqRegion">취득 당시 조정대상지역</label>
+    <select id="fhc_acqRegion"><option value="">선택하세요</option><option value="Y">해당</option><option value="N">해당하지 않음</option></select>
+    <label for="fhc_acqMetro">수도권 소재 여부</label>
+    <select id="fhc_acqMetro"><option value="">선택하세요</option><option value="Y">수도권</option><option value="N">수도권 외</option></select>
+    <label for="fhc_acqFirst">생애최초 구입 감면 요건 충족 여부</label>
+    <select id="fhc_acqFirst"><option value="">선택하세요</option><option value="Y">감면 요건 충족 확인</option><option value="N">미충족·미적용</option></select>
+   </div>
+   <div class="fhcTaxInputs" id="fhc_transferInputs" hidden>
+    <label for="fhc_trBuyAmt">취득가액 (만원)</label>
+    <input id="fhc_trBuyAmt" type="number" inputmode="numeric" min="10" step="1" placeholder="예: 70000">
+    <label for="fhc_trSellAmt">양도가액 (만원)</label>
+    <input id="fhc_trSellAmt" type="number" inputmode="numeric" min="10" step="1" placeholder="예: 95000">
+    <label for="fhc_trBuyDate">취득일</label>
+    <input id="fhc_trBuyDate" type="date">
+    <label for="fhc_trSellDate">양도일</label>
+    <input id="fhc_trSellDate" type="date">
+    <label for="fhc_trOwn">양도 시 적용 주택 수</label>
+    <select id="fhc_trOwn"><option value="">선택하세요</option><option value="one">1주택</option><option value="two">2주택</option><option value="more">3주택 이상</option></select>
+    <label for="fhc_trRegion">취득·양도 요건상 조정대상지역 적용</label>
+    <select id="fhc_trRegion"><option value="">선택하세요</option><option value="Y">해당</option><option value="N">해당하지 않음</option></select>
+    <label for="fhc_trLiveYears">실제 거주기간 (만 년)</label>
+    <input id="fhc_trLiveYears" type="number" inputmode="numeric" min="0" max="100" step="1" placeholder="예: 2 (거주하지 않으면 0)">
+    <label for="fhc_trCost">양도 관련 필요경비 합계 (만원 · 선택)</label>
+    <input id="fhc_trCost" type="number" inputmode="numeric" min="0" step="1" placeholder="모르면 비워 두세요">
+   </div>
+   <button id="fhc_taxSubmit" class="btn fhcTaxSubmit" type="button" onclick="FirstHyundaiCalculators.calculateTax()">예상 세액 계산</button>
+   <p id="fhc_taxStatus" class="fhcHint" role="status" aria-live="polite">모든 필수 조건을 선택한 뒤 계산해 주세요.</p>
+   <div id="fhc_taxResult" class="fhcTaxResult" hidden aria-label="API 예상 세액 계산 결과">
+    <h4>예상 세금 계산 내역</h4>
+    <div id="fhc_taxRows" class="fhcTaxRows"></div>
+    <p class="fhcHint">부동산계산기.com 제공 계산 결과입니다. 최종 세액·비과세 여부는 최신 법령과 거래 사실관계를 추가 확인해 주세요.</p>
+   </div>
    <div class="fhcTaxNotice"><strong>세액은 추정하지 않습니다</strong><p>세율·규제지역·보유주택 수·감면 또는 거주 요건에 따라 달라집니다. 부정확한 금액 대신 외부 계산 서비스로 안내합니다.</p></div>
    <a id="fhc_taxExternal" class="btn fhcTaxLink" href="https://xn--989a00af8jnslv3dba.com/acquisition">부동산계산기.com에서 계산하기 ↗</a>
    <a id="fhc_taxOfficial" class="fhcSource" href="https://www.wetax.go.kr">공식 세금 안내에서 확인하기 ↗</a>
