@@ -1,3 +1,4 @@
+import {calculateTax} from './realty-tax.mjs';
 import {themeWeather,weatherBriefing} from './theme-weather.mjs';
 /* Public settings reader; authenticated administrator writer. */
 const HEAD={"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store","Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET,OPTIONS","Access-Control-Allow-Headers":"Content-Type","X-Content-Type-Options":"nosniff"};
@@ -332,6 +333,7 @@ async function boardCommand(req,env,url,ctx){
  // a separate verified administrator session; the family board token alone is
  // never an administrator credential.
  const canModifyNote=async note=>note?.author?.id===caller.member.id||await isAdmin();
+ if(url.pathname==='/board/tax/calculate')return calculateTax(req,env,caller);
  if(url.pathname==="/board/accounts"&&req.method==="GET")
   return res({accounts:await memberList(env),current:{id:caller.member.id,name:caller.member.name}});
  if(url.pathname==="/board/account"&&req.method==="GET"){
