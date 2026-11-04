@@ -1,0 +1,41 @@
+/* 퍼스트현대 부동산 계산기 — six main tabs remain unchanged. */
+.fhcQuickAccess{display:flex;justify-content:flex-end;margin:-4px 0 11px}
+#fhc_quickOpen{min-height:45px;border:1px solid #b6cfc2;border-radius:13px;background:#edf6f0;color:#245d4a;font-weight:800;font-size:14px;padding:8px 15px}
+body[data-section="calculators"] #fhc_quickOpen{background:#226651;color:#fff;border-color:#226651}
+.fhcContractEntry{border:1px solid #d5bb9c;background:#fffaef;color:#76512d;border-radius:11px;min-height:44px;font-weight:750;padding:8px 14px;font-size:14px;align-self:flex-start}
+#calculators{max-width:760px;margin:0 auto}
+#calculators .sectionTitle{margin:5px 0 8px}
+.fhcLead{margin:0 0 14px;color:#52647a;font-size:15px}
+.fhcModeGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.fhcMode{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;text-align:left;min-height:104px;padding:15px;border-radius:18px;border:1.5px solid #d4dfd8;background:#fff;color:#1d3e43;box-shadow:0 2px 12px #2a5f4d10;font:inherit;cursor:pointer}
+.fhcMode span{font-size:25px;color:#327364;line-height:1.1}
+.fhcMode strong{font-size:17px;line-height:1.35}
+.fhcMode small{font-size:13px;color:#577069}
+.fhcMode.fhcTax{background:#f7faf6;border-color:#c9dacf}
+.fhcMode.fhcWide{grid-column:span 2;min-height:82px}
+.fhcMode:active{background:#eef6ed}
+.fhcDetail{margin:6px 0 18px}
+.fhcDetailTitle{font-size:21px;margin:10px 0 16px;color:#284d45}
+.fhcBack{border:0;background:none;color:#27614e;min-height:46px;font-size:15px;font-weight:800;padding:6px 4px}
+.fhcPane{display:flex;flex-direction:column;gap:8px}
+.fhcPane label{font-size:15px;font-weight:800;color:#314c4c;margin-top:6px}
+.fhcPane input:not([type="checkbox"]),.fhcPane select{width:100%;box-sizing:border-box;height:51px;font-size:17px;padding:10px 12px;background:#fffaf2}
+.fhcPane #fhc_feeRentWrap{margin-top:4px}
+.fhcPane #fhc_feeRentWrap label{display:block;margin:6px 0 7px}
+.fhcPane [hidden],#calculators [hidden]{display:none!important}
+.fhcSubAction{background:#f7f5ef;border:1px solid #d2d6cc;color:#315b4c;font-size:14px;font-weight:700;border-radius:12px;min-height:45px;padding:8px 12px}
+.fhcCheck{display:flex;align-items:center;gap:9px;font-weight:650!important;margin-top:10px!important}
+.fhcCheck input{width:22px;height:22px;accent-color:#2e6f58}
+.fhcResult{padding:17px 15px;margin:13px 0 4px;border-radius:17px;background:#edf5ed;border:1px solid #bfdbc9;overflow-wrap:anywhere}
+.fhcResult small{display:block;color:#426657;font-size:14px;font-weight:750}
+.fhcResult strong{display:block;margin:5px 0 7px;color:#24553c;font-size:clamp(19px,5vw,27px);letter-spacing:-.6px;line-height:1.5}
+.fhcResult p{margin:0;font-size:14px;line-height:1.7;color:#426251;white-space:pre-wrap}
+.fhcHint{font-size:14px;line-height:1.7;color:#536571;margin:7px 0}
+.fhcSource{display:inline-block;align-self:flex-start;margin-top:5px;font-size:14px;font-weight:750;color:#285e55;padding:8px 0;min-height:39px}
+.fhcTaxNotice{background:#f9f3e8;border:1px solid #e2d2b7;border-radius:13px;padding:16px;margin:6px 0 10px}
+.fhcTaxNotice strong{font-size:17px;color:#7c4c20}
+.fhcTaxNotice p{margin:6px 0 0;font-size:14px;line-height:1.7;color:#71583d}
+.fhcTaxLink{display:block;text-decoration:none;line-height:1.5;text-align:center;padding:12px 9px}
+.fhcAttribution{font-size:15px;color:#465b55}
+.fhcAttribution a{font-size:15px;color:#276454;text-decoration:underline}
+@media(max-width:360px){.fhcMode strong{font-size:15px}.fhcMode{padding:12px}.fhcMode small{font-size:12px}.fhcDetail{padding:14px}.fhcResult strong{font-size:20px}}
