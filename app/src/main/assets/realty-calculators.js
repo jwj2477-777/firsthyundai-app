@@ -147,32 +147,61 @@
   if(taxValue('fhc_taxCost')!=='')values.cost=taxWon('fhc_taxCost',true);
   return values;
  }
- function taxStatus(message){$('fhc_taxStatus').textContent=message;}
+ function taxStatus(message){
+  const box=$('fhc_taxStatus');
+  box.textContent=message||'';
+  box.hidden=!message;
+ }
+ function taxProblem(code){
+  switch(code){
+   case 'account_session_required': return '사무실 계정에 다시 로그인해 주세요.';
+   case 'tax_api_not_configured': return '계산 서비스 설정을 확인해 주세요.';
+   case 'provider_auth_error': return '계산 서비스 인증에 문제가 있습니다.';
+   case 'invalid_request':
+   case 'invalid_amount':
+   case 'invalid_housing_condition':
+   case 'invalid_date':
+   case 'invalid_date_order':
+   case 'invalid_living_years':
+   case 'invalid_boolean': return '입력 조건을 다시 확인해 주세요.';
+   case 'rate_limited':
+   case 'provider_rate_limited': return '계산 요청이 많습니다. 잠시 후 다시 시도해 주세요.';
+   case 'connection_timeout': return '응답이 지연되고 있습니다. 다시 시도해 주세요.';
+   case 'provider_requires_review': return '계산 조건을 확인할 수 없습니다. 아래에서 직접 확인해 주세요.';
+   default: return '계산에 실패했습니다. 다시 시도하거나 아래에서 직접 확인해 주세요.';
+  }
+ }
  function clearTax(){
   taxPending='';
   $('fhc_taxResult').hidden=true;
   $('fhc_taxRows').replaceChildren();
   $('fhc_taxBasis').textContent='';
+  $('fhc_taxFallback').hidden=true;
+  $('fhc_taxDiag').hidden=true;
+  $('fhc_taxDiag').textContent='';
+  taxStatus('');
   const button=$('fhc_taxCalculate');button.disabled=false;button.textContent='예상 세액 계산하기';
  }
  function onTaxEdit(){
   if(!['acquisition','transfer'].includes(chosen))return;
-  clearTax();taxStatus('조건이 변경됐습니다. 예상 세액을 다시 계산해 주세요.');
+  clearTax();
  }
  function calculateTax(){
   if(!['acquisition','transfer'].includes(chosen))return false;
   let values;
   try{values=taxInputs(chosen);}catch(e){taxStatus(e.message);return false;}
   if(!root.FirstHyundaiNative?.calculateRealtyTax){
-   taxStatus('최신 퍼스트현대 앱 설치 후 이용할 수 있습니다. 아래 외부 계산 서비스를 이용해 주세요.');return false;
+   taxStatus('앱 업데이트 후 계산하실 수 있습니다.');
+   $('fhc_taxFallback').hidden=false;
+   return false;
   }
   const requestId='tax-'+Date.now()+'-'+(++taxSequence);
   clearTax();taxPending=requestId;
   $('fhc_taxCalculate').disabled=true;
   $('fhc_taxCalculate').textContent='계산 확인 중…';
-  taxStatus('확인된 조건으로 예상 세액을 계산하고 있습니다.');
+  taxStatus('계산 중…');
   try{root.FirstHyundaiNative.calculateRealtyTax(JSON.stringify({type:chosen,values}),requestId);}
-  catch(e){clearTax();taxStatus('서버 연결을 시작하지 못했습니다. 다시 시도해 주세요.');return false;}
+  catch(e){clearTax();taxStatus('계산 요청을 시작하지 못했습니다.');$('fhc_taxFallback').hidden=false;return false;}
   return true;
  }
  function onTaxResult(event){
@@ -180,11 +209,16 @@
   clearTax();
   const response=event?.data;
   if(event.ok!==true||response?.ok!==true||!Array.isArray(response.rows)){
-   taxStatus('세금 계산 서버에 연결하지 못했습니다. 아래 외부 계산 서비스에서 확인해 주세요.');
+   const code=String(event?.errorCode||response?.error||'network_error').slice(0,64);
+   taxStatus(taxProblem(code));
+   $('fhc_taxFallback').hidden=false;
+   const http=Number(event?.httpStatus||0);
+   $('fhc_taxDiag').textContent='계산 오류: '+code+(http>0?' · HTTP '+http:'');
+   $('fhc_taxDiag').hidden=false;
    return;
   }
   const items=response.rows;
-  if(!items.length){taxStatus('계산 결과 항목을 받지 못했습니다. 외부 계산 서비스를 이용해 주세요.');return;}
+  if(!items.length){taxStatus('계산 결과가 없습니다. 외부 계산기를 이용해 주세요.');$('fhc_taxFallback').hidden=false;return;}
   const container=$('fhc_taxRows');
   for(const item of items.slice(0,100)){
    if(typeof item.label!=='string'||typeof item.value!=='string')continue;
@@ -198,7 +232,7 @@
   }
   $('fhc_taxBasis').textContent=String(response.basis||'').slice(0,1500);
   $('fhc_taxResult').hidden=false;
-  taxStatus('예상 세액 계산 결과입니다. 신고 전 적용 조건을 확인해 주세요.');
+  taxStatus('');
   $('fhc_taxResult').scrollIntoView?.({behavior:'smooth',block:'start'});
  }
  function select(type){
@@ -222,7 +256,7 @@
    clearTax();
    $('fhc_taxAcquisition').hidden=type!=='acquisition';
    $('fhc_taxTransfer').hidden=type!=='transfer';
-   taxStatus('계산할 조건을 입력해 주세요.');
+   taxStatus('');
   }
   update();
   $('fhc_detail').scrollIntoView?.({behavior:'smooth',block:'start'});
