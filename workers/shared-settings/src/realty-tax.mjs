@@ -46,7 +46,11 @@ function cleanRows(value){
  if(!Array.isArray(value)||value.length>100)throw Error('invalid_provider_response');
  return value.map(row=>{
   if(!row||typeof row!=='object')throw Error('invalid_provider_response');
-  const take=(key,max)=>typeof row[key]==='string'?row[key].slice(0,max):'';
+  const take=(key,max)=>{
+   const value=row[key];
+   return typeof value==='string'?value.slice(0,max):
+    typeof value==='number'&&Number.isFinite(value)?String(value).slice(0,max):'';
+  };
   return {label:take('적요',100),value:take('값',140),note:take('비고',240)};
  }).filter(row=>row.label);
 }
