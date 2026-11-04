@@ -83,6 +83,11 @@ assert.equal(acq({own:'two',conArea:'Y',tempTwo:'N',areaType:'big'}).totalWon,45
 assert.equal(acq({own:'three',conArea:'Y',areaType:'big'}).totalWon,67000000,'중과12% 85㎡ 초과 농특세');
 assert.equal(acq({metro:'N'}).totalWon,5500000,'85㎡ 이하 비수도권 일반세율');
 assert.equal(acq({metro:'N',areaType:'big'}),null,'비수도권 읍면 100㎡ 면제 가능성을 임의계산 금지');
+assert.equal(acq({firstOfLife:'Y',firstHomeType:'general'}).totalWon,3300000,'5억원 일반 생애최초 200만원 및 교육세 감면');
+assert.equal(acq({firstOfLife:'Y',firstHomeType:'small',areaType:'60'}).totalWon,2200000,'5억원 요건 충족 소형 비아파트 300만원 감면');
+assert.equal(acq({firstOfLife:'Y',firstHomeType:'small',areaType:'85'}),null,'비아파트 소형 요건과 면적 충돌 차단');
+assert.equal(acq({firstOfLife:'Y',firstHomeType:'general',amount:120001}),null,'12억원 초과 생애최초 감면 금지');
+assert.equal(acq({firstOfLife:'Y',firstHomeType:'general',areaType:'big'}),null,'농특세·감면 특수조건 무리한 계산 금지');
 const transfer=v=>fn.simpleTransferTax({buyAmt:80000,sellAmt:150000,buyDate:'20180101',
  sellDate:'20261101',own:'one',conArea:'N',liveYear:6,exemptionVerified:'Y',cost:0,...v});
 assert.equal(transfer({}).totalWon,9266400,'8억에 산 집 15억 양도·보유8년 거주6년');
@@ -109,7 +114,8 @@ const ids=['fhc_modes','fhc_detail','fhc_detailTitle','fhc_feePane','fhc_convers
  'fhc_feeVat','fhc_feePrimary','fhc_feeDetail','fhc_feeCaption','fhc_oldDeposit','fhc_newDeposit',
  'fhc_conversionRate','fhc_conversionPrimary','fhc_conversionDetail','fhc_loanAmount','fhc_loanRate',
  'fhc_loanMonths','fhc_loanMethod','fhc_loanPrimary','fhc_loanDetail','fhc_loanCaption',
- 'fhc_quickOpen','ct_price'];
+ 'fhc_quickOpen','ct_price','fhc_taxFirstHomeField','fhc_taxFirstHomeType',
+ 'fhc_taxTempTwoField','fhc_taxTemporaryTwo','fhc_taxExemptionField','fhc_taxExemptionVerified'];
 for(const id of ids)element(id);
 element('fhc_feeDeal').value='sale';element('fhc_feeKind').value='house';
 element('fhc_feeAmount').value='140000';
@@ -159,6 +165,11 @@ assert.equal(element('fhc_taxResult').hidden,false);
 assert.equal(element('fhc_taxRows').children[0].children[1].textContent,'5,500,000원');
 assert.match(element('fhc_taxBasis').textContent,/외부 API 전송 없음/);
 assert.equal(element('fhc_taxFallback').hidden,true);
+// First-home acquisition cases should also work without API even if provider returns 403.
+element('fhc_taxFirstLife').value='Y';element('fhc_taxFirstHomeType').value='general';
+assert.equal(calc.calculateTax(),true);
+assert.equal(element('fhc_taxRows').children[0].children[1].textContent,'3,300,000원');
+assert.equal(taxRequests.length,1);
 
 calc.select('transfer');
 assert.match(element('fhc_taxExternal').href,/\/transfer$/);
@@ -181,7 +192,19 @@ assert.equal(element('fhc_taxFallback').hidden,false,'Only reveal fallback on se
 assert.equal(element('fhc_taxStatus').hidden,false,'Show short actionable explanation');
 assert.match(element('fhc_taxStatus').textContent,/인증/);
 assert.match(element('fhc_taxDiag').textContent,/provider_auth_error.*503/);
-
+// One-house 2026 taxable high-value example — no provider dependency.
+element('fhc_taxBuyAmt').value='80000';element('fhc_taxSellAmt').value='150000';
+element('fhc_taxBuyDate').value='2018-01-01';element('fhc_taxSellDate').value='2026-11-01';
+element('fhc_taxLiving').value='6';element('fhc_taxExemptionVerified').value='Y';
+assert.equal(calc.calculateTax(),true);
+assert.equal(element('fhc_taxRows').children[0].children[1].textContent,'9,266,400원');
+assert.equal(taxRequests.length,2,'Verified 1-home sale must never transmit private inputs');
+element('fhc_taxExemptionVerified').value='N';
+assert.equal(calc.calculateTax(),true);
+assert.equal(taxRequests.length,3,'Not exempt => keep external specialized calculation path');
+assert(!Object.hasOwn(taxRequests[2][0].values,'exemptionVerified'),'Never send local eligibility flag to Worker');
+assert(!Object.hasOwn(taxRequests[2][0].values,'tempTwo'));
+assert(!Object.hasOwn(taxRequests[2][0].values,'firstHomeType'));
 
 calc.home();assert.equal(element('fhc_detail').hidden,true);
 assert.equal(element('fhc_modes').hidden,false);
@@ -209,6 +232,8 @@ assert(page.includes('id="fhc_taxTempTwoField" hidden'),'Two-home transition con
 assert(page.includes('id="fhc_taxTemporaryTwo"'),'Temporary-two condition is selectable');
 assert(page.includes('id="fhc_taxExemptionField" hidden'),'One-home tax status is not silently presumed');
 assert(page.includes('id="fhc_taxExemptionVerified"'),'Verified exemption required for safe local capital gains tax');
+assert(page.includes('id="fhc_taxFirstHomeField" hidden'),'First-home eligibility options only when relevant');
+assert(page.includes('id="fhc_taxFirstHomeType"'),'Distinguish general and small-house tax relief');
 const styles=read('app/src/main/assets/realty-calculators.css');
 assert(styles.includes('.fhcTaxInputs{display:grid;grid-template-columns:repeat(2'),
  'Use two-column compact fields on supported devices');
