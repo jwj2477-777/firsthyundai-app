@@ -114,7 +114,8 @@
   $('fhc_modes').hidden=true;
   $('fhc_detail').hidden=false;
   $('fhc_detailTitle').textContent=names[type];
-  for(const name of ['fee','conversion','loan','tax'])$('fhc_'+name+'Pane').hidden=type!==(name==='tax'?type:name);
+  for(const name of ['fee','conversion','loan'])$('fhc_'+name+'Pane').hidden=type!==name;
+  $('fhc_taxPane').hidden=!['acquisition','transfer'].includes(type);
   // Tax variants share one external-link panel, never an untrusted WebView iframe:
   // Android's JavascriptInterface is otherwise visible to child frames.
   if(type==='acquisition'||type==='transfer'){
