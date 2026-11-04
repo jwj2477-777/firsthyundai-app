@@ -3,11 +3,13 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const dir=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(dir,p),'utf8');
 const elements=new Map();
 function element(id){if(!elements.has(id))elements.set(id,{
- id,value:'',hidden:true,checked:false,textContent:'',href:'',attributes:{},
+ id,value:'',hidden:true,checked:false,textContent:'',href:'',attributes:{},children:[],
+ replaceChildren(){this.children=[];},
+ append(...items){this.children.push(...items);},
  setAttribute(name,value){this.attributes[name]=value;},
  scrollIntoView(){}
 });return elements.get(id);}
-const win={},doc={getElementById:element};
+const win={},doc={getElementById:element,createElement:tag=>({tag,textContent:'',className:'',children:[],append(...nodes){this.children.push(...nodes);}})};
 vm.runInNewContext(read('app/src/main/assets/realty-calculators.js'),{window:win,document:doc,Intl,Number,String,Math,Object,Set,Error});
 const calc=win.FirstHyundaiCalculators,fn=calc._test;
 const approx=(a,b,t=1e-7)=>assert(Math.abs(a-b)<=t,`expected ${a} ≈ ${b}`);
@@ -61,7 +63,10 @@ const ids=['fhc_modes','fhc_detail','fhc_detailTitle','fhc_feePane','fhc_convers
  'fhc_feeVat','fhc_feePrimary','fhc_feeDetail','fhc_feeCaption','fhc_oldDeposit','fhc_newDeposit',
  'fhc_conversionRate','fhc_conversionPrimary','fhc_conversionDetail','fhc_loanAmount','fhc_loanRate',
  'fhc_loanMonths','fhc_loanMethod','fhc_loanPrimary','fhc_loanDetail','fhc_loanCaption',
- 'fhc_quickOpen','ct_price'];
+ 'fhc_quickOpen','ct_price','fhc_taxStatus','fhc_taxResult','fhc_taxRows','fhc_taxSubmit',
+ 'fhc_acquisitionInputs','fhc_transferInputs','fhc_acqAmount','fhc_acqOwn','fhc_acqArea','fhc_acqRegion',
+ 'fhc_acqMetro','fhc_acqFirst','fhc_trBuyAmt','fhc_trSellAmt','fhc_trBuyDate','fhc_trSellDate',
+ 'fhc_trOwn','fhc_trRegion','fhc_trLiveYears','fhc_trCost'];
 for(const id of ids)element(id);
 element('fhc_feeDeal').value='sale';element('fhc_feeKind').value='house';
 element('fhc_feeAmount').value='140000';
@@ -75,13 +80,59 @@ assert.match(element('fhc_feeDetail').textContent,/3,100만원/);
 element('ct_price').value='140000';assert(calc.useContractAmount());
 assert.equal(element('fhc_feeAmount').value,'140000');
 calc.select('acquisition');
+element('fhc_acqAmount').value='140000';
+element('fhc_acqOwn').value='one';
+element('fhc_acqArea').value='85';
+element('fhc_acqRegion').value='N';
+element('fhc_acqMetro').value='Y';
+element('fhc_acqFirst').value='N';
+const acquisitionPayload=fn.taxRequest();
+assert.equal(acquisitionPayload.amount,1400000000);
+assert.equal(acquisitionPayload.metro,'Y');
+element('fhc_acqOwn').value='';
+assert.throws(()=>fn.taxRequest(),'Unselected ownership must block calculation');
+element('fhc_acqOwn').value='one';
+assert.equal(calc.calculateTax(),false,'Native transport absence must not fake a tax result');
+
 assert.equal(element('fhc_taxPane').hidden,false);
 assert.equal(element('fhc_feePane').hidden,true);
 assert.match(element('fhc_taxExternal').href,/\/acquisition$/);
 assert.match(element('fhc_taxOfficial').href,/wetax/);
 calc.select('transfer');
+element('fhc_trBuyAmt').value='70000';
+element('fhc_trSellAmt').value='95000';
+element('fhc_trBuyDate').value='2020-01-15';
+element('fhc_trSellDate').value='2026-06-28';
+element('fhc_trOwn').value='one';
+element('fhc_trRegion').value='N';
+element('fhc_trLiveYears').value='2';
+element('fhc_trCost').value='1000';
+const transferPayload=fn.taxRequest();
+assert.equal(transferPayload.buyAmt,700000000);
+assert.equal(transferPayload.sellAmt,950000000);
+assert.equal(transferPayload.buyDate,'20200115');
+assert.equal(transferPayload.cost,10000000);
+element('fhc_trBuyDate').value='2025-02-29';
+assert.throws(()=>fn.taxRequest(),'Impossible date must not be sent to tax provider');
+element('fhc_trBuyDate').value='2020-01-15';
+
 assert.match(element('fhc_taxExternal').href,/\/transfer$/);
 assert.match(element('fhc_taxOfficial').href,/hometax/);
+
+const requests=[];
+win.FirstHyundaiNative={calculateRealtyTax(id,json){requests.push({id,data:JSON.parse(json)})}};
+assert.equal(calc.calculateTax(),true,'Validated values should invoke native API');
+assert.equal(requests.length,1);
+assert.equal(requests[0].data.kind,'transfer');
+assert.equal(element('fhc_taxSubmit').disabled,true);
+fn.receiveTax({requestId:'tax-invalid',ok:true,payload:{ok:true,kind:'transfer',rows:[{label:'잘못된 응답',value:'5원'}]}});
+assert.equal(element('fhc_taxResult').hidden,true,'Wrong request ID must be ignored');
+fn.receiveTax({requestId:requests[0].id,ok:true,payload:{ok:true,kind:'transfer',rows:[{label:'예상 세액',value:'1,000,000',detail:'참고'}]}});
+assert.equal(element('fhc_taxResult').hidden,false);
+assert.equal(element('fhc_taxRows').children.length,1);
+assert.equal(element('fhc_taxSubmit').disabled,false);
+element('fhc_trBuyAmt').value='85000';calc.invalidateTax();
+assert.equal(element('fhc_taxResult').hidden,true,'Editing conditions removes old estimate');
 calc.home();assert.equal(element('fhc_detail').hidden,true);
 assert.equal(element('fhc_modes').hidden,false);
 calc.onOpen();assert.equal(element('fhc_quickOpen').attributes['aria-current'],'page');
