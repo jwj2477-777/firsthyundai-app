@@ -118,6 +118,13 @@ assert.equal(calc.calculateTax(),true);
 assert.equal(taxRequests[1][0].type,'transfer');
 assert.equal(taxRequests[1][0].values.buyDate,'20200115');
 assert.equal(taxRequests[1][0].values.liveYear,2);
+win.onFirstHyundaiRealtyTaxResult({requestId:taxRequests[1][1],ok:false,
+ errorCode:'provider_auth_error',httpStatus:503});
+assert.equal(element('fhc_taxFallback').hidden,false,'Only reveal fallback on server error');
+assert.equal(element('fhc_taxStatus').hidden,false,'Show short actionable explanation');
+assert.match(element('fhc_taxStatus').textContent,/인증/);
+assert.match(element('fhc_taxDiag').textContent,/provider_auth_error.*503/);
+
 
 calc.home();assert.equal(element('fhc_detail').hidden,true);
 assert.equal(element('fhc_modes').hidden,false);
@@ -133,6 +140,19 @@ assert(!page.includes('<iframe')&&!page.includes('addJavascriptInterface'),
 assert(page.includes('https://www.incheon.go.kr/build/BU050301/2106584'));
 assert(html.includes('src="realty-calculators.js"')&&html.includes('href="realty-calculators.css"'));
 assert(html.includes("FirstHyundaiCalculators?.onPageChange?.(id)"));
+assert(page.includes('class="fhcTaxNotice adminExplain"'),'General mode must not repeat tax guidance');
+assert(page.includes('id="fhc_taxFallback" class="fhcTaxFallback" hidden'),'Fallback stays hidden until error');
+assert(page.includes('id="fhc_taxDiag" class="fhcTaxDiagnostic adminExplain"'),'Technical status admin-only');
+assert(page.includes('class="fhcTaxField"'),'Group paired fields into compact cards');
+assert(page.includes('<details class="fhcMore"><summary>계산 기준 · 공식 확인</summary>'));
+assert(page.includes('제공: <a href="https://eznm.me/realestate">부동산계산기.com</a>'),
+ 'Attribution must stay visible for family users');
+assert(page.includes('입력 조건이 업체에 전달됩니다'),'Keep concise data-use notice in family mode');
+const styles=read('app/src/main/assets/realty-calculators.css');
+assert(styles.includes('.fhcTaxInputs{display:grid;grid-template-columns:repeat(2'),
+ 'Use two-column compact fields on supported devices');
+assert(styles.includes('.fhcTaxCalculate{margin-top:13px;min-height:56px'),'Keep primary action prominent');
+
 const source=read('app/src/main/assets/realty-calculators.js');
 assert(!/\b(fetch|XMLHttpRequest|localStorage|sessionStorage|api_key|Authorization)\b/.test(source),
  'Do not leak contracts or API secrets over network or store calculations');

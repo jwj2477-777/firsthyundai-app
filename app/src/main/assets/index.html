@@ -928,7 +928,7 @@ body.apartmentSheetActive{overflow:hidden}
 
 <div id="calculators" class="page hidden" aria-label="부동산 실무 계산기">
  <div class="sectionTitle"><h2>부동산 계산기</h2></div>
- <p class="fhcLead">필요한 계산을 선택하면 바로 입력할 수 있습니다.</p>
+ <p class="fhcLead adminExplain">필요한 계산을 선택하면 바로 입력할 수 있습니다.</p>
  <div id="fhc_modes" class="fhcModeGrid" aria-label="계산기 선택">
   <button type="button" class="fhcMode fhcTax" onclick="FirstHyundaiCalculators.select('acquisition')"><span aria-hidden="true">⌂</span><strong>취득세</strong><small>살 때 내는 세금</small></button>
   <button type="button" class="fhcMode fhcTax" onclick="FirstHyundaiCalculators.select('transfer')"><span aria-hidden="true">↗</span><strong>양도소득세</strong><small>팔 때 내는 세금</small></button>
@@ -950,15 +950,15 @@ body.apartmentSheetActive{overflow:hidden}
    <div id="fhc_feeRentWrap" hidden><label for="fhc_feeRent">월세 (만원)</label><input id="fhc_feeRent" type="number" inputmode="numeric" min="0" max="1000000000" step="1" placeholder="예: 150"></div>
    <label class="fhcCheck" for="fhc_feeVat"><input id="fhc_feeVat" type="checkbox"> 부가세 10% 가정액도 보기</label>
    <div class="fhcResult" role="status" aria-live="polite"><small id="fhc_feeCaption">예상 중개보수 상한</small><strong id="fhc_feePrimary">금액을 입력해 주세요</strong><p id="fhc_feeDetail"></p></div>
-   <p class="fhcHint">인천광역시 공표 요율 기준의 의뢰인 한쪽 상한입니다. 실제 보수는 상한 내 협의하고, 부가세 및 특약은 별도로 확인합니다.</p>
-   <a class="fhcSource" href="https://www.incheon.go.kr/build/BU050301/2106584">인천시 중개보수 요율 원문 ↗</a>
+   <p class="fhcHint adminExplain">인천광역시 공표 요율 기준의 의뢰인 한쪽 상한입니다. 실제 보수는 상한 내 협의하고, 부가세 및 특약은 별도로 확인합니다.</p>
+   <details class="fhcMore"><summary>계산 기준</summary><a class="fhcSource" href="https://www.incheon.go.kr/build/BU050301/2106584">인천시 요율표 ↗</a></details>
   </section>
   <section class="fhcPane" id="fhc_conversionPane" hidden oninput="FirstHyundaiCalculators.update()" onchange="FirstHyundaiCalculators.update()">
    <label for="fhc_oldDeposit">현재 보증금 (만원)</label><input id="fhc_oldDeposit" type="number" inputmode="numeric" min="0" max="1000000000" step="1" placeholder="예: 10000">
    <label for="fhc_newDeposit">변경 보증금 (만원)</label><input id="fhc_newDeposit" type="number" inputmode="numeric" min="0" max="1000000000" step="1" placeholder="예: 5000">
    <label for="fhc_conversionRate">가정한 연 전환율 (%)</label><input id="fhc_conversionRate" type="number" inputmode="decimal" min="0" max="100" step="0.1" placeholder="예: 4">
    <div class="fhcResult" role="status" aria-live="polite"><small>월세 조정 예상액</small><strong id="fhc_conversionPrimary">금액과 전환율을 입력해 주세요</strong><p id="fhc_conversionDetail"></p></div>
-   <p class="fhcHint">단순 비교용 계산입니다. 입력한 전환율을 적용하며, 법정 전월세전환율 상한이나 임대료 증액 가능 여부를 판정하지 않습니다.</p>
+   <details class="fhcMore"><summary>계산 기준</summary><p class="fhcHint">입력한 전환율의 단순 비교입니다. 법정 전환율 상한과 임대료 증액 가능 여부는 별도 확인이 필요합니다.</p></details>
   </section>
   <section class="fhcPane" id="fhc_loanPane" hidden oninput="FirstHyundaiCalculators.update()" onchange="FirstHyundaiCalculators.update()">
    <label for="fhc_loanAmount">대출금 (만원)</label><input id="fhc_loanAmount" type="number" inputmode="numeric" min="1" max="1000000000" step="1" placeholder="예: 30000">
@@ -966,37 +966,41 @@ body.apartmentSheetActive{overflow:hidden}
    <label for="fhc_loanMonths">대출기간 (개월)</label><input id="fhc_loanMonths" type="number" inputmode="numeric" min="1" max="600" step="1" placeholder="예: 360">
    <label for="fhc_loanMethod">상환 방식</label><select id="fhc_loanMethod"><option value="equal">원리금균등</option><option value="principal">원금균등</option><option value="bullet">만기일시</option></select>
    <div class="fhcResult" role="status" aria-live="polite"><small id="fhc_loanCaption">월 납입 예상액</small><strong id="fhc_loanPrimary">대출 조건을 입력해 주세요</strong><p id="fhc_loanDetail"></p></div>
-   <p class="fhcHint">매월 말 상환·고정금리 가정. 실제 이자, 수수료 및 상환 일정은 금융기관 약정에 따라 달라질 수 있습니다.</p>
+   <details class="fhcMore"><summary>계산 기준</summary><p class="fhcHint">매월 말 상환·고정금리 가정입니다. 실제 이자·수수료는 금융기관 약정에 따릅니다.</p></details>
   </section>
   <section class="fhcPane" id="fhc_taxPane" hidden>
-   <p id="fhc_taxIntro" class="fhcHint"></p>
-   <div class="fhcTaxNotice"><strong>세금 예상액 계산</strong><p>입력한 조건으로 계산 API에 요청합니다. 실제 신고 금액 및 비과세·감면 적용은 별도로 확인해 주세요.</p></div>
+   <p id="fhc_taxIntro" class="fhcHint adminExplain"></p>
+   <div class="fhcTaxNotice adminExplain"><strong>세금 예상액 계산</strong><p>입력한 조건으로 계산 API에 요청합니다. 실제 신고 금액 및 비과세·감면 적용은 별도로 확인해 주세요.</p></div>
    <div id="fhc_taxAcquisition" class="fhcTaxInputs" hidden>
-    <label for="fhc_taxAmount">취득금액 (만원)</label><input id="fhc_taxAmount" type="number" min="1" max="1000000000" inputmode="numeric" placeholder="예: 140000 → 14억원">
-    <label for="fhc_taxArea">전용면적</label><select id="fhc_taxArea"><option value="">선택해 주세요</option><option value="40">40㎡ 이하</option><option value="60">40㎡ 초과 ~ 60㎡ 이하</option><option value="85">60㎡ 초과 ~ 85㎡ 이하</option><option value="big">85㎡ 초과</option></select>
-    <label for="fhc_taxOwn">취득 후 주택 수</label><select id="fhc_taxOwn"><option value="">선택해 주세요</option><option value="one">1주택</option><option value="two">2주택</option><option value="three">3주택</option><option value="more">4주택 이상</option></select>
-    <label for="fhc_taxConArea">조정대상지역 여부</label><select id="fhc_taxConArea"><option value="">확인 후 선택</option><option value="N">아니요</option><option value="Y">예</option></select>
-    <label for="fhc_taxFirstLife">생애최초 주택구입 감면 대상</label><select id="fhc_taxFirstLife"><option value="">확인 후 선택</option><option value="N">아니요</option><option value="Y">예</option></select>
-    <label for="fhc_taxMetro">수도권 소재</label><select id="fhc_taxMetro"><option value="">확인 후 선택</option><option value="Y">예</option><option value="N">아니요</option></select>
+    <div class="fhcTaxField fhcWide"><label for="fhc_taxAmount">취득금액 (만원)</label><input id="fhc_taxAmount" type="number" min="1" max="1000000000" inputmode="numeric" placeholder="예: 140000 → 14억원"></div>
+    <div class="fhcTaxField"><label for="fhc_taxArea">전용면적</label><select id="fhc_taxArea"><option value="">선택해 주세요</option><option value="40">40㎡ 이하</option><option value="60">40㎡ 초과 ~ 60㎡ 이하</option><option value="85">60㎡ 초과 ~ 85㎡ 이하</option><option value="big">85㎡ 초과</option></select></div>
+    <div class="fhcTaxField"><label for="fhc_taxOwn">주택 수</label><select id="fhc_taxOwn"><option value="">선택해 주세요</option><option value="one">1주택</option><option value="two">2주택</option><option value="three">3주택</option><option value="more">4주택 이상</option></select></div>
+    <div class="fhcTaxField"><label for="fhc_taxConArea">조정대상지역</label><select id="fhc_taxConArea"><option value="">확인 후 선택</option><option value="N">아니요</option><option value="Y">예</option></select></div>
+    <div class="fhcTaxField"><label for="fhc_taxFirstLife">생애최초 감면</label><select id="fhc_taxFirstLife"><option value="">확인 후 선택</option><option value="N">아니요</option><option value="Y">예</option></select></div>
+    <div class="fhcTaxField"><label for="fhc_taxMetro">수도권 소재</label><select id="fhc_taxMetro"><option value="">확인 후 선택</option><option value="Y">예</option><option value="N">아니요</option></select></div>
    </div>
    <div id="fhc_taxTransfer" class="fhcTaxInputs" hidden>
-    <label for="fhc_taxBuyAmt">취득가액 (만원)</label><input id="fhc_taxBuyAmt" type="number" min="1" max="1000000000" inputmode="numeric" placeholder="예: 70000">
-    <label for="fhc_taxSellAmt">양도가액 (만원)</label><input id="fhc_taxSellAmt" type="number" min="1" max="1000000000" inputmode="numeric" placeholder="예: 95000">
-    <label for="fhc_taxBuyDate">취득일</label><input id="fhc_taxBuyDate" type="date">
-    <label for="fhc_taxSellDate">양도일</label><input id="fhc_taxSellDate" type="date">
-    <label for="fhc_taxTransferOwn">양도 당시 주택 수</label><select id="fhc_taxTransferOwn"><option value="">선택해 주세요</option><option value="one">1주택</option><option value="two">2주택</option><option value="more">3주택 이상</option></select>
-    <label for="fhc_taxTransferConArea">조정대상지역 여부</label><select id="fhc_taxTransferConArea"><option value="">확인 후 선택</option><option value="N">아니요</option><option value="Y">예</option></select>
-    <label for="fhc_taxLiving">실제 거주기간 (년)</label><input id="fhc_taxLiving" type="number" min="0" max="100" inputmode="decimal" step="0.1" placeholder="예: 2">
-    <label for="fhc_taxCost">필요경비 (만원)</label><input id="fhc_taxCost" type="number" min="0" max="1000000000" inputmode="numeric" placeholder="선택, 확인된 금액만 입력">
+    <div class="fhcTaxField fhcWide"><label for="fhc_taxBuyAmt">취득가액 (만원)</label><input id="fhc_taxBuyAmt" type="number" min="1" max="1000000000" inputmode="numeric" placeholder="예: 70000"></div>
+    <div class="fhcTaxField fhcWide"><label for="fhc_taxSellAmt">양도가액 (만원)</label><input id="fhc_taxSellAmt" type="number" min="1" max="1000000000" inputmode="numeric" placeholder="예: 95000"></div>
+    <div class="fhcTaxField"><label for="fhc_taxBuyDate">취득일</label><input id="fhc_taxBuyDate" type="date"></div>
+    <div class="fhcTaxField"><label for="fhc_taxSellDate">양도일</label><input id="fhc_taxSellDate" type="date"></div>
+    <div class="fhcTaxField"><label for="fhc_taxTransferOwn">양도 시 주택 수</label><select id="fhc_taxTransferOwn"><option value="">선택해 주세요</option><option value="one">1주택</option><option value="two">2주택</option><option value="more">3주택 이상</option></select></div>
+    <div class="fhcTaxField"><label for="fhc_taxTransferConArea">조정대상지역</label><select id="fhc_taxTransferConArea"><option value="">확인 후 선택</option><option value="N">아니요</option><option value="Y">예</option></select></div>
+    <div class="fhcTaxField"><label for="fhc_taxLiving">실제 거주기간 (년)</label><input id="fhc_taxLiving" type="number" min="0" max="100" inputmode="decimal" step="0.1" placeholder="예: 2"></div>
+    <div class="fhcTaxField"><label for="fhc_taxCost">필요경비 (만원)</label><input id="fhc_taxCost" type="number" min="0" max="1000000000" inputmode="numeric" placeholder="선택, 확인된 금액만 입력"></div>
    </div>
-   <p class="fhcHint">입력한 계산 조건과 결과는 부동산계산기.com API로 전송되고 서비스 제공업체의 운영 로그에 최대 1년 보관될 수 있습니다. 개인 이름·연락처·계좌는 입력하지 마세요.</p>
+   <p class="fhcHint adminExplain">입력한 계산 조건과 결과는 부동산계산기.com API로 전송되고 서비스 제공업체의 운영 로그에 최대 1년 보관될 수 있습니다. 개인 이름·연락처·계좌는 입력하지 마세요.</p>
    <button id="fhc_taxCalculate" type="button" class="btn fhcTaxCalculate" onclick="FirstHyundaiCalculators.calculateTax()">예상 세액 계산하기</button>
-   <p class="fhcAttribution">계산기 제공: <a href="https://eznm.me/realestate">부동산계산기.com</a></p>
-   <p id="fhc_taxStatus" class="fhcTaxStatus" role="status" aria-live="polite">계산할 조건을 입력해 주세요.</p>
-   <section id="fhc_taxResult" class="fhcTaxResult" hidden aria-label="세금 계산 결과"><h4>예상 세액 및 계산 근거</h4><div id="fhc_taxRows"></div><p id="fhc_taxBasis"></p><p class="fhcHint">결과는 참고용입니다. 임대사업자·특례·공동명의·추가주택 등 복잡한 조건은 외부 상세 계산에서 재확인해 주세요.</p></section>
-   <a id="fhc_taxExternal" class="btn fhcTaxLink" href="https://xn--989a00af8jnslv3dba.com/acquisition">부동산계산기.com에서 계산하기 ↗</a>
-   <a id="fhc_taxOfficial" class="fhcSource" href="https://www.wetax.go.kr">공식 세금 안내에서 확인하기 ↗</a>
-   <p class="fhcHint">외부 서비스는 브라우저로 열립니다. 계약서 내용·고객정보·은행/계좌정보는 자동 전달하지 않습니다. 외부 사이트에는 필요한 조건만 직접 입력해 주세요.</p>
+   <p class="fhcAttribution">제공: <a href="https://eznm.me/realestate">부동산계산기.com</a> <span class="fhcFamilyPrivacy">· 입력 조건이 업체에 전달됩니다</span></p>
+   <p id="fhc_taxStatus" class="fhcTaxStatus" role="status" aria-live="polite" hidden></p>
+   <p id="fhc_taxDiag" class="fhcTaxDiagnostic adminExplain" role="status" aria-live="polite" hidden></p>
+   <section id="fhc_taxResult" class="fhcTaxResult" hidden aria-label="세금 계산 결과"><h4 class="fhcResultTitle">예상 세금</h4><div id="fhc_taxRows"></div><p class="fhcFamilyResultNote">예상액 · 신고 전 확인</p><details class="fhcMore"><summary>상세 계산 근거</summary><p id="fhc_taxBasis"></p></details><p class="fhcHint adminExplain">결과는 참고용입니다. 임대사업자·특례·공동명의·추가주택 등 복잡한 조건은 외부 상세 계산에서 재확인해 주세요.</p></section>
+   <div id="fhc_taxFallback" class="fhcTaxFallback" hidden><a id="fhc_taxExternal" class="btn fhcTaxLink" href="https://xn--989a00af8jnslv3dba.com/acquisition">외부 계산기로 확인 ›</a></div>
+   <details class="fhcMore"><summary>계산 기준 · 공식 확인</summary>
+    <a id="fhc_taxOfficial" class="fhcSource" href="https://www.wetax.go.kr">공식 세금 안내에서 확인하기 ↗</a>
+    <p class="fhcHint">예상 금액이며, 특례·비과세·공동명의 등의 최종 적용은 별도로 확인해 주세요.</p>
+    <p class="fhcHint adminExplain">외부 서비스는 브라우저로 열립니다. 계약서 내용·고객정보·은행/계좌정보는 자동 전달하지 않습니다.</p>
+   </details>
 
   </section>
  </div>

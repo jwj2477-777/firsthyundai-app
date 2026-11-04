@@ -53,3 +53,34 @@ body[data-section="calculators"] #fhc_quickOpen{background:#226651;color:#fff;bo
 .fhcTaxRow strong{font-size:15px;text-align:right;color:#1d4734;overflow-wrap:anywhere}
 .fhcTaxRow small{grid-column:span 2;font-size:13px;color:#65736c;line-height:1.6}
 #fhc_taxBasis{font-size:13px;color:#5b6861;white-space:pre-wrap;line-height:1.7;overflow-wrap:anywhere}
+
+/* v2.1.81 Family calculator: inputs -> one action -> result. Detailed policy is optional. */
+.fhcTaxInputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 10px}
+.fhcTaxField{min-width:0;display:flex;flex-direction:column;gap:6px}
+.fhcTaxField.fhcWide{grid-column:1/-1}
+.fhcTaxField label{display:block;margin:0;font-size:14px;line-height:1.45;color:#294847;word-break:keep-all}
+.fhcTaxInputs .fhcTaxField input,.fhcTaxInputs .fhcTaxField select{height:52px;min-height:52px;font-size:16px;padding:9px 8px;border-radius:11px}
+.fhcTaxCalculate{margin-top:13px;min-height:56px;border-radius:14px;font-size:18px;font-weight:800}
+.fhcAttribution{font-size:12px;line-height:1.5;color:#707d76;margin:0 0 3px}
+.fhcAttribution a{font-size:12px;color:#326754}
+.fhcFamilyPrivacy{font-size:12px}
+.fhcTaxStatus{padding:12px 10px;background:#fff7ea;border:1px solid #eddbc4;border-radius:11px;color:#895b30;font-size:14px;line-height:1.5;margin:7px 0 2px}
+.fhcTaxStatus[hidden],.fhcTaxDiagnostic[hidden],.fhcTaxFallback[hidden]{display:none!important}
+.fhcTaxDiagnostic{font-size:12px;line-height:1.5;color:#536675;word-break:break-word}
+.fhcTaxResult{margin-top:8px;padding:14px 12px;background:#f2f7f1}
+.fhcTaxResult .fhcResultTitle{font-size:18px;margin:0 0 8px}
+.fhcTaxFallback{margin:7px 0}
+.fhcTaxFallback .fhcTaxLink{min-height:46px;background:#edf5ef;color:#275942;border:1px solid #c7d8cd;box-shadow:none;font-size:15px;line-height:1.4}
+.fhcMore{margin-top:7px;border-top:1px solid #e0e9e3;color:#5e7266}
+.fhcMore summary{cursor:pointer;min-height:45px;padding:13px 2px 8px;font-size:13px;font-weight:720;color:#5d7167}
+.fhcMore .fhcHint{font-size:13px;line-height:1.65;margin:6px 0}
+.fhcMore .fhcSource{font-size:13px;min-height:36px}
+body:not([data-office-role="admin"]) #calculators .fhcTaxNotice,
+body:not([data-office-role="admin"]) #calculators .fhcLead,
+body:not([data-office-role="admin"]) #calculators #fhc_taxIntro{display:none!important}
+body:not([data-office-role="admin"]) #calculators .fhcDetailTitle{margin:4px 0 12px}
+body:not([data-office-role="admin"]) #calculators .fhcDetail{padding-top:12px}
+@media(max-width:370px){.fhcTaxInputs{grid-template-columns:1fr}.fhcTaxField.fhcWide{grid-column:auto}}
+
+.fhcFamilyResultNote{margin:7px 0;font-size:12px;color:#65776e}
+body[data-office-role="admin"] .fhcFamilyResultNote{display:none}

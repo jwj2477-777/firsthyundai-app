@@ -63,4 +63,14 @@ assert(worker.includes('if(req.headers.has("origin"))return res({error:"native_o
 assert(native.includes('@JavascriptInterface public void calculateRealtyTax(String payload,String requestId)'));
 assert(client.includes('request("POST","/board/tax/calculate",payload,auth)'));
 assert(!native.includes('CALC_API_KEY')&&!client.includes('CALC_API_KEY'));
+assert(client.includes('connection.setReadTimeout("/board/tax/calculate".equals(path)?20000:9000)'),
+ 'Mobile read timeout must exceed Worker upstream timeout');
+assert(client.includes('throw new Exception("tax_error:"+status+":"+code)'),
+ 'Do not conflate provider authorization, invalid inputs and mobile timeout');
+assert(native.includes('.put("errorCode",code).put("httpStatus",http)'),
+ 'Return only safe tax diagnostic code and HTTP status to calculator UI');
+const deploy=fs.readFileSync(new URL('../.github/workflows/deploy-shared-settings.yml',import.meta.url),'utf8');
+assert(deploy.includes('python3 scripts/probe_realty_tax_api.py'),
+ 'Verify the actual key against the provider without printing it');
+
 console.log('PASS private tax calculation validation, proxy, rate limit, provider isolation and native authenticated bridge');
