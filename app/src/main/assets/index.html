@@ -985,7 +985,7 @@ body.apartmentSheetActive{overflow:hidden}
     <div class="fhcTaxField"><label for="fhc_taxBuyDate">취득일</label><input id="fhc_taxBuyDate" type="date"></div>
     <div class="fhcTaxField"><label for="fhc_taxSellDate">양도일</label><input id="fhc_taxSellDate" type="date"></div>
     <div class="fhcTaxField"><label for="fhc_taxTransferOwn">양도 시 주택 수</label><select id="fhc_taxTransferOwn"><option value="">선택해 주세요</option><option value="one">1주택</option><option value="two">2주택</option><option value="more">3주택 이상</option></select></div>
-    <div class="fhcTaxField"><label for="fhc_taxTransferConArea">조정대상지역 여부</label><select id="fhc_taxTransferConArea"><option value="">확인 후 선택</option><option value="N">아니요</option><option value="Y">예</option></select></div>
+    <div class="fhcTaxField"><label for="fhc_taxTransferConArea">조정대상지역</label><select id="fhc_taxTransferConArea"><option value="">확인 후 선택</option><option value="N">아니요</option><option value="Y">예</option></select></div>
     <div class="fhcTaxField"><label for="fhc_taxLiving">실제 거주기간 (년)</label><input id="fhc_taxLiving" type="number" min="0" max="100" inputmode="decimal" step="0.1" placeholder="예: 2"></div>
     <div class="fhcTaxField"><label for="fhc_taxCost">필요경비 (만원)</label><input id="fhc_taxCost" type="number" min="0" max="1000000000" inputmode="numeric" placeholder="선택, 확인된 금액만 입력"></div>
    </div>
@@ -994,7 +994,7 @@ body.apartmentSheetActive{overflow:hidden}
    <p class="fhcAttribution">제공: <a href="https://eznm.me/realestate">부동산계산기.com</a> <span class="fhcFamilyPrivacy">· 입력 조건이 업체에 전달됩니다</span></p>
    <p id="fhc_taxStatus" class="fhcTaxStatus" role="status" aria-live="polite" hidden></p>
    <p id="fhc_taxDiag" class="fhcTaxDiagnostic adminExplain" role="status" aria-live="polite" hidden></p>
-   <section id="fhc_taxResult" class="fhcTaxResult" hidden aria-label="세금 계산 결과"><h4 class="fhcResultTitle">예상 세금</h4><div id="fhc_taxRows"></div><p id="fhc_taxBasis"></p><p class="fhcHint adminExplain">결과는 참고용입니다. 임대사업자·특례·공동명의·추가주택 등 복잡한 조건은 외부 상세 계산에서 재확인해 주세요.</p></section>
+   <section id="fhc_taxResult" class="fhcTaxResult" hidden aria-label="세금 계산 결과"><h4 class="fhcResultTitle">예상 세금</h4><div id="fhc_taxRows"></div><p class="fhcFamilyResultNote">예상액 · 신고 전 확인</p><details class="fhcMore"><summary>상세 계산 근거</summary><p id="fhc_taxBasis"></p></details><p class="fhcHint adminExplain">결과는 참고용입니다. 임대사업자·특례·공동명의·추가주택 등 복잡한 조건은 외부 상세 계산에서 재확인해 주세요.</p></section>
    <div id="fhc_taxFallback" class="fhcTaxFallback" hidden><a id="fhc_taxExternal" class="btn fhcTaxLink" href="https://xn--989a00af8jnslv3dba.com/acquisition">외부 계산기로 확인 ›</a></div>
    <details class="fhcMore"><summary>계산 기준 · 공식 확인</summary>
     <a id="fhc_taxOfficial" class="fhcSource" href="https://www.wetax.go.kr">공식 세금 안내에서 확인하기 ↗</a>
