@@ -67,9 +67,13 @@ async function calculateTax(req,env,caller,fetcher=fetch){
  try{data=payload(type,input?.values);}
  catch(e){return new Response(JSON.stringify({error:e.message}),{status:400,headers:{'Content-Type':'application/json'}});}
  try{
-  const response=await fetcher(provider+type,{method:'POST',
-   headers:{Authorization:'Bearer '+env.CALC_API_KEY,'Content-Type':'application/json','Accept':'application/json'},
-   body:JSON.stringify(data),redirect:'error',signal:AbortSignal.timeout(10000)});
+  const body=JSON.stringify(data);
+  const options=(auth)=>({method:'POST',headers:{...auth,'Content-Type':'application/json','Accept':'application/json'},
+   body,redirect:'error',signal:AbortSignal.timeout(10000)});
+  let response=await fetcher(provider+type,options({Authorization:'Bearer '+env.CALC_API_KEY}));
+  // The provider documents X-Api-Key as an officially supported alternative auth header.
+  // Retry only once if the origin rejected Bearer with HTTP 403; never log key or request.
+  if(response.status===403)response=await fetcher(provider+type,options({'X-Api-Key':env.CALC_API_KEY}));
   if(response.status===429)return new Response(JSON.stringify({error:'provider_rate_limited'}),{status:429,headers:{'Content-Type':'application/json'}});
   if(response.status===401)return new Response(JSON.stringify({error:'provider_auth_error'}),{status:503,headers:{'Content-Type':'application/json'}});
   if(response.status===403)return new Response(JSON.stringify({error:'provider_forbidden'}),{status:503,headers:{'Content-Type':'application/json'}});
