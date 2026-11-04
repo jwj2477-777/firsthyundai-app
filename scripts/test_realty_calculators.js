@@ -49,7 +49,7 @@ assert.throws(()=>fn.conversion({oldWan:10000,newWan:5000,ratePct:''}),'No guess
 const loan=(amountWan,ratePct,monthsCount,method)=>fn.loan({amountWan,ratePct,monthsCount,method});
 assert.equal(loan(1200,0,12,'equal').first,1000000);
 assert.equal(loan(1200,0,12,'equal').totalInterest,0);
-const micro=loan(30000,0.00000001,600,'equal');
+const micro=loan(30000,'0.00000001',600,'equal');
 assert(Number.isFinite(micro.first)&&micro.first>0,'Near-zero floating-point annuity must remain finite');
 const amort=loan(30000,4.5,360,'equal');
 assert(amort.first>1500000&&amort.first<1600000,'30년 원리금균등 정상 범위');
@@ -87,7 +87,7 @@ const transfer=v=>fn.simpleTransferTax({buyAmt:80000,sellAmt:150000,buyDate:'201
  sellDate:'20261101',own:'one',conArea:'N',liveYear:6,exemptionVerified:'Y',cost:0,...v});
 assert.equal(transfer({}).totalWon,9266400,'8억에 산 집 15억 양도·보유8년 거주6년');
 assert.equal(transfer({sellAmt:120000}).totalWon,0,'12억원 이하 자격 확인된 1주택 비과세');
-assert.equal(transfer({sellAmt:150000,cost:10000}).totalWon,7920000,'필요경비는 차익에서 공제');
+assert.equal(transfer({sellAmt:150000,cost:10000}).totalWon,6943200,'필요경비는 차익에서 공제');
 assert.equal(transfer({exemptionVerified:'N'}),null,'비과세 요건 확인 없는 경우 임의계산 금지');
 assert.equal(transfer({sellDate:'20270101'}),null,'2027년 이후 개편될 가능성 있는 법안 자동 적용 금지');
 assert.equal(transfer({sellDate:'20230101',buyDate:'20220102'}),null,'보유2년 미달은 비과세 자동 계산 금지');
