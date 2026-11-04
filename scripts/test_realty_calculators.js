@@ -25,6 +25,10 @@ assert.equal(fee('house','sale',90000).maximum,4500000,'9억부터 0.5%');
 assert.equal(fee('house','sale',30000).maximum,1200000);
 assert.equal(fee('house','sale',19999).maximum,800000,'5천만~2억 cap 80만원');
 assert.equal(fee('house','sale',4000).maximum,240000,'5천만 미만 0.6%');
+for(const [wan,wanted] of [[4999,250000],[5000,250000],[19999,800000],[20000,800000],[89999,3599960],[90000,4500000],[119999,5999950],[120000,7200000],[149999,8999940],[150000,10500000]])
+ assert.equal(fee('house','sale',wan).maximum,wanted,'Sale threshold '+wan);
+for(const [wan,wanted] of [[4999,200000],[5000,200000],[9999,300000],[10000,300000],[59999,1799970],[60000,2400000],[119999,4799960],[120000,6000000],[149999,7499950],[150000,9000000]])
+ assert.equal(fee('house','lease',wan).maximum,wanted,'Rental threshold '+wan);
 assert.equal(fee('house','lease',60000).maximum,2400000,'6억부터 임대차 0.4%');
 assert.equal(fee('house','lease',9900).maximum,300000,'임대차 한도 30만원');
 assert.equal(fee('house','rent',1000,30).baseWan,3100,'월세환산액 5천만 미만이면 70배');
@@ -45,6 +49,8 @@ assert.throws(()=>fn.conversion({oldWan:10000,newWan:5000,ratePct:''}),'No guess
 const loan=(amountWan,ratePct,monthsCount,method)=>fn.loan({amountWan,ratePct,monthsCount,method});
 assert.equal(loan(1200,0,12,'equal').first,1000000);
 assert.equal(loan(1200,0,12,'equal').totalInterest,0);
+const micro=loan(30000,0.00000001,600,'equal');
+assert(Number.isFinite(micro.first)&&micro.first>0,'Near-zero floating-point annuity must remain finite');
 const amort=loan(30000,4.5,360,'equal');
 assert(amort.first>1500000&&amort.first<1600000,'30년 원리금균등 정상 범위');
 assert(amort.totalInterest>0&&Math.abs(amort.first-amort.last)<1e-5);
@@ -61,7 +67,39 @@ assert.equal(localTax(50000).totalWon,5500000,'5억 1주택 85㎡ 이하 = 550�
 assert.equal(localTax(60000).totalWon,6600000);
 assert.equal(localTax(70000).totalWon,12859000,'7억원 1.67% 중간세율 반올림');
 assert.equal(localTax(100000,'big').totalWon,35000000,'10억 85㎡ 초과 농어촌특별세');
-for(const changed of [{own:'two'},{firstOfLife:'Y'},{metro:'N'}]){
+assert.equal(localTax(30000,'big').totalWon,3900000,'3억 85㎡ 초과 일반세율');
+assert.equal(localTax(75000).totalWon,16500000,'7억5천 2%');
+assert.equal(localTax(80000).totalWon,20504000,'8억 2.33%');
+assert.equal(localTax(90000).totalWon,29700000,'9억 3%');
+const acq=overrides=>fn.simpleAcquisitionTax({amount:50000,areaType:'85',own:'one',conArea:'N',firstOfLife:'N',metro:'Y',...overrides});
+assert.equal(acq({own:'two',conArea:'N'}).totalWon,5500000,'비조정 2주택 일반세율');
+assert.equal(acq({own:'two',conArea:'Y',tempTwo:'N'}).totalWon,42000000,'조정 2주택 8%+교육세');
+assert.equal(acq({own:'two',conArea:'Y',tempTwo:'Y'}).totalWon,5500000,'확인된 일시적 2주택 일반세율');
+assert.equal(acq({own:'two',conArea:'Y'}),null,'일시적2주택 판단 없이 중과 확정 금지');
+assert.equal(acq({own:'three',conArea:'N'}).totalWon,42000000,'비조정 3주택 8%');
+assert.equal(acq({own:'three',conArea:'Y'}).totalWon,62000000,'조정 3주택 12%');
+assert.equal(acq({own:'more',conArea:'N'}).totalWon,62000000,'4주택 이상 12%');
+assert.equal(acq({own:'two',conArea:'Y',tempTwo:'N',areaType:'big'}).totalWon,45000000,'중과8% 85㎡ 초과 농특세');
+assert.equal(acq({own:'three',conArea:'Y',areaType:'big'}).totalWon,67000000,'중과12% 85㎡ 초과 농특세');
+assert.equal(acq({metro:'N'}).totalWon,5500000,'85㎡ 이하 비수도권 일반세율');
+assert.equal(acq({metro:'N',areaType:'big'}),null,'비수도권 읍면 100㎡ 면제 가능성을 임의계산 금지');
+const transfer=v=>fn.simpleTransferTax({buyAmt:80000,sellAmt:150000,buyDate:'20180101',
+ sellDate:'20261101',own:'one',conArea:'N',liveYear:6,exemptionVerified:'Y',cost:0,...v});
+assert.equal(transfer({}).totalWon,9266400,'8억에 산 집 15억 양도·보유8년 거주6년');
+assert.equal(transfer({sellAmt:120000}).totalWon,0,'12억원 이하 자격 확인된 1주택 비과세');
+assert.equal(transfer({sellAmt:150000,cost:10000}).totalWon,7920000,'필요경비는 차익에서 공제');
+assert.equal(transfer({exemptionVerified:'N'}),null,'비과세 요건 확인 없는 경우 임의계산 금지');
+assert.equal(transfer({sellDate:'20270101'}),null,'2027년 이후 개편될 가능성 있는 법안 자동 적용 금지');
+assert.equal(transfer({sellDate:'20230101',buyDate:'20220102'}),null,'보유2년 미달은 비과세 자동 계산 금지');
+assert.equal(transfer({liveYear:1.5}),null,'거주 2년 미달 비과세 자동 계산 금지');
+assert.equal(transfer({own:'two'}),null,'다주택 양도세 중과 임의 계산 금지');
+assert.equal(fn.standardTaxByBase(14000000),840000);
+assert.equal(fn.standardTaxByBase(50000000),6240000);
+assert.equal(fn.standardTaxByBase(88000000),15360000);
+assert.equal(fn.standardTaxByBase(1000000000),384060000);
+assert.equal(fn.heldFullYears('20180102','20260101'),7);
+assert.equal(fn.heldFullYears('20180101','20260101'),8);
+for(const changed of [{firstOfLife:'Y'},{areaType:'big',metro:'N'},{own:'two',conArea:'Y'}]){
  const basic={amount:50000,areaType:'85',own:'one',conArea:'N',firstOfLife:'N',metro:'Y'};
  assert.equal(fn.simpleAcquisitionTax({...basic,...changed}),null,'특례 여부 불확실한 조건의 임의계산 금지');
 }
@@ -94,15 +132,15 @@ assert.match(element('fhc_taxExternal').href,/\/acquisition$/);
 assert.match(element('fhc_taxOfficial').href,/wetax/);
 assert.equal(calc.calculateTax(),false,'Missing conditions must block tax request');
 element('fhc_taxAmount').value='140000';
-element('fhc_taxArea').value='85';
+element('fhc_taxArea').value='big';
 element('fhc_taxOwn').value='two';
 element('fhc_taxConArea').value='N';
 element('fhc_taxFirstLife').value='N';
-element('fhc_taxMetro').value='Y';
+element('fhc_taxMetro').value='N';
 assert.equal(calc.calculateTax(),true);
 assert.equal(taxRequests.length,1);
 assert.equal(taxRequests[0][0].values.amount,140000);
-assert.equal(taxRequests[0][0].values.metro,'Y');
+assert.equal(taxRequests[0][0].values.metro,'N');
 assert.equal(element('fhc_taxCalculate').disabled,true);
 const [request,requestId]=taxRequests[0];
 win.onFirstHyundaiRealtyTaxResult({requestId:'tax-outdated',ok:true,data:{ok:true,rows:[{label:'오류',value:'0'}]}});
@@ -114,6 +152,7 @@ assert.equal(element('fhc_taxCalculate').disabled,false);
 // Field regression: straightforward 5억원 1주택 must calculate without external service.
 calc.select('acquisition');
 element('fhc_taxAmount').value='50000';element('fhc_taxOwn').value='one';
+element('fhc_taxArea').value='85';element('fhc_taxMetro').value='Y';
 assert.equal(calc.calculateTax(),true);
 assert.equal(taxRequests.length,1,'Local basic tax must never call provider');
 assert.equal(element('fhc_taxResult').hidden,false);
@@ -163,9 +202,13 @@ assert(page.includes('id="fhc_taxFallback" class="fhcTaxFallback" hidden'),'Fall
 assert(page.includes('id="fhc_taxDiag" class="fhcTaxDiagnostic adminExplain"'),'Technical status admin-only');
 assert(page.includes('class="fhcTaxField"'),'Group paired fields into compact cards');
 assert(page.includes('<details class="fhcMore"><summary>계산 기준 · 공식 확인</summary>'));
-assert(page.includes('계산기 제공: <a href="https://eznm.me/realestate">부동산계산기.com</a>'),
+assert(page.includes('외부 계산기: <a href="https://eznm.me/realestate">부동산계산기.com</a>'),
  'Attribution must stay visible for family users');
 assert(page.includes('외부 계산 시에만 조건 전송'),'Disclose only external API transmission');
+assert(page.includes('id="fhc_taxTempTwoField" hidden'),'Two-home transition condition is conditional');
+assert(page.includes('id="fhc_taxTemporaryTwo"'),'Temporary-two condition is selectable');
+assert(page.includes('id="fhc_taxExemptionField" hidden'),'One-home tax status is not silently presumed');
+assert(page.includes('id="fhc_taxExemptionVerified"'),'Verified exemption required for safe local capital gains tax');
 const styles=read('app/src/main/assets/realty-calculators.css');
 assert(styles.includes('.fhcTaxInputs{display:grid;grid-template-columns:repeat(2'),
  'Use two-column compact fields on supported devices');
