@@ -989,13 +989,15 @@ body.apartmentSheetActive{overflow:hidden}
     <label for="fhc_taxLiving">실제 거주기간 (년)</label><input id="fhc_taxLiving" type="number" min="0" max="100" inputmode="decimal" step="0.1" placeholder="예: 2">
     <label for="fhc_taxCost">필요경비 (만원)</label><input id="fhc_taxCost" type="number" min="0" max="1000000000" inputmode="numeric" placeholder="선택, 확인된 금액만 입력">
    </div>
+   <p class="fhcHint">입력한 계산 조건과 결과는 부동산계산기.com API로 전송되고 서비스 제공업체의 운영 로그에 최대 1년 보관될 수 있습니다. 개인 이름·연락처·계좌는 입력하지 마세요.</p>
    <button id="fhc_taxCalculate" type="button" class="btn fhcTaxCalculate" onclick="FirstHyundaiCalculators.calculateTax()">예상 세액 계산하기</button>
+   <p class="fhcAttribution">계산기 제공: <a href="https://eznm.me/realestate">부동산계산기.com</a></p>
    <p id="fhc_taxStatus" class="fhcTaxStatus" role="status" aria-live="polite">계산할 조건을 입력해 주세요.</p>
    <section id="fhc_taxResult" class="fhcTaxResult" hidden aria-label="세금 계산 결과"><h4>예상 세액 및 계산 근거</h4><div id="fhc_taxRows"></div><p id="fhc_taxBasis"></p><p class="fhcHint">결과는 참고용입니다. 임대사업자·특례·공동명의·추가주택 등 복잡한 조건은 외부 상세 계산에서 재확인해 주세요.</p></section>
    <a id="fhc_taxExternal" class="btn fhcTaxLink" href="https://xn--989a00af8jnslv3dba.com/acquisition">부동산계산기.com에서 계산하기 ↗</a>
    <a id="fhc_taxOfficial" class="fhcSource" href="https://www.wetax.go.kr">공식 세금 안내에서 확인하기 ↗</a>
    <p class="fhcHint">외부 서비스는 브라우저로 열립니다. 계약서 내용·고객정보·은행/계좌정보는 자동 전달하지 않습니다. 외부 사이트에는 필요한 조건만 직접 입력해 주세요.</p>
-   <p class="fhcAttribution">외부 계산 서비스: <a href="https://eznm.me/realestate">부동산계산기.com</a> (퍼스트현대와 별도 운영)</p>
+
   </section>
  </div>
 </div>
