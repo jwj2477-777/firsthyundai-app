@@ -72,6 +72,7 @@ async function calculateTax(req,env,caller,fetcher=fetch){
    body:JSON.stringify(data),redirect:'error',signal:AbortSignal.timeout(10000)});
   if(response.status===429)return new Response(JSON.stringify({error:'provider_rate_limited'}),{status:429,headers:{'Content-Type':'application/json'}});
   if(response.status===401)return new Response(JSON.stringify({error:'provider_auth_error'}),{status:503,headers:{'Content-Type':'application/json'}});
+  if(response.status===403)return new Response(JSON.stringify({error:'provider_forbidden'}),{status:503,headers:{'Content-Type':'application/json'}});
   if(!response.ok)return new Response(JSON.stringify({error:'provider_unavailable'}),{status:503,headers:{'Content-Type':'application/json'}});
   const raw=await response.text();
   if(raw.length>60000)throw Error('too_large');

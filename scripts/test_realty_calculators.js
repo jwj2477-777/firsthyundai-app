@@ -145,12 +145,13 @@ assert(page.includes('id="fhc_taxFallback" class="fhcTaxFallback" hidden'),'Fall
 assert(page.includes('id="fhc_taxDiag" class="fhcTaxDiagnostic adminExplain"'),'Technical status admin-only');
 assert(page.includes('class="fhcTaxField"'),'Group paired fields into compact cards');
 assert(page.includes('<details class="fhcMore"><summary>계산 기준 · 공식 확인</summary>'));
-assert(page.includes('제공: <a href="https://eznm.me/realestate">부동산계산기.com</a>'),
+assert(page.includes('계산기 제공: <a href="https://eznm.me/realestate">부동산계산기.com</a>'),
  'Attribution must stay visible for family users');
 assert(page.includes('입력 조건이 업체에 전달됩니다'),'Keep concise data-use notice in family mode');
 const styles=read('app/src/main/assets/realty-calculators.css');
 assert(styles.includes('.fhcTaxInputs{display:grid;grid-template-columns:repeat(2'),
  'Use two-column compact fields on supported devices');
+assert(styles.includes('.fhcAttribution a{font-size:15px;'), 'Official provider attribution must be readable at ≥0.9rem');
 assert(styles.includes('.fhcTaxCalculate{margin-top:13px;min-height:56px'),'Keep primary action prominent');
 
 const source=read('app/src/main/assets/realty-calculators.js');
