@@ -989,9 +989,9 @@ body.apartmentSheetActive{overflow:hidden}
     <div class="fhcTaxField"><label for="fhc_taxLiving">실제 거주기간 (년)</label><input id="fhc_taxLiving" type="number" min="0" max="100" inputmode="decimal" step="0.1" placeholder="예: 2"></div>
     <div class="fhcTaxField"><label for="fhc_taxCost">필요경비 (만원)</label><input id="fhc_taxCost" type="number" min="0" max="1000000000" inputmode="numeric" placeholder="선택, 확인된 금액만 입력"></div>
    </div>
-   <p class="fhcHint adminExplain">입력한 계산 조건과 결과는 부동산계산기.com API로 전송되고 서비스 제공업체의 운영 로그에 최대 1년 보관될 수 있습니다. 개인 이름·연락처·계좌는 입력하지 마세요.</p>
+   <p class="fhcHint adminExplain">외부 API 계산 시 입력한 조건과 결과는 부동산계산기.com API로 전송되고 서비스 제공업체의 운영 로그에 최대 1년 보관될 수 있습니다. 개인 이름·연락처·계좌는 입력하지 마세요.</p>
    <button id="fhc_taxCalculate" type="button" class="btn fhcTaxCalculate" onclick="FirstHyundaiCalculators.calculateTax()">예상 세액 계산하기</button>
-   <p class="fhcAttribution">계산기 제공: <a href="https://eznm.me/realestate">부동산계산기.com</a> <span class="fhcFamilyPrivacy">· 입력 조건이 업체에 전달됩니다</span></p>
+   <p class="fhcAttribution">계산기 제공: <a href="https://eznm.me/realestate">부동산계산기.com</a> <span class="fhcFamilyPrivacy">· 외부 계산 시에만 조건 전송</span></p>
    <p id="fhc_taxStatus" class="fhcTaxStatus" role="status" aria-live="polite" hidden></p>
    <p id="fhc_taxDiag" class="fhcTaxDiagnostic adminExplain" role="status" aria-live="polite" hidden></p>
    <section id="fhc_taxResult" class="fhcTaxResult" hidden aria-label="세금 계산 결과"><h4 class="fhcResultTitle">예상 세금</h4><div id="fhc_taxRows"></div><p class="fhcFamilyResultNote">예상액 · 신고 전 확인</p><details class="fhcMore"><summary>상세 계산 근거</summary><p id="fhc_taxBasis"></p></details><p class="fhcHint adminExplain">결과는 참고용입니다. 임대사업자·특례·공동명의·추가주택 등 복잡한 조건은 외부 상세 계산에서 재확인해 주세요.</p></section>
