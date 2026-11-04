@@ -147,6 +147,27 @@
   if(taxValue('fhc_taxCost')!=='')values.cost=taxWon('fhc_taxCost',true);
   return values;
  }
+ function simpleAcquisitionTax(values){
+  // Conservative ordinary residential purchase only: no multi-home or relief estimates.
+  // Restrict to metropolitan homes to avoid rural national-size exceptions.
+  if(!values||values.own!=='one'||values.firstOfLife!=='N'||values.metro!=='Y'||
+     !['Y','N'].includes(values.conArea)||!['40','60','85','big'].includes(values.areaType))return null;
+  const man=values.amount;
+  if(!Number.isSafeInteger(man)||man<1||man>1000000000)return null;
+  // Verified general 2026 rates: <=6억 1%, 6~9억 1~3%, >9억 3%.
+  const rate=man<=60000?1:man>90000?3:Math.round((man/10000*2/3-3)*100)/100;
+  const base=man*10000;
+  const purchase=Math.round(base*rate/100);
+  const education=Math.round(base*rate/1000);
+  const rural=values.areaType==='big'?Math.round(base*.002):0;
+  const totalWon=purchase+education+rural;
+  return {ok:true,source:'local_basic',totalWon,
+   rows:[{label:'예상 합계',value:money(totalWon)},
+    {label:'취득세',value:money(purchase)},
+    {label:'지방교육세',value:money(education)},
+    {label:'농어촌특별세',value:money(rural)}],
+   basis:'앱 자체 계산 · 외부 API 전송 없음. 2026년 11월 확인한 일반 주택매매 기본세율('+rate.toFixed(2)+'%) 적용. 고급주택·특례·감면·과세표준 예외는 반영되지 않습니다. 최종 신고 전 관할 지자체와 위택스에서 확인해 주세요.'};
+ }
  function taxStatus(message){
   const box=$('fhc_taxStatus');
   box.textContent=message||'';
@@ -169,6 +190,9 @@
    case 'provider_rate_limited': return '계산 요청이 많습니다. 잠시 후 다시 시도해 주세요.';
    case 'connection_timeout': return '응답이 지연되고 있습니다. 다시 시도해 주세요.';
    case 'provider_requires_review': return '계산 조건을 확인할 수 없습니다. 아래에서 직접 확인해 주세요.';
+   case 'provider_unavailable':
+   case 'network_error':
+   case 'tax_server_error': return '외부 계산 서비스에 연결되지 않습니다. 아래에서 직접 확인해 주세요.';
    default: return '계산에 실패했습니다. 다시 시도하거나 아래에서 직접 확인해 주세요.';
   }
  }
@@ -191,6 +215,8 @@
   if(!['acquisition','transfer'].includes(chosen))return false;
   let values;
   try{values=taxInputs(chosen);}catch(e){taxStatus(e.message);return false;}
+  const local=chosen==='acquisition'?simpleAcquisitionTax(values):null;
+  if(local){clearTax();showTaxResult(local);return true;}
   if(!root.FirstHyundaiNative?.calculateRealtyTax){
    taxStatus('앱 업데이트 후 계산하실 수 있습니다.');
    $('fhc_taxFallback').hidden=false;
@@ -205,6 +231,25 @@
   catch(e){clearTax();taxStatus('계산 요청을 시작하지 못했습니다.');$('fhc_taxFallback').hidden=false;return false;}
   return true;
  }
+ function showTaxResult(response){
+  if(!Array.isArray(response.rows)||!response.rows.length){
+   taxStatus('계산 결과가 없습니다. 외부 계산기를 이용해 주세요.');
+   $('fhc_taxFallback').hidden=false;return;
+  }
+  const container=$('fhc_taxRows');
+  for(const item of response.rows.slice(0,100)){
+   if(typeof item.label!=='string'||typeof item.value!=='string')continue;
+   const row=document.createElement('div');row.className='fhcTaxRow';
+   const label=document.createElement('span'),value=document.createElement('strong');
+   label.textContent=item.label.slice(0,100);value.textContent=item.value.slice(0,140);
+   row.append(label,value);
+   if(item.note){const note=document.createElement('small');note.textContent=String(item.note).slice(0,240);row.append(note);}
+   container.append(row);
+  }
+  $('fhc_taxBasis').textContent=String(response.basis||'').slice(0,1500);
+  $('fhc_taxResult').hidden=false;taxStatus('');
+  $('fhc_taxResult').scrollIntoView?.({behavior:'smooth',block:'start'});
+ }
  function onTaxResult(event){
   if(!taxPending||event?.requestId!==taxPending)return;
   clearTax();
@@ -218,23 +263,7 @@
    $('fhc_taxDiag').hidden=false;
    return;
   }
-  const items=response.rows;
-  if(!items.length){taxStatus('계산 결과가 없습니다. 외부 계산기를 이용해 주세요.');$('fhc_taxFallback').hidden=false;return;}
-  const container=$('fhc_taxRows');
-  for(const item of items.slice(0,100)){
-   if(typeof item.label!=='string'||typeof item.value!=='string')continue;
-   const row=document.createElement('div');
-   row.className='fhcTaxRow';
-   const label=document.createElement('span'),value=document.createElement('strong');
-   label.textContent=item.label.slice(0,100);value.textContent=item.value.slice(0,140);
-   row.append(label,value);
-   if(item.note){const note=document.createElement('small');note.textContent=String(item.note).slice(0,240);row.append(note);}
-   container.append(row);
-  }
-  $('fhc_taxBasis').textContent=String(response.basis||'').slice(0,1500);
-  $('fhc_taxResult').hidden=false;
-  taxStatus('');
-  $('fhc_taxResult').scrollIntoView?.({behavior:'smooth',block:'start'});
+  showTaxResult(response);
  }
  function select(type){
   if(!types.has(type))return false;
@@ -284,5 +313,5 @@
  $('fhc_taxPane')?.addEventListener?.('input',onTaxEdit);
  $('fhc_taxPane')?.addEventListener?.('change',onTaxEdit);
  root.FirstHyundaiCalculators={select,home,update,onOpen,onPageChange,useContractAmount,calculateTax,
-  _test:{commission,conversion,loan,num}};
+  _test:{commission,conversion,loan,num,simpleAcquisitionTax}};
 })(window);
