@@ -203,6 +203,7 @@
  }
  function select(type){
   if(!types.has(type))return false;
+  if(taxPending)clearTax(); // A different calculator must never receive a late result.
   chosen=type;
   $('fhc_modes').hidden=true;
   $('fhc_detail').hidden=false;
