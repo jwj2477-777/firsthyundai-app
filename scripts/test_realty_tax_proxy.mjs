@@ -24,6 +24,11 @@ for(const input of [
 ])assert.throws(()=>payload('transfer',input));
 assert.deepEqual(cleanRows([{적요:'취득세',값:'42,000,000',비고:'적용요율',옵션:'font-weight:bold'}]),
  [{label:'취득세',value:'42,000,000',note:'적용요율'}]);
+assert.deepEqual(cleanRows([{적요:'지방교육세',값:500000,비고:0}]),
+ [{label:'지방교육세',value:'500000',note:'0'}],'Provider may return numeric values; do not silently blank amounts');
+assert.deepEqual(cleanRows([{적요:'예상세액',값:Infinity}]),
+ [{label:'예상세액',value:'',note:''}],'Never display non-finite totals');
+
 let sent=0,passedBody=null,auth='';
 const fakeFetch=async (url,options)=>{
  sent++;assert.equal(url,'https://calcapi.fran.kr/v1/acquisition');
