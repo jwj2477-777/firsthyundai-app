@@ -26,8 +26,7 @@ assert.deepEqual(cleanRows([{적요:'취득세',값:'42,000,000',비고:'적용�
  [{label:'취득세',value:'42,000,000',note:'적용요율'}]);
 assert.deepEqual(cleanRows([{적요:'지방교육세',값:500000,비고:0}]),
  [{label:'지방교육세',value:'500000',note:'0'}],'Provider may return numeric values; do not silently blank amounts');
-assert.deepEqual(cleanRows([{적요:'예상세액',값:Infinity}]),
- [{label:'예상세액',value:'',note:''}],'Never display non-finite totals');
+assert.throws(()=>cleanRows([{적요:'예상세액',값:Infinity}]),/invalid_provider_response/,'Never display non-finite totals');
 
 let sent=0,passedBody=null,auth='';
 const fakeFetch=async (url,options)=>{
