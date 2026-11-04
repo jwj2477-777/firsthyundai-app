@@ -189,6 +189,7 @@ body.apartmentSheetActive{overflow:hidden}
 <link rel="stylesheet" href="weather-detail.css">
 <link rel="stylesheet" href="notification-inbox.css">
 <link rel="stylesheet" href="nav-collapse.css">
+<link rel="stylesheet" href="realty-calculators.css">
 <link rel="stylesheet" href="device-display.css">
 </head>
 <body data-office-role="family" data-section="nearby">
@@ -197,6 +198,7 @@ body.apartmentSheetActive{overflow:hidden}
 </div></div></header>
 <main>
 <nav class="tabs" id="nav" aria-label="업무 주요 메뉴"></nav>
+<div class="fhcQuickAccess"><button type="button" id="fhc_quickOpen" onclick="switchPage('calculators')">▤ 부동산 계산기</button></div>
 <div id="appUpdateBanner" class="appUpdateBanner" role="status" aria-live="polite" hidden>
   <span id="appUpdateBannerText">새 버전이 있습니다.</span>
   <button id="appUpdateInstall" class="btn" type="button">업데이트</button>
@@ -923,8 +925,62 @@ body.apartmentSheetActive{overflow:hidden}
  </section>
 </div>
 
+
+<div id="calculators" class="page hidden" aria-label="부동산 실무 계산기">
+ <div class="sectionTitle"><h2>부동산 계산기</h2></div>
+ <p class="fhcLead">필요한 계산을 선택하면 바로 입력할 수 있습니다.</p>
+ <div id="fhc_modes" class="fhcModeGrid" aria-label="계산기 선택">
+  <button type="button" class="fhcMode fhcTax" onclick="FirstHyundaiCalculators.select('acquisition')"><span aria-hidden="true">⌂</span><strong>취득세</strong><small>살 때 내는 세금</small></button>
+  <button type="button" class="fhcMode fhcTax" onclick="FirstHyundaiCalculators.select('transfer')"><span aria-hidden="true">↗</span><strong>양도소득세</strong><small>팔 때 내는 세금</small></button>
+  <button type="button" class="fhcMode" onclick="FirstHyundaiCalculators.select('fee')"><span aria-hidden="true">₩</span><strong>중개보수</strong><small>거래금액별 상한</small></button>
+  <button type="button" class="fhcMode" onclick="FirstHyundaiCalculators.select('conversion')"><span aria-hidden="true">⇄</span><strong>전월세 전환</strong><small>보증금·월세 비교</small></button>
+  <button type="button" class="fhcMode fhcWide" onclick="FirstHyundaiCalculators.select('loan')"><span aria-hidden="true">▤</span><strong>대출이자</strong><small>상환방식별 월 납입액</small></button>
+ </div>
+ <div id="fhc_detail" class="panel fhcDetail" hidden>
+  <button type="button" class="fhcBack" onclick="FirstHyundaiCalculators.home()">‹ 계산 목록으로</button>
+  <h3 id="fhc_detailTitle" class="fhcDetailTitle">계산기</h3>
+  <section class="fhcPane" id="fhc_feePane" hidden oninput="FirstHyundaiCalculators.update()" onchange="FirstHyundaiCalculators.update()">
+   <label for="fhc_feeKind">부동산 종류</label>
+   <select id="fhc_feeKind"><option value="house">주택·아파트</option><option value="office">오피스텔(법정 조건 충족)</option><option value="other">상가·토지·기타</option></select>
+   <p class="fhcHint" id="fhc_officeNote" hidden>오피스텔은 전용 85㎡ 이하이며 전용입식 부엌·수세식 화장실·목욕시설 등 요건을 모두 충족할 때만 이 항목을 선택하세요. 그 외에는 '기타'로 계산하세요.</p>
+   <label for="fhc_feeDeal">계약 종류</label><select id="fhc_feeDeal"><option value="sale">매매</option><option value="lease">전세</option><option value="rent">월세</option></select>
+   <label for="fhc_feeAmount" id="fhc_feeAmountLabel">매매금액 (만원)</label>
+   <input id="fhc_feeAmount" type="number" inputmode="numeric" min="1" max="1000000000" step="1" placeholder="예: 140000 → 14억원">
+   <button class="fhcSubAction" type="button" onclick="FirstHyundaiCalculators.useContractAmount()">작성 중인 계약 금액 가져오기</button>
+   <div id="fhc_feeRentWrap" hidden><label for="fhc_feeRent">월세 (만원)</label><input id="fhc_feeRent" type="number" inputmode="numeric" min="0" max="1000000000" step="1" placeholder="예: 150"></div>
+   <label class="fhcCheck" for="fhc_feeVat"><input id="fhc_feeVat" type="checkbox"> 부가세 10% 가정액도 보기</label>
+   <div class="fhcResult" role="status" aria-live="polite"><small id="fhc_feeCaption">예상 중개보수 상한</small><strong id="fhc_feePrimary">금액을 입력해 주세요</strong><p id="fhc_feeDetail"></p></div>
+   <p class="fhcHint">인천광역시 공표 요율 기준의 의뢰인 한쪽 상한입니다. 실제 보수는 상한 내 협의하고, 부가세 및 특약은 별도로 확인합니다.</p>
+   <a class="fhcSource" href="https://www.incheon.go.kr/build/BU050301/2106584">인천시 중개보수 요율 원문 ↗</a>
+  </section>
+  <section class="fhcPane" id="fhc_conversionPane" hidden oninput="FirstHyundaiCalculators.update()" onchange="FirstHyundaiCalculators.update()">
+   <label for="fhc_oldDeposit">현재 보증금 (만원)</label><input id="fhc_oldDeposit" type="number" inputmode="numeric" min="0" max="1000000000" step="1" placeholder="예: 10000">
+   <label for="fhc_newDeposit">변경 보증금 (만원)</label><input id="fhc_newDeposit" type="number" inputmode="numeric" min="0" max="1000000000" step="1" placeholder="예: 5000">
+   <label for="fhc_conversionRate">가정한 연 전환율 (%)</label><input id="fhc_conversionRate" type="number" inputmode="decimal" min="0" max="100" step="0.1" placeholder="예: 4">
+   <div class="fhcResult" role="status" aria-live="polite"><small>월세 조정 예상액</small><strong id="fhc_conversionPrimary">금액과 전환율을 입력해 주세요</strong><p id="fhc_conversionDetail"></p></div>
+   <p class="fhcHint">단순 비교용 계산입니다. 입력한 전환율을 적용하며, 법정 전월세전환율 상한이나 임대료 증액 가능 여부를 판정하지 않습니다.</p>
+  </section>
+  <section class="fhcPane" id="fhc_loanPane" hidden oninput="FirstHyundaiCalculators.update()" onchange="FirstHyundaiCalculators.update()">
+   <label for="fhc_loanAmount">대출금 (만원)</label><input id="fhc_loanAmount" type="number" inputmode="numeric" min="1" max="1000000000" step="1" placeholder="예: 30000">
+   <label for="fhc_loanRate">연 이자율 (%)</label><input id="fhc_loanRate" type="number" inputmode="decimal" min="0" max="100" step="0.01" placeholder="예: 4.5">
+   <label for="fhc_loanMonths">대출기간 (개월)</label><input id="fhc_loanMonths" type="number" inputmode="numeric" min="1" max="600" step="1" placeholder="예: 360">
+   <label for="fhc_loanMethod">상환 방식</label><select id="fhc_loanMethod"><option value="equal">원리금균등</option><option value="principal">원금균등</option><option value="bullet">만기일시</option></select>
+   <div class="fhcResult" role="status" aria-live="polite"><small id="fhc_loanCaption">월 납입 예상액</small><strong id="fhc_loanPrimary">대출 조건을 입력해 주세요</strong><p id="fhc_loanDetail"></p></div>
+   <p class="fhcHint">매월 말 상환·고정금리 가정. 실제 이자, 수수료 및 상환 일정은 금융기관 약정에 따라 달라질 수 있습니다.</p>
+  </section>
+  <section class="fhcPane" id="fhc_taxPane" hidden>
+   <p id="fhc_taxIntro" class="fhcHint"></p>
+   <div class="fhcTaxNotice"><strong>세액은 추정하지 않습니다</strong><p>세율·규제지역·보유주택 수·감면 또는 거주 요건에 따라 달라집니다. 부정확한 금액 대신 외부 계산 서비스로 안내합니다.</p></div>
+   <a id="fhc_taxExternal" class="btn fhcTaxLink" href="https://xn--989a00af8jnslv3dba.com/acquisition">부동산계산기.com에서 계산하기 ↗</a>
+   <a id="fhc_taxOfficial" class="fhcSource" href="https://www.wetax.go.kr">공식 세금 안내에서 확인하기 ↗</a>
+   <p class="fhcHint">외부 서비스는 브라우저로 열립니다. 계약서 내용·고객정보·은행/계좌정보는 자동 전달하지 않습니다. 외부 사이트에는 필요한 조건만 직접 입력해 주세요.</p>
+   <p class="fhcAttribution">외부 계산 서비스: <a href="https://eznm.me/realestate">부동산계산기.com</a> (퍼스트현대와 별도 운영)</p>
+  </section>
+ </div>
+</div>
+
 <div id="contracts" class="page hidden">
- <div class="contractHero contractHeroCompact"><h2>계약 안내문 작성</h2></div>
+ <div class="contractHero contractHeroCompact"><h2>계약 안내문 작성</h2><button type="button" class="fhcContractEntry" onclick="switchPage('calculators')">부동산 계산기 ›</button></div>
  <div class="contractFlowSteps" id="ct_flowSteps" aria-label="계약 안내 작성 단계">
   <span class="contractFlowStep is-current" id="ct_flow1" aria-current="step">1 메모 작성</span><span class="contractFlowStep" id="ct_flow2">2 내용 확인</span><span class="contractFlowStep" id="ct_flow3">3 완성·공유</span>
  </div>
@@ -1235,7 +1291,7 @@ body.apartmentSheetActive{overflow:hidden}
 const NOTE_KEY='firsthyundai-local-v04', REPO_KEY='firsthyundai-public-repo';
 const DEFAULT_REPOSITORY='jwj2477-777/firsthyundai-app';
 const PRIVATE_PAGES=new Set(['settings','notes','security','apiGuide','adminCenter']);
-const PAGES=[['overview','전체 브리핑'],['nearby','★ 주변단지'],['complexes','단지정보'],['new','새소식'],['trades','실거래가'],['officetel','오피스텔 전월세'],['news','뉴스 브리핑'],['contracts','계약문자 작성'],['officeBoard','사무실 메모'],['notes','내 자료'],['apiGuide','API 신청'],['settings','설정'],['security','보안 관리'],['adminCenter','시스템 관리센터']];
+const PAGES=[['calculators','부동산 계산기'],['overview','전체 브리핑'],['nearby','★ 주변단지'],['complexes','단지정보'],['new','새소식'],['trades','실거래가'],['officetel','오피스텔 전월세'],['news','뉴스 브리핑'],['contracts','계약문자 작성'],['officeBoard','사무실 메모'],['notes','내 자료'],['apiGuide','API 신청'],['settings','설정'],['security','보안 관리'],['adminCenter','시스템 관리센터']];
 const $=id=>document.getElementById(id);
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeLink=url=>/^https:\/\/[a-z0-9.-]+(?:[:][0-9]+)?(?:[/?#]|$)/i.test(String(url||''))?String(url):'';
@@ -1427,7 +1483,7 @@ function switchPage(id){
  closeApartmentSheet(false);
  if(!activePages().some(([key])=>key===id))id='nearby';
  const pageNames={overview:'오늘 요약',nearby:'관심 단지',new:'새로 확인한 거래',
-  trades:'전체 실거래',officetel:'오피스텔 실거래',complexes:'아파트정보',news:'뉴스',contracts:'계약문자',
+  trades:'전체 실거래',officetel:'오피스텔 실거래',complexes:'아파트정보',news:'뉴스',contracts:'계약문자',calculators:'부동산 계산기',
   notes:'내 자료',officeBoard:'사무실 메모',settings:'설정',security:'보안',apiGuide:'API 연결 안내',adminCenter:'시스템 관리센터'};
  if(pageNames[id])document.title='퍼스트현대 · '+pageNames[id];
  currentPage=id;
@@ -1440,6 +1496,7 @@ function switchPage(id){
  if(id==='nearby')renderNearby();
  if(id==='complexes')renderComplexes();
  if(id==='contracts'&&window.FirstHyundaiContracts)window.FirstHyundaiContracts.onOpen();
+  if(id==='calculators')window.FirstHyundaiCalculators?.onOpen?.();
  if(id==='new')renderNew();
  if(id==='trades')renderTrades();
  if(id==='officetel'){renderOfficeRentals();refreshPublicServices(false);}
@@ -3366,7 +3423,7 @@ function exportComplexCatalog(){
 }
 window.onCatalogSaved=r=>alert(r.ok?'단지정보 JSON을 저장했습니다. GitHub에 올려야 가족에게 반영됩니다.':'단지정보 파일 저장 실패');
 
-</script><script src="public-live.js"></script><script src="price-trends.js"></script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-live.js"></script><script src="contract-image.js"></script><script src="scroll-top.js"></script><script src="admin-preferences.js"></script><script src="season-themes.js"></script><script src="weather-briefing.js"></script><script src="premium-motion.js"></script><script src="selection-flow.js"></script><script src="app-updates.js"></script><script src="admin-center.js"></script><script src="shared-settings.js"></script><script src="memo-dates.js"></script><script src="annual-calendar.js"></script><script src="office-board.js"></script><script src="office-board-images.js"></script><script src="office-members.js"></script><script src="admin-settings-navigator.js"></script><script src="notification-inbox.js"></script><script src="weather-detail.js"></script><script src="device-display.js"></script><script src="nav-collapse.js"></script></body></html>
+</script><script src="public-live.js"></script><script src="price-trends.js"></script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-live.js"></script><script src="contract-image.js"></script><script src="realty-calculators.js"></script><script src="scroll-top.js"></script><script src="admin-preferences.js"></script><script src="season-themes.js"></script><script src="weather-briefing.js"></script><script src="premium-motion.js"></script><script src="selection-flow.js"></script><script src="app-updates.js"></script><script src="admin-center.js"></script><script src="shared-settings.js"></script><script src="memo-dates.js"></script><script src="annual-calendar.js"></script><script src="office-board.js"></script><script src="office-board-images.js"></script><script src="office-members.js"></script><script src="admin-settings-navigator.js"></script><script src="notification-inbox.js"></script><script src="weather-detail.js"></script><script src="device-display.js"></script><script src="nav-collapse.js"></script></body></html>
 
 
 
