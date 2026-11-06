@@ -7,6 +7,7 @@
  const $=id=>document.getElementById(id),localDay=ms=>new Date(ms+OFFSET).toISOString().slice(0,10);
  const kinds={rain:'비',snow:'눈',mixed:'비·눈'};
  let data=null,lastAttempt=0,pending=false,sequence=0;
+ let offlineForecast=false,forecastUnavailable=false,forecastSavedAt=0;
  let hourlyExpanded=false;
  const requests=new Map();
  function atKst(day,hour){
@@ -156,7 +157,7 @@
   if(!hourlyExpanded)return;
   const rows=hourlyCards(data);
   const list=$('overviewHourlyList'),notice=$('overviewHourlyNotice'),meta=$('overviewHourlyMeta');
-  if(meta)meta.textContent='기상청 단기예보 · 기온 / 강수확률';
+  if(meta)meta.textContent=offlineForecast?'휴대폰 저장 예보 · 최신 강수 여부 미확인':'기상청 단기예보 · 기온 / 강수확률';
   if(!list||!notice)return;
   list.hidden=!rows.length;
   notice.hidden=!!rows.length;
@@ -188,6 +189,17 @@
   curr.textContent=detail.text;
   curr.classList?.toggle?.('is-reading',detail.hasTemperature);
   source.textContent=detail.source;
+  const warning=$('overviewWeatherOfflineWarning');
+  if(warning){
+   warning.hidden=!offlineForecast&&!forecastUnavailable;
+   if(!warning.hidden){
+    const when=forecastSavedAt?new Date(forecastSavedAt).toLocaleString('ko-KR',
+     {timeZone:'Asia/Seoul',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'시각 확인 불가';
+    warning.textContent=offlineForecast?
+     '⚠ 마지막 저장 예보 ('+when+') 참고용 · 현재 비·눈 여부를 확인할 수 없습니다. 퇴근 전 지도함은 실내에 보관하는 것이 안전합니다.':
+     '⚠ 최신 비·눈 예보를 확인할 수 없습니다. 퇴근 전 지도함 실내 보관을 권장합니다.';
+   }
+  }
   const calendarDay=new Date(now);
   const titleDate=$('overviewWeatherDate');
   if(titleDate){
@@ -203,8 +215,10 @@
   if(mapBox){
    mapBox.hidden=!view.mapAlert;
    const title=$('overviewMapAlertTitle'),reason=$('overviewMapAlertReason');
-   if(title)title.textContent=view.mapAlertTitle;
-   if(reason)reason.textContent=view.mapAlertReason;
+   if(title)title.textContent=offlineForecast&&view.mapAlert?
+    '⚠ 이전 예보에 강수 포함 · 지도함 실내 보관 권장':view.mapAlertTitle;
+   if(reason)reason.textContent=offlineForecast&&view.mapAlert?
+    '저장된 이전 예보입니다. 최신 강수 여부는 인터넷 연결 후 재확인해야 합니다.':view.mapAlertReason;
   }
   const precip=$('overviewPrecipitation');
   if(precip){
@@ -214,6 +228,9 @@
  }
  window.onFirstHyundaiWeatherBriefingFetched=result=>{
   const task=requests.get(result?.requestId);if(!task)return;requests.delete(result.requestId);
+  offlineForecast=!!(result.ok&&result.offlineCopy);
+  forecastUnavailable=!result.ok;
+  forecastSavedAt=offlineForecast?Number(result.offlineSavedAt)||0:0;
   result.ok?task.resolve(result.payload):task.reject(Error('forecast unavailable'));
  };
  function nativeRequest(){return new Promise((resolve,reject)=>{
@@ -232,7 +249,7 @@
    if(window.FirstHyundaiNative?.fetchWeatherBriefing)value=await nativeRequest();
    else{const r=await fetch(ENDPOINT,{cache:'no-store',signal:controller.signal});if(!r.ok)throw Error('unavailable');value=await r.json()}
    data=valid(value)?value:null;
-  }catch(e){if(!valid(data))data=null}
+  }catch(e){forecastUnavailable=true;if(!valid(data))data=null}
   finally{clearTimeout(timer);pending=false;render();document.dispatchEvent?.(new Event('firsthyundai-weather-forecast-updated'))}
  }
  window.FirstHyundaiWeatherBriefing={refresh,toggleHourly,
