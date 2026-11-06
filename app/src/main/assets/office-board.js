@@ -7,7 +7,7 @@ let sequence=0,items=[],busy=false,postInFlight=false,lastCheck=0,showCompleted=
 let focusLookupSeq=0,ambiguousPost=null;
 let timerMs=45000,pendingFocus='',view='compose',scheduleOpen=false,suggestedDate='';
 let archiveOpen=false,archived=[];
-let offlineMode=false,offlineAvailable=false,offlineChecking=false,offlineCachedAt=0,offlineCachedMember='';
+let offlineMode=false,offlineAvailable=false,offlineUnavailable=false,offlineChecking=false,offlineCachedAt=0,offlineCachedMember='';
 let memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10,finderTouched=false;
 const PAGE_SIZE=10;
 const expandedNotes=new Set();
@@ -69,11 +69,13 @@ function storeOffline(notes){
  }catch(e){return false}
 }
 function liveConnected(){
- offlineMode=false;offlineChecking=false;offlineBanner();
+ offlineMode=false;offlineUnavailable=false;offlineChecking=false;offlineBanner();
 }
 function useOffline(){
  const exists=restoreOffline(true);
- offlineMode=!!exists;offlineChecking=false;offlineBanner(!exists);
+ offlineMode=!!exists;offlineUnavailable=!exists;offlineChecking=false;
+ if(!exists){items=[];historyLoaded=false;}
+ offlineBanner(!exists);
  return exists;
 }
 function saveDraftNow(){
@@ -441,6 +443,11 @@ function filteredMemos(){
 function syncFinder(memos,filtered){
  const active=memos.filter(n=>!n.done).length,done=memos.length-active;
  const setText=(id,text)=>{const x=$(id);if(x)x.textContent=String(text)};
+ if(offlineUnavailable){
+  for(const field of ['officeBoardCount','officeBoardActiveCount','officeBoardDoneCount','officeBoardTotalCount'])setText(field,'—');
+  setText('officeBoardListResult','서버 연결 실패 · 메모 건수 확인 불가');
+  return;
+ }
  const legacy=$('officeBoardShowDone');
  if(legacy)legacy.textContent=showCompleted?'완료 숨기기':'완료 '+done+'건 보기';
  setText('officeBoardCount',active);
@@ -491,7 +498,9 @@ function draw(){
  const visible=filtered.slice(0,memoLimit);
  if(!visible.length){
   list.innerHTML='<div class="empty">'+
-   (memos.length?'조건에 맞는 메모가 없습니다. 검색어 또는 분류를 바꿔보세요.':
+   (offlineUnavailable?'서버 연결 오류로 목록을 확인하지 못했습니다. 실제 메모가 0건이라는 뜻이 아닙니다.':
+    memos.length?'조건에 맞는 메모가 없습니다. 검색어 또는 분류를 바꿔보세요.':
+    offlineMode?'마지막 저장 당시 메모가 없었습니다. 최신 정보는 미확인 상태입니다.':
     '아직 메모가 없습니다. 위의 새 메모 버튼으로 첫 메모를 작성해 보세요.')+'</div>';
   drawCalendar();syncViews();return;
  }
