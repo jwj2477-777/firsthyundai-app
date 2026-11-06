@@ -410,7 +410,7 @@ jobs:
           else
             gh release create v2.1.88 FirstHyundai-v2.1.88.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.88 · 전화번호 자동보정·중요 일정 알림 강화' \
+              --title '퍼스트현대 v2.1.88 · 암호화 오프라인 메모·일정 긴급 열람' \
               --notes '사무실 공유 메모·일정 전체 조회 완료 시 휴대폰 내부 보관 영역에 Android Keystore AES-256-GCM으로 자동 암호화 저장합니다. 인터넷·Cloudflare KV 장애 시 마지막 동기화된 보관본을 즉시 읽기 전용으로 보여주고 날짜와 최신 정보 미확인 경고를 표시합니다. 메모 검색·달력·전화번호 링크는 유지하되 오프라인 수정·완료·삭제·중복 전송을 막습니다. 작성 중인 메모는 기존 안전한 암호화 임시 저장을 유지합니다. 사용자 계정별 캐시 분리, 서버에서 계정이 폐기되면 해당 캐시 파기, 기존 가족 보안 정책 및 24시간 오프라인 인증 유효 조건을 유지합니다. 사진 원본은 오프라인에 자동 저장하지 않습니다. v2.1.88/build239. 서버 KV 한도 대응과 무관하게 마지막 보관본을 볼 수 있는 안전 기능입니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
