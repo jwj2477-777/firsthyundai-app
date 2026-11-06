@@ -1,0 +1,50 @@
+name: Recover Shared Memo Worker Deployment
+# A transient Cloudflare control-plane outage blocked an essential backend fix.
+# Dispatch the existing, secret-safe deploy workflow only while the old Worker
+# remains live. Stop automatically once the safe read-only marker is available.
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check deployed Worker version (no credentials or memo content)
+        id: state
+        run: |
+          python3 - <<'PY'
+          import json,os,urllib.error,urllib.request
+          url="https://firsthyundai-shared-settings.jwj2477.workers.dev/health?board=1"
+          doc={}
+          try:
+              request=urllib.request.Request(url,headers={
+                  "User-Agent":"FirstHyundaiBoardRecovery/1.0",
+                  "Cache-Control":"no-store","Accept":"application/json"})
+              try:
+                  response=urllib.request.urlopen(request,timeout=15)
+              except urllib.error.HTTPError as error:
+                  response=error
+              with response:
+                  raw=response.read(1200)
+              doc=json.loads(raw)
+          except (OSError,ValueError,TypeError):
+              pass
+          # Both true and false indicate the new code is live. False may just
+          # mean the KV LIST daily quota remains exhausted until UTC midnight.
+          current=isinstance(doc,dict) and type(doc.get("boardListAvailable")) is bool
+          with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as f:
+              f.write("needs_deploy="+("false" if current else "true")+"\n")
+          print("WORKER_RECOVERY_ALREADY_APPLIED" if current else "WORKER_RECOVERY_DEPLOY_NEEDED")
+          PY
+      - name: Dispatch existing signed, secret-safe deployment workflow
+        if: steps.state.outputs.needs_deploy == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run deploy-shared-settings.yml --repo "$GITHUB_REPOSITORY" --ref main
+          echo "Existing production deployment workflow dispatched; credentials remain in GitHub Secrets."

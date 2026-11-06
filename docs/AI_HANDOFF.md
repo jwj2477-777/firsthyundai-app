@@ -1,3 +1,8 @@
+## 2026-11-06 · Cloudflare 관리 API 503 시 공유 메모 서버 자동 복구 배포
+- 기존 공유 메모 Worker 수정 PR #114는 병합되어 소스/자동 테스트를 통과했으나, 운영 배포가 Cloudflare 관리 API `GET .../workers/services/firsthyundai-shared-settings` 단계의 `503 no healthy upstream`으로 중단됨. 여러 번의 수동 및 제한된 내부 재시도 모두 같은 문제였으며, 운영 Worker에 새 코드가 반영됐다고 주장하지 않음.
+- `.github/workflows/recover-shared-board-deployment.yml`: GitHub Actions에서 매시 17분 UTC, 공개 `/health?board=1`의 **새 버전 고유 boolean 속성 존재 여부만** 확인. 이미 새 Worker가 게시되면 배포를 다시 하지 않음. 구버전이거나 진단 페이지가 열리지 않으면 이전부터 사용해 온 `deploy-shared-settings.yml`만 `workflow_dispatch`로 호출. Cloudflare 비밀키/메모/전화번호/토큰은 진단하거나 로그에 출력하지 않음. 사용자가 앱을 삭제·재설치할 필요 없음.
+- 실패한 배포의 성공 여부는 GitHub Actions 결과 및 배포 후 진단 속성으로 확인. GitHub 예약 실행 시각은 지연될 수 있고, Cloudflare 장애·당일 KV 무료 LIST 사용량은 GitHub 자동 재시도만으로 즉시 해제되지 않을 수 있음.
+
 ## 2026-11-06 · 공유 메모 HTTP 500 / Cloudflare KV 무료 LIST 한도 예방 및 장애 진단
 - **현장 증상:** 공유 메모 > 메모함에서 `게시판 서버에 연결할 수 없습니다. HTTP 500`, 목록이 0건으로 보이는 현상. 이는 관리자모드 전용 권한 오류가 아니라 인증된 메모 조회의 서버 예외. 실제 저장 기록 삭제를 의미하지 않음.
 - **확인된 설계 결함:** `workers/shared-settings/src/index.mjs`에서 매분 `indexedDueNotes`(KV LIST)와 `cleanupArchivedPhotos`(KV LIST)를 실행하여 최소 **2,880회/일** LIST 발생. Cloudflare Workers KV 무료 등급은 **1,000 LIST/일**, UTC 자정 초기화(한국시간 09:00). 사용자 실측 이용량은 비공개라 특정 시점의 소진은 추가 진단 필요.
