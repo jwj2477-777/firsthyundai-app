@@ -49,6 +49,8 @@ function restoreOffline(force=false){
  if(!force&&offlineCachedMember===member&&items.length)return offlineAvailable;
  if(offlineCachedMember&&offlineCachedMember!==member){
   items=[];historyLoaded=false;localUpdates.clear();localDeletes.clear();archived=[];
+  offlineMode=false;offlineUnavailable=false;offlineChecking=false;
+  offlineCachedAt=0;offlineAvailable=false;
  }
  offlineCachedMember=member;
  const snapshot=snapshotOffline();
