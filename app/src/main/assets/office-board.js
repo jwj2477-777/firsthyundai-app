@@ -7,6 +7,7 @@ let sequence=0,items=[],busy=false,postInFlight=false,lastCheck=0,showCompleted=
 let focusLookupSeq=0,ambiguousPost=null;
 let timerMs=45000,pendingFocus='',view='compose',scheduleOpen=false,suggestedDate='';
 let archiveOpen=false,archived=[];
+let offlineMode=false,offlineAvailable=false,offlineChecking=false,offlineCachedAt=0,offlineCachedMember='';
 let memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10,finderTouched=false;
 const PAGE_SIZE=10;
 const expandedNotes=new Set();
@@ -17,6 +18,61 @@ let selectedDate='',calendarMonth='',editingBirthday='',calendarDraftDay='';
 let draftTimer=null,draftRestoredMember='',draftRevision=0;
 function draftMember(){
  try{return String(bridge?.getOfficeMemberId?.()||'')}catch(e){return ''}
+}
+// Private, encrypted native snapshot; never localStorage/sessionStorage/IndexedDB.
+function snapshotOffline(){
+ try{
+  if(typeof bridge?.getOfficeMemoOfflineSnapshot!=='function')return null;
+  const data=JSON.parse(bridge.getOfficeMemoOfflineSnapshot()||'{}');
+  if(!Array.isArray(data?.notes)||!Number.isFinite(data.cachedAt)||data.cachedAt<=0||
+     data.notes.length>5000||data.notes.some(n=>!valid(n?.id)||typeof n.text!=='string'||typeof n.done!=='boolean'))
+   return null;
+  return data;
+ }catch(e){return null}
+}
+function offlineBanner(missing=false){
+ const panel=$('officeBoardOfflineBanner');if(!panel)return;
+ panel.classList.toggle('hidden',!offlineMode&&!missing);
+ if(!offlineMode&&!missing)return;
+ const title=$('officeBoardOfflineTitle'),detail=$('officeBoardOfflineDetail');
+ if(title)title.textContent=missing?'서버 연결 안 됨 · 보관된 메모 없음':
+  offlineChecking?'저장된 메모 · 최신 정보 확인 중':'오프라인 보관본 · 읽기 전용';
+ const time=offlineCachedAt?new Date(offlineCachedAt).toLocaleString('ko-KR',
+  {year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'정보 없음';
+ if(detail)detail.textContent=missing?
+  '온라인에서 메모함을 한 번 완전히 열면 다음부터 암호화된 오프라인 보관본을 이용할 수 있습니다.':
+  '마지막 동기화 '+time+' · 최신 수정·완료 여부는 반영되지 않았을 수 있습니다. 수정·삭제·전송은 온라인에서만 가능합니다.';
+}
+function restoreOffline(force=false){
+ const member=draftMember();
+ if(!member)return false;
+ if(!force&&offlineCachedMember===member&&items.length)return offlineAvailable;
+ if(offlineCachedMember&&offlineCachedMember!==member){
+  items=[];historyLoaded=false;localUpdates.clear();localDeletes.clear();archived=[];
+ }
+ offlineCachedMember=member;
+ const snapshot=snapshotOffline();
+ offlineAvailable=!!snapshot;
+ if(!snapshot)return false;
+ offlineCachedAt=snapshot.cachedAt;offlineMode=true;offlineChecking=true;
+ historyLoaded=true;merge(snapshot.notes);offlineBanner();return true;
+}
+function storeOffline(notes){
+ if(!Array.isArray(notes)||notes.length>5000||
+    typeof bridge?.saveOfficeMemoOfflineSnapshot!=='function')return false;
+ try{
+  const ok=bridge.saveOfficeMemoOfflineSnapshot(JSON.stringify({notes}));
+  if(ok){offlineCachedAt=Date.now();offlineAvailable=true;offlineCachedMember=draftMember();}
+  return !!ok;
+ }catch(e){return false}
+}
+function liveConnected(){
+ offlineMode=false;offlineChecking=false;offlineBanner();
+}
+function useOffline(){
+ const exists=restoreOffline(true);
+ offlineMode=!!exists;offlineChecking=false;offlineBanner(!exists);
+ return exists;
 }
 function saveDraftNow(){
  if(draftTimer){clearTimeout(draftTimer);draftTimer=null;}
@@ -125,7 +181,7 @@ function sortItems(){
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const valid=id=>/^[a-z0-9]{8,14}-[0-9a-f-]{36}$/.test(String(id||''));
 function canEditNote(note){
- if(!note||!valid(note.id))return false;
+ if(offlineMode||!note||!valid(note.id))return false;
  if(bridge?.getMode?.()==='admin')return true;
  const ownId=String(bridge?.getOfficeMemberId?.()||'');
  // Do not use display names: they can change and are not unique.
@@ -422,7 +478,7 @@ $('officeBoardSort')?.addEventListener?.('change',e=>setSort(e.target?.value));
 function draw(){
  const list=$('officeBoardList');if(!list)return;
  const memos=memoItems();
- const admin=bridge?.getMode?.()==='admin';
+ const admin=!offlineMode&&bridge?.getMode?.()==='admin';
  $('officeBoardArchiveOpen')?.classList?.toggle?.('hidden',!admin);
  const filtered=filteredMemos();
  if(pendingFocus){
@@ -463,7 +519,8 @@ function draw(){
    body+(note.scheduled_at?'<div class="officeBoardNoteSchedule">▦ '+esc(note.all_day?kstDate(note.scheduled_at)+' · 종일':dateText(note.scheduled_at))+
      (!note.all_day&&!note.done?'<small class="officeBoardReminderHint">🔔 시작 30분 전 알림</small>':'')+'</div>':'')+
    (overdue?'<small class="officeBoardOverdueHint">예정 시간이 지났습니다 · 완료 또는 일정 변경을 확인하세요.</small>':'')+
-   (Array.isArray(note.images)&&note.images.length?'<div class="officeBoardPhotoStrip" aria-label="첨부 사진">'+
+    (offlineMode&&Array.isArray(note.images)&&note.images.length?'<small class="officeBoardReminderHint">사진은 인터넷에 연결되면 볼 수 있습니다.</small>':'')+
+   (Array.isArray(note.images)&&note.images.length&&!offlineMode?'<div class="officeBoardPhotoStrip" aria-label="첨부 사진">'+
     note.images.filter(x=>/^[0-9a-f-]{36}$/.test(x)).map((photo,i)=>
       '<button type="button" class="officeBoardPhotoTile" data-action="photoView" data-id="'+id+
       '" data-photo="'+photo+'">▧ 사진 '+(i+1)+' 보기</button>').join('')+'</div>':'')+
