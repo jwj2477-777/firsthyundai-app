@@ -750,6 +750,12 @@ async function refresh(silent=false){
  }catch(e){
   if(cycle===refreshCycle){
    historyLoading=false;
+   // A desktop HTML preview has no authenticated Android bridge; it must
+   // not masquerade as an offline failure or block demonstration filters.
+   if(typeof bridge?.officeBoardAction!=='function'){
+    draw();if(!silent)msg('메모 공유는 안드로이드 앱에서 지원합니다.');
+    return;
+   }
    const cached=useOffline();draw();
    if(!silent||!cached)msg(cached?
     '서버 연결 실패 · 휴대폰에 저장된 마지막 메모를 읽기 전용으로 표시합니다.':
