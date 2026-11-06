@@ -75,12 +75,32 @@ try{
  await Promise.all(pending.splice(0));
  requests.length=0;
  const due=service._test.timedMemoDue;
+ const cronRuns=service._test.cronRuns;
+ assert.equal(cronRuns(now,8),true);
+ assert.equal(cronRuns(now+1*60000,8),false);
+ const oneDay=Array.from({length:1440},(_,i)=>now+i*60000);
+ const dueScans=oneDay.filter(t=>cronRuns(t,8)).length;
+ const migrationScans=oneDay.filter(t=>cronRuns(t,30)).length;
+ const cleanupScans=oneDay.filter(t=>cronRuns(t,180)).length;
+ assert.equal(dueScans,180,'No more than 180 scheduled LISTs per day');
+ assert.equal(migrationScans,48);
+ assert.equal(cleanupScans,8,'Archive cleanup must not LIST each minute');
+ assert(dueScans+migrationScans+cleanupScans<250,'Leave free LIST budget for four family phones');
+ // Every appointment minute must have at least one cron tick in the 24-33m window.
+ for(let eventMinute=1;eventMinute<=1440;eventMinute++){
+  const eventAt=now+eventMinute*60000;
+  const possible=oneDay.filter(t=>cronRuns(t,8)&&eventAt-t>=24*60000&&eventAt-t<=33*60000);
+  if(eventMinute>=40)assert(possible.length>0,'Missed a T-30 window');
+ }
+
  assert.equal(due(valid,now),true);
  for(const note of [day,late,future,birthday])assert.equal(due(note,now),false);
  assert.equal(due({...valid,done:true},now),false);
  assert.equal(due({...valid,scheduled_at:null},now),false);
- assert.equal(due(valid,now+3*60000),false,'Must not remind at 27 minutes before');
- assert.equal(due(valid,now-2*60000),false,'Must not remind at 32 minutes before');
+ assert.equal(due(valid,now+3*60000),true,'Sparse cron may deliver at 27 minutes before');
+ assert.equal(due(valid,now-2*60000),true,'Sparse cron may deliver at 32 minutes before');
+ assert.equal(due(valid,now+7*60000),false,'Do not notify later than 23 minutes before');
+ assert.equal(due(valid,now-4*60000),false,'Do not notify earlier than 34 minutes before');
  assert.equal(due(valid,now-1*60000),true);
  const first=await service._test.deliverDueReminders(env,now);
  assert.equal(first.eligible,1);
@@ -98,10 +118,10 @@ try{
  // An amended schedule is eligible for a new event-specific reminder,
  // but an old timestamp will no longer pass the Android verification.
  assert.equal((await req('/board/'+valid.id,'PATCH',{scheduled_at:at(60)},tokens[0])).status,200);
- await service.scheduled({scheduledTime:now+30*60000},env,{});
- assert.equal(requests.length,4,'Rescheduling creates a new alert for the new start time');
+ await service.scheduled({scheduledTime:now+32*60000},env,{});
+ assert.equal(requests.length,4,'Rescheduling creates a new alert at the next 8-minute scan');
  assert(requests.slice(2).every(x=>x.data.scheduled_at===at(60)));
- await service.scheduled({scheduledTime:now+30*60000},env,{});
+ await service.scheduled({scheduledTime:now+32*60000},env,{});
  assert.equal(requests.length,4,'Repeated cron at new scheduled time is idempotent');
  assert.equal((await req('/board/'+future.id,'PATCH',{done:true},tokens[0])).status,200);
  await service.scheduled({scheduledTime:now+40*60000},env,{});
