@@ -19,7 +19,10 @@ final class OfficeBoardClient {
     static void clear(Context context){
         // Do not clear the stable device ID; revoked devices must not silently rejoin.
         SharedPreferences p=context.getSharedPreferences(PREF,Context.MODE_PRIVATE);
+        String previous=p.getString("member_id","");
         p.edit().remove("token").remove("expiry").remove("member_id").remove("member_name").apply();
+        // An explicitly revoked account must not continue reading its last snapshot.
+        OfficeOfflineStore.clear(context,previous);
     }
     static String memberName(Context c){
         return c.getSharedPreferences(PREF,Context.MODE_PRIVATE).getString("member_name","");
