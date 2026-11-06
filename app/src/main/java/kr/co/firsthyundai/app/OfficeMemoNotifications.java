@@ -22,7 +22,7 @@ final class OfficeMemoNotifications {
     static final String CHANNEL="firsthyundai_private_office_notes";
     static final int PERMISSION=1418;
     private static final int JOB_ID=43152;
-    private static final String REMINDER_CHANNEL="firsthyundai_private_schedule_reminders";
+    private static final String REMINDER_CHANNEL="firsthyundai_private_schedule_reminders_loud_v2";
     private static final String LAST_REMINDER="last_reminder_";
     private static final String PREF="firsthyundai-office-note-notify-v1";
     private static final String LAST="last_id";
@@ -50,6 +50,7 @@ final class OfficeMemoNotifications {
         channel.setDescription("시간이 정해진 사무실 공유 일정이 시작되기 30분 전 알림");
         channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
         channel.enableVibration(true);
+        channel.setVibrationPattern(new long[]{0,800,250,800,250,1200});
         manager.createNotificationChannel(channel);
     }
     static boolean enabled(Context c){return c.getSharedPreferences(PREF,Context.MODE_PRIVATE).getBoolean(ENABLED,true);}
