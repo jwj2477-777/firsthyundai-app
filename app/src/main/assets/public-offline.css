@@ -1,0 +1,11 @@
+/* Public-feed stale-data notice: only visible while cached data is displayed. */
+.publicOfflineNotice{display:flex;flex-direction:column;gap:4px;
+ margin:10px 12px;padding:12px 15px;border:1.5px solid #c79d55;
+ border-radius:14px;background:#fff7e8;color:#6a4725;line-height:1.45}
+.publicOfflineNotice.hidden{display:none!important}
+.publicOfflineNotice strong{font-size:15px;font-weight:850}
+.publicOfflineNotice span{font-size:13px;word-break:keep-all}
+@media(max-width:380px){
+ .publicOfflineNotice{margin:8px 6px;padding:10px 12px}
+ .publicOfflineNotice strong{font-size:14px}
+}
