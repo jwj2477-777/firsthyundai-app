@@ -3110,6 +3110,20 @@ function clearPublicOffline(filename){
  delete publicOfflineStatus[filename];
  updatePublicOfflineNotice();
 }
+let lastPublicReconnect=0;
+function recoverPublicFeeds(){
+ if(document.hidden||!Object.keys(publicOfflineStatus).length||
+    Date.now()-lastPublicReconnect<60000)return;
+ lastPublicReconnect=Date.now();
+ // Connectivity is a hint, not proof that the origin or KV is working.
+ // Never discard the local copy until a fully verified network response arrives.
+ refreshAll(false);
+ refreshPublicServices(false);
+}
+window.addEventListener?.('online',recoverPublicFeeds);
+document.addEventListener?.('visibilitychange',()=>{
+ if(!document.hidden)recoverPublicFeeds();
+});
 function fetchRemote(filename){let target=`https://raw.githubusercontent.com/${repository}/main/data/${filename}.json`;
 if(window.FirstHyundaiNative){return new Promise((resolve,reject)=>{let id=String(++serial);pending[id]={resolve,reject};window.FirstHyundaiNative.fetch(repository,filename+'.json',id);});}
 return fetch(target+'?t='+Date.now(),{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json();});}
