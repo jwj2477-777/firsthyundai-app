@@ -211,7 +211,8 @@ final class OfficeMemoNotifications {
         // Phone numbers are deliberately masked in the unlocked notification too.
         String result=value.replaceAll("[\\r\\n\\t]+"," ").replaceAll("\\s+"," ").trim()
                 .replaceAll("(?<!\\d)01[016789][- .]?\\d{3,4}[- .]?\\d{4}(?!\\d)","연락처 확인")
-                .replaceAll("(?<!\\d)0\\d{1,2}[- .]?\\d{3,4}[- .]?\\d{4}(?!\\d)","연락처 확인");
+                .replaceAll("(?<!\\d)0\\d{1,2}[- .ㅡ－−–—―‐‑]?\\d{3,4}[- .ㅡ－−–—―‐‑]?\\d{4}(?!\\d)","연락처 확인")
+                .replaceAll("(?<!\\d)[1-9]\\d{2,3}[-ㅡ－−–—―‐‑]\\d{4}(?!\\d)","연락처 확인");
         return result.length()>110?result.substring(0,110)+"…":result;
     }
     private static String[] preview(Context context,String id) {
