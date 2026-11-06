@@ -90,7 +90,8 @@ online=true;
 await api.refresh();
 assert(saved>=1,'Complete successful online sync must save an encrypted snapshot');
 assert(el('officeBoardList').innerHTML.includes('서버 최신 방문 예약'));
-assert(!el('officeBoardOfflineTitle').textContent.includes('읽기 전용'));
+assert(el('officeBoardOfflineBanner').classList.contains('hidden'),
+ 'A verified online refresh hides the read-only warning');
 assert(api._test.canEditNote(note),'Online authenticated admin access restored');
 online=false;
 await api.refresh();
