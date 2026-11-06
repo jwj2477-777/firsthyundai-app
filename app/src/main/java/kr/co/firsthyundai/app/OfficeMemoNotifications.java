@@ -49,7 +49,7 @@ final class OfficeMemoNotifications {
         NotificationManager manager=(NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE);
         if(manager==null||manager.getNotificationChannel(REMINDER_CHANNEL)!=null)return;
         NotificationChannel channel=new NotificationChannel(REMINDER_CHANNEL,
-            "공유 일정 시작 30분 전",NotificationManager.IMPORTANCE_HIGH);
+            "중요 일정 · 시작 30분 전",NotificationManager.IMPORTANCE_HIGH);
         channel.setDescription("시간이 정해진 사무실 공유 일정이 시작되기 30분 전 알림");
         channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
         channel.enableVibration(true);
@@ -173,7 +173,7 @@ final class OfficeMemoNotifications {
         String text=safePreview(note.optString("preview",""));
         if(text.isEmpty())text="곧 시작하는 공유 일정을 확인해 주세요.";
         String author=safePreview(note.optString("author",""));
-        String heading=ScheduleReminderTiming.title(System.currentTimeMillis(),startsAt);
+        String heading="🔔 중요 · "+ScheduleReminderTiming.title(System.currentTimeMillis(),startsAt);
         if(!author.isEmpty())heading+=" · "+author;
         Intent open=new Intent(context,LockActivity.class);
         open.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -189,7 +189,8 @@ final class OfficeMemoNotifications {
             .setStyle(new Notification.BigTextStyle().bigText(text))
             .setVisibility(Notification.VISIBILITY_PRIVATE)
             .setContentIntent(tap).setAutoCancel(true)
-            .setCategory(Notification.CATEGORY_EVENT)
+            .setCategory(Notification.CATEGORY_ALARM)
+            .setPriority(Notification.PRIORITY_MAX)
             .setWhen(System.currentTimeMillis()).setShowWhen(true);
         Notification.Builder hidden=Build.VERSION.SDK_INT>=26
             ?new Notification.Builder(context,REMINDER_CHANNEL):new Notification.Builder(context);
