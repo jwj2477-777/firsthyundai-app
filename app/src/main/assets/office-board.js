@@ -141,7 +141,18 @@ function dateText(value){
   hour:'numeric',minute:'2-digit',hour12:preferences().memoClock!=='24'});
 }
 function phones(value){
- return window.FirstHyundaiPhones?.linkify?.(value,esc)??esc(String(value||''));
+ if(window.FirstHyundaiPhones?.linkify)
+  return window.FirstHyundaiPhones.linkify(value,esc);
+ // Defensive fallback keeps existing tap-to-call links when an old cached
+ // WebView page or isolated UI test did not load the new helper yet.
+ const text=String(value||''),re=/(0\d{1,2}[- ]?\d{3,4}[- ]?\d{4})/g;
+ let html='',offset=0,m;
+ while((m=re.exec(text))!==null){
+  html+=esc(text.slice(offset,m.index));
+  html+='<a class="officeBoardPhone" href="tel:'+m[0].replace(/[^0-9]/g,'')+'">'+esc(m[0])+'</a>';
+  offset=m.index+m[0].length;
+ }
+ return html+esc(text.slice(offset));
 }
 /* Private shared calendar: use the same authenticated notes; no external sync or browser storage. */
 function kstParts(date){
