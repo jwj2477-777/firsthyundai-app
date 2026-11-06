@@ -1,12 +1,35 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-11-07T00:53:50+09:00",
+  "checked_at": "2026-11-07T03:56:21+09:00",
   "state": "ok",
   "errors": [],
   "source": "Google 뉴스 RSS (보도 제목·출처 메타데이터)",
   "brief_method": "기사 본문 확인 Gemini 요약 + Groq 보완(짧은 3~4문장)",
   "warning": "언론 기사 제목은 공식 확정 발표가 아닙니다. 사업 일정, 세금, 대출, 시행일은 기관 원문 확인 필요.",
   "briefs": [
+    {
+      "id": "202561a6f40091",
+      "category": "정책·규제",
+      "title": "홍지선 국토교통부장관, \"주택건설업계와 적극 소통하며, 현장의 어려움을 신속히 해소할 것\"",
+      "summary": "정부는 도시정비법령을 조속히 개정한다는 입장을 밝혔다.\n연내 통합 주택공급 지원센터를 출범해 맞춤형 솔루션을 제공할 예정이다.\n홍 장관은 향후 5년간 수도권에 150만호 이상 착공 목표를 제시했다.",
+      "verification": "2개 AI 검토 · 사실 확인은 원문 기준",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-06T20:50:34+09:00",
+      "sources": [
+        {
+          "title": "홍지선 국토교통부장관, \"주택건설업계와 적극 소통하며, 현장의 어려움을 신속히 해소할 것\"",
+          "publisher": "뉴스다",
+          "published_at": "2026-11-06T20:50:34+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE1mbEg0MExmV2lWamVuTW9fUHdxOTVIRlp5a3RvQkNaUUFzOXpZNzdWWWZiem9YXzRCaVNhOHdhWUVvREdVaGhLdTlhRFRVRmJGSFpiVUZORnlwNmktWkVn?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.newsda.net/news/article.html?no=606402",
+      "summary_version": 3,
+      "groq_reviewed": true
+    },
     {
       "id": "fa86fa794653df",
       "category": "개발·교통",
@@ -28,25 +51,6 @@
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.kihoilbo.co.kr/news/articleView.html?idxno=3039923",
       "summary_version": 3
-    },
-    {
-      "id": "d376531ca75e6d",
-      "category": "정책·규제",
-      "title": "홍지선 국토교통부장관, ˝주택건설업계와 적극 소통하며, 현장의 어려움을 신속히 해소할 것˝:경인투데이뉴스",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-06T20:14:00+09:00",
-      "sources": [
-        {
-          "title": "홍지선 국토교통부장관, ˝주택건설업계와 적극 소통하며, 현장의 어려움을 신속히 해소할 것˝:경인투데이뉴스",
-          "publisher": "경인투데이뉴스",
-          "published_at": "2026-11-06T20:14:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTFA0NTZWSUhxSWVLSTFDMUttWkZfZ3BwV3BDTmFiUC11dVBCVUFvUkh6ckE5eExNVWFYU0taTkxNWEItOG9rRzM0bGhhVHJxd1XSAV9BVV95cUxPVVhXTnNqSFVEWERnV3k1WVF0R2xjZzZ2TXZiRlZfU0NyeExzZnRrYmpwcHlHUzJySi1DYkE4ZEVnVVZOeTFJbnhFU296cnY2b0JPNkZ1THh4NFBvZkZkNA?oc=5"
-        }
-      ],
-      "summary_method": "headline_only"
     },
     {
       "id": "4b98b33d47c415",
@@ -128,7 +132,7 @@
       "category": "정책·규제",
       "title": "홍지선 “민간 공급 걸림돌 신속 해소”…지원센터 연내 출범",
       "summary": "홍지선 국토교통부 장관은 민간 주택공급의 걸림돌을 신속히 해소하겠다고 밝혔다.\n도시정비법령을 조속히 개정하고 연내 출범하는 통합 주택공급 지원센터를 통해 PF 등 자금 조달 문제를 관리한다.\n간담회는 6일 서울 국토발전전시관에서 3개 협회 및 회원사와 함께 개최되었다.",
-      "verification": "2개 AI 검토 · 사실 확인은 원문 기준",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-06T16:56:49+09:00",
@@ -230,9 +234,9 @@
       "sources": [
         {
           "title": "서울시의회 김지훈 의원, 주택정책의 목표는 공급량 아닌 시민의 주거안정",
-          "publisher": "www.newszoom.kr",
+          "publisher": "뉴스줌",
           "published_at": "2026-11-06T12:03:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiRkFVX3lxTE56ZVpvR2RzM3ZBT1IyYTRQSGtqMjY4OWt3UlNOQ0w1cFBnR0llZjlZb2FTQ3Fjd05FUGJFX0k5MjdJbHBLamc?oc=5"
+          "link": "https://news.google.com/rss/articles/CBMiREFVX3lxTE5zM2ZiTVlWeEdyNnFZRTdTekFnRDBTOWlWZEw1RlJ3bVNHMUZCenFsX0tHclM1Q2dsOVV0b3cza0N1c0ln?oc=5"
         }
       ],
       "summary_method": "headline_only"
@@ -495,28 +499,6 @@
       "summary_version": 3
     },
     {
-      "id": "ee709004613b54",
-      "category": "정책·규제",
-      "title": "[제3회 도시정비 포럼] 김용선 국토부 사무관 \"재개발 동의율 낮추고 인허가 간소화…사업 속도 높인다\"",
-      "summary": "정부는 재개발 조합설립 동의율을 75%에서 70%로 낮춘다.\n공공재개발 시행자 지정 동의율도 67%에서 60%로 완화한다.\n개정안은 현재 국회 국토교통위원회 심사 중이다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-05T17:16:15+09:00",
-      "sources": [
-        {
-          "title": "[제3회 도시정비 포럼] 김용선 국토부 사무관 \"재개발 동의율 낮추고 인허가 간소화…사업 속도 높인다\"",
-          "publisher": "디벨로퍼뉴스",
-          "published_at": "2026-11-05T17:16:15+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBtY0VwMmtWNzBYcDMtd3BRUHVkYTdHZFF4VjFnd3ZsVmpid1U3enZMQUVZUXhBQjBLa3VCSnRKTzhMSkx4M19mT1o3SG5tUTFnV21fSGNrQktSTkhRaEZDQ2cwME1OWkZE?oc=5"
-        }
-      ],
-      "summary_method": "groq_article",
-      "summary_model": "openai/gpt-oss-120b",
-      "summary_source_url": "https://www.dpnews.co.kr/news/articleView.html?idxno=2712",
-      "summary_version": 3
-    },
-    {
       "id": "60b15e5315bee2",
       "category": "송도 종합",
       "title": "서울 강남 3구, 송도행 뚝…서남권은 검단·계양으로",
@@ -725,25 +707,6 @@
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.yna.co.kr/amp/view/AKR20261105088500003",
       "summary_version": 3
-    },
-    {
-      "id": "c9985bd0edd416",
-      "category": "송도 종합",
-      "title": "롯데바이오, 송도 1공장 의약품업체 허가…상업생산 준비 진전",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-05T13:50:04+09:00",
-      "sources": [
-        {
-          "title": "롯데바이오, 송도 1공장 의약품업체 허가…상업생산 준비 진전",
-          "publisher": "PRESS9",
-          "published_at": "2026-11-05T13:50:04+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFB4cWdaQzRieDg5TjhscHNWa2w0RnJFZGJKRHBBTkptdU1lbGV5MkhHbHotQmxCZDJ3cVF1Z21GZUZXSFZYVW9XNk5JRjJUWHpqblhKZnNfQ21Qb242MTI0dWxUWE4?oc=5"
-        }
-      ],
-      "summary_method": "headline_only"
     },
     {
       "id": "e0d5ba5926ad2c",
@@ -996,6 +959,82 @@
       "summary_method": "headline_only"
     },
     {
+      "id": "2cdc61d622b08d",
+      "category": "송도 종합",
+      "title": "'제약바이오투자대전', 11월 19일 송도서 개최",
+      "summary": "제약바이오기업과 투자자가 만나는 제약바이오투자대전이 인천 송도컨벤시아에서 열린다.\n행사는 투자 컨퍼런스와 해외 바이어 20곳 등 총 70곳 내외의 일대일 상담회로 구성된다.\n참석자는 300명 내외로 예상되며 참가 신청은 공식 누리집에서 확인할 수 있다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 11,
+      "publisher_count": 11,
+      "last_published_at": "2026-11-05T08:57:13+09:00",
+      "sources": [
+        {
+          "title": "'제약바이오투자대전', 11월 19일 송도서 개최",
+          "publisher": "세계뉴스통신",
+          "published_at": "2026-11-05T08:57:13+09:00",
+          "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE5OTUpHTnp5VUFJbk1Fc2ZHSVdyTlNOU1BUdXpTYnVoa3JqNmc1MDJFTFpaTE1BTUZlbElraGc0dzJzRTB0YlhvWTF6bXZsX29YYnRMbG1IYzhUclVSSGZtRzE0LXpubkNjaHphcFdaQkltNlFi?oc=5"
+        },
+        {
+          "title": "인천시,‘2026 제약바이오투자대전’송도서 개최, 비즈니스 협력 물꼬 > 뉴스",
+          "publisher": "더코리아",
+          "published_at": "2026-11-04T20:33:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE5lblFOTXZYZ3R6czVlMjgxNGxxV2h0dTFTNDVubGsyQVNVR29ERXpQVmdxVlk4eEotLTcwcWNZSFQxZ2lVb2xEQXF1X2ktOWdXZTREeS1XdVY1VHlxMEtRbzlBeU1qWlU0b3lmNnlnYWI1Zw?oc=5"
+        },
+        {
+          "title": "인천시, ‘2026 제약바이오투자대전’ 송도서 개최, 비즈니스 협력 물꼬",
+          "publisher": "경기일보",
+          "published_at": "2026-11-04T16:44:39+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9GVzd4bGJTWC1kcFNBbzhOdVJPaEhwOVhleFRDRDhGTVUxY01sa2VYLWZQeHY0dzVGbm41NElDWDBHTVhma2dFN3dQejJHVjlsSW1zeFJ2bE1JREU?oc=5"
+        },
+        {
+          "title": "인천 송도서 ‘2026 제약바이오투자대전’ 19일 개최...글로벌 투자자 한자리에",
+          "publisher": "경인신문",
+          "published_at": "2026-11-04T15:01:24+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTFBFcG85M0g5czJUMHQxbG1MV0VZXzJpSk5UNmhwUEl6NlJDMWVpbDF3N2dMWTVXSEluUktEZHRCNmZxRlVraEdrWUdJSTZrclo1ZHZLb3RieFRUaVBIOTVBcXMwQzdTV3M?oc=5"
+        },
+        {
+          "title": "글로벌 제약·바이오 투자 포럼 '2026 제약바이오투자대전' 19일 송도서 개최",
+          "publisher": "인천신문",
+          "published_at": "2026-11-04T12:08:29+09:00",
+          "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTE5qYjZxNi1RTllvMDdwcDg3NDFSN2RWcHVVNXJ4ci1BbElyYUYtQzRMbE1haU5yTGZ0bFlBNUN3TXlYVWhtTkNWMTdpR1JqMVlBa0ZmZVdTQTJERVlzcnZacW5EMGV6MDkwdHQxZzNHQk1UT2d4Z3UwS9IBeEFVX3lxTE5qYjZxNi1RTllvMDdwcDg3NDFSN2RWcHVVNXJ4ci1BbElyYUYtQzRMbE1haU5yTGZ0bFlBNUN3TXlYVWhtTkNWMTdpR1JqMVlBa0ZmZVdTQTJERVlzcnZacW5EMGV6MDkwdHQxZzNHQk1UT2d4Z3UwSw?oc=5"
+        },
+        {
+          "title": "글로벌 제약·바이오 투자 포럼, 19일 송도컨벤시아서 개최",
+          "publisher": "중부일보",
+          "published_at": "2026-11-04T11:12:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE05ZmFNcF9GSWwtLWtvS2MzWjNMNnZBM0l1TlZGc1FWaDFXeFJjN2ZMampxUlBqVmRFWm9WQXd4ZW1GOVJVd1B4c1F0eElhb21YdGZJZE9VVk5PNEp1WWpMSGhaYUNjNWo1Z3A0eGJRQQ?oc=5"
+        },
+        {
+          "title": "인천시, ‘2026 제약바이오투자대전’ 송도서 개최...비즈니스 협력 물꼬",
+          "publisher": "인천뉴스",
+          "published_at": "2026-11-04T10:27:18+09:00",
+          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBwSUgyazNsellscTlhLXdUOVJkVFRZTFM4MVg3MWc4ZUdPSFpKSS11eEtLa1NXOVhsbWE2ZmRjZ2hDRC1NQkptQUxwa1BJQ09QQlNRZklTVXp5S0JNLWZXZ0RqRktGQTdTWlJSNlE1bw?oc=5"
+        },
+        {
+          "title": "AI바이오·투자유치 키워드 한자리에… 인천 송도서 ‘2026 제약바이오투자대전’ 열린다",
+          "publisher": "에이빙",
+          "published_at": "2026-11-04T10:24:16+09:00",
+          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE1kY1Rma2RXaGk3Z1pEel9pNVc4cUNyVUotSzB3S0VuczRhWXBnQ1VTUGFqU01LbVd4NFdHaDdyUTZGdk5rWGlVRm1XaVh1N1VNeVVESGpHYXFfU082a0lnRG5keHFFWEFUeENV0gFrQVVfeXFMTWRjVGZrZFdoaTdnWkR6X2k1VzhxQ3JVSi1LMHdLRW5zNGFZcGdDVVNQYWpTTUttV3g0V0doN3JRNkZ2TmtYaVVGbVdpWHU3VU15VURIakdhcV9TTzZrSWdEbmR4cUVYQVR4Q1U?oc=5"
+        },
+        {
+          "title": "글로벌 제약·바이오 투자 포럼, 인천 송도에서 열린다 ‘2026 제약바이오투자대전’ 19일 개최",
+          "publisher": "https://www.climatepol.com/",
+          "published_at": "2026-11-04T09:48:25+09:00",
+          "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFB0SHVzWjJuRnV6N1R0TVRiYTZsQ0xtZTZCQ3ZxTHlnYi1rcHpSdDRFQkNvVElYaGdUU0NpWWxXSXBzcDFScXVOX3ZwZHMySjFHbzRaQV92dXEtTnlxeDdqYWFOcmxLNFJ6djdrYw?oc=5"
+        },
+        {
+          "title": "글로벌 제약·바이오 투자 포럼, 오는 19일 송도컨벤시아서 개최",
+          "publisher": "www.incheonin.com",
+          "published_at": "2026-11-04T09:16:13+09:00",
+          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTFBCYXFzOTdTcTZSX1Vhc29tYVZFb25mcmE4aGUtWmREUzNFazUxQXVqTGdOU3JTb2R3aWM4UThES3hoUzkwN1lxT1BLMm5oY21RY1FDQTF2UUotU1oxLXVZQVozRlYtU2p6WWdJ?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.segyenewsagency.com/news/articleView.html?idxno=643588",
+      "summary_version": 3
+    },
+    {
       "id": "273b81184d8170",
       "category": "정책·규제",
       "title": "\"이젠 인천 국평도 8억 있어야\"…분양가 역대 최고",
@@ -1112,82 +1151,6 @@
       "summary_version": 3
     },
     {
-      "id": "8fe7a6122bade3",
-      "category": "송도 종합",
-      "title": "인천시,‘2026 제약바이오투자대전’송도서 개최, 비즈니스 협력 물꼬 > 뉴스",
-      "summary": "인천시는 제약·바이오 기업의 투자 유치를 위해 오는 19일 송도컨벤시아에서 제약바이오투자대전을 연다.\n이번 행사에서는 해외 투자자 20곳과 국내 기업 50곳이 일대일 비즈니스 상담을 진행할 예정이다.\n행사에는 업계 관계자와 투자기관 및 바이어 등 약 300명이 참석할 것으로 확인됐다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 10,
-      "publisher_count": 10,
-      "last_published_at": "2026-11-04T20:33:00+09:00",
-      "sources": [
-        {
-          "title": "인천시,‘2026 제약바이오투자대전’송도서 개최, 비즈니스 협력 물꼬 > 뉴스",
-          "publisher": "더코리아",
-          "published_at": "2026-11-04T20:33:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE5lblFOTXZYZ3R6czVlMjgxNGxxV2h0dTFTNDVubGsyQVNVR29ERXpQVmdxVlk4eEotLTcwcWNZSFQxZ2lVb2xEQXF1X2ktOWdXZTREeS1XdVY1VHlxMEtRbzlBeU1qWlU0b3lmNnlnYWI1Zw?oc=5"
-        },
-        {
-          "title": "인천시, ‘2026 제약바이오투자대전’ 송도서 개최, 비즈니스 협력 물꼬",
-          "publisher": "경기일보",
-          "published_at": "2026-11-04T16:44:39+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9GVzd4bGJTWC1kcFNBbzhOdVJPaEhwOVhleFRDRDhGTVUxY01sa2VYLWZQeHY0dzVGbm41NElDWDBHTVhma2dFN3dQejJHVjlsSW1zeFJ2bE1JREU?oc=5"
-        },
-        {
-          "title": "인천시 19일 송도서 제약바이오투자대전 개최…70여 개 기업 참여",
-          "publisher": "경기신문",
-          "published_at": "2026-11-04T14:10:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE1tSmRWaEl4RUtFdVJmZ056a0hnUENiTHJ6VEtKZ3c5VEw5YnAxV0U1RjA4SVNnOUR5M3diMG45ZHNGN1hKVmgzM2dROHhtRVFlLWhfTjNpMEt3c21wTDdEaUhR?oc=5"
-        },
-        {
-          "title": "글로벌 제약·바이오 투자 포럼 '2026 제약바이오투자대전' 19일 송도서 개최",
-          "publisher": "인천신문",
-          "published_at": "2026-11-04T12:08:29+09:00",
-          "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTE5qYjZxNi1RTllvMDdwcDg3NDFSN2RWcHVVNXJ4ci1BbElyYUYtQzRMbE1haU5yTGZ0bFlBNUN3TXlYVWhtTkNWMTdpR1JqMVlBa0ZmZVdTQTJERVlzcnZacW5EMGV6MDkwdHQxZzNHQk1UT2d4Z3UwS9IBeEFVX3lxTE5qYjZxNi1RTllvMDdwcDg3NDFSN2RWcHVVNXJ4ci1BbElyYUYtQzRMbE1haU5yTGZ0bFlBNUN3TXlYVWhtTkNWMTdpR1JqMVlBa0ZmZVdTQTJERVlzcnZacW5EMGV6MDkwdHQxZzNHQk1UT2d4Z3UwSw?oc=5"
-        },
-        {
-          "title": "글로벌 제약·바이오 투자 포럼, 19일 송도컨벤시아서 개최",
-          "publisher": "중부일보",
-          "published_at": "2026-11-04T11:12:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE05ZmFNcF9GSWwtLWtvS2MzWjNMNnZBM0l1TlZGc1FWaDFXeFJjN2ZMampxUlBqVmRFWm9WQXd4ZW1GOVJVd1B4c1F0eElhb21YdGZJZE9VVk5PNEp1WWpMSGhaYUNjNWo1Z3A0eGJRQQ?oc=5"
-        },
-        {
-          "title": "인천시, ‘2026 제약바이오투자대전’ 송도서 개최...비즈니스 협력 물꼬",
-          "publisher": "인천뉴스",
-          "published_at": "2026-11-04T10:27:18+09:00",
-          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBwSUgyazNsellscTlhLXdUOVJkVFRZTFM4MVg3MWc4ZUdPSFpKSS11eEtLa1NXOVhsbWE2ZmRjZ2hDRC1NQkptQUxwa1BJQ09QQlNRZklTVXp5S0JNLWZXZ0RqRktGQTdTWlJSNlE1bw?oc=5"
-        },
-        {
-          "title": "AI바이오·투자유치 키워드 한자리에… 인천 송도서 ‘2026 제약바이오투자대전’ 열린다",
-          "publisher": "에이빙",
-          "published_at": "2026-11-04T10:24:16+09:00",
-          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE1kY1Rma2RXaGk3Z1pEel9pNVc4cUNyVUotSzB3S0VuczRhWXBnQ1VTUGFqU01LbVd4NFdHaDdyUTZGdk5rWGlVRm1XaVh1N1VNeVVESGpHYXFfU082a0lnRG5keHFFWEFUeENV0gFrQVVfeXFMTWRjVGZrZFdoaTdnWkR6X2k1VzhxQ3JVSi1LMHdLRW5zNGFZcGdDVVNQYWpTTUttV3g0V0doN3JRNkZ2TmtYaVVGbVdpWHU3VU15VURIakdhcV9TTzZrSWdEbmR4cUVYQVR4Q1U?oc=5"
-        },
-        {
-          "title": "글로벌 제약·바이오 투자 포럼, 인천 송도에서 열린다 ‘2026 제약바이오투자대전’ 19일 개최",
-          "publisher": "https://www.climatepol.com/",
-          "published_at": "2026-11-04T09:48:25+09:00",
-          "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFB0SHVzWjJuRnV6N1R0TVRiYTZsQ0xtZTZCQ3ZxTHlnYi1rcHpSdDRFQkNvVElYaGdUU0NpWWxXSXBzcDFScXVOX3ZwZHMySjFHbzRaQV92dXEtTnlxeDdqYWFOcmxLNFJ6djdrYw?oc=5"
-        },
-        {
-          "title": "글로벌 제약·바이오 투자 포럼, 오는 19일 송도컨벤시아서 개최",
-          "publisher": "www.incheonin.com",
-          "published_at": "2026-11-04T09:16:13+09:00",
-          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTFBCYXFzOTdTcTZSX1Vhc29tYVZFb25mcmE4aGUtWmREUzNFazUxQXVqTGdOU3JTb2R3aWM4UThES3hoUzkwN1lxT1BLMm5oY21RY1FDQTF2UUotU1oxLXVZQVozRlYtU2p6WWdJ?oc=5"
-        },
-        {
-          "title": "인천시, 2026 제약바이오투자대전 19일 송도 개최",
-          "publisher": "인천투데이",
-          "published_at": "2026-11-04T08:41:13+09:00",
-          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTFByUW5YTmRVWWNVLWhhNm13dlNtVUN6YXZPUzRWZkpCWE5rTGFMb1pINjIzMFB5aGZ2UzhuQTA3U2JubDNXQkszN2V4NnhVeUpVNzgxSG43dDUxSHlmdlRUZ0VZUzR4MnFHWlB0SlN2Mk0?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.kyeonggi.com/article/20261104580410",
-      "summary_version": 3
-    },
-    {
       "id": "cef686c6deb87a",
       "category": "송도 종합",
       "title": "송도트램 신속 추진 공청회 “KTX 송도역 연계 미흡…대안 노선 마련해야”",
@@ -1229,7 +1192,7 @@
           "title": "글로벌 제약·바이오 투자 포럼, 인천 송도에서 열린다",
           "publisher": "중앙신문",
           "published_at": "2026-11-04T15:13:30+09:00",
-          "link": "https://news.google.com/rss/articles/CBMixgJBVV95cUxQSUxsdFMtck9iLXJCeE9meW95UUh2SmoxbENTRnRPcnpNeEhQMU9oMVRteXFJTmZ6ZTJRd25wbXB0b2dWbkpfOHR6dnV1b3pXOFpRLWdJNkdXeEJ5Q1N1NnFxWE1nTzNqTWphU1M5Q1BheXRGOTFVLUZnekh4Wkd6M00zamMwTVV1VWsxYnJTMFBuc096NjhpRWtQOE9nTnA1TnN2NmJmdndZQUdnZ2xDNjJ1UVJSbkZSRmVkMWdxM1BkbHNhYnJoUDFHSEdLdzF4aDhXM2dtb1N4ZzhJREFyNkotQkxKN01IUUphMlJ6REROLWRFUEZ6VkR3cHV1a0JobkkwQWRiV0RkX1owdnYxQy1YMHU4R3Vvc3p0YktieHFxNlUxNFAxV3UxdlhMbW9ITndYNld4RlpYN1dfQk8wVG9BN0RtUQ?oc=5"
+          "link": "https://news.google.com/rss/articles/CBMixgJBVV95cUxPRDFiaTVzUXZFRHl3Y254M3V4UXF3QUVEN0RSLWFzRVNfZ1VVVndlMVRYVS1WdjZSTDFYOTRESV9pMHNPWC1YbnFmM1d5STlaUlR1ZTZzdno2Z1JNNG9DbmU5R09QY1plbTBfNm4zRnZYZGhSWFdxSGlPUFlUX3h4RWtERFlqTDRLQjZQVmgxT1BIa0taSmQ2QXh2a2s2WVFZZ3E0eDY2WjlqSzBDTjNvdzlzQzNNUzhzQi05QTRUR0JxUlZ6YTkwZF9aYWdnb2dkTldzZ0VyVG1MSTVWT3lEaU5kcEFpb0FGSkstTWoyX3dSSkFqbkZaMHFSUlZuemNVNEJKUGJFeWNGYXlfUWVWdjliRUc5d0s4anREVkxodllkTF96ckRLTWduZ3ZIb2N5dEdkYjUyRC0xelFrMWRjTUNnQUNpUQ?oc=5"
         },
         {
           "title": "글로벌 제약·바이오 투자 포럼, 인천 송도에서 열린다",
@@ -1320,7 +1283,7 @@
       "category": "송도 종합",
       "title": "정일영 국회의원 “송도 트램, 이제는 실행으로” … 4일 공청회 개최",
       "summary": "정일영 국회의원은 송도트램 신속 추진과 예비타당성조사를 위한 공청회를 개최했다.\n송도트램은 총연장 25.2km이며 사업비는 약 7,461억 원 규모로 추진되고 있다.\n인천시는 2027년 예비타당성조사 대상 사업 재신청을 목표로 용역을 진행하고 있다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-04T18:28:51+09:00",
@@ -1647,7 +1610,7 @@
           "title": "송도 에디슨 박물관 '아파트 증설설'에 주민 반발…인천경제청 \"기존 사업 정상 추진\"",
           "publisher": "시민의소리",
           "published_at": "2026-11-04T13:48:16+09:00",
-          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5lQnAxOVFvVzZGT2hEZTFlMFJBbWh4d2VPNVBWSjBvMEZSNTNfcXprYlZnN1J1ajhTWkZfdzk2TW1qOHFlQkhCMW42SXlhZTgwUERRTXM1ekctakg5Qjd2QUxLSThkckE3ZndCZndiWDjSAXBBVV95cUxOZUJwMTlRb1c2Rk9oRGUxZTBSQW1oeHdlTzVQVkowbzBGUjUzX3F6a2JWZzdSdWo4U1pGX3c5Nk1tajhxZUJIQjFuNkl5YWU4MFBEUU1zNXpHLWpIOUI3dkFMS0k4ZHJBN2Z3QmZ3Ylg4?oc=5"
+          "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE82NmNiVW5lYW1CSXh2SnRoMV9kT1JFNlU4VFlVR3Fvcm5Gend1Y01DcGlkWTRpUDVuUEVBU1g0SUhWOE1jVmp0ZG9LTWlEOGxWMFpuRTh2ZXhKelhLOVdiQUZ4QXBNVU5hZXlQVdIBcEFVX3lxTE5lQnAxOVFvVzZGT2hEZTFlMFJBbWh4d2VPNVBWSjBvMEZSNTNfcXprYlZnN1J1ajhTWkZfdzk2TW1qOHFlQkhCMW42SXlhZTgwUERRTXM1ekctakg5Qjd2QUxLSThkckE3ZndCZndiWDg?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -1954,6 +1917,28 @@
       "summary_version": 3
     },
     {
+      "id": "5d62f451b1ef58",
+      "category": "송도 종합",
+      "title": "인천시, 송도 제약바이오 투자대전에 국내외 300명 집결",
+      "summary": "인천시는 기업 투자 유치와 해외시장 진출을 지원하기 위해 제약바이오투자대전을 개최한다.\n국내외 투자기관과 제약·바이오 기업 관계자 등 300여 명이 참석해 투자와 수출 상담을 진행한다.\n이번 행사는 오는 19일 송도컨벤시아 그랜드볼룸에서 개최될 예정이다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-04T10:13:46+09:00",
+      "sources": [
+        {
+          "title": "인천시, 송도 제약바이오 투자대전에 국내외 300명 집결",
+          "publisher": "디스커버리뉴스(DISCOVERYNEWS)",
+          "published_at": "2026-11-04T10:13:46+09:00",
+          "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE42N2FLbmx4Q2w1TGhaVXdPWEVtTjQyZ202RFpHRFNKeTA1MHJ5MTgwT0xUeURvV2pjTUZVRjE5M25TX0otY1RhU21za05qTnlhODFUYlk1TlIxbW9KWFY2b1RWU2RFaFdTbEdTMEVDcktmUQ?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.discoverynews.kr/news/articleView.html?idxno=1105744",
+      "summary_version": 3
+    },
+    {
       "id": "07cd5585f11771",
       "category": "세금·대출",
       "title": "종부세, '몇 채'가 아니라 '얼마'에 매긴다...실거주 중심 부동산세 개편",
@@ -2074,7 +2059,7 @@
       "category": "세금·대출",
       "title": "부동산 세제개편 놓고 전문가 공방…“징벌적 과세” vs “담세력 반영”",
       "summary": "국회 재정경제기획위원회가 개최한 2026년 세제개편안 공청회에서 정부의 부동산 세제 개편 방향을 두고 전문가들의 찬반 의견이 팽팽하게 맞섰다.\n주택 수 중심에서 주택가액과 실거주 여부 중심으로 과세 기준을 전환하는 방안에 대해 비거주자 과세 강화와 임대료 전가 우려 등이 제기됐다.\n이번 공청회에서는 국내생산세액공제의 직접 환급 허용 여부와 가업상속공제 요건 등도 주요 쟁점으로 다뤄졌다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-03T21:18:56+09:00",
@@ -2294,31 +2279,6 @@
       "summary_version": 3
     },
     {
-      "id": "52503c6ab3a6b5",
-      "category": "송도 종합",
-      "title": "인천 연수구, ‘제10회 연수 북 페스티벌’ 개최…송도 센트럴파크서 독서문화 축제",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
-      "article_count": 2,
-      "publisher_count": 2,
-      "last_published_at": "2026-11-03T14:47:57+09:00",
-      "sources": [
-        {
-          "title": "인천 연수구, ‘제10회 연수 북 페스티벌’ 개최…송도 센트럴파크서 독서문화 축제",
-          "publisher": "연합시민의소리",
-          "published_at": "2026-11-03T14:47:57+09:00",
-          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE1KamtDRTd0bUhoRDhOVkFYZnE5aTBucFBneVFuOE9COUNDRDBZeWEwTV9vcVNhQ1lHRGhiYjhLNW9TWkpyRTBYVGF3T0hKS3Fxdks0V0FJODhfZkdXbTRTQnhVUmRpRDhPc0VN?oc=5"
-        },
-        {
-          "title": "연수구, 송도 센트럴파크서 ‘제10회 북 페스티벌’ 개최",
-          "publisher": "매일일보",
-          "published_at": "2026-11-03T13:16:40+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1UZ0I2S2NYQUtEbmNpLVloWDNiV2RNNE5Ubzk5ZXVfVW4tZzhENFBNMGcyd3BjQ25hSTZSeDRfYzdOWXk0VWlybjB3UVJoQmFOM1Z3VU1HVGNJVlg0QjE1ekd1aDg?oc=5"
-        }
-      ],
-      "summary_method": "headline_only"
-    },
-    {
       "id": "b06480b0eb4e5b",
       "category": "세금·대출",
       "title": "서울에서도 미분양 아파트 한달 새 10% 증가..자금 조달 어려워",
@@ -2434,6 +2394,28 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.kmib.co.kr/article/20261103500744",
+      "summary_version": 3
+    },
+    {
+      "id": "7434fece4188d1",
+      "category": "송도 종합",
+      "title": "연수구, 송도 센트럴파크서 ‘제10회 북 페스티벌’ 개최",
+      "summary": "연수구는 송도 센트럴파크 잔디광장에서 제10회 연수 북 페스티벌을 개최했다.\n행사장 주변에는 27개의 체험 공간이 운영되고 다양한 독서 문화 프로그램이 진행됐다.\n연수구는 지난달 31일에 열린 이번 축제를 성공적으로 마무리했다고 3일에 밝혔다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-03T13:16:40+09:00",
+      "sources": [
+        {
+          "title": "연수구, 송도 센트럴파크서 ‘제10회 북 페스티벌’ 개최",
+          "publisher": "매일일보",
+          "published_at": "2026-11-03T13:16:40+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1UZ0I2S2NYQUtEbmNpLVloWDNiV2RNNE5Ubzk5ZXVfVW4tZzhENFBNMGcyd3BjQ25hSTZSeDRfYzdOWXk0VWlybjB3UVJoQmFOM1Z3VU1HVGNJVlg0QjE1ekd1aDg?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.m-i.kr/news/articleView.html?idxno=2013708",
       "summary_version": 3
     },
     {
@@ -2837,28 +2819,6 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.mk.co.kr/news/realestate/12193149",
-      "summary_version": 3
-    },
-    {
-      "id": "ec5f96c1377779",
-      "category": "개발·교통",
-      "title": "GTX-B 본공사 들어간 부평역…서울역 10분대 기대에 집값 엇갈려 : 부동산",
-      "summary": "GTX-B 민자 구간의 본공사가 시작되면서 인천 부평역 일대가 주거시장 변화의 중심지로 떠올랐다.\n올해 1월부터 9월까지 부평구 아파트 매매 건수는 3968건으로 지난해 월평균보다 21.8% 많았다.\n정부가 제시한 GTX-B 개통 목표 시점은 2030년이다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-02T12:09:00+09:00",
-      "sources": [
-        {
-          "title": "GTX-B 본공사 들어간 부평역…서울역 10분대 기대에 집값 엇갈려 : 부동산",
-          "publisher": "재경일보",
-          "published_at": "2026-11-02T12:09:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE1Wa3ZieDdvRVhMWTVueVFhUGpiY1lYTjVqYUx4cWlaUmg0ZG0tZ0ItQ1dleHdqMDJJSC1GUFlTM1AxRUQ4WXZ0OVljYw?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://news.jkn.co.kr/post/1065096",
       "summary_version": 3
     },
     {
@@ -3336,28 +3296,6 @@
       "summary_version": 3
     },
     {
-      "id": "94151aeb703a80",
-      "category": "세금·대출",
-      "title": "정책대출 금리…제도 구조와 확인 절차 안내",
-      "summary": "정부는 정책대출 금리 적용 방식을 안내했다.\n금리는 연도 고시 기준금리에 마진을 더해 산정되며, 주택담보·신혼부부 대출에 우대가 제공된다.\n신청자는 소득·재산·DSR 등을 확인해 공식 안내에서 최신 금리를 검토해야 한다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-10-31T11:16:53+09:00",
-      "sources": [
-        {
-          "title": "정책대출 금리…제도 구조와 확인 절차 안내",
-          "publisher": "스페셜타임스",
-          "published_at": "2026-10-31T11:16:53+09:00",
-          "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTE02YjNfZFRiSmU2bkdsQVlnajdvSUZSdkVoZER1NjRiNFBHcUJKOWF2dGQtd19HQzkwamkzZHJKWVh3Tjd5d0pJSTFCeTE4akdzOTRLWmZXRU9XMkcwY3RzSElsREY0QmIyZUFfR1JWVVlaRTA?oc=5"
-        }
-      ],
-      "summary_method": "groq_article",
-      "summary_model": "openai/gpt-oss-120b",
-      "summary_source_url": "https://www.specialtimes.co.kr/news/articleView.html?idxno=480474",
-      "summary_version": 3
-    },
-    {
       "id": "d29d30bfa1fa73",
       "category": "송도 종합",
       "title": "인천 송도·차이나타운 비 오는 날 실내 명소 TOP 10 : TOP10 장소",
@@ -3446,6 +3384,15 @@
   ],
   "articles": [
     {
+      "title": "홍지선 국토교통부장관, \"주택건설업계와 적극 소통하며, 현장의 어려움을 신속히 해소할 것\"",
+      "publisher": "뉴스다",
+      "published_at": "2026-11-06T20:50:34+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE1mbEg0MExmV2lWamVuTW9fUHdxOTVIRlp5a3RvQkNaUUFzOXpZNzdWWWZiem9YXzRCaVNhOHdhWUVvREdVaGhLdTlhRFRVRmJGSFpiVUZORnlwNmktWkVn?oc=5",
+      "category": "정책·규제",
+      "query": "국토교통부 주택 정책",
+      "id": "08560b4b027e8daed2"
+    },
+    {
       "title": "송도 에디슨박물관 빼고 ‘또파트’ 개발… “약속 파기” 주민 뿔났다",
       "publisher": "기호일보",
       "published_at": "2026-11-06T20:39:04+09:00",
@@ -3453,15 +3400,6 @@
       "category": "개발·교통",
       "query": "송도 워터프런트",
       "id": "2b018307da90fa30da"
-    },
-    {
-      "title": "홍지선 국토교통부장관, ˝주택건설업계와 적극 소통하며, 현장의 어려움을 신속히 해소할 것˝:경인투데이뉴스",
-      "publisher": "경인투데이뉴스",
-      "published_at": "2026-11-06T20:14:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTFA0NTZWSUhxSWVLSTFDMUttWkZfZ3BwV3BDTmFiUC11dVBCVUFvUkh6ckE5eExNVWFYU0taTkxNWEItOG9rRzM0bGhhVHJxd1XSAV9BVV95cUxPVVhXTnNqSFVEWERnV3k1WVF0R2xjZzZ2TXZiRlZfU0NyeExzZnRrYmpwcHlHUzJySi1DYkE4ZEVnVVZOeTFJbnhFU296cnY2b0JPNkZ1THh4NFBvZkZkNA?oc=5",
-      "category": "정책·규제",
-      "query": "국토교통부 주택 정책",
-      "id": "9d4b61c3bffca486f6"
     },
     {
       "title": "홍지선 국토부 장관, 주택건설업계 간담회…공급 애로 해소 논의",
@@ -3555,12 +3493,12 @@
     },
     {
       "title": "서울시의회 김지훈 의원, 주택정책의 목표는 공급량 아닌 시민의 주거안정",
-      "publisher": "www.newszoom.kr",
+      "publisher": "뉴스줌",
       "published_at": "2026-11-06T12:03:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiRkFVX3lxTE56ZVpvR2RzM3ZBT1IyYTRQSGtqMjY4OWt3UlNOQ0w1cFBnR0llZjlZb2FTQ3Fjd05FUGJFX0k5MjdJbHBLamc?oc=5",
+      "link": "https://news.google.com/rss/articles/CBMiREFVX3lxTE5zM2ZiTVlWeEdyNnFZRTdTekFnRDBTOWlWZEw1RlJ3bVNHMUZCenFsX0tHclM1Q2dsOVV0b3cza0N1c0ln?oc=5",
       "category": "정책·규제",
       "query": "인천 부동산 규제",
-      "id": "ce03451089ec2b6385"
+      "id": "47daf71fefef84e3ed"
     },
     {
       "title": "이재호 연수구청장 “신뢰가 크면 책임 또한 무겁다”, 민선 9기 공약 90개 확정… 연내 실천 계획 마련",
@@ -3671,15 +3609,6 @@
       "id": "d63bd5c9f5d1166334"
     },
     {
-      "title": "[제3회 도시정비 포럼] 김용선 국토부 사무관 \"재개발 동의율 낮추고 인허가 간소화…사업 속도 높인다\"",
-      "publisher": "디벨로퍼뉴스",
-      "published_at": "2026-11-05T17:16:15+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBtY0VwMmtWNzBYcDMtd3BRUHVkYTdHZFF4VjFnd3ZsVmpid1U3enZMQUVZUXhBQjBLa3VCSnRKTzhMSkx4M19mT1o3SG5tUTFnV21fSGNrQktSTkhRaEZDQ2cwME1OWkZE?oc=5",
-      "category": "정책·규제",
-      "query": "국토교통부 주택 정책",
-      "id": "4ef2a184917cb63cbb"
-    },
-    {
       "title": "서울 강남 3구, 송도행 뚝…서남권은 검단·계양으로",
       "publisher": "인천일보",
       "published_at": "2026-11-05T17:11:00+09:00",
@@ -3759,15 +3688,6 @@
       "category": "정책·규제",
       "query": "인천 부동산 규제",
       "id": "f2c0eb64ec20c19a98"
-    },
-    {
-      "title": "롯데바이오, 송도 1공장 의약품업체 허가…상업생산 준비 진전",
-      "publisher": "PRESS9",
-      "published_at": "2026-11-05T13:50:04+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFB4cWdaQzRieDg5TjhscHNWa2w0RnJFZGJKRHBBTkptdU1lbGV5MkhHbHotQmxCZDJ3cVF1Z21GZUZXSFZYVW9XNk5JRjJUWHpqblhKZnNfQ21Qb242MTI0dWxUWE4?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도",
-      "id": "75fe44ad22c25c24ca"
     },
     {
       "title": "인천 부평구(富平區) · '26년 11월 부동산 흐름 (국평 10억 원 넘긴 산곡6, 59㎡ 146가구 남았다 — 부평 84㎡ 거래 227건 중 8억 원 넘은 3건은 어디?)",
@@ -3867,6 +3787,15 @@
       "category": "세금·대출",
       "query": "부동산 취득세 양도소득세",
       "id": "bf583c525876819dd0"
+    },
+    {
+      "title": "'제약바이오투자대전', 11월 19일 송도서 개최",
+      "publisher": "세계뉴스통신",
+      "published_at": "2026-11-05T08:57:13+09:00",
+      "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE5OTUpHTnp5VUFJbk1Fc2ZHSVdyTlNOU1BUdXpTYnVoa3JqNmc1MDJFTFpaTE1BTUZlbElraGc0dzJzRTB0YlhvWTF6bXZsX29YYnRMbG1IYzhUclVSSGZtRzE0LXpubkNjaHphcFdaQkltNlFi?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도 기업 바이오",
+      "id": "e081fdbc8c419d764b"
     },
     {
       "title": "\"이젠 인천 국평도 8억 있어야\"…분양가 역대 최고",
@@ -4178,9 +4107,9 @@
       "title": "글로벌 제약·바이오 투자 포럼, 인천 송도에서 열린다",
       "publisher": "중앙신문",
       "published_at": "2026-11-04T15:13:30+09:00",
-      "link": "https://news.google.com/rss/articles/CBMixgJBVV95cUxQSUxsdFMtck9iLXJCeE9meW95UUh2SmoxbENTRnRPcnpNeEhQMU9oMVRteXFJTmZ6ZTJRd25wbXB0b2dWbkpfOHR6dnV1b3pXOFpRLWdJNkdXeEJ5Q1N1NnFxWE1nTzNqTWphU1M5Q1BheXRGOTFVLUZnekh4Wkd6M00zamMwTVV1VWsxYnJTMFBuc096NjhpRWtQOE9nTnA1TnN2NmJmdndZQUdnZ2xDNjJ1UVJSbkZSRmVkMWdxM1BkbHNhYnJoUDFHSEdLdzF4aDhXM2dtb1N4ZzhJREFyNkotQkxKN01IUUphMlJ6REROLWRFUEZ6VkR3cHV1a0JobkkwQWRiV0RkX1owdnYxQy1YMHU4R3Vvc3p0YktieHFxNlUxNFAxV3UxdlhMbW9ITndYNld4RlpYN1dfQk8wVG9BN0RtUQ?oc=5",
+      "link": "https://news.google.com/rss/articles/CBMixgJBVV95cUxPRDFiaTVzUXZFRHl3Y254M3V4UXF3QUVEN0RSLWFzRVNfZ1VVVndlMVRYVS1WdjZSTDFYOTRESV9pMHNPWC1YbnFmM1d5STlaUlR1ZTZzdno2Z1JNNG9DbmU5R09QY1plbTBfNm4zRnZYZGhSWFdxSGlPUFlUX3h4RWtERFlqTDRLQjZQVmgxT1BIa0taSmQ2QXh2a2s2WVFZZ3E0eDY2WjlqSzBDTjNvdzlzQzNNUzhzQi05QTRUR0JxUlZ6YTkwZF9aYWdnb2dkTldzZ0VyVG1MSTVWT3lEaU5kcEFpb0FGSkstTWoyX3dSSkFqbkZaMHFSUlZuemNVNEJKUGJFeWNGYXlfUWVWdjliRUc5d0s4anREVkxodllkTF96ckRLTWduZ3ZIb2N5dEdkYjUyRC0xelFrMWRjTUNnQUNpUQ?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도 문화 축제",
+      "query": "인천 송도",
       "id": "53493fd25c6c56b4e1"
     },
     {
@@ -4191,6 +4120,15 @@
       "category": "송도 종합",
       "query": "인천 송도 사건 사고",
       "id": "c47ae23bc88106b510"
+    },
+    {
+      "title": "인천 송도서 ‘2026 제약바이오투자대전’ 19일 개최...글로벌 투자자 한자리에",
+      "publisher": "경인신문",
+      "published_at": "2026-11-04T15:01:24+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTFBFcG85M0g5czJUMHQxbG1MV0VZXzJpSk5UNmhwUEl6NlJDMWVpbDF3N2dMWTVXSEluUktEZHRCNmZxRlVraEdrWUdJSTZrclo1ZHZLb3RieFRUaVBIOTVBcXMwQzdTV3M?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도 기업 바이오",
+      "id": "73340cc50991c8103e"
     },
     {
       "title": "“박물관 짓겠다더니 아파트만 늘리나”…송도 주민단체, 인천경제청에 책임 추궁",
@@ -4220,15 +4158,6 @@
       "id": "c203fda0079b597acf"
     },
     {
-      "title": "인천시 19일 송도서 제약바이오투자대전 개최…70여 개 기업 참여",
-      "publisher": "경기신문",
-      "published_at": "2026-11-04T14:10:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE1tSmRWaEl4RUtFdVJmZ056a0hnUENiTHJ6VEtKZ3c5VEw5YnAxV0U1RjA4SVNnOUR5M3diMG45ZHNGN1hKVmgzM2dROHhtRVFlLWhfTjNpMEt3c21wTDdEaUhR?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도 기업 바이오",
-      "id": "661f3a5eb08e68d0eb"
-    },
-    {
       "title": "[이슈체크] 집값 25%로 입주해도 내집 아니다…20년간 이어질 자금 마련 부담",
       "publisher": "조세금융신문",
       "published_at": "2026-11-04T14:03:28+09:00",
@@ -4241,7 +4170,7 @@
       "title": "송도 에디슨 박물관 '아파트 증설설'에 주민 반발…인천경제청 \"기존 사업 정상 추진\"",
       "publisher": "시민의소리",
       "published_at": "2026-11-04T13:48:16+09:00",
-      "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5lQnAxOVFvVzZGT2hEZTFlMFJBbWh4d2VPNVBWSjBvMEZSNTNfcXprYlZnN1J1ajhTWkZfdzk2TW1qOHFlQkhCMW42SXlhZTgwUERRTXM1ekctakg5Qjd2QUxLSThkckE3ZndCZndiWDjSAXBBVV95cUxOZUJwMTlRb1c2Rk9oRGUxZTBSQW1oeHdlTzVQVkowbzBGUjUzX3F6a2JWZzdSdWo4U1pGX3c5Nk1tajhxZUJIQjFuNkl5YWU4MFBEUU1zNXpHLWpIOUI3dkFMS0k4ZHJBN2Z3QmZ3Ylg4?oc=5",
+      "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE82NmNiVW5lYW1CSXh2SnRoMV9kT1JFNlU4VFlVR3Fvcm5Gend1Y01DcGlkWTRpUDVuUEVBU1g0SUhWOE1jVmp0ZG9LTWlEOGxWMFpuRTh2ZXhKelhLOVdiQUZ4QXBNVU5hZXlQVdIBcEFVX3lxTE5lQnAxOVFvVzZGT2hEZTFlMFJBbWh4d2VPNVBWSjBvMEZSNTNfcXprYlZnN1J1ajhTWkZfdzk2TW1qOHFlQkhCMW42SXlhZTgwUERRTXM1ekctakg5Qjd2QUxLSThkckE3ZndCZndiWDg?oc=5",
       "category": "개발·교통",
       "query": "송도 워터프런트",
       "id": "b5c49c5b603586ff39"
@@ -4270,7 +4199,7 @@
       "published_at": "2026-11-04T12:44:10+09:00",
       "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE9CLXdRcXFZbmwtR19LS2FPclBPYjdqYVNBUjBVM3AxemxiaGUtR0xJNXdHLTQ5UVZsOXpZVkJtYlY4RHlzSFVsNFJVa1lOQlJOY3JxR3lVUUdyNzJROTdWeTBEQWlGM2tIcXc?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도 기업 바이오",
+      "query": "인천 송도",
       "id": "ed3353fb8c770fc12c"
     },
     {
@@ -4324,7 +4253,7 @@
       "published_at": "2026-11-04T11:27:42+09:00",
       "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE04OTRQQ0RQQkxiSWZJNDVQeVU4TEZtSTJTVUlFekR0WkdvYXRvNFdqTnMwdm1vbDVOeXpqMVZQbjdQVEpDUi1JS1pjVzJ0R1FrbTY0YjliWGRsLUJLTkxKd2xiQ1pLOTY2aHZJcmdrYWZ1QQ?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도 기업 바이오",
+      "query": "인천 송도동",
       "id": "a8656467032644e8a6"
     },
     {
@@ -4333,7 +4262,7 @@
       "published_at": "2026-11-04T11:12:00+09:00",
       "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE05ZmFNcF9GSWwtLWtvS2MzWjNMNnZBM0l1TlZGc1FWaDFXeFJjN2ZMampxUlBqVmRFWm9WQXd4ZW1GOVJVd1B4c1F0eElhb21YdGZJZE9VVk5PNEp1WWpMSGhaYUNjNWo1Z3A0eGJRQQ?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도동",
+      "query": "인천 송도",
       "id": "92d8de91b88314df49"
     },
     {
@@ -4387,7 +4316,7 @@
       "published_at": "2026-11-04T10:53:58+09:00",
       "link": "https://news.google.com/rss/articles/CBMickFVX3lxTFBqb01pYnUwZXFnYXQ4cWVHcU5ETVNjN0dFbU1YTDJ2VUxpZ0hia280V0VEV3dNaVNneGJScnkwZkhheGJIdV9EZnR6cmE3d2o5c1FaamxmSjJTek5EOXVxQlpNMUprNFE4V2g0V1FIZ2ZFQQ?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도 기업 바이오",
+      "query": "인천 송도동",
       "id": "2042d1682a6de79d72"
     },
     {
@@ -4425,6 +4354,15 @@
       "category": "개발·교통",
       "query": "인천 경제자유구역 개발",
       "id": "7c00b8c5716ad316dd"
+    },
+    {
+      "title": "인천시, 송도 제약바이오 투자대전에 국내외 300명 집결",
+      "publisher": "디스커버리뉴스(DISCOVERYNEWS)",
+      "published_at": "2026-11-04T10:13:46+09:00",
+      "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE42N2FLbmx4Q2w1TGhaVXdPWEVtTjQyZ202RFpHRFNKeTA1MHJ5MTgwT0xUeURvV2pjTUZVRjE5M25TX0otY1RhU21za05qTnlhODFUYlk1TlIxbW9KWFY2b1RWU2RFaFdTbEdTMEVDcktmUQ?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도 기업 바이오",
+      "id": "56ce7cf728715bef1f"
     },
     {
       "title": "인천경제청, 청라 K-콘텐츠·송도 바이오 육성··· 강화 경제자유구역 확대",
@@ -4625,15 +4563,6 @@
       "id": "9e034736f343c20d26"
     },
     {
-      "title": "인천 연수구, ‘제10회 연수 북 페스티벌’ 개최…송도 센트럴파크서 독서문화 축제",
-      "publisher": "연합시민의소리",
-      "published_at": "2026-11-03T14:47:57+09:00",
-      "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE1KamtDRTd0bUhoRDhOVkFYZnE5aTBucFBneVFuOE9COUNDRDBZeWEwTV9vcVNhQ1lHRGhiYjhLNW9TWkpyRTBYVGF3T0hKS3Fxdks0V0FJODhfZkdXbTRTQnhVUmRpRDhPc0VN?oc=5",
-      "category": "송도 종합",
-      "query": "인천 연수구 송도",
-      "id": "cb7893af035bd5ca1f"
-    },
-    {
       "title": "서울에서도 미분양 아파트 한달 새 10% 증가..자금 조달 어려워",
       "publisher": "메디컬투데이",
       "published_at": "2026-11-03T14:00:43+09:00",
@@ -4675,7 +4604,7 @@
       "published_at": "2026-11-03T13:16:40+09:00",
       "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1UZ0I2S2NYQUtEbmNpLVloWDNiV2RNNE5Ubzk5ZXVfVW4tZzhENFBNMGcyd3BjQ25hSTZSeDRfYzdOWXk0VWlybjB3UVJoQmFOM1Z3VU1HVGNJVlg0QjE1ekd1aDg?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도",
+      "query": "인천 연수구 송도",
       "id": "e77ad680ac67aab0f6"
     },
     {
@@ -4810,7 +4739,7 @@
       "published_at": "2026-11-03T04:30:00+09:00",
       "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTFBiSU1JYi1VSmVPWUxoNTluOXlNZ2FVM3hmMlh0OGlnX2lwZ0x0ZG5CR3EyOWNibFlxdTBmcTcwOFBDZVQ1XzJ5aWNDd3ZneHZRbXUyRTNuWEFES0Y3aVVLNDJBOGhBVVBWaDFDaG9seUo2bzBFaFHSAWZBVV95cUxOenVOd2RXSTYtREs4SWFJd1pvSXhLaDR3YlFibDJWU2lwbk9vemFySHdQUUx6SnZIRWwyUW5vdUlOVjBUZ2JLd05xQ0JjNkZ4ZUg4NlZBLUZwdlFURDZrekhWV1V5RUE?oc=5",
       "category": "송도 종합",
-      "query": "\"송도국제도시\"",
+      "query": "인천 연수구 송도",
       "id": "d3240b87019756cfc3"
     },
     {
@@ -4922,15 +4851,6 @@
       "id": "d7ad3e414083945f25"
     },
     {
-      "title": "GTX-B 본공사 들어간 부평역…서울역 10분대 기대에 집값 엇갈려 : 부동산",
-      "publisher": "재경일보",
-      "published_at": "2026-11-02T12:09:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE1Wa3ZieDdvRVhMWTVueVFhUGpiY1lYTjVqYUx4cWlaUmg0ZG0tZ0ItQ1dleHdqMDJJSC1GUFlTM1AxRUQ4WXZ0OVljYw?oc=5",
-      "category": "개발·교통",
-      "query": "송도 GTX-B",
-      "id": "9448ceebdfa4f47d3f"
-    },
-    {
       "title": "“집 팔라면서 팔땐 세금 더 내라”…부동산 세제개편 꼬집은 예정처",
       "publisher": "헤럴드경제",
       "published_at": "2026-11-02T12:04:41+09:00",
@@ -5026,7 +4946,7 @@
       "published_at": "2026-11-01T23:24:00+09:00",
       "link": "https://news.google.com/rss/articles/CBMickFVX3lxTFBrc0lqU25Fb3lIWnJkM2J2MjJ4XzBmQnJwMFFuUG5QM0dDSVVkV3B4WU1CNWhKcjFxdS1hVmdtMUJ3MUQtVGZrc3gxZHpqbl9zUGVGVFpSbW5MZTk4Uk4xbS1SdlNhQTNKWUVjRGpiWmtvUQ?oc=5",
       "category": "송도 종합",
-      "query": "인천 연수구 송도",
+      "query": "인천 송도",
       "id": "bef97a0dcebb65ac5c"
     },
     {
@@ -5147,15 +5067,6 @@
       "id": "1b62bdc6b8cafa637f"
     },
     {
-      "title": "정책대출 금리…제도 구조와 확인 절차 안내",
-      "publisher": "스페셜타임스",
-      "published_at": "2026-10-31T11:16:53+09:00",
-      "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTE02YjNfZFRiSmU2bkdsQVlnajdvSUZSdkVoZER1NjRiNFBHcUJKOWF2dGQtd19HQzkwamkzZHJKWVh3Tjd5d0pJSTFCeTE4akdzOTRLWmZXRU9XMkcwY3RzSElsREY0QmIyZUFfR1JWVVlaRTA?oc=5",
-      "category": "세금·대출",
-      "query": "주택담보대출 DSR 정책",
-      "id": "c66c62b3014567e7de"
-    },
-    {
       "title": "인천 송도·차이나타운 비 오는 날 실내 명소 TOP 10 : TOP10 장소",
       "publisher": "재경일보",
       "published_at": "2026-10-31T09:40:36+09:00",
@@ -5193,71 +5104,51 @@
     }
   ],
   "counts": {
-    "briefs": 145,
-    "articles": 194
+    "briefs": 142,
+    "articles": 191
   },
   "ai_summary_stats": {
-    "created": 3,
-    "reused": 124,
+    "created": 4,
+    "reused": 123,
     "article_fetches": 17,
     "source_links_resolved": 17,
-    "body_readable": 9,
-    "gemini_requests": 6,
-    "retry_requests": 4,
+    "body_readable": 10,
+    "gemini_requests": 7,
+    "retry_requests": 5,
     "retry_strategy": "two_article_batch",
     "gemini_circuit": "open",
     "candidate_articles": 8,
     "groq_created": 0,
-    "groq_requests": 4,
+    "groq_requests": 3,
     "groq_reviewed": 1,
-    "awaiting_body": 18,
+    "awaiting_body": 15,
     "gemini_http_requests_total": 9
   },
   "ai_office_digest_stats": {
     "state": "created",
-    "count": 3,
-    "method": "groq"
+    "count": 1,
+    "method": "gemini"
   },
   "ai_office_digest": {
     "schema_version": 1,
     "prompt_version": 2,
-    "fingerprint": "34943148696842253bcd2141b15a2de1",
-    "generated_at": "2026-11-06T15:55:19.034656+00:00",
-    "model": "openai/gpt-oss-120b",
-    "method": "groq",
+    "fingerprint": "b7a63dc004efd3adc4c9f38108d0a8bd",
+    "generated_at": "2026-11-06T18:57:25.820215+00:00",
+    "model": "gemini-3.5-flash-lite",
+    "method": "gemini",
     "items": [
-      {
-        "id": "4b98b33d47c415",
-        "point": "홍지선 국토부 장관이 주택건설업계와 간담회를 열어 공급 애로를 논의했다.",
-        "evidence": "홍지선 국토부 장관이 주택건설업계와 간담회를 열어 공급 애로를 논의했다.",
-        "check": "민간 주택 공급 걸림돌 해소 방안에 대해 확인하십시오.",
-        "audiences": [
-          "매수",
-          "매도"
-        ],
-        "questions": []
-      },
       {
         "id": "fa86fa794653df",
         "point": "인천 송도 6공구에서 에디슨과학교육박물관을 제외하고 아파트를 추가로 짓는 방안이 검토되고 있다.",
         "evidence": "인천 송도 6공구에서 에디슨과학교육박물관을 제외하고 아파트를 추가로 짓는 방안이 검토되고 있다.",
-        "check": "추가 아파트 건설 계획에 대해 확인하십시오.",
+        "check": "인천 송도 6공구 에디슨과학교육박물관 제외 및 아파트 추가 건립 검토와 관련하여 향후 계획을 확인해 주시기 바랍니다.",
         "audiences": [
-          "매수",
-          "임대"
+          "매수"
         ],
-        "questions": []
-      },
-      {
-        "id": "c6fb632fa8463a",
-        "point": "한국부동산원 주간 지수로 남동구 아파트 매매가격은 2026년 들어 -0.28% 내렸다.",
-        "evidence": "한국부동산원 주간 지수로 남동구 아파트 매매가격은 2026년 들어 -0.28% 내렸다.",
-        "check": "남동구 매매가격 변동에 대해 확인하십시오.",
-        "audiences": [
-          "매수",
-          "매도"
-        ],
-        "questions": []
+        "questions": [
+          "공동주택 가구 수 변경에 따른 향후 일정은 어떻게 되는지 문의합니다.",
+          "주민단체 반발에 따른 사업 계획 수정 가능성이 있는지 문의합니다."
+        ]
       }
     ],
     "notice": "공개 기사 기반 AI 참고 요약 · 수치·일정·정책은 원문 확인"
