@@ -32,7 +32,10 @@ function snapshotOffline(){
 }
 function offlineBanner(missing=false){
  const panel=$('officeBoardOfflineBanner');if(!panel)return;
- panel.classList.toggle('hidden',!offlineMode&&!missing);
+ const shouldHide=!offlineMode&&!missing;
+ if(typeof panel.classList?.toggle==='function')panel.classList.toggle('hidden',shouldHide);
+ else if(shouldHide)panel.classList?.add?.('hidden');
+ else panel.classList?.remove?.('hidden');
  if(!offlineMode&&!missing)return;
  const title=$('officeBoardOfflineTitle'),detail=$('officeBoardOfflineDetail');
  if(title)title.textContent=missing?'서버 연결 안 됨 · 보관된 메모 없음':
