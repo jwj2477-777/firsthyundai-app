@@ -889,10 +889,28 @@ public class MainActivity extends Activity {
                 deliver("onFirstHyundaiSharedSettingsPublished",response);
             });
         }
+        @JavascriptInterface public void readPublicOfflineFeed(String repository,String filename,String requestId){
+            // Read only approved public records. Never expose private office memos.
+            if(requestId==null||!requestId.matches("publiccache[0-9]{1,10}")||
+                !PublicOfflineCache.allowed(repository,filename))return;
+            io.execute(()->{
+                JSONObject reply=new JSONObject();
+                try{
+                    JSONObject saved=PublicOfflineCache.read(getApplicationContext(),repository,filename);
+                    reply.put("requestId",requestId).put("ok",saved!=null);
+                    if(saved!=null){
+                        reply.put("payload",saved.optJSONObject("payload"));
+                        reply.put("savedAt",saved.optLong("savedAt"));
+                    }
+                }catch(Exception ignored){}
+                deliver("onFirstHyundaiPublicOfflineFeed",reply);
+            });
+        }
         @JavascriptInterface public void fetch(String repository, String filename, String requestId) {
             // Public data ONLY. Never inject API tokens / family records into remote requests.
-            if (repository==null || !repository.matches("[A-Za-z0-9_.-]{1,60}/[A-Za-z0-9_.-]{1,100}") ||
-                    !("trades.json".equals(filename) || "new_trades.json".equals(filename) || "news.json".equals(filename) || "complexes.json".equals(filename) || "public_services.json".equals(filename) || "school_districts.json".equals(filename) || "nearby_config.json".equals(filename))) {
+            if (!PublicOfflineCache.allowed(repository,filename) &&
+                    !(repository!=null && repository.matches("[A-Za-z0-9_.-]{1,60}/[A-Za-z0-9_.-]{1,100}") &&
+                      "nearby_config.json".equals(filename))) {
                 deliverFeed(requestId, false, "저장소 주소 또는 파일명이 올바르지 않습니다.", null);
                 return;
             }
@@ -924,6 +942,9 @@ public class MainActivity extends Activity {
                         }
                     }
                     JSONObject parsed = new JSONObject(out.toString("UTF-8"));
+                    // A failed or incomplete network request never destroys the
+                    // last-good public data already available on this handset.
+                    PublicOfflineCache.save(getApplicationContext(),repository,filename,parsed);
                     deliverFeed(requestId,true,"",parsed);
                 } catch(Exception e) {
                     deliverFeed(requestId,false,e.getMessage()==null?"네트워크 연결 실패":e.getMessage(),null);
