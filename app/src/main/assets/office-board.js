@@ -560,7 +560,9 @@ async function readAllBoard(){
   if(!Number.isInteger(next)||next<=offset)break;
   offset=next;
  }
- return [...all.values()];
+ const complete=[...all.values()];
+ storeOffline(complete);
+ return complete;
 }
 window.onFirstHyundaiOfficeBoardResult=e=>{
  const result=requests.get(e?.requestId);if(!result)return;
@@ -662,9 +664,16 @@ function openBriefing(force=false){
  const target=$('overviewMemoEntries');
  if(target&&!lastBriefing)target.textContent='공유 일정을 확인하는 중…';
  readAllBoard().then(notes=>{
-  merge(notes);
+  liveConnected();merge(notes);
   lastBriefing=Date.now();
- },()=>{if(target&&!lastBriefing){$('overviewMemoBriefing').hidden=false;target.textContent='일정 연결을 확인해 주세요.'}})
+ },()=>{
+  if(restoreOffline(true)){
+   offlineChecking=false;offlineBanner();renderBriefing();
+  }else if(target&&!lastBriefing){
+   $('overviewMemoBriefing').hidden=false;
+   target.textContent='일정 연결이 되지 않고 휴대폰 저장본도 없습니다.';
+  }
+ })
  .finally(()=>{briefingBusy=false});
 }
 function openBriefingNote(id){
@@ -688,7 +697,8 @@ async function refresh(silent=false){
  try{
   const first=await call('list',{offset:0});
   if(cycle!==refreshCycle)return;
-  const recent=Array.isArray(first.notes)?first.notes:[];
+  if(!Array.isArray(first.notes))throw Error('메모 목록 응답 오류');
+  const recent=first.notes;
   if(silent&&historyLoaded&&Date.now()-lastFullHistory<5*60000){
    // Keep already fetched history when checking recent posts every 45 seconds.
    const ids=new Set(recent.map(n=>n.id));
@@ -696,8 +706,10 @@ async function refresh(silent=false){
   }else merge(recent);
   lastCheck=Date.now();lastBriefing=lastCheck;
   $('officeBoardAuth')?.classList?.add?.('hidden');
-  if(!first.has_more){historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;draw();
-   if(!silent)msg('메모를 확인했습니다.');return}
+  if(!first.has_more){
+   historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;
+   storeOffline(items);liveConnected();draw();
+   if(!silent)msg('메모 확인 완료 · 휴대폰에 암호화 보관했습니다.');return}
   if(silent&&historyLoaded&&Date.now()-lastFullHistory<5*60000)return;
   historyLoaded=false;historyLoading=true;draw();
   const seen=new Map(recent.map(n=>[n.id,n]));
@@ -707,7 +719,8 @@ async function refresh(silent=false){
   while(cycle===refreshCycle&&offset<=5000){
    const page=await call('list',{offset});
    if(cycle!==refreshCycle)return;
-   for(const item of page.notes||[])if(valid(item?.id))seen.set(item.id,item);
+   if(!Array.isArray(page.notes))throw Error('메모 목록 응답 오류');
+   for(const item of page.notes)if(valid(item?.id))seen.set(item.id,item);
    merge([...seen.values()]);
    if(!page.has_more)break;
    const next=Number(page.next_offset);
@@ -715,12 +728,16 @@ async function refresh(silent=false){
    offset=next;
   }
   if(cycle!==refreshCycle)return;
-  historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;draw();
-  if(!silent)msg('전체 공유 메모를 불러왔습니다.');
+  historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;
+  storeOffline(items);liveConnected();draw();
+  if(!silent)msg('전체 공유 메모를 확인하고 암호화 보관했습니다.');
  }catch(e){
   if(cycle===refreshCycle){
-   historyLoading=false;draw();
-   if(!silent||!historyLoaded)msg('메모 연결을 확인해 주세요: '+e.message);
+   historyLoading=false;
+   const cached=useOffline();draw();
+   if(!silent||!cached)msg(cached?
+    '서버 연결 실패 · 휴대폰에 저장된 마지막 메모를 읽기 전용으로 표시합니다.':
+    '메모 연결 실패 · 휴대폰에 보관된 메모가 없습니다. 인터넷 연결 후 다시 확인해 주세요.');
   }
  }
 }
@@ -768,9 +785,11 @@ function open(){
  $('officeBoardBirthdayAdd')?.classList?.toggle?.('hidden',bridge?.getMode?.()!=='admin');
  const account=$('officeBoardCurrentMember');
  if(account)account.textContent=bridge?.getOfficeMemberName?.()||'계정 연결 필요';
- settingsChanged();syncNotificationStatus();syncViews();restoreDraft();checkSuggestion();refresh();
+ restoreOffline();settingsChanged();syncNotificationStatus();syncViews();
+ restoreDraft();checkSuggestion();refresh();
 }
 async function mutate(action,data){
+ if(offlineMode){msg('오프라인 보관본은 읽기 전용입니다. 수정·완료·삭제는 연결 후 가능합니다.');return null}
  if(busy)return null;
  busy=true;$('officeBoardPost').disabled=true;
  try{
@@ -787,7 +806,8 @@ async function mutate(action,data){
   msg(action==='post'?'메모를 공유했습니다. 메모함과 해당 날짜의 달력에서 확인할 수 있습니다.':'메모가 반영됐습니다.');
   return result;
  }catch(e){
-  // A timeout after sending does NOT prove the server rejected the memo.
+  if(/HTTP 5\d\d|연결할 수 없습니다|시간 초과/i.test(String(e.message||'')))useOffline();
+   // A timeout after sending does NOT prove the server rejected the memo.
   // Retain only volatile text/date metadata for verification on a retry.
   if(action==='post'&&/시간 초과|연결|HTTP 5\d\d/i.test(String(e.message||'')))
    ambiguousPost={data:{...data},startedAt:postStartedAt};
@@ -804,6 +824,7 @@ let postStartedAt=0;
 async function post(){
  // Covers the entire compose -> server post -> optional photo upload flow.
  // The generic mutation lock ends before optional photo upload completes.
+ if(offlineMode){msg('오프라인에서는 전송하지 않습니다. 작성 중인 내용은 휴대폰에 보관됩니다.');saveDraftNow();return}
  if(postInFlight||busy){msg('메모 등록이 진행 중입니다. 중복으로 올리지 않도록 잠시 확인해 주세요.');return}
  postInFlight=true;
  try{
