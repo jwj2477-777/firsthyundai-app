@@ -186,7 +186,9 @@ run("publicServices.subscriptions.records[0].notice_url='https://evil.example/'"
 run('renderPublicSubscriptions()');
 assert(!nodes.publicSubscriptions.innerHTML.includes('https://evil.example/'));
 const native=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/MainActivity.java'),'utf8');
-assert(native.includes('"public_services.json".equals(filename)'));
+const publicCache=fs.readFileSync(path.join(root,'app/src/main/java/kr/co/firsthyundai/app/PublicOfflineCache.java'),'utf8');
+assert(native.includes('PublicOfflineCache.allowed(repository,filename)'));
+assert(publicCache.includes('public_services.json'),'Public services must remain allowlisted by the new shared public-feed guard');
 const snapshot=JSON.parse(fs.readFileSync(path.join(root,'data/public_services.json'),'utf8'));
 for(const name of ['schools','school_zones','office_rents','office_sales','building_registry','maintenance','addresses','subscriptions'])assert(snapshot[name]);
 console.log('Public hub UI passed: school not falsely assigned, separate office rents, API approval statuses, three family menus');
