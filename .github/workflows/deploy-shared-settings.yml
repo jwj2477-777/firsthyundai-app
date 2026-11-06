@@ -8,6 +8,7 @@ on:
       - '.github/workflows/deploy-shared-settings.yml'
       - 'scripts/setup_shared_settings_kv.py'
       - 'scripts/check_shared_settings_health.py'
+      - 'scripts/check_board_kv_health.py'
   workflow_run:
     workflows: ['Publish Administrator Access Policy', 'Publish Family Access Code Policy']
     types: [completed]
@@ -196,6 +197,8 @@ jobs:
           PYCODE
       - name: Verify Worker ready
         run: python3 scripts/check_shared_settings_health.py
+      - name: Diagnose private-board KV LIST access (read-only, non-blocking)
+        run: python3 scripts/check_board_kv_health.py
 
 
 
