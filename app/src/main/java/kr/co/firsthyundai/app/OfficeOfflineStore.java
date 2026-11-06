@@ -115,7 +115,11 @@ final class OfficeOfflineStore {
     }
     static synchronized boolean has(Context context,String member){
         // A complete, authenticated snapshot is required for emergency entry.
-        return memberOk(member)&&read(context,member).startsWith("{\"schema\":1");
+        if(!memberOk(member))return false;
+        try{
+            JSONObject data=new JSONObject(read(context,member));
+            return data.optInt("schema")==1&&data.optJSONArray("notes")!=null;
+        }catch(Exception ignored){return false;}
     }
     static synchronized void clear(Context context,String member){
         if(memberOk(member))document(context,member).delete();
