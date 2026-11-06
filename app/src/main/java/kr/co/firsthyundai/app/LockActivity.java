@@ -604,7 +604,23 @@ public class LockActivity extends Activity {
                                     if(welcomeElapsed)finishWelcome();
                                     openMain();
                                 }
-                                else{
+                                else if(OfficeBoardClient.enrolled(getApplicationContext())&&
+                                    AccessPolicy.authorized(getApplicationContext(),result.policy)&&
+                                    OfficeOfflineStore.has(getApplicationContext(),
+                                        OfficeBoardClient.memberId(getApplicationContext()))&&
+                                    (problem.contains("HTTP 5")||
+                                     problem.contains("연결 오류")||
+                                     problem.contains("연결할 수 없습니다")||
+                                     problem.contains("timed out")||
+                                     problem.contains("Unable to resolve host")||
+                                     problem.contains("failed to connect"))){
+                                    // Access policy is current (or in its 24h offline
+                                    // grace), member session is still locally valid,
+                                    // and an encrypted snapshot was previously saved.
+                                    if(welcomeElapsed)finishWelcome();
+                                    status.setText("오프라인 보관본으로 접속합니다. 최신 변경은 확인되지 않습니다.");
+                                    openMain();
+                                }else{
                                     if(welcomeElapsed)finishWelcome();
                                     status.setText(problem.startsWith("account_revoked")?
                                         "이 계정의 사용 권한이 해제됐습니다. 관리자에게 문의해 주세요.":
