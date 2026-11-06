@@ -141,14 +141,7 @@ function dateText(value){
   hour:'numeric',minute:'2-digit',hour12:preferences().memoClock!=='24'});
 }
 function phones(value){
- const text=String(value||''),re=/(0\d{1,2}[- ]?\d{3,4}[- ]?\d{4})/g;
- let html='',offset=0,m;
- while((m=re.exec(text))!==null){
-  html+=esc(text.slice(offset,m.index));
-  html+='<a class="officeBoardPhone" href="tel:'+m[0].replace(/[^0-9]/g,'')+'">'+esc(m[0])+'</a>';
-  offset=m.index+m[0].length;
- }
- return html+esc(text.slice(offset));
+ return window.FirstHyundaiPhones?.linkify?.(value,esc)??esc(String(value||''));
 }
 /* Private shared calendar: use the same authenticated notes; no external sync or browser storage. */
 function kstParts(date){
@@ -755,7 +748,8 @@ async function post(){
  if(photos?.pendingTarget?.()&&!value){
   await photos.uploadPending(photos.pendingTarget());return;
  }
- const text=value||'📷 사진 공유';
+ const text=window.FirstHyundaiPhones?.normalize?.(value)||value||'📷 사진 공유';
+ if(text.length>1600){msg('전화번호를 자동 정리한 뒤 글자 수가 초과됐습니다. 내용을 조금 줄여 주세요.');return}
  const parsed=draftSchedule(text);
  if(hasDateCue(text)&&!parsed){
   msg('메모의 날짜가 올바르지 않습니다. 날짜를 다시 확인한 후 등록해 주세요.');
@@ -868,7 +862,8 @@ function cancelEdit(){editing='';editDraft='';draw()}
 function saveEdit(id){
  if(id!==editing)return;
  if(!canEditId(id)){denied();cancelEdit();return}
- const value=String($('officeBoardList')?.querySelector?.('textarea[data-edit]')?.value||'').trim();
+ const raw=String($('officeBoardList')?.querySelector?.('textarea[data-edit]')?.value||'').trim();
+ const value=window.FirstHyundaiPhones?.normalize?.(raw)||raw;
  if(!value||value.length>1600){msg('수정 내용은 1~1600자여야 합니다.');return}
  // Text-only edits preserve a separately selected calendar date.
  const payload={id,text:value};
