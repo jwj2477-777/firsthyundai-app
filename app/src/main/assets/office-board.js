@@ -19,7 +19,7 @@ let draftTimer=null,draftRestoredMember='',draftRevision=0;
 function draftMember(){
  try{return String(bridge?.getOfficeMemberId?.()||'')}catch(e){return ''}
 }
-// Private, encrypted native snapshot; never localStorage/sessionStorage/IndexedDB.
+// Private, encrypted native snapshot; never browser-managed persistence.
 function snapshotOffline(){
  try{
   if(typeof bridge?.getOfficeMemoOfflineSnapshot!=='function')return null;
