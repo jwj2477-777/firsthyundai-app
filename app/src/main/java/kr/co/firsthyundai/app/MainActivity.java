@@ -892,7 +892,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void fetch(String repository, String filename, String requestId) {
             // Public data ONLY. Never inject API tokens / family records into remote requests.
             if (repository==null || !repository.matches("[A-Za-z0-9_.-]{1,60}/[A-Za-z0-9_.-]{1,100}") ||
-                    !("trades.json".equals(filename) || "new_trades.json".equals(filename) || "news.json".equals(filename) || "complexes.json".equals(filename) || "public_services.json".equals(filename) || "school_districts.json".equals(filename) || "nearby_config.json".equals(filename))) {
+                    !("trades.json".equals(filename) || "new_trades.json".equals(filename) || "news.json".equals(filename) || "complexes.json".equals(filename) || "public_services.json".equals(filename) || "school_districts.json".equals(filename) || "maintenance_estimates.json".equals(filename) || "maintenance_partial.json".equals(filename) || "nearby_config.json".equals(filename))) {
                 deliverFeed(requestId, false, "저장소 주소 또는 파일명이 올바르지 않습니다.", null);
                 return;
             }
@@ -924,9 +924,18 @@ public class MainActivity extends Activity {
                         }
                     }
                     JSONObject parsed = new JSONObject(out.toString("UTF-8"));
-                    deliverFeed(requestId,true,"",parsed);
+                    // Cache ONLY complete, schema-verified public repository feeds.
+                    // Successful network reads never need an old local fallback.
+                    boolean saved=PublicSnapshotStore.save(getApplicationContext(),repository,filename,parsed);
+                    deliverFeed(requestId,true,"",parsed,false,0L,saved);
                 } catch(Exception e) {
-                    deliverFeed(requestId,false,e.getMessage()==null?"네트워크 연결 실패":e.getMessage(),null);
+                    JSONObject saved=PublicSnapshotStore.read(getApplicationContext(),repository,filename);
+                    if(saved!=null){
+                        deliverFeed(requestId,true,"",saved.optJSONObject("payload"),
+                            true,saved.optLong("cachedAt",0L),true);
+                    }else{
+                        deliverFeed(requestId,false,e.getMessage()==null?"네트워크 연결 실패":e.getMessage(),null);
+                    }
                 } finally {if(conn!=null)conn.disconnect();}
             });
         }
@@ -1068,12 +1077,21 @@ public class MainActivity extends Activity {
     }
 
     private void deliverFeed(String requestId, boolean ok, String error, JSONObject payload) {
+        deliverFeed(requestId,ok,error,payload,false,0L,false);
+    }
+    private void deliverFeed(String requestId, boolean ok, String error, JSONObject payload,
+                             boolean offline,long storedAt,boolean deviceSaved) {
         JSONObject obj=new JSONObject();
         try {
             obj.put("requestId",requestId==null?"":requestId);
             obj.put("ok",ok);
             obj.put("error",error);
             if(payload!=null)obj.put("payload",payload);
+            if(offline){
+                obj.put("offlineCopy",true);
+                obj.put("offlineSavedAt",storedAt);
+            }
+            if(deviceSaved)obj.put("deviceSnapshotSaved",true);
         } catch(Exception ignored) {}
         deliver("onFirstHyundaiResult",obj);
     }
