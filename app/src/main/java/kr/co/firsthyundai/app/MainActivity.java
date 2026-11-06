@@ -23,6 +23,9 @@ import android.content.ClipboardManager;
 import android.speech.RecognizerIntent;
 import java.util.ArrayList;
 import android.net.Uri;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -90,6 +93,20 @@ public class MainActivity extends Activity {
     private SmoothBrandOverlay nativeHandoff;
     private boolean webFirstFrameShown = false;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
+    // Public GitHub JSON downloads must not block member validation, memo
+    // notifications or each other during an unstable mobile connection.
+    private final ExecutorService publicFeedsIo = Executors.newFixedThreadPool(3);
+    private boolean publicNetworkPresent(){
+        try{
+            ConnectivityManager manager=(ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+            if(manager==null)return true;
+            Network network=manager.getActiveNetwork();
+            if(network==null)return false;
+            NetworkCapabilities capabilities=manager.getNetworkCapabilities(network);
+            return capabilities==null||
+                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+        }catch(Exception ignored){return true;}
+    }
     private final android.os.Handler memoTimer = new android.os.Handler(android.os.Looper.getMainLooper());
     private final Runnable memoCheck = new Runnable(){
         @Override public void run(){
@@ -896,7 +913,15 @@ public class MainActivity extends Activity {
                 deliverFeed(requestId, false, "저장소 주소 또는 파일명이 올바르지 않습니다.", null);
                 return;
             }
-            io.execute(() -> {
+            publicFeedsIo.execute(() -> {
+                if(!publicNetworkPresent()){
+                    JSONObject offline=PublicSnapshotStore.read(getApplicationContext(),repository,filename);
+                    if(offline!=null)deliverFeed(requestId,true,"",offline.optJSONObject("payload"),
+                        true,offline.optLong("cachedAt",0L),true);
+                    else deliverFeed(requestId,false,
+                        "인터넷 연결이 없고 이 휴대폰에 저장된 자료도 없습니다.",null);
+                    return;
+                }
                 HttpURLConnection conn = null;
                 try {
                     // branch fixed to main; HTTPS host fixed to raw.githubusercontent.com
@@ -908,8 +933,8 @@ public class MainActivity extends Activity {
                     conn=(HttpURLConnection)new URL(address).openConnection();
                     conn.setUseCaches(false);
                     conn.setDefaultUseCaches(false);
-                    conn.setConnectTimeout(15000);
-                    conn.setReadTimeout(20000);
+                    conn.setConnectTimeout(8000);
+                    conn.setReadTimeout(12000);
                     conn.setInstanceFollowRedirects(false);
                     conn.setRequestProperty("Accept", "application/json");
                     conn.setRequestProperty("Cache-Control", "no-cache, no-store, max-age=0");
@@ -924,6 +949,8 @@ public class MainActivity extends Activity {
                         }
                     }
                     JSONObject parsed = new JSONObject(out.toString("UTF-8"));
+                    if(!PublicSnapshotStore.valid(filename,parsed))
+                        throw new Exception("공개자료 검증 실패 · 이전 정상 저장본 사용");
                     // Cache ONLY complete, schema-verified public repository feeds.
                     // Successful network reads never need an old local fallback.
                     boolean saved=PublicSnapshotStore.save(getApplicationContext(),repository,filename,parsed);
@@ -1185,7 +1212,7 @@ public class MainActivity extends Activity {
     @Override protected void onDestroy(){
         stopPublicLiveVoice();
         if(pendingMemoImages!=null){pendingMemoImages.onReceiveValue(null);pendingMemoImages=null;}
-        memoTimer.removeCallbacks(memoCheck);io.shutdownNow();if(nativeHandoff!=null){nativeHandoff.finish(null);nativeHandoff=null;}if(web!=null)web.destroy();super.onDestroy();}
+        memoTimer.removeCallbacks(memoCheck);io.shutdownNow();publicFeedsIo.shutdownNow();if(nativeHandoff!=null){nativeHandoff.finish(null);nativeHandoff=null;}if(web!=null)web.destroy();super.onDestroy();}
     @Override public void onBackPressed() {
         if(web==null) {super.onBackPressed();return;}
         // Close the native-feeling apartment detail screen before leaving the app.
