@@ -507,20 +507,23 @@ async function boardCommand(req,env,url,ctx){
    all_day:note.all_day===true,done:note.done===true});
  }
  if(url.pathname==="/board"&&req.method==="GET"){
-  // Older APKs call /board without offset. Preserve their original full-list
-  // response until all four family phones can update, using a private KV cache.
-  if(!url.searchParams.has("offset"))
-   return res({schema:1,notes:await boardList(env)});
+  if(!url.searchParams.has("offset")){
+   try{return res({schema:1,notes:await boardList(env)});}
+   catch(e){console.warn("office_board_legacy_deferred");return res({error:"board_storage_temporarily_unavailable"},503);}
+  }
   const offsetRaw=url.searchParams.get("offset")||"0";
   if(!/^\d{1,4}$/.test(offsetRaw)||Number(offsetRaw)>5000)
    return res({error:"invalid_page"},400);
-  return res(await cachedPrivateBoard(env,"page-"+offsetRaw,()=>boardPage(env,Number(offsetRaw))));
+  try{return res(await cachedPrivateBoard(env,"page-"+offsetRaw,()=>boardPage(env,Number(offsetRaw))));}
+  catch(e){console.warn("office_board_page_deferred");return res({error:"board_storage_temporarily_unavailable"},503);}
  }
  if(url.pathname==="/board/updates"&&req.method==="GET"){
-  const list=await boardKeys(env,BOARD_PREFIX);
-  const items=list.slice(-120).filter(x=>validBoardId(x.name.slice(BOARD_PREFIX.length)))
-   .map(x=>({id:x.name.slice(BOARD_PREFIX.length),device:x.metadata?.device||""}));
-  return res({schema:1,items});
+  try{
+   const list=await boardKeys(env,BOARD_PREFIX);
+   const items=list.slice(-120).filter(x=>validBoardId(x.name.slice(BOARD_PREFIX.length)))
+    .map(x=>({id:x.name.slice(BOARD_PREFIX.length),device:x.metadata?.device||""}));
+   return res({schema:1,items});
+  }catch(e){console.warn("office_board_updates_deferred");return res({error:"board_storage_temporarily_unavailable"},503);}
  }
  if(url.pathname==="/board"&&req.method==="POST"){
   let data,content,scheduled;try{data=await body(req,7000);content=validBoardText(data?.text);scheduled=boardSchedule(data?.scheduled_at)}
@@ -723,7 +726,8 @@ function timedMemoDue(note,now){
   /^\s*🎂/.test(String(note.text||"")))return false;
  const until=Date.parse(note.scheduled_at)-now;
  // Every-minute cron with jitter tolerance; never notify after a past event.
- return until>=28*60000&&until<=31*60000;
+ // 8-minute scan must still catch appointments near T-30.
+ return until>=24*60000&&until<=33*60000;
 }
 // One-minute due lookup is independent of note creation order.
 async function indexedDueNotes(env,now){
@@ -975,12 +979,16 @@ async function liveToken(req,env){
  }catch(e){return res({error:"live_provider_unavailable"},503)}
 }
 
+// KV Free has only 1,000 LISTs/day. Previous cron made >=2,880/day.
+const cronRuns=(now,interval)=>Math.floor(now/60000)%interval===0;
 export default {async scheduled(event,env,ctx){
   const now=Number(event?.scheduledTime)||Date.now();
-  await backfillDueNotes(env,now);
-  await migrateOldExpiry(env,now);
-  await cleanupArchivedPhotos(env,now);
-  await deliverDueReminders(env,now);
+  if(cronRuns(now,8)){
+   await backfillDueNotes(env,now);
+   await deliverDueReminders(env,now);
+  }
+  if(cronRuns(now,30))await migrateOldExpiry(env,now);
+  if(cronRuns(now,180))await cleanupArchivedPhotos(env,now);
  },async fetch(req,env,ctx){
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:HEAD});
  const url=new URL(req.url);
@@ -989,8 +997,17 @@ export default {async scheduled(event,env,ctx){
  if(!env.SETTINGS)return res({error:"kv_not_configured"},503);
  if(url.pathname==="/health"&&req.method==="GET"){
   if(env.FIRSTHYUNDAI_ACCESS_CODE)await ensureDefaultMembers(env);
-  return res({ok:true,storage:true,defaultAccountsReady:!!(await env.SETTINGS.get(DEFAULT_MEMBERS_KEY,"json")),
-  authConfigured:!!env.FIRSTHYUNDAI_ADMIN_CODE,boardAuthConfigured:!!env.FIRSTHYUNDAI_ACCESS_CODE,fcmConfigured:!!fcmConfig(env)});
+  const state={ok:true,storage:true,
+   defaultAccountsReady:!!(await env.SETTINGS.get(DEFAULT_MEMBERS_KEY,"json")),
+   authConfigured:!!env.FIRSTHYUNDAI_ADMIN_CODE,
+   boardAuthConfigured:!!env.FIRSTHYUNDAI_ACCESS_CODE,fcmConfigured:!!fcmConfig(env)};
+  // Optional read-only status for private-board LIST quota (no note details).
+  if(url.searchParams.get("board")==="1"){
+   try{await env.SETTINGS.list({prefix:BOARD_PREFIX,limit:1});state.boardListAvailable=true;}
+   catch(e){state.boardListAvailable=false;}
+   return res(state,state.boardListAvailable?200:503);
+  }
+  return res(state);
  }
  if(url.pathname==="/board/ai/live-token")return liveToken(req,env);
  if(url.pathname==="/board/ai/live-status")return liveStatus(req,env);
@@ -1014,6 +1031,6 @@ export default {async scheduled(event,env,ctx){
   await env.SETTINGS.put(key,JSON.stringify(record));return res(record);
  }
  return res({error:"not_found"},404);
-},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,memberList,boardToken,validBoardToken,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision,timedMemoDue,deliverDueReminders,liveTokenRequestConfig,liveQuota,liveReset}};
+},_test:{validate,token,checkToken,same,validBoardToken,boardToken,validBoardText,boardList,boardSchedule,memberList,boardToken,validBoardToken,fcmConfig,fcmPublicConfig,fcmTokenValid,sendPush,familyRevision,timedMemoDue,deliverDueReminders,cronRuns,liveTokenRequestConfig,liveQuota,liveReset}};
 
 

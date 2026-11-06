@@ -97,4 +97,25 @@ assert.equal(expiryOptions.get(legacyKey)?.expirationTtl,undefined,
  'Legacy note TTL should be cleared during quiet-time migration');
 assert.equal(JSON.parse(store.get(legacyKey)).text,legacyText,
  'Migration must preserve original customer memo content');
-console.log('PASS 62-note authenticated paging, old TTL migration, stale-write guard and memo privacy');
+// On the free KV plan, LIST quota may be exhausted while GET still works.
+// The app must receive a safe 503, never a raw HTTP 500 or a fabricated empty list.
+const safeList=env.SETTINGS.list;
+env.SETTINGS.list=async args=>{
+ if(args.prefix==='office-postit-v1:')throw Error('cloud vendor private storage diagnostic');
+ return safeList(args);
+};
+const ordinaryHealth=await send('/health','GET');
+assert.equal(ordinaryHealth.status,200);
+const boardHealth=await send('/health?board=1','GET');
+assert.equal(boardHealth.status,503);
+const boardHealthText=await boardHealth.text();
+assert(boardHealthText.includes('"boardListAvailable":false'));
+assert(!boardHealthText.includes('cloud vendor'),'Raw storage errors must remain private');
+await env.SETTINGS.put('office-postit-cache-revision-v1','forced-cache-miss-for-quota-test');
+const storageDenied=await send('/board?offset=0','GET',undefined,auth);
+assert.equal(storageDenied.status,503,'LIST outage reports 503 instead of unhandled 500');
+assert.equal((await storageDenied.json()).error,'board_storage_temporarily_unavailable');
+assert.equal((await send('/board/updates','GET',undefined,auth)).status,503);
+env.SETTINGS.list=safeList;
+assert.equal((await send('/health?board=1')).status,200,'Recovery probe does not need account credentials');
+console.log('PASS 62-note authenticated paging, old TTL migration, KV quota diagnosis, 503 fallback and memo privacy');
