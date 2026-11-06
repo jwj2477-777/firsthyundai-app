@@ -61,6 +61,8 @@ function storeOffline(notes){
  if(!Array.isArray(notes)||notes.length>5000||
     typeof bridge?.saveOfficeMemoOfflineSnapshot!=='function')return false;
  try{
+  // Keep the existing full backup if an unexpected empty list is returned.
+  if(!notes.length&&offlineAvailable&&snapshotOffline()?.notes?.length)return false;
   const ok=bridge.saveOfficeMemoOfflineSnapshot(JSON.stringify({notes}));
   if(ok){offlineCachedAt=Date.now();offlineAvailable=true;offlineCachedMember=draftMember();}
   return !!ok;
@@ -708,8 +710,8 @@ async function refresh(silent=false){
   $('officeBoardAuth')?.classList?.add?.('hidden');
   if(!first.has_more){
    historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;
-   storeOffline(items);liveConnected();draw();
-   if(!silent)msg('메모 확인 완료 · 휴대폰에 암호화 보관했습니다.');return}
+   const saved=storeOffline(items);liveConnected();draw();
+   if(!silent)msg(saved?'메모 확인 완료 · 휴대폰에 암호화 보관했습니다.':'메모를 확인했지만 휴대폰 보관본 저장이 실패했습니다.');return}
   if(silent&&historyLoaded&&Date.now()-lastFullHistory<5*60000)return;
   historyLoaded=false;historyLoading=true;draw();
   const seen=new Map(recent.map(n=>[n.id,n]));
@@ -729,8 +731,8 @@ async function refresh(silent=false){
   }
   if(cycle!==refreshCycle)return;
   historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;
-  storeOffline(items);liveConnected();draw();
-  if(!silent)msg('전체 공유 메모를 확인하고 암호화 보관했습니다.');
+  const saved=storeOffline(items);liveConnected();draw();
+  if(!silent)msg(saved?'전체 공유 메모를 확인하고 암호화 보관했습니다.':'전체 메모를 확인했지만 휴대폰 보관본 저장이 실패했습니다.');
  }catch(e){
   if(cycle===refreshCycle){
    historyLoading=false;
@@ -803,6 +805,7 @@ async function mutate(action,data){
   if(action==='restore'&&result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
   editing='';editDraft='';
   merge(items);
+  if(historyLoaded)storeOffline(items);
   msg(action==='post'?'메모를 공유했습니다. 메모함과 해당 날짜의 달력에서 확인할 수 있습니다.':'메모가 반영됐습니다.');
   return result;
  }catch(e){
