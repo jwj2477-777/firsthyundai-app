@@ -779,6 +779,18 @@ public class MainActivity extends Activity {
             OfficeDraftStore.clear(getApplicationContext(),
                 OfficeBoardClient.memberId(getApplicationContext()));
         }
+        // Cached customer notes are encrypted natively; no WebView localStorage.
+        // Read/write only the currently authenticated family member's snapshot.
+        @JavascriptInterface public String getOfficeMemoOfflineSnapshot(){
+            if(!OfficeBoardClient.enrolled(getApplicationContext()))return "{}";
+            return OfficeOfflineStore.read(getApplicationContext(),
+                OfficeBoardClient.memberId(getApplicationContext()));
+        }
+        @JavascriptInterface public boolean saveOfficeMemoOfflineSnapshot(String snapshot){
+            if(!OfficeBoardClient.enrolled(getApplicationContext()))return false;
+            return OfficeOfflineStore.save(getApplicationContext(),
+                OfficeBoardClient.memberId(getApplicationContext()),snapshot);
+        }
         @JavascriptInterface public void officeBoardAction(String action,String payload,String requestId){
             if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
             if(action==null||!java.util.Arrays.asList("list","post","edit","done","schedule","delete","archive","restore",
