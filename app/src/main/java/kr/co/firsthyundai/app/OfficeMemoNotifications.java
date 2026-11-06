@@ -13,6 +13,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,7 +25,7 @@ final class OfficeMemoNotifications {
     static final String CHANNEL="firsthyundai_private_office_notes";
     static final int PERMISSION=1418;
     private static final int JOB_ID=43152;
-    private static final String REMINDER_CHANNEL="firsthyundai_private_schedule_reminders";
+    private static final String REMINDER_CHANNEL="firsthyundai_private_schedule_reminders_loud_v2";
     private static final String LAST_REMINDER="last_reminder_";
     private static final String PREF="firsthyundai-office-note-notify-v1";
     private static final String LAST="last_id";
@@ -46,10 +49,16 @@ final class OfficeMemoNotifications {
         NotificationManager manager=(NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE);
         if(manager==null||manager.getNotificationChannel(REMINDER_CHANNEL)!=null)return;
         NotificationChannel channel=new NotificationChannel(REMINDER_CHANNEL,
-            "공유 일정 시작 30분 전",NotificationManager.IMPORTANCE_HIGH);
+            "중요 일정 · 시작 30분 전",NotificationManager.IMPORTANCE_HIGH);
         channel.setDescription("시간이 정해진 사무실 공유 일정이 시작되기 30분 전 알림");
         channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
         channel.enableVibration(true);
+        channel.setVibrationPattern(new long[]{0,800,250,800,250,1200});
+        Uri sound=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        if(sound==null)sound=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        if(sound!=null)channel.setSound(sound,new AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ALARM)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
         manager.createNotificationChannel(channel);
     }
     static boolean enabled(Context c){return c.getSharedPreferences(PREF,Context.MODE_PRIVATE).getBoolean(ENABLED,true);}
@@ -164,7 +173,7 @@ final class OfficeMemoNotifications {
         String text=safePreview(note.optString("preview",""));
         if(text.isEmpty())text="곧 시작하는 공유 일정을 확인해 주세요.";
         String author=safePreview(note.optString("author",""));
-        String heading=ScheduleReminderTiming.title(System.currentTimeMillis(),startsAt);
+        String heading="🔔 중요 · "+ScheduleReminderTiming.title(System.currentTimeMillis(),startsAt);
         if(!author.isEmpty())heading+=" · "+author;
         Intent open=new Intent(context,LockActivity.class);
         open.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -180,7 +189,8 @@ final class OfficeMemoNotifications {
             .setStyle(new Notification.BigTextStyle().bigText(text))
             .setVisibility(Notification.VISIBILITY_PRIVATE)
             .setContentIntent(tap).setAutoCancel(true)
-            .setCategory(Notification.CATEGORY_EVENT)
+            .setCategory(Notification.CATEGORY_ALARM)
+            .setPriority(Notification.PRIORITY_MAX)
             .setWhen(System.currentTimeMillis()).setShowWhen(true);
         Notification.Builder hidden=Build.VERSION.SDK_INT>=26
             ?new Notification.Builder(context,REMINDER_CHANNEL):new Notification.Builder(context);
@@ -201,7 +211,8 @@ final class OfficeMemoNotifications {
         // Phone numbers are deliberately masked in the unlocked notification too.
         String result=value.replaceAll("[\\r\\n\\t]+"," ").replaceAll("\\s+"," ").trim()
                 .replaceAll("(?<!\\d)01[016789][- .]?\\d{3,4}[- .]?\\d{4}(?!\\d)","연락처 확인")
-                .replaceAll("(?<!\\d)0\\d{1,2}[- .]?\\d{3,4}[- .]?\\d{4}(?!\\d)","연락처 확인");
+                .replaceAll("(?<!\\d)0\\d{1,2}[- .ㅡ－−–—―‐‑]?\\d{3,4}[- .ㅡ－−–—―‐‑]?\\d{4}(?!\\d)","연락처 확인")
+                .replaceAll("(?<!\\d)[1-9]\\d{2,3}[-ㅡ－−–—―‐‑]\\d{4}(?!\\d)","연락처 확인");
         return result.length()>110?result.substring(0,110)+"…":result;
     }
     private static String[] preview(Context context,String id) {
