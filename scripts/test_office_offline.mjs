@@ -98,4 +98,14 @@ await api.refresh();
 assert(el('officeBoardList').innerHTML.includes('서버 최신 방문 예약'),
  'After a later outage, fallback uses the most recently saved full snapshot');
 assert(el('officeBoardOfflineTitle').textContent.includes('읽기 전용'));
+// A second family identity without its own encrypted backup must never see
+// the first account's customer notes, and an outage is NOT an empty board.
+accountId='22222222-2222-2222-2222-222222222222';
+snapshot='{}';
+api.open();
+await new Promise(resolve=>setTimeout(resolve,90));
+assert(!el('officeBoardList').innerHTML.includes('032-123-4567'));
+assert.equal(el('officeBoardTotalCount').textContent,'—',
+ 'Do not show a misleading 0-count when the board is inaccessible');
+assert(el('officeBoardList').innerHTML.includes('실제 메모가 0건이라는 뜻이 아닙니다'));
 console.log('PASS encrypted emergency notes, no false zero, account-bound offline view, no edits, online recovery');
