@@ -7,6 +7,7 @@ let sequence=0,items=[],busy=false,postInFlight=false,lastCheck=0,showCompleted=
 let focusLookupSeq=0,ambiguousPost=null;
 let timerMs=45000,pendingFocus='',view='compose',scheduleOpen=false,suggestedDate='';
 let archiveOpen=false,archived=[];
+let offlineMode=false,offlineAvailable=false,offlineUnavailable=false,offlineChecking=false,offlineCachedAt=0,offlineCachedMember='';
 let memoStatus='active',memoQuery='',memoAuthor='',memoSort='newest',memoLimit=10,finderTouched=false;
 const PAGE_SIZE=10;
 const expandedNotes=new Set();
@@ -17,6 +18,70 @@ let selectedDate='',calendarMonth='',editingBirthday='',calendarDraftDay='';
 let draftTimer=null,draftRestoredMember='',draftRevision=0;
 function draftMember(){
  try{return String(bridge?.getOfficeMemberId?.()||'')}catch(e){return ''}
+}
+// Private, encrypted native snapshot; never browser-managed persistence.
+function snapshotOffline(){
+ try{
+  if(typeof bridge?.getOfficeMemoOfflineSnapshot!=='function')return null;
+  const data=JSON.parse(bridge.getOfficeMemoOfflineSnapshot()||'{}');
+  if(!Array.isArray(data?.notes)||!Number.isFinite(data.cachedAt)||data.cachedAt<=0||
+     data.notes.length>5000||data.notes.some(n=>!valid(n?.id)||typeof n.text!=='string'||typeof n.done!=='boolean'))
+   return null;
+  return data;
+ }catch(e){return null}
+}
+function offlineBanner(missing=false){
+ const panel=$('officeBoardOfflineBanner');if(!panel)return;
+ const shouldHide=!offlineMode&&!missing;
+ if(typeof panel.classList?.toggle==='function')panel.classList.toggle('hidden',shouldHide);
+ else if(shouldHide)panel.classList?.add?.('hidden');
+ else panel.classList?.remove?.('hidden');
+ if(!offlineMode&&!missing)return;
+ const title=$('officeBoardOfflineTitle'),detail=$('officeBoardOfflineDetail');
+ if(title)title.textContent=missing?'서버 연결 안 됨 · 보관된 메모 없음':
+  offlineChecking?'저장된 메모 · 최신 정보 확인 중':'오프라인 보관본 · 읽기 전용';
+ const time=offlineCachedAt?new Date(offlineCachedAt).toLocaleString('ko-KR',
+  {year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'정보 없음';
+ if(detail)detail.textContent=missing?
+  '온라인에서 메모함을 한 번 완전히 열면 다음부터 암호화된 오프라인 보관본을 이용할 수 있습니다.':
+  '마지막 동기화 '+time+' · 최신 수정·완료 여부는 반영되지 않았을 수 있습니다. 수정·삭제·전송은 온라인에서만 가능합니다.';
+}
+function restoreOffline(force=false){
+ const member=draftMember();
+ if(!member)return false;
+ if(!force&&offlineCachedMember===member&&items.length)return offlineAvailable;
+ if(offlineCachedMember&&offlineCachedMember!==member){
+  items=[];historyLoaded=false;localUpdates.clear();localDeletes.clear();archived=[];
+  offlineMode=false;offlineUnavailable=false;offlineChecking=false;
+  offlineCachedAt=0;offlineAvailable=false;
+ }
+ offlineCachedMember=member;
+ const snapshot=snapshotOffline();
+ offlineAvailable=!!snapshot;
+ if(!snapshot)return false;
+ offlineCachedAt=snapshot.cachedAt;offlineMode=true;offlineChecking=true;
+ historyLoaded=true;merge(snapshot.notes);offlineBanner();return true;
+}
+function storeOffline(notes){
+ if(!Array.isArray(notes)||notes.length>5000||
+    typeof bridge?.saveOfficeMemoOfflineSnapshot!=='function')return false;
+ try{
+  // Keep the existing full backup if an unexpected empty list is returned.
+  if(!notes.length&&offlineAvailable&&snapshotOffline()?.notes?.length)return false;
+  const ok=bridge.saveOfficeMemoOfflineSnapshot(JSON.stringify({notes}));
+  if(ok){offlineCachedAt=Date.now();offlineAvailable=true;offlineCachedMember=draftMember();}
+  return !!ok;
+ }catch(e){return false}
+}
+function liveConnected(){
+ offlineMode=false;offlineUnavailable=false;offlineChecking=false;offlineBanner();
+}
+function useOffline(){
+ const exists=restoreOffline(true);
+ offlineMode=!!exists;offlineUnavailable=!exists;offlineChecking=false;
+ if(!exists){items=[];historyLoaded=false;}
+ offlineBanner(!exists);
+ return exists;
 }
 function saveDraftNow(){
  if(draftTimer){clearTimeout(draftTimer);draftTimer=null;}
@@ -125,7 +190,7 @@ function sortItems(){
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const valid=id=>/^[a-z0-9]{8,14}-[0-9a-f-]{36}$/.test(String(id||''));
 function canEditNote(note){
- if(!note||!valid(note.id))return false;
+ if(offlineMode||!note||!valid(note.id))return false;
  if(bridge?.getMode?.()==='admin')return true;
  const ownId=String(bridge?.getOfficeMemberId?.()||'');
  // Do not use display names: they can change and are not unique.
@@ -383,6 +448,11 @@ function filteredMemos(){
 function syncFinder(memos,filtered){
  const active=memos.filter(n=>!n.done).length,done=memos.length-active;
  const setText=(id,text)=>{const x=$(id);if(x)x.textContent=String(text)};
+ if(offlineUnavailable){
+  for(const field of ['officeBoardCount','officeBoardActiveCount','officeBoardDoneCount','officeBoardTotalCount'])setText(field,'—');
+  setText('officeBoardListResult','서버 연결 실패 · 메모 건수 확인 불가');
+  return;
+ }
  const legacy=$('officeBoardShowDone');
  if(legacy)legacy.textContent=showCompleted?'완료 숨기기':'완료 '+done+'건 보기';
  setText('officeBoardCount',active);
@@ -422,7 +492,7 @@ $('officeBoardSort')?.addEventListener?.('change',e=>setSort(e.target?.value));
 function draw(){
  const list=$('officeBoardList');if(!list)return;
  const memos=memoItems();
- const admin=bridge?.getMode?.()==='admin';
+ const admin=!offlineMode&&bridge?.getMode?.()==='admin';
  $('officeBoardArchiveOpen')?.classList?.toggle?.('hidden',!admin);
  const filtered=filteredMemos();
  if(pendingFocus){
@@ -433,7 +503,9 @@ function draw(){
  const visible=filtered.slice(0,memoLimit);
  if(!visible.length){
   list.innerHTML='<div class="empty">'+
-   (memos.length?'조건에 맞는 메모가 없습니다. 검색어 또는 분류를 바꿔보세요.':
+   (offlineUnavailable?'서버 연결 오류로 목록을 확인하지 못했습니다. 실제 메모가 0건이라는 뜻이 아닙니다.':
+    memos.length?'조건에 맞는 메모가 없습니다. 검색어 또는 분류를 바꿔보세요.':
+    offlineMode?'마지막 저장 당시 메모가 없었습니다. 최신 정보는 미확인 상태입니다.':
     '아직 메모가 없습니다. 위의 새 메모 버튼으로 첫 메모를 작성해 보세요.')+'</div>';
   drawCalendar();syncViews();return;
  }
@@ -463,7 +535,8 @@ function draw(){
    body+(note.scheduled_at?'<div class="officeBoardNoteSchedule">▦ '+esc(note.all_day?kstDate(note.scheduled_at)+' · 종일':dateText(note.scheduled_at))+
      (!note.all_day&&!note.done?'<small class="officeBoardReminderHint">🔔 시작 30분 전 알림</small>':'')+'</div>':'')+
    (overdue?'<small class="officeBoardOverdueHint">예정 시간이 지났습니다 · 완료 또는 일정 변경을 확인하세요.</small>':'')+
-   (Array.isArray(note.images)&&note.images.length?'<div class="officeBoardPhotoStrip" aria-label="첨부 사진">'+
+    (offlineMode&&Array.isArray(note.images)&&note.images.length?'<small class="officeBoardReminderHint">사진은 인터넷에 연결되면 볼 수 있습니다.</small>':'')+
+   (Array.isArray(note.images)&&note.images.length&&!offlineMode?'<div class="officeBoardPhotoStrip" aria-label="첨부 사진">'+
     note.images.filter(x=>/^[0-9a-f-]{36}$/.test(x)).map((photo,i)=>
       '<button type="button" class="officeBoardPhotoTile" data-action="photoView" data-id="'+id+
       '" data-photo="'+photo+'">▧ 사진 '+(i+1)+' 보기</button>').join('')+'</div>':'')+
@@ -503,7 +576,9 @@ async function readAllBoard(){
   if(!Number.isInteger(next)||next<=offset)break;
   offset=next;
  }
- return [...all.values()];
+ const complete=[...all.values()];
+ storeOffline(complete);
+ return complete;
 }
 window.onFirstHyundaiOfficeBoardResult=e=>{
  const result=requests.get(e?.requestId);if(!result)return;
@@ -605,9 +680,16 @@ function openBriefing(force=false){
  const target=$('overviewMemoEntries');
  if(target&&!lastBriefing)target.textContent='공유 일정을 확인하는 중…';
  readAllBoard().then(notes=>{
-  merge(notes);
+  liveConnected();merge(notes);
   lastBriefing=Date.now();
- },()=>{if(target&&!lastBriefing){$('overviewMemoBriefing').hidden=false;target.textContent='일정 연결을 확인해 주세요.'}})
+ },()=>{
+  if(restoreOffline(true)){
+   offlineChecking=false;offlineBanner();renderBriefing();
+  }else if(target&&!lastBriefing){
+   $('overviewMemoBriefing').hidden=false;
+   target.textContent='일정 연결이 되지 않고 휴대폰 저장본도 없습니다.';
+  }
+ })
  .finally(()=>{briefingBusy=false});
 }
 function openBriefingNote(id){
@@ -631,7 +713,8 @@ async function refresh(silent=false){
  try{
   const first=await call('list',{offset:0});
   if(cycle!==refreshCycle)return;
-  const recent=Array.isArray(first.notes)?first.notes:[];
+  if(!Array.isArray(first.notes))throw Error('메모 목록 응답 오류');
+  const recent=first.notes;
   if(silent&&historyLoaded&&Date.now()-lastFullHistory<5*60000){
    // Keep already fetched history when checking recent posts every 45 seconds.
    const ids=new Set(recent.map(n=>n.id));
@@ -639,8 +722,10 @@ async function refresh(silent=false){
   }else merge(recent);
   lastCheck=Date.now();lastBriefing=lastCheck;
   $('officeBoardAuth')?.classList?.add?.('hidden');
-  if(!first.has_more){historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;draw();
-   if(!silent)msg('메모를 확인했습니다.');return}
+  if(!first.has_more){
+   historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;
+   const saved=storeOffline(items);liveConnected();draw();
+   if(!silent)msg(saved?'메모 확인 완료 · 휴대폰에 암호화 보관했습니다.':'메모를 확인했지만 휴대폰 보관본 저장이 실패했습니다.');return}
   if(silent&&historyLoaded&&Date.now()-lastFullHistory<5*60000)return;
   historyLoaded=false;historyLoading=true;draw();
   const seen=new Map(recent.map(n=>[n.id,n]));
@@ -650,7 +735,8 @@ async function refresh(silent=false){
   while(cycle===refreshCycle&&offset<=5000){
    const page=await call('list',{offset});
    if(cycle!==refreshCycle)return;
-   for(const item of page.notes||[])if(valid(item?.id))seen.set(item.id,item);
+   if(!Array.isArray(page.notes))throw Error('메모 목록 응답 오류');
+   for(const item of page.notes)if(valid(item?.id))seen.set(item.id,item);
    merge([...seen.values()]);
    if(!page.has_more)break;
    const next=Number(page.next_offset);
@@ -658,12 +744,22 @@ async function refresh(silent=false){
    offset=next;
   }
   if(cycle!==refreshCycle)return;
-  historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;draw();
-  if(!silent)msg('전체 공유 메모를 불러왔습니다.');
+  historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;
+  const saved=storeOffline(items);liveConnected();draw();
+  if(!silent)msg(saved?'전체 공유 메모를 확인하고 암호화 보관했습니다.':'전체 메모를 확인했지만 휴대폰 보관본 저장이 실패했습니다.');
  }catch(e){
   if(cycle===refreshCycle){
-   historyLoading=false;draw();
-   if(!silent||!historyLoaded)msg('메모 연결을 확인해 주세요: '+e.message);
+   historyLoading=false;
+   // A desktop HTML preview has no authenticated Android bridge; it must
+   // not masquerade as an offline failure or block demonstration filters.
+   if(typeof bridge?.officeBoardAction!=='function'){
+    draw();if(!silent)msg('메모 공유는 안드로이드 앱에서 지원합니다.');
+    return;
+   }
+   const cached=useOffline();draw();
+   if(!silent||!cached)msg(cached?
+    '서버 연결 실패 · 휴대폰에 저장된 마지막 메모를 읽기 전용으로 표시합니다.':
+    '메모 연결 실패 · 휴대폰에 보관된 메모가 없습니다. 인터넷 연결 후 다시 확인해 주세요.');
   }
  }
 }
@@ -711,9 +807,11 @@ function open(){
  $('officeBoardBirthdayAdd')?.classList?.toggle?.('hidden',bridge?.getMode?.()!=='admin');
  const account=$('officeBoardCurrentMember');
  if(account)account.textContent=bridge?.getOfficeMemberName?.()||'계정 연결 필요';
- settingsChanged();syncNotificationStatus();syncViews();restoreDraft();checkSuggestion();refresh();
+ restoreOffline();settingsChanged();syncNotificationStatus();syncViews();
+ restoreDraft();checkSuggestion();refresh();
 }
 async function mutate(action,data){
+ if(offlineMode){msg('오프라인 보관본은 읽기 전용입니다. 수정·완료·삭제는 연결 후 가능합니다.');return null}
  if(busy)return null;
  busy=true;$('officeBoardPost').disabled=true;
  try{
@@ -727,10 +825,12 @@ async function mutate(action,data){
   if(action==='restore'&&result.note)localUpdates.set(result.note.id,{note:result.note,time:Date.now()});
   editing='';editDraft='';
   merge(items);
+  if(historyLoaded)storeOffline(items);
   msg(action==='post'?'메모를 공유했습니다. 메모함과 해당 날짜의 달력에서 확인할 수 있습니다.':'메모가 반영됐습니다.');
   return result;
  }catch(e){
-  // A timeout after sending does NOT prove the server rejected the memo.
+  if(/HTTP 5\d\d|연결할 수 없습니다|시간 초과/i.test(String(e.message||'')))useOffline();
+   // A timeout after sending does NOT prove the server rejected the memo.
   // Retain only volatile text/date metadata for verification on a retry.
   if(action==='post'&&/시간 초과|연결|HTTP 5\d\d/i.test(String(e.message||'')))
    ambiguousPost={data:{...data},startedAt:postStartedAt};
@@ -747,6 +847,7 @@ let postStartedAt=0;
 async function post(){
  // Covers the entire compose -> server post -> optional photo upload flow.
  // The generic mutation lock ends before optional photo upload completes.
+ if(offlineMode){msg('오프라인에서는 전송하지 않습니다. 작성 중인 내용은 휴대폰에 보관됩니다.');saveDraftNow();return}
  if(postInFlight||busy){msg('메모 등록이 진행 중입니다. 중복으로 올리지 않도록 잠시 확인해 주세요.');return}
  postInFlight=true;
  try{

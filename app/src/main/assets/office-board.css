@@ -598,3 +598,15 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 .officeBoardOverdueHint{display:block;margin:6px 0;color:#9e481f;font-weight:650;font-size:.82rem}
 .officeBoardNote:has(.officeBoardOverdueHint){border-left:3px solid #c17a45}
 .officeBoardOverdueHeading{padding:10px 12px;margin:5px 0 8px;border-radius:10px;background:#fff1e5;color:#89451e;font-weight:750;font-size:.86rem}
+
+/* Emergency read-only encrypted snapshot, readable for older family members. */
+#officeBoard .officeBoardOfflineBanner{display:flex;flex-direction:column;align-items:flex-start;
+ gap:7px;margin:12px 0;padding:14px 15px;border-radius:15px;
+ border:2px solid #bb8450;background:#fff4e7;color:#714122;line-height:1.5}
+#officeBoard .officeBoardOfflineBanner.hidden{display:none!important}
+#officeBoard .officeBoardOfflineBanner strong{font-size:16px;font-weight:850}
+#officeBoard .officeBoardOfflineBanner p{margin:0;font-size:14px;word-break:keep-all}
+#officeBoard .officeBoardOfflineBanner button{min-height:44px;min-width:112px;
+ font-size:14px;font-weight:800;border-radius:10px;border:1px solid #a77c50;
+ background:#fff;color:#603f25;padding:10px 16px}
+#officeBoard .officeBoardOfflineBanner button:focus-visible{outline:3px solid #207a72;outline-offset:3px}
