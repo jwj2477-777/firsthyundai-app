@@ -99,7 +99,8 @@ assert(store.has('office-postit-image-v1:'+keptPhoto));
 assert.equal((await ask('/board/'+note.id,'DELETE',null,token,'',adminToken)).status,200);
 assert(store.has('office-postit-image-v1:'+keptPhoto),
  'Archived notes retain their photos during 30-day recovery');
-const future=Date.now()+32*86400000;
+const later=Date.now()+32*86400000;
+const future=Math.ceil(later/(180*60000))*(180*60000); // cleanup sweep every 3 hours
 await service.scheduled({scheduledTime:future},env,{});
 assert(!store.has('office-postit-image-v1:'+keptPhoto),
  'Photos are removed when their archived memo recovery period ends');
