@@ -15,6 +15,7 @@ on:
       - 'scripts/test_office_memo_notifications.mjs'
       - 'scripts/test_office_phones.mjs'
       - 'scripts/test_office_offline.mjs'
+      - 'scripts/test_public_offline_cache.mjs'
       - 'scripts/test_office_memo_native.js'
       - 'scripts/test_fcm_push.mjs'
       - 'scripts/test_office_schedule_reminders.mjs'
@@ -280,6 +281,7 @@ jobs:
           node scripts/test_office_schedule_reminders.mjs
           node scripts/test_office_phones.mjs
           node scripts/test_office_offline.mjs
+          node scripts/test_public_offline_cache.mjs
           node scripts/test_season_themes.js
           node scripts/test_season_points.js
           node scripts/test_theme_weather.mjs
@@ -397,25 +399,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.88 encrypted emergency offline memo APK
+      - name: Publish v2.1.89 offline public data reader APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.88.apk
-          unzip -t FirstHyundai-v2.1.88.apk | grep 'No errors detected'
-          if gh release view v2.1.88 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.89.apk
+          unzip -t FirstHyundai-v2.1.89.apk | grep 'No errors detected'
+          if gh release view v2.1.89 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.1.88 FirstHyundai-v2.1.88.apk \
+            gh release create v2.1.89 FirstHyundai-v2.1.89.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.88 · 암호화 오프라인 메모·일정 긴급 열람' \
-              --notes '사무실 공유 메모·일정 전체 조회 완료 시 휴대폰 내부 보관 영역에 Android Keystore AES-256-GCM으로 자동 암호화 저장합니다. 인터넷·Cloudflare KV 장애 시 마지막 동기화된 보관본을 즉시 읽기 전용으로 보여주고 날짜와 최신 정보 미확인 경고를 표시합니다. 메모 검색·달력·전화번호 링크는 유지하되 오프라인 수정·완료·삭제·중복 전송을 막습니다. 작성 중인 메모는 기존 안전한 암호화 임시 저장을 유지합니다. 사용자 계정별 캐시 분리, 서버에서 계정이 폐기되면 해당 캐시 파기, 기존 가족 보안 정책 및 24시간 오프라인 인증 유효 조건을 유지합니다. 사진 원본은 오프라인에 자동 저장하지 않습니다. v2.1.88/build239. 서버 KV 한도 대응과 무관하게 마지막 보관본을 볼 수 있는 안전 기능입니다.'
+              --title '퍼스트현대 v2.1.89 · 인터넷 장애에도 실거래·단지·뉴스 확인' \
+              --notes '퍼스트현대 앱에 공개 자료 오프라인 우선 보기 기능을 추가했습니다. 실거래, 새 거래, 아파트 관심 단지정보, 뉴스, 관리비, 학교와 공공정보는 온라인에서 정상 갱신한 자료를 앱 내부 AtomicFile에 저장합니다. 다음 실행부터 인터넷 요청을 기다리기 전에 마지막 정상 자료를 표시하고 최신 정보 미확인·저장 기준 시각을 화면에 명확히 알립니다. 온라인 복구 시 자동으로 새 자료를 받아 갱신하며, 수신 실패나 불완전한 JSON으로 마지막 저장본을 덮어쓰지 않습니다. 고객 메모와 계약 개인정보는 이 공개 캐시에 저장하지 않으며 기존 암호화 전용 보관 기능은 유지합니다. 지도·실시간 날씨·AI는 연결이 필요할 수 있습니다. v2.1.89/build240.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.88 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.88 --apk FirstHyundai-v2.1.88.apk
+          gh release upload v2.1.89 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.89 --apk FirstHyundai-v2.1.89.apk
 
 
 
