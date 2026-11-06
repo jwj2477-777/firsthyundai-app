@@ -3134,6 +3134,20 @@ async function refreshOne(filename,manual=false){
  }
  issues[filename]='';
  let result;
+ // Last verified phone snapshot is shown before attempting network.
+ if(!remote[filename]){
+  const cached=await readPublicOffline(filename);
+  if(seq!==refreshGeneration[filename])return {ok:false,superseded:true,filename};
+  if(cached&&validPublicSnapshot(filename,cached.payload)){
+   remote[filename]=cached.payload;
+   showPublicOffline(filename,cached.savedAt);
+   renderOverview();
+   if(filename==='trades'){renderTrades();renderNearby();renderComplexes();}
+   else if(filename==='new_trades')renderNew();
+   else if(filename==='complexes')renderComplexes();
+   else renderNews();
+  }
+ }
  try{
   const fresh=await fetchRemote(filename);
   if(!fresh||typeof fresh!=='object'||fresh.schema_version!==1)throw Error('JSON 데이터 형식이 맞지 않습니다');
@@ -3143,6 +3157,7 @@ async function refreshOne(filename,manual=false){
   if(seq!==refreshGeneration[filename])return {ok:false,superseded:true,filename};
   const changed=JSON.stringify(remote[filename])!==JSON.stringify(fresh);
   remote[filename]=fresh;
+  clearPublicOffline(filename);
   if(filename==='new_trades'){
    try {
     window.FirstHyundaiTradeAlerts?.process(fresh,{
@@ -3168,6 +3183,7 @@ async function refreshOne(filename,manual=false){
  }catch(e){
   if(seq!==refreshGeneration[filename])return {ok:false,superseded:true,filename};
   issues[filename]=e.message||String(e);
+  if(remote[filename])showPublicOffline(filename,publicOfflineStatus[filename]?.savedAt||0);
   result={ok:false,error:issues[filename],filename};
   if(manual)showRefreshFeedback('자료 확인 실패: '+result.error+' · 기존 화면 자료는 유지합니다.','error');
  }finally{
