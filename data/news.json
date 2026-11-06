@@ -1,31 +1,12 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-11-06T22:08:05+09:00",
+  "checked_at": "2026-11-07T00:53:50+09:00",
   "state": "ok",
   "errors": [],
   "source": "Google 뉴스 RSS (보도 제목·출처 메타데이터)",
   "brief_method": "기사 본문 확인 Gemini 요약 + Groq 보완(짧은 3~4문장)",
   "warning": "언론 기사 제목은 공식 확정 발표가 아닙니다. 사업 일정, 세금, 대출, 시행일은 기관 원문 확인 필요.",
   "briefs": [
-    {
-      "id": "202561a6f40091",
-      "category": "정책·규제",
-      "title": "홍지선 국토교통부장관, \"주택건설업계와 적극 소통하며, 현장의 어려움을 신속히 해소할 것\"",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-06T20:50:35+09:00",
-      "sources": [
-        {
-          "title": "홍지선 국토교통부장관, \"주택건설업계와 적극 소통하며, 현장의 어려움을 신속히 해소할 것\"",
-          "publisher": "누리일보",
-          "published_at": "2026-11-06T20:50:35+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1yakZnMDlEMEluRUtLSlJOUU9ESDNBVXBZN09nRExVNWtoSkNpUEY2SldHRmJMdlhNZWJXRllEWjg1SWtiS3BQV1ROdGFWTE9nblhkTmtaMnp1YU0?oc=5"
-        }
-      ],
-      "summary_method": "headline_only"
-    },
     {
       "id": "fa86fa794653df",
       "category": "개발·교통",
@@ -49,11 +30,30 @@
       "summary_version": 3
     },
     {
+      "id": "d376531ca75e6d",
+      "category": "정책·규제",
+      "title": "홍지선 국토교통부장관, ˝주택건설업계와 적극 소통하며, 현장의 어려움을 신속히 해소할 것˝:경인투데이뉴스",
+      "summary": "",
+      "verification": "기사 본문 요약 대기",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-06T20:14:00+09:00",
+      "sources": [
+        {
+          "title": "홍지선 국토교통부장관, ˝주택건설업계와 적극 소통하며, 현장의 어려움을 신속히 해소할 것˝:경인투데이뉴스",
+          "publisher": "경인투데이뉴스",
+          "published_at": "2026-11-06T20:14:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTFA0NTZWSUhxSWVLSTFDMUttWkZfZ3BwV3BDTmFiUC11dVBCVUFvUkh6ckE5eExNVWFYU0taTkxNWEItOG9rRzM0bGhhVHJxd1XSAV9BVV95cUxPVVhXTnNqSFVEWERnV3k1WVF0R2xjZzZ2TXZiRlZfU0NyeExzZnRrYmpwcHlHUzJySi1DYkE4ZEVnVVZOeTFJbnhFU296cnY2b0JPNkZ1THh4NFBvZkZkNA?oc=5"
+        }
+      ],
+      "summary_method": "headline_only"
+    },
+    {
       "id": "4b98b33d47c415",
       "category": "정책·규제",
       "title": "홍지선 국토부 장관, 주택건설업계 간담회…공급 애로 해소 논의",
       "summary": "홍지선 국토부 장관이 주택건설업계와 간담회를 열어 공급 애로를 논의했다.\n도시정비법령 개정·지식산업센터 주거 활용 등 즉시 정책 반영을 계획했다.\n연내 출범 예정인 통합 주택공급 지원센터로 현장 맞춤형 해결 방안을 제공한다.",
-      "verification": "Groq 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 3,
       "publisher_count": 3,
       "last_published_at": "2026-11-06T19:01:26+09:00",
@@ -127,8 +127,8 @@
       "id": "6996111eacbb69",
       "category": "정책·규제",
       "title": "홍지선 “민간 공급 걸림돌 신속 해소”…지원센터 연내 출범",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
+      "summary": "홍지선 국토교통부 장관은 민간 주택공급의 걸림돌을 신속히 해소하겠다고 밝혔다.\n도시정비법령을 조속히 개정하고 연내 출범하는 통합 주택공급 지원센터를 통해 PF 등 자금 조달 문제를 관리한다.\n간담회는 6일 서울 국토발전전시관에서 3개 협회 및 회원사와 함께 개최되었다.",
+      "verification": "2개 AI 검토 · 사실 확인은 원문 기준",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-06T16:56:49+09:00",
@@ -140,7 +140,11 @@
           "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTFBFODV6RW5EWTNCUll4M1BxWWxvZG55MFlqcHQ1S24xUnBXNnRlZk1ZNGdoR0FqUGNrWWNIbk1aU3lNMmhHQUs4ZlNqbDhqUV9iNUHSAVNBVV95cUxOOFpNWEpqWTY3T0FlVll6RU5WX3JDdjlRMTAzM0NHdnVCZlpoUjlkM3V6OGxiV2w1UGl2VzY4X3EwaEszbmNmSWxrZDRVclJ2UENnaw?oc=5"
         }
       ],
-      "summary_method": "headline_only"
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.sedaily.com/article/20111256",
+      "summary_version": 3,
+      "groq_reviewed": true
     },
     {
       "id": "c96b8be1b2e0a4",
@@ -191,29 +195,6 @@
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://contents.premium.naver.com/plaform/bg/contents/261106160247830bg",
       "summary_version": 3
-    },
-    {
-      "id": "e9efdd30c6e13c",
-      "category": "정책·규제",
-      "title": "국토부 \"온라인 유포 부동산 대책 내용 거짓…수사 의뢰 예정\"",
-      "summary": "국토교통부는 온라인에 유포된 부동산 대책 내용이 사실이 아니라고 밝혔다.\n올해 2월·6월·10월에 각각 수사를 의뢰한 바 있다.\n6일에 추가 수사를 의뢰할 예정임을 공식 발표했다.",
-      "verification": "2개 AI 검토 · 사실 확인은 원문 기준",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-06T15:03:32+09:00",
-      "sources": [
-        {
-          "title": "국토부 \"온라인 유포 부동산 대책 내용 거짓…수사 의뢰 예정\"",
-          "publisher": "중앙신문",
-          "published_at": "2026-11-06T15:03:32+09:00",
-          "link": "https://news.google.com/rss/articles/CBMi-AJBVV95cUxQRjRaeGl3bElsNklFRzVkb0hucTJiV09XTHIweUhNbGFZNm92U1pEeU1MeS1BMF84MXdNY3RJS2dHb3pWQnlqZmtsNkY0b2cwRXFwZEpKbWNXUXFtYTBBSGlob0tidGRnYmdVakNxQVl0aGluYkRjZ1Y0czdpbll3c2JYSTBKaFZMUktfNG9DMDBKNFBVRFRDZE1TdDRLaUp2dWVVLW9DUmJzRE92blV2YlhNcWxkN3JadFRtY3FiQkYtTzBpd0ZpdVJrY0FMQXRQbWJTWFRrWkZVcGhLWFBUbGlsaWJoVnVMNzFpc2RYcVJSYW5MUzk1RmthNkFOcXlnSXgtcllqSHRTX2Vpd2Y3T0tzMjVkS2xKRFl0WEY1ZFgxYmhZMHpZTXJpaUdIS3dBNUd6cjVGM3FEQUJ2OEc2RFpLWk1QUWJHY3NKUE1JWF9rQzB5Ykt4NEpuZGw5MHFpLUU2OGdxbV83ZkUyYXktRGdoQWRXOVdL?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.jasm.co.kr/news/view/324451/%EA%B5%AD%ED%86%A0%EB%B6%80-%EC%98%A8%EB%9D%BC%EC%9D%B8-%EC%9C%A0%ED%8F%AC-%EB%B6%80%EB%8F%99%EC%82%B0-%EB%8C%80%EC%B1%85-%EB%82%B4%EC%9A%A9-%EA%B1%B0%EC%A7%93-%EC%88%98%EC%82%AC-%EC%9D%98%EB%A2%B0-%EC%98%88%EC%A0%95-2026",
-      "summary_version": 3,
-      "groq_reviewed": true
     },
     {
       "id": "29627fbc5dea02",
@@ -276,28 +257,6 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.jeonmae.co.kr/news/articleView.html?idxno=1309188",
-      "summary_version": 3
-    },
-    {
-      "id": "1ebd9e8de5d476",
-      "category": "정책·규제",
-      "title": "[국토교통부] 분양가 25%로 입주하는 LH 공공분양주택… 12월 고양창릉서 첫 분양",
-      "summary": "국토교통부는 지분적립형 및 이익공유형Ⅱ 방식의 LH 공공분양주택 공급 시행 방안을 마련해 발표했다.\n지분적립형은 분양가의 25%인 1.28억 원으로 초기 입주하고, 이익공유형Ⅱ는 분양가의 30%인 1.53억 원으로 분양받을 수 있다.\n부담가능한 공공분양주택은 올해 12월 고양창릉 S-2BL에서 284세대의 지분적립형 분양을 시작으로 공급된다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-06T11:17:30+09:00",
-      "sources": [
-        {
-          "title": "[국토교통부] 분양가 25%로 입주하는 LH 공공분양주택… 12월 고양창릉서 첫 분양",
-          "publisher": "커넥트이천",
-          "published_at": "2026-11-06T11:17:30+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTFBmcWpySDRGY2JHcUJ2Ui12a1hqS2duaW9aVDNsNVFmQVJLUmVaRmJ0RzlRWkxFMzkxSm9iUk1YMGFndVlZNFRJbzNuWndSWFRsem5RZ1VvU0xPZTZ6Nmc?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.connecticheon.com/ko-kr/articles/3223",
       "summary_version": 3
     },
     {
@@ -392,7 +351,7 @@
       "category": "정책·규제",
       "title": "서초구 \"재초환은 주택공급 위축\"…정부에 폐지 건의",
       "summary": "서초구가 재초환 제도 폐지를 정부에 건의했다.\n구는 재초환이 주택공급 위축을 초래한다며 문제점을 제기했다.\n구는 구체적 대안 없이 제도 폐지를 요구했다.",
-      "verification": "Groq 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-06T07:32:24+09:00",
@@ -407,28 +366,6 @@
       "summary_method": "groq_article",
       "summary_model": "openai/gpt-oss-120b",
       "summary_source_url": "https://www.hankyung.com/article/202611058319i",
-      "summary_version": 3
-    },
-    {
-      "id": "09061db46d5627",
-      "category": "세금·대출",
-      "title": "“갚을 능력 있는데 왜 대출 막나”…관치금융 2.0 벗어나야[만났습니다]",
-      "summary": "조동철 KDI 국제정책대학원 교수가 최근 금융정책 흐름을 관치금융 2.0으로 진단했다.\n조 교수는 지난달 28일 이데일리와의 인터뷰에서 가계대출 총량 규제 등을 과잉 규제로 지적했다.\n그는 대안으로 총부채원리금상환비율과 위험가중치 조정을 제시했다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-06T06:29:02+09:00",
-      "sources": [
-        {
-          "title": "“갚을 능력 있는데 왜 대출 막나”…관치금융 2.0 벗어나야[만났습니다]",
-          "publisher": "이데일리",
-          "published_at": "2026-11-06T06:29:02+09:00",
-          "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxOQXcwMS1TTDVRUGtORmZ1Q1pXT1p1NHdjeGRvcmQ4bnJtTFFYd1hHTnlocDlnZk1sanQ0ZkdwdlpsRFNkQnBEcFlfY1YxOUwzOFdURktzdVZ6dDhFN1FZTl90X0JRWDZkTFMtWkMzdVlvR1NfZVg5NjRBdmNGLWhUMw?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.edaily.co.kr/News/Read?newsId=02299286645643096&mediaCodeNo=257",
       "summary_version": 3
     },
     {
@@ -540,7 +477,7 @@
       "category": "송도 종합",
       "title": "송도세브란스병원 건립 지연에 주민 반발…“이달 중순 착공 못 하면 2028년 개원 어려워”",
       "summary": "인천 송도세브란스병원 지상부 공사가 시공사 본계약 지연으로 차질을 빚고 있다.\n이달 중순까지 착공하지 못하면 2028년 말 개원 목표를 맞추기 어렵다.\n주민단체들은 5일 현장에서 집회를 열고 구체적인 일정 공개를 촉구했다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-05T17:28:00+09:00",
@@ -652,28 +589,6 @@
       "summary_version": 3
     },
     {
-      "id": "f5e625f702b663",
-      "category": "송도 종합",
-      "title": "인천 송도 인천대입구역 눈썹문신,두피문신 ‘올스뷰티 송도본점’ 김나경 원장, 아름다움은 자연스러움에서 완성된다",
-      "summary": "인천 송도에 위치한 올스뷰티 송도본점 김나경 원장이 눈썹·두피문신 시술을 제공한다.\n원장은 자체 개발한 ‘올스 안개 헤어라인’ 기법으로 자연스러운 밀도 표현을 강조한다.\n시술 전 상담을 중시하며 고객 맞춤 자연스러운 결과를 지속적으로 추구한다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-05T16:37:31+09:00",
-      "sources": [
-        {
-          "title": "인천 송도 인천대입구역 눈썹문신,두피문신 ‘올스뷰티 송도본점’ 김나경 원장, 아름다움은 자연스러움에서 완성된다",
-          "publisher": "유스연합",
-          "published_at": "2026-11-05T16:37:31+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE56d0ZkQjg5N0FkV3cwbkJ2RHJiTG5kWUtWQW5CX1l0YTZGZHpmQVFVeDVBT0VIWmdvRk50eFJYdFdGU2xYRE1LRHdLSlZGck9kazJF?oc=5"
-        }
-      ],
-      "summary_method": "groq_article",
-      "summary_model": "openai/gpt-oss-120b",
-      "summary_source_url": "https://www.youthassembly.kr/news/1030842",
-      "summary_version": 3
-    },
-    {
       "id": "a82583fd9ba0f2",
       "category": "송도 종합",
       "title": "“송도 바이오 인재, 지역 직업계고에서 키운다”…인천바이오과학고의 도전",
@@ -700,7 +615,7 @@
       "category": "정책·규제",
       "title": "서초구 “재건축 발목 잡는 규제 풀어야”… 국토부에 재초환 폐지 건의",
       "summary": "서울 서초구가 정부에 재건축초과이익환수제 폐지를 촉구했다.\n서초구청 관계자들이 국토교통부를 방문해 제도 개선 건의문과 주민 탄원서를 전달했다.\n서초구는 앞으로도 재건축 현장의 의견을 국토부에 전달하고 건의 활동을 이어갈 계획이다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-05T16:04:37+09:00",
@@ -810,6 +725,25 @@
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.yna.co.kr/amp/view/AKR20261105088500003",
       "summary_version": 3
+    },
+    {
+      "id": "c9985bd0edd416",
+      "category": "송도 종합",
+      "title": "롯데바이오, 송도 1공장 의약품업체 허가…상업생산 준비 진전",
+      "summary": "",
+      "verification": "기사 본문 요약 대기",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-05T13:50:04+09:00",
+      "sources": [
+        {
+          "title": "롯데바이오, 송도 1공장 의약품업체 허가…상업생산 준비 진전",
+          "publisher": "PRESS9",
+          "published_at": "2026-11-05T13:50:04+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFB4cWdaQzRieDg5TjhscHNWa2w0RnJFZGJKRHBBTkptdU1lbGV5MkhHbHotQmxCZDJ3cVF1Z21GZUZXSFZYVW9XNk5JRjJUWHpqblhKZnNfQ21Qb242MTI0dWxUWE4?oc=5"
+        }
+      ],
+      "summary_method": "headline_only"
     },
     {
       "id": "e0d5ba5926ad2c",
@@ -1382,6 +1316,28 @@
       "summary_version": 3
     },
     {
+      "id": "7b72298df7b1fb",
+      "category": "송도 종합",
+      "title": "정일영 국회의원 “송도 트램, 이제는 실행으로” … 4일 공청회 개최",
+      "summary": "정일영 국회의원은 송도트램 신속 추진과 예비타당성조사를 위한 공청회를 개최했다.\n송도트램은 총연장 25.2km이며 사업비는 약 7,461억 원 규모로 추진되고 있다.\n인천시는 2027년 예비타당성조사 대상 사업 재신청을 목표로 용역을 진행하고 있다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-04T18:28:51+09:00",
+      "sources": [
+        {
+          "title": "정일영 국회의원 “송도 트램, 이제는 실행으로” … 4일 공청회 개최",
+          "publisher": "뉴뉴스",
+          "published_at": "2026-11-04T18:28:51+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTFAzODB0ZFlDbENfLUdkNXhEOFR2M2dRSUQ5SFNRcXVJNF95ZUpWaXBVdlVwc2pTbWhZUlRiZGtSSUFMSTd4RWFBR1hKRTZyUFp3MENTTTE2LVdHc3JZRkktMllmZGpLUQ?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.nnewss.com/news/articleView.html?idxno=8389",
+      "summary_version": 3
+    },
+    {
       "id": "4f5d73a43c8e78",
       "category": "개발·교통",
       "title": "인천시, 송도트램 예타 내년에 재도전",
@@ -1525,13 +1481,13 @@
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
-      "last_published_at": "2026-11-04T16:30:00+09:00",
+      "last_published_at": "2026-11-04T16:30:19+09:00",
       "sources": [
         {
           "title": "'킹'과 '폰' 움직인 송도 국제 체스 페스티벌…국제 타이틀 30명 포함 18개국 214명 참가",
           "publisher": "더팩트",
-          "published_at": "2026-11-04T16:30:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE1yQ0VnSkNQTlpEVlFkU1YyWXFENU8yLXl3UnJBMnMzajdwRmNTSHcxVDRsQ2MwYzNEWjl1bXBvNlB4QUE2NnpORnptX1JlX05xQlp2bi1n0gFWQVVfeXFMTXJDRWdKQ1BOWkRWUWRTVjJZcUQ1TzIteXdSckEyczNqN3BGY1NIdzFUNGxDYzBjM0RaOXVtcG82UHhBQTY2ek5Gem1fUmVfTnFCWnZuLWc?oc=5"
+          "published_at": "2026-11-04T16:30:19+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE5QSks0dnN1a0x1S0p5ZF94T3U3YUZQYmZnT1dSdkpDT3hCQ2JOdTlNYVV5VGo1UUU4NWQ5OUFxdlIzWkhhOGZQYWVIU0QxZlZnSzJSZkY0OHJRMHfSAVZBVV95cUxNckNFZ0pDUE5aRFZRZFNWMllxRDVPMi15d1JyQTJzM2o3cEZjU0h3MVQ0bENjMGMzRFo5dW1wbzZQeEFBNjZ6TkZ6bV9SZV9OcUJadm4tZw?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -1903,8 +1859,8 @@
       "title": "인천경제청, 청라 콘텐츠·송도 바이오로 미래산업 키운다",
       "summary": "인천경제청은 송도와 영종, 청라에 이어 강화남단까지 미래산업 생태계를 넓히는 전략을 추진한다.\n2024년 인천 제약 바이오 산업 생산액은 7조7천억 원으로 전국 61.8%를 기록했다.\n인천경제청은 오는 12월 최종 보고회를 거쳐 제2차 인천경제자유구역 발전계획을 산업통상부에 제출할 예정이다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 4,
-      "publisher_count": 4,
+      "article_count": 3,
+      "publisher_count": 3,
       "last_published_at": "2026-11-04T11:01:24+09:00",
       "sources": [
         {
@@ -1918,12 +1874,6 @@
           "publisher": "SBS 뉴스",
           "published_at": "2026-11-04T09:29:10+09:00",
           "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE9OMlJMc3BndVdpeUFtYjMxUTViS1MtcUlobDN3aGhQV2VQckFxdGNwOWhQQ1ZoVHB3OWVoUUxMT2xWTnZCd0NOUzdhaER0Mmh2eEJKN0N2aUZXZzE2cWxkSE1XcmE2TndqYUE?oc=5"
-        },
-        {
-          "title": "인천경제청 \"청라·송도에 K콘텐츠·바이오 등 미래산업 기반↑\"",
-          "publisher": "news.sbs.co.kr",
-          "published_at": "2026-11-04T09:29:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTFBVd3FEN0dJZkMwcU9xaGU4cmpaaGh3dm5WRF9RZ0RpUHl0bm9YazRMSjhRcDhmektSRHdVXzc5NW44S3VJN1hldWRjUDUxSW9Pc1g0VEZEQUZQSUdyOW80T1dpb2U4UQ?oc=5"
         },
         {
           "title": "인천경제청 \"청라·송도에 K콘텐츠·바이오 등 미래산업 기반↑\"",
@@ -2009,8 +1959,8 @@
       "title": "종부세, '몇 채'가 아니라 '얼마'에 매긴다...실거주 중심 부동산세 개편",
       "summary": "정부가 국회에 제출한 세제개편안은 주택 수 대신 실거주 여부와 가액을 기준으로 종합부동산세 체계를 개편한다.\n2주택 이하와 3주택 이상의 중과 제도를 없애고 2028년부터는 6억원 이하부터 94억원 초과까지 단일 세율표를 적용한다.\n정부안에 따라 공정시장가액비율은 2027년에 모든 주택 70%로 오르며 이후 다주택자는 80%로 차등화된다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 2,
-      "publisher_count": 2,
+      "article_count": 1,
+      "publisher_count": 1,
       "last_published_at": "2026-11-04T09:20:00+09:00",
       "sources": [
         {
@@ -2018,12 +1968,6 @@
           "publisher": "이로운넷",
           "published_at": "2026-11-04T09:20:00+09:00",
           "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9UUmU4YjFKbnhRVWxKbXdqZEJVTFNucGpKMFN0dXJvNDBPNWNEN3IzUi1QM2k3ZmNBUGlTV1R1MG44RkVkRzVfRnRLck1NSGNHdndmVmJMWEVleFp3MUdsVzZIRU9aZw?oc=5"
-        },
-        {
-          "title": "실거주 중심 부동산세 개편…전문가들 \"임대료 전가 살펴야\"",
-          "publisher": "뉴시스",
-          "published_at": "2026-11-03T16:22:48+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBCaGREVjhwaXl0ZldvRGlpcUhKWjlab1ZQd1hLaFBZOW9uVFQweF9EdzZCc092WWcxQ0htTXhVVjVqcHF4WGp2NmJjYVdJdGZNcUJ3Tk9LRnk5N3pCZkdZQtIBeEFVX3lxTE1YbXJqcDJtWHJTNlVfYWpCSWQwYnlQbkQtRGdWeTJVRlZTTzBLTjM3MnBFaXNmUEI4Z0RueThBeXN1Y0oyTkFVU0ZYSUpGU193YWlaeWdYN0d5UjItOTNnV1dycV9kT3NEVUpHYy1YanFaRC1Wd015Wg?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -2059,8 +2003,8 @@
       "title": "동아ST, 인천 송도서 '친환경 도시 숲 가꾸기' 활동…'모동숲' 전개",
       "summary": "동아에스티가 지역사회와 함께 도심 녹지 생태계 보전을 위한 환경보호 활동에 나섰다.\n동아에스티는 인천 연수구 송도 누리공원에서 친환경 도시 숲 가꾸기 캠페인 모동숲을 전개했다.\n이번 행사는 지난 2일에 진행되었으며 1년 동안 사용할 수 있는 분량의 친환경 자재를 기증할 예정이다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 2,
-      "publisher_count": 2,
+      "article_count": 1,
+      "publisher_count": 1,
       "last_published_at": "2026-11-04T09:14:00+09:00",
       "sources": [
         {
@@ -2068,12 +2012,6 @@
           "publisher": "비즈월드",
           "published_at": "2026-11-04T09:14:00+09:00",
           "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE1KQnhodkpqNjd3aVJzcEI3Z1Q0eHVGS0lHZ3ZjUGpJTVJ1VTlKV1FWNXRvLTM4VXZ0cS1oenBwbE52SEx4dVRYZjN2eU9xNlZ0ZDBGRk9fYmZNWG00LVBIWXU0V25pSnhSQWc?oc=5"
-        },
-        {
-          "title": "동아에스티, 인천 송도 '모동숲' 가꾸기 캠페인 전개",
-          "publisher": "메디소비자뉴스",
-          "published_at": "2026-11-03T09:50:06+09:00",
-          "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTE5iU3ZhVEo2eG9tVDlHWkYyRUNSamJURm16bHpBdUZBR1Q5UDNlQnVNT29VNTZFTFhhTFRJSDlBYXBOb3pBYmZtcnR0X3QxN0hUVmhiODktbkRfZ1RacTJpZmE3azdGdmZBbzdveFlNYXI1U0HSAXZBVV95cUxPSFd2Y0s0eXpNb3VFQzlHX0FGWjVkNGJIRXNVZ1hOQnZvUjVMUno5dnNBdHUwalpIbG8tbTZ6TjdDZDVGdk82WGk3ZDhhSlFDNkdrWENVU3hkZ2V0LW1rV1pMUkp2a3FfcENsRkdlZlk0LW1RNGVR?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -2129,6 +2067,28 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://magazine.hankyung.com/business/article/202610281017b",
+      "summary_version": 3
+    },
+    {
+      "id": "3ae2f554ca11ed",
+      "category": "세금·대출",
+      "title": "부동산 세제개편 놓고 전문가 공방…“징벌적 과세” vs “담세력 반영”",
+      "summary": "국회 재정경제기획위원회가 개최한 2026년 세제개편안 공청회에서 정부의 부동산 세제 개편 방향을 두고 전문가들의 찬반 의견이 팽팽하게 맞섰다.\n주택 수 중심에서 주택가액과 실거주 여부 중심으로 과세 기준을 전환하는 방안에 대해 비거주자 과세 강화와 임대료 전가 우려 등이 제기됐다.\n이번 공청회에서는 국내생산세액공제의 직접 환급 허용 여부와 가업상속공제 요건 등도 주요 쟁점으로 다뤄졌다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-03T21:18:56+09:00",
+      "sources": [
+        {
+          "title": "부동산 세제개편 놓고 전문가 공방…“징벌적 과세” vs “담세력 반영”",
+          "publisher": "Daily NTN",
+          "published_at": "2026-11-03T21:18:56+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTFBYMnMyd0VqVkhfLUJZS0FvX1UxNGlaUnhFU3NVV3hpWUEyaE5pZTJUckVFaXgtc3JfUGpIbXJhTVowb21QQ3BDR0JaX0s2NWdyaDFHbkxXaGREVzE1LWJMMm1Jd1JkV0NidGc?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.intn.co.kr/news/articleView.html?idxno=2054490",
       "summary_version": 3
     },
     {
@@ -2262,6 +2222,25 @@
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.incheonilbo.com/news/articleView.html?idxno=1335854",
       "summary_version": 3
+    },
+    {
+      "id": "ac47bf768d8c1e",
+      "category": "세금·대출",
+      "title": "실거주 중심 부동산세 개편…전문가들 \"임대료 전가 살펴야\"",
+      "summary": "",
+      "verification": "기사 본문 요약 대기",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-03T16:22:48+09:00",
+      "sources": [
+        {
+          "title": "실거주 중심 부동산세 개편…전문가들 \"임대료 전가 살펴야\"",
+          "publisher": "뉴시스",
+          "published_at": "2026-11-03T16:22:48+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBCaGREVjhwaXl0ZldvRGlpcUhKWjlab1ZQd1hLaFBZOW9uVFQweF9EdzZCc092WWcxQ0htTXhVVjVqcHF4WGp2NmJjYVdJdGZNcUJ3Tk9LRnk5N3pCZkdZQtIBeEFVX3lxTE1YbXJqcDJtWHJTNlVfYWpCSWQwYnlQbkQtRGdWeTJVRlZTTzBLTjM3MnBFaXNmUEI4Z0RueThBeXN1Y0oyTkFVU0ZYSUpGU193YWlaeWdYN0d5UjItOTNnV1dycV9kT3NEVUpHYy1YanFaRC1Wd015Wg?oc=5"
+        }
+      ],
+      "summary_method": "headline_only"
     },
     {
       "id": "d05aa6821fe081",
@@ -2972,7 +2951,7 @@
       "category": "송도 종합",
       "title": "‘송도달빛지구대’ 11개월 앞당겨 조기 개소",
       "summary": "인천 송도에 세 번째 지구대인 송도달빛지구대가 개소하여 본격적인 운영에 들어갔다.\n송도달빛지구대에는 경찰관 35명이 배치되어 송도5동과 송도2·3동 일부 지역의 치안을 담당한다.\n이번 지구대는 애초 계획된 2027년 9월 완공 예정일보다 11개월 앞당겨 운영을 시작했다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 3,
       "publisher_count": 3,
       "last_published_at": "2026-11-02T09:37:27+09:00",
@@ -3066,6 +3045,25 @@
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.kyeonggi.com/article/20261101580267",
       "summary_version": 3
+    },
+    {
+      "id": "25685fbf3ea434",
+      "category": "정책·규제",
+      "title": "\"자산시장 정상화 향한 인내의 시간\"…이재명 부동산 실험의 결말은",
+      "summary": "",
+      "verification": "기사 본문 요약 대기",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-02T05:30:00+09:00",
+      "sources": [
+        {
+          "title": "\"자산시장 정상화 향한 인내의 시간\"…이재명 부동산 실험의 결말은",
+          "publisher": "뉴시스",
+          "published_at": "2026-11-02T05:30:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBPRWdabXpYZ2tCZkZQbGZuVjdpY0NXZEdNUzJiVDhkNG1uallyZThBZE5xTGx4cXZ2R1MxcVBSdDFJZEVqRGdKM0hsd1E0MXh6amJsa0VOVWJkdXVGQ0ZUdNIBeEFVX3lxTE5odVRnTGxoenJvMUpPenpITmV1NHpZTzI1V09QSnlFXzliZzBtdHkxX1NHekR4Ty1oS2hPd1FHZHNXazlJeVJKZ29qUUVCYWRuZENQdFFzbkZWY0F1cjE2T0R2Q0piRFVTaS1yWjB6MW5VdU5sTmlPaQ?oc=5"
+        }
+      ],
+      "summary_method": "headline_only"
     },
     {
       "id": "9ff85bbc5a8de6",
@@ -3448,15 +3446,6 @@
   ],
   "articles": [
     {
-      "title": "홍지선 국토교통부장관, \"주택건설업계와 적극 소통하며, 현장의 어려움을 신속히 해소할 것\"",
-      "publisher": "누리일보",
-      "published_at": "2026-11-06T20:50:35+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1yakZnMDlEMEluRUtLSlJOUU9ESDNBVXBZN09nRExVNWtoSkNpUEY2SldHRmJMdlhNZWJXRllEWjg1SWtiS3BQV1ROdGFWTE9nblhkTmtaMnp1YU0?oc=5",
-      "category": "정책·규제",
-      "query": "국토교통부 주택 정책",
-      "id": "654c7e77a29f7a8b31"
-    },
-    {
       "title": "송도 에디슨박물관 빼고 ‘또파트’ 개발… “약속 파기” 주민 뿔났다",
       "publisher": "기호일보",
       "published_at": "2026-11-06T20:39:04+09:00",
@@ -3464,6 +3453,15 @@
       "category": "개발·교통",
       "query": "송도 워터프런트",
       "id": "2b018307da90fa30da"
+    },
+    {
+      "title": "홍지선 국토교통부장관, ˝주택건설업계와 적극 소통하며, 현장의 어려움을 신속히 해소할 것˝:경인투데이뉴스",
+      "publisher": "경인투데이뉴스",
+      "published_at": "2026-11-06T20:14:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTFA0NTZWSUhxSWVLSTFDMUttWkZfZ3BwV3BDTmFiUC11dVBCVUFvUkh6ckE5eExNVWFYU0taTkxNWEItOG9rRzM0bGhhVHJxd1XSAV9BVV95cUxPVVhXTnNqSFVEWERnV3k1WVF0R2xjZzZ2TXZiRlZfU0NyeExzZnRrYmpwcHlHUzJySi1DYkE4ZEVnVVZOeTFJbnhFU296cnY2b0JPNkZ1THh4NFBvZkZkNA?oc=5",
+      "category": "정책·규제",
+      "query": "국토교통부 주택 정책",
+      "id": "9d4b61c3bffca486f6"
     },
     {
       "title": "홍지선 국토부 장관, 주택건설업계 간담회…공급 애로 해소 논의",
@@ -3538,15 +3536,6 @@
       "id": "c8449b72e0176749d1"
     },
     {
-      "title": "국토부 \"온라인 유포 부동산 대책 내용 거짓…수사 의뢰 예정\"",
-      "publisher": "중앙신문",
-      "published_at": "2026-11-06T15:03:32+09:00",
-      "link": "https://news.google.com/rss/articles/CBMi-AJBVV95cUxQRjRaeGl3bElsNklFRzVkb0hucTJiV09XTHIweUhNbGFZNm92U1pEeU1MeS1BMF84MXdNY3RJS2dHb3pWQnlqZmtsNkY0b2cwRXFwZEpKbWNXUXFtYTBBSGlob0tidGRnYmdVakNxQVl0aGluYkRjZ1Y0czdpbll3c2JYSTBKaFZMUktfNG9DMDBKNFBVRFRDZE1TdDRLaUp2dWVVLW9DUmJzRE92blV2YlhNcWxkN3JadFRtY3FiQkYtTzBpd0ZpdVJrY0FMQXRQbWJTWFRrWkZVcGhLWFBUbGlsaWJoVnVMNzFpc2RYcVJSYW5MUzk1RmthNkFOcXlnSXgtcllqSHRTX2Vpd2Y3T0tzMjVkS2xKRFl0WEY1ZFgxYmhZMHpZTXJpaUdIS3dBNUd6cjVGM3FEQUJ2OEc2RFpLWk1QUWJHY3NKUE1JWF9rQzB5Ykt4NEpuZGw5MHFpLUU2OGdxbV83ZkUyYXktRGdoQWRXOVdL?oc=5",
-      "category": "정책·규제",
-      "query": "인천 부동산 규제",
-      "id": "cd91f52253e1f87915"
-    },
-    {
       "title": "홍지선 국토장관, 주택건설업계 만나 \"현장 애로 신속 해소\"",
       "publisher": "파이낸셜뉴스",
       "published_at": "2026-11-06T13:56:05+09:00",
@@ -3583,21 +3572,12 @@
       "id": "4e65335670e9df9560"
     },
     {
-      "title": "[국토교통부] 분양가 25%로 입주하는 LH 공공분양주택… 12월 고양창릉서 첫 분양",
-      "publisher": "커넥트이천",
-      "published_at": "2026-11-06T11:17:30+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTFBmcWpySDRGY2JHcUJ2Ui12a1hqS2duaW9aVDNsNVFmQVJLUmVaRmJ0RzlRWkxFMzkxSm9iUk1YMGFndVlZNFRJbzNuWndSWFRsem5RZ1VvU0xPZTZ6Nmc?oc=5",
-      "category": "정책·규제",
-      "query": "국토교통부 주택 정책",
-      "id": "06a31a3063939c735b"
-    },
-    {
       "title": "정일영·송도 시·구의원 “해사국제상사법원 본청사 송도로”",
       "publisher": "미디어생활",
       "published_at": "2026-11-06T11:00:22+09:00",
       "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5fUmFKczEzcmtJbG5aaWNNQkFHOHRCMThNWmZJeHJia3ZDWUM4eHBtNV9ZSTlZV1JpM3RQelZFTTNWVmVWUUZJcHM0VjBnaEd5al9UeWttYktrQzZBQ3VjYS1tRmNMbWNCSlpNZGxnYw?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도",
+      "query": "\"송도국제도시\"",
       "id": "c8c131e5576e016f23"
     },
     {
@@ -3626,15 +3606,6 @@
       "category": "정책·규제",
       "query": "국토교통부 주택 정책",
       "id": "6e290ef762df1d7b23"
-    },
-    {
-      "title": "“갚을 능력 있는데 왜 대출 막나”…관치금융 2.0 벗어나야[만났습니다]",
-      "publisher": "이데일리",
-      "published_at": "2026-11-06T06:29:02+09:00",
-      "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxOQXcwMS1TTDVRUGtORmZ1Q1pXT1p1NHdjeGRvcmQ4bnJtTFFYd1hHTnlocDlnZk1sanQ0ZkdwdlpsRFNkQnBEcFlfY1YxOUwzOFdURktzdVZ6dDhFN1FZTl90X0JRWDZkTFMtWkMzdVlvR1NfZVg5NjRBdmNGLWhUMw?oc=5",
-      "category": "세금·대출",
-      "query": "주택담보대출 DSR 정책",
-      "id": "bb89937450f487e492"
     },
     {
       "title": "[秘하인드 스토리] 송도국제도시 투자사‘게일[GALE]’ 컨설팅 비용 미납 피소된 이유는?",
@@ -3736,15 +3707,6 @@
       "id": "542264a7b52441dd07"
     },
     {
-      "title": "인천 송도 인천대입구역 눈썹문신,두피문신 ‘올스뷰티 송도본점’ 김나경 원장, 아름다움은 자연스러움에서 완성된다",
-      "publisher": "유스연합",
-      "published_at": "2026-11-05T16:37:31+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE56d0ZkQjg5N0FkV3cwbkJ2RHJiTG5kWUtWQW5CX1l0YTZGZHpmQVFVeDVBT0VIWmdvRk50eFJYdFdGU2xYRE1LRHdLSlZGck9kazJF?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도동",
-      "id": "8ea9664df5896bf13d"
-    },
-    {
       "title": "“송도 바이오 인재, 지역 직업계고에서 키운다”…인천바이오과학고의 도전",
       "publisher": "쓰담미디어",
       "published_at": "2026-11-05T16:36:15+09:00",
@@ -3797,6 +3759,15 @@
       "category": "정책·규제",
       "query": "인천 부동산 규제",
       "id": "f2c0eb64ec20c19a98"
+    },
+    {
+      "title": "롯데바이오, 송도 1공장 의약품업체 허가…상업생산 준비 진전",
+      "publisher": "PRESS9",
+      "published_at": "2026-11-05T13:50:04+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFB4cWdaQzRieDg5TjhscHNWa2w0RnJFZGJKRHBBTkptdU1lbGV5MkhHbHotQmxCZDJ3cVF1Z21GZUZXSFZYVW9XNk5JRjJUWHpqblhKZnNfQ21Qb242MTI0dWxUWE4?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도",
+      "id": "75fe44ad22c25c24ca"
     },
     {
       "title": "인천 부평구(富平區) · '26년 11월 부동산 흐름 (국평 10억 원 넘긴 산곡6, 59㎡ 146가구 남았다 — 부평 84㎡ 거래 227건 중 8억 원 넘은 3건은 어디?)",
@@ -4024,6 +3995,15 @@
       "id": "0368d49f55e641131c"
     },
     {
+      "title": "정일영 국회의원 “송도 트램, 이제는 실행으로” … 4일 공청회 개최",
+      "publisher": "뉴뉴스",
+      "published_at": "2026-11-04T18:28:51+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTFAzODB0ZFlDbENfLUdkNXhEOFR2M2dRSUQ5SFNRcXVJNF95ZUpWaXBVdlVwc2pTbWhZUlRiZGtSSUFMSTd4RWFBR1hKRTZyUFp3MENTTTE2LVdHc3JZRkktMllmZGpLUQ?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도",
+      "id": "3894a25ef2aecb32df"
+    },
+    {
       "title": "인천시, 송도트램 예타 내년에 재도전",
       "publisher": "기호일보",
       "published_at": "2026-11-04T17:46:01+09:00",
@@ -4134,11 +4114,11 @@
     {
       "title": "'킹'과 '폰' 움직인 송도 국제 체스 페스티벌…국제 타이틀 30명 포함 18개국 214명 참가",
       "publisher": "더팩트",
-      "published_at": "2026-11-04T16:30:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTE1yQ0VnSkNQTlpEVlFkU1YyWXFENU8yLXl3UnJBMnMzajdwRmNTSHcxVDRsQ2MwYzNEWjl1bXBvNlB4QUE2NnpORnptX1JlX05xQlp2bi1n0gFWQVVfeXFMTXJDRWdKQ1BOWkRWUWRTVjJZcUQ1TzIteXdSckEyczNqN3BGY1NIdzFUNGxDYzBjM0RaOXVtcG82UHhBQTY2ek5Gem1fUmVfTnFCWnZuLWc?oc=5",
+      "published_at": "2026-11-04T16:30:19+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE5QSks0dnN1a0x1S0p5ZF94T3U3YUZQYmZnT1dSdkpDT3hCQ2JOdTlNYVV5VGo1UUU4NWQ5OUFxdlIzWkhhOGZQYWVIU0QxZlZnSzJSZkY0OHJRMHfSAVZBVV95cUxNckNFZ0pDUE5aRFZRZFNWMllxRDVPMi15d1JyQTJzM2o3cEZjU0h3MVQ0bENjMGMzRFo5dW1wbzZQeEFBNjZ6TkZ6bV9SZV9OcUJadm4tZw?oc=5",
       "category": "송도 종합",
       "query": "\"송도국제도시\"",
-      "id": "caf430672e8ff8c64b"
+      "id": "ae29f975e4e205ecad"
     },
     {
       "title": "정일영·민주당, 송도 트램 이제는 실행으로",
@@ -4200,7 +4180,7 @@
       "published_at": "2026-11-04T15:13:30+09:00",
       "link": "https://news.google.com/rss/articles/CBMixgJBVV95cUxQSUxsdFMtck9iLXJCeE9meW95UUh2SmoxbENTRnRPcnpNeEhQMU9oMVRteXFJTmZ6ZTJRd25wbXB0b2dWbkpfOHR6dnV1b3pXOFpRLWdJNkdXeEJ5Q1N1NnFxWE1nTzNqTWphU1M5Q1BheXRGOTFVLUZnekh4Wkd6M00zamMwTVV1VWsxYnJTMFBuc096NjhpRWtQOE9nTnA1TnN2NmJmdndZQUdnZ2xDNjJ1UVJSbkZSRmVkMWdxM1BkbHNhYnJoUDFHSEdLdzF4aDhXM2dtb1N4ZzhJREFyNkotQkxKN01IUUphMlJ6REROLWRFUEZ6VkR3cHV1a0JobkkwQWRiV0RkX1owdnYxQy1YMHU4R3Vvc3p0YktieHFxNlUxNFAxV3UxdlhMbW9ITndYNld4RlpYN1dfQk8wVG9BN0RtUQ?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도 기업 바이오",
+      "query": "인천 송도 문화 축제",
       "id": "53493fd25c6c56b4e1"
     },
     {
@@ -4474,15 +4454,6 @@
       "id": "0ea9e1478b4f5eeac2"
     },
     {
-      "title": "인천경제청 \"청라·송도에 K콘텐츠·바이오 등 미래산업 기반↑\"",
-      "publisher": "news.sbs.co.kr",
-      "published_at": "2026-11-04T09:29:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTFBVd3FEN0dJZkMwcU9xaGU4cmpaaGh3dm5WRF9RZ0RpUHl0bm9YazRMSjhRcDhmektSRHdVXzc5NW44S3VJN1hldWRjUDUxSW9Pc1g0VEZEQUZQSUdyOW80T1dpb2U4UQ?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도",
-      "id": "9042aa3c46ab75e8ca"
-    },
-    {
       "title": "종부세, '몇 채'가 아니라 '얼마'에 매긴다...실거주 중심 부동산세 개편",
       "publisher": "이로운넷",
       "published_at": "2026-11-04T09:20:00+09:00",
@@ -4562,6 +4533,15 @@
       "category": "정책·규제",
       "query": "인천 부동산 규제",
       "id": "1e5ba31b1ed1e8046c"
+    },
+    {
+      "title": "부동산 세제개편 놓고 전문가 공방…“징벌적 과세” vs “담세력 반영”",
+      "publisher": "Daily NTN",
+      "published_at": "2026-11-03T21:18:56+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTFBYMnMyd0VqVkhfLUJZS0FvX1UxNGlaUnhFU3NVV3hpWUEyaE5pZTJUckVFaXgtc3JfUGpIbXJhTVowb21QQ3BDR0JaX0s2NWdyaDFHbkxXaGREVzE1LWJMMm1Jd1JkV0NidGc?oc=5",
+      "category": "세금·대출",
+      "query": "부동산 취득세 양도소득세",
+      "id": "1e721f2af2610d764e"
     },
     {
       "title": "넉달째 표류 '송도 글로벌타운' 3단계 사업…인천경제청 책임론",
@@ -4731,7 +4711,7 @@
       "published_at": "2026-11-03T11:16:49+09:00",
       "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE5FYlNGOE45ZEQ2emNfMkpDdHFvU0NXbEFtSmNnZmNvQXA1S1A0RWlkSU1mM01zMTMwR2c1U2xNRkV5NE5VWk9TUXl0ZFlXbkg2LWd5bTdXOTh6c3REWnhoRDdrNHXSAWhBVV95cUxPNmdjUTNxRjNZWE5lZW55MHh5Tmd3MnNMZGJnOGkxRnhURjByV2hGc245ZEtTN0s5ZFJPNWJrR0RRU1BVZ05pV0NKa3B5Yk5STnNILVM2dnpJeGdWRXZhNGpZd2FGcTZyVQ?oc=5",
       "category": "송도 종합",
-      "query": "\"송도국제도시\"",
+      "query": "인천 송도",
       "id": "83796c5e857c08e57d"
     },
     {
@@ -4787,15 +4767,6 @@
       "category": "송도 종합",
       "query": "인천 송도",
       "id": "819e067cbffef9aa1f"
-    },
-    {
-      "title": "동아에스티, 인천 송도 '모동숲' 가꾸기 캠페인 전개",
-      "publisher": "메디소비자뉴스",
-      "published_at": "2026-11-03T09:50:06+09:00",
-      "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTE5iU3ZhVEo2eG9tVDlHWkYyRUNSamJURm16bHpBdUZBR1Q5UDNlQnVNT29VNTZFTFhhTFRJSDlBYXBOb3pBYmZtcnR0X3QxN0hUVmhiODktbkRfZ1RacTJpZmE3azdGdmZBbzdveFlNYXI1U0HSAXZBVV95cUxPSFd2Y0s0eXpNb3VFQzlHX0FGWjVkNGJIRXNVZ1hOQnZvUjVMUno5dnNBdHUwalpIbG8tbTZ6TjdDZDVGdk82WGk3ZDhhSlFDNkdrWENVU3hkZ2V0LW1rV1pMUkp2a3FfcENsRkdlZlk0LW1RNGVR?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도",
-      "id": "fd3c9907a7ea5d8da4"
     },
     {
       "title": "‘제13회 국제기후금융·산업컨퍼런스’, 3일 송도컨벤시아에서 열려",
@@ -5032,6 +5003,15 @@
       "id": "0ade9ea248680f1c35"
     },
     {
+      "title": "\"자산시장 정상화 향한 인내의 시간\"…이재명 부동산 실험의 결말은",
+      "publisher": "뉴시스",
+      "published_at": "2026-11-02T05:30:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBPRWdabXpYZ2tCZkZQbGZuVjdpY0NXZEdNUzJiVDhkNG1uallyZThBZE5xTGx4cXZ2R1MxcVBSdDFJZEVqRGdKM0hsd1E0MXh6amJsa0VOVWJkdXVGQ0ZUdNIBeEFVX3lxTE5odVRnTGxoenJvMUpPenpITmV1NHpZTzI1V09QSnlFXzliZzBtdHkxX1NHekR4Ty1oS2hPd1FHZHNXazlJeVJKZ29qUUVCYWRuZENQdFFzbkZWY0F1cjE2T0R2Q0piRFVTaS1yWjB6MW5VdU5sTmlPaQ?oc=5",
+      "category": "정책·규제",
+      "query": "인천 부동산 규제",
+      "id": "79afa5863a99c083d2"
+    },
+    {
       "title": "연수구 송도건강생활지원센터, ‘우리 가족 생활안전 건강 특강’ 운영 > 뉴스",
       "publisher": "더코리아",
       "published_at": "2026-11-01T23:30:00+09:00",
@@ -5213,25 +5193,25 @@
     }
   ],
   "counts": {
-    "briefs": 144,
-    "articles": 196
+    "briefs": 145,
+    "articles": 194
   },
   "ai_summary_stats": {
-    "created": 6,
-    "reused": 120,
-    "article_fetches": 23,
-    "source_links_resolved": 23,
-    "body_readable": 15,
-    "gemini_requests": 7,
+    "created": 3,
+    "reused": 124,
+    "article_fetches": 17,
+    "source_links_resolved": 17,
+    "body_readable": 9,
+    "gemini_requests": 6,
     "retry_requests": 4,
     "retry_strategy": "two_article_batch",
     "gemini_circuit": "open",
-    "candidate_articles": 11,
-    "groq_created": 2,
+    "candidate_articles": 8,
+    "groq_created": 0,
     "groq_requests": 4,
     "groq_reviewed": 1,
-    "awaiting_body": 16,
-    "gemini_http_requests_total": 12
+    "awaiting_body": 18,
+    "gemini_http_requests_total": 9
   },
   "ai_office_digest_stats": {
     "state": "created",
@@ -5241,51 +5221,43 @@
   "ai_office_digest": {
     "schema_version": 1,
     "prompt_version": 2,
-    "fingerprint": "d32a45b44a033c2b382998e049b32061",
-    "generated_at": "2026-11-06T13:10:02.130476+00:00",
+    "fingerprint": "34943148696842253bcd2141b15a2de1",
+    "generated_at": "2026-11-06T15:55:19.034656+00:00",
     "model": "openai/gpt-oss-120b",
     "method": "groq",
     "items": [
       {
-        "id": "fa86fa794653df",
-        "point": "인천 송도 6공구에서 에디슨과학교육박물관을 제외하고 아파트를 추가로 짓는 방안이 검토되고 있다.",
-        "evidence": "인천 송도 6공구에서 에디슨과학교육박물관을 제외하고 아파트를 추가로 짓는 방안이 검토되고 있다.",
-        "check": "추가 아파트 건설 계획에 대한 구체적인 승인 일정과 조건을 확인하시겠습니까?",
+        "id": "4b98b33d47c415",
+        "point": "홍지선 국토부 장관이 주택건설업계와 간담회를 열어 공급 애로를 논의했다.",
+        "evidence": "홍지선 국토부 장관이 주택건설업계와 간담회를 열어 공급 애로를 논의했다.",
+        "check": "민간 주택 공급 걸림돌 해소 방안에 대해 확인하십시오.",
         "audiences": [
           "매수",
           "매도"
         ],
-        "questions": [
-          "현재 진행 중인 6공구 재개발 사업의 전체 규모와 예상 분양가를 확인해야 합니다.",
-          "에디슨박물관 제외에 따른 토지 이용 변경 허가 여부를 문의하십시오."
-        ]
+        "questions": []
+      },
+      {
+        "id": "fa86fa794653df",
+        "point": "인천 송도 6공구에서 에디슨과학교육박물관을 제외하고 아파트를 추가로 짓는 방안이 검토되고 있다.",
+        "evidence": "인천 송도 6공구에서 에디슨과학교육박물관을 제외하고 아파트를 추가로 짓는 방안이 검토되고 있다.",
+        "check": "추가 아파트 건설 계획에 대해 확인하십시오.",
+        "audiences": [
+          "매수",
+          "임대"
+        ],
+        "questions": []
       },
       {
         "id": "c6fb632fa8463a",
         "point": "한국부동산원 주간 지수로 남동구 아파트 매매가격은 2026년 들어 -0.28% 내렸다.",
         "evidence": "한국부동산원 주간 지수로 남동구 아파트 매매가격은 2026년 들어 -0.28% 내렸다.",
-        "check": "남동구 아파트 매매가격 변동 추이를 확인하시겠습니까?",
+        "check": "남동구 매매가격 변동에 대해 확인하십시오.",
         "audiences": [
           "매수",
           "매도"
         ],
-        "questions": [
-          "5월 청약한 힐스테이트 구월아트파크의 청약 경쟁률과 공급 현황을 확인하십시오."
-        ]
-      },
-      {
-        "id": "72900b6b1354df",
-        "point": "인천시는 송도유원지 개발 정상화를 위해 TF를 가동한다는 계획을 발표했다.",
-        "evidence": "인천시는 송도유원지 개발 정상화를 위해 TF를 가동한다는 계획을 발표했다.",
-        "check": "송도유원지 개발 TF의 구체적인 추진 일정과 주요 과제를 확인하시겠습니까?",
-        "audiences": [
-          "매수",
-          "임차"
-        ],
-        "questions": [
-          "마스터플랜에 포함된 8개 블록별 개발 내용과 예상 완료 시점을 문의하십시오.",
-          "TF 첫 회의에서 도출된 주요 문제점과 해결 방안을 확인하십시오."
-        ]
+        "questions": []
       }
     ],
     "notice": "공개 기사 기반 AI 참고 요약 · 수치·일정·정책은 원문 확인"
