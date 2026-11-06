@@ -2477,14 +2477,16 @@ async function refreshPublicServices(manual=false){
   ]);
   if(partials?.schema_version===1&&
     ['verified_partial','awaiting_verified_source'].includes(partials.state)&&
-    Array.isArray(partials.records))maintenancePartial=partials;
-  if(averages?.schema_version===1&&['verified_partial','awaiting_verified_source'].includes(averages.state)&&Array.isArray(averages.records))maintenanceEstimates=averages;
-  if(district?.schema_version===1 && district.elementary_zones && district.schoolinfo)
-    schoolDistrictData=district;
+    Array.isArray(partials.records)){maintenancePartial=partials;clearPublicOffline('maintenance_partial');}
+  if(averages?.schema_version===1&&['verified_partial','awaiting_verified_source'].includes(averages.state)&&Array.isArray(averages.records)){
+   maintenanceEstimates=averages;clearPublicOffline('maintenance_estimates');
+  }
+  if(district?.schema_version===1 && district.elementary_zones && district.schoolinfo){
+    schoolDistrictData=district;clearPublicOffline('school_districts');
+  }
   if(doc?.schema_version!==1||!doc.schools||!doc.office_rents)throw Error('자료 형식 오류');
   publicServices=doc;
-  for(const name of ['school_districts','maintenance_estimates','maintenance_partial','public_services'])
-   clearPublicOffline(name);
+  clearPublicOffline('public_services');
   window.FirstHyundaiAdminCenter?.publicError?.('');
   if(manual)showRefreshFeedback('공공정보 게시자료를 확인했습니다. 미승인 서비스는 연동 대기로 표시합니다.','success');
  }catch(e){
