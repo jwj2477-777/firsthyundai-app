@@ -13,6 +13,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -51,6 +54,11 @@ final class OfficeMemoNotifications {
         channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
         channel.enableVibration(true);
         channel.setVibrationPattern(new long[]{0,800,250,800,250,1200});
+        Uri sound=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        if(sound==null)sound=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        if(sound!=null)channel.setSound(sound,new AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ALARM)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
         manager.createNotificationChannel(channel);
     }
     static boolean enabled(Context c){return c.getSharedPreferences(PREF,Context.MODE_PRIVATE).getBoolean(ENABLED,true);}
