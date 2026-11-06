@@ -2449,6 +2449,25 @@ function renderPublicSubscriptions(){
   sourceLink('https://www.applyhome.co.kr/','청약홈 공식 홈페이지');
 }
 async function refreshPublicServices(manual=false){
+ // School, maintenance and subscription snapshots stay readable offline.
+ if(!publicServices){
+  const names=['school_districts','maintenance_estimates','maintenance_partial','public_services'];
+  const saved=await Promise.all(names.map(readPublicOffline));
+  for(let i=0;i<names.length;i++){
+   const name=names[i],cached=saved[i];
+   if(!cached||!validPublicSnapshot(name,cached.payload))continue;
+   const doc=cached.payload;
+   if(name==='school_districts'&&doc.elementary_zones&&doc.schoolinfo)schoolDistrictData=doc;
+   if(name==='maintenance_estimates'&&
+      ['verified_partial','awaiting_verified_source'].includes(doc.state)&&Array.isArray(doc.records))
+     maintenanceEstimates=doc;
+   if(name==='maintenance_partial'&&doc.state==='verified_partial'&&Array.isArray(doc.records))
+     maintenancePartial=doc;
+   if(name==='public_services'&&doc.schools&&doc.office_rents)publicServices=doc;
+   showPublicOffline(name,cached.savedAt);
+  }
+  if(publicServices){renderOfficeRentals();renderPublicSubscriptions();}
+ }
  try{
   const [district,averages,partials,doc]=await Promise.all([
     fetchRemote('school_districts').catch(()=>null),
@@ -2464,9 +2483,13 @@ async function refreshPublicServices(manual=false){
     schoolDistrictData=district;
   if(doc?.schema_version!==1||!doc.schools||!doc.office_rents)throw Error('자료 형식 오류');
   publicServices=doc;
+  for(const name of ['school_districts','maintenance_estimates','maintenance_partial','public_services'])
+   clearPublicOffline(name);
   window.FirstHyundaiAdminCenter?.publicError?.('');
   if(manual)showRefreshFeedback('공공정보 게시자료를 확인했습니다. 미승인 서비스는 연동 대기로 표시합니다.','success');
  }catch(e){
+  if(publicServices)for(const name of ['school_districts','maintenance_estimates','maintenance_partial','public_services'])
+   if(!publicOfflineStatus[name])showPublicOffline(name,0);
   window.FirstHyundaiAdminCenter?.publicError?.('공공자료 요청 또는 형식 확인 실패');
   if(manual)showRefreshFeedback('공공정보 요청 실패 · 이전 정보 유지','error');
  }
