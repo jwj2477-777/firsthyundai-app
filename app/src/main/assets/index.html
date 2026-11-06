@@ -204,6 +204,12 @@ body.apartmentSheetActive{overflow:hidden}
   <button id="appUpdateDismiss" type="button" aria-label="업데이트 안내 닫기">×</button>
 </div>
 <div id="refreshFeedback" class="refreshFeedback hidden" role="status" aria-live="polite"></div>
+<div id="publicOfflineBanner" class="publicOfflineBanner hidden" role="status" aria-live="polite">
+ <strong id="publicOfflineTitle">오프라인 보관 자료</strong>
+ <p id="publicOfflineDetail"></p>
+ <small>마지막 저장본입니다. 가격·분양 일정·관리비·학교 정보는 달라졌을 수 있으므로 실제 계약이나 안내 전에 최신 자료를 확인해 주세요.</small>
+ <button type="button" onclick="refreshAll(true);refreshPublicServices(true)">다시 연결</button>
+</div>
 <div id="favoriteTradeAlertBanner" class="favoriteTradeAlertBanner hidden" role="status" aria-live="polite">
  <span class="alertBell" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg></span><div class="alertBannerCopy"><span class="alertEyebrow">관심 단지 소식</span><strong id="favoriteTradeAlertCount">새 실거래</strong><small id="favoriteTradeAlertBannerDetail"></small></div>
  <button type="button" class="btn" onclick="FirstHyundaiTradeAlerts.open()">보기</button><button type="button" class="favoriteTradeAlertDismiss" onclick="FirstHyundaiTradeAlerts.dismiss()" aria-label="새 거래 배너 닫기">×</button>
@@ -3029,9 +3035,11 @@ async function readBrowserBackup(e){let file=e.target.files?.[0];if(!file)return
 window.onBackupOpened=r=>{if(r.ok)restoreNotes(r.json);else alert('백업 읽기 실패: '+(r.error||''));};
 window.onBackupSaved=r=>alert(r.ok?'메모 백업 저장 완료':'백업 파일 저장 실패');
 let pending={};let serial=0;
-window.onFirstHyundaiResult=result=>{let p=pending[result.requestId];if(!p)return;delete pending[result.requestId];if(result.ok)p.resolve(result.payload);else p.reject(new Error(result.error||'알 수 없는 오류'));};
+window.onFirstHyundaiResult=result=>{let p=pending[result.requestId];if(!p)return;delete pending[result.requestId];
+if(p.filename)window.FirstHyundaiPublicOffline?.track?.(p.filename,result);
+if(result.ok)p.resolve(result.payload);else p.reject(new Error(result.error||'알 수 없는 오류'));};
 function fetchRemote(filename){let target=`https://raw.githubusercontent.com/${repository}/main/data/${filename}.json`;
-if(window.FirstHyundaiNative){return new Promise((resolve,reject)=>{let id=String(++serial);pending[id]={resolve,reject};window.FirstHyundaiNative.fetch(repository,filename+'.json',id);});}
+if(window.FirstHyundaiNative){return new Promise((resolve,reject)=>{let id=String(++serial);pending[id]={resolve,reject,filename};window.FirstHyundaiNative.fetch(repository,filename+'.json',id);});}
 return fetch(target+'?t='+Date.now(),{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json();});}
 // Refresh means download the most recently *published* GitHub snapshot.
 // Government open-data/RSS collection happens separately in scheduled workflows.
@@ -3086,7 +3094,7 @@ async function refreshOne(filename,manual=false){
   if(seq!==refreshGeneration[filename])return {ok:false,superseded:true,filename};
   const changed=JSON.stringify(remote[filename])!==JSON.stringify(fresh);
   remote[filename]=fresh;
-  if(filename==='new_trades'){
+  if(filename==='new_trades'&&!window.FirstHyundaiPublicOffline?.isCached?.(filename)){
    try {
     window.FirstHyundaiTradeAlerts?.process(fresh,{
      repository,lookup:favoriteIdForBuilding,favorites:FAVORITE_APTS,
@@ -3102,12 +3110,15 @@ async function refreshOne(filename,manual=false){
     });
    }catch(e){/* notification logic never blocks normal public data refresh */}
   }
-  result={ok:true,changed,filename,published:publishedAt(fresh),checked:new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})};
-  if(manual)showRefreshFeedback(
+  const offline=Boolean(window.FirstHyundaiPublicOffline?.isCached?.(filename));
+  result={ok:true,offline,changed,filename,published:publishedAt(fresh),
+   checked:new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})};
+  if(manual)showRefreshFeedback(offline?
+   '서버 최신 자료에 연결되지 않아 휴대폰 저장본을 표시합니다. 자료의 현재 상태는 확인할 수 없습니다.':
    (changed?'새로 게시된 자료를 반영했습니다.':'현재 게시된 자료와 동일합니다.')+
    ' · 서버 확인: '+result.checked+' · 자료 수집: '+result.published+
    ' · 버튼은 서버 자료 재확인이며 새 수집은 정기 실행됩니다.',
-   changed?'success':'warning');
+   offline?'warning':changed?'success':'warning');
  }catch(e){
   if(seq!==refreshGeneration[filename])return {ok:false,superseded:true,filename};
   issues[filename]=e.message||String(e);
@@ -3141,14 +3152,16 @@ async function refreshAll(manual=false){
  if(manual){
   const failed=all.filter(x=>!x.ok&&!x.pending);
   const pending=all.filter(x=>x.pending);
-  const changed=all.filter(x=>x.ok&&x.changed);
-  const latest=all.find(x=>x.filename==='trades'&&x.ok);
+  const offline=all.filter(x=>x.offline);
+  const changed=all.filter(x=>x.ok&&x.changed&&!x.offline);
+  const latest=all.find(x=>x.filename==='trades'&&x.ok&&!x.offline);
   showRefreshFeedback(pending.length?
    pending.length+'개 자료는 이미 확인 중입니다. 중복 요청하지 않았습니다.':failed.length?
    (4-failed.length)+'개 자료 확인, '+failed.length+'개 확인 실패 · 기존 자료를 유지합니다.':
+   offline.length?'휴대폰 보관 자료 '+offline.length+'종 표시 중 · 최신 정보 확인 불가':
    changed.length?'새 게시자료 '+changed.length+'개 반영 완료 · 실거래 마지막 수집: '+(latest?.published||'확인 전'):
    '모든 게시자료를 확인했습니다. 새로 게시된 자료는 없습니다. · 실거래 마지막 수집: '+(latest?.published||'확인 전'),
-   failed.length?'error':pending.length?'info':changed.length?'success':'warning');
+   failed.length?'error':pending.length?'info':offline.length?'warning':changed.length?'success':'warning');
  }
  return all;
 }
@@ -3480,7 +3493,7 @@ function exportComplexCatalog(){
 }
 window.onCatalogSaved=r=>alert(r.ok?'단지정보 JSON을 저장했습니다. GitHub에 올려야 가족에게 반영됩니다.':'단지정보 파일 저장 실패');
 
-</script><script src="public-live.js"></script><script src="price-trends.js"></script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-live.js"></script><script src="contract-image.js"></script><script src="realty-calculators.js"></script><script src="scroll-top.js"></script><script src="admin-preferences.js"></script><script src="season-themes.js"></script><script src="weather-briefing.js"></script><script src="premium-motion.js"></script><script src="selection-flow.js"></script><script src="app-updates.js"></script><script src="admin-center.js"></script><script src="shared-settings.js"></script><script src="office-phones.js"></script><script src="memo-dates.js"></script><script src="annual-calendar.js"></script><script src="office-board.js"></script><script src="office-board-images.js"></script><script src="office-members.js"></script><script src="admin-settings-navigator.js"></script><script src="notification-inbox.js"></script><script src="weather-detail.js"></script><script src="device-display.js"></script><script src="nav-collapse.js"></script></body></html>
+</script><script src="public-offline-ui.js"></script><script src="public-live.js"></script><script src="price-trends.js"></script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-live.js"></script><script src="contract-image.js"></script><script src="realty-calculators.js"></script><script src="scroll-top.js"></script><script src="admin-preferences.js"></script><script src="season-themes.js"></script><script src="weather-briefing.js"></script><script src="premium-motion.js"></script><script src="selection-flow.js"></script><script src="app-updates.js"></script><script src="admin-center.js"></script><script src="shared-settings.js"></script><script src="office-phones.js"></script><script src="memo-dates.js"></script><script src="annual-calendar.js"></script><script src="office-board.js"></script><script src="office-board-images.js"></script><script src="office-members.js"></script><script src="admin-settings-navigator.js"></script><script src="notification-inbox.js"></script><script src="weather-detail.js"></script><script src="device-display.js"></script><script src="nav-collapse.js"></script></body></html>
 
 
 
