@@ -862,8 +862,21 @@ public class MainActivity extends Activity {
             if(requestId==null || !requestId.matches("forecast[0-9]{1,10}"))return;
             io.execute(() -> {
                 JSONObject response=new JSONObject();
-                try {response.put("requestId",requestId).put("payload",SharedSettingsClient.readWeatherBriefing()).put("ok",true);}
-                catch(Exception e){try{response.put("requestId",requestId).put("ok",false);}catch(Exception ignored){}}
+                try {
+                    if(!publicNetworkPresent())throw new Exception("offline");
+                    JSONObject current=SharedSettingsClient.readWeatherBriefing();
+                    WeatherOfflineStore.save(getApplicationContext(),current);
+                    response.put("requestId",requestId).put("payload",current).put("ok",true);
+                }catch(Exception e){
+                    JSONObject backup=WeatherOfflineStore.read(getApplicationContext());
+                    try{
+                        response.put("requestId",requestId);
+                        if(backup!=null){
+                            response.put("ok",true).put("payload",backup.optJSONObject("forecast"))
+                                .put("offlineCopy",true).put("offlineSavedAt",backup.optLong("cachedAt"));
+                        }else response.put("ok",false);
+                    }catch(Exception ignored){}
+                }
                 deliver("onFirstHyundaiWeatherBriefingFetched",response);
             });
         }
