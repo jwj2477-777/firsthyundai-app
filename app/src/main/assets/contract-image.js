@@ -219,7 +219,7 @@ function draw(page,index,total){
  for(const item of items){
   const y=item.y+item.line-11;
   if(item.kind==='row'){
-   const prominent=/^(?:매매대금|전세보증금|임대차보증금|보증금|월세|월 차임|계약금|중도금|잔금|이번 송금액|오늘 송금액)$/.test(item.label);
+   const prominent=/^(?:매매대금|전세보증금|임대차보증금|보증금|월세|월 차임|계약금|(?:[12]차\s*)?중도금|잔금|이번 송금액|오늘 송금액)$/.test(item.label);
    if(prominent&&!item.continuation){
     c.fillStyle='#e8f3f2';round(c,LEFT-10,item.y-5,RIGHT-LEFT+20,item.line+8,9);c.fill();
    }
