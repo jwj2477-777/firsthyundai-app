@@ -57,6 +57,7 @@ reset();
 // A numbered second instalment must retain both amounts/dates in the reviewed
 // customer notice and in the remaining-balance arithmetic.
 tryNote('파크애비뉴 1601동 901호 매매 10억 계약금 1억\n1차 중도금 2억 27년 1월 31일\n2차 중도금 3억 27년 6월 30일\n잔금 27년 8월 10일');
+eq('contractDeposit','10000');
 eq('interim','20000');
 eq('interim2','30000');
 eq('interimDate','2027-01-31');
