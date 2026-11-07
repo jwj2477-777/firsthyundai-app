@@ -50,7 +50,7 @@ const familyNames='김이박최정강조윤장임한오서신권황안송전홍�
 const notName=/^(?:한다|있다|된다|예정|완료|확인|금지|수리|허용|변경|협의|상호|매매|전세|월세|계약|보증금|중도금|잔금|가계약|오늘|금일|이번|당일|먼저|지금|내일|입금|송금|이체|보내|보낼|넣을|은행|계좌|명의|계약서|예금주|아파트|송도|퍼스트|마스터|퍼팍|마뷰|프라임|센트럴|더샵|신한|국민|우리|하나|농협|기업|카카오|토스|새마을|우체국|부동산|내용|날짜|기간|확인|특약|임대인|매도인|임차인|매수인|집주인|세입자|소재지|계약금|만원|상담|계좌번호|거래|계약일|잔금일|입주일|동호수|금액|사무실)/;
 function holderCandidate(text,account,bank){
  const s=String(text||'');
- const explicit=/(?:예금주|계좌주|계좌\s*명의자|명의자|수취인|입금\s*받는\s*분)\s*[:：]?\s*([가-힣]{2,5})(?=\s|$|[,.;)\/\]])/g;
+ const explicit=/(?:예금주|계좌주|계좌\s*명의자|수취인|입금\s*받는\s*분)\s*[:：]?\s*([가-힣]{2,5})(?=\s|$|[,.;)\/\]])/g;
  const specified=[...new Set([...s.matchAll(explicit)].map(m=>m[1]).filter(name=>!reserved.test(name)&&!notName.test(name)))];
  if(specified.length===1)return {value:specified[0],confidence:'explicit'};
  if(specified.length>1)return {value:null,warning:'서로 다른 예금주가 적혀 있습니다. 명의를 확인해 주세요.'};
