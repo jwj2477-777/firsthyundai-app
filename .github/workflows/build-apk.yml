@@ -399,25 +399,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.89 offline public data reader APK
+      - name: Publish v2.1.90 contract second-interim APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.89.apk
-          unzip -t FirstHyundai-v2.1.89.apk | grep 'No errors detected'
-          if gh release view v2.1.89 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.90.apk
+          unzip -t FirstHyundai-v2.1.90.apk | grep 'No errors detected'
+          if gh release view v2.1.90 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.1.89 FirstHyundai-v2.1.89.apk \
+            gh release create v2.1.90 FirstHyundai-v2.1.90.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.89 · 인터넷 장애에도 실거래·단지·뉴스 확인' \
-              --notes '퍼스트현대 앱에 공개 자료 오프라인 우선 보기 기능을 추가했습니다. 실거래, 새 거래, 아파트 관심 단지정보, 뉴스, 관리비, 학교와 공공정보는 온라인에서 정상 갱신한 자료를 앱 내부 AtomicFile에 저장합니다. 다음 실행부터 인터넷 요청을 기다리기 전에 마지막 정상 자료를 표시하고 최신 정보 미확인·저장 기준 시각을 화면에 명확히 알립니다. 온라인 복구 시 자동으로 새 자료를 받아 갱신하며, 수신 실패나 불완전한 JSON으로 마지막 저장본을 덮어쓰지 않습니다. 고객 메모와 계약 개인정보는 이 공개 캐시에 저장하지 않으며 기존 암호화 전용 보관 기능은 유지합니다. 지도·실시간 날씨·AI는 연결이 필요할 수 있습니다. v2.1.89/build240.'
+              --title '퍼스트현대 v2.1.90 · 1차·2차 중도금 개별 인식' \
+               --notes '계약 메모에서 1차·2차 중도금의 금액 및 지급일을 각각 인식하고 계약문자와 이미지에 구분하여 표시합니다. 잔금 계산은 계약금과 중도금 1·2차 금액을 모두 차감하며, 회차별 날짜 누락·역전·금액 초과가 있으면 확인 요청합니다. 중도금이 한 번이거나 없는 기존 계약 방식은 유지합니다. 직접 입력과 선택형 Live 음성 인식에서도 별도 회차를 지원합니다. 외부 연결 없이 처리하는 메모 인식은 계속 단말 내부에서 동작합니다. v2.1.90/build241.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.89 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.89 --apk FirstHyundai-v2.1.89.apk
+          gh release upload v2.1.90 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.90 --apk FirstHyundai-v2.1.90.apk
 
 
 
