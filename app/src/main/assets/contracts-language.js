@@ -199,10 +199,18 @@ function numberedInterims(raw,found,review){
   const id=round===1?'interim':'interim2',dateId=round===1?'interimDate':'interimDate2';
   const following=source.slice(match.index+match[0].length,i+1<matches.length?matches[i+1].index:source.length);
   const segment=following.split(/\n|(?=\s*(?:잔금(?:일|은)?|계약금|계약일|이번\s*송금|특약(?:사항)?|계좌번호|은행|예금주)\s*[:：]?)/)[0].trim();
-  const token=segment.match(/^\s*(?:(?:은|는|금액은?|금액이|약)\s*|[:：-]\s*)*((?:\d[\d,.]*|[일이삼사오육륙칠팔구한십백천]+)\s*(?:억|천|백|만원|만|원)(?:\s*(?:\d[\d,.]*|[일이삼사오육륙칠팔구한십백천]+)\s*(?:천|백|만원|만|원))*)/);
-  const numeric=token?moneyPart(token[1]):null;
+  // Both "1차 중도금 2억 1월31일" and "중도금1차 1월31일 2억원" are valid.
+  // Strip dates *before* searching for money so 1월31일 never becomes 1만원
+  // or 31만원, and the amount need not precede its payment date.
+  const amountOnly=segment
+   .replace(/(?<!\d)(?:20\d{2}|\d{2})\s*년\s*\d{1,2}\s*월\s*\d{1,2}\s*일?/g,' ')
+   .replace(/(?<!\d)(?:20\d{2}|\d{2})[./-]\s*\d{1,2}[./-]\s*\d{1,2}(?!\d)/g,' ')
+   .replace(/(?<!\d)\d{1,2}\s*월\s*\d{1,2}\s*일?/g,' ');
+  const tokens=tokenizeMoney(amountOnly).filter(t=>/(?:억|천|백|만원|만|원)/.test(t.raw));
+  const unique=[...new Set(tokens.map(t=>t.amount))];
+  const numeric=unique.length===1?unique[0]:null;
   if(numeric!==null&&numeric>0)apply(id,numeric,found);
-  else if(!val(id))review.push(round+'차 중도금 금액을 확인해 주세요.');
+  else if(!val(id))review.push(round+'차 중도금 '+(unique.length>1?'금액이 여러 개입니다. 확인해 주세요.':'금액을 확인해 주세요.'));
   const due=dateIn(segment);
   if(due){
    if(apply(dateId,due.value,found)&&due.assumed)review.push(round+'차 중도금 지급일의 연도를 추정했습니다. 확인하세요.');

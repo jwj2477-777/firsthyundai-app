@@ -399,25 +399,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.90 contract second-interim APK
+      - name: Publish v2.1.91 date-first interim recognition APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.90.apk
-          unzip -t FirstHyundai-v2.1.90.apk | grep 'No errors detected'
-          if gh release view v2.1.90 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.91.apk
+          unzip -t FirstHyundai-v2.1.91.apk | grep 'No errors detected'
+          if gh release view v2.1.91 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.1.90 FirstHyundai-v2.1.90.apk \
+            gh release create v2.1.91 FirstHyundai-v2.1.91.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.90 · 1차·2차 중도금 개별 인식' \
-               --notes '계약 메모에서 1차·2차 중도금의 금액 및 지급일을 각각 인식하고 계약문자와 이미지에 구분하여 표시합니다. 잔금 계산은 계약금과 중도금 1·2차 금액을 모두 차감하며, 회차별 날짜 누락·역전·금액 초과가 있으면 확인 요청합니다. 중도금이 한 번이거나 없는 기존 계약 방식은 유지합니다. 직접 입력과 선택형 Live 음성 인식에서도 별도 회차를 지원합니다. 외부 연결 없이 처리하는 메모 인식은 계속 단말 내부에서 동작합니다. v2.1.90/build241.'
+              --title '퍼스트현대 v2.1.91 · 중도금 날짜 먼저 입력도 인식' \
+               --notes '계약 메모에서 1차·2차 중도금의 금액과 날짜를 어느 순서로 적어도 각각 인식합니다. 예: 중도금1차 1월31일 1억원, 중도금2차 6월30일 5억원. 날짜를 금액으로 혼동하지 않고 잔금 계산에 중도금 합계를 반영합니다. 금액 없는 일정은 추정하지 않고 확인 요청합니다. 기존 금액→날짜 입력, 중도금 한 번/없음 계약, Live 음성 및 특약 분리도 유지합니다. 계약 정보는 메모 처리 시 단말 내부에서만 분석합니다. v2.1.91/build242.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.90 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.90 --apk FirstHyundai-v2.1.90.apk
+          gh release upload v2.1.91 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.91 --apk FirstHyundai-v2.1.91.apk
 
 
 
