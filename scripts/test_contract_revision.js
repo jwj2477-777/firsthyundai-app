@@ -14,7 +14,7 @@ const javaPath=path.resolve(__dirname,'../app/src/main/java/kr/co/firsthyundai/a
 const native=fs.readFileSync(path.join(javaPath,'ContractRevisionStore.java'),'utf8');
 const bridge=fs.readFileSync(path.join(javaPath,'MainActivity.java'),'utf8');
 assert(native.includes('AES/GCM/NoPadding')&&native.includes('getNoBackupFilesDir()')&&native.includes('AtomicFile'));
-assert(native.includes('member.getBytes')||native.includes('contract-approved-v1:'+ 'member'));
+assert(native.includes('cipher.updateAAD')&&native.includes('contract-approved-v1:'),'Encrypted contract is bound to member identity');
 assert(bridge.includes('OfficeBoardClient.enrolled')&&bridge.includes('saveLastApprovedContract'));
 const stored={value:'{}'};
 let copyToNetwork=0;
