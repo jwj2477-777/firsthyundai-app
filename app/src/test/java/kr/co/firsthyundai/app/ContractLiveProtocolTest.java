@@ -115,7 +115,9 @@ public class ContractLiveProtocolTest {
         JSONObject tool=ContractLiveProtocol.tools().getJSONObject(0).getJSONArray("functionDeclarations").getJSONObject(0);
         assertEquals(ContractLiveProtocol.FUNCTION,tool.getString("name"));
         JSONObject fields=tool.getJSONObject("parameters").getJSONObject("properties");
-        assertEquals(18,fields.length());
+        assertEquals(20,fields.length());
+        assertTrue(fields.has("interim2"));
+        assertTrue(fields.has("interimDate2"));
         assertTrue(fields.has("reviewField"));
         assertTrue(fields.has("reviewStatus"));
         for(String k:new String[]{"account","bank","address","owner","buyer","send","save","rough"})assertFalse(fields.has(k));

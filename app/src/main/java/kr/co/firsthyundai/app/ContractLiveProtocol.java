@@ -8,8 +8,8 @@ import java.time.ZoneId;
 /** No access to Activity, form contents, storage, customer data or credentials. */
 final class ContractLiveProtocol {
     static final String FUNCTION="propose_contract_conditions";
-    static final String[] MONEY={"price","contractDeposit","advance","interim","monthlyRent"};
-    static final String[] DATES={"contractDate","interimDate","balanceDate","leaseStart","leaseEnd"};
+    static final String[] MONEY={"price","contractDeposit","advance","interim","interim2","monthlyRent"};
+    static final String[] DATES={"contractDate","interimDate","interimDate2","balanceDate","leaseStart","leaseEnd"};
     static final String[] TEXT={"dealType","property","unit","leaseDuration","balanceTime","terms"};
     private static boolean contains(String[] list,String key){for(String s:list)if(s.equals(key))return true;return false;}
     static String prompt(){
@@ -46,7 +46,7 @@ final class ContractLiveProtocol {
             +"금액과 날짜가 불명확하면 한 번에 하나씩 되물으세요. 연도 없는 월일은 가까운 미래로 해석하되 "
             +"연도·날짜를 정확한 연월일로 읽어 다시 확인하세요. 지난 날짜를 도구로 보내면 거절됩니다. "
             +"이번 대화에서 빠진 단지명, 동·호수, 거래유형, 총액, 계약금, 이번 송금액, 계약일, 잔금일을 하나씩 질문하세요. "
-            +"중도금이 있으면 금액과 지급일을, 전월세면 기간과 입주일을, 월세면 월 차임도 확인하세요. "
+            +"중도금이 있으면 1차·2차 회차별 금액과 지급일을 구분해 interim/interimDate 및 interim2/interimDate2로 제안하세요. 없는 2차는 만들지 마세요. 전월세면 기간과 입주일을, 월세면 월 차임도 확인하세요. "
             +"특약은 필요한지 묻되 없으면 만들지 마세요. 모른다/미정/나중에 직접 입력하겠다는 답이면 강요하지 말고 미확정으로 남기세요. "
             +"앞선 금액/날짜와 충돌하는 새 발언은 변경 의도를 되묻고 확인 후 제안하세요. "
             +"실제 합의의 진위를 알 수 없으므로 정확성을 보증하지 마세요. 앱에서도 필수항목과 계산을 검사합니다. "
@@ -64,7 +64,7 @@ final class ContractLiveProtocol {
             +"도구 결과가 rejected_invalid_fields이면 반영됐다고 말하지 말고 잘못된 형식이나 불명확한 항목을 다시 확인하세요. "
             +"도구 결과가 rejected_inconsistent_conditions이면 거래 총액/계약금/이번 송금액/중도금 또는 날짜 순서가 충돌한 것입니다. 반영됐다고 말하지 말고 한 번에 한 항목씩 확인하여 서로 맞는 조건을 함께 다시 제안하세요. "
             +"도구 결과가 rejected_past_date이면 과거 연도 제안이 거절된 것입니다. 사용자에게 실제 의도한 연도를 물어 확인하고, 미래 날짜로 확정한 뒤 다시 제안하세요. 과거 날짜를 반복해서 보내지 마세요. "
-            +"중도금 없다는 말은 interim=0, interimDate=빈 문자열로 제안하세요. "
+            +"중도금 없다는 말은 interim=0, interimDate=빈 문자열과 interim2=0, interimDate2=빈 문자열로 제안하세요. "
             +"특약 변경 시 이번 대화에서 정리한 특약 전체를 terms로 보내세요. "
             +"도구는 화면의 검토 후보만 만들며 실제 계약 저장/공유는 하지 않습니다. "
             +"사용자가 완료라 하면 도구 반영 후 '종료하고 확인'을 누르도록 안내하세요.";
@@ -74,7 +74,7 @@ final class ContractLiveProtocol {
         for(String k:MONEY)properties.put(k,new JSONObject().put("type","INTEGER")
             .put("description",k+": 사용자가 명시한 원 단위 금액. 불명확하면 생략."));
         for(String k:DATES)properties.put(k,new JSONObject().put("type","STRING")
-            .put("description",k+": 확인한 YYYY-MM-DD. contractDate/interimDate만 협의 문구 허용. 삭제는 빈 문자열."));
+            .put("description",k+": 확인한 YYYY-MM-DD. contractDate/interimDate/interimDate2만 협의 문구 허용. 삭제는 빈 문자열."));
         properties.put("dealType",new JSONObject().put("type","STRING").put("enum",new JSONArray().put("매매").put("전세").put("월세")));
         properties.put("property",new JSONObject().put("type","STRING").put("description",
             "아파트 단지명만. 예: 퍼스트파크 15블럭 또는 파크애비뉴. 고객명·계좌·상세 주소는 제외."));
@@ -86,7 +86,7 @@ final class ContractLiveProtocol {
         properties.put("reviewField",new JSONObject().put("type","STRING")
             .put("enum",new JSONArray().put("property").put("unit").put("dealType")
               .put("price").put("contractDeposit").put("contractDate").put("advance")
-              .put("balanceDate").put("interim").put("interimDate").put("leaseStart")
+              .put("balanceDate").put("interim").put("interimDate").put("interim2").put("interimDate2").put("leaseStart")
               .put("leaseEnd").put("leaseDuration").put("monthlyRent")
               .put("balanceTime").put("terms"))
             .put("description","이번 음성 대화 중 사용자 명시적으로 미정/협의/직접입력/해당없음이라 답한 항목만. reviewStatus와 둘만 묶어 제안."));
@@ -122,10 +122,15 @@ final class ContractLiveProtocol {
         long deposit=merged.has("contractDeposit")?merged.getLong("contractDeposit"):-1;
         long advance=merged.has("advance")?merged.getLong("advance"):-1;
         long interim=merged.has("interim")?merged.getLong("interim"):-1;
+        long interim2=merged.has("interim2")?merged.getLong("interim2"):-1;
         if(total>=0&&deposit>=0&&deposit>total)throw new Exception("deposit exceeds total");
         if(deposit>=0&&advance>=0&&advance>deposit)throw new Exception("advance exceeds deposit");
         if(total>=0&&interim>=0&&interim>total)throw new Exception("interim exceeds total");
-        if(total>=0&&deposit>=0&&interim>=0&&deposit+interim>total)throw new Exception("scheduled payments exceed total");
+        if(total>=0&&interim2>=0&&interim2>total)throw new Exception("second interim exceeds total");
+        if(total>=0&&deposit>=0&&(interim>=0||interim2>=0)&&deposit+Math.max(interim,0)+Math.max(interim2,0)>total)throw new Exception("scheduled payments exceed total");
+        if(interim2>0&&interim<=0)throw new Exception("first interim missing");
+        if(validDate(merged.optString("interimDate",""))&&validDate(merged.optString("interimDate2",""))&&
+            LocalDate.parse(merged.optString("interimDate2")).isBefore(LocalDate.parse(merged.optString("interimDate"))))throw new Exception("reversed interim dates");
         for(String[] pair:new String[][]{{"contractDate","balanceDate"},{"leaseStart","leaseEnd"}}){
             String start=merged.optString(pair[0],"");
             String end=merged.optString(pair[1],"");
@@ -147,7 +152,7 @@ final class ContractLiveProtocol {
                 if(!(value instanceof Number))throw new Exception("invalid amount");
                 double n=((Number)value).doubleValue();
                 if(!Double.isFinite(n)||n<0||n>1_000_000_000_000L||n!=Math.rint(n)
-                    ||(n==0&&!k.equals("interim")&&!k.equals("monthlyRent")))throw new Exception("invalid amount");
+                    ||(n==0&&!k.equals("interim")&&!k.equals("interim2")&&!k.equals("monthlyRent")))throw new Exception("invalid amount");
                 result.put(k,(long)n);
             }else if(contains(DATES,k)||contains(TEXT,k)){
                 if(!(value instanceof String))throw new Exception("invalid text");
@@ -171,7 +176,7 @@ final class ContractLiveProtocol {
                 if(contains(DATES,k)&&validDate(s)&&LocalDate.parse(s).isBefore(today))
                     throw new PastContractDateException();
                 if(contains(DATES,k)&&!s.isEmpty()&&!validDate(s)){
-                    if(!(k.equals("contractDate")||k.equals("interimDate"))
+                    if(!(k.equals("contractDate")||k.equals("interimDate")||k.equals("interimDate2"))
                         ||!s.matches("[0-9\\s년월일초중말순경~～.\\-/협의추후미정예정상호결정까지부터전후사이]+")
                         ||!java.util.regex.Pattern.compile("협의|미정|추후|초순|중순|하순|월말|월초|전후|사이|~|～").matcher(s).find())
                         throw new Exception("invalid date");

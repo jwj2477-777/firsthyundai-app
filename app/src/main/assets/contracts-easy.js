@@ -61,7 +61,7 @@ function isPaymentLine(line){
 }
 function isDealField(line){
  const s=String(line||'').trim().replace(/^[▶→•\s]+/,'');
- if(/^(?:매매대금|매매가|매매금액|전세보증금|보증금|계약금|중도금|월세|차임)\s*[:：]?\s*[\d일이삼사오육륙칠팔구십백천]/.test(s))return true;
+ if(/^(?:(?:[12]\s*차\s*)?중도금|매매대금|매매가|매매금액|전세보증금|보증금|계약금|월세|차임)\s*[:：]?\s*[\d일이삼사오육륙칠팔구십백천]/.test(s))return true;
  if(/^(?:잔금일?|중도금\s*지급일|계약(?:서)?\s*작성일?|본계약|입주일|만기일)\s*[:：]?\s*(?:\d|추후|미정)/.test(s))return true;
  if(/^(?:소재지|주소|단지명|아파트명|동호수)\s*[:：]/.test(s))return true;
  return false;
@@ -157,7 +157,7 @@ function simpleMissing(errors){
   '이번 송금액':'이번 송금액','계약일':'계약일','잔금 예정일':'잔금일',
   '송금 은행·계좌·예금주':'입금 은행·계좌·예금주',
   '동·호수':'동·호수','임대차 기간':'임대차 기간',
-  '중도금 숫자':'중도금 금액','월세 금액':'월세 금액'
+  '중도금 숫자':'중도금 금액','2차 중도금 숫자':'2차 중도금 금액','2차 중도금 지급일':'2차 중도금 지급일','월세 금액':'월세 금액'
  };
  return '⚠ 확인할 정보 '+errors.length+'가지: '+errors.map(v=>friendly[v]||v).join(' · ');
 }
@@ -168,6 +168,11 @@ const FIX_FIELD=[
  ['단지명','property','단지명'],
  ['중도금 일정은 있는데 금액이 없음','interim','중도금 금액'],
  ['중도금 지급일 오타 확인','interimDate','중도금 지급일'],
+ ['2차 중도금 숫자','interim2','2차 중도금 금액'],
+ ['2차 중도금 금액','interim2','2차 중도금 금액'],
+ ['2차 중도금은 있는데 1차 금액이 없음','interim','1차 중도금 금액'],
+ ['2차 중도금 일정은 있는데 금액이 없음','interim2','2차 중도금 금액'],
+ ['2차 중도금 지급일','interimDate2','2차 중도금 지급일'],
  ['아파트 단지 선택 확인','property','단지 선택'],
  ['소재지 도로명주소','address','소재지 주소'],
  ['동·호수','unit','동·호수'],
@@ -191,7 +196,7 @@ function missingField(error){
 }
 // Inline correction uses the original validated contract input fields.
 const QUICK_BANK=['bank','account','accountHolder'];
-const QUICK_NAMES=new Set(['property','address','unit','price','contractDeposit','advance','contractDate','balanceDate','monthlyRent','leaseDuration','interim','interimDate','leaseStart','bank','rough']);
+const QUICK_NAMES=new Set(['property','address','unit','price','contractDeposit','advance','contractDate','balanceDate','monthlyRent','leaseDuration','interim','interimDate','interim2','interimDate2','leaseStart','bank','rough']);
 let activeQuick='';
 const quickDraft=new Map(); // Volatile only: never persist client/payment information.
 function quickName(error){return missingField(error)[1];}
@@ -219,7 +224,7 @@ function inlineField(name,label){
  return '<div class="contractInlineField"><strong>'+label+'</strong>'+
   parts.map(part=>{
    const title=part==='bank'?'은행명':part==='account'?'계좌번호':part==='accountHolder'?'예금주':label;
-   const inputMode=['price','contractDeposit','advance','monthlyRent','interim'].includes(part)?'decimal':'text';
+   const inputMode=['price','contractDeposit','advance','monthlyRent','interim','interim2'].includes(part)?'decimal':'text';
    const current=quickDraft.has(part)?quickDraft.get(part):E(part)?.value;
    return '<label for="ct_quick_'+part+'">'+title+'</label>'+
     '<input id="ct_quick_'+part+'" aria-label="'+title+'" type="text" inputmode="'+inputMode+'" placeholder="'+title+'" maxlength="220" value="'+safeInputValue(current)+'">';
@@ -254,13 +259,13 @@ function showQuickField(rawName){
 // Quick corrections use the SAME on-device parsers as the free-form memo.
 // Keep flexible signing windows verbatim; never convert a proposed range
 // to a fictitious one-day appointment.
-const QUICK_MONEY=new Set(['price','contractDeposit','advance','interim','monthlyRent']);
-const QUICK_DATES=new Set(['contractDate','balanceDate','interimDate','leaseStart']);
+const QUICK_MONEY=new Set(['price','contractDeposit','advance','interim','interim2','monthlyRent']);
+const QUICK_DATES=new Set(['contractDate','balanceDate','interimDate','interimDate2','leaseStart']);
 function normalizeQuickField(part,raw){
  const text=String(raw||'').normalize('NFKC').trim();
  if(QUICK_MONEY.has(part)){
   const n=window.FirstHyundaiLanguage?._test?.moneyPart?.(text);
-  if(n===null||n===undefined||!Number.isFinite(n)||n<0||(part!=='interim'&&n===0))return null;
+  if(n===null||n===undefined||!Number.isFinite(n)||n<0||(!['interim','interim2'].includes(part)&&n===0))return null;
   return String(Math.round(n*100)/100); // All editable price fields store units of 만원.
  }
  if(QUICK_DATES.has(part)){

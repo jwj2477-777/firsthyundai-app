@@ -18,6 +18,14 @@ const c=vm.createContext({window:win,document:{getElementById:el,createElement:e
 for(const name of ['contracts.js','contracts-smart.js','contracts-language.js','contracts-easy.js','contract-live.js'])
  vm.runInContext(read('app/src/main/assets/'+name),c);
 const live=win.FirstHyundaiContractLive;
+const secondProposal=live._test.normalize({interim:200000000,interim2:300000000,interimDate2:'2027-06-30'});
+assert.equal(secondProposal.interim,'20000');
+assert.equal(secondProposal.interim2,'30000');
+assert.equal(secondProposal.interimDate2,'2027-06-30');
+assert(live._test.missingConditions({interim2:'30000'}).includes('interimDate2'),'A second instalment needs its own due date');
+assert(live._test.consistency({price:'100000',contractDeposit:'10000',interim:'30000'},{interim2:'65000'}).includes('합계'),'Two instalments must be combined when validating the amount');
+assert(!live._test.consistency({price:'100000',contractDeposit:'10000',interim:'20000'},{interim2:'30000'}),'Valid two-stage instalments must be accepted');
+
 win.onFirstHyundaiLiveQuotaStatus({limit:6,used:2,pending:1,remaining:3,reset_at_kst:'2026-10-31 오전 9시'});
 assert(el('cl_quota').textContent.includes('3/6회')&&el('newsLiveVoiceQuota').textContent.includes('3/6회'));
 assert(el('cl_quota').textContent.includes('2026-10-31 오전 9시'));

@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 const E=id=>document.getElementById(id);
-const FIELDS=['dealType','property','address','unit','owner','buyer','price','monthlyRent','contractDeposit','advance','interim','interimDate','contractDate','balanceDate','balanceTime','exclusiveArea','supplyInfo','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms','cancellation','brokerFee','rough'];
+const FIELDS=['dealType','property','address','unit','owner','buyer','price','monthlyRent','contractDeposit','advance','interim','interimDate','interim2','interimDate2','contractDate','balanceDate','balanceTime','exclusiveArea','supplyInfo','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms','cancellation','brokerFee','rough'];
 let created=false, approved=false;
 function field(id){return String(E('ct_'+id)?.value||'').trim();}
 // Textarea cannot color individual substrings. Show a safe, noneditable color
@@ -142,7 +142,8 @@ function extractNotes(){
  E('ct_status').className='contractReview';
 }
 function collect(){
- const type=field('dealType'),price=amount('price'),deposit=amount('contractDeposit'),advance=amount('advance'),interim=field('interim')?amount('interim'):0;
+ const type=field('dealType'),price=amount('price'),deposit=amount('contractDeposit'),advance=amount('advance'),interim=field('interim')?amount('interim'):0,interim2=field('interim2')?amount('interim2'):0;
+ const interimTotal=interim!==null&&interim2!==null?interim+interim2:null;
  const errors=[];
  if(!field('property'))errors.push('단지명');
  if(!field('address'))errors.push('소재지 도로명주소');
@@ -152,9 +153,15 @@ function collect(){
  if(deposit===null||deposit<=0)errors.push('약정 계약금');
  if(advance===null||advance<=0)errors.push('이번 송금액');
  if(interim===null||interim<0)errors.push('중도금 숫자');
+ if(interim2===null||interim2<0)errors.push('2차 중도금 숫자');
+ if(/(?:2\s*차\s*중도금|중도금\s*2\s*차)/.test(field('rough'))&&!(interim2>0))errors.push('2차 중도금 금액');
+ if(interim2>0&&!(interim>0))errors.push('2차 중도금은 있는데 1차 금액이 없음');
+ if(field('interimDate2')&&!(interim2>0))errors.push('2차 중도금 일정은 있는데 금액이 없음');
+ if(interim2>0&&!field('interimDate2'))errors.push('2차 중도금 지급일');
+ if(/(?:[3-9]\s*차\s*중도금|중도금\s*[3-9]\s*차)/.test(field('rough')))errors.push('3차 이상 중도금은 직접 확인 필요');
  if(price!==null&&deposit!==null&&deposit>price)errors.push('계약금이 총금액을 초과함');
  if(deposit!==null&&advance!==null&&advance>deposit)errors.push('이번 송금액이 계약금보다 큼');
- if(price!==null&&deposit!==null&&interim!==null&&price-deposit-interim<0)errors.push('잔금 계산이 음수');
+ if(price!==null&&deposit!==null&&interimTotal!==null&&price-deposit-interimTotal<0)errors.push('잔금 계산이 음수');
  if(!field('contractDate')||/\[[^\]]*확인 필요[^\]]*\]/.test(field('contractDate')))errors.push('계약일');
  if(!field('balanceDate'))errors.push('잔금 예정일');
  if(field('interimDate')&&!(interim>0))errors.push('중도금 일정은 있는데 금액이 없음');
@@ -164,15 +171,20 @@ function collect(){
  if(type!=='매매'&&!field('leaseDuration')&&!(field('leaseStart')&&field('leaseEnd')))errors.push('임대차 기간');
  const signing=exactContractDate(field('contractDate')),balanceDay=exactContractDate(field('balanceDate'));
  const interimDay=exactContractDate(field('interimDate'));
+ const interimDay2=exactContractDate(field('interimDate2'));
+ if(interim2>0&&interimDay&&interimDay2&&interimDay2<interimDay)
+  errors.push('2차 중도금 지급일이 1차보다 빠름(날짜 재확인)');
  const leaseStartDay=exactContractDate(field('leaseStart')),leaseEndDay=exactContractDate(field('leaseEnd'));
  if(signing&&balanceDay&&signing>balanceDay)errors.push('잔금일이 계약일보다 빠름(날짜 재확인)');
  if(interim>0&&interimDay&&balanceDay&&interimDay>balanceDay)
   errors.push('중도금 지급일이 잔금일보다 늦음(날짜 재확인)');
+ if(interim2>0&&interimDay2&&balanceDay&&interimDay2>balanceDay)
+  errors.push('2차 중도금 지급일이 잔금일보다 늦음(날짜 재확인)');
  if(leaseStartDay&&leaseEndDay&&leaseStartDay>leaseEndDay)
   errors.push('임대차 종료일이 시작일보다 빠름(날짜 재확인)');
  if(balanceDay&&leaseStartDay&&leaseStartDay<balanceDay)
   errors.push('입주일이 잔금일보다 빠름(재확인)');
- return {type,price,deposit,advance,interim,errors,balance:price!==null&&deposit!==null&&interim!==null?price-deposit-interim:null,
+ return {type,price,deposit,advance,interim,interim2,interimTotal,errors,balance:price!==null&&deposit!==null&&interimTotal!==null?price-deposit-interimTotal:null,
   remainder:deposit!==null&&advance!==null?deposit-advance:null};
 }
 // Three explicit states: pending (disabled), ready to confirm, confirmed.
@@ -290,7 +302,7 @@ function updateSummary(){
   '\n약정 계약금: '+(data.deposit===null?'미입력':money(data.deposit))+
   '  /  이번 송금: '+(data.advance===null?'미입력':money(data.advance))+
   '\n최종 잔금: '+(data.balance===null?'계산 불가':money(data.balance))+
-  (data.interim>0?' (중도금 '+money(data.interim)+' 별도)':'');
+  (data.interimTotal>0?' (중도금 합계 '+money(data.interimTotal)+' 별도)':'');
  if(created&&E('ct_preview').value){
   created=false;approved=false; // Invalidate stale preview after any upstream condition changed.
   E('ct_status').textContent='조건이 변경되었습니다. 문자를 다시 생성해 검토해 주세요.';
@@ -324,9 +336,14 @@ function makePreview(){
  const ratio=d.price>0&&d.deposit!==null?d.deposit/d.price*100:null;
  out.push('▶ 계약금 : '+moneyOr(d.deposit)+(ratio!==null&&Math.abs(ratio-10)<0.00001?' (매매대금의 10%)'.replace('매매대금',totalName):''));
  if(d.interim>0){
-  if(field('interimDate'))out.push('▶ 중도금 지급일 : '+dateLabel(field('interimDate')));
+  const named=d.interim2>0;
+  if(field('interimDate'))out.push('▶ '+(named?'1차 중도금':'중도금')+' 지급일 : '+dateLabel(field('interimDate')));
   else if(/중도금[^\n]{0,70}\b\d{1,2}\s*년\s*\d{1,2}\s*일/.test(field('rough')))out.push('▶ 중도금 지급일 : [메모 날짜 확인 필요]');
-  out.push('▶ 중도금 : '+money(d.interim));
+  out.push('▶ '+(named?'1차 중도금':'중도금')+' : '+money(d.interim));
+ }
+ if(d.interim2>0){
+  out.push('▶ 2차 중도금 지급일 : '+(field('interimDate2')?dateLabel(field('interimDate2')):'[확인 필요]'));
+  out.push('▶ 2차 중도금 : '+money(d.interim2));
  }
  out.push('','▶ 잔금일 : '+(field('balanceDate')?dateLabel(field('balanceDate')):'[확인 필요]')+(field('balanceTime')?' '+field('balanceTime'):''));
  out.push('▶ 잔금 : '+moneyOr(d.balance));
@@ -383,7 +400,7 @@ function previewReviewWarnings(){
  if(bankAccount.length>=7&&!text.replace(/\D/g,'').includes(bankAccount))
   warnings.push('입금 계좌번호');
  const data=collect();
- for(const [name,value] of [['총액',data.price],['계약금',data.deposit],['이번 송금액',data.advance]]){
+ for(const [name,value] of [['총액',data.price],['계약금',data.deposit],['이번 송금액',data.advance],['1차 중도금',data.interim],['2차 중도금',data.interim2]]){
   if(value!==null&&value>0&&!compact.includes(money(value).replace(/[\s,]/g,'')))
    warnings.push(name);
  }
