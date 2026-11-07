@@ -4,7 +4,9 @@
 'use strict';
 const E=id=>document.getElementById(id);
 const FIELDS=['dealType','property','address','unit','price','monthlyRent','contractDeposit','advance','interim','interimDate','interim2','interimDate2','contractDate','balanceDate','balanceTime','exclusiveArea','supplyInfo','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms','cancellation','brokerFee','rough'];
-let created=false, approved=false;
+let created=false, approved=false, lastPreviewFields='';
+// Comparing inputs prevents navigation/reopening from accidentally cancelling approval.
+function previewSourceSignature(){return JSON.stringify(FIELDS.map(id=>field(id)).concat([String(E('ct_specialMemo')?.value||'')]));}
 function field(id){return String(E('ct_'+id)?.value||'').trim();}
 // Textarea cannot color individual substrings. Show a safe, noneditable color
 // preview to family members; tap "직접 수정" to edit the original plain text.
@@ -301,8 +303,8 @@ function updateSummary(){
   '  /  이번 송금: '+(data.advance===null?'미입력':money(data.advance))+
   '\n최종 잔금: '+(data.balance===null?'계산 불가':money(data.balance))+
   (data.interimTotal>0?' (중도금 합계 '+money(data.interimTotal)+' 별도)':'');
- if(created&&E('ct_preview').value){
-  created=false;approved=false; // Invalidate stale preview after any upstream condition changed.
+ if(created&&E('ct_preview').value&&previewSourceSignature()!==lastPreviewFields){
+  created=false;approved=false; // Only genuine input changes invalidate an approved preview.
   E('ct_status').textContent='조건이 변경되었습니다. 문자를 다시 생성해 검토해 주세요.';
   E('ct_status').className='contractReview bad';
  }
@@ -371,7 +373,7 @@ function makePreview(){
  refreshHighlightedNotice();
  created=false;approved=false;
  updateSummary();
- created=true; // A newly generated preview remains approvable; only later form edits invalidate it.
+ created=true;lastPreviewFields=previewSourceSignature(); // Only genuine edits invalidate confirmation.
  E('ct_status').className='contractReview '+(d.errors.length?'bad':'');
  E('ct_status').textContent=d.errors.length?'⚠ 발송 전 보완: '+d.errors.join(' · '):
   '계약내용·금액·계좌·당사자 합의를 대조한 뒤 ‘내용 확인 완료’를 누르세요.';
@@ -492,7 +494,7 @@ function clearForNewMemo(){
  E('ct_selectedComplexContext')?.classList?.add?.('hidden');
  E('ct_status').textContent='메모에서 새 계약조건을 분석합니다.';
  E('ct_status').className='contractReview';
- created=false;approved=false;
+ created=false;approved=false;lastPreviewFields='';
  window.FirstHyundaiSmart?.reset();
  updateSummary();
 }
@@ -505,7 +507,7 @@ function reset(){
  E('ct_selectedComplexContext')?.classList?.add?.('hidden');
  E('ct_status').textContent='조건을 입력하면 초안을 생성할 수 있습니다.';
  E('ct_status').className='contractReview';
- created=false;approved=false;updateSummary();
+ created=false;approved=false;lastPreviewFields='';updateSummary();
  syncReviewButton();
 }
 function voice(){
