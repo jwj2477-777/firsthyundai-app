@@ -86,7 +86,7 @@ assert.equal(transfer.packet('국민은행 연락처 010-1234-5678').account,nul
 
 // The only unlabelled person is normally the receiving account holder; a draft guess is reviewable.
 for(const [memo,holder,advance] of [
- ['김철수 전세 4억, 계약금 4천 오늘 500만원 입금','김철수',500],
+ ['김철수 전세 4억, 계약금 4천 오늘 500만원 입금',null,500],
  ['오늘 500만원 이체 / 신한은행 123-456-789012 김철수','김철수',500],
  ['김철수 국민은행 123-456-789012 보낼 돈 500','김철수',500],
  ['국민은행 123-456-789012 김철수 계약금 중 500 보내기로','김철수',500],
@@ -104,6 +104,11 @@ assert(el('ct_languageWarnings').textContent.includes('추정했습니다'),'Unl
 assert.equal(transfer.packet('예금주 박민수 임대인 김철수 국민은행 123-456-789012 오늘 500 송금').holder,'박민수');
 assert.equal(transfer.packet('김철수 박민수 국민은행 123-456-789012 오늘 500 송금').holder,null,'Two names are ambiguous');
 assert.equal(transfer.packet('임차인 김철수 국민은행 123-456-789012 오늘 500 송금').holder,null,'Buyer alone is not payee');
+assert.equal(transfer.packet('매도인 김철수 국민은행 123-456-789012 오늘 500 송금').holder,null,'Seller name is not proof of account ownership');
+assert.equal(transfer.packet('매도인은 임차인 퇴거용도로 2차중도금을 사용한다').holder,null,'Special-clause roles never become payees');
+assert.equal(transfer.packet('집주인 김철수 세입자 이영희 계약금 5천').holder,null,'Named parties without a bank account cannot supply a payee');
+assert.equal(transfer.packet('국민은행 123-456-789012 예금주 김철수').holder,'김철수','An explicitly named account holder must still be recognized');
+
 assert.equal(transfer.packet('오늘 500 송금, 계약금 4000, 중도금 2000').amount,500);
 assert.equal(transfer.packet('계약금 4000, 중도금 2000').amount,null,'Totals are not remittance');
 console.log('Unique payee and spoken remittance checks passed.');
