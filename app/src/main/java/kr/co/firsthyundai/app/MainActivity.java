@@ -769,6 +769,23 @@ public class MainActivity extends Activity {
             return OfficeDraftStore.save(getApplicationContext(),
                 OfficeBoardClient.memberId(getApplicationContext()),text,selectedDay);
         }
+        // Contract revisions are member-isolated, encrypted and offline.
+        // Only explicit human-approved notices are saved. Never sync to GitHub.
+        @JavascriptInterface public boolean saveLastApprovedContract(String record){
+            if(!OfficeBoardClient.enrolled(getApplicationContext()))return false;
+            return ContractRevisionStore.save(getApplicationContext(),
+                OfficeBoardClient.memberId(getApplicationContext()),record);
+        }
+        @JavascriptInterface public String getLastApprovedContract(){
+            if(!OfficeBoardClient.enrolled(getApplicationContext()))return "{}";
+            return ContractRevisionStore.read(getApplicationContext(),
+                OfficeBoardClient.memberId(getApplicationContext()));
+        }
+        @JavascriptInterface public void clearLastApprovedContract(){
+            if(!OfficeBoardClient.enrolled(getApplicationContext()))return;
+            ContractRevisionStore.clear(getApplicationContext(),
+                OfficeBoardClient.memberId(getApplicationContext()));
+        }
         @JavascriptInterface public String getOfficeMemoDraft(){
             if(!OfficeBoardClient.enrolled(getApplicationContext()))return "{}";
             return OfficeDraftStore.read(getApplicationContext(),
