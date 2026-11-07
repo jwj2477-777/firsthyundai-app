@@ -50,7 +50,11 @@ public class ContractLiveChecklistTest {
   assertTrue(all.contains("monthlyRent"));
   assertTrue(all.contains("leaseDuration"));
   assertTrue(all.contains("interimDate"));
-  p.put("dealType","매매").put("interim",0);
+  p.put("interim2",30000000);
+  assertTrue(ContractLiveChecklist.missing(p).toString().contains("interimDate2"));
+  p.put("interimDate2","2027-02-10");
+  assertFalse(ContractLiveChecklist.missing(p).toString().contains("interimDate2"));
+  p.put("dealType","매매").put("interim",0).put("interim2",0);
   String sale=ContractLiveChecklist.missing(p).toString();
   assertFalse(sale.contains("monthlyRent"));
   assertFalse(sale.contains("leaseDuration"));
