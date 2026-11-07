@@ -175,13 +175,40 @@ function apartmentCandidates(text){
  }
  return [...scored.values()].sort((a,b)=>b.score-a.score||a.row.label.localeCompare(b.row.label,'ko'));
 }
-const FIELDS=['property','unit','exclusiveArea','supplyInfo','price','contractDeposit','advance','interim','monthlyRent','contractDate','balanceDate','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms'];
+const FIELDS=['property','unit','exclusiveArea','supplyInfo','price','contractDeposit','advance','interim','interim2','monthlyRent','contractDate','balanceDate','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms'];
 function apply(id,newValue,found,source){
  if(newValue==null||newValue==='')return false;
  const e=E(id);if(!e||val(id))return false;
  e.value=String(newValue);
  found.push({id,value:String(newValue),source:source||'메모'});
  return true;
+}
+// Numbered instalments are separate payment facts; a later instalment
+// must not overwrite the earlier amount or due date.
+function numberedInterims(raw,found,review){
+ const source=String(raw||'').normalize('NFKC').replace(/\r/g,'');
+ const pattern=/(?:([12])\s*차\s*중도금|중도금\s*([12])\s*차)/g;
+ const matches=[...source.matchAll(pattern)];
+ for(let i=0;i<matches.length;i++){
+  const match=matches[i],round=Number(match[1]||match[2]);
+  const id=round===1?'interim':'interim2',dateId=round===1?'interimDate':'interimDate2';
+  const following=source.slice(match.index+match[0].length,i+1<matches.length?matches[i+1].index:source.length);
+  const segment=following.split(/\n|(?=\s*(?:잔금(?:일|은)?|계약금|계약일|이번\s*송금|특약(?:사항)?|계좌번호|은행|예금주)\s*[:：]?)/)[0].trim();
+  const token=segment.match(/^\s*(?:(?:은|는|금액은?|금액이|약)\s*|[:：-]\s*)*((?:\d[\d,.]*|[일이삼사오육륙칠팔구한십백천]+)\s*(?:억|천|백|만원|만|원)(?:\s*(?:\d[\d,.]*|[일이삼사오육륙칠팔구한십백천]+)\s*(?:천|백|만원|만|원))*)/);
+  const numeric=token?moneyPart(token[1]):null;
+  if(numeric!==null&&numeric>0)apply(id,numeric,found);
+  else if(!val(id))review.push(round+'차 중도금 금액을 확인해 주세요.');
+  const due=dateIn(segment);
+  if(due){
+   if(apply(dateId,due.value,found)&&due.assumed)review.push(round+'차 중도금 지급일의 연도를 추정했습니다. 확인하세요.');
+  }else{
+   const flexible=segment.match(/(?:(?:20)?\d{2}\s*년\s*)?\d{1,2}\s*월\s*(?:초순|중순|하순|초|중|말일|말)(?:\s*(?:협의|예정|전후|경))?/);
+   if(flexible){
+    if(apply(dateId,flexible[0].trim(),found))review.push(round+'차 중도금 지급일은 협의 일정으로 입력했습니다.');
+   }else if(!val(dateId))review.push(round+'차 중도금 지급일을 확인해 주세요.');
+  }
+ }
+ return matches.length>0;
 }
 function recognize(raw){
  let s=String(raw||'').normalize('NFKC').replace(/\r/g,'').replace(/[，]/g,',').replace(/\s+/g,' ').trim();
@@ -273,6 +300,8 @@ function recognize(raw){
   if(m){const n=moneyPart(m[1].replace(/\s+/g,''));if(n!==null)advance={amount:n,raw:m[1]};}
  }
  if(advance?.amount!=null)apply('advance',advance.amount,found);
+ const hasNamedInterims=numberedInterims(raw,found,review);
+ if(!hasNamedInterims){
  // First isolate the interim payment from trailing dates. E.g., 4억 12년20일
  // is 4억 plus an unclear date, NOT a malformed monetary amount.
  const interimContext=/중도금(?!\s*(?:지급일|지급\s*예정일|일정|날짜))\s*(?:은|는)?\s*[:：]?\s*((?:\d[\d,.]*|[일이삼사오육륙칠팔구한십백천]+)\s*(?:억|천|백|만원|만|원))/.exec(s);
@@ -312,6 +341,7 @@ function recognize(raw){
    }
    break;
   }
+ }
  }
  const rent=amountAfter(s,['월차임','월세액','월세\\s*금액','월세는','월세']);
  if(deal==='월세'){
@@ -424,9 +454,9 @@ function report(data){
  const view=E('recognized');
  if(view){
   const labels={dealType:'거래유형',property:'아파트',unit:'동·호수',price:'총 금액',contractDeposit:'약정 계약금',
-   advance:'선송금액',interim:'중도금',monthlyRent:'월세',balanceDate:'잔금일',leaseStart:'입주일',
+   advance:'선송금액',interim:'중도금',interim2:'2차 중도금',monthlyRent:'월세',balanceDate:'잔금일',leaseStart:'입주일',
    leaseEnd:'종료일',contractDate:'본계약일',leaseDuration:'임대차 기간',bank:'은행',account:'계좌번호',
-   accountHolder:'예금주',interimDate:'중도금 지급일',address:'소재지',owner:'임대인·매도인',buyer:'임차인·매수인',terms:'특약'};
+   accountHolder:'예금주',interimDate:'중도금 지급일',interimDate2:'2차 중도금 지급일',address:'소재지',owner:'임대인·매도인',buyer:'임차인·매수인',terms:'특약'};
   view.textContent=data.found.length?
    '✓ 자동 인식: '+data.found.map(x=>labels[x.id]||x.id).join(' · '):
    '자동으로 확정할 수 있는 항목을 찾지 못했습니다. 아래 입력란에서 직접 확인해 주세요.';
