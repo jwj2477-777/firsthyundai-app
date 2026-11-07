@@ -440,11 +440,11 @@ function recognize(raw){
  if(bankTriplet){
   apply('bank',bankTriplet[1].trim(),found);
   apply('account',bankTriplet[2].replace(/\s/g,''),found);
-  if(bankTriplet[3])apply('accountHolder',bankTriplet[3],found);
+  if(bankTriplet[3]&&!/^(?:매수인|임차인|매도인|임대인|세입자|집주인|명의자|계좌|계약금|금액|송금액|입금액|퇴거|퇴거용도)$/.test(bankTriplet[3]))apply('accountHolder',bankTriplet[3],found);
  }else if(bankNamed)apply('bank',bankNamed[1],found);
  const account=s.match(/(?:계좌번호|입금계좌|송금계좌|계좌는|계좌)\s*[:：]?\s*(?:[가-힣A-Za-z]{2,8}\s*)?(\d{2,8}(?:[- ]?\d{2,8}){2,5})/);
  if(account)apply('account',account[1].replace(/\s/g,''),found);
- const holder=s.match(/(?:예금주|명의자)\s*[:：]?\s*([가-힣]{2,5})(?=\s|$|[,.;)\]])/);
+ const holder=s.match(/(?:예금주|계좌\s*명의자|계좌주)\s*[:：]?\s*([가-힣]{2,5})(?=\s|$|[,.;)\]])/);
  if(holder)apply('accountHolder',holder[1],found);
  // Party names are not extracted as contract facts. Role words inside
  // clauses (e.g. "임차인 퇴거용도") are obligations, not person identities.
