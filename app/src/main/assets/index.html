@@ -173,6 +173,28 @@ body.apartmentSheetActive{overflow:hidden}
 .complexQuickLinks a{display:flex;align-items:center;justify-content:center;min-height:52px;padding:10px;border-radius:11px;background:#f8f1eb;color:#7e5430;text-align:center;font-size:13px;font-weight:800}
 .complexTypeList span{font-weight:700;font-size:13px;padding:10px 11px}
 @media(max-width:420px){.complexTabBar button{font-size:13px}.complexQuickLinks a{font-size:12px}}
+
+/* Contract correction controls: prominent enough for older family members. */
+#ct_resumePanel{border:2px solid #a5c8bc;background:#f4faf7;margin:12px 0;padding:16px}
+#ct_resumePanel .contractSection{color:#245d51;font-size:19px;font-weight:850;margin:0 0 7px}
+#ct_resumePanel .contractHint{color:#476a62;font-size:14px;line-height:1.6}
+#ct_resumePanel .contractActions{display:flex;gap:8px;flex-wrap:wrap}
+#ct_resumePanel .contractActions button{min-height:54px;font-size:15px;font-weight:850}
+.contractRevisionPanel{border:2px solid #b9cfc8;background:linear-gradient(155deg,#f5fbf9,#fffdf9);border-radius:18px;padding:16px;margin:15px 0 20px}
+.contractRevisionHeader strong{display:block;color:#24574f;font-size:20px;font-weight:900}
+.contractRevisionHeader p{margin:5px 0 14px;color:#54716a;font-size:14px;line-height:1.55;font-weight:650}
+#ct_revisionStart{width:100%;min-height:58px;font-size:17px;font-weight:850;border-radius:13px;background:#246d60;color:#fff;border-color:#246d60}
+#ct_revisionEditor{padding-top:14px}
+#ct_revisionEditor>label{display:block;font-size:15px;margin:10px 0 7px;font-weight:850}
+#ct_revisionField,#ct_revisionValue{width:100%;border:1.5px solid #b4c8c2;border-radius:11px;background:white;color:#263f3e;font-size:17px;padding:12px;line-height:1.6}
+#ct_revisionField{min-height:53px}
+#ct_revisionValue{min-height:58px;resize:vertical}
+#ct_revisionBefore{font-size:14px;color:#4b6a65;font-weight:750;white-space:pre-wrap}
+#ct_revisionEditor .contractActions{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+#ct_revisionEditor .contractActions button{min-height:53px;flex:1 1 190px;font-weight:850;font-size:15px}
+#ct_revisionStatus{white-space:pre-wrap;line-height:1.7;font-size:14px;font-weight:750;color:#24574f}
+#ct_previousNoticeWrap{margin-top:13px}
+#ct_previousNoticeWrap textarea{width:100%;max-height:360px;border:1px solid #d8d8d8;background:#f8f8f8;color:#39494b;font-size:13px;line-height:1.6;padding:12px;resize:vertical}
 </style>
 <link rel="stylesheet" href="contracts.css">
 <link rel="stylesheet" href="ai-news-office.css">
