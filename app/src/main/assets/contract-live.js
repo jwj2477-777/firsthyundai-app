@@ -4,10 +4,10 @@
  'use strict';
  const $=id=>document.getElementById(id), field=k=>$('ct_'+k);
  const LABELS={property:'아파트명 / 단지명',unit:'동·호수',dealType:'계약 유형',price:'거래금액 / 보증금',contractDeposit:'계약금',advance:'이번 송금액',
-  interim:'중도금',monthlyRent:'월세',contractDate:'계약일',interimDate:'중도금 지급일',balanceDate:'잔금일',
+  interim:'1차 중도금',interim2:'2차 중도금',monthlyRent:'월세',contractDate:'계약일',interimDate:'1차 중도금 지급일',interimDate2:'2차 중도금 지급일',balanceDate:'잔금일',
   leaseStart:'입주일',leaseEnd:'임대차 종료일',leaseDuration:'임대차 기간',balanceTime:'잔금 시간',terms:'특약 (기존 특약에 추가)'};
- const MONEY=new Set(['price','contractDeposit','advance','interim','monthlyRent']);
- const DATES=new Set(['contractDate','interimDate','balanceDate','leaseStart','leaseEnd']);
+ const MONEY=new Set(['price','contractDeposit','advance','interim','interim2','monthlyRent']);
+ const DATES=new Set(['contractDate','interimDate','interimDate2','balanceDate','leaseStart','leaseEnd']);
  let active=false,stopping=false,reviewing=false,requestId='',sequence=0,proposals={},reviewStates={},selected={},failed=false;
  const REVIEW_STATES={pending:'미정',discussion:'협의 중',manual:'직접 입력',not_applicable:'해당 없음'};
  function status(text){$('cl_status').textContent=text;}
@@ -22,7 +22,7 @@
   for(const [k,v] of Object.entries(raw)){
    if(!Object.hasOwn(LABELS,k))return null;
    if(MONEY.has(k)){
-    if(!Number.isSafeInteger(v)||v<0||v>1e12||(!v&&!['interim','monthlyRent'].includes(k)))return null;
+    if(!Number.isSafeInteger(v)||v<0||v>1e12||(!v&&!['interim','interim2','monthlyRent'].includes(k)))return null;
     out[k]=String(v/10000); // Existing form stores 만원, API schema explicitly uses 원.
    }else{
     if(typeof v!=='string')return null;
@@ -41,7 +41,7 @@
       continue;
     }
     if(DATES.has(k)&&s&&!validDate(s)){
-     if(!['contractDate','interimDate'].includes(k)||
+     if(!['contractDate','interimDate','interimDate2'].includes(k)||
         !/^[\d\s년월일초중말순경~～.\-/협의추후미정예정상호결정까지부터전후사이]+$/.test(s)||
         !/(협의|미정|추후|초순|중순|하순|월말|월초|전후|사이|~|～)/.test(s))return null;
     }
@@ -58,11 +58,12 @@
  function consistency(existing,update){
   const p={...existing,...update};
   const num=k=>Object.hasOwn(p,k)&&p[k]!==''?Number(p[k]):null;
-  const total=num('price'),deposit=num('contractDeposit'),send=num('advance'),interim=num('interim');
+  const total=num('price'),deposit=num('contractDeposit'),send=num('advance'),interim=num('interim'),interim2=num('interim2');
   if(total!==null&&deposit!==null&&deposit>total)return '계약금이 거래금액보다 큽니다.';
   if(deposit!==null&&send!==null&&send>deposit)return '이번 송금액이 계약금보다 큽니다.';
   if(total!==null&&interim!==null&&interim>total)return '중도금이 거래금액보다 큽니다.';
-  if(total!==null&&deposit!==null&&interim!==null&&deposit+interim>total)return '계약금과 중도금의 합계가 거래금액보다 큽니다.';
+  if(total!==null&&interim2!==null&&interim2>total)return '2차 중도금이 거래금액보다 큽니다.';
+  if(total!==null&&deposit!==null&&(interim!==null||interim2!==null)&&deposit+(interim||0)+(interim2||0)>total)return '계약금과 중도금의 합계가 거래금액보다 큽니다.';
   for(const [first,last,label] of [['contractDate','balanceDate','잔금일이 계약일보다 빠릅니다.'],
                                     ['leaseStart','leaseEnd','임대차 종료일이 입주일보다 빠릅니다.']]){
    if(validDate(p[first]||'')&&validDate(p[last]||'')&&p[first]>p[last])return label;
@@ -89,6 +90,8 @@
   if(type==='월세'&&unanswered('monthlyRent'))missing.push('monthlyRent');
   const interim=Object.hasOwn(chosen,'interim')?chosen.interim:proposals.interim;
   if(Number(interim)>0&&unanswered('interimDate'))missing.push('interimDate');
+  const interim2=Object.hasOwn(chosen,'interim2')?chosen.interim2:proposals.interim2;
+  if(Number(interim2)>0&&unanswered('interimDate2'))missing.push('interimDate2');
   return missing;
  }
  function buttons(){
