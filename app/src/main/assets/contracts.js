@@ -154,6 +154,7 @@ function collect(){
  if(advance===null||advance<=0)errors.push('이번 송금액');
  if(interim===null||interim<0)errors.push('중도금 숫자');
  if(interim2===null||interim2<0)errors.push('2차 중도금 숫자');
+ if(/(?:2\s*차\s*중도금|중도금\s*2\s*차)/.test(field('rough'))&&!(interim2>0))errors.push('2차 중도금 금액');
  if(interim2>0&&!(interim>0))errors.push('2차 중도금은 있는데 1차 금액이 없음');
  if(field('interimDate2')&&!(interim2>0))errors.push('2차 중도금 일정은 있는데 금액이 없음');
  if(interim2>0&&!field('interimDate2'))errors.push('2차 중도금 지급일');
