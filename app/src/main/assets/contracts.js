@@ -499,7 +499,7 @@ function clearForNewMemo(){
  updateSummary();
 }
 function reset(){
- if(!confirm('현재 작성 중인 계약 내용을 모두 지우시겠습니까? 저장된 사본은 없습니다.'))return;
+ if(!confirm('현재 화면에서 작성 중인 내용은 지워집니다. 그래도 새 계약을 시작하시겠습니까? 최근 확인 완료한 계약 1건은 이 기기에 암호화 보관되어 다시 불러올 수 있습니다.'))return;
  const extra=E('ct_moreActions');if(extra)extra.open=false;
  FIELDS.forEach(id=>{const el=E('ct_'+id);if(el)el.value='';});
  if(E('ct_specialMemo'))E('ct_specialMemo').value='';
