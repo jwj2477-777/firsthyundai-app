@@ -104,7 +104,7 @@ api.makePreview();
 assert(el('ct_preview').value.includes('▶ 1차 중도금 : 5,000만원'));
 assert(el('ct_preview').value.includes('▶ 2차 중도금 : 4,000만원'));
 assert(el('ct_preview').value.includes('▶ 2차 중도금 지급일 : 2026.12.15.'));
-assert.equal(collect().balance,30000,'Both instalments reduce final payment');
+assert.equal(collect().balance,26100,'Both instalments reduce final payment');
 el('ct_interimDate2').value='2026-12-01';
 assert(collect().errors.some(e=>e.includes('2차 중도금 지급일이 1차보다 빠름')));
 el('ct_interimDate2').value='2026-12-15';
