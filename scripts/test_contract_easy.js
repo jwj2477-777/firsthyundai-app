@@ -83,6 +83,7 @@ input('집주인 김철수 세입자 이영희 퍼스트파크 15블럭 1501동 
 eq('owner','');eq('buyer','');
 assert(!e('ct_preview').value.includes('▶ 매도인 :')&&!e('ct_preview').value.includes('▶ 임차인 :'),'No separate party-name rows');
 eq('contractDeposit','1950');
+assert(e('ct_languageWarnings').textContent.includes('5%'));
 input('파크애비뉴 1604동 2101호 매매 14.3억 계약금 2억\n중도금1차 1월31일 1억원\n중도금2차 6월30일 5억원\n잔금 7월30일');
 e('ct_specialMemo').value='매도인은 2차중도금을 현재 본주택 내 거주중인 임차인 퇴거용도로만 사용한다.';
 easy.compose();
@@ -94,7 +95,6 @@ assert(e('ct_preview').value.includes('매도인은 2차중도금을'),'Keep sel
 assert(!e('ct_accountHolder').value,'No payee without bank or account evidence');
 e('ct_specialMemo').value='';
 
-assert(e('ct_languageWarnings').textContent.includes('5%'));
 input('퍼스트파크 15블럭 1501동 1203호 전세 3억9천, 계약금 10%, 선입금 500만원 잔금 2026.12.30 기간 2년');
 eq('contractDeposit','3900');
 assert(e('ct_preview').value.includes('▶ 계약금 : 3,900만원'));
