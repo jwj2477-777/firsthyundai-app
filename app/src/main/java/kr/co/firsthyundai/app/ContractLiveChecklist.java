@@ -27,6 +27,8 @@ final class ContractLiveChecklist {
             missing.put("monthlyRent");
         if(p.optLong("interim",0)>0&&!present(p,"interimDate")&&!states.has("interimDate"))
             missing.put("interimDate");
+        if(p.optLong("interim2",0)>0&&!present(p,"interimDate2")&&!states.has("interimDate2"))
+            missing.put("interimDate2");
         return missing;
     }
     private static boolean present(JSONObject p,String name){
