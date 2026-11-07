@@ -66,13 +66,16 @@ function holderCandidate(text,account,bank){
    const name=m[1];
    if(!familyNames.includes(name[0])||reserved.test(name)||notName.test(name))continue;
    if(/(?:금|월|년|은행|계좌|계약|만원|송금|입금|기간)$/.test(name))continue;
-   if(/(?:매수인|임차인|세입자)\s*[:：]?\s*$/.test(line.slice(Math.max(0,m.index-14),m.index)))continue;
+   if(/(?:매수인|임차인|세입자|매도인|임대인|집주인)\s*[:：]?\s*$/.test(line.slice(Math.max(0,m.index-14),m.index)))continue;
    if(!sameLine.includes(name))sameLine.push(name);
   }
  }
  if(sameLine.length===1)return {value:sameLine[0],confidence:'bank-line',warning:'은행·계좌가 있는 줄의 사람 이름을 예금주로 추정했습니다. 실제 계좌 명의를 확인해 주세요.'};
  if(sameLine.length>1)return {value:null,warning:'계좌가 기재된 줄에 여러 사람 이름이 있어 예금주 확인이 필요합니다.'};
 
+ // A person mentioned somewhere in a contract is not necessarily the payee.
+ // No account + bank context means no automatic holder guess.
+ if(!account||!bank)return {value:null};
  const memo=s.split(/(?:^|\n)\s*(?:특약(?:사항)?|합의사항)\s*[:：]/m)[0];
  const people=new Map();
  for(const m of memo.matchAll(/(?<![가-힣])([가-힣]{2,4})(?![가-힣])/g)){
@@ -85,13 +88,14 @@ function holderCandidate(text,account,bank){
   const nearAccount=!!account&&Math.abs(m.index-account.start)<65;
   const nearBank=!!bank&&Math.abs(m.index-bank.start)<65;
   if(name.length===2&&!owner&&!buyer&&!nearAccount&&!nearBank)continue;
-  const old=people.get(name)||{name,buyer:false};
-  old.buyer=old.buyer||buyer;people.set(name,old);
+  // Party names, even when explicitly written, are not evidence of account ownership.
+  if(buyer||owner||!nearAccount&&!nearBank)continue;
+  people.set(name,{name});
  }
- const names=[...people.values()].filter(x=>!x.buyer);
+ const names=[...people.values()];
  if(names.length>1)return {value:null,warning:'서로 다른 이름이 여러 개 있어 예금주를 선택하지 않았습니다.'};
  if(names.length===1)return {value:names[0].name,confidence:'inferred-name',warning:'메모의 유일한 이름을 예금주로 추정했습니다. 실제 계좌 명의와 확인해 주세요.'};
- if(people.size)return {value:null,warning:'매수인·임차인 이름만 있습니다. 예금주를 확인해 주세요.'};
+ 
  return {value:null};
 }
 function moneyCandidates(text,account){
