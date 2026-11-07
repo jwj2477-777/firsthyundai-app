@@ -69,6 +69,40 @@ assert(el('ct_preview').value.includes('▶ 2차 중도금 : 30,000만원'));
 assert(el('ct_preview').value.includes('▶ 2차 중도금 지급일 : 2027.06.30.'));
 assert(el('ct_preview').value.includes('▶ 잔금 : 40,000만원'));
 reset();
+// Regression: field-order varies in real office memos. The dates must not
+// swallow the following currency, including when spaces are omitted.
+tryNote('파크애비뉴 1601동 901호 매매계약\n거래대금 10억\n계약금 1억\n중도금1차 1월31일 2억원\n중도금2차 6월30일 3억원\n잔금 7월30일');
+eq('price','100000');eq('contractDeposit','10000');
+eq('interim','20000');eq('interim2','30000');
+eq('interimDate',language._test.dateIn('1월31일').value);
+eq('interimDate2',language._test.dateIn('6월30일').value);
+eq('balanceDate',language._test.dateIn('7월30일').value);
+assert.equal(app._test.collect().balance,40000,'Date-first amounts must reduce the remaining balance');
+assert(!app._test.collect().errors.some(e=>/중도금/.test(e)),'Both amounts/dates recognized without false missing notices');
+app.makePreview();
+assert(el('ct_preview').value.includes('▶ 1차 중도금 : 20,000만원'));
+assert(el('ct_preview').value.includes('▶ 2차 중도금 : 30,000만원'));
+assert(el('ct_preview').value.includes('▶ 잔금 : 40,000만원'));
+reset();
+tryNote('파크애비뉴 매매 10억 계약금 1억\n중도금1차1월31일2억원\n중도금2차6월30일3억원\n잔금 7월30일');
+eq('interim','20000');eq('interim2','30000');
+eq('interimDate',language._test.dateIn('1월31일').value);
+eq('interimDate2',language._test.dateIn('6월30일').value);
+reset();
+// Mixed order and a clause that mentions the second payment must neither
+// overwrite it nor create an extra phantom payment.
+el('ct_specialMemo').value='매도인은 2차중도금을 정해진 용도로만 사용한다.';
+tryNote('파크애비뉴 매매 10억 계약금 1억\n1차 중도금 2억원 27년 1월31일\n중도금 2차 27년 6월30일 3억원\n잔금 27년 7월30일');
+eq('interim','20000');eq('interim2','30000');
+eq('interimDate','2027-01-31');eq('interimDate2','2027-06-30');
+assert(!app._test.collect().errors.some(e=>/중도금/.test(e)),'Special clause must not produce phantom instalment warnings');
+reset();
+// A date alone is not an amount, even if its day number looks monetary.
+tryNote('파크애비뉴 매매 10억 계약금 1억\n중도금1차 1월31일\n중도금2차 6월30일 3억원');
+eq('interim2','30000');
+assert(!el('ct_interim').value,'Date-only 1st instalment cannot fabricate money');
+assert(app._test.collect().errors.includes('2차 중도금은 있는데 1차 금액이 없음'));
+reset();
 tryNote('파크애비뉴 매매 10억 계약금 1억 2차 중도금 3억 27년 6월 30일');
 assert(app._test.collect().errors.includes('2차 중도금은 있는데 1차 금액이 없음'),'A second instalment cannot silently stand in for the first');
 reset();
