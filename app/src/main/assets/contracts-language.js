@@ -72,10 +72,15 @@ function tokenizeMoney(s){
  const rx=/(?<![가-힣])(\d[\d,.]*(?:\s*(?:억|천|백|십|만|원))?(?:\s*\d[\d,.]*(?:\s*(?:억|천|백|십|만|원))?)*|[일이삼사오육륙칠팔구한십백천]+(?:\s*(?:억|만원|만|원))?(?:\s*[일이삼사오육륙칠팔구한십백천]+(?:천|백|십|만|원)?)*)/g;
  let m,res=[];
  while((m=rx.exec(text))!==null){
-  const normalized=m[0].trim();
+  let normalized=m[0].trim();
+  // '계약금 1억 1차 중도금' must NOT become 1억1만원: 1 is an instalment ordinal.
+  const behind=text.slice(rx.lastIndex).trimStart();
+  if(/^차\s*중도금/.test(behind)&&/[1-9]$/.test(normalized)){
+   const clean=normalized.replace(/\s*[1-9]$/,'').trim();
+   if(clean&&moneyPart(clean)!==null)normalized=clean;
+  }
   if(normalized.length===1&&/[가-힣]/.test(text[rx.lastIndex]||''))continue; // 금일·오늘은 금액이 아님
   // Exclude possible apartment dong/ho numbers, year/month/day pieces.
-  const behind=text.slice(rx.lastIndex).trimStart();
   // List markers such as '3.계약금' are never monetary values.
   if(/^\d{1,2}\.$/.test(normalized)&&/^(?:매매|거래|계약금|중도금|잔금|기타|특약|계좌|주소|소재지)/.test(behind))continue;
   if(/^\d{1,2}$/.test(normalized)&&/^[.)]\s*(?:매매|거래|계약금|중도금|잔금|기타|특약|계좌|주소|소재지)/.test(behind))continue;
