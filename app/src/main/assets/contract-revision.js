@@ -17,7 +17,9 @@ const LABELS={balanceDate:'잔금일',contractDate:'계약일',interimDate:'1차
  interimDate2:'2차 중도금 지급일',balanceTime:'잔금 시간',leaseStart:'입주일',
  leaseEnd:'임대차 종료일',price:'매매대금 / 보증금',contractDeposit:'계약금',
  interim:'1차 중도금',interim2:'2차 중도금',advance:'이번 송금액',
- monthlyRent:'월세',unit:'동·호수',terms:'특약 문구'};
+ monthlyRent:'월세',unit:'동·호수',property:'아파트·단지명',address:'소재지 주소',
+ bank:'송금 은행',account:'송금 계좌번호',accountHolder:'예금주',leaseDuration:'임대차 기간',
+ terms:'특약 문구',cancellation:'별도 해제·위약 합의',brokerFee:'별도 중개보수 합의'};
 const NOTICE_LINES={balanceDate:['잔금일'],contractDate:['계약일'],
  interimDate:['1차 중도금 지급일','중도금 지급일'],interimDate2:['2차 중도금 지급일'],
  leaseStart:['입주일']};
