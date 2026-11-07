@@ -210,6 +210,8 @@ jobs:
           node --check app/src/main/assets/contracts.js
           node --check app/src/main/assets/contracts-smart.js
           node scripts/test_contracts.js
+          node --check app/src/main/assets/contract-revision.js
+          node scripts/test_contract_revision.js
           node --check app/src/main/assets/contracts-language.js
           node scripts/test_contract_language.js
           node scripts/test_contract_punctuation.js
@@ -399,25 +401,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.92 account-only party name APK
+      - name: Publish v2.1.93 contract post-approval correction APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.92.apk
-          unzip -t FirstHyundai-v2.1.92.apk | grep 'No errors detected'
-          if gh release view v2.1.92 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.93.apk
+          unzip -t FirstHyundai-v2.1.93.apk | grep 'No errors detected'
+          if gh release view v2.1.93 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.1.92 FirstHyundai-v2.1.92.apk \
+            gh release create v2.1.93 FirstHyundai-v2.1.93.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.92 · 당사자 이름 오인식 방지' \
-               --notes '계약 메모와 특약에서 매수인·임차인·매도인·임대인의 이름을 별도 항목으로 인식하거나 계약 안내문에 표시하지 않습니다. 예: 임차인 퇴거용도라는 특약 문구가 매수인 퇴거로 바뀌지 않습니다. 특약의 원래 권리·의무 문구는 유지합니다. 입금 계좌의 예금주 정보는 그대로 사용하며, 단순 인명만으로 계좌 명의자를 임의 생성하지 않고 계좌·은행·예금주에 근거해 작성합니다. 기존 중도금, 계약문자, Live, 오프라인 작성 기능은 유지합니다. v2.1.92/build243.'
+              --title '퍼스트현대 v2.1.93 · 확인 후 계약 내용 수정·다시 발행' \
+               --notes '계약 안내문을 내용 확인 완료 후에도 잔금일·계약일·중도금 지급일·금액·특약 등 특정 항목만 골라 수정하고, 다시 확인 후 새 이미지와 문자로 발행할 수 있습니다. 날짜 하나만 수정할 때는 기존 문구를 최대한 유지합니다. 수정본에는 이전 안내문 대신 수정본을 확인하라는 표시가 붙고, 조건을 바꾸면 이전 이미지 공유가 차단됩니다. 마지막으로 확인한 계약 안내문 1건은 해당 계정의 Android Keystore AES-GCM으로 단말 내부에만 암호화 보관해 오프라인에서 복원할 수 있습니다. 온라인 전송이나 브라우저 Web Storage 저장은 하지 않습니다. 저장된 확인본은 직접 삭제할 수 있습니다. v2.1.93/build244.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.92 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.92 --apk FirstHyundai-v2.1.92.apk
+          gh release upload v2.1.93 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.93 --apk FirstHyundai-v2.1.93.apk
 
 
 
