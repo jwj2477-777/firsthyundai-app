@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 const E=id=>document.getElementById(id);
-const FIELDS=['dealType','property','address','unit','owner','buyer','price','monthlyRent','contractDeposit','advance','interim','interimDate','interim2','interimDate2','contractDate','balanceDate','balanceTime','exclusiveArea','supplyInfo','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms','cancellation','brokerFee','rough'];
+const FIELDS=['dealType','property','address','unit','price','monthlyRent','contractDeposit','advance','interim','interimDate','interim2','interimDate2','contractDate','balanceDate','balanceTime','exclusiveArea','supplyInfo','leaseStart','leaseEnd','leaseDuration','bank','account','accountHolder','terms','cancellation','brokerFee','rough'];
 let created=false, approved=false;
 function field(id){return String(E('ct_'+id)?.value||'').trim();}
 // Textarea cannot color individual substrings. Show a safe, noneditable color
@@ -98,8 +98,6 @@ function extractNotes(){
  const mappings=[
   ['property',/^\s*(?:소재지|주소|아파트|단지명)\s*[:：-]?\s*(.+)/],
   ['unit',/^\s*(?:동호수|동\s*\/\s*호|호수|대상물)\s*[:：-]?\s*(.+)/],
-  ['owner',/^\s*(?:임대인|매도인)\s*[:：-]\s*(.+)/],
-  ['buyer',/^\s*(?:임차인|매수인)\s*[:：-]\s*(.+)/],
   ['price',/^\s*(?:매매가|매매대금|전세금|전세보증금|보증금|총\s*금액)\s*[:：-]?\s*(.+)/],
   ['contractDeposit',/^\s*(?:총\s*계약금|약정\s*계약금|계약금)\s*[:：-]?\s*(.+)/],
   ['advance',/^\s*(?:선송금액|먼저\s*보낼\s*금액|일부\s*계약금|이번\s*송금액|입금예정액)\s*[:：-]?\s*(.+)/],
@@ -327,8 +325,6 @@ function makePreview(){
    out.push('▶ 전용면적 : '+String(area)+'㎡'+(field('supplyInfo')?' · '+field('supplyInfo'):''));
   }
  }
- if(field('owner'))out.push('▶ '+who+' : '+field('owner'));
- if(field('buyer'))out.push('▶ '+paying+' : '+field('buyer'));
  out.push('','▶ '+totalName+' : '+moneyOr(d.price));
  if(d.type==='월세')out.push('▶ 월세 : '+moneyOr(amount('monthlyRent')));
  if(d.type!=='매매')out.push('▶ 임대차 기간 : '+(field('leaseDuration')||(field('leaseStart')&&field('leaseEnd')?dateLabel(field('leaseStart'))+' ~ '+dateLabel(field('leaseEnd')):'[확인 필요]')));

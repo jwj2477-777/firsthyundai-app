@@ -440,17 +440,14 @@ function recognize(raw){
  if(bankTriplet){
   apply('bank',bankTriplet[1].trim(),found);
   apply('account',bankTriplet[2].replace(/\s/g,''),found);
-  if(bankTriplet[3])apply('accountHolder',bankTriplet[3],found);
+  if(bankTriplet[3]&&!/^(?:매수인|임차인|매도인|임대인|세입자|집주인|명의자|계좌|계약금|금액|송금액|입금액|퇴거|퇴거용도)$/.test(bankTriplet[3]))apply('accountHolder',bankTriplet[3],found);
  }else if(bankNamed)apply('bank',bankNamed[1],found);
  const account=s.match(/(?:계좌번호|입금계좌|송금계좌|계좌는|계좌)\s*[:：]?\s*(?:[가-힣A-Za-z]{2,8}\s*)?(\d{2,8}(?:[- ]?\d{2,8}){2,5})/);
  if(account)apply('account',account[1].replace(/\s/g,''),found);
- const holder=s.match(/(?:예금주|명의자)\s*[:：]?\s*([가-힣]{2,5})(?=\s|$|[,.;)\]])/);
+ const holder=s.match(/(?:예금주|계좌\s*명의자|계좌주)\s*[:：]?\s*([가-힣]{2,5})(?=\s|$|[,.;)\]])/);
  if(holder)apply('accountHolder',holder[1],found);
- // Broker shorthand: "집주인 김철수 / 세입자 이영희".
- const owner=s.match(/(?:집주인|임대인|매도인)\s*[:：]?\s*([가-힣]{2,4})(?=\s|$|[,.;/])/);
- const buyer=s.match(/(?:세입자|임차인|매수인)\s*[:：]?\s*([가-힣]{2,4})(?=\s|$|[,.;/])/);
- if(owner&&!/^(?:계좌|계약|송금|명의|은행|예금주)$/.test(owner[1]))apply('owner',owner[1],found);
- if(buyer&&!/^(?:계좌|계약|송금|명의|은행|예금주)$/.test(buyer[1]))apply('buyer',buyer[1],found);
+ // Party names are not extracted as contract facts. Role words inside
+ // clauses (e.g. "임차인 퇴거용도") are obligations, not person identities.
  // Warn on a separately dictated remaining balance that differs from the calculated balance.
  const spokenBalance=amountAfter(s,['최종\\s*잔금','남은\\s*잔금','잔금액','잔금금액']);
  const computed=base._test.collect();
@@ -469,7 +466,7 @@ function report(data){
   const labels={dealType:'거래유형',property:'아파트',unit:'동·호수',price:'총 금액',contractDeposit:'약정 계약금',
    advance:'선송금액',interim:'중도금',interim2:'2차 중도금',monthlyRent:'월세',balanceDate:'잔금일',leaseStart:'입주일',
    leaseEnd:'종료일',contractDate:'본계약일',leaseDuration:'임대차 기간',bank:'은행',account:'계좌번호',
-   accountHolder:'예금주',interimDate:'중도금 지급일',interimDate2:'2차 중도금 지급일',address:'소재지',owner:'임대인·매도인',buyer:'임차인·매수인',terms:'특약'};
+   accountHolder:'예금주',interimDate:'중도금 지급일',interimDate2:'2차 중도금 지급일',address:'소재지',terms:'특약'};
   view.textContent=data.found.length?
    '✓ 자동 인식: '+data.found.map(x=>labels[x.id]||x.id).join(' · '):
    '자동으로 확정할 수 있는 항목을 찾지 못했습니다. 아래 입력란에서 직접 확인해 주세요.';

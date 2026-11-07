@@ -11,6 +11,8 @@ assert(current.indexOf('<details id="ct_manualPanel"')<current.indexOf('id="cont
 assert(!/<details id="ct_manualPanel"[^>]*\sopen(?:\s|>)/.test(current),'Manual form must be initially collapsed');
 assert(current.includes('FirstHyundaiEasy.compose()'));
 assert(current.includes('id="ct_resultPanel" class="panel hidden"'));
+assert(!current.includes('id="ct_owner"')&&!current.includes('id="ct_buyer"'),'Names are not independent contract inputs');
+assert(current.includes('id="ct_accountHolder"'),'Receiving account payee still has its own field');
 assert(current.includes('id="ct_termOriginal"')&&current.includes('id="ct_termPolished"'));
 const els=new Map();
 function e(id){
@@ -78,9 +80,21 @@ input('퍼스트파크 15블럭 1501동 1203호 전세 3억9천, 500 먼저 보�
 eq('balanceDate','');
 assert(e('ct_languageWarnings').textContent.includes('정확한 날짜'));
 input('집주인 김철수 세입자 이영희 퍼스트파크 15블럭 1501동 1203호 전세 3억9천, 계약금 5%, 선입금 500만원, 잔금 2026.12.30 기간 2년');
-eq('owner','김철수');eq('buyer','이영희');
+eq('owner','');eq('buyer','');
+assert(!e('ct_preview').value.includes('▶ 매도인 :')&&!e('ct_preview').value.includes('▶ 임차인 :'),'No separate party-name rows');
 eq('contractDeposit','1950');
 assert(e('ct_languageWarnings').textContent.includes('5%'));
+input('파크애비뉴 1604동 2101호 매매 14.3억 계약금 2억\n중도금1차 1월31일 1억원\n중도금2차 6월30일 5억원\n잔금 7월30일');
+e('ct_specialMemo').value='매도인은 2차중도금을 현재 본주택 내 거주중인 임차인 퇴거용도로만 사용한다.';
+easy.compose();
+eq('owner','');eq('buyer','');
+assert(e('ct_terms').value.includes('임차인 퇴거용도로만 사용한다.'),'A party role in a special clause remains clause text');
+assert(!e('ct_preview').value.includes('▶ 매수인 : 퇴거'),'Never turn an action into a buyer name');
+assert(!/▶ (?:매수인|임차인|매도인|임대인)\s*:/.test(e('ct_preview').value),'Neither party is a field in the customer notice');
+assert(e('ct_preview').value.includes('매도인은 2차중도금을'),'Keep seller duties in the agreed clause');
+assert(!e('ct_accountHolder').value,'No payee without bank or account evidence');
+e('ct_specialMemo').value='';
+
 input('퍼스트파크 15블럭 1501동 1203호 전세 3억9천, 계약금 10%, 선입금 500만원 잔금 2026.12.30 기간 2년');
 eq('contractDeposit','3900');
 assert(e('ct_preview').value.includes('▶ 계약금 : 3,900만원'));

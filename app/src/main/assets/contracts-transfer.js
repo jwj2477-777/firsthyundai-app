@@ -50,7 +50,7 @@ const familyNames='김이박최정강조윤장임한오서신권황안송전홍�
 const notName=/^(?:한다|있다|된다|예정|완료|확인|금지|수리|허용|변경|협의|상호|매매|전세|월세|계약|보증금|중도금|잔금|가계약|오늘|금일|이번|당일|먼저|지금|내일|입금|송금|이체|보내|보낼|넣을|은행|계좌|명의|계약서|예금주|아파트|송도|퍼스트|마스터|퍼팍|마뷰|프라임|센트럴|더샵|신한|국민|우리|하나|농협|기업|카카오|토스|새마을|우체국|부동산|내용|날짜|기간|확인|특약|임대인|매도인|임차인|매수인|집주인|세입자|소재지|계약금|만원|상담|계좌번호|거래|계약일|잔금일|입주일|동호수|금액|사무실)/;
 function holderCandidate(text,account,bank){
  const s=String(text||'');
- const explicit=/(?:예금주|계좌주|계좌\s*명의자|명의자|수취인|입금\s*받는\s*분)\s*[:：]?\s*([가-힣]{2,5})(?=\s|$|[,.;)\/\]])/g;
+ const explicit=/(?:예금주|계좌주|계좌\s*명의자|수취인|입금\s*받는\s*분)\s*[:：]?\s*([가-힣]{2,5})(?=\s|$|[,.;)\/\]])/g;
  const specified=[...new Set([...s.matchAll(explicit)].map(m=>m[1]).filter(name=>!reserved.test(name)&&!notName.test(name)))];
  if(specified.length===1)return {value:specified[0],confidence:'explicit'};
  if(specified.length>1)return {value:null,warning:'서로 다른 예금주가 적혀 있습니다. 명의를 확인해 주세요.'};
@@ -66,13 +66,16 @@ function holderCandidate(text,account,bank){
    const name=m[1];
    if(!familyNames.includes(name[0])||reserved.test(name)||notName.test(name))continue;
    if(/(?:금|월|년|은행|계좌|계약|만원|송금|입금|기간)$/.test(name))continue;
-   if(/(?:매수인|임차인|세입자)\s*[:：]?\s*$/.test(line.slice(Math.max(0,m.index-14),m.index)))continue;
+   if(/(?:매수인|임차인|세입자|매도인|임대인|집주인)\s*[:：]?\s*$/.test(line.slice(Math.max(0,m.index-14),m.index)))continue;
    if(!sameLine.includes(name))sameLine.push(name);
   }
  }
  if(sameLine.length===1)return {value:sameLine[0],confidence:'bank-line',warning:'은행·계좌가 있는 줄의 사람 이름을 예금주로 추정했습니다. 실제 계좌 명의를 확인해 주세요.'};
  if(sameLine.length>1)return {value:null,warning:'계좌가 기재된 줄에 여러 사람 이름이 있어 예금주 확인이 필요합니다.'};
 
+ // A person mentioned somewhere in a contract is not necessarily the payee.
+ // No account + bank context means no automatic holder guess.
+ if(!account||!bank)return {value:null};
  const memo=s.split(/(?:^|\n)\s*(?:특약(?:사항)?|합의사항)\s*[:：]/m)[0];
  const people=new Map();
  for(const m of memo.matchAll(/(?<![가-힣])([가-힣]{2,4})(?![가-힣])/g)){
@@ -85,13 +88,14 @@ function holderCandidate(text,account,bank){
   const nearAccount=!!account&&Math.abs(m.index-account.start)<65;
   const nearBank=!!bank&&Math.abs(m.index-bank.start)<65;
   if(name.length===2&&!owner&&!buyer&&!nearAccount&&!nearBank)continue;
-  const old=people.get(name)||{name,buyer:false};
-  old.buyer=old.buyer||buyer;people.set(name,old);
+  // Party names, even when explicitly written, are not evidence of account ownership.
+  if(buyer||owner||!nearAccount&&!nearBank)continue;
+  people.set(name,{name});
  }
- const names=[...people.values()].filter(x=>!x.buyer);
+ const names=[...people.values()];
  if(names.length>1)return {value:null,warning:'서로 다른 이름이 여러 개 있어 예금주를 선택하지 않았습니다.'};
  if(names.length===1)return {value:names[0].name,confidence:'inferred-name',warning:'메모의 유일한 이름을 예금주로 추정했습니다. 실제 계좌 명의와 확인해 주세요.'};
- if(people.size)return {value:null,warning:'매수인·임차인 이름만 있습니다. 예금주를 확인해 주세요.'};
+ 
  return {value:null};
 }
 function moneyCandidates(text,account){

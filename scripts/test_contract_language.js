@@ -33,6 +33,14 @@ assert.equal(language._test.moneyPart('2억5천5백만원'),25500);
 assert.equal(language._test.moneyPart('500만원'),500);
 assert.equal(language._test.dateIn('12월 말'),null);
 assert.equal(language._test.dateIn('2026년 2월 31일'),null);
+tryNote('파크애비뉴 1604동 2101호 매매 14.3억 계약금 2억 1차 중도금 1억 1월31일');
+eq('owner','');eq('buyer','');
+reset();
+tryNote('파크애비뉴 매매 14.3억 계약금 2억 특약: 매도인은 임차인 퇴거용도로만 2차 중도금을 사용한다.');
+eq('owner','');eq('buyer','');
+assert(!el('ct_recognized').textContent.includes('매수인'),'A clause keyword must not be a recognized buyer');
+reset();
+
 tryNote('퍼스트팍 15블럭 1501동 1203호 전세 삼억구천만원 오백 먼저 보내고 잔금은 2026년 12월 30일, 기간 2년');
 eq('property','퍼스트파크 15블럭');
 eq('address',catalog[1].address);
