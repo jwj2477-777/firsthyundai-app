@@ -1050,7 +1050,7 @@ body.apartmentSheetActive{overflow:hidden}
   <div class="contractEntryGroup" role="group" aria-label="계약 내용 입력">
    <div class="contractMemoInputArea">
     <label class="contractMemoLabel" for="ct_rough">✎ 계약 내용 입력</label>
-    <textarea id="ct_rough" rows="10" maxlength="12000" aria-describedby="ct_memoHelp ct_memoWriteTip" placeholder="이 칸을 눌러 계약 내용을 적으세요.&#10;&#10;예) 퍼팍 1502동 3004호&#10;매매 16억 / 계약금 6천&#10;중도금 4억 12월4일&#10;잔금 1월5일"></textarea>
+    <textarea id="ct_rough" rows="10" maxlength="12000" aria-describedby="ct_memoHelp ct_memoWriteTip" placeholder="이 칸을 눌러 계약 내용을 적으세요.&#10;&#10;예) 퍼팍 1502동 3004호&#10;매매 16억 / 계약금 6천&#10;1차 중도금 1억 12월4일&#10;2차 중도금 2억 1월5일&#10;잔금 2월10일"></textarea>
     <p id="ct_memoWriteTip" class="contractMemoWriteTip adminExplain">편하게 작성하시면 계약 내용과 특약을 구분해 정리합니다.</p>
    </div>
    <div class="contractSpecialMemoArea">
@@ -1100,6 +1100,8 @@ body.apartmentSheetActive{overflow:hidden}
     <div><label class="inputLabel" for="ct_advance">이번에 먼저 보낼 금액 (만원)</label><input id="ct_advance" inputmode="decimal" placeholder="500"></div>
     <div><label class="inputLabel" for="ct_interim">중도금 (만원 · 없으면 빈칸)</label><input id="ct_interim" inputmode="decimal" placeholder="0"></div>
     <div><label class="inputLabel" for="ct_interimDate">중도금 지급일 (선택·협의 가능)</label><input id="ct_interimDate" maxlength="100" placeholder="2026년 12월 중 협의"></div>
+    <div><label class="inputLabel" for="ct_interim2">2차 중도금 (만원 · 있을 때만)</label><input id="ct_interim2" inputmode="decimal" placeholder="없으면 빈칸"></div>
+    <div><label class="inputLabel" for="ct_interimDate2">2차 중도금 지급일</label><input id="ct_interimDate2" maxlength="100" placeholder="2027년 1월 31일 · 협의 가능"></div>
    </div>
    <div id="ct_amountSummary" class="contractMoneySummary" aria-live="polite">계약 금액을 입력해 주세요.</div>
    <h3 class="contractSection">2. 계약 일정</h3>
