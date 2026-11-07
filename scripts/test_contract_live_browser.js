@@ -10,7 +10,8 @@ async function verify(){
   const live=window.FirstHyundaiContractLive,dialog=get('cl_dialog');
   check(!dialog.open,'Live must be closed by default');
   check(get('ct_rough')&&get('ct_specialMemo'),'Default memo inputs preserved');
-  const privateKeys=['rough','specialMemo','bank','account','accountHolder','owner','buyer'];
+  check(!get('ct_owner')&&!get('ct_buyer'),'Party-name inputs removed from screen');
+  const privateKeys=['rough','specialMemo','bank','account','accountHolder'];
   for(const k of privateKeys)get('ct_'+k).value='SYNTHETIC_LOCAL_'+k;
   get('ct_unit').value='SYNTHETIC_OLD_UNIT';
   get('ct_price').value='80000';get('ct_terms').value='기존 특약 보존.';
