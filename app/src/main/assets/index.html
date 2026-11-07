@@ -1038,6 +1038,15 @@ body.apartmentSheetActive{overflow:hidden}
  <div class="contractFlowSteps" id="ct_flowSteps" aria-label="계약 안내 작성 단계">
   <span class="contractFlowStep is-current" id="ct_flow1" aria-current="step">1 메모 작성</span><span class="contractFlowStep" id="ct_flow2">2 내용 확인</span><span class="contractFlowStep" id="ct_flow3">3 완성·공유</span>
  </div>
+ <section id="ct_resumePanel" class="panel hidden" aria-label="이전에 확인한 계약 불러오기">
+  <p class="contractSection">최근 확인한 계약 다시 수정하기</p>
+  <p class="contractHint">이 휴대전화에 암호화 보관한 마지막 확인본 1건을 불러옵니다. 인터넷 없이 이용할 수 있습니다.</p>
+  <div class="contractActions">
+   <button id="ct_resumeButton" type="button" class="btn contractPrimary" onclick="FirstHyundaiContractRevision.restore()">↶ 최근 계약 불러와 수정</button>
+   <button type="button" class="btn alt" onclick="FirstHyundaiContractRevision.clearSaved()">저장본 삭제</button>
+  </div>
+  <p id="ct_resumeStatus" role="status" aria-live="polite"></p>
+ </section>
  <div class="panel contractMemoCard" aria-labelledby="ct_memoTitle">
   <div class="contractMemoHeading">
    <span class="contractMemoStep" aria-hidden="true">1</span>
@@ -1127,6 +1136,49 @@ body.apartmentSheetActive{overflow:hidden}
  </div></details></div>
  <div id="ct_resultPanel" class="panel hidden">
   <h3 class="contractSection">계약 안내문 확인</h3>
+  <section id="ct_revisionPanel" class="contractRevisionPanel hidden" aria-label="확인 후 계약 내용 간편 수정">
+   <div class="contractRevisionHeader">
+    <strong>발행한 내용 바로 수정</strong>
+    <p>날짜·금액·특약을 처음부터 다시 쓰지 않고 변경할 수 있습니다.</p>
+   </div>
+   <button id="ct_revisionStart" type="button" class="btn contractPrimary" onclick="FirstHyundaiContractRevision.start()">✎ 기존 계약내용 수정하기</button>
+   <div id="ct_revisionEditor" class="hidden">
+    <label class="inputLabel" for="ct_revisionField">수정할 항목</label>
+    <select id="ct_revisionField" onchange="FirstHyundaiContractRevision.select()">
+     <optgroup label="날짜 · 일정">
+      <option value="balanceDate">잔금일</option>
+      <option value="contractDate">계약일</option>
+      <option value="interimDate">1차 중도금 지급일</option>
+      <option value="interimDate2">2차 중도금 지급일</option>
+      <option value="balanceTime">잔금 시간</option>
+      <option value="leaseStart">입주일</option>
+      <option value="leaseEnd">임대차 종료일</option>
+     </optgroup>
+     <optgroup label="금액 · 계약조건">
+      <option value="price">매매대금 / 보증금</option>
+      <option value="contractDeposit">계약금</option>
+      <option value="interim">1차 중도금</option>
+      <option value="interim2">2차 중도금</option>
+      <option value="advance">이번 송금액</option>
+      <option value="monthlyRent">월세</option>
+      <option value="unit">동·호수</option>
+      <option value="terms">특약 문구</option>
+     </optgroup>
+    </select>
+    <p id="ct_revisionBefore" class="contractHint"></p>
+    <label class="inputLabel" for="ct_revisionValue">변경할 내용</label>
+    <textarea id="ct_revisionValue" rows="2" maxlength="8000" aria-describedby="ct_revisionBefore" placeholder="예: 2027.07.30"></textarea>
+    <div class="contractActions">
+     <button type="button" class="btn contractPrimary" onclick="FirstHyundaiContractRevision.apply()">변경 적용하고 수정본 만들기</button>
+     <button type="button" class="btn alt" onclick="FirstHyundaiEasy.openManual()">전체 항목 수정</button>
+    </div>
+    <p id="ct_revisionStatus" class="contractHint" role="status" aria-live="polite"></p>
+    <details id="ct_previousNoticeWrap" class="contractCompactDetails hidden">
+     <summary>수정 전 확인본 펼쳐보기</summary>
+     <textarea id="ct_previousNotice" readonly rows="8" aria-label="수정 전 계약 안내문"></textarea>
+    </details>
+   </div>
+  </section>
   <p class="contractHint adminExplain">이 안내는 거래당사자에게 계약조건을 전달하고 동의 여부를 확인받기 위한 문서입니다. 송금액·계좌와 제안 내용을 발송 전에 확인하세요.</p>
   <div id="ct_missing" class="contractReview" role="status" aria-live="polite">확인할 계약정보를 정리합니다.</div>
   <section id="ct_missingQuickFields" class="contractMissingQuick hidden" aria-label="누락된 내용을 이 자리에서 입력"></section>
@@ -1163,7 +1215,7 @@ body.apartmentSheetActive{overflow:hidden}
     <button type="button" class="btn alt" onclick="FirstHyundaiContracts.share()">문자 / 카톡 공유</button>
     <button type="button" class="btn alt" onclick="FirstHyundaiContracts.reset()">새 계약 시작</button>
    </div>
-   <p class="contractInfo adminExplain">이 기능은 계약서 자체가 아니라 당사자 간 사전 합의 내용을 정리하는 도구입니다. 일부 송금만으로 계약의 효력·해제 조건이 일률적으로 결정되는 것은 아닙니다. 필수 조건과 당사자 의사 확인이 중요합니다. 작성 내용은 공개 GitHub에 업로드하거나 앱의 온라인 데이터로 전송하지 않으며, 별도로 저장하지 않습니다. 복사·공유 후에는 휴대폰 클립보드나 선택한 앱에 내용이 남을 수 있습니다.</p><p class="familySimpleNote familyShortSafety">상대방에게 계약조건을 전달하는 안내문입니다. 전송 후 동의 여부를 확인하세요.</p>
+   <p class="contractInfo adminExplain">이 기능은 계약서 자체가 아니라 당사자 간 사전 합의 내용을 정리하는 도구입니다. 일부 송금만으로 계약의 효력·해제 조건이 일률적으로 결정되는 것은 아닙니다. 필수 조건과 당사자 의사 확인이 중요합니다. 계약내용은 공개 GitHub나 온라인 서버로 전송하지 않습니다. 앱에서 '내용 확인 완료'한 마지막 확인본 1건은 이 휴대전화에 계정별로 암호화하여 보관하고 필요 시 삭제할 수 있습니다. 설치형 앱이 아닌 브라우저에서는 저장되지 않습니다. 복사·공유 후에는 휴대폰 클립보드나 선택한 앱에 내용이 남을 수 있습니다.</p><p class="familySimpleNote familyShortSafety">상대방에게 계약조건을 전달하는 안내문입니다. 전송 후 동의 여부를 확인하세요.</p>
   </details>
   <details id="ct_templateEditor" class="contractAdminTemplate adminOnly">
    <summary>⚙ 관리자 · 공통 계약 안내문구 수정</summary>
@@ -3592,7 +3644,7 @@ function exportComplexCatalog(){
 }
 window.onCatalogSaved=r=>alert(r.ok?'단지정보 JSON을 저장했습니다. GitHub에 올려야 가족에게 반영됩니다.':'단지정보 파일 저장 실패');
 
-</script><script src="public-live.js"></script><script src="price-trends.js"></script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-live.js"></script><script src="contract-image.js"></script><script src="realty-calculators.js"></script><script src="scroll-top.js"></script><script src="admin-preferences.js"></script><script src="season-themes.js"></script><script src="weather-briefing.js"></script><script src="premium-motion.js"></script><script src="selection-flow.js"></script><script src="app-updates.js"></script><script src="admin-center.js"></script><script src="shared-settings.js"></script><script src="office-phones.js"></script><script src="memo-dates.js"></script><script src="annual-calendar.js"></script><script src="office-board.js"></script><script src="office-board-images.js"></script><script src="office-members.js"></script><script src="admin-settings-navigator.js"></script><script src="notification-inbox.js"></script><script src="weather-detail.js"></script><script src="device-display.js"></script><script src="nav-collapse.js"></script></body></html>
+</script><script src="public-live.js"></script><script src="price-trends.js"></script><script src="maintenance-trends.js"></script><script src="trade-alerts.js"></script><script src="contracts.js"></script><script src="contracts-smart.js"></script><script src="contracts-language.js"></script><script src="contracts-transfer.js"></script><script src="contracts-easy.js"></script><script src="contract-revision.js"></script><script src="contract-live.js"></script><script src="contract-image.js"></script><script src="realty-calculators.js"></script><script src="scroll-top.js"></script><script src="admin-preferences.js"></script><script src="season-themes.js"></script><script src="weather-briefing.js"></script><script src="premium-motion.js"></script><script src="selection-flow.js"></script><script src="app-updates.js"></script><script src="admin-center.js"></script><script src="shared-settings.js"></script><script src="office-phones.js"></script><script src="memo-dates.js"></script><script src="annual-calendar.js"></script><script src="office-board.js"></script><script src="office-board-images.js"></script><script src="office-members.js"></script><script src="admin-settings-navigator.js"></script><script src="notification-inbox.js"></script><script src="weather-detail.js"></script><script src="device-display.js"></script><script src="nav-collapse.js"></script></body></html>
 
 
 
