@@ -114,3 +114,10 @@ body:not([data-office-role="admin"]) #calculators .fhcDetail{padding-top:12px}
 
 .fhcFamilyResultNote{margin:7px 0;font-size:12px;color:#65776e}
 body[data-office-role="admin"] .fhcFamilyResultNote{display:none}
+
+/* Keep general-mode calculator focused on inputs, action, and result. */
+body:not([data-office-role="admin"]) #calculators .adminExplain{display:none!important}
+body:not([data-office-role="admin"]) #calculators .fhcMode small{display:none}
+body:not([data-office-role="admin"]) #calculators .fhcMode{min-height:78px;align-items:center;text-align:center;gap:4px}
+body:not([data-office-role="admin"]) #calculators .fhcMode.fhcWide{min-height:74px}
+body:not([data-office-role="admin"]) #calculators .fhcAttribution,body:not([data-office-role="admin"]) #calculators .fhcAttribution a{font-size:12px}
