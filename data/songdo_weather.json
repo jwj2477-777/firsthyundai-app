@@ -1,14 +1,14 @@
 {
   "schema": 1,
   "status": "ok",
-  "checked_at": "2026-11-13T13:58:17.507Z",
+  "checked_at": "2026-11-13T14:55:46.111Z",
   "observed": {
     "schema": 1,
     "status": "ok",
     "effect": "none",
-    "temp": 13.4,
+    "temp": 12.5,
     "precip_mm": 0,
-    "observed_at": "2026-11-13T22:00:00+09:00",
+    "observed_at": "2026-11-13T23:00:00+09:00",
     "provider": "기상청 초단기실황",
     "area": "송도",
     "grid": {
@@ -22,22 +22,8 @@
     "status": "ok",
     "area": "송도",
     "date": "2026-11-13",
-    "issued_at": "2026-11-13T20:00:00+09:00",
+    "issued_at": "2026-11-13T23:00:00+09:00",
     "hours": [
-      {
-        "at": "2026-11-13T22:00:00+09:00",
-        "type": "none",
-        "pop": 30,
-        "temp": 11,
-        "sky": 4
-      },
-      {
-        "at": "2026-11-13T23:00:00+09:00",
-        "type": "rain",
-        "pop": 60,
-        "temp": 11,
-        "sky": 4
-      },
       {
         "at": "2026-11-14T00:00:00+09:00",
         "type": "rain",
@@ -597,10 +583,17 @@
         "pop": 60,
         "temp": 12,
         "sky": 4
+      },
+      {
+        "at": "2026-11-18T00:00:00+09:00",
+        "type": "rain",
+        "pop": 60,
+        "temp": 10,
+        "sky": 4
       }
     ],
-    "complete": true,
-    "coverage_until": "2026-11-17T21:00:00+09:00",
+    "complete": false,
+    "coverage_until": "2026-11-18T00:00:00+09:00",
     "provider": "기상청 단기예보",
     "source_url": "https://www.data.go.kr/data/15084084/openapi.do"
   }
