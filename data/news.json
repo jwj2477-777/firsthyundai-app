@@ -1,12 +1,41 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-11-15T03:48:15+09:00",
+  "checked_at": "2026-11-15T06:41:41+09:00",
   "state": "ok",
   "errors": [],
   "source": "Google 뉴스 RSS (보도 제목·출처 메타데이터)",
   "brief_method": "기사 본문 확인 Gemini 요약 + Groq 보완(짧은 3~4문장)",
   "warning": "언론 기사 제목은 공식 확정 발표가 아닙니다. 사업 일정, 세금, 대출, 시행일은 기관 원문 확인 필요.",
   "briefs": [
+    {
+      "id": "45bdfa7c7bab64",
+      "category": "정책·규제",
+      "title": "인천시의회 신영희 의원, 재개발·재건축 사전컨설팅 과도한 규제 개선을",
+      "summary": "집행부는 기존에 1년가량 소요되던 사전컨설팅 절차를 2~3개월 내로 단축하겠다고 밝혔다.\n제출서류와 협의 부서를 줄여 절차를 간소화하겠다고 발표했다.\n내년 도시정비기본계획 변경을 통해 사전컨설팅을 선택적으로 받을 수 있도록 추진한다.",
+      "verification": "2개 AI 검토 · 사실 확인은 원문 기준",
+      "article_count": 2,
+      "publisher_count": 2,
+      "last_published_at": "2026-11-15T06:05:00+09:00",
+      "sources": [
+        {
+          "title": "인천시의회 신영희 의원, 재개발·재건축 사전컨설팅 과도한 규제 개선을",
+          "publisher": "일간투데이",
+          "published_at": "2026-11-15T06:05:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE1Uc21VTlJkRkQxRVFIOXNIS1JyaGI2dmN6STM5ajlEajU2Unh2US1VTE9EeTFwbGgyZDYtTlFGSWF3MUFFNmNjeWdDQUNyS01iWjNaWS1JaThudDE2cmtFZmo1NjdsN0c0bmRJ?oc=5"
+        },
+        {
+          "title": "인천시의회 신영희 의원, 재개발·재건축 사전컨설팅 규제 완화 촉구",
+          "publisher": "웹이코노미",
+          "published_at": "2026-11-13T20:51:03+09:00",
+          "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE1LeVVVUkpTYXgzOW9UZXRsVjVLaG1fX0NNUklRTHVaalJrd0Y0SjJBbWxtSTBkMGtyRXE5cjVnaFFxVnhZYk8xSE5JOU1nMkJKQm10MUlXXzJMbm5DeXZIazB0LTJqLTdVOEp1X2l3X1dBUQ?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.dtoday.co.kr/news/articleView.html?idxno=803662",
+      "summary_version": 3,
+      "groq_reviewed": true
+    },
     {
       "id": "84abdb9120d0cf",
       "category": "송도 종합",
@@ -48,6 +77,25 @@
       "summary_version": 3
     },
     {
+      "id": "b3f023c7893fdf",
+      "category": "세금·대출",
+      "title": "멈춰 선 ‘금리’, 쪼그라든 ‘공급’...'26 부동산, 변곡점을 지나고 있어",
+      "summary": "",
+      "verification": "기사 본문 요약 대기",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-14T20:02:11+09:00",
+      "sources": [
+        {
+          "title": "멈춰 선 ‘금리’, 쪼그라든 ‘공급’...'26 부동산, 변곡점을 지나고 있어",
+          "publisher": "부동산신문",
+          "published_at": "2026-11-14T20:02:11+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1sX2MxbFZ0NEtVcU9tcXYybWhxR2F4SE5lYkYxb2RhN2EwdEVFdC10dmEtYjhtMnA3SUctZ29xeldGUDlMSTBERUh1V05KMmpBNzhuMnNYbW9jQ0EwYkJUSzdWN3dyX2RC?oc=5"
+        }
+      ],
+      "summary_method": "headline_only"
+    },
+    {
       "id": "538dea13eb3cbf",
       "category": "송도 종합",
       "title": "인천글로벌시티, '홈잉루츠 송도' 사진공모전 개최",
@@ -80,7 +128,7 @@
           "title": "송도 바이오 인프라, 미래 과학인재와 만났다…인천경제청 청소년 아카데미 개최",
           "publisher": "서프라이즈뉴스",
           "published_at": "2026-11-14T15:29:37+09:00",
-          "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTFBBQzRTa0NyMzRQczJ5ODNfTVdZaGg5TmFCYUpVcVJ2LVhWNkQzTHZVdHh4R2U2OEZmenRORmFGUTBnSE82NTBpN2NjZnN3Tk81TGQ1UFFPSTd6Rkc5VWJ5TEFOWlVLa25TZkdNOWl3?oc=5"
+          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFB2UkR2RTF0Q0Zpc1VtWG9IRk1SMC1ZelVMWTZOaGFMbnI4bHYtQ29ocDZVanZkM2tLdGFMNXNZV1o3blN6SFRTek5wSVRSenQ3N05jelNFWE05bEpKc1ZfVFpwSV80OS12SDVuT1VNZw?oc=5"
         },
         {
           "title": "송도에서 바이오 인재 꿈 펼쳐라… ‘2026 IFEZ 청소년 바이오 아카데미’ 개최",
@@ -361,35 +409,6 @@
       "summary_version": 3
     },
     {
-      "id": "08cb6a99e5d78a",
-      "category": "정책·규제",
-      "title": "인천시의회 신영희 의원, 재개발·재건축 사전컨설팅 규제 완화 촉구",
-      "summary": "재개발·재건축 사전컨설팅은 30여 개 부서 협의와 전문가 자문 등으로 1년 이상 소요된다.\n초기 단계에서 수억 원 규모의 용역비 부담이 발생한다.\n내년 도시정비기본계획 변경을 통해 사전컨설팅을 선택적으로 받을 수 있도록 추진한다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 2,
-      "publisher_count": 2,
-      "last_published_at": "2026-11-13T20:51:03+09:00",
-      "sources": [
-        {
-          "title": "인천시의회 신영희 의원, 재개발·재건축 사전컨설팅 규제 완화 촉구",
-          "publisher": "웹이코노미",
-          "published_at": "2026-11-13T20:51:03+09:00",
-          "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE1LeVVVUkpTYXgzOW9UZXRsVjVLaG1fX0NNUklRTHVaalJrd0Y0SjJBbWxtSTBkMGtyRXE5cjVnaFFxVnhZYk8xSE5JOU1nMkJKQm10MUlXXzJMbm5DeXZIazB0LTJqLTdVOEp1X2l3X1dBUQ?oc=5"
-        },
-        {
-          "title": "인천시의회 신영희 의원, 재개발·재건축 사전컨설팅 과도한 규제 개선 촉구",
-          "publisher": "한국미디어뉴스",
-          "published_at": "2026-11-13T18:50:04+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE1LTXB5QUdqSkQxcEd5UFpYRzVBbjN1YTI5Y3RTVzhIX2lUWDR3RHNlZHE1Z2VXRWE1c2Frb1dhbGdOLXZMSjgydzhnSWVuUEdCblBMZmJsRjBZS3pPM293MHF3eDJVdw?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.webeconomy.co.kr/news/articleView.html?idxno=2375526",
-      "summary_version": 3,
-      "groq_reviewed": true
-    },
-    {
       "id": "18172ac23eb6e2",
       "category": "송도 종합",
       "title": "이강구·인천의회, 송도 6공구 공공시설 계획 변경·지연 질타 송도6공구 주민과의 약속인 원계획대로 조속 추진해야",
@@ -649,7 +668,7 @@
       "category": "세금·대출",
       "title": "돈 없는데 청약해도 될까…내 집 마련, 질문부터 바꿔라",
       "summary": "배우 변우석이 한남더힐 235㎡ 주택을 130억 현금으로 매입했다.\n매입 가격은 130억 원이며 전액 현금으로 지급되었다.\n매입은 5월에 등기부에 등재돼 현재 소유권이 확정되었다.",
-      "verification": "Groq 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-13T10:40:18+09:00",
@@ -809,76 +828,6 @@
       "summary_version": 3
     },
     {
-      "id": "3ba43d846c52d3",
-      "category": "송도 종합",
-      "title": "인천시, 오는 14일 송도서 ‘2026 인천 공정무역 페스티벌’개최",
-      "summary": "인천시는 오는 14일 송도 센트럴파크 잔디광장에서 공정무역 페스티벌을 개최한다.\n이번 행사에서는 무료 시음과 전시 홍보 판매전 등 다채로운 부스가 운영된다.\n인천시는 지난 2010년 공정무역도시 선언 이후 관련 정책을 꾸준히 추진해 왔다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
-      "article_count": 9,
-      "publisher_count": 9,
-      "last_published_at": "2026-11-13T03:50:00+09:00",
-      "sources": [
-        {
-          "title": "인천시, 오는 14일 송도서 ‘2026 인천 공정무역 페스티벌’개최",
-          "publisher": "일간투데이",
-          "published_at": "2026-11-13T03:50:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE92TDhnZUNtVjBHWEk1MGV4U2lnLWlOb0dIVUJGbWZFdndRdEg0UWpRbkREdWtrbExfZWhJWkxPX3o3c2FxNjBFczlhUVlFeEZBekRRM3dFNTJsXzNOaWRweEVveThWUTRmZkpN?oc=5"
-        },
-        {
-          "title": "인천시, 14일 송도 센트럴파크서 ‘2026 인천 공정무역 페스티벌’ 개최",
-          "publisher": "서남투데이",
-          "published_at": "2026-11-12T20:46:41+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE5YcGFLamZzN1dMZ1UtT0VsZzRTYVltOUo3ZUdJTDdZSG8xSGxNN2ZDWE1hQWpTZkpWUnlQUFR2bXppYXdkaWpoekJ3Uk53VnBlLS1VSi02N0wyZw?oc=5"
-        },
-        {
-          "title": "인천시, 송도서 ‘2026 공정무역 페스티벌’ 개최",
-          "publisher": "뉴스아이이에스",
-          "published_at": "2026-11-12T16:04:36+09:00",
-          "link": "https://news.google.com/rss/articles/CBMickFVX3lxTFBTR0dGN0kxNV9ubHl4Rk1MMERpa3lzNG5kcTJUWU9Xbk8wYmJfeGQzVnB2RzVrV3dRQldkYmo4eFRtdE9WcFJLN2pmWWNoVDcxbWFISEFIbHA3cXJqUVZZN0ZWOFRpRk5PN2hKeGhEOVpLQdIBckFVX3lxTFBTR0dGN0kxNV9ubHl4Rk1MMERpa3lzNG5kcTJUWU9Xbk8wYmJfeGQzVnB2RzVrV3dRQldkYmo4eFRtdE9WcFJLN2pmWWNoVDcxbWFISEFIbHA3cXJqUVZZN0ZWOFRpRk5PN2hKeGhEOVpLQQ?oc=5"
-        },
-        {
-          "title": "인천 공정무역 페스티벌 14일 개최…송도 센트럴파크서 시민 참여 행사",
-          "publisher": "글로벌경제신문",
-          "published_at": "2026-11-12T13:20:38+09:00",
-          "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1TMWNGQTM1d29hanNWTjVRMFAxMWhzZm9QZzFuZWNnc2lkdkhEN1VSel92angwcDJsbl81UnR4YTFEdVpGRGlheXo1cFI4OG02a2VGZHhHM0Izb2xlVld3QVMwdGVQQ0V5TDlqUNIBcEFVX3lxTE5KdWVlcE80U1B5bmx6Vmh5VVZlRzU2XzBsOWJaOVMxRFo5c3BnWlJWbW9pY3FfMHloSHNxMkJaeEtKLXQzSHFaWVZkVHM0eUdaSVBTOVBHMGZfSDQ0c1FzTGRlcDZESk95S01TOWx4OWQ?oc=5"
-        },
-        {
-          "title": "인천시, 14일 송도서 ‘2026 공정무역 페스티벌’ 개최… 윤리적 소비 확산",
-          "publisher": "투어코리아",
-          "published_at": "2026-11-12T11:42:13+09:00",
-          "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE50R2lkY3hYakRMTVNFM2pSWUFSblcyZkVqU3BkNWdHbThzakU2cF9ibkZRc0R2Zmd5WVI0LWtwRXVuNzQwU2FIMzBMRFR2bTlaWEx4dlQtOEcxYTZoWDVvVXZJcFJ1Ui1TVlBDVlZB?oc=5"
-        },
-        {
-          "title": "인천시, 송도 센트럴파크서 '2026 공정무역 페스티벌' 연다",
-          "publisher": "경인매일",
-          "published_at": "2026-11-12T11:02:38+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE90NzJHZU9pdTB5ZTIxNWIzVVd0VnllVHV2ZzhvRmtBUUtHcnRYa19tQUs4M0FGZ3o2Z2dmdGwtSGMyM0VrYzRwTEp5SmUwclJaZVVTLTZCYVF5TUhTTGlQN0RhYzlBMGhG?oc=5"
-        },
-        {
-          "title": "[인천소식] 송도센트럴파크서 14일 '공정무역 페스티벌'",
-          "publisher": "연합뉴스",
-          "published_at": "2026-11-12T10:15:03+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBUaW84enBpd1J0TlFQTDQ0WGVqY2QzUkFOaXhXV2pWZ2ZFMkU0Y1VSWXpiLS1lc2RSSGRWRElXdGV0ZDdtLWdFeW14d0FFdXBCaDRZcEpQQ0RrcTVPUnUtT9IBYEFVX3lxTFBUaW84enBpd1J0TlFQTDQ0WGVqY2QzUkFOaXhXV2pWZ2ZFMkU0Y1VSWXpiLS1lc2RSSGRWRElXdGV0ZDdtLWdFeW14d0FFdXBCaDRZcEpQQ0RrcTVPUnUtTw?oc=5"
-        },
-        {
-          "title": "'2026 인천 공정무역 페스티벌', 14일 송도 센트럴파크 잔디광장",
-          "publisher": "인천in 시민의 손으로 만드는 인터넷신문",
-          "published_at": "2026-11-12T09:56:49+09:00",
-          "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFB4VzRYWHVBMl8zRDBkWGlkNGlYbWpIQ1dleW9PUkNVUlBxUXU4TUhRZFY4Q2tpYkM3RnhmM21KZHN1YlVfckFqcEVvQThLX2VJSmhCWUYxTnB0MzdHR04tY0hUc0FFSTg2dHhIZQ?oc=5"
-        },
-        {
-          "title": "인천시, 송도 센트럴파크서 공정무역 페스티벌 개최",
-          "publisher": "매일일보",
-          "published_at": "2026-11-12T09:55:06+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE4zNzNLRmhtcUhHZElMOC1Oekg1bDRFYWRQaTE1LUQ5bDhPOHIzRnhTQnZTOWR5VF9YS0lmZmgwaXJicnpocmJ1WEZwTVBYUWw4RVhObHZwaWR2NXRfaFU5ODJQLXY?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.dtoday.co.kr/news/articleView.html?idxno=803395",
-      "summary_version": 3
-    },
-    {
       "id": "5b9669a1c0bed9",
       "category": "정책·규제",
       "title": "[사설] 떨어지던 인천마저 상승…확산되는 전월세난 이대로 둘 건가",
@@ -926,8 +875,8 @@
       "title": "“김치에 담은 따뜻한 마음”…채드윅송도국제학교 학생들, 인천 연수구에 240kg 기탁",
       "summary": "채드윅송도국제학교 학생들이 인천 연수구에 직접 담근 김치를 기탁했다.\n학생들은 10kg 24박스로 총 240kg에 달하는 김치를 전달했다.\n인천 연수구는 지난 10일 이러한 김치 기탁 사실을 밝혔다.",
       "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 6,
-      "publisher_count": 6,
+      "article_count": 5,
+      "publisher_count": 5,
       "last_published_at": "2026-11-12T22:10:17+09:00",
       "sources": [
         {
@@ -947,12 +896,6 @@
           "publisher": "매일일보",
           "published_at": "2026-11-12T15:23:21+09:00",
           "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTFB2YlpPeXJNQmpiUm05Q0IwUkdNQV9TVnZSYVUxRnlwSHVwaHdrRW55UW5tSHJZSFFsczFfVFQySWplY1FUMzY4NDBGdEsydWN2Tmtkb0pPUnVuUTJjUmMzVHo4ODk?oc=5"
-        },
-        {
-          "title": "[12일 인천 연수구] 채드윅송도국제학교 학생들, 직접 담근 김치 기탁 등",
-          "publisher": "아시아타임즈",
-          "published_at": "2026-11-12T13:27:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE44a1pCc19kOEVVMVUtcnRrSFFDbk9wS095Ry03RkRGMzRmdVFDZko3cUdzWkY0dUwtY2cwTG1hbExTcTh1V2J4c1JPWWMzMHVaSGgzODh0ZTVoRzllalE?oc=5"
         },
         {
           "title": "채드윅송도국제학교 학생들, 직접 담근 김치 240kg 연수구 기탁",
@@ -1020,13 +963,83 @@
       "summary_version": 3
     },
     {
+      "id": "b8111b6e4c5a32",
+      "category": "송도 종합",
+      "title": "인천시, 14일 송도 센트럴파크서 ‘2026 인천 공정무역 페스티벌’ 개최",
+      "summary": "인천시는 시민들의 윤리적 소비문화 확산을 위한 공정무역 축제를 개최한다고 밝혔다.\n이번 행사는 송도 센트럴파크 잔디광장에서 무료 시음과 체험 프로그램 등으로 진행된다.\n인천시는 오는 14일 오전 11시부터 오후 5시 30분까지 행사를 운영한다고 전했다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 9,
+      "publisher_count": 9,
+      "last_published_at": "2026-11-12T20:46:41+09:00",
+      "sources": [
+        {
+          "title": "인천시, 14일 송도 센트럴파크서 ‘2026 인천 공정무역 페스티벌’ 개최",
+          "publisher": "서남투데이",
+          "published_at": "2026-11-12T20:46:41+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE5YcGFLamZzN1dMZ1UtT0VsZzRTYVltOUo3ZUdJTDdZSG8xSGxNN2ZDWE1hQWpTZkpWUnlQUFR2bXppYXdkaWpoekJ3Uk53VnBlLS1VSi02N0wyZw?oc=5"
+        },
+        {
+          "title": "인천시, 송도서 ‘2026 공정무역 페스티벌’ 개최",
+          "publisher": "뉴스아이이에스",
+          "published_at": "2026-11-12T16:04:36+09:00",
+          "link": "https://news.google.com/rss/articles/CBMickFVX3lxTFBTR0dGN0kxNV9ubHl4Rk1MMERpa3lzNG5kcTJUWU9Xbk8wYmJfeGQzVnB2RzVrV3dRQldkYmo4eFRtdE9WcFJLN2pmWWNoVDcxbWFISEFIbHA3cXJqUVZZN0ZWOFRpRk5PN2hKeGhEOVpLQdIBckFVX3lxTFBTR0dGN0kxNV9ubHl4Rk1MMERpa3lzNG5kcTJUWU9Xbk8wYmJfeGQzVnB2RzVrV3dRQldkYmo4eFRtdE9WcFJLN2pmWWNoVDcxbWFISEFIbHA3cXJqUVZZN0ZWOFRpRk5PN2hKeGhEOVpLQQ?oc=5"
+        },
+        {
+          "title": "인천시, 오는 14일 송도서 ‘2026 인천 공정무역 페스티벌’개최",
+          "publisher": "내외뉴스통신",
+          "published_at": "2026-11-12T15:46:52+09:00",
+          "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBlZGxKTk9mckxVYVNzZzhLRGthYUNnaGdwYWJkcGJnZTdwU0NQT2NGWUhIVEE3bUwwaXBEN3lidXhvd2hxRWIzRTVROXY2akkySHBHSmM2Tkt5WlJGamV3RFc4SE91aWVJVGxISNIBcEFVX3lxTE9URHNCMEpkTjk1UjhCUUtJMm1FZ0x5RkFWMzJSQllvX0lmdEtfS2hKNmJPSzdyRkVTRHoyM1gxcFJXYjYwdTZKQjVfZ2lWTEJJVG41M0ZxWGk2TjNFeTdqWnFZS2VkTEE5VlpOQzFKWko?oc=5"
+        },
+        {
+          "title": "인천 공정무역 페스티벌 14일 개최…송도 센트럴파크서 시민 참여 행사",
+          "publisher": "글로벌경제신문",
+          "published_at": "2026-11-12T13:20:38+09:00",
+          "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1TMWNGQTM1d29hanNWTjVRMFAxMWhzZm9QZzFuZWNnc2lkdkhEN1VSel92angwcDJsbl81UnR4YTFEdVpGRGlheXo1cFI4OG02a2VGZHhHM0Izb2xlVld3QVMwdGVQQ0V5TDlqUNIBcEFVX3lxTE5KdWVlcE80U1B5bmx6Vmh5VVZlRzU2XzBsOWJaOVMxRFo5c3BnWlJWbW9pY3FfMHloSHNxMkJaeEtKLXQzSHFaWVZkVHM0eUdaSVBTOVBHMGZfSDQ0c1FzTGRlcDZESk95S01TOWx4OWQ?oc=5"
+        },
+        {
+          "title": "인천시, 14일 송도서 ‘2026 공정무역 페스티벌’ 개최… 윤리적 소비 확산",
+          "publisher": "투어코리아",
+          "published_at": "2026-11-12T11:42:13+09:00",
+          "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE50R2lkY3hYakRMTVNFM2pSWUFSblcyZkVqU3BkNWdHbThzakU2cF9ibkZRc0R2Zmd5WVI0LWtwRXVuNzQwU2FIMzBMRFR2bTlaWEx4dlQtOEcxYTZoWDVvVXZJcFJ1Ui1TVlBDVlZB?oc=5"
+        },
+        {
+          "title": "인천시, 송도 센트럴파크서 '2026 공정무역 페스티벌' 연다",
+          "publisher": "경인매일",
+          "published_at": "2026-11-12T11:02:38+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE90NzJHZU9pdTB5ZTIxNWIzVVd0VnllVHV2ZzhvRmtBUUtHcnRYa19tQUs4M0FGZ3o2Z2dmdGwtSGMyM0VrYzRwTEp5SmUwclJaZVVTLTZCYVF5TUhTTGlQN0RhYzlBMGhG?oc=5"
+        },
+        {
+          "title": "[인천소식] 송도센트럴파크서 14일 '공정무역 페스티벌'",
+          "publisher": "연합뉴스",
+          "published_at": "2026-11-12T10:15:03+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBUaW84enBpd1J0TlFQTDQ0WGVqY2QzUkFOaXhXV2pWZ2ZFMkU0Y1VSWXpiLS1lc2RSSGRWRElXdGV0ZDdtLWdFeW14d0FFdXBCaDRZcEpQQ0RrcTVPUnUtT9IBYEFVX3lxTFBUaW84enBpd1J0TlFQTDQ0WGVqY2QzUkFOaXhXV2pWZ2ZFMkU0Y1VSWXpiLS1lc2RSSGRWRElXdGV0ZDdtLWdFeW14d0FFdXBCaDRZcEpQQ0RrcTVPUnUtTw?oc=5"
+        },
+        {
+          "title": "'2026 인천 공정무역 페스티벌', 14일 송도 센트럴파크 잔디광장",
+          "publisher": "인천in 시민의 손으로 만드는 인터넷신문",
+          "published_at": "2026-11-12T09:56:49+09:00",
+          "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFB4VzRYWHVBMl8zRDBkWGlkNGlYbWpIQ1dleW9PUkNVUlBxUXU4TUhRZFY4Q2tpYkM3RnhmM21KZHN1YlVfckFqcEVvQThLX2VJSmhCWUYxTnB0MzdHR04tY0hUc0FFSTg2dHhIZQ?oc=5"
+        },
+        {
+          "title": "인천시, 송도 센트럴파크서 공정무역 페스티벌 개최",
+          "publisher": "매일일보",
+          "published_at": "2026-11-12T09:55:06+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE4zNzNLRmhtcUhHZElMOC1Oekg1bDRFYWRQaTE1LUQ5bDhPOHIzRnhTQnZTOWR5VF9YS0lmZmgwaXJicnpocmJ1WEZwTVBYUWw4RVhObHZwaWR2NXRfaFU5ODJQLXY?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.getnews.co.kr/news/articleView.html?idxno=886876",
+      "summary_version": 3
+    },
+    {
       "id": "44ba4f1cea2125",
       "category": "개발·교통",
       "title": "아이에스시, 송도에 차세대 반도체 소켓 신공장 착공…2028년 본격 가동",
       "summary": "반도체 테스트 소켓 기업 ISC가 송도국제도시에 신공장을 착공했다.\n신공장에는 차세대 AI 반도체 연구시설 및 첨단 제조시설이 들어선다.\n2027년 공사를 마무리하고 2028년부터 운영에 들어갈 예정이다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
-      "article_count": 2,
-      "publisher_count": 2,
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
+      "article_count": 1,
+      "publisher_count": 1,
       "last_published_at": "2026-11-12T18:05:12+09:00",
       "sources": [
         {
@@ -1034,12 +1047,6 @@
           "publisher": "포커스인천",
           "published_at": "2026-11-12T18:05:12+09:00",
           "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE5ZMjFvd2FlUWNWZEU5TEFIQzJWT29mQkNnRm95SENJVzZUZ3pJaUVmaGtTTzNZSzBFRklvZDN5ZnQzakdjLXFqS09lQ3Q1SkhYZnZMTjRUbG45a0Q5ODEzd04za1RLTWprZlAwQmVR0gFyQVVfeXFMTUNPVnNRVTNYRU5wS29nYzdaNWg5a0stR2MtYk5KM2dvNEItUlV2ZkIwdlhfWVo3b3VNWjRfa2N6dGpOSnhhdVYzVHhyZWlvZDBtb3hEWHpHZEQyekdwOExkaURvak5rU1hhUmFSdE12WXJB?oc=5"
-        },
-        {
-          "title": "반도체 테스트 소켓 기업 ISC 송도에 신공장 착공",
-          "publisher": "기호일보",
-          "published_at": "2026-11-12T14:26:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE1tU05yWllwTW9hYktVdS1HZHFfY1hfWE5nLTlrcHNFWGh1UlFpcTNQOTZud09FSW5XNHFHS0JnN3dRQnlLWVh1SWhsUTdnMy1RYVpvSFdLanhKQ01pbVA4WUtuSmVnc2NMZ2o5R2hLYw?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -1052,7 +1059,7 @@
       "category": "송도 종합",
       "title": "‘송도 영어학원 방화’ 60대 구속심사…금전 갈등이 범행 동기 추정",
       "summary": "60대 남성 A씨가 인천 송도 영어학원에 불을 지른 혐의로 구속 전 피의자 심문을 받았다.\nA씨는 휘발유를 이용해 방화를 저질렀으나 스프링클러가 작동해 인명 피해는 발생하지 않았다.\n경찰은 학원 설립 과정의 금전 갈등으로 동업 관계가 종료된 것을 범행 동기로 보고 있다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-12T17:17:00+09:00",
@@ -1118,7 +1125,7 @@
       "category": "개발·교통",
       "title": "아이에스시, 인천 송도에 반도체 신공장 건설…AI 테스트 소켓 시장 공략",
       "summary": "아이에스시가 송도에 AI 반도체 테스트 소켓 공장을 건립한다.\n투자액은 350억 원이며 2026년 말 완공을 목표로 한다.\n공장은 현재 착공 단계에 있으며 2027년 가동을 계획한다.",
-      "verification": "Groq 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 3,
       "publisher_count": 3,
       "last_published_at": "2026-11-12T17:06:53+09:00",
@@ -1136,10 +1143,10 @@
           "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFBvQWxnZUtlN1lqWjd0Rmg5SlNQUXlQMlhLWXlpdWE2Qkc4bGU4QWtoTVJWenhITllaUzk4Qkh1YnlXMC1aMWIxbXQ4aEFfRnExaTA1YldzNWN2QQ?oc=5"
         },
         {
-          "title": "아이에스시, 송도에 반도체 테스트 소켓 제조·연구시설 증설",
-          "publisher": "서울일보",
-          "published_at": "2026-11-12T14:52:12+09:00",
-          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFA3WUg3a3hlQWtuaVM1NVBXUU9OaEN3bFd4R05uOWhlaERNel9HNFRnS2hnbzNXdlFUNmFaNGlJdE12cDJOWTlZemVMYlFqQUFCc19oNGV2VXlkci1WVTdGT0NrWUFyckg3cjgyTlA2ONIBb0FVX3lxTFA3WUg3a3hlQWtuaVM1NVBXUU9OaEN3bFd4R05uOWhlaERNel9HNFRnS2hnbzNXdlFUNmFaNGlJdE12cDJOWTlZemVMYlFqQUFCc19oNGV2VXlkci1WVTdGT0NrWUFyckg3cjgyTlA2OA?oc=5"
+          "title": "반도체 테스트 소켓 기업 ISC 송도에 신공장 착공",
+          "publisher": "기호일보",
+          "published_at": "2026-11-12T14:26:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE1tU05yWllwTW9hYktVdS1HZHFfY1hfWE5nLTlrcHNFWGh1UlFpcTNQOTZud09FSW5XNHFHS0JnN3dRQnlLWVh1SWhsUTdnMy1RYVpvSFdLanhKQ01pbVA4WUtuSmVnc2NMZ2o5R2hLYw?oc=5"
         }
       ],
       "summary_method": "groq_article",
@@ -1237,7 +1244,7 @@
       "category": "송도 종합",
       "title": "아이에스시, 인천 송도에 AI 반도체 연구·생산시설 신공장 착공",
       "summary": "아이에스시가 인천 송도국제도시에 AI 반도체 연구 및 생산시설을 갖춘 신공장 착공식을 개최했다.\n신공장에는 차세대 AI 반도체 연구시설과 테스트 소켓 제조를 위한 첨단 생산시설이 들어선다.\n아이에스시는 2027년까지 공사를 마무리하고 2028년부터 가동하는 것을 목표로 설정했다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 6,
       "publisher_count": 6,
       "last_published_at": "2026-11-12T15:57:31+09:00",
@@ -1310,10 +1317,10 @@
       "id": "308f54f05153e8",
       "category": "세금·대출",
       "title": "이준석 \"이 대통령 연락주면 20만호 즉시 공급 가능한 땅 알려주겠다\"",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
-      "article_count": 1,
-      "publisher_count": 1,
+      "summary": "이준석 개혁신당 의원이 20만호 규모 주택 부지를 즉시 공급할 수 있다며 정부 정책 전환을 촉구했다.\n그는 재건축·재개발 외에 생애주기별 취득·양도세 감면 방안을 검토 중이라고 밝혔다.\n구체적 부지 위치는 공개되지 않았으며, 대통령이 공급 정책 전환 의사를 밝히면 알려주겠다고 전했다.",
+      "verification": "Groq 기사 본문 요약 · 사실 미검증",
+      "article_count": 2,
+      "publisher_count": 2,
       "last_published_at": "2026-11-12T14:42:27+09:00",
       "sources": [
         {
@@ -1321,9 +1328,18 @@
           "publisher": "JTBC",
           "published_at": "2026-11-12T14:42:27+09:00",
           "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTE5zY0p4R3d5cVJDUzZINlFvRVN3Sk1BTzBUem9iTnpVTzNZcnBQbkFwcUd1Yk11VS1hcGhRaDhCeFU1c1dsRnlkOHN6VkpYQjQzdnc?oc=5"
+        },
+        {
+          "title": "이준석 \"李대통령 연락달라…20만호 즉시 공급할 땅 있다\"",
+          "publisher": "이데일리",
+          "published_at": "2026-11-12T09:42:41+09:00",
+          "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxNdm1KS3RSYTJDOWxIanQ3TjEyS1NHYWJyVnJNNVdHVy1VcXpwOGlFRjJ1M0w4eGlhbUhNWklSYzNQb3JKZjhsOHVrRkVwQ2Y1M0E1QXM2bDhSVF9YSWxRQVFNTDVaS2MyUU1ibWRIRXlrdUdJeGJXZVkxTkgwWHJMNw?oc=5"
         }
       ],
-      "summary_method": "headline_only"
+      "summary_method": "groq_article",
+      "summary_model": "openai/gpt-oss-120b",
+      "summary_source_url": "https://www.edaily.co.kr/News/Read?newsId=02555126645645064&mediaCodeNo=257",
+      "summary_version": 3
     },
     {
       "id": "4f0bc4c46a9687",
@@ -1345,6 +1361,34 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.newsfreezone.co.kr/news/articleViewAmp.html?idxno=719009",
+      "summary_version": 3
+    },
+    {
+      "id": "4d5ea962231f47",
+      "category": "정책·규제",
+      "title": "광명시, 매입임대주택 정책 첫 도입",
+      "summary": "광명시는 주거취약계층의 안정적인 주거생활을 지원하기 위해 매입임대주택 정책을 처음으로 도입한다.\n전액 시비 19억 5천만 원을 들여 광명동 2호와 철산동 1호 및 소하동 4호 등 총 7호의 주택을 매입해 공급한다.\n해당 사업은 제도적 기반 마련을 거쳐 2027년 1월부터 본격적으로 진행될 예정이다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 2,
+      "publisher_count": 2,
+      "last_published_at": "2026-11-12T14:03:53+09:00",
+      "sources": [
+        {
+          "title": "광명시, 매입임대주택 정책 첫 도입",
+          "publisher": "경인매일",
+          "published_at": "2026-11-12T14:03:53+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE9VZFVfaFh0WFZMRmNQS2EtQVV2YVBTTVk2YXpJdVJoTWh3TXlhUWYySkoyZkRDRG5LQWQ1bGxheURBZVZtbTNXTVBPRVQ5T2tlc2w5d2cxY2tyV1U2VnZ1RFRKbE9xTmRS?oc=5"
+        },
+        {
+          "title": "\"최장 30년 거주 보장\"…광명시, 자체 '매입임대주택' 정책 첫 도입",
+          "publisher": "파이낸셜뉴스",
+          "published_at": "2026-11-12T11:48:24+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE94UWRxYjlRLW0xREdJMkJjSVRDYVRRQjFUcE5GWUh0SENoS0V4aXF1Z2NfN2RzYnVmRjBvWUlEM0kzemVXMXVObEFWN2x5blNHT1B3ekhlTkN5UQ?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.kmaeil.com/news/articleView.html?idxno=658016",
       "summary_version": 3
     },
     {
@@ -1389,34 +1433,6 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.etoday.co.kr/news/view/2647385",
-      "summary_version": 3
-    },
-    {
-      "id": "41ef4c21ece925",
-      "category": "정책·규제",
-      "title": "광명시, 매입임대주택 정책 `첫 도입`…취약계층 주거안정에 `큰 힘`",
-      "summary": "경기 광명시는 주거취약계층의 주거권 보장을 위해 자체 매입임대주택 정책을 처음 도입한다.\n광명시는 전액 시비 19억5000만원을 투입해 자체 매입임대주택 7가구를 확보해 내년에 공급한다.\n입주자는 최초 2년 계약 후 최대 14회 재계약으로 최장 30년간 안정적으로 거주할 수 있다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 2,
-      "publisher_count": 2,
-      "last_published_at": "2026-11-12T13:17:00+09:00",
-      "sources": [
-        {
-          "title": "광명시, 매입임대주택 정책 `첫 도입`…취약계층 주거안정에 `큰 힘`",
-          "publisher": "일간경인",
-          "published_at": "2026-11-12T13:17:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiREFVX3lxTFBwNVcyS3pRNTFZREVUelZ5UXFIMlVvZmViT1EtTl9Yd0lXZ2dxLWJqbjZ4SEFha2UxNjVCWlIyamNLdGts?oc=5"
-        },
-        {
-          "title": "광명시, 주거취약계층 주거안정에 힘 싣는다… 매입임대주택 정책 첫 도입",
-          "publisher": "인디포커스",
-          "published_at": "2026-11-12T08:34:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiQ0FVX3lxTE9SRVRLZVBLY0xzZWdjbExqYS1KWHlsdkZSSUtmdTdOYlAxdUV3SHd2cElDbWo3ZFJySnc5RDMydzJBWkU?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.fnnews.com/news/202611121144546933",
       "summary_version": 3
     },
     {
@@ -1490,28 +1506,6 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://ic.newdaily.co.kr/site/data/html/2026/11/12/2026111200063.html",
-      "summary_version": 3
-    },
-    {
-      "id": "9b18584b649c2a",
-      "category": "세금·대출",
-      "title": "이준석 \"20만호 즉시 공급할 부지 있다…취득·양도세 감면 추진\"",
-      "summary": "이준석 의원이 20만호 규모 주택 부지를 즉시 공급할 수 있다고 발표했다.\n그는 생애주기별 취득·양도세 감면 방안을 검토 중이라고 밝혔다.\n구체적 위치는 비공개이며, 정부가 공급 정책 전환 의사를 밝히면 부지를 알려줄 계획이다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-12T09:42:41+09:00",
-      "sources": [
-        {
-          "title": "이준석 \"20만호 즉시 공급할 부지 있다…취득·양도세 감면 추진\"",
-          "publisher": "이데일리",
-          "published_at": "2026-11-12T09:42:41+09:00",
-          "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxNdm1KS3RSYTJDOWxIanQ3TjEyS1NHYWJyVnJNNVdHVy1VcXpwOGlFRjJ1M0w4eGlhbUhNWklSYzNQb3JKZjhsOHVrRkVwQ2Y1M0E1QXM2bDhSVF9YSWxRQVFNTDVaS2MyUU1ibWRIRXlrdUdJeGJXZVkxTkgwWHJMNw?oc=5"
-        }
-      ],
-      "summary_method": "groq_article",
-      "summary_model": "openai/gpt-oss-120b",
-      "summary_source_url": "https://www.edaily.co.kr/News/Read?newsId=02555126645645064&mediaCodeNo=257",
       "summary_version": 3
     },
     {
@@ -1594,7 +1588,7 @@
       "category": "송도 종합",
       "title": "'동업 해지에 갈등'…경찰, 인천 송도 영어유치원 방화 60대 구속영장 신청",
       "summary": "인천 연수경찰서는 어린이집 앞에 불을 지른 60대 A 씨에 대해 구속영장을 신청할 예정이다.\nA 씨는 지난 10일 오전 7시 1분 송도국제도시의 상가 건물 3층 영어 어린이집에 불을 질렀다.\n경찰은 동업 해지 통보와 소송 문제로 불만을 품은 A 씨를 긴급체포해 수사하고 있다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 4,
       "publisher_count": 4,
       "last_published_at": "2026-11-11T18:43:59+09:00",
@@ -1725,6 +1719,28 @@
       "groq_reviewed": true
     },
     {
+      "id": "160b477e64089b",
+      "category": "정책·규제",
+      "title": "부동산 불법행위 354건 적발…정부 부동산 정책 어디로 가나",
+      "summary": "정부의 합동점검 결과 아파트 부정청약 의심 사례가 대거 적발됐다.\n국토교통부와 국무조정실이 서울 등 43개 단지를 점검해 354건을 적발했다.\n국무조정실 부동산감독추진단은 지난 10일 협의회를 열고 대응방안을 점검했다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-11T17:05:20+09:00",
+      "sources": [
+        {
+          "title": "부동산 불법행위 354건 적발…정부 부동산 정책 어디로 가나",
+          "publisher": "경북구미신문",
+          "published_at": "2026-11-11T17:05:20+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE5iME9DcjNtQkV4WDFmQ3RMam8xbVdBTUowWkwxZEhjUFFvM3dyXzAyTzdPRmRVekxtVnFtMW0xcWRtQ0V6Q3MwQ0V1bFU1dGpnem5uLW5pWWRyMmZoakZTSFlFNm0wTklVWkE?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.guminews.net/news/articleView.html?idxno=17590",
+      "summary_version": 3
+    },
+    {
       "id": "359cad56dea092",
       "category": "개발·교통",
       "title": "송도 신세계 복합쇼핑시설 건립 본궤도… 경관심의 조건부 통과",
@@ -1836,7 +1852,7 @@
       "category": "개발·교통",
       "title": "인천시의회 정해권 의원, GTX-B 청학역 추진 집중 점검...“청학역은 원도심 변화의 시작”",
       "summary": "인천시의회 정해권 의원은 행정사무감사에서 GTX-B 청학역 신설 사업 추진 전반을 점검했다.\n청학역의 총사업비는 2천694억 원이며 경제성(B/C)은 1.03으로 추진되고 있다.\n인천시는 올해 안으로 GTX-B 민간사업자와 위·수탁 협약을 체결할 예정이다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-11T13:57:28+09:00",
@@ -1873,28 +1889,6 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.joongboo.com/news/articleView.html?idxno=363742155",
-      "summary_version": 3
-    },
-    {
-      "id": "7652a3a317181a",
-      "category": "정책·규제",
-      "title": "최경환 국회 특강서 현 정부 부동산 규제 정면 비판 : 부동산",
-      "summary": "보수 야권 의원 모임이 최경환 전 경제부총리를 초청해 현 정부의 부동산 정책을 비판했다.\n최 전 부총리는 대출 규제와 토지거래허가제 손질 및 시장 중심 정책 전환을 요구했다.\n참석 의원들은 정부의 정책 책임을 따져 물으며 규제를 걷어내야 한다고 촉구했다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-11T12:14:12+09:00",
-      "sources": [
-        {
-          "title": "최경환 국회 특강서 현 정부 부동산 규제 정면 비판 : 부동산",
-          "publisher": "재경일보",
-          "published_at": "2026-11-11T12:14:12+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTFBlWkpTaVc0V2UzQTVPY1R4Q0RIaUtiajJHVzRxYWJnb3d5bjNQUUR2UkQ0YkRRb212UUFBWHdJd0M1bkZDSElybUM5MA?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://news.jkn.co.kr/post/1085921",
       "summary_version": 3
     },
     {
@@ -2127,7 +2121,7 @@
       "category": "정책·규제",
       "title": "정부 부인에도 끊이지 않는 부동산 규제설…대출 축소·규제 확대 왜?",
       "summary": "국토교통부는 온라인에 퍼진 추가 부동산 규제 소문이 사실이 아니라고 공식 반박했다.\n해당 지라시에는 부천·수원·안양 등 지역을 규제지역으로 지정하고 25억원 초과 주택담보대출을 전면 제한한다는 내용이 포함돼 있었다.\n국토교통부는 이 허위 게시글에 대해 추가 수사를 의뢰하겠다고 밝혔다.",
-      "verification": "2개 AI 검토 · 사실 확인은 원문 기준",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-11T06:00:00+09:00",
@@ -2283,6 +2277,28 @@
       "summary_version": 3
     },
     {
+      "id": "a8ece9e69f646a",
+      "category": "송도 종합",
+      "title": "송도도서관, 임시주차장 만료 '골치'",
+      "summary": "송도국제도서관이 임시주차장 사용기간 만료를 앞두고 예산 부담과 대체 부지 부족으로 골머리를 앓고 있다.\n해당 도서관의 임시주차장은 내년 3월 말까지 무상으로 사용할 수 있으며 이후 대부료나 매입비용이 크게 발생한다.\n도서관 측은 부지 매입과 계약 갱신 모두 부담이 큰 만큼 기존 주차장의 유료화를 통해 회전율을 높일 계획이다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-10T18:26:00+09:00",
+      "sources": [
+        {
+          "title": "송도도서관, 임시주차장 만료 '골치'",
+          "publisher": "인천일보",
+          "published_at": "2026-11-10T18:26:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5GWVJlZnRyem1ObzVQY0ZxVVZ6cVVyd1p5eUFTWkRaaXB1RzBlLTZDRHk2QnY1Y3ZtdnFtMjZYVzdDNTBncjRyN3MwYVFtY0VZeS1CUUUtUC1BQUJMNjZpVE1mU0ZZaW5IRnJjQTJNYlI?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.incheonilbo.com/news/articleView.html?idxno=1336471",
+      "summary_version": 3
+    },
+    {
       "id": "5b8db426c349bc",
       "category": "송도 종합",
       "title": "“장기 표류 송도유원지 개발, 노후계획도시 이주 수요와 연계해야\"",
@@ -2302,28 +2318,6 @@
       "summary_method": "groq_article",
       "summary_model": "openai/gpt-oss-120b",
       "summary_source_url": "https://www.incheonin.com/news/articleView.html?idxno=122174",
-      "summary_version": 3
-    },
-    {
-      "id": "1df313bd6bef21",
-      "category": "송도 종합",
-      "title": "[인천시의회 행감] “송도국제도시에 90도 상수도 수직관 17곳, 대형 누수 우려…대책 시급”",
-      "summary": "인천시의회 행정사무감사에서 송도국제도시에 90도 상수도 수직관이 17곳에 달해 대형 누수 우려가 제기됐다.\n인천지역에서는 2024년부터 2026년까지 송도와 서해구에서 총 4건의 대형 지반 침하 및 누수 사고가 발생했다.\n상수도사업본부장은 해당 수도관이 2009년에 설치되어 당장 사업을 하기는 이르며 중장기적으로 검토할 사안이라고 밝혔다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-10T17:31:00+09:00",
-      "sources": [
-        {
-          "title": "[인천시의회 행감] “송도국제도시에 90도 상수도 수직관 17곳, 대형 누수 우려…대책 시급”",
-          "publisher": "인천일보",
-          "published_at": "2026-11-10T17:31:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5lX1VRejJRWFhwZnV4TVdsc2JlazY5OUljTVh2VEJTZXRjdkJlQ3gtc3RzZkIteER6MDF1WFZuSl9idHIycko5Y0hnLUNIQ0RGTzFUT3RXVUY4Vm5nejlmc1puY0ZmdFhOVzgxTDhBMm0?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.incheonilbo.com/news/articleView.html?idxno=1336454",
       "summary_version": 3
     },
     {
@@ -2469,7 +2463,7 @@
       "category": "송도 종합",
       "title": "송도 어린이집 앞에 불 지른 60대…차량서 자해 시도 후 체포 - 머니투데이",
       "summary": "인천 송도국제도시 한 학원 앞에 불을 지른 60대 남성이 경찰에 체포됐다.\n화재는 오전 7시 1분에 발생했으며 스프링클러가 작동해 인명피해는 없었다.\n피의자는 자해 후 병원 치료를 받고 있으며 조사 결과에 따라 구속 여부가 결정될 예정이다.",
-      "verification": "Groq 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-10T14:52:51+09:00",
@@ -2588,7 +2582,7 @@
       "category": "정책·규제",
       "title": "의왕시, 전세사기 예방 위해 '경기 안심 부동산 서비스' 현장 홍보",
       "summary": "의왕시는 전세사기 예방을 위해 인공지능 기반 경기 안심 부동산 서비스를 홍보한다.\n이용자는 등기부와 시세 및 근저당 등 위험 요인을 인공지능으로 미리 분석할 수 있다.\n해당 서비스는 현재 시험 운영 중이며 2027년 현장 도입을 앞두고 있다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-10T13:37:23+09:00",
@@ -2632,7 +2626,7 @@
       "category": "송도 종합",
       "title": "인천 송도 어린이집이 있는 상가에 불 지른 60대 체포",
       "summary": "인천 송도 어린이집이 있는 상가 건물에 불을 지른 60대 남성이 경찰에 체포됐다.\n당시 스프링클러가 작동해 자체 진화되면서 인명 피해는 발생하지 않았다.\n경찰은 범행 약 2시간 뒤 미추홀구 한 주차장에서 피의자를 긴급체포했다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-10T13:04:20+09:00",
@@ -2698,7 +2692,7 @@
       "category": "송도 종합",
       "title": "인천 송도 어린이집 앞 방화 혐의 60대 체포…스프링클러 작동해 인명피해 막아",
       "summary": "인천 송도국제도시의 한 어린이집 앞에서 불을 지른 60대 남성이 경찰에 체포됐다.\n건물에 설치된 스프링클러가 작동하고 소방당국이 출동해 다행히 인명피해는 발생하지 않았다.\n경찰은 피의자의 치료 상황 등을 고려해 향후 구체적인 방화 경위와 범행 동기를 조사할 방침이다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-10T11:40:46+09:00",
@@ -2757,50 +2751,6 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://biz.heraldcorp.com/article/10931706",
-      "summary_version": 3
-    },
-    {
-      "id": "3c7685c17db2f3",
-      "category": "송도 종합",
-      "title": "인천시, 송도스포츠파크·신포시장 등에 다회용기 38만개 추가 보급",
-      "summary": "인천시는 야구장과 축구장에 이어 송도스포츠파크 캠핑장과 신포국제시장 등에 다회용기 38만 개를 추가 보급한다.\n신포국제시장에서는 다회용기 사용 매장에서 1만원 이상 구매하고 이용한 고객에게 3000원 상당의 바우처를 지급한다.\n이번 바우처 이벤트는 11월 13일부터 22일까지 진행되며 예산이 소진되면 조기 중단될 수 있다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-10T09:53:36+09:00",
-      "sources": [
-        {
-          "title": "인천시, 송도스포츠파크·신포시장 등에 다회용기 38만개 추가 보급",
-          "publisher": "일간경기",
-          "published_at": "2026-11-10T09:53:36+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5YSGRnc0xfMnJ0U2FFZTB0STVQb0V4QzdMWi16NlBOaERmZjI5RnFQcnBYXzlmbnk4alBOMnFPemhxY19wenNzamQ4T1Aybm1yeXMyNnp1TXRXNThWbTZYUHUzTHE5a0l3?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.1gan.co.kr/news/articleView.html?idxno=418936",
-      "summary_version": 3
-    },
-    {
-      "id": "c7f8569cf437ed",
-      "category": "정책·규제",
-      "title": "부동산 실용주의 의원모임 ‘전실모’ 출범…정책 전환 분수령 될까",
-      "summary": "더불어민주당 수도권 의원 약 20명이 참여하는 부동산 실용주의 의원 모임인 전실모가 출범한다.\n전실모는 서민과 중산층의 주거 불안을 해소하기 위해 당 주도로 부동산 정책의 전환을 모색한다.\n전실모는 11일 국회에서 공식 출범하며 첫 공개토론회를 개최하고 활동을 본격화할 예정이다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-10T09:09:32+09:00",
-      "sources": [
-        {
-          "title": "부동산 실용주의 의원모임 ‘전실모’ 출범…정책 전환 분수령 될까",
-          "publisher": "중앙신문",
-          "published_at": "2026-11-10T09:09:32+09:00",
-          "link": "https://news.google.com/rss/articles/CBMigwNBVV95cUxNSklRak8teFFFb1BwdkpmeTRyd1RjS0hwMW83alNYWkpFTDE4VW0tVDUwRGVjWXRnSk1CZTNRYlZmZ2EtWkx0UUtYeGltUDFvUHJUckw1WlBhYndFRkNfR0lTLWdnTVJ1VEJ4dHd5bzYteVpNeVFZcVNGSVNDUmJPTl8wUDM5QkNSc2ZYcm9MM0xaRG53OERTdHo0T0o1M2ZWRjJTajZwSkFDMGFKeDU5REQwRGRLVUdOZ210Znk5ZEVFX3JSTjVIVS1EQUxEenU1WkFVUnlva0RqLWZOQ3h4aDZKb1prNnhYVnJBWGZyaVlHR1NZbnRETUtEUUdiNlNpY1RzTENiNDNfc2JvTHllYTZCNzJDRXlkNFNBNnJVc2QxTVo4QjhXRnkwSTIxWldCbW1ZczFMa1lMNnpVN0h0akxJMlE0S3pkZnl6aF9YNWNVOGU1eHBYc0kxVEZHUWxieXdZQjhOdk1mWVRrMTYtNUlra2Q0NmkzTFZXNjlhbzJfcEE?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.jasm.co.kr/news/view/324738/%EB%B6%80%EB%8F%99%EC%82%B0-%EC%8B%A4%EC%9A%A9%EC%A3%BC-%EC%9D%98%EC%9B%90%EB%AA%A8%EC%9E%84-%EC%A0%84%EC%8B%A4%EB%AA%A8-%EC%B6%9C%EB%B2%94-%EC%A0%95%EC%B1%85-%EC%A0%84%ED%99%98-%EB%B6%84%EC%88%98%EB%A0%B9-%EB%90%A0%EA%B9%8C-2026",
       "summary_version": 3
     },
     {
@@ -3124,25 +3074,6 @@
       "summary_version": 3
     },
     {
-      "id": "7a44e0eb02ceb2",
-      "category": "세금·대출",
-      "title": "서울 아파트 84㎡·59㎡ 가격차 1억7000만원 밑으로…대출 규제에 소형 '선방'",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-09T09:34:02+09:00",
-      "sources": [
-        {
-          "title": "서울 아파트 84㎡·59㎡ 가격차 1억7000만원 밑으로…대출 규제에 소형 '선방'",
-          "publisher": "뉴스로드",
-          "published_at": "2026-11-09T09:34:02+09:00",
-          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTFBXVEJySDNpbnl3X2tmQ0JMMDFXMHhjcGpLazJMajFpa1p1OFBWYXI5d0tRQVFEWnphT3lDbHdnM1ROOEJiLXNscWk2QnZDRWN1UGpkMGRLVnlIVEFTLThSd3E3MmtPTUlneDlr0gFvQVVfeXFMTUJOUjhadFVXZ1VSc0E3VWx0YWVmM2RwU3NSUU1ZemczcjdNbFBuVWpEdnlIRlo3eG40QXdGSHptVTdKSVBWS1hZc1Rac2FNZ0xld1pDb2F1UmFscHZKYjZIdEhrMWNzR3E2N25jRHQw?oc=5"
-        }
-      ],
-      "summary_method": "headline_only"
-    },
-    {
       "id": "e26697ec5a5231",
       "category": "송도 종합",
       "title": "인천 송도 바이오기업 주가 ‘급락장 속’ 상승세...외인 팔고 기관 사고",
@@ -3169,7 +3100,7 @@
       "category": "정책·규제",
       "title": "[최정호 시장 숏폼 인터뷰⑥] “월세 1만원 청년주택 추진…2027년 국토부 공모 도전”",
       "summary": "최정호 익산시장이 반도체 소부장 기업 증설에 대응해 월세 1만원 청년주택 사업을 추진한다.\n익산시가 전체 사업비의 약 5%만 부담하고 국토부와 HUG 등을 통해 재원을 마련할 구상이다.\n최 시장은 내년도에 국토부 공모에 신청해 선정되도록 하겠다고 밝혔다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-09T04:51:00+09:00",
@@ -3383,7 +3314,7 @@
       "category": "송도 종합",
       "title": "IFEZ 송도국제도시 럭스오션SK뷰, 발코니 붕괴 이어 ‘100세대 물바다’ 심각",
       "summary": "인천 송도국제도시 럭스오션SK뷰 아파트에서 100세대 넘는 침수 피해가 발생했다.\n지난 10월 18일 창호 주변을 통해 빗물이 쏟아져 들어오며 단지 전체에서 피해가 접수됐다.\n주민들은 시공사의 무책임한 대응을 규탄하며 철저한 진상 규명을 촉구하고 있다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-08T11:54:36+09:00",
@@ -3497,6 +3428,15 @@
   ],
   "articles": [
     {
+      "title": "인천시의회 신영희 의원, 재개발·재건축 사전컨설팅 과도한 규제 개선을",
+      "publisher": "일간투데이",
+      "published_at": "2026-11-15T06:05:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE1Uc21VTlJkRkQxRVFIOXNIS1JyaGI2dmN6STM5ajlEajU2Unh2US1VTE9EeTFwbGgyZDYtTlFGSWF3MUFFNmNjeWdDQUNyS01iWjNaWS1JaThudDE2cmtFZmo1NjdsN0c0bmRJ?oc=5",
+      "category": "정책·규제",
+      "query": "인천 부동산 규제",
+      "id": "b3b6729328343f18d7"
+    },
+    {
       "title": "IFEZ 송도국제도시 ‘글로벌 특화병원 사업’ 사실상 무산",
       "publisher": "전국매일신문",
       "published_at": "2026-11-14T20:28:33+09:00",
@@ -3504,6 +3444,15 @@
       "category": "송도 종합",
       "query": "\"송도국제도시\"",
       "id": "04b523df09e1894fbd"
+    },
+    {
+      "title": "멈춰 선 ‘금리’, 쪼그라든 ‘공급’...'26 부동산, 변곡점을 지나고 있어",
+      "publisher": "부동산신문",
+      "published_at": "2026-11-14T20:02:11+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1sX2MxbFZ0NEtVcU9tcXYybWhxR2F4SE5lYkYxb2RhN2EwdEVFdC10dmEtYjhtMnA3SUctZ29xeldGUDlMSTBERUh1V05KMmpBNzhuMnNYbW9jQ0EwYkJUSzdWN3dyX2RC?oc=5",
+      "category": "세금·대출",
+      "query": "주택담보대출 DSR 정책",
+      "id": "ac44687ac00e60c077"
     },
     {
       "title": "인천글로벌시티, '홈잉루츠 송도' 사진공모전 개최",
@@ -3518,7 +3467,7 @@
       "title": "송도 바이오 인프라, 미래 과학인재와 만났다…인천경제청 청소년 아카데미 개최",
       "publisher": "서프라이즈뉴스",
       "published_at": "2026-11-14T15:29:37+09:00",
-      "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTFBBQzRTa0NyMzRQczJ5ODNfTVdZaGg5TmFCYUpVcVJ2LVhWNkQzTHZVdHh4R2U2OEZmenRORmFGUTBnSE82NTBpN2NjZnN3Tk81TGQ1UFFPSTd6Rkc5VWJ5TEFOWlVLa25TZkdNOWl3?oc=5",
+      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFB2UkR2RTF0Q0Zpc1VtWG9IRk1SMC1ZelVMWTZOaGFMbnI4bHYtQ29ocDZVanZkM2tLdGFMNXNZV1o3blN6SFRTek5wSVRSenQ3N05jelNFWE05bEpKc1ZfVFpwSV80OS12SDVuT1VNZw?oc=5",
       "category": "송도 종합",
       "query": "인천 송도",
       "id": "6dcc92d8802355e0cc"
@@ -3666,15 +3615,6 @@
       "category": "송도 종합",
       "query": "\"송도국제도시\"",
       "id": "a74c20460bc1d11633"
-    },
-    {
-      "title": "인천시의회 신영희 의원, 재개발·재건축 사전컨설팅 과도한 규제 개선 촉구",
-      "publisher": "한국미디어뉴스",
-      "published_at": "2026-11-13T18:50:04+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE1LTXB5QUdqSkQxcEd5UFpYRzVBbjN1YTI5Y3RTVzhIX2lUWDR3RHNlZHE1Z2VXRWE1c2Frb1dhbGdOLXZMSjgydzhnSWVuUEdCblBMZmJsRjBZS3pPM293MHF3eDJVdw?oc=5",
-      "category": "정책·규제",
-      "query": "인천 부동산 규제",
-      "id": "b22b870ed94029cd0d"
     },
     {
       "title": "\"송도, 800병상 세브란스론 역부족...추가 유치 속도 내야\"",
@@ -3893,15 +3833,6 @@
       "id": "7e3fb9f77c71109f01"
     },
     {
-      "title": "인천시, 오는 14일 송도서 ‘2026 인천 공정무역 페스티벌’개최",
-      "publisher": "일간투데이",
-      "published_at": "2026-11-13T03:50:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE92TDhnZUNtVjBHWEk1MGV4U2lnLWlOb0dIVUJGbWZFdndRdEg0UWpRbkREdWtrbExfZWhJWkxPX3o3c2FxNjBFczlhUVlFeEZBekRRM3dFNTJsXzNOaWRweEVveThWUTRmZkpN?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도 문화 축제",
-      "id": "8827486759266b7187"
-    },
-    {
       "title": "[사설] 떨어지던 인천마저 상승…확산되는 전월세난 이대로 둘 건가",
       "publisher": "한국일보",
       "published_at": "2026-11-13T00:10:00+09:00",
@@ -3925,7 +3856,7 @@
       "published_at": "2026-11-12T23:49:36+09:00",
       "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1vYjBSZHN3UVZNWjhaNmV5c2VWTXlUVVBCdFdMa0pYMmtoUV9jYkdXTksxNEJVUlVraElYWnROVVhWZWRaNzRfbXNoNTJBYkhxY2E2VVNwcG5HOWhrcUhDNnBuRXBrampScXBjMw?oc=5",
       "category": "송도 종합",
-      "query": "인천 연수구 송도",
+      "query": "인천 송도동",
       "id": "e0f33b7b5c5f2686de"
     },
     {
@@ -4015,7 +3946,7 @@
       "published_at": "2026-11-12T20:46:41+09:00",
       "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE5YcGFLamZzN1dMZ1UtT0VsZzRTYVltOUo3ZUdJTDdZSG8xSGxNN2ZDWE1hQWpTZkpWUnlQUFR2bXppYXdkaWpoekJ3Uk53VnBlLS1VSi02N0wyZw?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도 문화 축제",
+      "query": "인천 송도",
       "id": "2a2fb5b1e5741dc30f"
     },
     {
@@ -4127,6 +4058,15 @@
       "id": "8e5f2d473abf5f57d9"
     },
     {
+      "title": "인천시, 오는 14일 송도서 ‘2026 인천 공정무역 페스티벌’개최",
+      "publisher": "내외뉴스통신",
+      "published_at": "2026-11-12T15:46:52+09:00",
+      "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBlZGxKTk9mckxVYVNzZzhLRGthYUNnaGdwYWJkcGJnZTdwU0NQT2NGWUhIVEE3bUwwaXBEN3lidXhvd2hxRWIzRTVROXY2akkySHBHSmM2Tkt5WlJGamV3RFc4SE91aWVJVGxISNIBcEFVX3lxTE9URHNCMEpkTjk1UjhCUUtJMm1FZ0x5RkFWMzJSQllvX0lmdEtfS2hKNmJPSzdyRkVTRHoyM1gxcFJXYjYwdTZKQjVfZ2lWTEJJVG41M0ZxWGk2TjNFeTdqWnFZS2VkTEE5VlpOQzFKWko?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도 문화 축제",
+      "id": "942c4122d22e4d5f58"
+    },
+    {
       "title": "인천 송도 영어유치원 방화 60대 남성 영장심사…구속 갈림길",
       "publisher": "연합뉴스TV",
       "published_at": "2026-11-12T15:46:00+09:00",
@@ -4170,15 +4110,6 @@
       "category": "개발·교통",
       "query": "송도 GTX-B",
       "id": "a20e0298e52c47d49f"
-    },
-    {
-      "title": "아이에스시, 송도에 반도체 테스트 소켓 제조·연구시설 증설",
-      "publisher": "서울일보",
-      "published_at": "2026-11-12T14:52:12+09:00",
-      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFA3WUg3a3hlQWtuaVM1NVBXUU9OaEN3bFd4R05uOWhlaERNel9HNFRnS2hnbzNXdlFUNmFaNGlJdE12cDJOWTlZemVMYlFqQUFCc19oNGV2VXlkci1WVTdGT0NrWUFyckg3cjgyTlA2ONIBb0FVX3lxTFA3WUg3a3hlQWtuaVM1NVBXUU9OaEN3bFd4R05uOWhlaERNel9HNFRnS2hnbzNXdlFUNmFaNGlJdE12cDJOWTlZemVMYlFqQUFCc19oNGV2VXlkci1WVTdGT0NrWUFyckg3cjgyTlA2OA?oc=5",
-      "category": "개발·교통",
-      "query": "인천 경제자유구역 개발",
-      "id": "f961243ed23e537b89"
     },
     {
       "title": "반도체 소켓 전문기업 아이에스시 송도국제도시서 신공장 착공",
@@ -4244,6 +4175,15 @@
       "id": "3f81562bcdee17d241"
     },
     {
+      "title": "광명시, 매입임대주택 정책 첫 도입",
+      "publisher": "경인매일",
+      "published_at": "2026-11-12T14:03:53+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE9VZFVfaFh0WFZMRmNQS2EtQVV2YVBTTVk2YXpJdVJoTWh3TXlhUWYySkoyZkRDRG5LQWQ1bGxheURBZVZtbTNXTVBPRVQ5T2tlc2w5d2cxY2tyV1U2VnZ1RFRKbE9xTmRS?oc=5",
+      "category": "정책·규제",
+      "query": "국토교통부 주택 정책",
+      "id": "24f1b3294a7dc491b4"
+    },
+    {
       "title": "[인천경제자유구역 3대 신도시 발전사①] 송도국제도시",
       "publisher": "열린정책뉴스",
       "published_at": "2026-11-12T13:51:50+09:00",
@@ -4280,15 +4220,6 @@
       "id": "ae4eb4d5df8f7ff77c"
     },
     {
-      "title": "[12일 인천 연수구] 채드윅송도국제학교 학생들, 직접 담근 김치 기탁 등",
-      "publisher": "아시아타임즈",
-      "published_at": "2026-11-12T13:27:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE44a1pCc19kOEVVMVUtcnRrSFFDbk9wS095Ry03RkRGMzRmdVFDZko3cUdzWkY0dUwtY2cwTG1hbExTcTh1V2J4c1JPWWMzMHVaSGgzODh0ZTVoRzllalE?oc=5",
-      "category": "송도 종합",
-      "query": "인천 연수구 송도",
-      "id": "927a74c2f2ddbf3311"
-    },
-    {
       "title": "홍지선 국토장관 “매물 쌓이고 거래 감소…주택가격 하락 신호”",
       "publisher": "이투데이",
       "published_at": "2026-11-12T13:21:00+09:00",
@@ -4307,15 +4238,6 @@
       "id": "8aa01d965db6b74f4b"
     },
     {
-      "title": "광명시, 매입임대주택 정책 `첫 도입`…취약계층 주거안정에 `큰 힘`",
-      "publisher": "일간경인",
-      "published_at": "2026-11-12T13:17:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiREFVX3lxTFBwNVcyS3pRNTFZREVUelZ5UXFIMlVvZmViT1EtTl9Yd0lXZ2dxLWJqbjZ4SEFha2UxNjVCWlIyamNLdGts?oc=5",
-      "category": "정책·규제",
-      "query": "국토교통부 주택 정책",
-      "id": "d983ded6c39086d8fb"
-    },
-    {
       "title": "인천 송도에 아이에스시 AI 반도체 테스트 소켓 신공장 착공… 2028년 가동",
       "publisher": "헤럴드경제",
       "published_at": "2026-11-12T12:09:43+09:00",
@@ -4323,6 +4245,15 @@
       "category": "송도 종합",
       "query": "인천 송도동",
       "id": "329d2d9f579d52e0ab"
+    },
+    {
+      "title": "\"최장 30년 거주 보장\"…광명시, 자체 '매입임대주택' 정책 첫 도입",
+      "publisher": "파이낸셜뉴스",
+      "published_at": "2026-11-12T11:48:24+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE94UWRxYjlRLW0xREdJMkJjSVRDYVRRQjFUcE5GWUh0SENoS0V4aXF1Z2NfN2RzYnVmRjBvWUlEM0kzemVXMXVObEFWN2x5blNHT1B3ekhlTkN5UQ?oc=5",
+      "category": "정책·규제",
+      "query": "국토교통부 주택 정책",
+      "id": "e27cf5fae16eaecb11"
     },
     {
       "title": "인천시, 14일 송도서 ‘2026 공정무역 페스티벌’ 개최… 윤리적 소비 확산",
@@ -4411,7 +4342,7 @@
       "published_at": "2026-11-12T09:56:49+09:00",
       "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFB4VzRYWHVBMl8zRDBkWGlkNGlYbWpIQ1dleW9PUkNVUlBxUXU4TUhRZFY4Q2tpYkM3RnhmM21KZHN1YlVfckFqcEVvQThLX2VJSmhCWUYxTnB0MzdHR04tY0hUc0FFSTg2dHhIZQ?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도 문화 축제",
+      "query": "인천 송도",
       "id": "609238eff3d69fa0bd"
     },
     {
@@ -4433,13 +4364,13 @@
       "id": "b093998274277a5382"
     },
     {
-      "title": "이준석 \"20만호 즉시 공급할 부지 있다…취득·양도세 감면 추진\"",
+      "title": "이준석 \"李대통령 연락달라…20만호 즉시 공급할 땅 있다\"",
       "publisher": "이데일리",
       "published_at": "2026-11-12T09:42:41+09:00",
       "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxNdm1KS3RSYTJDOWxIanQ3TjEyS1NHYWJyVnJNNVdHVy1VcXpwOGlFRjJ1M0w4eGlhbUhNWklSYzNQb3JKZjhsOHVrRkVwQ2Y1M0E1QXM2bDhSVF9YSWxRQVFNTDVaS2MyUU1ibWRIRXlrdUdJeGJXZVkxTkgwWHJMNw?oc=5",
       "category": "세금·대출",
       "query": "부동산 취득세 양도소득세",
-      "id": "a06f7ab76eb72dde68"
+      "id": "e445af973f985b7151"
     },
     {
       "title": "인천아트쇼, 오는 19일부터 송도컨벤시아서 개최",
@@ -4449,15 +4380,6 @@
       "category": "송도 종합",
       "query": "인천 송도",
       "id": "eb71e7df7f4b2c2e8e"
-    },
-    {
-      "title": "광명시, 주거취약계층 주거안정에 힘 싣는다… 매입임대주택 정책 첫 도입",
-      "publisher": "인디포커스",
-      "published_at": "2026-11-12T08:34:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiQ0FVX3lxTE9SRVRLZVBLY0xzZWdjbExqYS1KWHlsdkZSSUtmdTdOYlAxdUV3SHd2cElDbWo3ZFJySnc5RDMydzJBWkU?oc=5",
-      "category": "정책·규제",
-      "query": "국토교통부 주택 정책",
-      "id": "12a38a81fbb214be50"
     },
     {
       "title": "\"이번엔 가평까지 달릴까\"…국가철도망 발표에 GTX-B 연장 촉각",
@@ -4530,6 +4452,15 @@
       "category": "정책·규제",
       "query": "인천 부동산 규제",
       "id": "f6dfc1577450991c48"
+    },
+    {
+      "title": "부동산 불법행위 354건 적발…정부 부동산 정책 어디로 가나",
+      "publisher": "경북구미신문",
+      "published_at": "2026-11-11T17:05:20+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE5iME9DcjNtQkV4WDFmQ3RMam8xbVdBTUowWkwxZEhjUFFvM3dyXzAyTzdPRmRVekxtVnFtMW0xcWRtQ0V6Q3MwQ0V1bFU1dGpnem5uLW5pWWRyMmZoakZTSFlFNm0wTklVWkE?oc=5",
+      "category": "정책·규제",
+      "query": "국토교통부 주택 정책",
+      "id": "04d7a9681f203334f7"
     },
     {
       "title": "송도 신세계 복합쇼핑시설 건립 본궤도… 경관심의 조건부 통과",
@@ -4674,15 +4605,6 @@
       "category": "송도 종합",
       "query": "인천 송도",
       "id": "bd373f700e7427cb46"
-    },
-    {
-      "title": "최경환 국회 특강서 현 정부 부동산 규제 정면 비판 : 부동산",
-      "publisher": "재경일보",
-      "published_at": "2026-11-11T12:14:12+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTFBlWkpTaVc0V2UzQTVPY1R4Q0RIaUtiajJHVzRxYWJnb3d5bjNQUUR2UkQ0YkRRb212UUFBWHdJd0M1bkZDSElybUM5MA?oc=5",
-      "category": "정책·규제",
-      "query": "인천 부동산 규제",
-      "id": "d696b988b8fb70e4ce"
     },
     {
       "title": "2026 인천아트쇼 19일 인천 송도컨벤시아에서 개막",
@@ -4847,6 +4769,15 @@
       "id": "5a725394ba070200d9"
     },
     {
+      "title": "송도도서관, 임시주차장 만료 '골치'",
+      "publisher": "인천일보",
+      "published_at": "2026-11-10T18:26:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5GWVJlZnRyem1ObzVQY0ZxVVZ6cVVyd1p5eUFTWkRaaXB1RzBlLTZDRHk2QnY1Y3ZtdnFtMjZYVzdDNTBncjRyN3MwYVFtY0VZeS1CUUUtUC1BQUJMNjZpVE1mU0ZZaW5IRnJjQTJNYlI?oc=5",
+      "category": "송도 종합",
+      "query": "인천 연수구 송도",
+      "id": "77529df89d06fd6757"
+    },
+    {
       "title": "인천 송도 영어유치원 입구에 방화…60대 체포",
       "publisher": "연합뉴스TV",
       "published_at": "2026-11-10T18:22:00+09:00",
@@ -4863,15 +4794,6 @@
       "category": "송도 종합",
       "query": "인천 연수구 송도",
       "id": "bade801bb892574f46"
-    },
-    {
-      "title": "[인천시의회 행감] “송도국제도시에 90도 상수도 수직관 17곳, 대형 누수 우려…대책 시급”",
-      "publisher": "인천일보",
-      "published_at": "2026-11-10T17:31:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5lX1VRejJRWFhwZnV4TVdsc2JlazY5OUljTVh2VEJTZXRjdkJlQ3gtc3RzZkIteER6MDF1WFZuSl9idHIycko5Y0hnLUNIQ0RGTzFUT3RXVUY4Vm5nejlmc1puY0ZmdFhOVzgxTDhBMm0?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도",
-      "id": "04158fdaba4bc40f58"
     },
     {
       "title": "이혁재 송도 아파트 2채, 지금까지 보유했다면",
@@ -5171,24 +5093,6 @@
       "id": "7ae274e8acdf8ee940"
     },
     {
-      "title": "인천시, 송도스포츠파크·신포시장 등에 다회용기 38만개 추가 보급",
-      "publisher": "일간경기",
-      "published_at": "2026-11-10T09:53:36+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5YSGRnc0xfMnJ0U2FFZTB0STVQb0V4QzdMWi16NlBOaERmZjI5RnFQcnBYXzlmbnk4alBOMnFPemhxY19wenNzamQ4T1Aybm1yeXMyNnp1TXRXNThWbTZYUHUzTHE5a0l3?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도 주민 생활",
-      "id": "9238275bd36dc9e95e"
-    },
-    {
-      "title": "부동산 실용주의 의원모임 ‘전실모’ 출범…정책 전환 분수령 될까",
-      "publisher": "중앙신문",
-      "published_at": "2026-11-10T09:09:32+09:00",
-      "link": "https://news.google.com/rss/articles/CBMigwNBVV95cUxNSklRak8teFFFb1BwdkpmeTRyd1RjS0hwMW83alNYWkpFTDE4VW0tVDUwRGVjWXRnSk1CZTNRYlZmZ2EtWkx0UUtYeGltUDFvUHJUckw1WlBhYndFRkNfR0lTLWdnTVJ1VEJ4dHd5bzYteVpNeVFZcVNGSVNDUmJPTl8wUDM5QkNSc2ZYcm9MM0xaRG53OERTdHo0T0o1M2ZWRjJTajZwSkFDMGFKeDU5REQwRGRLVUdOZ210Znk5ZEVFX3JSTjVIVS1EQUxEenU1WkFVUnlva0RqLWZOQ3h4aDZKb1prNnhYVnJBWGZyaVlHR1NZbnRETUtEUUdiNlNpY1RzTENiNDNfc2JvTHllYTZCNzJDRXlkNFNBNnJVc2QxTVo4QjhXRnkwSTIxWldCbW1ZczFMa1lMNnpVN0h0akxJMlE0S3pkZnl6aF9YNWNVOGU1eHBYc0kxVEZHUWxieXdZQjhOdk1mWVRrMTYtNUlra2Q0NmkzTFZXNjlhbzJfcEE?oc=5",
-      "category": "정책·규제",
-      "query": "인천 부동산 규제",
-      "id": "3e3760155bdbffb19b"
-    },
-    {
       "title": "주담대 월급의 OO% 이하로 받으세요 | 연수원",
       "publisher": "한국경제",
       "published_at": "2026-11-10T09:00:59+09:00",
@@ -5351,15 +5255,6 @@
       "id": "38a705fb8f2c0db6eb"
     },
     {
-      "title": "서울 아파트 84㎡·59㎡ 가격차 1억7000만원 밑으로…대출 규제에 소형 '선방'",
-      "publisher": "뉴스로드",
-      "published_at": "2026-11-09T09:34:02+09:00",
-      "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTFBXVEJySDNpbnl3X2tmQ0JMMDFXMHhjcGpLazJMajFpa1p1OFBWYXI5d0tRQVFEWnphT3lDbHdnM1ROOEJiLXNscWk2QnZDRWN1UGpkMGRLVnlIVEFTLThSd3E3MmtPTUlneDlr0gFvQVVfeXFMTUJOUjhadFVXZ1VSc0E3VWx0YWVmM2RwU3NSUU1ZemczcjdNbFBuVWpEdnlIRlo3eG40QXdGSHptVTdKSVBWS1hZc1Rac2FNZ0xld1pDb2F1UmFscHZKYjZIdEhrMWNzR3E2N25jRHQw?oc=5",
-      "category": "세금·대출",
-      "query": "주택담보대출 DSR 정책",
-      "id": "d0f49da04506ac8cb6"
-    },
-    {
       "title": "인천 송도 바이오기업 주가 ‘급락장 속’ 상승세...외인 팔고 기관 사고",
       "publisher": "중부일보",
       "published_at": "2026-11-09T08:33:00+09:00",
@@ -5473,7 +5368,7 @@
       "published_at": "2026-11-08T12:27:49+09:00",
       "link": "https://news.google.com/rss/articles/CBMi7wFBVV95cUxOeW9XeGUtbFZOUlJaaEtIQjUwYlN5Z1RJSVJxdkViU1hnM0hYSS1XaXVNQWozM3FNLXZ6ZEpEQ0otUXNQLTR3V2ttOGpKblZ0M2xZRjMwZEZpM3pTSm5pQXZ2QUFnNXdrczBFbldOcFhlVGNhaGVfY0ZjN1REWmtpZlpLVWdHWExHUzRnTDVQcWtzLTlHQUpLb3FFX3hfUUNBb3h4WEEyc3F5T3RzNTRfSGhWNG93eTdRLXNTci0yMmtfNDBlbnJSOEU5dmxFNWR6MVA3VExkb0otQ1ZBZkJ3Z0laZmxDeWgwVk1mOGVXRQ?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도동",
+      "query": "인천 송도",
       "id": "09313bb800c7b70d39"
     },
     {
@@ -5532,25 +5427,25 @@
     }
   ],
   "counts": {
-    "briefs": 141,
-    "articles": 226
+    "briefs": 138,
+    "articles": 222
   },
   "ai_summary_stats": {
-    "created": 13,
-    "reused": 110,
-    "article_fetches": 37,
-    "source_links_resolved": 37,
-    "body_readable": 24,
-    "gemini_requests": 10,
-    "retry_requests": 6,
+    "created": 5,
+    "reused": 118,
+    "article_fetches": 20,
+    "source_links_resolved": 20,
+    "body_readable": 9,
+    "gemini_requests": 5,
+    "retry_requests": 3,
     "retry_strategy": "two_article_batch",
     "gemini_circuit": "open",
-    "candidate_articles": 16,
-    "groq_created": 3,
-    "groq_requests": 3,
+    "candidate_articles": 6,
+    "groq_created": 1,
+    "groq_requests": 2,
     "groq_reviewed": 1,
-    "awaiting_body": 15,
-    "gemini_http_requests_total": 11
+    "awaiting_body": 14,
+    "gemini_http_requests_total": 7
   },
   "ai_office_digest_stats": {
     "state": "created",
@@ -5560,8 +5455,8 @@
   "ai_office_digest": {
     "schema_version": 1,
     "prompt_version": 2,
-    "fingerprint": "344417f21e2c8f1810584c7348f4bdb3",
-    "generated_at": "2026-11-14T18:49:27.341146+00:00",
+    "fingerprint": "4c7f30064dfd3d909436769460382d99",
+    "generated_at": "2026-11-14T21:42:20.844291+00:00",
     "model": "gemini-3.5-flash-lite",
     "method": "gemini",
     "items": [
@@ -5569,7 +5464,7 @@
         "id": "3ae58928d3f90b",
         "point": "연수구 송도더샵퍼스트파크 전용 84㎡는 신규 계약 5건 중 4건의 보증금이 5억원을 넘었다.",
         "evidence": "연수구 송도더샵퍼스트파크 전용 84㎡는 신규 계약 5건 중 4건의 보증금이 5억원을 넘었다.",
-        "check": "송도 지역의 신규 임대 계약 시 보증금 시세 변동 추이와 향후 입주 물량 부족에 따른 전세가 영향을 확인하시기 바랍니다.",
+        "check": "송도 지역 아파트 신규 임대차 계약 시 보증금 변동 추이와 향후 입주 물량 부족에 따른 전셋값 수준을 확인해 주시기 바랍니다.",
         "audiences": [
           "임대",
           "임차"
@@ -5580,8 +5475,9 @@
         "id": "005c8ff645bfe8",
         "point": "당초 올해 준공·개관 예정이었으나 착공이 없고, 계획 변경 검토가 논란이 되고 있다.",
         "evidence": "당초 올해 준공·개관 예정이었으나 착공이 없고, 계획 변경 검토가 논란이 되고 있다.",
-        "check": "송도6공구 복합문화도서관 및 에디슨과학교육박물관 건립 사업의 향후 착공 일정과 계획 변경 여부를 문의하시기 바랍니다.",
+        "check": "송도6공구 복합문화도서관 및 박물관 건립과 관련하여 향후 구체적인 착공 및 준공 로드맵이 마련되었는지 문의해 주시기 바랍니다.",
         "audiences": [
+          "매수",
           "공통"
         ],
         "questions": []
@@ -5590,14 +5486,12 @@
         "id": "38d450eea657c0",
         "point": "송도자이풍경채 그라노블은 1·2단지가 2027년 5월, 3~5단지가 2028년 3월 준공을 목표로 공사를 진행하고 있다.",
         "evidence": "송도자이풍경채 그라노블은 1·2단지가 2027년 5월, 3~5단지가 2028년 3월 준공을 목표로 공사를 진행하고 있다.",
-        "check": "송도자이풍경채 그라노블의 단지별 정확한 준공 목표 시기와 향후 입주민 간담회 일정을 확인하시기 바랍니다.",
+        "check": "송도자이풍경채 그라노블 단지의 정확한 단지별 준공 목표 시기와 향후 입주민 간담회 일정을 확인해 주시기 바랍니다.",
         "audiences": [
           "매수",
-          "임차"
+          "공통"
         ],
-        "questions": [
-          "공사 진행 과정에서 준공 일정 변경 가능성이 있는지 추가로 확인해야 하는가?"
-        ]
+        "questions": []
       }
     ],
     "notice": "공개 기사 기반 AI 참고 요약 · 수치·일정·정책은 원문 확인"
