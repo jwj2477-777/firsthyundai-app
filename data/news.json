@@ -1,12 +1,34 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-11-16T03:50:02+09:00",
+  "checked_at": "2026-11-16T06:44:13+09:00",
   "state": "ok",
   "errors": [],
   "source": "Google 뉴스 RSS (보도 제목·출처 메타데이터)",
   "brief_method": "기사 본문 확인 Gemini 요약 + Groq 보완(짧은 3~4문장)",
   "warning": "언론 기사 제목은 공식 확정 발표가 아닙니다. 사업 일정, 세금, 대출, 시행일은 기관 원문 확인 필요.",
   "briefs": [
+    {
+      "id": "f79ca209615928",
+      "category": "개발·교통",
+      "title": "인천 송도1공구 국제 병원·K-뷰티 부지 ‘20년 넘게 방치’...사업 백지화 예고",
+      "summary": "인천 송도국제도시 국제병원 부지에 추진되던 차병원 글로벌특화병원 조성 사업이 백지화될 전망이다.\n인천경제청은 2023년 9월 차병원과 업무협약을 맺었으나 수익시설과 용적률 이견으로 사업이 무산됐다.\n인천경제청은 사업 추진이 어렵다고 판단하고 조만간 차병원 측에 공식 입장을 전달할 계획이다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-16T06:02:11+09:00",
+      "sources": [
+        {
+          "title": "인천 송도1공구 국제 병원·K-뷰티 부지 ‘20년 넘게 방치’...사업 백지화 예고",
+          "publisher": "경기일보",
+          "published_at": "2026-11-16T06:02:11+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1zeHlpQV9WSkZpTGg4OVhsUExCbXRTOTVmRktfYXRwUzJ2c2pHV2xxU3g3cGZLdjNzbHY5WUtYTDB0ZWNKTXJDWUlzTnlZYnAxQ1B1V2hEbzRBdzg?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.kyeonggi.com/article/20261115580327",
+      "summary_version": 3
+    },
     {
       "id": "1eb0c3654220fb",
       "category": "송도 종합",
@@ -46,16 +68,16 @@
           "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE9vaXdDM3BxYnN1Q1ExR2VvWFotRjNoalJmU256YXJLbWVJeF9uWVJRaElFU0gyRGl0ZWRSdHh0X2RaTEdvYkZkNGEzZXU3Nl9icDFHTk5CX1lqQ1cwa1pXRGhybw?oc=5"
         },
         {
-          "title": "인천시의회 이강구 의원, 송도 6공구 핵심 공공시설 계획 변경·지연 질타",
-          "publisher": "뉴스피크",
-          "published_at": "2026-11-14T09:57:49+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE00MmdLc05FYTU3bG1PLWpWVnk4V2FEYUczdmxSc1paNnVSUExfS1labndYUWVsWXVTb2JURXdZTGk1M0ZBZVY3bmJiamZjbWM4bFpYN1dsNWFEREpRU0l0aVJtVkVuVzlL?oc=5"
-        },
-        {
           "title": "이강구·인천의회, 송도 6공구 공공시설 계획 변경·지연 질타 송도6공구 주민과의 약속인 원계획대로 조속 추진해야",
           "publisher": "오토투데이",
           "published_at": "2026-11-13T19:08:54+09:00",
           "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBZQm5iR3dPaS1POGlDXzdGSzNBVHdQWlhvVjQ4VlpWajcyQ3JtNTdsczJLVDZKeVJPRTZnSHZtajNQMHVNM3lmZTB4dXRqZGhyTFBDZjNqMjBrVC1Xa3loV2dQVjdiU1JNZW5ucHVISQ?oc=5"
+        },
+        {
+          "title": "인천시의회 이강구 의원, 송도 6공구 핵심 공공시설 계획 변경·지연 강력 질타",
+          "publisher": "경기매일",
+          "published_at": "2026-11-13T17:50:33+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE5RcUlwNVd0aEpiTTJ4dEdQTHNSY3FuaHYyS0F1SWRpME5SbFk1VWNHaWpreEJvLVBtWnBtM1lxLVVNMTFBV0t5MWFPbFhZX1dqVkU1dmdLRVd6bUl4U2J0WmoybU55MW8?oc=5"
         }
       ],
       "summary_method": "gemini_article",
@@ -141,8 +163,8 @@
       "id": "cba79ea50da9fd",
       "category": "송도 종합",
       "title": "인구 23만 송도, 아픈 아이 어디로?…조민경 인천시의원, 소아응급 대책 촉구",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
+      "summary": "조민경 인천시의원이 송도 의료공백 해소를 위해 종합병원 유치와 대책 마련을 촉구했다.\n송도 인구 22만6000명당 병상 1.8개에 비해 800병상 규모 송도세브란스병원 건설 중이며, 소아 응급진료 가능한 종합병원 추가 필요가 강조되었다.\n인천경제청은 차병원 유치 협상이 결렬돼 사업 종료 절차를 준비 중이며, 새로운 종합병원 사업자를 모집하고 의료시설 부지를 추가 확보하도록 주문했다.",
+      "verification": "Groq 기사 본문 요약 · 사실 미검증",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-15T19:41:52+09:00",
@@ -154,7 +176,10 @@
           "link": "https://news.google.com/rss/articles/CBMiTkFVX3lxTFBTa0FZNWpaY0hCN2trUG01ZTU2Z01vcDRlYy1Kalp0bHJmY3c2cDd6WkV6ZWdZX21OV0E1dDNaS3UtdEhFWlJnbWlabHgzZw?oc=5"
         }
       ],
-      "summary_method": "headline_only"
+      "summary_method": "groq_article",
+      "summary_model": "openai/gpt-oss-120b",
+      "summary_source_url": "https://www.etnews.com/20261115000174",
+      "summary_version": 3
     },
     {
       "id": "99dc40154bf39e",
@@ -204,28 +229,6 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.dailian.co.kr/news/view/1715233/",
-      "summary_version": 3
-    },
-    {
-      "id": "26b5489231a80a",
-      "category": "개발·교통",
-      "title": "인천 송도 1공구 방치 장기화…차병원 좌초에 K-뷰티 부지 표류까지",
-      "summary": "인천 송도국제도시 1공구의 국제병원 및 K-뷰티 부지 개발이 차병원 사업 백지화 등으로 장기 방치될 전망이다.\n인천경제청은 총사업비 2조원을 들여 추진하려던 차병원 글로벌특화병원 사업이 이견과 자금 조달 문제로 무산 수순을 밟고 있다고 밝혔다.\n박성진 인천경제청 투자유치본부장은 사업을 더 이상 추진하기 어렵다며 방치를 막기 위해 다른 사업을 찾겠다고 전했다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-15T18:05:08+09:00",
-      "sources": [
-        {
-          "title": "인천 송도 1공구 방치 장기화…차병원 좌초에 K-뷰티 부지 표류까지",
-          "publisher": "경기일보",
-          "published_at": "2026-11-15T18:05:08+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1zeHlpQV9WSkZpTGg4OVhsUExCbXRTOTVmRktfYXRwUzJ2c2pHV2xxU3g3cGZLdjNzbHY5WUtYTDB0ZWNKTXJDWUlzTnlZYnAxQ1B1V2hEbzRBdzg?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.kyeonggi.com/article/20261115580327",
       "summary_version": 3
     },
     {
@@ -299,7 +302,7 @@
       "category": "정책·규제",
       "title": "\"서울도 아닌데\"…1년 새 3.6억 뛰더니 '20억 클럽' 입성 [이송렬의 부동산한입]",
       "summary": "서울 아파트값이 1년 새 3.6억 상승해 20억 클럽에 진입했다.\n가격 상승은 92주 연속 상승 기록을 경신하며 외곽 지역이 주도했다.\n현재 상승세는 지속 중이며 향후 가격 변동은 추이 관찰이 필요하다.",
-      "verification": "Groq 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-15T16:00:03+09:00",
@@ -314,86 +317,6 @@
       "summary_method": "groq_article",
       "summary_model": "openai/gpt-oss-120b",
       "summary_source_url": "https://www.hankyung.com/article/2026111218726",
-      "summary_version": 3
-    },
-    {
-      "id": "f317ff1b3dc298",
-      "category": "송도 종합",
-      "title": "인천 송도 곳곳서 털 빠진 너구리 출몰…개선충 감염 신고 잇따라",
-      "summary": "인천 송도 곳곳에서 털이 빠진 야생 너구리가 잇따라 출몰해 인수공통감염병인 개선충 감염 우려가 커지고 있다.\n올해 1월부터 지난 12일까지 연수구에 접수된 너구리 구조 및 포획 요청 민원은 총 89건으로 지난해보다 82% 증가했다.\n인천시 야생동물구조관리센터와 연수구는 15일 관련 피해 확산을 막기 위해 주민들에게 안전거리 유지를 당부했다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 7,
-      "publisher_count": 7,
-      "last_published_at": "2026-11-15T16:00:00+09:00",
-      "sources": [
-        {
-          "title": "인천 송도 곳곳서 털 빠진 너구리 출몰…개선충 감염 신고 잇따라",
-          "publisher": "세계일보",
-          "published_at": "2026-11-15T16:00:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE8zTzdONUlrZjRuSlp5aHFPOUt2Zl9RS0dFek10Tk1sWmNqbnFaRWFOT1AwYTBRb2k0dmExMGdsMUpFSFZmVEVvM2tHZVlVWUJvYWxBV0VfdzA1Rm1RemhXM1E5TXRBRmF5REJJ0gFUQVVfeXFMT1E5N1F0Z2pzZ0JBeWYxeHlEQ2dpZ1BhVmdkdTk3ZUVQdGc3Z2xWX3hfcnJxVG00OFZTa3JYenhlMzJjRVdkVmI1YUhiOUgxbm5nZXo4?oc=5"
-        },
-        {
-          "title": "인천 송도 곳곳서 ‘털 빠진 너구리’ 잇따라 발견",
-          "publisher": "조선일보",
-          "published_at": "2026-11-15T13:52:18+09:00",
-          "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPcVR2RjdQQ0dPOVE1T0JDcVRwY0FDNmxCd3RwMi0tYVR2dEt4ZmF3SV9lV1FtaTRwcVZ1MXVxUGY5eldERlZNZVVlc2NhWW55cEFyblh6LXZ6WnAtUENsYXoxRjMtRkUxelVuYURnUko1S24yQllTRDc2djlQWnpKeFhYZmNvOXROX1AwQl9Hbno?oc=5"
-        },
-        {
-          "title": "인천 송도 학교·공원서 잇따라 ‘털 빠진’ 너구리 발견…‘개선충’ 주의보",
-          "publisher": "www.dt.co.kr",
-          "published_at": "2026-11-15T11:20:11+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE9FcnNQYzRsMkRqdW5fZEpCdE9TVS1FalNBSTJidjhrbU1SQ3NxUGhTWFByQWhaZUM2akRONFhHbnNBSlZaNk9jZmVaUEp2UQ?oc=5"
-        },
-        {
-          "title": "인천 송도 곳곳서 털 빠진 너구리 잇따라 발견…개선충 확산 우려",
-          "publisher": "동아일보",
-          "published_at": "2026-11-15T10:19:15+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTFAwSU5tMXRoY2VrWE01ZmNSWHNEa3FlM0RscjZ5Vk9SNHRsRkgzYlRMQzBiaVEzWmFuM1FCVFI5UjMyQUlNcHE4WWY4UzRBUFFPcC0wN2h2Qnd5bnFhcTZ0TVNXYm1Bd9IBZkFVX3lxTFAwSU5tMXRoY2VrWE01ZmNSWHNEa3FlM0RscjZ5Vk9SNHRsRkgzYlRMQzBiaVEzWmFuM1FCVFI5UjMyQUlNcHE4WWY4UzRBUFFPcC0wN2h2Qnd5bnFhcTZ0TVNXYm1Bdw?oc=5"
-        },
-        {
-          "title": "인천 송도 곳곳서 털 빠진 너구리 잇따라 발견…개선충 확산 우려",
-          "publisher": "뉴시스",
-          "published_at": "2026-11-15T10:07:36+09:00",
-          "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBGckM0VkNCRjEzZ3NZSzBKVk1Da3hDQnZxYm9vSXVRY05MQUdpeTU0WjlheEFBam85bDhsNFZ0Q1BCdjJCbWpWV3kwVGgxSXliZWw4dGhhQW91bmxhZ2ZhWUQwNk1VRUFOMWxKVVlmOUduSkJjRVZiQdIBeEFVX3lxTFBGckM0VkNCRjEzZ3NZSzBKVk1Da3hDQnZxYm9vSXVRY05MQUdpeTU0WjlheEFBam85bDhsNFZ0Q1BCdjJCbWpWV3kwVGgxSXliZWw4dGhhQW91bmxhZ2ZhWUQwNk1VRUFOMWxKVVlmOUduSkJjRVZiQQ?oc=5"
-        },
-        {
-          "title": "“털 빠진 너구리 조심하세요”…인천 송도 곳곳서 발견, 학교도 비상",
-          "publisher": "전자신문",
-          "published_at": "2026-11-15T08:43:26+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiTkFVX3lxTFBsYlctUHE2QjBHZ3VuSm1SUGd3MDU1aGpUaVNGSVhGT0c3TWhxTnFrR1hZX0hCdlZxQzNlUGJWZGVDbmk3S3NsMFBoeUxpUQ?oc=5"
-        },
-        {
-          "title": "인천 송도 학교·공원·골프장서 온몸에 털빠진 너구리 발견",
-          "publisher": "연합뉴스",
-          "published_at": "2026-11-15T07:17:01+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1wX0RhRXNKbTFSRDZURkZmdExPNnJvZmgwbGhjY1NqbEx4TThWSHgyS20zX2Nrb0VOaU1ha1NTUFRuZ2pBMnZUWHdCSXotVEFMRlBfN3ZLLUUtdDDSAWBBVV95cUxQanE0T1NOZXNWUXdRNjNEdEtPVUdyQmdrT2JDNW4tRkRHMlVBOHdwQTJLN2hSb1BYVGVkX1RfVEFNVFNTYnBYOVYzejZ4aTdQTjI4cFJ5SjVHQm5UNDk0NTU?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.segye.com/newsView/20261115504284?OutUrl=google",
-      "summary_version": 3
-    },
-    {
-      "id": "0f3d2ba04ed9ee",
-      "category": "송도 종합",
-      "title": "인천 송도 곳곳서 털 빠진 야생 너구리 출현…“거리 유지” 당부",
-      "summary": "인천 송도국제도시에서 털이 빠진 채 배회하는 야생 너구리가 잇따라 목격되고 있다.\n올해 12일까지 연수구 내 너구리 구조 및 포획 민원은 89건으로 지난해보다 82% 늘었다.\n연수구는 올해 4월 공원과 녹지 등 너구리 출몰 지역 30여곳에 미끼예방약을 살포했다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-15T15:51:00+09:00",
-      "sources": [
-        {
-          "title": "인천 송도 곳곳서 털 빠진 야생 너구리 출현…“거리 유지” 당부",
-          "publisher": "한겨레",
-          "published_at": "2026-11-15T15:51:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBzNWhjRlJFUWdVV3FudzdEYnNNcVQ3MkVKOFJ4aHBmZW9LbVFrYVFNazZWZ3BMZzFMWjlqVFp6MzFMUHZpMmpLc2VyR2lZLWxaeVRwWm91LUV2SDZEdjZGeXNEbw?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.hani.co.kr/arti/area/capital/1287399.html",
       "summary_version": 3
     },
     {
@@ -527,6 +450,70 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.hankyung.com/article/2026111572507",
+      "summary_version": 3
+    },
+    {
+      "id": "5c36d2d0e5efc5",
+      "category": "송도 종합",
+      "title": "인천 송도 곳곳서 ‘털 빠진 너구리’ 잇따라 발견",
+      "summary": "인천 송도국제도시 일대에서 온몸에 털이 빠진 너구리가 잇따라 발견되어 주민들이 우려하고 있다.\n연수구에 접수된 너구리 구조 및 포획 민원은 89건으로 지난해 같은 기간보다 82% 증가했다.\n전문가들은 너구리들이 옴 진드기의 일종인 개선충에 감염된 것으로 추측하고 있다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 8,
+      "publisher_count": 8,
+      "last_published_at": "2026-11-15T13:52:18+09:00",
+      "sources": [
+        {
+          "title": "인천 송도 곳곳서 ‘털 빠진 너구리’ 잇따라 발견",
+          "publisher": "조선일보",
+          "published_at": "2026-11-15T13:52:18+09:00",
+          "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPcVR2RjdQQ0dPOVE1T0JDcVRwY0FDNmxCd3RwMi0tYVR2dEt4ZmF3SV9lV1FtaTRwcVZ1MXVxUGY5eldERlZNZVVlc2NhWW55cEFyblh6LXZ6WnAtUENsYXoxRjMtRkUxelVuYURnUko1S24yQllTRDc2djlQWnpKeFhYZmNvOXROX1AwQl9Hbno?oc=5"
+        },
+        {
+          "title": "인천 송도 학교·공원서 잇따라 ‘털 빠진’ 너구리 발견…‘개선충’ 주의보",
+          "publisher": "www.dt.co.kr",
+          "published_at": "2026-11-15T11:20:11+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE9FcnNQYzRsMkRqdW5fZEpCdE9TVS1FalNBSTJidjhrbU1SQ3NxUGhTWFByQWhaZUM2akRONFhHbnNBSlZaNk9jZmVaUEp2UQ?oc=5"
+        },
+        {
+          "title": "온몸에 털 빠진 너구리 인천 송도 곳곳서 발견… 개선충 사람에도 옮겨 비상",
+          "publisher": "세계일보",
+          "published_at": "2026-11-15T11:06:11+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTFBOYTkwYm9WbUFTeGhfaXFXUHZUMzJMUTZVYThQVHBuUlpsUWU4VjF3c3dvY0o5Slgzc2NZanU2RjZvN1BjemRYZi1ISXNEZ19GZjBmTU55eXfSAVRBVV95cUxObFRZLThMNHdoSDRFeHB2b0p0TWx4VlE5MHlFd1ViRzk4LXcwX096SGJWRzZ1NFgzUmEzeU5lRG9ZVGpUdGJwV0JQSm1rR2g1QndiYVo?oc=5"
+        },
+        {
+          "title": "인천 송도 곳곳서 털 빠진 너구리 잇따라 발견…개선충 확산 우려",
+          "publisher": "동아일보",
+          "published_at": "2026-11-15T10:19:15+09:00",
+          "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE1DV25ETHF2NndtX1VnVk92NHZfa3pJaGhvdHhnTGN2VG5mS0RuemRvS3Vtc2hlMGRkQ3gxRHJJVnpwSGVZQWVEb2lQNC1aeDFta21VLVh5Zkd3TUNRWFVrRWpfd2VzOGZtRzVZMmFKLTkxYzRGU1HSAWZBVV95cUxQMElObTF0aGNla1hNNWZjUlhzRGtxZTNEbHI2eVZPUjR0bEZIM2JUTEMwYmlRM1phbjNRQlRSOVIzMkFJTXBxOFlmOFM0QVBRT3AtMDdodkJ3eW5xYXE2dE1TV2JtQXc?oc=5"
+        },
+        {
+          "title": "인천 송도 곳곳서 털 빠진 너구리 잇따라 발견…개선충 확산 우려",
+          "publisher": "뉴시스",
+          "published_at": "2026-11-15T10:07:36+09:00",
+          "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBGckM0VkNCRjEzZ3NZSzBKVk1Da3hDQnZxYm9vSXVRY05MQUdpeTU0WjlheEFBam85bDhsNFZ0Q1BCdjJCbWpWV3kwVGgxSXliZWw4dGhhQW91bmxhZ2ZhWUQwNk1VRUFOMWxKVVlmOUduSkJjRVZiQdIBeEFVX3lxTFBGckM0VkNCRjEzZ3NZSzBKVk1Da3hDQnZxYm9vSXVRY05MQUdpeTU0WjlheEFBam85bDhsNFZ0Q1BCdjJCbWpWV3kwVGgxSXliZWw4dGhhQW91bmxhZ2ZhWUQwNk1VRUFOMWxKVVlmOUduSkJjRVZiQQ?oc=5"
+        },
+        {
+          "title": "인천 송도서 온몸 털 빠진 너구리 잇따라 발견…감염 우려 확산",
+          "publisher": "진일보 | 전남일보",
+          "published_at": "2026-11-15T08:51:11+09:00",
+          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBxUm9NdXMtOG1pT3BwOUp6MlpuQVpUUF9POW5iRjJlbnVMZ1RrS3JkMjZiRGtuZE5Jc0JQeGxBMEo4UHQ3SldpOVRxSFdWUE9tejlubUlWaW85MF9BS3czTC0wcVJwWUVnUV96Y1VTaw?oc=5"
+        },
+        {
+          "title": "“털 빠진 너구리 조심하세요”…인천 송도 곳곳서 발견, 학교도 비상",
+          "publisher": "전자신문",
+          "published_at": "2026-11-15T08:43:26+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiTkFVX3lxTFBsYlctUHE2QjBHZ3VuSm1SUGd3MDU1aGpUaVNGSVhGT0c3TWhxTnFrR1hZX0hCdlZxQzNlUGJWZGVDbmk3S3NsMFBoeUxpUQ?oc=5"
+        },
+        {
+          "title": "인천 송도 학교·공원·골프장서 온몸에 털빠진 너구리 발견",
+          "publisher": "연합뉴스",
+          "published_at": "2026-11-15T07:17:01+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1wX0RhRXNKbTFSRDZURkZmdExPNnJvZmgwbGhjY1NqbEx4TThWSHgyS20zX2Nrb0VOaU1ha1NTUFRuZ2pBMnZUWHdCSXotVEFMRlBfN3ZLLUUtdDDSAWBBVV95cUxQanE0T1NOZXNWUXdRNjNEdEtPVUdyQmdrT2JDNW4tRkRHMlVBOHdwQTJLN2hSb1BYVGVkX1RfVEFNVFNTYnBYOVYzejZ4aTdQTjI4cFJ5SjVHQm5UNDk0NTU?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.dt.co.kr/article/12095172",
       "summary_version": 3
     },
     {
@@ -760,28 +747,6 @@
       "summary_version": 3
     },
     {
-      "id": "aaf618d778b026",
-      "category": "송도 종합",
-      "title": "온몸에 털 빠진 너구리 인천 송도 곳곳서 발견… 개선충 사람에도 옮겨 비상",
-      "summary": "인천 연수구 송도 곳곳에서 온몸에 털이 빠진 너구리가 잇따라 발견되고 있다.\n올해 1부터 11월까지 송도 관할 연수구에 접수된 너구리 구조 및 포획 요청 민원은 총 89건이다.\n지자체와 전문가들은 사람도 감염될 수 있는 개선충 확산에 따라 주민들에게 주의를 당부하고 있다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-15T11:06:11+09:00",
-      "sources": [
-        {
-          "title": "온몸에 털 빠진 너구리 인천 송도 곳곳서 발견… 개선충 사람에도 옮겨 비상",
-          "publisher": "세계일보",
-          "published_at": "2026-11-15T11:06:11+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE5sVFktOEw0d2hINEV4cHZvSnRNbHhWUTkweUV3VWJHOTgtdzBfT3pIYlZHNnU0WDNSYTN5TmVEb1lUalR0YnBXQlBKbWtHaDVCd2JhWtIBVEFVX3lxTE5sVFktOEw0d2hINEV4cHZvSnRNbHhWUTkweUV3VWJHOTgtdzBfT3pIYlZHNnU0WDNSYTN5TmVEb1lUalR0YnBXQlBKbWtHaDVCd2JhWg?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://m.segye.com/ampView/20261115503970",
-      "summary_version": 3
-    },
-    {
       "id": "9f4840748739fb",
       "category": "송도 종합",
       "title": "송도~원도심 잇는 ‘꿈이음길’ 달렸다",
@@ -908,6 +873,52 @@
       "summary_version": 3
     },
     {
+      "id": "045a0f2c504652",
+      "category": "송도 종합",
+      "title": "인천시의회 조민경 의원, 종합병원 한 곳 없는 송도 의료종합대책 촉구",
+      "summary": "인천시의회 조민경 의원은 인구 23만 명인 송도국제도시에 종합병원이 단 한 곳도 없다고 지적했다.\n송도의 병상은 인구 1천 명당 1.8개인 411개에 불과해 의료 인프라 확충 대책 마련이 시급하다.\n조 의원은 지난 13일 열린 인천경제청 행정사무감사에서 신규 종합병원 유치 등을 촉구했다.",
+      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "article_count": 5,
+      "publisher_count": 5,
+      "last_published_at": "2026-11-15T06:05:00+09:00",
+      "sources": [
+        {
+          "title": "인천시의회 조민경 의원, 종합병원 한 곳 없는 송도 의료종합대책 촉구",
+          "publisher": "일간투데이",
+          "published_at": "2026-11-15T06:05:00+09:00",
+          "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE81YnU0TDZCVnk4OFFWYVRUVTZhMXV6a2ZrYmZMUHNia21yQ2ZDSUxnYTNtenNxVGl3NFcyWVJnY3pRS3pHb2JkZ2tYc0JFeDAxQ1hwSERjcncwOWsxenc2Z0JCUmh1X3BLMVVz?oc=5"
+        },
+        {
+          "title": "인천시의회 조민경 의원, 송도 종합병원 유치와 의료대책 촉구",
+          "publisher": "매일일보",
+          "published_at": "2026-11-14T12:24:43+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1OX0RGU0VnU2JaRXRoek4zdTRHZVpkSFpuNGs0N2tJa250bVlGTGI3U2NTWE9yTlJwMlpvVmFabVdGbkdkN1YwTmFKbzVmQzV3UkdmTVhtRnRfVEdGcDdOQkpWbE8?oc=5"
+        },
+        {
+          "title": "23만 송도국제도시 종합병원 '0곳'…조민경 인천시의원 '추가 유치 등 의료종합대책 시급'",
+          "publisher": "포커스인천",
+          "published_at": "2026-11-14T01:21:04+09:00",
+          "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE4xSURfUDlVS2xvYnUtVHRWTmtNSzRGZ0lEZ0hRLTd5TThOcG5uLVVudjJtZTJQcW1VNW9UOWE2dTluaVR4Zk5sUnU2RDdnb2hwc2FldWVKYllGellUeWlJUnZQZktvWXlrcml1aWxR0gFyQVVfeXFMTTJHaVM2d2M5YmtxbkVUdTBSWVZoRkJ6RXdiZHZ3OXF6emp6YTB3RG00TmViRmhQV3dORjNpVkxCaW91OWFsRm5GbFQ1anllX0VFUUVmVDlidzFFRjZfN1JlSTg3QjM4UWZrNXRFdmxwQWdB?oc=5"
+        },
+        {
+          "title": "인천시의회 조민경 의원, 송도에 의료종합대책 마련 촉구",
+          "publisher": "뉴스피크",
+          "published_at": "2026-11-13T17:36:41+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE4wOW9CVTJmRE5qM1FvZXFmZGJWeld3NXBySExHUWJqSUtsRElsdmNTUURRYmZaTWdnYjNOZ2o0RlY5dWtXY0FucnozaWltOEFjSDZFWXJUVk9NRGVSa1pfbU8yQkxFRnlX?oc=5"
+        },
+        {
+          "title": "인천시의회 조민경 의원, 송도 인구 23만 명에 종합병원 전무 지적...의료 인프라 확충 촉구",
+          "publisher": "경인매일",
+          "published_at": "2026-11-13T17:23:27+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBLUG53ODRtT1RuUERUbHQ2dnZEeGtraVBuejdseDZhM1ZZSTZxaTlRbFlNNzZfQVhpaEN5NUVlQUhST3B3REFuOW9ESFQ2SDdmVUVHTU1LMWNoMU1HUGRLM1Q5d1BraTd6?oc=5"
+        }
+      ],
+      "summary_method": "gemini_article",
+      "summary_model": "gemini-3.5-flash-lite",
+      "summary_source_url": "https://www.dtoday.co.kr/news/articleView.html?idxno=803673",
+      "summary_version": 3
+    },
+    {
       "id": "45bdfa7c7bab64",
       "category": "정책·규제",
       "title": "인천시의회 신영희 의원, 재개발·재건축 사전컨설팅 과도한 규제 개선을",
@@ -996,7 +1007,7 @@
           "title": "송도 글로벌 특화병원 유치 무산…\"추가 종합병원 필요\"",
           "publisher": "뉴시스",
           "published_at": "2026-11-13T15:02:05+09:00",
-          "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBRWnN5aUpaTUNVWnl1WDYtNF9SN1ZsTTM3SzVkZlJvdjlVNlpsdmV4ekJqUzR3cXhtMi1YSENHTWlOYmFpQ3V2azhEdTAxdjNERzU2eDg1THBSb1JSWXFROWM5Z2lZOTdJdWxPMTVPQURhNUZYTXpLcNIBeEFVX3lxTFBRWnN5aUpaTUNVWnl1WDYtNF9SN1ZsTTM3SzVkZlJvdjlVNlpsdmV4ekJqUzR3cXhtMi1YSENHTWlOYmFpQ3V2azhEdTAxdjNERzU2eDg1THBSb1JSWXFROWM5Z2lZOTdJdWxPMTVPQURhNUZYTXpLcA?oc=5"
+          "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5oMlB5WDViU3NmaEZPZHFxM1dScEotTVZlbTF3UjRudkRCOURLWFhsTFlFUG1xYUZrYU1LWTg0Z0lncm1fZEtWdjZ5aEFjRW5DTS1qWllfUmdSZkNhQWxaOdIBeEFVX3lxTFBRWnN5aUpaTUNVWnl1WDYtNF9SN1ZsTTM3SzVkZlJvdjlVNlpsdmV4ekJqUzR3cXhtMi1YSENHTWlOYmFpQ3V2azhEdTAxdjNERzU2eDg1THBSb1JSWXFROWM5Z2lZOTdJdWxPMTVPQURhNUZYTXpLcA?oc=5"
         },
         {
           "title": "인천 송도국제도시 글로벌 특화병원 사업 사실상 무산",
@@ -1028,40 +1039,6 @@
         }
       ],
       "summary_method": "headline_only"
-    },
-    {
-      "id": "08f3e4a023ce78",
-      "category": "송도 종합",
-      "title": "인천시의회 조민경 의원, 송도 종합병원 유치와 의료대책 촉구",
-      "summary": "인천시의회 조민경 의원은 종합병원이 없는 송도국제도시의 의료 인프라 확충을 촉구했다.\n송도 인구는 약 23만 명이지만 병상은 인구 1000명당 1.8개로 크게 부족한 상태다.\n조 의원은 13일 열린 인천경제청 행정사무감사에서 이 같은 문제를 지적했다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
-      "article_count": 3,
-      "publisher_count": 3,
-      "last_published_at": "2026-11-14T12:24:43+09:00",
-      "sources": [
-        {
-          "title": "인천시의회 조민경 의원, 송도 종합병원 유치와 의료대책 촉구",
-          "publisher": "매일일보",
-          "published_at": "2026-11-14T12:24:43+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1OX0RGU0VnU2JaRXRoek4zdTRHZVpkSFpuNGs0N2tJa250bVlGTGI3U2NTWE9yTlJwMlpvVmFabVdGbkdkN1YwTmFKbzVmQzV3UkdmTVhtRnRfVEdGcDdOQkpWbE8?oc=5"
-        },
-        {
-          "title": "인천시의회 조민경 의원, 송도에 의료종합대책 마련 촉구",
-          "publisher": "뉴스피크",
-          "published_at": "2026-11-13T17:36:41+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE4wOW9CVTJmRE5qM1FvZXFmZGJWeld3NXBySExHUWJqSUtsRElsdmNTUURRYmZaTWdnYjNOZ2o0RlY5dWtXY0FucnozaWltOEFjSDZFWXJUVk9NRGVSa1pfbU8yQkxFRnlX?oc=5"
-        },
-        {
-          "title": "인천시의회 조민경 의원, 송도 인구 23만 명에 종합병원 전무 지적...의료 인프라 확충 촉구",
-          "publisher": "경인매일",
-          "published_at": "2026-11-13T17:23:27+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBLUG53ODRtT1RuUERUbHQ2dnZEeGtraVBuejdseDZhM1ZZSTZxaTlRbFlNNzZfQVhpaEN5NUVlQUhST3B3REFuOW9ESFQ2SDdmVUVHTU1LMWNoMU1HUGRLM1Q5d1BraTd6?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.m-i.kr/news/articleView.html?idxno=2018532",
-      "summary_version": 3
     },
     {
       "id": "2f13d8a27007e9",
@@ -1231,25 +1208,6 @@
       "summary_model": "openai/gpt-oss-120b",
       "summary_source_url": "https://www.focusincheon.com/news/articleView.html?idxno=10980",
       "summary_version": 3
-    },
-    {
-      "id": "726e1bfd2e526b",
-      "category": "송도 종합",
-      "title": "23만 송도국제도시 종합병원 '0곳'…조민경 인천시의원 '추가 유치 등 의료종합대책 시급'",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-14T01:21:04+09:00",
-      "sources": [
-        {
-          "title": "23만 송도국제도시 종합병원 '0곳'…조민경 인천시의원 '추가 유치 등 의료종합대책 시급'",
-          "publisher": "포커스인천",
-          "published_at": "2026-11-14T01:21:04+09:00",
-          "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE4xSURfUDlVS2xvYnUtVHRWTmtNSzRGZ0lEZ0hRLTd5TThOcG5uLVVudjJtZTJQcW1VNW9UOWE2dTluaVR4Zk5sUnU2RDdnb2hwc2FldWVKYllGellUeWlJUnZQZktvWXlrcml1aWxR0gFyQVVfeXFMTTJHaVM2d2M5YmtxbkVUdTBSWVZoRkJ6RXdiZHZ3OXF6emp6YTB3RG00TmViRmhQV3dORjNpVkxCaW91OWFsRm5GbFQ1anllX0VFUUVmVDlidzFFRjZfN1JlSTg3QjM4UWZrNXRFdmxwQWdB?oc=5"
-        }
-      ],
-      "summary_method": "headline_only"
     },
     {
       "id": "633189075d3429",
@@ -1495,6 +1453,28 @@
       "summary_method": "gemini_article",
       "summary_model": "gemini-3.5-flash-lite",
       "summary_source_url": "https://www.gokorea.kr/news/articleView.html?idxno=885384",
+      "summary_version": 3
+    },
+    {
+      "id": "5b003531694daf",
+      "category": "정책·규제",
+      "title": "홍지선 국토장관 \"주택·교통 함께 가야\"…철도망 확충 속도",
+      "summary": "홍지선 국토장관이 13일 국가철도망 구축계획 의견수렴 행사에서 주택공급과 철도망 확충 연계 방침을 발표했다.\n정부는 향후 10년간 3대 메가프로젝트 지원 철도망 구축과 ‘5극 3특’ 지역 연결 등 투자 확대를 검토한다.\n계획은 10년 동안 진행될 것이며 구체적 일정은 아직 확정되지 않았다.",
+      "verification": "Groq 기사 본문 요약 · 사실 미검증",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-13T11:03:05+09:00",
+      "sources": [
+        {
+          "title": "홍지선 국토장관 \"주택·교통 함께 가야\"…철도망 확충 속도",
+          "publisher": "더팩트",
+          "published_at": "2026-11-13T11:03:05+09:00",
+          "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE5MVHJiU3BZOVdZUUxJMk8tMS1raEhjMVdKY19hVF9tUy1rMGpSazVUdHRFMW40OWF3X1gxWGhwb2lPM1l1SHp0cTNuZmZMLWZpNzNQMG8yVUhWZ9IBVEFVX3lxTE5FNU9GcXk5M3NaMmxTenZsSS1RRGRybmxsVUZpaW9pS2FIWnpENEJEek9zTVFGYkRqN0dwTklJdUtnVFZ1bVJLeWczM1RaMEpNODBxWQ?oc=5"
+        }
+      ],
+      "summary_method": "groq_article",
+      "summary_model": "openai/gpt-oss-120b",
+      "summary_source_url": "https://news.tf.co.kr/read/economy/2388442.htm",
       "summary_version": 3
     },
     {
@@ -2054,7 +2034,7 @@
       "category": "송도 종합",
       "title": "채드윅송도국제학교 학생들, 연수구에 직접 담근 김치 240kg 기탁",
       "summary": "채드윅송도국제학교 학생들이 지역 내 취약계층을 위해 직접 담근 김치를 인천 연수구에 기탁했다.\n이번에 기탁된 물품은 10kg짜리 24박스를 합친 총 240kg 규모다.\n해당 기부 행사는 지난 10일에 진행되었으며 구는 전달받은 김치를 저소득 가정에 배분할 예정이다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 2,
       "publisher_count": 2,
       "last_published_at": "2026-11-12T15:38:15+09:00",
@@ -2600,6 +2580,28 @@
       "summary_version": 3
     },
     {
+      "id": "bfceb978236624",
+      "category": "정책·규제",
+      "title": "부채 느는 iH , 인천시 지원은 불과 30억··· 공공임대 주택기금 조성 제안",
+      "summary": "인천시가 iH 인천도시공사에 공공임대주택 공급 부담을 지우면서 일반회계 지원은 30억 원에 그친다고 지적했다.\niH 부채비율이 지난해 말 190.4%로 행정안전부 가이드라인 200%에 근접해 재정 부담이 크다.\n박흥석 의원은 iH 보조금을 출자금 전환 등으로 5천억 원 규모 기금 조성을 제안했지만 구체적 시행 일정은 아직 미정이다.",
+      "verification": "Groq 기사 본문 요약 · 사실 미검증",
+      "article_count": 1,
+      "publisher_count": 1,
+      "last_published_at": "2026-11-11T10:43:06+09:00",
+      "sources": [
+        {
+          "title": "부채 느는 iH , 인천시 지원은 불과 30억··· 공공임대 주택기금 조성 제안",
+          "publisher": "인천투데이",
+          "published_at": "2026-11-11T10:43:06+09:00",
+          "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTFBFWHlneno4T1FaSThSZ09vUldjZUlXS3NPSnYzbW9ReWJGcGV0RnNMTUZDNkZvSkR2Njh3LUl0dmwwQ1A5YTEwcUVQamFyNEVHMThUSDI5UXdqSTF5QnNhY0QtZlVUV18zeDdaelZoZjc?oc=5"
+        }
+      ],
+      "summary_method": "groq_article",
+      "summary_model": "openai/gpt-oss-120b",
+      "summary_source_url": "https://www.incheontoday.com/news/articleView.html?idxno=326212",
+      "summary_version": 3
+    },
+    {
       "id": "f7f4b0c55968f2",
       "category": "개발·교통",
       "title": "바이오·교육·의료 인프라 집결…송도 11공구, 새 주거 중심지로 부상",
@@ -3050,8 +3052,8 @@
       "id": "e1f0aa3096275e",
       "category": "송도 종합",
       "title": "인천 송도 유아 영어학원 앞에 불지르고 자해…60대男 체포",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
+      "summary": "인천 송도 유아 영어학원 앞에서 60대 남성이 불을 지르고 자해한 사건이 발생했다.\n현장에 있던 경찰이 신속히 진압하고 해당 남성을 체포했다.\n현재 남성은 구속 상태이며 사건 조사와 재판 일정이 진행 중이다.",
+      "verification": "Groq 기사 본문 요약 · 사실 미검증",
       "article_count": 2,
       "publisher_count": 2,
       "last_published_at": "2026-11-10T13:42:00+09:00",
@@ -3069,7 +3071,10 @@
           "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE1xdUduMTZlU2RRSTRtYVpab0pad1FtTjRZYzktRlNPeDR5OEVMbXlmUW16MkFBQUJvOGstdk1iZ01VWTIxX2FEbmw5UEh6VGtGRWhGMDZJby1vbGJDVnc?oc=5"
         }
       ],
-      "summary_method": "headline_only"
+      "summary_method": "groq_article",
+      "summary_model": "openai/gpt-oss-120b",
+      "summary_source_url": "https://www.donga.com/news/Society/article/all/20261110/134998508/2",
+      "summary_version": 3
     },
     {
       "id": "b2924dcb96eeb4",
@@ -3252,7 +3257,7 @@
       "category": "세금·대출",
       "title": "조정훈·이준석, 그때 빚내서 집 살걸 ‘초이노믹스’ 최경환, 이재명 정부 부동산 정책 정조준",
       "summary": "수도권 주거혁신포럼은 11월 11일 오전 10시 30분 국회의원회관 제9간담회의실에서 ‘그때 빚내서 집 살걸’ 주제로 제3차 세미나를 개최한다.\n최경환 전 경제부총리는 ‘이재명 정부 부동산 정책은 왜 실패하는가’를 주제로 특별강연을 진행한다.\n세미나 일정·시간·장소는 기사와 요약 모두 동일하게 11월 11일 오전 10시 30분 국회의원회관에서 열린다.",
-      "verification": "2개 AI 검토 · 사실 확인은 원문 기준",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-10T09:01:26+09:00",
@@ -3275,7 +3280,7 @@
       "category": "세금·대출",
       "title": "주담대 월급의 OO% 이하로 받으세요 | 연수원",
       "summary": "정부가 새로운 주택공급 후보지로 경기 하남 K컬처지구와 감일2지구를 선정했습니다.\n그린벨트로 묶인 이 지역들을 풀어 총 1만8500가구를 공급할 계획입니다.\n국민은행은 5일 신용보증기금 및 기술보증기금과 청년창업 금융지원 업무협약을 체결했습니다.",
-      "verification": "Gemini 기사 본문 요약 · 사실 미검증",
+      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
       "article_count": 1,
       "publisher_count": 1,
       "last_published_at": "2026-11-10T09:00:59+09:00",
@@ -3336,25 +3341,6 @@
       "summary_source_url": "https://www.mt.co.kr/amp/estate/2026/11/10/2026110914005183662",
       "summary_version": 3,
       "groq_reviewed": true
-    },
-    {
-      "id": "23e703e085dfeb",
-      "category": "정책·규제",
-      "title": "지원 vs 공급… 국토부·LH, 청년주거 주도권 '신경전' - 머니투데이",
-      "summary": "",
-      "verification": "기사 본문 요약 대기",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-10T04:10:00+09:00",
-      "sources": [
-        {
-          "title": "지원 vs 공급… 국토부·LH, 청년주거 주도권 '신경전' - 머니투데이",
-          "publisher": "머니투데이",
-          "published_at": "2026-11-10T04:10:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5NYTRSQkYwbXJjRGxhbzJJeWY1WUk4dms3VC0td1hwUWZLMlFkd0ZKdU9RT2hELXpsdUZTdFZZX0RZdlkwUHhEMmYyTjI5SklOSEJ6eVd4TThMVFFwcnNnTlVwUkZQeE4zVGhnazVFSdIBb0FVX3lxTE5NYTRSQkYwbXJjRGxhbzJJeWY1WUk4dms3VC0td1hwUWZLMlFkd0ZKdU9RT2hELXpsdUZTdFZZX0RZdlkwUHhEMmYyTjI5SklOSEJ6eVd4TThMVFFwcnNnTlVwUkZQeE4zVGhnazVFSQ?oc=5"
-        }
-      ],
-      "summary_method": "headline_only"
     },
     {
       "id": "1c24281a595097",
@@ -3629,31 +3615,18 @@
       "summary_model": "openai/gpt-oss-120b",
       "summary_source_url": "https://www.joongboo.com/news/articleView.html?idxno=363741861",
       "summary_version": 3
-    },
-    {
-      "id": "5f5763ecbcd6ca",
-      "category": "정책·규제",
-      "title": "[최정호 시장 숏폼 인터뷰⑥] “월세 1만원 청년주택 추진…2027년 국토부 공모 도전”",
-      "summary": "최정호 익산시장이 반도체 소부장 기업 증설에 대응해 월세 1만원 청년주택 사업을 추진한다.\n익산시가 전체 사업비의 약 5%만 부담하고 국토부와 HUG 등을 통해 재원을 마련할 구상이다.\n최 시장은 내년도에 국토부 공모에 신청해 선정되도록 하겠다고 밝혔다.",
-      "verification": "기사 본문 기반 AI 요약 · 최종 확인은 원문",
-      "article_count": 1,
-      "publisher_count": 1,
-      "last_published_at": "2026-11-09T04:51:00+09:00",
-      "sources": [
-        {
-          "title": "[최정호 시장 숏폼 인터뷰⑥] “월세 1만원 청년주택 추진…2027년 국토부 공모 도전”",
-          "publisher": "투데이안",
-          "published_at": "2026-11-09T04:51:00+09:00",
-          "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE9yRWRYN20yTkQ0NkxEaU5YU3RGcFhVNlh2cmo1VW8yV1JiNUZSbEJjLTd2alJld3duc0M2NkwzSlBtdHBsMHYwMEdvTGRYcUJaRVI0REZFSE5NMmRJM2Rkc0x4MXpob1Fpemc?oc=5"
-        }
-      ],
-      "summary_method": "gemini_article",
-      "summary_model": "gemini-3.5-flash-lite",
-      "summary_source_url": "https://www.todayan.com/news/articleView.html?idxno=636019",
-      "summary_version": 3
     }
   ],
   "articles": [
+    {
+      "title": "인천 송도1공구 국제 병원·K-뷰티 부지 ‘20년 넘게 방치’...사업 백지화 예고",
+      "publisher": "경기일보",
+      "published_at": "2026-11-16T06:02:11+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1zeHlpQV9WSkZpTGg4OVhsUExCbXRTOTVmRktfYXRwUzJ2c2pHV2xxU3g3cGZLdjNzbHY5WUtYTDB0ZWNKTXJDWUlzTnlZYnAxQ1B1V2hEbzRBdzg?oc=5",
+      "category": "개발·교통",
+      "query": "송도 11공구",
+      "id": "e01c55828c7ae15621"
+    },
     {
       "title": "인천 송도 ‘털 빠진 너구리’ 출몰에 불안 고조",
       "publisher": "국민일보",
@@ -3714,17 +3687,8 @@
       "published_at": "2026-11-15T18:41:00+09:00",
       "link": "https://news.google.com/rss/articles/CBMilwJBVV95cUxOTWpQNzVQMkxGemo4NkdtR3o2dUNNU1NTZ0FweEZmN1FYaTVhS0pzaUFtM194elVFS05hZm1fLWV4Q1EyemZkR3NMNnRHdU5zRzVKSDBhN3Q0WHNxRTZ6Z0dJWXlfc0Z6M2gwUEJ2RGtGVG9TMlpBZVBMQkZvcW9STlpwLS1KQW5aaEU2MXM5LUxIRndqM1VKc3NEOG1OZTIwTGxHNndKRkVwOUUwVUtHd09PVWRKOE02N25fZW5YVXhsM0kySHZFVGJWMlItVmo0TFB4RkpOLXA5S1gyQUdxNlo2clBpWVYwc0FfVU1VZHpUX1RfUkNGQklib095LTg0aFRnUUlOOGlHUVJaM29TSG9sMERNWms?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도동",
+      "query": "인천 송도",
       "id": "c9af0bc79371d2c297"
-    },
-    {
-      "title": "인천 송도 1공구 방치 장기화…차병원 좌초에 K-뷰티 부지 표류까지",
-      "publisher": "경기일보",
-      "published_at": "2026-11-15T18:05:08+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1zeHlpQV9WSkZpTGg4OVhsUExCbXRTOTVmRktfYXRwUzJ2c2pHV2xxU3g3cGZLdjNzbHY5WUtYTDB0ZWNKTXJDWUlzTnlZYnAxQ1B1V2hEbzRBdzg?oc=5",
-      "category": "개발·교통",
-      "query": "송도 11공구",
-      "id": "ccb3c41fac8acaeba6"
     },
     {
       "title": "송도국제도시, 진드기 감염 너구리 속출",
@@ -3761,24 +3725,6 @@
       "category": "정책·규제",
       "query": "국토교통부 주택 정책",
       "id": "e5836ac3d730619c84"
-    },
-    {
-      "title": "인천 송도 곳곳서 털 빠진 너구리 출몰…개선충 감염 신고 잇따라",
-      "publisher": "세계일보",
-      "published_at": "2026-11-15T16:00:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE8zTzdONUlrZjRuSlp5aHFPOUt2Zl9RS0dFek10Tk1sWmNqbnFaRWFOT1AwYTBRb2k0dmExMGdsMUpFSFZmVEVvM2tHZVlVWUJvYWxBV0VfdzA1Rm1RemhXM1E5TXRBRmF5REJJ0gFUQVVfeXFMT1E5N1F0Z2pzZ0JBeWYxeHlEQ2dpZ1BhVmdkdTk3ZUVQdGc3Z2xWX3hfcnJxVG00OFZTa3JYenhlMzJjRVdkVmI1YUhiOUgxbm5nZXo4?oc=5",
-      "category": "송도 종합",
-      "query": "인천 연수구 송도",
-      "id": "1b79afadcd8a5efaed"
-    },
-    {
-      "title": "인천 송도 곳곳서 털 빠진 야생 너구리 출현…“거리 유지” 당부",
-      "publisher": "한겨레",
-      "published_at": "2026-11-15T15:51:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBzNWhjRlJFUWdVV3FudzdEYnNNcVQ3MkVKOFJ4aHBmZW9LbVFrYVFNazZWZ3BMZzFMWjlqVFp6MzFMUHZpMmpLc2VyR2lZLWxaeVRwWm91LUV2SDZEdjZGeXNEbw?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도",
-      "id": "e1d5ae17992319648d"
     },
     {
       "title": "“사람도 전염”…인천 송도 곳곳서 ‘털 빠진 너구리’ 출몰, 뭔일",
@@ -3849,7 +3795,7 @@
       "published_at": "2026-11-15T13:51:21+09:00",
       "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE4yNUxZUXJvSElmdUlwWUprSFpoX2g3bV9qckxKeW1DakpVME1ndjgxb1BfNmdxeUNYaksxeUVFU3QwankxcEdONVZWRGFXRUdIUE9Ya1JXWDQ0YnlncHhHS1AxTHBoeHNjRmN2WQ?oc=5",
       "category": "송도 종합",
-      "query": "\"송도국제도시\"",
+      "query": "인천 송도",
       "id": "3a865e619f57938c8c"
     },
     {
@@ -3964,7 +3910,7 @@
       "title": "온몸에 털 빠진 너구리 인천 송도 곳곳서 발견… 개선충 사람에도 옮겨 비상",
       "publisher": "세계일보",
       "published_at": "2026-11-15T11:06:11+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE5sVFktOEw0d2hINEV4cHZvSnRNbHhWUTkweUV3VWJHOTgtdzBfT3pIYlZHNnU0WDNSYTN5TmVEb1lUalR0YnBXQlBKbWtHaDVCd2JhWtIBVEFVX3lxTE5sVFktOEw0d2hINEV4cHZvSnRNbHhWUTkweUV3VWJHOTgtdzBfT3pIYlZHNnU0WDNSYTN5TmVEb1lUalR0YnBXQlBKbWtHaDVCd2JhWg?oc=5",
+      "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTFBOYTkwYm9WbUFTeGhfaXFXUHZUMzJMUTZVYThQVHBuUlpsUWU4VjF3c3dvY0o5Slgzc2NZanU2RjZvN1BjemRYZi1ISXNEZ19GZjBmTU55eXfSAVRBVV95cUxObFRZLThMNHdoSDRFeHB2b0p0TWx4VlE5MHlFd1ViRzk4LXcwX096SGJWRzZ1NFgzUmEzeU5lRG9ZVGpUdGJwV0JQSm1rR2g1QndiYVo?oc=5",
       "category": "송도 종합",
       "query": "인천 송도",
       "id": "f72e4ff79c420f239e"
@@ -4002,14 +3948,14 @@
       "published_at": "2026-11-15T10:24:09+09:00",
       "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOVEplY2lfZlZlWWpFTDloeFFMMFVMVnJOWnRwcFlndTd1NzZ1YVQ1RVZyRFpCemtXXy1nVnNuc1UxclNtVkloUWs2akVReXBwV3d1cmw5SXBGMU5BYWxDY1AxZmQtZ1ExWVFZb2hvRnVNd1N5Xzc0Q2d0Y3ZzUVZjVUVpU0VhNHA3QnEtbkVZYw?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도 주민 생활",
+      "query": "인천 송도",
       "id": "d037dc58cb41cfd095"
     },
     {
       "title": "인천 송도 곳곳서 털 빠진 너구리 잇따라 발견…개선충 확산 우려",
       "publisher": "동아일보",
       "published_at": "2026-11-15T10:19:15+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTFAwSU5tMXRoY2VrWE01ZmNSWHNEa3FlM0RscjZ5Vk9SNHRsRkgzYlRMQzBiaVEzWmFuM1FCVFI5UjMyQUlNcHE4WWY4UzRBUFFPcC0wN2h2Qnd5bnFhcTZ0TVNXYm1Bd9IBZkFVX3lxTFAwSU5tMXRoY2VrWE01ZmNSWHNEa3FlM0RscjZ5Vk9SNHRsRkgzYlRMQzBiaVEzWmFuM1FCVFI5UjMyQUlNcHE4WWY4UzRBUFFPcC0wN2h2Qnd5bnFhcTZ0TVNXYm1Bdw?oc=5",
+      "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE1DV25ETHF2NndtX1VnVk92NHZfa3pJaGhvdHhnTGN2VG5mS0RuemRvS3Vtc2hlMGRkQ3gxRHJJVnpwSGVZQWVEb2lQNC1aeDFta21VLVh5Zkd3TUNRWFVrRWpfd2VzOGZtRzVZMmFKLTkxYzRGU1HSAWZBVV95cUxQMElObTF0aGNla1hNNWZjUlhzRGtxZTNEbHI2eVZPUjR0bEZIM2JUTEMwYmlRM1phbjNRQlRSOVIzMkFJTXBxOFlmOFM0QVBRT3AtMDdodkJ3eW5xYXE2dE1TV2JtQXc?oc=5",
       "category": "송도 종합",
       "query": "인천 송도",
       "id": "8475a711668d829182"
@@ -4069,6 +4015,15 @@
       "id": "e55f745ee1c1d06cd9"
     },
     {
+      "title": "인천 송도서 온몸 털 빠진 너구리 잇따라 발견…감염 우려 확산",
+      "publisher": "진일보 | 전남일보",
+      "published_at": "2026-11-15T08:51:11+09:00",
+      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBxUm9NdXMtOG1pT3BwOUp6MlpuQVpUUF9POW5iRjJlbnVMZ1RrS3JkMjZiRGtuZE5Jc0JQeGxBMEo4UHQ3SldpOVRxSFdWUE9tejlubUlWaW85MF9BS3czTC0wcVJwWUVnUV96Y1VTaw?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도",
+      "id": "ce82b08af1f0406149"
+    },
+    {
       "title": "“털 빠진 너구리 조심하세요”…인천 송도 곳곳서 발견, 학교도 비상",
       "publisher": "전자신문",
       "published_at": "2026-11-15T08:43:26+09:00",
@@ -4112,6 +4067,15 @@
       "category": "정책·규제",
       "query": "인천 부동산 규제",
       "id": "b3b6729328343f18d7"
+    },
+    {
+      "title": "인천시의회 조민경 의원, 종합병원 한 곳 없는 송도 의료종합대책 촉구",
+      "publisher": "일간투데이",
+      "published_at": "2026-11-15T06:05:00+09:00",
+      "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE81YnU0TDZCVnk4OFFWYVRUVTZhMXV6a2ZrYmZMUHNia21yQ2ZDSUxnYTNtenNxVGl3NFcyWVJnY3pRS3pHb2JkZ2tYc0JFeDAxQ1hwSERjcncwOWsxenc2Z0JCUmh1X3BLMVVz?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도",
+      "id": "dc87d0876ae72a8f4f"
     },
     {
       "title": "\"니탓\" \"네탓\" 서울시·국토부, 도심공공주택복합사업 두고 '으르렁'",
@@ -4195,15 +4159,6 @@
       "id": "527226801cd9a67d93"
     },
     {
-      "title": "인천시의회 이강구 의원, 송도 6공구 핵심 공공시설 계획 변경·지연 질타",
-      "publisher": "뉴스피크",
-      "published_at": "2026-11-14T09:57:49+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE00MmdLc05FYTU3bG1PLWpWVnk4V2FEYUczdmxSc1paNnVSUExfS1labndYUWVsWXVTb2JURXdZTGk1M0ZBZVY3bmJiamZjbWM4bFpYN1dsNWFEREpRU0l0aVJtVkVuVzlL?oc=5",
-      "category": "송도 종합",
-      "query": "인천 송도 문화 축제",
-      "id": "120d8df5bb35f42cf8"
-    },
-    {
       "title": "3분기 경기·인천 아파트 ‘거래 급감’… 규제·금리에 눌렸다",
       "publisher": "경인일보",
       "published_at": "2026-11-14T08:56:00+09:00",
@@ -4218,7 +4173,7 @@
       "published_at": "2026-11-14T08:48:05+09:00",
       "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE9Ld05XRGh0QXpLRzhSQXhEcHBhcUdRYjRra0xPQW03dXFrVVhuUGJEZkFIbDJuSzRYUHBEaHJyc1FxUGhTUFg5dmpMVnRtRlA2TXFnVjllaGUtN2RJZkJTZlAtV2tIU2x6R0Nn?oc=5",
       "category": "송도 종합",
-      "query": "\"송도국제도시\"",
+      "query": "인천 송도",
       "id": "7df1829202d6095422"
     },
     {
@@ -4303,6 +4258,15 @@
       "id": "67d0fbd270ef8a75f8"
     },
     {
+      "title": "인천시의회 이강구 의원, 송도 6공구 핵심 공공시설 계획 변경·지연 강력 질타",
+      "publisher": "경기매일",
+      "published_at": "2026-11-13T17:50:33+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE5RcUlwNVd0aEpiTTJ4dEdQTHNSY3FuaHYyS0F1SWRpME5SbFk1VWNHaWpreEJvLVBtWnBtM1lxLVVNMTFBV0t5MWFPbFhZX1dqVkU1dmdLRVd6bUl4U2J0WmoybU55MW8?oc=5",
+      "category": "송도 종합",
+      "query": "인천 송도 문화 축제",
+      "id": "2827c0c6d4f6dc1903"
+    },
+    {
       "title": "인천시의회 조민경 의원, 송도에 의료종합대책 마련 촉구",
       "publisher": "뉴스피크",
       "published_at": "2026-11-13T17:36:41+09:00",
@@ -4378,9 +4342,9 @@
       "title": "송도 글로벌 특화병원 유치 무산…\"추가 종합병원 필요\"",
       "publisher": "뉴시스",
       "published_at": "2026-11-13T15:02:05+09:00",
-      "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBRWnN5aUpaTUNVWnl1WDYtNF9SN1ZsTTM3SzVkZlJvdjlVNlpsdmV4ekJqUzR3cXhtMi1YSENHTWlOYmFpQ3V2azhEdTAxdjNERzU2eDg1THBSb1JSWXFROWM5Z2lZOTdJdWxPMTVPQURhNUZYTXpLcNIBeEFVX3lxTFBRWnN5aUpaTUNVWnl1WDYtNF9SN1ZsTTM3SzVkZlJvdjlVNlpsdmV4ekJqUzR3cXhtMi1YSENHTWlOYmFpQ3V2azhEdTAxdjNERzU2eDg1THBSb1JSWXFROWM5Z2lZOTdJdWxPMTVPQURhNUZYTXpLcA?oc=5",
+      "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5oMlB5WDViU3NmaEZPZHFxM1dScEotTVZlbTF3UjRudkRCOURLWFhsTFlFUG1xYUZrYU1LWTg0Z0lncm1fZEtWdjZ5aEFjRW5DTS1qWllfUmdSZkNhQWxaOdIBeEFVX3lxTFBRWnN5aUpaTUNVWnl1WDYtNF9SN1ZsTTM3SzVkZlJvdjlVNlpsdmV4ekJqUzR3cXhtMi1YSENHTWlOYmFpQ3V2azhEdTAxdjNERzU2eDg1THBSb1JSWXFROWM5Z2lZOTdJdWxPMTVPQURhNUZYTXpLcA?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도",
+      "query": "인천 송도동",
       "id": "080ff39b1e1aa3303a"
     },
     {
@@ -4427,6 +4391,15 @@
       "category": "송도 종합",
       "query": "\"송도국제도시\"",
       "id": "8c2d8427b6be63a403"
+    },
+    {
+      "title": "홍지선 국토장관 \"주택·교통 함께 가야\"…철도망 확충 속도",
+      "publisher": "더팩트",
+      "published_at": "2026-11-13T11:03:05+09:00",
+      "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE5MVHJiU3BZOVdZUUxJMk8tMS1raEhjMVdKY19hVF9tUy1rMGpSazVUdHRFMW40OWF3X1gxWGhwb2lPM1l1SHp0cTNuZmZMLWZpNzNQMG8yVUhWZ9IBVEFVX3lxTE5FNU9GcXk5M3NaMmxTenZsSS1RRGRybmxsVUZpaW9pS2FIWnpENEJEek9zTVFGYkRqN0dwTklJdUtnVFZ1bVJLeWczM1RaMEpNODBxWQ?oc=5",
+      "category": "정책·규제",
+      "query": "국토교통부 주택 정책",
+      "id": "65c6dfb698dff11176"
     },
     {
       "title": "송도국제도시 15년 방치된 땅, 결국 환수 조치된다",
@@ -4506,7 +4479,7 @@
       "published_at": "2026-11-13T03:50:00+09:00",
       "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE1ZYmhfT255TWhRWGtkTXJlN1RkNVhWQ0JhVmd0X3Z1VUdHWm1IMmlOSW9wNXpqZDJ6dXhmN2g1YkQ0VlNtREdMSVpFc2FiOU1ROGZ0YWR1OUEzQnJoa1I0dzh4Si1UUG1RbnlF?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도",
+      "query": "인천 송도동",
       "id": "fbb20fe2026a83ace7"
     },
     {
@@ -4632,7 +4605,7 @@
       "published_at": "2026-11-12T20:30:29+09:00",
       "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE16MjEyZS1sN1hGbmY0TnlKbm1XX2J5X0F2c0tyaUxRekNYLXZPeWx3YzF5RlJCZ0REZGlhU3hYRXZITURWT2t4QUx2bTU3cmg3dWo2dU4weXplMXJhWHRxazl5SnDSAWhBVV95cUxOU3lnbUpfUWU0cGdTcC16c0dMWnhUbldkcDR3clFnT2NIek5LOVUxdzVZOGowQmVQTDBNRC00NWE3XzhXUWRRbkN6WVJOWnJyUGozLVNRcmJpbXRWTVhrU256UHNTdjJSNw?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도",
+      "query": "인천 송도동",
       "id": "6d7e09bef849ced231"
     },
     {
@@ -4974,7 +4947,7 @@
       "published_at": "2026-11-12T11:34:18+09:00",
       "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTFBGOVZQNXQtc19wNmVKaVJ1MXBkMzV6Zk9hcUlId3gwMk5XNkF6RGMxX3lEWDYwQlJTSTM3SFU0YUZ0ckx0UWQ4SlB6bkpXZWpFNE83Wks5eGdaUHJVV2tlRUxHMDZRWVZ3V1hNOWFIT3c?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도",
+      "query": "인천 송도동",
       "id": "a7cffed6f5a4fd1076"
     },
     {
@@ -5248,6 +5221,15 @@
       "id": "008e9afe1139b75873"
     },
     {
+      "title": "부채 느는 iH , 인천시 지원은 불과 30억··· 공공임대 주택기금 조성 제안",
+      "publisher": "인천투데이",
+      "published_at": "2026-11-11T10:43:06+09:00",
+      "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTFBFWHlneno4T1FaSThSZ09vUldjZUlXS3NPSnYzbW9ReWJGcGV0RnNMTUZDNkZvSkR2Njh3LUl0dmwwQ1A5YTEwcUVQamFyNEVHMThUSDI5UXdqSTF5QnNhY0QtZlVUV18zeDdaelZoZjc?oc=5",
+      "category": "정책·규제",
+      "query": "국토교통부 주택 정책",
+      "id": "89798c9987414de750"
+    },
+    {
       "title": "바이오·교육·의료 인프라 집결…송도 11공구, 새 주거 중심지로 부상",
       "publisher": "핀포인트뉴스",
       "published_at": "2026-11-11T09:29:42+09:00",
@@ -5325,7 +5307,7 @@
       "published_at": "2026-11-10T19:42:16+09:00",
       "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE5lU2VqRFpQZTJHNEZkaUlvaDdqUlBadGxOa3hpWjl6WUlod3owblhxRlB1T19vZ1M5MWxwVG11UXctU3M3NWtLSFdPelpwemRPREcyTA?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도",
+      "query": "인천 송도동",
       "id": "3d348a0b25f415c858"
     },
     {
@@ -5487,7 +5469,7 @@
       "published_at": "2026-11-10T13:30:00+09:00",
       "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTFBIcmtLVlNNWEdaZ2gyWVgwR1lMcEpVRGNacUlxc253aEZYbkVSWTZxbFV2X3FCWTVLalRRNGZFbWROZG9fSTJjQWh4YVpEOE04M2tqemhHd1pmSmxQbGJIM2hQSURoXzNmN2hjbVBWN1U?oc=5",
       "category": "송도 종합",
-      "query": "인천 송도",
+      "query": "인천 송도동",
       "id": "acfc82b8ec53413094"
     },
     {
@@ -5606,15 +5588,6 @@
       "category": "정책·규제",
       "query": "국토교통부 주택 정책",
       "id": "5fbe15c964e02d55ea"
-    },
-    {
-      "title": "지원 vs 공급… 국토부·LH, 청년주거 주도권 '신경전' - 머니투데이",
-      "publisher": "머니투데이",
-      "published_at": "2026-11-10T04:10:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5NYTRSQkYwbXJjRGxhbzJJeWY1WUk4dms3VC0td1hwUWZLMlFkd0ZKdU9RT2hELXpsdUZTdFZZX0RZdlkwUHhEMmYyTjI5SklOSEJ6eVd4TThMVFFwcnNnTlVwUkZQeE4zVGhnazVFSdIBb0FVX3lxTE5NYTRSQkYwbXJjRGxhbzJJeWY1WUk4dms3VC0td1hwUWZLMlFkd0ZKdU9RT2hELXpsdUZTdFZZX0RZdlkwUHhEMmYyTjI5SklOSEJ6eVd4TThMVFFwcnNnTlVwUkZQeE4zVGhnazVFSQ?oc=5",
-      "category": "정책·규제",
-      "query": "국토교통부 주택 정책",
-      "id": "f5fac574ae1b9136cd"
     },
     {
       "title": "대광건영 · 모아건설산업, ‘송도 대광로제비앙 모아엘가’ 11월 분양",
@@ -5750,87 +5723,65 @@
       "category": "개발·교통",
       "query": "송도 GTX-B",
       "id": "1c94230af6c65ed539"
-    },
-    {
-      "title": "[최정호 시장 숏폼 인터뷰⑥] “월세 1만원 청년주택 추진…2027년 국토부 공모 도전”",
-      "publisher": "투데이안",
-      "published_at": "2026-11-09T04:51:00+09:00",
-      "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE9yRWRYN20yTkQ0NkxEaU5YU3RGcFhVNlh2cmo1VW8yV1JiNUZSbEJjLTd2alJld3duc0M2NkwzSlBtdHBsMHYwMEdvTGRYcUJaRVI0REZFSE5NMmRJM2Rkc0x4MXpob1Fpemc?oc=5",
-      "category": "정책·규제",
-      "query": "국토교통부 주택 정책",
-      "id": "4625f9eba82a8ea4ff"
     }
   ],
   "counts": {
-    "briefs": 149,
+    "briefs": 146,
     "articles": 234
   },
   "ai_summary_stats": {
-    "created": 4,
-    "reused": 125,
-    "article_fetches": 22,
-    "source_links_resolved": 22,
-    "body_readable": 8,
-    "gemini_requests": 4,
-    "retry_requests": 2,
+    "created": 3,
+    "reused": 124,
+    "article_fetches": 25,
+    "source_links_resolved": 25,
+    "body_readable": 12,
+    "gemini_requests": 6,
+    "retry_requests": 4,
     "retry_strategy": "two_article_batch",
     "gemini_circuit": "open",
-    "candidate_articles": 6,
-    "groq_created": 1,
-    "groq_requests": 2,
-    "groq_reviewed": 1,
-    "awaiting_body": 19,
-    "gemini_http_requests_total": 5
+    "candidate_articles": 8,
+    "groq_created": 4,
+    "groq_requests": 3,
+    "groq_reviewed": 0,
+    "awaiting_body": 15,
+    "gemini_http_requests_total": 7
   },
   "ai_office_digest_stats": {
     "state": "created",
-    "count": 3,
+    "count": 2,
     "method": "gemini"
   },
   "ai_office_digest": {
     "schema_version": 1,
     "prompt_version": 2,
-    "fingerprint": "0a572d057c0a6b7aa2e36bbd6e0034e9",
-    "generated_at": "2026-11-15T18:50:39.289344+00:00",
+    "fingerprint": "5db6187bad32fab1287acf6c1d98f29e",
+    "generated_at": "2026-11-15T21:45:36.449228+00:00",
     "model": "gemini-3.5-flash-lite",
     "method": "gemini",
     "items": [
       {
-        "id": "64c78d6c037d81",
-        "point": "신공장 건설에는 약 350억 원이 투입되며 연구시설과 테스트 소켓 생산시설이 들어선다.",
-        "evidence": "신공장 건설에는 약 350억 원이 투입되며 연구시설과 테스트 소켓 생산시설이 들어선다.",
-        "check": "송도 지식정보산업단지 내 아이에스시 신공장 구축 사업의 2027년 말 준공 및 2028년 가동 일정에 따른 인근 지역 고용 창출 및 주거 수요 변화를 확인하시겠습니까?",
-        "audiences": [
-          "매수",
-          "임대"
-        ],
-        "questions": [
-          "해당 신공장 건설로 인해 인근 부동산 시장에 미치는 영향에 대해 추가로 문의할 사항이 있습니까?"
-        ]
-      },
-      {
         "id": "7c19888ee15db2",
-        "point": "인천 송도자이 더 스타가 11월 16일 전용 151㎡형 잔여 1세대의 무순위 청약을 진행한다.",
-        "evidence": "인천 송도자이 더 스타가 11월 16일 전용 151㎡형 잔여 1세대의 무순위 청약을 진행한다.",
-        "check": "송도자이 더 스타 잔여 1세대 무순위 청약 공급금액과 발코니 확장 및 유상 옵션을 합산한 총 계약 대상 금액이 25억4470만원임을 확인하시겠습니까?",
+        "point": "공급금액과 발코니 확장 및 유상 옵션을 합산한 총 계약 대상 금액은 25억4470만원이다.",
+        "evidence": "공급금액과 발코니 확장 및 유상 옵션을 합산한 총 계약 대상 금액은 25억4470만원이다.",
+        "check": "송도자이 더 스타 무순위 1세대 청약과 관련하여 발코니 확장 및 유상 옵션 비용이 포함된 정확한 총 계약 금액 조건을 확인해야 합니다.",
         "audiences": [
           "매수"
         ],
         "questions": [
-          "당첨자 발표일인 19일 이후 24일 서울 대치동 자이갤러리에서 진행되는 계약 일정을 다시 한번 확인하시겠습니까?"
+          "당첨자 발표일 이후 서울 대치동 자이갤러리에서 진행되는 계약일정을 문의합니다."
         ]
       },
       {
         "id": "3ae58928d3f90b",
         "point": "연수구 송도더샵퍼스트파크 전용 84㎡는 신규 계약 5건 중 4건의 보증금이 5억원을 넘었다.",
         "evidence": "연수구 송도더샵퍼스트파크 전용 84㎡는 신규 계약 5건 중 4건의 보증금이 5억원을 넘었다.",
-        "check": "송도더샵퍼스트파크 전용 84㎡ 신규 임대차 계약 시 보증금 현황과 향후 입주 물량 부족에 따른 전세 시장 동향을 확인하시겠습니까?",
+        "check": "송도 지역 아파트의 최근 전세 신규 계약 보증금 동향과 향후 입주 물량 부족에 따른 임대차 계약 조건을 확인해야 합니다.",
         "audiences": [
-          "임차",
-          "임대"
+          "임대",
+          "임차"
         ],
         "questions": [
-          "올해와 2027년 송도 지역의 예상 입주 물량 부족이 임대차 계약 조건에 미치는 영향에 대해 문의하시겠습니까?"
+          "향후 송도 지역의 예상 입주 물량 및 전세 시장 변동성에 따른 추가 보증금 변동 여부를 문의합니다."
         ]
       }
     ],
