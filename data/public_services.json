@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "state": "awaiting_approval",
-  "updated_at": "2026-11-15T08:38:28+0900",
+  "updated_at": "2026-11-16T06:54:04+0900",
   "note": "신청·인증 전에는 빈 배열을 실제 조회 0건으로 해석하지 않습니다. 학구도와 가까운 학교를 배정학교로 자동 판단하지 않습니다. 키는 GitHub Secrets에만 보관.",
   "schools": {
     "state": "awaiting_key",
@@ -18,12 +18,12 @@
   },
   "building_registry": {
     "state": "verified",
-    "updated_at": "2026-10-23T01:32:51.725612+00:00",
+    "updated_at": "2026-11-15T21:47:01.023209+00:00",
     "source_url": "https://www.data.go.kr/data/15134735/openapi.do",
     "note": "송도동 법정동/지번과 K-apt 공식 단지코드, 건축물대장 표제부 주용도·주소 검증을 통과한 건물 정보만 표시. 단지 내 미일치 동은 표시하지 않음.",
     "scanned": 77,
     "eligible": 77,
-    "failures": 1,
+    "failures": 9,
     "records": [
       {
         "complex_id": "kapt-a10020270",
@@ -58,6 +58,204 @@
             "name": "8단지",
             "ground_floors": 20,
             "approval_date": "2010-11-19"
+          }
+        ]
+      },
+      {
+        "complex_id": "kapt-a10020527",
+        "kapt_code": "A10020527",
+        "summary": "건축물대장 표제부 37건 확인 · 주용도 공동주택 · 사용승인 2025-07-10 · 확인 건물 최고 지상 36층",
+        "title_count": 37,
+        "approval_date": "2025-07-10",
+        "top_ground_floor": 36,
+        "purposes": [
+          "공동주택"
+        ],
+        "buildings": [
+          {
+            "name": "437동",
+            "ground_floors": 1,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "436동",
+            "ground_floors": 20,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "435동",
+            "ground_floors": 0,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "434동",
+            "ground_floors": 1,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "433동",
+            "ground_floors": 1,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "432동",
+            "ground_floors": 0,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "431동",
+            "ground_floors": 33,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "430동",
+            "ground_floors": 31,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "421동",
+            "ground_floors": 1,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "420동",
+            "ground_floors": 1,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "411동",
+            "ground_floors": 24,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "408동",
+            "ground_floors": 32,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "401동",
+            "ground_floors": 36,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "410동",
+            "ground_floors": 27,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "407동",
+            "ground_floors": 36,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "404동",
+            "ground_floors": 31,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "406동",
+            "ground_floors": 35,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "403동",
+            "ground_floors": 33,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "413동",
+            "ground_floors": 0,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "409동",
+            "ground_floors": 29,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "402동",
+            "ground_floors": 34,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "414동",
+            "ground_floors": 1,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "412동",
+            "ground_floors": 28,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "415동",
+            "ground_floors": 1,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "405동",
+            "ground_floors": 34,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "416동",
+            "ground_floors": 0,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "417동",
+            "ground_floors": 0,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "418동",
+            "ground_floors": 0,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "419동",
+            "ground_floors": 0,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "429동",
+            "ground_floors": 1,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "422동",
+            "ground_floors": 1,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "423동",
+            "ground_floors": 0,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "428동",
+            "ground_floors": 1,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "427동",
+            "ground_floors": 1,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "426동",
+            "ground_floors": 0,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "425동",
+            "ground_floors": 1,
+            "approval_date": "2025-07-10"
+          },
+          {
+            "name": "424동",
+            "ground_floors": 1,
+            "approval_date": "2025-07-10"
           }
         ]
       },
@@ -452,129 +650,6 @@
             "name": "107동",
             "ground_floors": 33,
             "approval_date": "2025-02-25"
-          }
-        ]
-      },
-      {
-        "complex_id": "kapt-a10021000",
-        "kapt_code": "A10021000",
-        "summary": "건축물대장 표제부 22건 확인 · 주용도 공동주택 · 사용승인 2024-12-27 · 확인 건물 최고 지상 44층",
-        "title_count": 22,
-        "approval_date": "2024-12-27",
-        "top_ground_floor": 44,
-        "purposes": [
-          "공동주택"
-        ],
-        "buildings": [
-          {
-            "name": "103동",
-            "ground_floors": 43,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "108동",
-            "ground_floors": 44,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "109동",
-            "ground_floors": 12,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "213동",
-            "ground_floors": 0,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "212동",
-            "ground_floors": 0,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "102동",
-            "ground_floors": 44,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "208동",
-            "ground_floors": 1,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "203동",
-            "ground_floors": 1,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "211동",
-            "ground_floors": 0,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "204동",
-            "ground_floors": 1,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "107동",
-            "ground_floors": 44,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "202동",
-            "ground_floors": 1,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "206동",
-            "ground_floors": 1,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "104동",
-            "ground_floors": 43,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "101동",
-            "ground_floors": 44,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "106동",
-            "ground_floors": 36,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "209동",
-            "ground_floors": 0,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "210동",
-            "ground_floors": 37,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "205동",
-            "ground_floors": 1,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "105동",
-            "ground_floors": 44,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "207동",
-            "ground_floors": 1,
-            "approval_date": "2024-12-27"
-          },
-          {
-            "name": "201동",
-            "ground_floors": 0,
-            "approval_date": "2024-12-27"
           }
         ]
       },
@@ -1679,204 +1754,6 @@
             "name": "110동",
             "ground_floors": 0,
             "approval_date": "2020-07-16"
-          }
-        ]
-      },
-      {
-        "complex_id": "kapt-a10024779",
-        "kapt_code": "A10024779",
-        "summary": "건축물대장 표제부 37건 확인 · 주용도 공동주택 · 사용승인 2020-07-13 · 확인 건물 최고 지상 38층",
-        "title_count": 37,
-        "approval_date": "2020-07-13",
-        "top_ground_floor": 38,
-        "purposes": [
-          "공동주택"
-        ],
-        "buildings": [
-          {
-            "name": "205동(주민공동시설4)",
-            "ground_floors": 0,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "210동(지하주차장)",
-            "ground_floors": 0,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "122동",
-            "ground_floors": 29,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "203동(주민공동시설2)",
-            "ground_floors": 2,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "207동(경비실-2)",
-            "ground_floors": 1,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "104동",
-            "ground_floors": 34,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "202동(주민공동시설1)",
-            "ground_floors": 1,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "115동",
-            "ground_floors": 29,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "111동",
-            "ground_floors": 36,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "116동",
-            "ground_floors": 29,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "106동",
-            "ground_floors": 35,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "123동",
-            "ground_floors": 34,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "103동",
-            "ground_floors": 38,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "201동(경로당)",
-            "ground_floors": 1,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "211동(외부계단)",
-            "ground_floors": 1,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "109동",
-            "ground_floors": 34,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "105동",
-            "ground_floors": 38,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "208동(저류조관리층)",
-            "ground_floors": 0,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "120동",
-            "ground_floors": 38,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "110동",
-            "ground_floors": 34,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "117동",
-            "ground_floors": 38,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "209동(기계,전기실)",
-            "ground_floors": 0,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "113동",
-            "ground_floors": 35,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "101동",
-            "ground_floors": 38,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "119동",
-            "ground_floors": 38,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "107동",
-            "ground_floors": 38,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "201동(어린이집)",
-            "ground_floors": 1,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "114동",
-            "ground_floors": 35,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "102동",
-            "ground_floors": 38,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "112동",
-            "ground_floors": 35,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "121동",
-            "ground_floors": 29,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "124동",
-            "ground_floors": 8,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "204동(주민공동시설3)",
-            "ground_floors": 1,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "206동(경비실-1)",
-            "ground_floors": 1,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "108동",
-            "ground_floors": 36,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "125동",
-            "ground_floors": 28,
-            "approval_date": "2020-07-13"
-          },
-          {
-            "name": "118동",
-            "ground_floors": 38,
-            "approval_date": "2020-07-13"
           }
         ]
       },
@@ -3270,197 +3147,6 @@
         ]
       },
       {
-        "complex_id": "kapt-a10027367",
-        "kapt_code": "A10027367",
-        "summary": "건축물대장 표제부 14건 확인 · 주용도 공동주택 · 사용승인 2016-08-25 · 확인 건물 최고 지상 41층",
-        "title_count": 14,
-        "approval_date": "2016-08-25",
-        "top_ground_floor": 41,
-        "purposes": [
-          "공동주택"
-        ],
-        "buildings": [
-          {
-            "name": "경비실2",
-            "ground_floors": 1,
-            "approval_date": "2016-08-25"
-          },
-          {
-            "name": "203",
-            "ground_floors": 41,
-            "approval_date": "2016-08-25"
-          },
-          {
-            "name": "주민공동시설,관리사무소",
-            "ground_floors": 2,
-            "approval_date": "2016-08-25"
-          },
-          {
-            "name": "202",
-            "ground_floors": 41,
-            "approval_date": "2016-08-25"
-          },
-          {
-            "name": "재활용창고",
-            "ground_floors": 1,
-            "approval_date": "2016-08-25"
-          },
-          {
-            "name": "208",
-            "ground_floors": 32,
-            "approval_date": "2016-08-25"
-          },
-          {
-            "name": "경비실3",
-            "ground_floors": 1,
-            "approval_date": "2016-08-25"
-          },
-          {
-            "name": "204",
-            "ground_floors": 41,
-            "approval_date": "2016-08-25"
-          },
-          {
-            "name": "경비실1",
-            "ground_floors": 1,
-            "approval_date": "2016-08-25"
-          },
-          {
-            "name": "201",
-            "ground_floors": 41,
-            "approval_date": "2016-08-25"
-          },
-          {
-            "name": "206",
-            "ground_floors": 33,
-            "approval_date": "2016-08-25"
-          },
-          {
-            "name": "205",
-            "ground_floors": 40,
-            "approval_date": "2016-08-25"
-          },
-          {
-            "name": "지하주차장",
-            "ground_floors": 0,
-            "approval_date": "2016-08-25"
-          },
-          {
-            "name": "207",
-            "ground_floors": 36,
-            "approval_date": "2016-08-25"
-          }
-        ]
-      },
-      {
-        "complex_id": "kapt-a10027653",
-        "kapt_code": "A10027653",
-        "summary": "건축물대장 표제부 19건 확인 · 주용도 공동주택 · 사용승인 2016-03-10 · 확인 건물 최고 지상 55층",
-        "title_count": 19,
-        "approval_date": "2016-03-10",
-        "top_ground_floor": 55,
-        "purposes": [
-          "공동주택"
-        ],
-        "buildings": [
-          {
-            "name": "508",
-            "ground_floors": 1,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "507",
-            "ground_floors": 1,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "401",
-            "ground_floors": 0,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "512",
-            "ground_floors": 1,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "106",
-            "ground_floors": 46,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "501",
-            "ground_floors": 1,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "511",
-            "ground_floors": 1,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "506",
-            "ground_floors": 1,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "514",
-            "ground_floors": 1,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "103",
-            "ground_floors": 47,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "102",
-            "ground_floors": 49,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "502",
-            "ground_floors": 1,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "407",
-            "ground_floors": 0,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "104",
-            "ground_floors": 49,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "503",
-            "ground_floors": 1,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "513",
-            "ground_floors": 1,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "101",
-            "ground_floors": 55,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "402",
-            "ground_floors": 0,
-            "approval_date": "2016-03-10"
-          },
-          {
-            "name": "105",
-            "ground_floors": 47,
-            "approval_date": "2016-03-10"
-          }
-        ]
-      },
-      {
         "complex_id": "kapt-a10027884",
         "kapt_code": "A10027884",
         "summary": "건축물대장 표제부 12건 확인 · 주용도 공동주택 · 사용승인 2015-10-07 · 확인 건물 최고 지상 29층",
@@ -3568,99 +3254,6 @@
             "name": "부대복리시설",
             "ground_floors": 2,
             "approval_date": "2015-06-26"
-          }
-        ]
-      },
-      {
-        "complex_id": "kapt-a10027888",
-        "kapt_code": "A10027888",
-        "summary": "건축물대장 표제부 16건 확인 · 주용도 공동주택 · 사용승인 2015-10-07 · 확인 건물 최고 지상 34층",
-        "title_count": 16,
-        "approval_date": "2015-10-07",
-        "top_ground_floor": 34,
-        "purposes": [
-          "공동주택"
-        ],
-        "buildings": [
-          {
-            "name": "1801",
-            "ground_floors": 34,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "복리시설3",
-            "ground_floors": 0,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "부대시설2",
-            "ground_floors": 1,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "복리시설1",
-            "ground_floors": 1,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "경비실1",
-            "ground_floors": 1,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "기계전기실",
-            "ground_floors": 0,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "1803",
-            "ground_floors": 34,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "1806",
-            "ground_floors": 34,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "1805",
-            "ground_floors": 32,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "1802",
-            "ground_floors": 29,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "복리시설2",
-            "ground_floors": 1,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "지하주차장",
-            "ground_floors": 0,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "1804",
-            "ground_floors": 34,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "부대시설1",
-            "ground_floors": 1,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "부대시설3",
-            "ground_floors": 1,
-            "approval_date": "2015-10-07"
-          },
-          {
-            "name": "경비실2",
-            "ground_floors": 1,
-            "approval_date": "2015-10-07"
           }
         ]
       },
@@ -4898,345 +4491,6 @@
             "name": "301",
             "ground_floors": 20,
             "approval_date": "2011-01-17"
-          }
-        ]
-      },
-      {
-        "complex_id": "kapt-a40673906",
-        "kapt_code": "A40673906",
-        "summary": "건축물대장 표제부 13건 확인 · 주용도 공동주택 · 사용승인 2011-03-29 · 확인 건물 최고 지상 42층",
-        "title_count": 13,
-        "approval_date": "2011-03-29",
-        "top_ground_floor": 42,
-        "purposes": [
-          "공동주택"
-        ],
-        "buildings": [
-          {
-            "name": "105",
-            "ground_floors": 31,
-            "approval_date": "2011-03-29"
-          },
-          {
-            "name": "부대복리시설-4",
-            "ground_floors": 1,
-            "approval_date": "2011-03-29"
-          },
-          {
-            "name": "부대복리시설-3",
-            "ground_floors": 2,
-            "approval_date": "2011-03-29"
-          },
-          {
-            "name": "부대복리시설-1",
-            "ground_floors": 3,
-            "approval_date": "2011-03-29"
-          },
-          {
-            "name": "107",
-            "ground_floors": 42,
-            "approval_date": "2011-03-29"
-          },
-          {
-            "name": "부대복리시설-2",
-            "ground_floors": 2,
-            "approval_date": "2011-03-29"
-          },
-          {
-            "name": "103",
-            "ground_floors": 18,
-            "approval_date": "2011-03-29"
-          },
-          {
-            "name": "104",
-            "ground_floors": 18,
-            "approval_date": "2011-03-29"
-          },
-          {
-            "name": "101",
-            "ground_floors": 15,
-            "approval_date": "2011-03-29"
-          },
-          {
-            "name": "106",
-            "ground_floors": 40,
-            "approval_date": "2011-03-29"
-          },
-          {
-            "name": "지하주차장",
-            "ground_floors": 0,
-            "approval_date": "2011-03-29"
-          },
-          {
-            "name": "경비실",
-            "ground_floors": 1,
-            "approval_date": "2011-03-29"
-          },
-          {
-            "name": "102",
-            "ground_floors": 17,
-            "approval_date": "2011-03-29"
-          }
-        ]
-      },
-      {
-        "complex_id": "kapt-a40673907",
-        "kapt_code": "A40673907",
-        "summary": "건축물대장 표제부 24건 확인 · 주용도 공동주택 · 사용승인 2011-02-23 · 확인 건물 최고 지상 33층",
-        "title_count": 24,
-        "approval_date": "2011-02-23",
-        "top_ground_floor": 33,
-        "purposes": [
-          "공동주택"
-        ],
-        "buildings": [
-          {
-            "name": "203동",
-            "ground_floors": 28,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실4",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "209동",
-            "ground_floors": 6,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "208동",
-            "ground_floors": 6,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실2",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "206동",
-            "ground_floors": 14,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실3",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실7",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "207동",
-            "ground_floors": 16,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "202동",
-            "ground_floors": 30,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "복지동3",
-            "ground_floors": 4,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "경비실1",
-            "ground_floors": 1,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실5",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "지하주차장",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "복지동2",
-            "ground_floors": 2,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실1",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "201동",
-            "ground_floors": 33,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "204동",
-            "ground_floors": 16,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "복지동4",
-            "ground_floors": 1,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "경비실2",
-            "ground_floors": 1,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "복지동1",
-            "ground_floors": 2,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "펌프실,휀룸",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실6",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "205동",
-            "ground_floors": 14,
-            "approval_date": "2011-02-23"
-          }
-        ]
-      },
-      {
-        "complex_id": "kapt-a40673908",
-        "kapt_code": "A40673908",
-        "summary": "건축물대장 표제부 23건 확인 · 주용도 공동주택 · 사용승인 2011-02-23 · 확인 건물 최고 지상 41층",
-        "title_count": 23,
-        "approval_date": "2011-02-23",
-        "top_ground_floor": 41,
-        "purposes": [
-          "공동주택"
-        ],
-        "buildings": [
-          {
-            "name": "102동",
-            "ground_floors": 28,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실3",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실7",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "104동",
-            "ground_floors": 16,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "105동",
-            "ground_floors": 16,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "101동",
-            "ground_floors": 41,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실1",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실5",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "복지동2",
-            "ground_floors": 2,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "복지동4",
-            "ground_floors": 1,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실4",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "107동",
-            "ground_floors": 16,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "복지동1",
-            "ground_floors": 2,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "경비실2",
-            "ground_floors": 1,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "경비실1",
-            "ground_floors": 1,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "106동",
-            "ground_floors": 16,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "지하주차장",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "펌프실,휀룸",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "복지동3",
-            "ground_floors": 4,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실2",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "103동",
-            "ground_floors": 27,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "기계실,전기실6",
-            "ground_floors": 0,
-            "approval_date": "2011-02-23"
-          },
-          {
-            "name": "108동",
-            "ground_floors": 6,
-            "approval_date": "2011-02-23"
           }
         ]
       },
@@ -7224,348 +6478,182 @@
             "approval_date": "2008-02-01"
           }
         ]
-      },
-      {
-        "complex_id": "kapt-a40684013",
-        "kapt_code": "A40684013",
-        "summary": "건축물대장 표제부 21건 확인 · 주용도 공동주택 · 사용승인 2009-01-22 · 확인 건물 최고 지상 64층",
-        "title_count": 21,
-        "approval_date": "2009-01-22",
-        "top_ground_floor": 64,
-        "purposes": [
-          "공동주택"
-        ],
-        "buildings": [
-          {
-            "name": "연결통로",
-            "ground_floors": 0,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "계단실 #1",
-            "ground_floors": 1,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "4동",
-            "ground_floors": 64,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "3동",
-            "ground_floors": 64,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "경비실 #2",
-            "ground_floors": 1,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "경비실 #1",
-            "ground_floors": 1,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "2동",
-            "ground_floors": 26,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "1동",
-            "ground_floors": 64,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "5동",
-            "ground_floors": 26,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "선큰엘리베이터",
-            "ground_floors": 1,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "TEA HOUSE",
-            "ground_floors": 1,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "셔틀엘리베이터 #3",
-            "ground_floors": 1,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "계단실 #3",
-            "ground_floors": 1,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "6동",
-            "ground_floors": 64,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "지하주차장",
-            "ground_floors": 0,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "셔틀엘리베이터 #4",
-            "ground_floors": 1,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "셔틀엘리베이터 #1",
-            "ground_floors": 1,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "셔틀엘리베이터 #2",
-            "ground_floors": 1,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "선큰엘리베이터",
-            "ground_floors": 1,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "계단실 #4",
-            "ground_floors": 1,
-            "approval_date": "2009-01-22"
-          },
-          {
-            "name": "계단실 #2",
-            "ground_floors": 1,
-            "approval_date": "2009-01-22"
-          }
-        ]
       }
     ]
   },
   "maintenance": {
     "state": "verified",
-    "updated_at": "2026-10-23T01:36:38.603113+00:00",
+    "updated_at": "2026-11-15T21:54:04.284820+00:00",
     "source_url": "https://www.data.go.kr/data/15057937/openapi.do",
-    "month": "202608",
+    "month": "202609",
     "scanned": 77,
-    "eligible": 76,
-    "failures": 1,
+    "eligible": 77,
+    "failures": 6,
     "note": "국토교통부 K-apt 공용관리비 API의 인건비·경비비·청소비 공개항목만 표시. 전체 관리비와 별개이며 실제 세대 청구액이 아님.",
     "records": [
       {
-        "complex_id": "kapt-a10020270",
-        "kapt_code": "A10020270",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 0원 · 경비비 7,077,970원 · 청소비 3,707,820원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 0,
-          "경비비": 7077970,
-          "청소비": 3707820
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
         "complex_id": "kapt-a10020272",
         "kapt_code": "A10020272",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 0원 · 경비비 6,949,480원 · 청소비 6,669,330원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 0원 · 경비비 6,949,480원 · 청소비 6,840,310원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
           "인건비": 0,
           "경비비": 6949480,
-          "청소비": 6669330
+          "청소비": 6840310
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10020527",
         "kapt_code": "A10020527",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 50,417,687원 · 경비비 41,576,552원 · 청소비 45,558,622원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 47,476,675원 · 경비비 33,491,850원 · 청소비 38,290,960원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 50417687,
-          "경비비": 41576552,
-          "청소비": 45558622
+          "인건비": 47476675,
+          "경비비": 33491850,
+          "청소비": 38290960
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10020539",
         "kapt_code": "A10020539",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 41,597,780원 · 경비비 15,692,070원 · 청소비 12,193,150원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 38,860,410원 · 경비비 15,632,220원 · 청소비 12,770,210원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 41597780,
-          "경비비": 15692070,
-          "청소비": 12193150
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "kapt-a10020712",
-        "kapt_code": "A10020712",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 46,227,845원 · 경비비 25,550,020원 · 청소비 33,161,665원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 46227845,
-          "경비비": 25550020,
-          "청소비": 33161665
+          "인건비": 38860410,
+          "경비비": 15632220,
+          "청소비": 12770210
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10020744",
         "kapt_code": "A10020744",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 46,851,395원 · 경비비 28,451,886원 · 청소비 41,781,436원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 49,674,586원 · 경비비 27,737,294원 · 청소비 41,861,315원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 46851395,
-          "경비비": 28451886,
-          "청소비": 41781436
+          "인건비": 49674586,
+          "경비비": 27737294,
+          "청소비": 41861315
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10021000",
         "kapt_code": "A10021000",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 60,529,670원 · 경비비 44,382,202원 · 청소비 62,439,213원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 59,029,100원 · 경비비 46,097,925원 · 청소비 64,482,371원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 60529670,
-          "경비비": 44382202,
-          "청소비": 62439213
+          "인건비": 59029100,
+          "경비비": 46097925,
+          "청소비": 64482371
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10022353",
         "kapt_code": "A10022353",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 15,083,250원 · 경비비 8,479,020원 · 청소비 9,775,250원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 14,904,860원 · 경비비 8,579,020원 · 청소비 9,975,250원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 15083250,
-          "경비비": 8479020,
-          "청소비": 9775250
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "kapt-a10022395",
-        "kapt_code": "A10022395",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 0원 · 경비비 6,104,000원 · 청소비 3,246,000원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 0,
-          "경비비": 6104000,
-          "청소비": 3246000
+          "인건비": 14904860,
+          "경비비": 8579020,
+          "청소비": 9975250
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10022494",
         "kapt_code": "A10022494",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 61,464,130원 · 경비비 55,967,043원 · 청소비 52,238,550원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 69,156,260원 · 경비비 56,417,967원 · 청소비 52,354,200원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 61464130,
-          "경비비": 55967043,
-          "청소비": 52238550
+          "인건비": 69156260,
+          "경비비": 56417967,
+          "청소비": 52354200
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10022498",
         "kapt_code": "A10022498",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 66,137,840원 · 경비비 47,221,240원 · 청소비 49,885,259원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 60,991,420원 · 경비비 48,603,830원 · 청소비 52,602,891원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 66137840,
-          "경비비": 47221240,
-          "청소비": 49885259
+          "인건비": 60991420,
+          "경비비": 48603830,
+          "청소비": 52602891
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10022954",
         "kapt_code": "A10022954",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 44,851,021원 · 경비비 31,777,030원 · 청소비 30,516,670원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 45,602,794원 · 경비비 32,044,770원 · 청소비 30,814,480원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 44851021,
-          "경비비": 31777030,
-          "청소비": 30516670
+          "인건비": 45602794,
+          "경비비": 32044770,
+          "청소비": 30814480
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10022964",
         "kapt_code": "A10022964",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 34,634,428원 · 경비비 15,495,462원 · 청소비 17,943,980원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 36,652,301원 · 경비비 15,501,082원 · 청소비 16,450,040원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 34634428,
-          "경비비": 15495462,
-          "청소비": 17943980
+          "인건비": 36652301,
+          "경비비": 15501082,
+          "청소비": 16450040
+        },
+        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
+      },
+      {
+        "complex_id": "centennial",
+        "kapt_code": "A10023207",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 23,874,030원 · 경비비 15,967,350원 · 청소비 13,803,211원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "breakdown_won": {
+          "인건비": 23874030,
+          "경비비": 15967350,
+          "청소비": 13803211
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10023361",
         "kapt_code": "A10023361",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 61,793,790원 · 경비비 48,527,020원 · 청소비 44,098,550원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 61,908,820원 · 경비비 48,138,020원 · 청소비 44,312,690원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 61793790,
-          "경비비": 48527020,
-          "청소비": 44098550
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "central3",
-        "kapt_code": "A10023434",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 29,866,320원 · 경비비 14,709,910원 · 청소비 13,686,980원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 29866320,
-          "경비비": 14709910,
-          "청소비": 13686980
+          "인건비": 61908820,
+          "경비비": 48138020,
+          "청소비": 44312690
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "prime20",
         "kapt_code": "A10023693",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 44,373,764원 · 경비비 25,299,050원 · 청소비 20,595,550원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 44,918,744원 · 경비비 25,299,050원 · 청소비 20,570,390원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 44373764,
+          "인건비": 44918744,
           "경비비": 25299050,
-          "청소비": 20595550
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "prime25",
-        "kapt_code": "A10024083",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 20,370,752원 · 경비비 11,880,690원 · 청소비 7,314,560원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 20370752,
-          "경비비": 11880690,
-          "청소비": 7314560
+          "청소비": 20570390
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "skcentral",
         "kapt_code": "A10024573",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 24,144,260원 · 경비비 0원 · 청소비 6,264,490원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 25,678,110원 · 경비비 0원 · 청소비 6,264,490원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 24144260,
+          "인건비": 25678110,
           "경비비": 0,
           "청소비": 6264490
         },
@@ -7574,274 +6662,226 @@
       {
         "complex_id": "kapt-a10024710",
         "kapt_code": "A10024710",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 82,035,660원 · 경비비 55,378,635원 · 청소비 63,314,935원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 79,028,490원 · 경비비 55,897,500원 · 청소비 64,662,530원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 82035660,
-          "경비비": 55378635,
-          "청소비": 63314935
+          "인건비": 79028490,
+          "경비비": 55897500,
+          "청소비": 64662530
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10024779",
         "kapt_code": "A10024779",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 109,874,770원 · 경비비 73,813,291원 · 청소비 89,523,256원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 111,626,590원 · 경비비 72,331,747원 · 청소비 89,168,426원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 109874770,
-          "경비비": 73813291,
-          "청소비": 89523256
+          "인건비": 111626590,
+          "경비비": 72331747,
+          "청소비": 89168426
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10025031",
         "kapt_code": "A10025031",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 64,762,350원 · 경비비 33,030,800원 · 청소비 45,561,020원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 63,240,570원 · 경비비 33,030,800원 · 청소비 46,597,580원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 64762350,
+          "인건비": 63240570,
           "경비비": 33030800,
-          "청소비": 45561020
+          "청소비": 46597580
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10025071",
         "kapt_code": "A10025071",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 43,210,520원 · 경비비 18,991,020원 · 청소비 26,590,240원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 46,635,230원 · 경비비 19,415,350원 · 청소비 26,915,239원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 43210520,
-          "경비비": 18991020,
-          "청소비": 26590240
+          "인건비": 46635230,
+          "경비비": 19415350,
+          "청소비": 26915239
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10025399",
         "kapt_code": "A10025399",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 81,472,890원 · 경비비 42,569,271원 · 청소비 70,038,972원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 83,084,940원 · 경비비 42,624,811원 · 청소비 70,716,492원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 81472890,
-          "경비비": 42569271,
-          "청소비": 70038972
+          "인건비": 83084940,
+          "경비비": 42624811,
+          "청소비": 70716492
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10025443",
         "kapt_code": "A10025443",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 34,958,960원 · 경비비 13,375,370원 · 청소비 22,092,250원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 36,024,050원 · 경비비 13,379,340원 · 청소비 19,647,680원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 34958960,
-          "경비비": 13375370,
-          "청소비": 22092250
+          "인건비": 36024050,
+          "경비비": 13379340,
+          "청소비": 19647680
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
-        "complex_id": "avenue",
-        "kapt_code": "A10025853",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 44,311,700원 · 경비비 24,185,060원 · 청소비 22,052,450원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "complex_id": "kapt-a10025745",
+        "kapt_code": "A10025745",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 47,395,532원 · 경비비 17,162,644원 · 청소비 19,396,099원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 44311700,
-          "경비비": 24185060,
-          "청소비": 22052450
+          "인건비": 47395532,
+          "경비비": 17162644,
+          "청소비": 19396099
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10025886",
         "kapt_code": "A10025886",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 98,447,830원 · 경비비 60,568,190원 · 청소비 81,052,250원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 109,439,470원 · 경비비 62,218,190원 · 청소비 84,817,600원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 98447830,
-          "경비비": 60568190,
-          "청소비": 81052250
+          "인건비": 109439470,
+          "경비비": 62218190,
+          "청소비": 84817600
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10026038",
         "kapt_code": "A10026038",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 81,880,135원 · 경비비 42,908,920원 · 청소비 73,070,600원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 83,291,411원 · 경비비 42,921,590원 · 청소비 72,379,850원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 81880135,
-          "경비비": 42908920,
-          "청소비": 73070600
+          "인건비": 83291411,
+          "경비비": 42921590,
+          "청소비": 72379850
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10026547",
         "kapt_code": "A10026547",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 45,950,800원 · 경비비 30,883,290원 · 청소비 29,064,800원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 50,295,280원 · 경비비 30,883,290원 · 청소비 28,994,620원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 45950800,
+          "인건비": 50295280,
           "경비비": 30883290,
-          "청소비": 29064800
+          "청소비": 28994620
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "f13",
         "kapt_code": "A10026678",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 40,782,620원 · 경비비 22,011,510원 · 청소비 22,516,860원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 43,972,620원 · 경비비 22,526,580원 · 청소비 22,825,290원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 40782620,
-          "경비비": 22011510,
-          "청소비": 22516860
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "f15",
-        "kapt_code": "A10026679",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 41,018,470원 · 경비비 22,188,900원 · 청소비 28,934,790원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 41018470,
-          "경비비": 22188900,
-          "청소비": 28934790
+          "인건비": 43972620,
+          "경비비": 22526580,
+          "청소비": 22825290
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "f14",
         "kapt_code": "A10026681",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 41,153,690원 · 경비비 22,948,739원 · 청소비 22,727,960원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 47,700,190원 · 경비비 23,548,739원 · 청소비 23,832,560원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 41153690,
-          "경비비": 22948739,
-          "청소비": 22727960
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "kapt-a10027171",
-        "kapt_code": "A10027171",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 63,730,570원 · 경비비 32,728,820원 · 청소비 48,957,430원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 63730570,
-          "경비비": 32728820,
-          "청소비": 48957430
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "kapt-a10027367",
-        "kapt_code": "A10027367",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 47,731,980원 · 경비비 33,508,420원 · 청소비 43,836,550원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 47731980,
-          "경비비": 33508420,
-          "청소비": 43836550
+          "인건비": 47700190,
+          "경비비": 23548739,
+          "청소비": 23832560
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10027653",
         "kapt_code": "A10027653",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 48,861,740원 · 경비비 46,008,370원 · 청소비 37,986,514원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 49,835,680원 · 경비비 46,008,370원 · 청소비 38,049,960원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 48861740,
+          "인건비": 49835680,
           "경비비": 46008370,
-          "청소비": 37986514
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "kapt-a10027884",
-        "kapt_code": "A10027884",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 23,681,590원 · 경비비 14,028,690원 · 청소비 9,000,730원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 23681590,
-          "경비비": 14028690,
-          "청소비": 9000730
+          "청소비": 38049960
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10027887",
         "kapt_code": "A10027887",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 39,279,895원 · 경비비 33,446,014원 · 청소비 20,407,390원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 39,282,437원 · 경비비 33,446,014원 · 청소비 20,262,510원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 39279895,
+          "인건비": 39282437,
           "경비비": 33446014,
-          "청소비": 20407390
+          "청소비": 20262510
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a10027888",
         "kapt_code": "A10027888",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 42,006,200원 · 경비비 28,106,540원 · 청소비 21,780,050원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 41,430,790원 · 경비비 29,509,470원 · 청소비 23,157,740원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 42006200,
-          "경비비": 28106540,
-          "청소비": 21780050
+          "인건비": 41430790,
+          "경비비": 29509470,
+          "청소비": 23157740
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "artwin",
         "kapt_code": "A10027898",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 48,603,592원 · 경비비 46,937,985원 · 청소비 33,641,945원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 48,831,862원 · 경비비 46,691,215원 · 청소비 33,382,154원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 48603592,
-          "경비비": 46937985,
-          "청소비": 33641945
+          "인건비": 48831862,
+          "경비비": 46691215,
+          "청소비": 33382154
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "m21",
         "kapt_code": "A10027925",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 41,582,131원 · 경비비 27,356,660원 · 청소비 27,203,990원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 41,841,328원 · 경비비 27,280,220원 · 청소비 27,381,150원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 41582131,
-          "경비비": 27356660,
-          "청소비": 27203990
+          "인건비": 41841328,
+          "경비비": 27280220,
+          "청소비": 27381150
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "m22",
         "kapt_code": "A10027929",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 41,421,910원 · 경비비 20,594,530원 · 청소비 26,448,390원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 41,487,343원 · 경비비 18,736,280원 · 청소비 26,286,200원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 41421910,
-          "경비비": 20594530,
-          "청소비": 26448390
+          "인건비": 41487343,
+          "경비비": 18736280,
+          "청소비": 26286200
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673002",
         "kapt_code": "A40673002",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 26,224,590원 · 경비비 18,430,140원 · 청소비 12,528,480원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 26,163,070원 · 경비비 18,430,140원 · 청소비 12,528,480원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 26224590,
+          "인건비": 26163070,
           "경비비": 18430140,
           "청소비": 12528480
         },
@@ -7850,287 +6890,239 @@
       {
         "complex_id": "kapt-a40673101",
         "kapt_code": "A40673101",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 21,391,670원 · 경비비 26,356,920원 · 청소비 9,329,270원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 22,309,580원 · 경비비 27,109,460원 · 청소비 9,311,870원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 21391670,
-          "경비비": 26356920,
-          "청소비": 9329270
+          "인건비": 22309580,
+          "경비비": 27109460,
+          "청소비": 9311870
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673412",
         "kapt_code": "A40673412",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 39,392,700원 · 경비비 33,640,270원 · 청소비 21,591,630원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 39,315,670원 · 경비비 33,640,270원 · 청소비 21,591,630원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 39392700,
+          "인건비": 39315670,
           "경비비": 33640270,
           "청소비": 21591630
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
-        "complex_id": "kapt-a40673510",
-        "kapt_code": "A40673510",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 36,384,230원 · 경비비 28,698,000원 · 청소비 19,051,990원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "complex_id": "kapt-a40673603",
+        "kapt_code": "A40673603",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 21,015,650원 · 경비비 22,545,280원 · 청소비 10,341,460원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 36384230,
-          "경비비": 28698000,
-          "청소비": 19051990
+          "인건비": 21015650,
+          "경비비": 22545280,
+          "청소비": 10341460
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
-        "complex_id": "kapt-a40673603",
-        "kapt_code": "A40673603",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 20,240,620원 · 경비비 22,606,070원 · 청소비 9,241,280원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "complex_id": "verified-extra-01",
+        "kapt_code": "A40673901",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 74,402,963원 · 경비비 51,022,360원 · 청소비 44,715,410원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 20240620,
-          "경비비": 22606070,
-          "청소비": 9241280
+          "인건비": 74402963,
+          "경비비": 51022360,
+          "청소비": 44715410
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673902",
         "kapt_code": "A40673902",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 27,224,750원 · 경비비 13,215,940원 · 청소비 16,997,170원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 29,833,430원 · 경비비 13,448,870원 · 청소비 17,652,550원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 27224750,
-          "경비비": 13215940,
-          "청소비": 16997170
+          "인건비": 29833430,
+          "경비비": 13448870,
+          "청소비": 17652550
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673903",
         "kapt_code": "A40673903",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 29,629,610원 · 경비비 12,919,960원 · 청소비 12,902,460원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 31,938,240원 · 경비비 12,919,960원 · 청소비 12,706,240원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 29629610,
+          "인건비": 31938240,
           "경비비": 12919960,
-          "청소비": 12902460
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "kapt-a40673904",
-        "kapt_code": "A40673904",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 51,671,287원 · 경비비 40,895,380원 · 청소비 34,245,943원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 51671287,
-          "경비비": 40895380,
-          "청소비": 34245943
+          "청소비": 12706240
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "verified-extra-13",
         "kapt_code": "A40673905",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 0원 · 경비비 31,951,260원 · 청소비 17,923,870원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 0원 · 경비비 31,951,260원 · 청소비 18,012,940원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
           "인건비": 0,
           "경비비": 31951260,
-          "청소비": 17923870
+          "청소비": 18012940
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673906",
         "kapt_code": "A40673906",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 42,496,799원 · 경비비 25,305,758원 · 청소비 22,527,290원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 45,843,214원 · 경비비 25,305,758원 · 청소비 22,515,690원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 42496799,
+          "인건비": 45843214,
           "경비비": 25305758,
-          "청소비": 22527290
+          "청소비": 22515690
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673907",
         "kapt_code": "A40673907",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 33,597,330원 · 경비비 32,206,220원 · 청소비 15,571,620원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 35,165,780원 · 경비비 32,047,840원 · 청소비 15,571,620원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 33597330,
-          "경비비": 32206220,
+          "인건비": 35165780,
+          "경비비": 32047840,
           "청소비": 15571620
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "kapt-a40673908",
-        "kapt_code": "A40673908",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 36,659,950원 · 경비비 31,240,350원 · 청소비 14,774,399원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 36659950,
-          "경비비": 31240350,
-          "청소비": 14774399
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673910",
         "kapt_code": "A40673910",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 52,678,970원 · 경비비 35,612,460원 · 청소비 30,325,911원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 53,696,200원 · 경비비 35,845,760원 · 청소비 31,088,298원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 52678970,
-          "경비비": 35612460,
-          "청소비": 30325911
+          "인건비": 53696200,
+          "경비비": 35845760,
+          "청소비": 31088298
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673911",
         "kapt_code": "A40673911",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 23,299,292원 · 경비비 15,011,900원 · 청소비 9,526,304원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 23,299,302원 · 경비비 15,011,910원 · 청소비 9,129,224원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 23299292,
-          "경비비": 15011900,
-          "청소비": 9526304
+          "인건비": 23299302,
+          "경비비": 15011910,
+          "청소비": 9129224
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673912",
         "kapt_code": "A40673912",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 28,143,230원 · 경비비 22,631,403원 · 청소비 13,737,420원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 28,507,229원 · 경비비 22,631,403원 · 청소비 14,138,650원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 28143230,
+          "인건비": 28507229,
           "경비비": 22631403,
-          "청소비": 13737420
+          "청소비": 14138650
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673913",
         "kapt_code": "A40673913",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 34,276,360원 · 경비비 21,989,577원 · 청소비 19,824,460원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 37,288,520원 · 경비비 22,539,577원 · 청소비 20,567,800원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 34276360,
-          "경비비": 21989577,
-          "청소비": 19824460
+          "인건비": 37288520,
+          "경비비": 22539577,
+          "청소비": 20567800
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673914",
         "kapt_code": "A40673914",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 30,840,811원 · 경비비 23,589,875원 · 청소비 17,739,042원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 30,942,571원 · 경비비 23,829,875원 · 청소비 18,019,042원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 30840811,
-          "경비비": 23589875,
-          "청소비": 17739042
+          "인건비": 30942571,
+          "경비비": 23829875,
+          "청소비": 18019042
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673915",
         "kapt_code": "A40673915",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 30,199,670원 · 경비비 22,114,460원 · 청소비 13,075,980원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 31,928,370원 · 경비비 22,276,960원 · 청소비 13,242,770원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 30199670,
-          "경비비": 22114460,
-          "청소비": 13075980
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "kapt-a40673916",
-        "kapt_code": "A40673916",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 32,105,806원 · 경비비 27,777,330원 · 청소비 17,430,700원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 32105806,
-          "경비비": 27777330,
-          "청소비": 17430700
+          "인건비": 31928370,
+          "경비비": 22276960,
+          "청소비": 13242770
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673917",
         "kapt_code": "A40673917",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 34,386,288원 · 경비비 27,384,980원 · 청소비 14,711,220원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 34,367,438원 · 경비비 27,384,980원 · 청소비 14,746,220원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 34386288,
+          "인건비": 34367438,
           "경비비": 27384980,
-          "청소비": 14711220
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "kapt-a40673918",
-        "kapt_code": "A40673918",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 23,062,910원 · 경비비 10,696,806원 · 청소비 8,237,907원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 23062910,
-          "경비비": 10696806,
-          "청소비": 8237907
+          "청소비": 14746220
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673920",
         "kapt_code": "A40673920",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 59,845,971원 · 경비비 45,422,800원 · 청소비 39,534,200원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 59,872,570원 · 경비비 45,565,490원 · 청소비 39,671,400원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 59845971,
-          "경비비": 45422800,
-          "청소비": 39534200
+          "인건비": 59872570,
+          "경비비": 45565490,
+          "청소비": 39671400
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673921",
         "kapt_code": "A40673921",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 66,858,443원 · 경비비 49,878,810원 · 청소비 64,653,440원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 70,514,351원 · 경비비 47,781,580원 · 청소비 64,947,280원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 66858443,
-          "경비비": 49878810,
-          "청소비": 64653440
+          "인건비": 70514351,
+          "경비비": 47781580,
+          "청소비": 64947280
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40673922",
         "kapt_code": "A40673922",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 64,199,690원 · 경비비 41,641,320원 · 청소비 39,858,840원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 68,350,140원 · 경비비 43,241,320원 · 청소비 42,758,840원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 64199690,
-          "경비비": 41641320,
-          "청소비": 39858840
+          "인건비": 68350140,
+          "경비비": 43241320,
+          "청소비": 42758840
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40684004",
         "kapt_code": "A40684004",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 26,900,503원 · 경비비 22,121,207원 · 청소비 11,024,691원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 26,922,043원 · 경비비 21,997,367원 · 청소비 11,024,691원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 26900503,
-          "경비비": 22121207,
+          "인건비": 26922043,
+          "경비비": 21997367,
           "청소비": 11024691
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
@@ -8138,11 +7130,11 @@
       {
         "complex_id": "kapt-a40684005",
         "kapt_code": "A40684005",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 34,801,790원 · 경비비 25,009,204원 · 청소비 16,483,935원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 33,175,470원 · 경비비 23,875,904원 · 청소비 16,483,935원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 34801790,
-          "경비비": 25009204,
+          "인건비": 33175470,
+          "경비비": 23875904,
           "청소비": 16483935
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
@@ -8150,60 +7142,48 @@
       {
         "complex_id": "kapt-a40684007",
         "kapt_code": "A40684007",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 27,418,961원 · 경비비 26,215,410원 · 청소비 12,937,520원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 27,834,587원 · 경비비 26,212,764원 · 청소비 12,888,520원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 27418961,
-          "경비비": 26215410,
-          "청소비": 12937520
+          "인건비": 27834587,
+          "경비비": 26212764,
+          "청소비": 12888520
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40684008",
         "kapt_code": "A40684008",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 26,553,640원 · 경비비 22,184,360원 · 청소비 15,539,850원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 27,209,360원 · 경비비 22,784,360원 · 청소비 17,043,560원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 26553640,
-          "경비비": 22184360,
-          "청소비": 15539850
-        },
-        "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
-      },
-      {
-        "complex_id": "kapt-a40684009",
-        "kapt_code": "A40684009",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 38,069,569원 · 경비비 33,527,997원 · 청소비 23,396,194원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
-        "breakdown_won": {
-          "인건비": 38069569,
-          "경비비": 33527997,
-          "청소비": 23396194
+          "인건비": 27209360,
+          "경비비": 22784360,
+          "청소비": 17043560
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40684011",
         "kapt_code": "A40684011",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 42,853,631원 · 경비비 27,642,162원 · 청소비 38,614,942원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 43,454,610원 · 경비비 27,842,162원 · 청소비 39,189,466원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 42853631,
-          "경비비": 27642162,
-          "청소비": 38614942
+          "인건비": 43454610,
+          "경비비": 27842162,
+          "청소비": 39189466
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       },
       {
         "complex_id": "kapt-a40684013",
         "kapt_code": "A40684013",
-        "month": "202608",
-        "summary": "2026년 8월 공용관리비 공개항목 · 인건비 108,749,217원 · 경비비 103,296,030원 · 청소비 68,000,820원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
+        "month": "202609",
+        "summary": "2026년 9월 공용관리비 공개항목 · 인건비 111,378,057원 · 경비비 103,274,230원 · 청소비 67,797,459원 · 전체 관리비 또는 세대별 청구액이 아닙니다.",
         "breakdown_won": {
-          "인건비": 108749217,
-          "경비비": 103296030,
-          "청소비": 68000820
+          "인건비": 111378057,
+          "경비비": 103274230,
+          "청소비": 67797459
         },
         "note": "국토부 K-apt 단지 전체 공용관리비 일부 항목; 개별 세대 관리비 및 관리비 전체 합계 아님."
       }
