@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "state": "awaiting_approval",
-  "updated_at": "2026-11-18T08:52:36+0900",
+  "updated_at": "2026-11-19T08:52:51+0900",
   "note": "신청·인증 전에는 빈 배열을 실제 조회 0건으로 해석하지 않습니다. 학구도와 가까운 학교를 배정학교로 자동 판단하지 않습니다. 키는 GitHub Secrets에만 보관.",
   "schools": {
     "state": "awaiting_key",
@@ -7197,11 +7197,88 @@
   },
   "office_rents": {
     "state": "verified",
-    "updated_at": "2026-11-18T08:52:32+0900",
+    "updated_at": "2026-11-19T08:52:47+0900",
     "source_url": "https://www.data.go.kr/data/15126475/openapi.do",
     "note": "연수구 송도동의 오피스텔 전월세, 국토부 신고·확정일자 자료. 아파트와 별개. 개인정보 및 호수 없음.",
     "months": 6,
     "records": [
+      {
+        "building": "송도 더샵 퍼스트월드",
+        "contract_date": "2026-11-18",
+        "area_m2": 61.62,
+        "floor": "18",
+        "lot_number": "4-1",
+        "type": "월세",
+        "deposit_10k": 15800,
+        "monthly_10k": 10,
+        "source_month": "202611"
+      },
+      {
+        "building": "글로벌 캠퍼스 푸르지오",
+        "contract_date": "2026-11-18",
+        "area_m2": 46.32,
+        "floor": "4",
+        "lot_number": "190-2",
+        "type": "월세",
+        "deposit_10k": 18600,
+        "monthly_10k": 8,
+        "source_month": "202611"
+      },
+      {
+        "building": "글로벌 캠퍼스 푸르지오",
+        "contract_date": "2026-11-18",
+        "area_m2": 46.32,
+        "floor": "4",
+        "lot_number": "190-2",
+        "type": "월세",
+        "deposit_10k": 18600,
+        "monthly_10k": 8,
+        "source_month": "202611"
+      },
+      {
+        "building": "롯데캐슬 캠퍼스타운",
+        "contract_date": "2026-11-18",
+        "area_m2": 34.68,
+        "floor": "29",
+        "lot_number": "149",
+        "type": "월세",
+        "deposit_10k": 13000,
+        "monthly_10k": 25,
+        "source_month": "202611"
+      },
+      {
+        "building": "랜드마크시티 센트럴 더샵",
+        "contract_date": "2026-11-18",
+        "area_m2": 59.87,
+        "floor": "10",
+        "lot_number": "311",
+        "type": "월세",
+        "deposit_10k": 2000,
+        "monthly_10k": 120,
+        "source_month": "202611"
+      },
+      {
+        "building": "힐스테이트 송도 더테라스",
+        "contract_date": "2026-11-17",
+        "area_m2": 84.82,
+        "floor": "19",
+        "lot_number": "316",
+        "type": "월세",
+        "deposit_10k": 3000,
+        "monthly_10k": 160,
+        "source_month": "202611"
+      },
+      {
+        "building": "롯데몰 송도 캐슬파크",
+        "contract_date": "2026-11-17",
+        "area_m2": 22.14,
+        "floor": "34",
+        "lot_number": "8-37",
+        "type": "월세",
+        "deposit_10k": 500,
+        "monthly_10k": 75,
+        "source_month": "202611"
+      },
       {
         "building": "호반 써밋 송도",
         "contract_date": "2026-11-17",
@@ -7632,6 +7709,39 @@
         "source_month": "202611"
       },
       {
+        "building": "송도센트럴파크 푸르지오 시티",
+        "contract_date": "2026-11-10",
+        "area_m2": 25.78,
+        "floor": "17",
+        "lot_number": "83",
+        "type": "전세",
+        "deposit_10k": 10600,
+        "monthly_10k": 0,
+        "source_month": "202611"
+      },
+      {
+        "building": "디에트르 송도 시그니처뷰",
+        "contract_date": "2026-11-10",
+        "area_m2": 85.0,
+        "floor": "24",
+        "lot_number": "30-1",
+        "type": "월세",
+        "deposit_10k": 4000,
+        "monthly_10k": 185,
+        "source_month": "202611"
+      },
+      {
+        "building": "송도센텀하이브",
+        "contract_date": "2026-11-10",
+        "area_m2": 63.68,
+        "floor": "22",
+        "lot_number": "30-6",
+        "type": "월세",
+        "deposit_10k": 2000,
+        "monthly_10k": 140,
+        "source_month": "202611"
+      },
+      {
         "building": "글로벌 캠퍼스 푸르지오",
         "contract_date": "2026-11-10",
         "area_m2": 46.32,
@@ -7852,6 +7962,28 @@
         "source_month": "202611"
       },
       {
+        "building": "송도센트럴파크 푸르지오 시티",
+        "contract_date": "2026-11-07",
+        "area_m2": 25.78,
+        "floor": "20",
+        "lot_number": "83",
+        "type": "월세",
+        "deposit_10k": 500,
+        "monthly_10k": 65,
+        "source_month": "202611"
+      },
+      {
+        "building": "송도지웰푸르지오시티",
+        "contract_date": "2026-11-07",
+        "area_m2": 25.77,
+        "floor": "14",
+        "lot_number": "8-23",
+        "type": "월세",
+        "deposit_10k": 500,
+        "monthly_10k": 82,
+        "source_month": "202611"
+      },
+      {
         "building": "송도아메리칸타운아이파크",
         "contract_date": "2026-11-07",
         "area_m2": 25.52,
@@ -8067,6 +8199,17 @@
         "floor": "9",
         "lot_number": "33-1",
         "type": "전세",
+        "deposit_10k": 11000,
+        "monthly_10k": 0,
+        "source_month": "202611"
+      },
+      {
+        "building": "오피스텔",
+        "contract_date": "2026-11-05",
+        "area_m2": 28.84,
+        "floor": "9",
+        "lot_number": "33-1",
+        "type": "전세",
         "deposit_10k": 11300,
         "monthly_10k": 0,
         "source_month": "202611"
@@ -8146,6 +8289,17 @@
         "type": "전세",
         "deposit_10k": 29400,
         "monthly_10k": 0,
+        "source_month": "202611"
+      },
+      {
+        "building": "롯데캐슬 캠퍼스타운",
+        "contract_date": "2026-11-04",
+        "area_m2": 29.83,
+        "floor": "15",
+        "lot_number": "149",
+        "type": "월세",
+        "deposit_10k": 5300,
+        "monthly_10k": 43,
         "source_month": "202611"
       },
       {
@@ -8521,6 +8675,17 @@
         "deposit_10k": 28000,
         "monthly_10k": 0,
         "source_month": "202611"
+      },
+      {
+        "building": "송도지웰푸르지오시티",
+        "contract_date": "2026-10-31",
+        "area_m2": 25.77,
+        "floor": "30",
+        "lot_number": "8-23",
+        "type": "월세",
+        "deposit_10k": 500,
+        "monthly_10k": 80,
+        "source_month": "202610"
       },
       {
         "building": "송도센트럴파크 푸르지오 시티",
@@ -9664,6 +9829,17 @@
         "type": "월세",
         "deposit_10k": 11700,
         "monthly_10k": 13,
+        "source_month": "202610"
+      },
+      {
+        "building": "더샵 송도트리플타워 East",
+        "contract_date": "2026-10-21",
+        "area_m2": 59.15,
+        "floor": "21",
+        "lot_number": "169",
+        "type": "전세",
+        "deposit_10k": 27500,
+        "monthly_10k": 0,
         "source_month": "202610"
       },
       {
@@ -10929,6 +11105,17 @@
         "type": "전세",
         "deposit_10k": 13700,
         "monthly_10k": 0,
+        "source_month": "202610"
+      },
+      {
+        "building": "송도 더샵 센트럴시티",
+        "contract_date": "2026-10-12",
+        "area_m2": 84.99,
+        "floor": "16",
+        "lot_number": "190-4",
+        "type": "월세",
+        "deposit_10k": 2000,
+        "monthly_10k": 104,
         "source_month": "202610"
       },
       {
@@ -30911,12 +31098,26 @@
   },
   "subscriptions": {
     "state": "verified",
-    "updated_at": "2026-11-18T08:52:26+0900",
+    "updated_at": "2026-11-19T08:52:41+0900",
     "source_url": "https://www.data.go.kr/data/15098547/openapi.do",
     "note": "한국부동산원 청약홈 공식 모집공고일 기준 인천광역시 전체 소재 공고. 접수일 미기재는 별도 확인 필요. 접수 마감 공고도 지난 공고 탭에서 조회 가능.",
-    "window_start": "2025-09-24",
-    "window_end": "2027-01-17",
+    "window_start": "2025-09-25",
+    "window_end": "2027-01-18",
     "records": [
+      {
+        "kind": "무순위·잔여세대",
+        "house_manage_no": "2026910292",
+        "notice_no": "2026910292",
+        "name": "검암역 푸르지오 프라베뉴 (B-1BL) 공공분양주택",
+        "address": "인천광역시 서해구 인천검암역세권 공공주택지구 내 B-1BL",
+        "notice_date": "2026-11-18",
+        "apply_start": "2026-11-23",
+        "apply_end": "2026-11-23",
+        "announcement_date": "2026-11-30",
+        "move_in": "202907",
+        "households": 9,
+        "notice_url": "https://www.applyhome.co.kr/ai/aia/selectAPTRemndrLttotPblancDetailView.do?houseManageNo=2026910292&pblancNo=2026910292"
+      },
       {
         "kind": "무순위·잔여세대",
         "house_manage_no": "2026910291",
@@ -32585,11 +32786,37 @@
   },
   "office_sales": {
     "state": "verified",
-    "updated_at": "2026-11-18T08:52:36+0900",
+    "updated_at": "2026-11-19T08:52:51+0900",
     "source_url": "https://apis.data.go.kr/1613000/RTMSDataSvcOffiTrade/getRTMSDataSvcOffiTrade",
     "note": "연수구 송도동의 오피스텔 매매 신고정보. 아파트/전월세 자료와 별개, 호수 미제공.",
     "months": 6,
     "records": [
+      {
+        "building": "힐스테이트 송도 더테라스",
+        "contract_date": "2026-11-18",
+        "area_m2": 84.03,
+        "floor": "22",
+        "lot_number": "316",
+        "type": "매매",
+        "price_10k": 39900,
+        "status": "신고",
+        "cancellation_date": "",
+        "dealing_type": "중개거래",
+        "source_month": "202611"
+      },
+      {
+        "building": "힐스테이트 송도 더테라스",
+        "contract_date": "2026-11-17",
+        "area_m2": 84.91,
+        "floor": "23",
+        "lot_number": "316",
+        "type": "매매",
+        "price_10k": 40000,
+        "status": "신고",
+        "cancellation_date": "",
+        "dealing_type": "중개거래",
+        "source_month": "202611"
+      },
       {
         "building": "호반 써밋 송도",
         "contract_date": "2026-11-17",
@@ -32598,6 +32825,19 @@
         "lot_number": "312-1",
         "type": "매매",
         "price_10k": 33000,
+        "status": "신고",
+        "cancellation_date": "",
+        "dealing_type": "중개거래",
+        "source_month": "202611"
+      },
+      {
+        "building": "오네스타",
+        "contract_date": "2026-11-13",
+        "area_m2": 25.68,
+        "floor": "20",
+        "lot_number": "168-2",
+        "type": "매매",
+        "price_10k": 10500,
         "status": "신고",
         "cancellation_date": "",
         "dealing_type": "중개거래",
@@ -32624,6 +32864,19 @@
         "lot_number": "190-4",
         "type": "매매",
         "price_10k": 39000,
+        "status": "신고",
+        "cancellation_date": "",
+        "dealing_type": "중개거래",
+        "source_month": "202611"
+      },
+      {
+        "building": "송도 더 프라우 2",
+        "contract_date": "2026-11-13",
+        "area_m2": 33.71,
+        "floor": "5",
+        "lot_number": "15-10",
+        "type": "매매",
+        "price_10k": 9900,
         "status": "신고",
         "cancellation_date": "",
         "dealing_type": "중개거래",
@@ -32819,6 +33072,19 @@
         "lot_number": "155-1",
         "type": "매매",
         "price_10k": 25500,
+        "status": "신고",
+        "cancellation_date": "",
+        "dealing_type": "중개거래",
+        "source_month": "202610"
+      },
+      {
+        "building": "송도 더샵 퍼스트월드",
+        "contract_date": "2026-10-24",
+        "area_m2": 64.64,
+        "floor": "2",
+        "lot_number": "4-1",
+        "type": "매매",
+        "price_10k": 16300,
         "status": "신고",
         "cancellation_date": "",
         "dealing_type": "중개거래",
@@ -34275,8 +34541,8 @@
         "lot_number": "316",
         "type": "매매",
         "price_10k": 42100,
-        "status": "신고",
-        "cancellation_date": "",
+        "status": "해제",
+        "cancellation_date": "26.11.18",
         "dealing_type": "중개거래",
         "source_month": "202607"
       },
