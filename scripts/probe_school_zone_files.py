@@ -1,18 +1,31 @@
 #!/usr/bin/env python3
-"""Find data.go.kr school-district (학구도) file datasets and their download links. No keys."""
-import re
+"""Download data.go.kr school-district (학구도) files and describe them. No keys, no personal data."""
+import io, json, re, zipfile
+from urllib.parse import urlencode
 from urllib.request import Request, urlopen
-UA={'User-Agent':'Mozilla/5.0 FirstHyundai-SchoolZoneProbe'}
-def get(u):
-    with urlopen(Request(u,headers=UA),timeout=40) as r: return r.read(2_000_000).decode('utf-8','replace')
-for pk in list(range(15159258,15159272))+[15159184]:
-    try: html=get(f'https://www.data.go.kr/data/{pk}/fileData.do')
+UA={'User-Agent':'Mozilla/5.0 FirstHyundai-SchoolZoneProbe','Referer':'https://www.data.go.kr/'}
+def get(u, raw=False, limit=300_000_000):
+    with urlopen(Request(u,headers=UA),timeout=120) as r:
+        b=r.read(limit); return (b, r.headers.get('Content-Type','')) if raw else b.decode('utf-8','replace')
+page=get('https://www.data.go.kr/data/15159265/fileData.do')
+i=page.find('function fn_fileDataDown')
+print('ZJS', re.sub(r'\s+',' ',page[i:i+1500]) if i>=0 else 'function not inline')
+for src in sorted(set(re.findall(r'<script[^>]+src="([^"]+)"',page)))[:40]:
+    if 'fileData' in src or 'dss' in src or 'common' in src: print('ZSCRIPT',src)
+DATASETS={'elementary':('15159265','uddi:fe8b71fa-5321-4d89-b6bb-a9a6ddd2fa8c'),
+          'middle':('15159264','uddi:0dae54bb-7464-4e01-9d82-c4b901686200'),
+          'link':('15159266','uddi:0765351b-d4d6-4ca3-85fa-e4e01dbb7963')}
+for name,(pk,uddi) in DATASETS.items():
+    q=urlencode({'recommendDataYn':'','publicDataPk':pk,'publicDataDetailPk':uddi,'fileDetailSn':'1'})
+    try:
+        meta=get('https://www.data.go.kr/tcs/dss/selectFileDataDownload.do?'+q)
+        print('ZMETA',name,meta[:400])
+        m=json.loads(meta)
+        atch=m.get('atchFileId') or (m.get('fileDataRegistVO') or {}).get('atchFileId')
+        sn=str(m.get('fileDetailSn') or (m.get('fileDataRegistVO') or {}).get('fileDetailSn') or '1')
+        data,ctype=get('https://www.data.go.kr/cmm/cmm/fileDownload.do?'+urlencode({'atchFileId':atch,'fileDetailSn':sn}),raw=True)
+        print('ZDOWN',name,len(data),ctype,data[:4])
+        z=zipfile.ZipFile(io.BytesIO(data))
+        for info in z.infolist()[:40]: print('ZENTRY',name,info.filename.encode('cp437','replace').decode('cp949','replace') if info.flag_bits & 0x800 == 0 else info.filename,info.file_size)
     except Exception as e:
-        print('ZONEFILE',pk,'ERR',type(e).__name__); continue
-    t=re.search(r'<title>([^<]+)</title>',html); title=t.group(1).strip() if t else ''
-    h=re.search(r'class="tit"[^>]*>\s*([^<]{3,80})<',html)
-    ids=sorted(set(re.findall(r'atchFileId=([A-Za-z0-9_]+)',html))|set(re.findall(r"atchFileId['\"]?\s*[:=]\s*['\"]([A-Za-z0-9_]+)",html)))
-    sn=sorted(set(re.findall(r'fileDetailSn=(\d+)',html)))
-    funcs=sorted(set(re.findall(r'(fn_fileDataDown\([^)]{0,120}\)|fileDownload[^"\'\s]{0,140})',html)))[:6]
-    ext=sorted(set(re.findall(r'확장자\s*</th>\s*<td[^>]*>\s*([A-Z]{2,5})',html)))
-    print('ZONEFILE',pk,'|',title[:70],'|',(h.group(1).strip() if h else ''),'| ext',ext,'| atch',ids[:4],'| sn',sn[:4],'| funcs',funcs)
+        print('ZERR',name,type(e).__name__,str(e)[:200])
