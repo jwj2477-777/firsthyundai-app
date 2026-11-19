@@ -2194,7 +2194,8 @@ function renderComplexes(){
     '<div class="complexSchoolRow"><span>'+escapeHtml(x.level)+' · '+(x.classification==='assigned'?'배정학교 확인':'인근 참고학교 (배정 미확인)')+'</span>'+
     '<strong>'+escapeHtml(x.name)+'</strong>'+
     (safeLink(x.source_url)?'<a href="'+escapeHtml(safeLink(x.source_url))+'">근거 확인 ↗</a>':'')+'</div>').join('')+'</div>':
-    '<div class="empty">이 단지의 배정학교는 아직 검증되지 않았습니다.</div>';
+    // Do not contradict a verified 통학구역/학교군 card shown just above.
+    (match||jointChoices.length||middle?'':'<div class="empty">이 단지의 배정학교는 아직 검증되지 않았습니다.</div>');
   const trends=window.FirstHyundaiPriceTrends?.render?.({rows:complexTradeRows(p),type:complexTrendType,
    area:complexTrendArea,months:complexTrendMonths,includeRenewals:complexTrendIncludeRenewals,
    snapshot:remote.trades||{},formatArea:area=>displayExclusiveArea(area,p)})||
@@ -2300,12 +2301,12 @@ function renderSchoolPublicInfo(){
  return '<div class="apiSmallCard"><h3>'+(schoolinfoFallback?'연수구 학교 기본정보':'송도 학교 정보')+'</h3>'+
   (coverage?'<p class="complexSectionNote"><strong>관심 '+coverage.total+'개 단지 · 초등 통학구역 참고 '+coverage.confirmed+'곳 확인</strong>'+
    (coverage.confirmed<coverage.total?' · 미확인 '+(coverage.total-coverage.confirmed)+'곳은 단지별 검증 사유를 확인해 주세요.':'')+
-   ' · 실제 배정학교 확정이 아닌 공식 경계·도로명주소 대조 결과입니다.</p>':
+   ' · 공식 학구도 경계와 단지 도로명주소를 대조한 결과입니다(실제 입학은 교육지원청 확인).</p>':
    '<p class="complexSectionNote">관심단지 통학구역 원문을 확인 중입니다. 배정학교는 확정하지 않습니다.</p>')+
   '<p class="complexSectionNote">'+(schoolinfoFallback?
    '학교알리미에서 확인한 연수구 학교명·학교급 목록입니다. 위치·주변학교 여부와 배정학교는 확인되지 않았습니다.':
    '송도 운영 학교의 공식 위치와 기본정보이며, 현재 선택한 아파트의 배정학교가 아닙니다.')+
-   ' 초등 통학구역은 위 단지별 검증 결과에서 확인하며, 중학교 학교군/실제 배정은 별도 확인이 필요합니다.</p>'+
+   ' 초등 통학구역과 중학교 학교군은 위 단지별 결과에서 확인합니다.</p>'+
   '<details class="details complexSourceDetails"><summary>자료 출처·기준일 보기</summary>'+ 
   '<p class="tiny">공식 초등 통학구역: 인천 연수구 34개 경계 (2026-09-20) · 학교알리미: '+
    (schoolinfo?'연수구 학교 '+schoolinfo.length+'곳 연결':'연동 확인 대기')+'</p>'+

@@ -1,3 +1,6 @@
+## 2026-11-20 · v2.1.96 · 학교 탭 상충 문구 정리
+- v2.1.95 실데이터 360px 렌더링 확인 중 발견: 통학구역·학교군 카드 바로 아래에 "이 단지의 배정학교는 아직 검증되지 않았습니다"가 함께 보임. 카드가 있으면 숨김(아무 검증이 없을 때만 표시). 연수구 학교 기본정보의 "중학교 학교군은 별도 확인 필요" 문장을 "위 단지별 결과에서 확인"으로 갱신. v2.1.95 기능은 그대로.
+
 ## 2026-11-20 · v2.1.95 · 학구도 원본 정밀도 · 중학교 학교군 · 관리비 장기수선충당금 API 수정
 - **관리비(데이터, PR #126·#127):** 장기수선충당금 HTTP 400은 승인 문제가 아니라 존재하지 않는 오퍼레이션(`getHsmpMonthChargeAmtInfoV3`, returnReasonCode 12). data.go.kr 15059160 공식 목록: `getHsmpMonthFeeInfoV3`=월부과액(`sLevy`), `getHsmpMonthRetalFeeInfoV3`=월사용액(`sUse`), `getHsmpReserveBalanceInfoV3`=잔액(`sTot`), `getHsmpAccumulationTariffInfoV3`=적립요율(`sPer`). 또 개별사용료 필드(`heatC/heatP/electC/electP/waterHotP/preMeet/buildInsu` 등)와 `bookSupply`가 '미분류 숫자'로 거부되던 문제를 `KNOWN_FEE_FIELDS`로 해결. F15 2026-07 실측 세 그룹 합계가 기준값과 원 단위 일치. 공식 검증 단지 9 → 70.
 - **학구도:** `scripts/collect_school_zone_files.py`가 data.go.kr 학구도 파일(15159265 초등학교통학구역, 15159264 중학교학교군, 15159266 학교학구도연계정보; 3·9월 배포, 이용 제한 없음, 키 불필요)을 매주 내려받아 연수구만 원본 꼭짓점(약 1m)으로 `data/school_zones_yeonsu.json`(precision=original, 학교명 포함)과 `data/school_middle_groups_yeonsu.json` 생성. 실패 시 기존 파일 유지. `collect_schoolinfo.py`는 정밀도별 경계 기준(원본 10m / 기존 간략화 35m)을 쓰고 `middle_groups`(학교군·학교 목록)와 공동통학구역 선택 학교(`zone_review.schools`)를 기록. 실데이터 사전 실행: 초등 통학구역 확인 79 → 91개 단지, 보류 14 → 2(공동통학구역 1, 주소 미확인 1), 중학교 7학교군 92개 단지·20개교. 관심 14단지 결과는 이전과 동일.
