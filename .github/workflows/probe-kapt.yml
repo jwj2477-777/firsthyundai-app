@@ -15,28 +15,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Inspect official apartment transaction address fields (no personal data)
+      - name: Diagnose long-term repair reserve API (public fee data, key scrubbed)
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
-        run: |
-          python - <<'PY'
-          import os
-          from scripts.collect_trades import fetch_month, http_request
-          from scripts import collect_complexes as k
-          token=os.environ['DATA_GO_KR_SERVICE_KEY']
-          for category in ['매매','임대']:
-              try:
-                  rows=fetch_month(http_request,category,'202609',token,page_size=1000,max_pages=3,pause=0)
-                  songdo=[x for x in rows if (x.get('법정동') or x.get('umdNm'))=='송도동']
-                  print(category,'total',len(rows),'songdo',len(songdo),flush=True)
-                  if songdo:
-                      x=songdo[0]
-                      print(category,'keys:',sorted(x.keys()),flush=True)
-                      print(category,'address-related:',{k:x[k] for k in x if any(a in k.lower() for a in ('지번','jibun','aptseq','road','도로명','umd','법정동','bonbun','bubun','sgg','code','land','landcd'))},flush=True)
-              except Exception as err:
-                  print(category,'error:',type(err).__name__,str(err)[:120],flush=True)
-          listrows,_=k.unpack(k.call_api(k.LIST_URL,{'sigunguCode':'28185','numOfRows':500,'pageNo':1,'_type':'json'},token))
-          row=next(x for x in listrows if x.get('bjdCode')==k.SONGDO_CODE)
-          bas=k.base_item(token,row['kaptCode'])
-          print('K-apt basic address-related:',{name:bas.get(name) for name in ('bjdCode','kaptAddr','doroJuso','kaptCode','kaptName')},flush=True)
-          PY
+        run: python3 scripts/probe_reserve_fee.py
