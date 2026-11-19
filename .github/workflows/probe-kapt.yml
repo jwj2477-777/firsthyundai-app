@@ -19,3 +19,5 @@ jobs:
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
         run: python3 scripts/probe_reserve_fee.py
+      - name: Read public API specification page (no key)
+        run: python3 scripts/probe_reserve_spec.py

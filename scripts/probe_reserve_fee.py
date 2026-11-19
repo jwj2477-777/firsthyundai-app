@@ -14,9 +14,9 @@ from collect_complexes import key_normalize
 RAW = os.environ.get('DATA_GO_KR_SERVICE_KEY', '').strip()
 KEY = key_normalize(RAW) if RAW else ''
 BASE = 'https://apis.data.go.kr/1613000/AptRepairsCostServiceV3/'
-OPS = ['getHsmpMonthRetalFeeInfoV3', 'getHsmpMonthChargeAmtInfoV3']
+OPS = ['getHsmpMonthRetalFeeInfoV3']
 CODES = {'F15': 'A10026679'}
-MONTHS = ['202607', '202606', '202604', '202601', '202512']
+MONTHS = ['202606']
 
 def scrub(text):
     for secret in {KEY, RAW}:
