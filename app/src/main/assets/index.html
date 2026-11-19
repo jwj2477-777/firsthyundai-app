@@ -2151,24 +2151,45 @@ function renderComplexes(){
    overlapping_zones:'복수 경계가 겹쳐 자동으로 판단할 수 없습니다. 교육지원청에 주소 기준을 확인해 주세요.',
    requires_manual_review:'교육지원청이 제공하는 최신 주소 기준 학구도와 직접 대조해 주세요.'
   };
-  const boundaryGap=schoolReview?.reason==='near_boundary'&&
+  const reviewMin=[10,35].includes(schoolReview?.min_required_clearance_m)?schoolReview.min_required_clearance_m:0;
+  const boundaryGap=schoolReview?.reason==='near_boundary'&&reviewMin&&
    Number.isInteger(schoolReview.boundary_clearance_m)&&
-   schoolReview.boundary_clearance_m>=0&&schoolReview.boundary_clearance_m<35&&
-   schoolReview.min_required_clearance_m===35?
-   ' · 단지 좌표의 경계 이격 약 '+schoolReview.boundary_clearance_m+'m (자동 확인 기준 35m)':'';
+   schoolReview.boundary_clearance_m>=0&&schoolReview.boundary_clearance_m<reviewMin?
+   ' · 단지 좌표의 경계 이격 약 '+schoolReview.boundary_clearance_m+'m (자동 확인 기준 '+reviewMin+'m)':'';
+  const schoolNames=list=>Array.isArray(list)?list.filter(x=>typeof x==='string'&&/^[가-힣A-Za-z0-9 ()·.-]{2,30}$/.test(x)):[];
+  const jointChoices=schoolReview?.reason==='joint_zone'?schoolNames(schoolReview.schools).slice(0,4):[];
   const reviewAction=schoolReview?.reason?reviewActions[schoolReview.reason]||'공식 학구도를 다시 확인해 주세요.':
    '최신 학구도와 단지 주소의 검증 결과를 확인 중입니다.';
-  const zoneCard=match?
-    '<div class="complexSchoolRow schoolZoneReference"><span>초등학교 · 공식 통학구역 참고</span>'+
-    '<strong>'+escapeHtml(match.zone_name.replace(/통학구역$/,''))+'</strong>'+
+  const zoneSchool=match?schoolNames(match.schools)[0]:'';
+  const middleData=schoolDistrictData?.middle_groups;
+  const middle=middleData?.state==='verified_partial'&&Array.isArray(middleData.records)&&
+   middleData.reference_date===schoolDistrictData?.elementary_zones?.reference_date?
+   middleData.records.find(x=>x&&x.complex_id===p.id&&x.kind==='middle_school_group'&&
+     /^Z[0-9]{9}$/.test(x.group_id||'')&&typeof x.group_name==='string'&&x.group_name.length<=20&&
+     Number.isInteger(x.boundary_clearance_m)&&x.boundary_clearance_m>=10):null;
+  const middleSchools=middle?schoolNames(middle.schools):[];
+  const middleCard=middle?
+    '<div class="complexSchoolRow schoolZoneReference"><span>중학교 · 공식 학교군</span>'+
+    '<strong>'+escapeHtml(middle.group_name)+'</strong>'+
+    '<span class="tiny">중학교는 학교군 안의 여러 학교 중에서 배정됩니다(특정 학교 확정 아님).</span>'+
+    (middleSchools.length?'<details class="tiny"><summary>'+escapeHtml(middle.group_name)+' 중학교 '+middleSchools.length+'곳 보기</summary>'+
+      escapeHtml(middleSchools.join(' · '))+'</details>':'')+'</div>':'';
+  const zoneCard=(match?
+    '<div class="complexSchoolRow schoolZoneReference"><span>초등학교 · 공식 통학구역</span>'+
+    '<strong>'+escapeHtml(zoneSchool||match.zone_name.replace(/통학구역$/,''))+'</strong>'+
     '<span class="tiny">공식 학구도 '+escapeHtml(match.reference_date||'')+
-    ' 기준 · 단지 도로명주소 좌표와 경계를 대조한 결과입니다. 실제 입학 배정은 교육지원청에 확인해 주세요.</span>'+
+    ' 기준 · '+escapeHtml(match.zone_name)+' 안에 있는 단지입니다. 실제 입학 배정은 교육지원청에 확인해 주세요.</span>'+
+    sourceLink('https://schoolzone.emac.kr/','공식 학구도 원문 확인')+'</div>':
+    jointChoices.length?
+    '<div class="complexSchoolRow schoolZoneReference"><span>초등학교 · 공동통학구역</span>'+
+    '<strong>'+escapeHtml(jointChoices.join(' / '))+'</strong>'+
+    '<span class="tiny">공동통학구역이라 위 학교 중 선택할 수 있습니다. 해마다 적용 규정이 달라질 수 있어 교육지원청에 확인해 주세요.</span>'+
     sourceLink('https://schoolzone.emac.kr/','공식 학구도 원문 확인')+'</div>':
     '<div class="apiNotice"><strong>초등 통학구역 검증 보류</strong> · '+escapeHtml(reviewReason)+
     escapeHtml(boundaryGap)+
     '<div class="tiny">추가 확인: '+escapeHtml(reviewAction)+
     ' 특정 학교 배정은 확인되지 않았습니다.</div>'+
-    sourceLink(PUBLIC_SRC.zone,'공식 학구도 확인')+'</div>';
+    sourceLink(PUBLIC_SRC.zone,'공식 학구도 확인')+'</div>')+middleCard;
   const schoolView=schools.length?'<div class="complexSchoolList">'+schools.slice(0,25).map(x=>
     '<div class="complexSchoolRow"><span>'+escapeHtml(x.level)+' · '+(x.classification==='assigned'?'배정학교 확인':'인근 참고학교 (배정 미확인)')+'</span>'+
     '<strong>'+escapeHtml(x.name)+'</strong>'+
@@ -2213,7 +2234,9 @@ function verifiedSchoolZoneReference(row,referenceDate){
   row.method==='verified_exact_kakao_road_address'&&
   /^Z[0-9]{9}$/.test(row.zone_id||'')&&
   typeof row.zone_name==='string'&&row.zone_name.endsWith('통학구역')&&
-  Number.isInteger(row.boundary_clearance_m)&&row.boundary_clearance_m>=35&&
+  Number.isInteger(row.boundary_clearance_m)&&
+  // Original-precision 학구도 (≈1 m) needs 10 m; the legacy simplified file needed 35 m.
+  row.boundary_clearance_m>=(row.min_required_clearance_m===10?10:35)&&
   /^20[0-9]{2}-[01][0-9]-[0-3][0-9]$/.test(referenceDate||'')&&
   row.reference_date===referenceDate);
 }

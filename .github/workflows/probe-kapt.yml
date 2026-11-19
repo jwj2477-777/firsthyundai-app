@@ -1,35 +1,42 @@
 name: Probe approved K-apt API (safe one-time check)
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/probe-kapt.yml']
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   verify-access:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 7
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install --quiet pyshp==2.3.1 pyproj==3.6.1
-      - name: Dry run original-precision school zones (branch only, nothing pushed)
+      - name: Inspect official apartment transaction address fields (no personal data)
         env:
-          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
         run: |
-          python scripts/collect_school_zone_files.py
-          python -m unittest discover -s tests -p test_school_districts.py
-          python scripts/collect_schoolinfo.py
           python - <<'PY'
-          import json
-          d=json.load(open('data/school_districts.json',encoding='utf-8'))
-          z=json.load(open('data/school_zones_yeonsu.json',encoding='utf-8'))
-          print('DRY zones',len(z['zones']),z.get('precision'),z['reference_date'])
-          ez=d['elementary_zones'];print('DRY elementary',len(ez['records']),ez['note'])
-          rv=d['zone_review']['records'];print('DRY pending',len(rv),[ (x['complex_id'],x['reason'],x.get('boundary_clearance_m'),x.get('schools')) for x in rv])
-          mg=d.get('middle_groups',{});print('DRY middle',len(mg.get('records',[])),sorted({(r['group_name'],len(r['schools'])) for r in mg.get('records',[])}))
-          fav=['f13','f14','f15','m21','m22','m23','avenue','centennial','prime20','prime25','skcentral','artwin','central3','kapt-a10027887']
-          by={r['complex_id']:r for r in ez['records']}
-          print('DRY fav',[(f,by.get(f,{}).get('zone_name'),by.get(f,{}).get('schools')) for f in fav])
-          print('DRY middle schools',(mg.get('records') or [{}])[0].get('schools'))
+          import os
+          from scripts.collect_trades import fetch_month, http_request
+          from scripts import collect_complexes as k
+          token=os.environ['DATA_GO_KR_SERVICE_KEY']
+          for category in ['매매','임대']:
+              try:
+                  rows=fetch_month(http_request,category,'202609',token,page_size=1000,max_pages=3,pause=0)
+                  songdo=[x for x in rows if (x.get('법정동') or x.get('umdNm'))=='송도동']
+                  print(category,'total',len(rows),'songdo',len(songdo),flush=True)
+                  if songdo:
+                      x=songdo[0]
+                      print(category,'keys:',sorted(x.keys()),flush=True)
+                      print(category,'address-related:',{k:x[k] for k in x if any(a in k.lower() for a in ('지번','jibun','aptseq','road','도로명','umd','법정동','bonbun','bubun','sgg','code','land','landcd'))},flush=True)
+              except Exception as err:
+                  print(category,'error:',type(err).__name__,str(err)[:120],flush=True)
+          listrows,_=k.unpack(k.call_api(k.LIST_URL,{'sigunguCode':'28185','numOfRows':500,'pageNo':1,'_type':'json'},token))
+          row=next(x for x in listrows if x.get('bjdCode')==k.SONGDO_CODE)
+          bas=k.base_item(token,row['kaptCode'])
+          print('K-apt basic address-related:',{name:bas.get(name) for name in ('bjdCode','kaptAddr','doroJuso','kaptCode','kaptName')},flush=True)
           PY

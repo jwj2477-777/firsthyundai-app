@@ -18,9 +18,12 @@ assert(!actualFooter.includes('관심 14개 단지'),'Remove redundant repeated 
 assert(!html.includes('이전 수집에 없었고 새로 확인된 날짜'),'Remove unnecessary public trades intro paragraph');
 const estimates=JSON.parse(read('data/maintenance_estimates.json'));
 const f15Fee=estimates.records.find(x=>x.complex_id==='f15');
-assert(f15Fee&&f15Fee.kapt_code==='A10026679'&&f15Fee.month==='202607'&&f15Fee.won_per_exclusive_m2===3831,
+const f15Seed=f15Fee&&(f15Fee.month==='202607'?f15Fee:(f15Fee.monthly_history||[]).find(h=>h.month==='202607'));
+assert(f15Fee&&f15Fee.kapt_code==='A10026679'&&f15Fee.month>='202607'&&f15Seed&&f15Seed.won_per_exclusive_m2===3831,
  'Only real sourced F15 K-apt monthly fee rate should be loaded as an initial record');
-assert(f15Fee.monthly_total_won===270762294&&f15Fee.source_url==='https://apt.koreacharts.com/apt/A10026679/contents.html');
+// 2026-07 seed keeps its original source; later months come straight from official K-apt.
+assert(f15Seed.monthly_total_won===270762294&&f15Seed.source_url==='https://apt.koreacharts.com/apt/A10026679/contents.html');
+assert(f15Fee.month==='202607'||f15Fee.source_url==='https://www.k-apt.go.kr/','Newer F15 months must cite official K-apt');
 assert(!html.includes('class="brandEdition"'),'Stale 2.0 badge removed');
 assert(html.includes('<h1>퍼스트현대</h1>'));
 assert(html.includes('brandSubtitle'));
