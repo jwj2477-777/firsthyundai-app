@@ -1,27 +1,70 @@
 {
   "schema_version": 1,
   "state": "verified_partial",
-  "source": "K-apt 공식 공개 관리비 원문 재게시 자료(단지·기준월·세 항목 합계 교차 확인)",
-  "updated_at": "2026-10-24T02:02:00+09:00",
-  "checked_codes": 9,
-  "success_count": 9,
-  "failed_codes": 0,
+  "source": "공식 K-apt 공동주택 공용관리비·개별사용료·장기수선충당금 API",
+  "updated_at": "2026-11-20T01:00:20.809988+09:00",
+  "checked_codes": 75,
+  "success_count": 70,
+  "failed_codes": 5,
   "records": [
+    {
+      "complex_id": "artwin",
+      "kapt_code": "A10027898",
+      "month": "202608",
+      "won_per_exclusive_m2": 4845,
+      "monthly_total_won": 474288011,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 155597518,
+        "individual": 281008123,
+        "reserve": 37682370
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4845,
+          "monthly_total_won": 474288011,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 155597518,
+            "individual": 281008123,
+            "reserve": 37682370
+          }
+        }
+      ]
+    },
     {
       "complex_id": "avenue",
       "kapt_code": "A10025853",
-      "month": "202607",
-      "won_per_exclusive_m2": 3808,
-      "monthly_total_won": 200531373,
-      "source_url": "https://apt.koreacharts.com/apt/A10025853/contents.html",
-      "method": "published_kapt_mirror_full_total_per_exclusive_m2",
-      "basis": "출처에 확인된 공용관리비·개별사용료·장기수선충당금 월부과액 합계 / 단지 주거전용면적. 평형별 실제 세대 고지액 아님.",
+      "month": "202608",
+      "won_per_exclusive_m2": 4314,
+      "monthly_total_won": 227131894,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
       "components_won": {
-        "common": 106091762,
-        "individual": 88421201,
+        "common": 100238434,
+        "individual": 120875050,
         "reserve": 6018410
       },
       "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4314,
+          "monthly_total_won": 227131894,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 100238434,
+            "individual": 120875050,
+            "reserve": 6018410
+          }
+        },
         {
           "month": "202607",
           "won_per_exclusive_m2": 3808,
@@ -48,18 +91,31 @@
     {
       "complex_id": "central3",
       "kapt_code": "A10023434",
-      "month": "202606",
-      "won_per_exclusive_m2": 3834,
-      "monthly_total_won": 145502153,
-      "source_url": "https://apt.koreacharts.com/apt/A10023434/contents.html",
-      "method": "published_kapt_mirror_full_total_per_exclusive_m2",
-      "basis": "출처에 확인된 공용관리비·개별사용료·장기수선충당금 월부과액 합계 / 단지 주거전용면적. 평형별 실제 세대 고지액 아님.",
+      "month": "202608",
+      "won_per_exclusive_m2": 4790,
+      "monthly_total_won": 181772070,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
       "components_won": {
-        "common": 65837840,
-        "individual": 67120043,
+        "common": 68308010,
+        "individual": 100919790,
         "reserve": 12544270
       },
       "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4790,
+          "monthly_total_won": 181772070,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 68308010,
+            "individual": 100919790,
+            "reserve": 12544270
+          }
+        },
         {
           "month": "202606",
           "won_per_exclusive_m2": 3834,
@@ -132,73 +188,1955 @@
     {
       "complex_id": "f14",
       "kapt_code": "A10026681",
-      "month": "202606",
-      "won_per_exclusive_m2": 3340,
-      "monthly_total_won": 235614899,
-      "source_url": "https://apt.koreacharts.com/apt/A10026681/202606.html",
-      "method": "published_kapt_mirror_full_total_per_exclusive_m2",
-      "basis": "출처에 확인된 공용관리비·개별사용료·장기수선충당금 월부과액 합계 / 단지 주거전용면적. 평형별 실제 세대 고지액 아님.",
+      "month": "202608",
+      "won_per_exclusive_m2": 4171,
+      "monthly_total_won": 294193853,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
       "components_won": {
-        "common": 111046799,
-        "individual": 114721940,
+        "common": 110972009,
+        "individual": 173375684,
         "reserve": 9846160
-      }
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4171,
+          "monthly_total_won": 294193853,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 110972009,
+            "individual": 173375684,
+            "reserve": 9846160
+          }
+        },
+        {
+          "month": "202606",
+          "won_per_exclusive_m2": 3340,
+          "monthly_total_won": 235614899,
+          "source_url": "https://apt.koreacharts.com/apt/A10026681/202606.html",
+          "method": "published_kapt_mirror_full_total_per_exclusive_m2",
+          "basis": "출처에 확인된 공용관리비·개별사용료·장기수선충당금 월부과액 합계 / 단지 주거전용면적. 평형별 실제 세대 고지액 아님.",
+          "components_won": {
+            "common": 111046799,
+            "individual": 114721940,
+            "reserve": 9846160
+          }
+        }
+      ]
     },
     {
       "complex_id": "f15",
       "kapt_code": "A10026679",
-      "month": "202607",
-      "won_per_exclusive_m2": 3831,
-      "monthly_total_won": 270762294,
-      "source_url": "https://apt.koreacharts.com/apt/A10026679/contents.html",
-      "method": "kapt_published_total_per_residential_exclusive_m2",
-      "basis": "2026년 7월 공개 합계(공용관리비 115,610,190원 + 개별사용료 145,310,174원 + 장기수선충당금 9,841,930원) / 주거전용면적 합계 70,685.27㎡; ㎡당 공개 반올림 단가 3,831원. 실제 세대 청구액과 다름."
+      "month": "202608",
+      "won_per_exclusive_m2": 4082,
+      "monthly_total_won": 288540012,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 114141430,
+        "individual": 164556652,
+        "reserve": 9841930
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4082,
+          "monthly_total_won": 288540012,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 114141430,
+            "individual": 164556652,
+            "reserve": 9841930
+          }
+        },
+        {
+          "month": "202607",
+          "won_per_exclusive_m2": 3831,
+          "monthly_total_won": 270762294,
+          "source_url": "https://apt.koreacharts.com/apt/A10026679/contents.html",
+          "method": "kapt_published_total_per_residential_exclusive_m2",
+          "basis": "2026년 7월 공개 합계(공용관리비 115,610,190원 + 개별사용료 145,310,174원 + 장기수선충당금 9,841,930원) / 주거전용면적 합계 70,685.27㎡; ㎡당 공개 반올림 단가 3,831원. 실제 세대 청구액과 다름."
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10020270",
+      "kapt_code": "A10020270",
+      "month": "202608",
+      "won_per_exclusive_m2": 4657,
+      "monthly_total_won": 67465899,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 12164160,
+        "individual": 51851189,
+        "reserve": 3450550
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4657,
+          "monthly_total_won": 67465899,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 12164160,
+            "individual": 51851189,
+            "reserve": 3450550
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10020272",
+      "kapt_code": "A10020272",
+      "month": "202608",
+      "won_per_exclusive_m2": 4399,
+      "monthly_total_won": 72565540,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 14619810,
+        "individual": 53657700,
+        "reserve": 4288030
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4399,
+          "monthly_total_won": 72565540,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 14619810,
+            "individual": 53657700,
+            "reserve": 4288030
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10020527",
+      "kapt_code": "A10020527",
+      "month": "202608",
+      "won_per_exclusive_m2": 4076,
+      "monthly_total_won": 506794711,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 167876421,
+        "individual": 318650522,
+        "reserve": 20267768
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4076,
+          "monthly_total_won": 506794711,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 167876421,
+            "individual": 318650522,
+            "reserve": 20267768
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10020539",
+      "kapt_code": "A10020539",
+      "month": "202608",
+      "won_per_exclusive_m2": 4495,
+      "monthly_total_won": 207095008,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 81865490,
+        "individual": 115169218,
+        "reserve": 10060300
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4495,
+          "monthly_total_won": 207095008,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 81865490,
+            "individual": 115169218,
+            "reserve": 10060300
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10020712",
+      "kapt_code": "A10020712",
+      "month": "202608",
+      "won_per_exclusive_m2": 4116,
+      "monthly_total_won": 332914558,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 120964244,
+        "individual": 198767354,
+        "reserve": 13182960
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4116,
+          "monthly_total_won": 332914558,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 120964244,
+            "individual": 198767354,
+            "reserve": 13182960
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10020744",
+      "kapt_code": "A10020744",
+      "month": "202608",
+      "won_per_exclusive_m2": 3196,
+      "monthly_total_won": 317385817,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 137361799,
+        "individual": 159590003,
+        "reserve": 20434015
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3196,
+          "monthly_total_won": 317385817,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 137361799,
+            "individual": 159590003,
+            "reserve": 20434015
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10021000",
+      "kapt_code": "A10021000",
+      "month": "202608",
+      "won_per_exclusive_m2": 4414,
+      "monthly_total_won": 602845120,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 207464321,
+        "individual": 377380021,
+        "reserve": 18000778
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4414,
+          "monthly_total_won": 602845120,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 207464321,
+            "individual": 377380021,
+            "reserve": 18000778
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10022353",
+      "kapt_code": "A10022353",
+      "month": "202608",
+      "won_per_exclusive_m2": 4544,
+      "monthly_total_won": 78890120,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 37207930,
+        "individual": 33948910,
+        "reserve": 7733280
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4544,
+          "monthly_total_won": 78890120,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 37207930,
+            "individual": 33948910,
+            "reserve": 7733280
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10022395",
+      "kapt_code": "A10022395",
+      "month": "202608",
+      "won_per_exclusive_m2": 2778,
+      "monthly_total_won": 39525270,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 10740000,
+        "individual": 25993470,
+        "reserve": 2791800
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 2778,
+          "monthly_total_won": 39525270,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 10740000,
+            "individual": 25993470,
+            "reserve": 2791800
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10022494",
+      "kapt_code": "A10022494",
+      "month": "202608",
+      "won_per_exclusive_m2": 4594,
+      "monthly_total_won": 564284507,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 202585963,
+        "individual": 328397114,
+        "reserve": 33301430
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4594,
+          "monthly_total_won": 564284507,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 202585963,
+            "individual": 328397114,
+            "reserve": 33301430
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10022498",
+      "kapt_code": "A10022498",
+      "month": "202608",
+      "won_per_exclusive_m2": 4494,
+      "monthly_total_won": 655942518,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 200849525,
+        "individual": 412772323,
+        "reserve": 42320670
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4494,
+          "monthly_total_won": 655942518,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 200849525,
+            "individual": 412772323,
+            "reserve": 42320670
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10022954",
+      "kapt_code": "A10022954",
+      "month": "202608",
+      "won_per_exclusive_m2": 4526,
+      "monthly_total_won": 442114476,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 152751411,
+        "individual": 276241710,
+        "reserve": 13121355
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4526,
+          "monthly_total_won": 442114476,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 152751411,
+            "individual": 276241710,
+            "reserve": 13121355
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10022964",
+      "kapt_code": "A10022964",
+      "month": "202608",
+      "won_per_exclusive_m2": 4068,
+      "monthly_total_won": 249551608,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 82143104,
+        "individual": 159566084,
+        "reserve": 7842420
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4068,
+          "monthly_total_won": 249551608,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 82143104,
+            "individual": 159566084,
+            "reserve": 7842420
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10023361",
+      "kapt_code": "A10023361",
+      "month": "202608",
+      "won_per_exclusive_m2": 4094,
+      "monthly_total_won": 673255736,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 190059187,
+        "individual": 460362049,
+        "reserve": 22834500
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4094,
+          "monthly_total_won": 673255736,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 190059187,
+            "individual": 460362049,
+            "reserve": 22834500
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10024710",
+      "kapt_code": "A10024710",
+      "month": "202608",
+      "won_per_exclusive_m2": 3784,
+      "monthly_total_won": 739464040,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 255015741,
+        "individual": 445513479,
+        "reserve": 38934820
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3784,
+          "monthly_total_won": 739464040,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 255015741,
+            "individual": 445513479,
+            "reserve": 38934820
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10024779",
+      "kapt_code": "A10024779",
+      "month": "202608",
+      "won_per_exclusive_m2": 3077,
+      "monthly_total_won": 798297557,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 340731901,
+        "individual": 436986606,
+        "reserve": 20579050
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3077,
+          "monthly_total_won": 798297557,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 340731901,
+            "individual": 436986606,
+            "reserve": 20579050
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10025031",
+      "kapt_code": "A10025031",
+      "month": "202608",
+      "won_per_exclusive_m2": 3945,
+      "monthly_total_won": 498780392,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 173163084,
+        "individual": 305563768,
+        "reserve": 20053540
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3945,
+          "monthly_total_won": 498780392,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 173163084,
+            "individual": 305563768,
+            "reserve": 20053540
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10025071",
+      "kapt_code": "A10025071",
+      "month": "202608",
+      "won_per_exclusive_m2": 3861,
+      "monthly_total_won": 300859380,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 109155760,
+        "individual": 167877130,
+        "reserve": 23826490
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3861,
+          "monthly_total_won": 300859380,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 109155760,
+            "individual": 167877130,
+            "reserve": 23826490
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10025399",
+      "kapt_code": "A10025399",
+      "month": "202608",
+      "won_per_exclusive_m2": 3651,
+      "monthly_total_won": 651873485,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 229905923,
+        "individual": 388520672,
+        "reserve": 33446890
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3651,
+          "monthly_total_won": 651873485,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 229905923,
+            "individual": 388520672,
+            "reserve": 33446890
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10025443",
+      "kapt_code": "A10025443",
+      "month": "202608",
+      "won_per_exclusive_m2": 3144,
+      "monthly_total_won": 248660815,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 84733083,
+        "individual": 154603072,
+        "reserve": 9324660
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3144,
+          "monthly_total_won": 248660815,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 84733083,
+            "individual": 154603072,
+            "reserve": 9324660
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10025745",
+      "kapt_code": "A10025745",
+      "month": "202608",
+      "won_per_exclusive_m2": 3933,
+      "monthly_total_won": 267138885,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 101068915,
+        "individual": 149750750,
+        "reserve": 16319220
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3933,
+          "monthly_total_won": 267138885,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 101068915,
+            "individual": 149750750,
+            "reserve": 16319220
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10025886",
+      "kapt_code": "A10025886",
+      "month": "202608",
+      "won_per_exclusive_m2": 4432,
+      "monthly_total_won": 911464126,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 301327422,
+        "individual": 495457974,
+        "reserve": 114678730
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4432,
+          "monthly_total_won": 911464126,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 301327422,
+            "individual": 495457974,
+            "reserve": 114678730
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10026038",
+      "kapt_code": "A10026038",
+      "month": "202608",
+      "won_per_exclusive_m2": 3612,
+      "monthly_total_won": 664930881,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 259718923,
+        "individual": 362735858,
+        "reserve": 42476100
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3612,
+          "monthly_total_won": 664930881,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 259718923,
+            "individual": 362735858,
+            "reserve": 42476100
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10026547",
+      "kapt_code": "A10026547",
+      "month": "202608",
+      "won_per_exclusive_m2": 3807,
+      "monthly_total_won": 329017907,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 127346791,
+        "individual": 184903516,
+        "reserve": 16767600
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3807,
+          "monthly_total_won": 329017907,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 127346791,
+            "individual": 184903516,
+            "reserve": 16767600
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10027171",
+      "kapt_code": "A10027171",
+      "month": "202608",
+      "won_per_exclusive_m2": 4334,
+      "monthly_total_won": 621508512,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 199021122,
+        "individual": 356055620,
+        "reserve": 66431770
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4334,
+          "monthly_total_won": 621508512,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 199021122,
+            "individual": 356055620,
+            "reserve": 66431770
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10027367",
+      "kapt_code": "A10027367",
+      "month": "202608",
+      "won_per_exclusive_m2": 3778,
+      "monthly_total_won": 413330013,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 158180322,
+        "individual": 232686281,
+        "reserve": 22463410
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3778,
+          "monthly_total_won": 413330013,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 158180322,
+            "individual": 232686281,
+            "reserve": 22463410
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10027653",
+      "kapt_code": "A10027653",
+      "month": "202608",
+      "won_per_exclusive_m2": 4124,
+      "monthly_total_won": 428050094,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 157087549,
+        "individual": 246156145,
+        "reserve": 24806400
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4124,
+          "monthly_total_won": 428050094,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 157087549,
+            "individual": 246156145,
+            "reserve": 24806400
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10027884",
+      "kapt_code": "A10027884",
+      "month": "202608",
+      "won_per_exclusive_m2": 4449,
+      "monthly_total_won": 136518934,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 52690270,
+        "individual": 79307584,
+        "reserve": 4521080
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4449,
+          "monthly_total_won": 136518934,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 52690270,
+            "individual": 79307584,
+            "reserve": 4521080
+          }
+        }
+      ]
     },
     {
       "complex_id": "kapt-a10027887",
       "kapt_code": "A10027887",
-      "month": "202607",
-      "won_per_exclusive_m2": 3871,
-      "monthly_total_won": 213449231,
-      "source_url": "https://apt.koreacharts.com/apt/A10027887/contents.html",
-      "method": "published_kapt_mirror_full_total_per_exclusive_m2",
-      "basis": "출처에 확인된 공용관리비·개별사용료·장기수선충당금 월부과액 합계 / 단지 주거전용면적. 평형별 실제 세대 고지액 아님.",
+      "month": "202608",
+      "won_per_exclusive_m2": 4693,
+      "monthly_total_won": 258765626,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
       "components_won": {
-        "common": 108751599,
-        "individual": 80634732,
+        "common": 106001669,
+        "individual": 128701057,
         "reserve": 24062900
-      }
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4693,
+          "monthly_total_won": 258765626,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 106001669,
+            "individual": 128701057,
+            "reserve": 24062900
+          }
+        },
+        {
+          "month": "202607",
+          "won_per_exclusive_m2": 3871,
+          "monthly_total_won": 213449231,
+          "source_url": "https://apt.koreacharts.com/apt/A10027887/contents.html",
+          "method": "published_kapt_mirror_full_total_per_exclusive_m2",
+          "basis": "출처에 확인된 공용관리비·개별사용료·장기수선충당금 월부과액 합계 / 단지 주거전용면적. 평형별 실제 세대 고지액 아님.",
+          "components_won": {
+            "common": 108751599,
+            "individual": 80634732,
+            "reserve": 24062900
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a10027888",
+      "kapt_code": "A10027888",
+      "month": "202608",
+      "won_per_exclusive_m2": 4785,
+      "monthly_total_won": 353882232,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 117157281,
+        "individual": 207458241,
+        "reserve": 29266710
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4785,
+          "monthly_total_won": 353882232,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 117157281,
+            "individual": 207458241,
+            "reserve": 29266710
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673002",
+      "kapt_code": "A40673002",
+      "month": "202608",
+      "won_per_exclusive_m2": 3423,
+      "monthly_total_won": 156461184,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 65292050,
+        "individual": 75908734,
+        "reserve": 15260400
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3423,
+          "monthly_total_won": 156461184,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 65292050,
+            "individual": 75908734,
+            "reserve": 15260400
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673101",
+      "kapt_code": "A40673101",
+      "month": "202608",
+      "won_per_exclusive_m2": 3246,
+      "monthly_total_won": 181190451,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 71562872,
+        "individual": 91649139,
+        "reserve": 17978440
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3246,
+          "monthly_total_won": 181190451,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 71562872,
+            "individual": 91649139,
+            "reserve": 17978440
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673412",
+      "kapt_code": "A40673412",
+      "month": "202608",
+      "won_per_exclusive_m2": 3247,
+      "monthly_total_won": 310922134,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 109923623,
+        "individual": 166942951,
+        "reserve": 34055560
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3247,
+          "monthly_total_won": 310922134,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 109923623,
+            "individual": 166942951,
+            "reserve": 34055560
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673510",
+      "kapt_code": "A40673510",
+      "month": "202608",
+      "won_per_exclusive_m2": 3753,
+      "monthly_total_won": 305435818,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 96810949,
+        "individual": 146733029,
+        "reserve": 61891840
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3753,
+          "monthly_total_won": 305435818,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 96810949,
+            "individual": 146733029,
+            "reserve": 61891840
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673603",
+      "kapt_code": "A40673603",
+      "month": "202608",
+      "won_per_exclusive_m2": 3524,
+      "monthly_total_won": 150873080,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 58040780,
+        "individual": 78865300,
+        "reserve": 13967000
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3524,
+          "monthly_total_won": 150873080,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 58040780,
+            "individual": 78865300,
+            "reserve": 13967000
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673902",
+      "kapt_code": "A40673902",
+      "month": "202608",
+      "won_per_exclusive_m2": 1954,
+      "monthly_total_won": 116188840,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 70627110,
+        "individual": 23585730,
+        "reserve": 21976000
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 1954,
+          "monthly_total_won": 116188840,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 70627110,
+            "individual": 23585730,
+            "reserve": 21976000
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673903",
+      "kapt_code": "A40673903",
+      "month": "202608",
+      "won_per_exclusive_m2": 4252,
+      "monthly_total_won": 205932736,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 69358594,
+        "individual": 114803732,
+        "reserve": 21770410
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4252,
+          "monthly_total_won": 205932736,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 69358594,
+            "individual": 114803732,
+            "reserve": 21770410
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673904",
+      "kapt_code": "A40673904",
+      "month": "202608",
+      "won_per_exclusive_m2": 6807,
+      "monthly_total_won": 590111695,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 151693510,
+        "individual": 406132104,
+        "reserve": 32286081
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 6807,
+          "monthly_total_won": 590111695,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 151693510,
+            "individual": 406132104,
+            "reserve": 32286081
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673906",
+      "kapt_code": "A40673906",
+      "month": "202608",
+      "won_per_exclusive_m2": 5656,
+      "monthly_total_won": 427085407,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 100986887,
+        "individual": 297331280,
+        "reserve": 28767240
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 5656,
+          "monthly_total_won": 427085407,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 100986887,
+            "individual": 297331280,
+            "reserve": 28767240
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673907",
+      "kapt_code": "A40673907",
+      "month": "202608",
+      "won_per_exclusive_m2": 6332,
+      "monthly_total_won": 403275865,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 110916805,
+        "individual": 275508040,
+        "reserve": 16851020
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 6332,
+          "monthly_total_won": 403275865,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 110916805,
+            "individual": 275508040,
+            "reserve": 16851020
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673908",
+      "kapt_code": "A40673908",
+      "month": "202608",
+      "won_per_exclusive_m2": 5976,
+      "monthly_total_won": 422383402,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 102143579,
+        "individual": 292575583,
+        "reserve": 27664240
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 5976,
+          "monthly_total_won": 422383402,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 102143579,
+            "individual": 292575583,
+            "reserve": 27664240
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673910",
+      "kapt_code": "A40673910",
+      "month": "202608",
+      "won_per_exclusive_m2": 6922,
+      "monthly_total_won": 532772905,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 153496161,
+        "individual": 358303884,
+        "reserve": 20972860
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 6922,
+          "monthly_total_won": 532772905,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 153496161,
+            "individual": 358303884,
+            "reserve": 20972860
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673911",
+      "kapt_code": "A40673911",
+      "month": "202608",
+      "won_per_exclusive_m2": 5149,
+      "monthly_total_won": 158129454,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 54537252,
+        "individual": 93493332,
+        "reserve": 10098870
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 5149,
+          "monthly_total_won": 158129454,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 54537252,
+            "individual": 93493332,
+            "reserve": 10098870
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673912",
+      "kapt_code": "A40673912",
+      "month": "202608",
+      "won_per_exclusive_m2": 5770,
+      "monthly_total_won": 356805138,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 86211668,
+        "individual": 234711260,
+        "reserve": 35882210
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 5770,
+          "monthly_total_won": 356805138,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 86211668,
+            "individual": 234711260,
+            "reserve": 35882210
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673913",
+      "kapt_code": "A40673913",
+      "month": "202608",
+      "won_per_exclusive_m2": 6591,
+      "monthly_total_won": 402794452,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 94827043,
+        "individual": 288044669,
+        "reserve": 19922740
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 6591,
+          "monthly_total_won": 402794452,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 94827043,
+            "individual": 288044669,
+            "reserve": 19922740
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673914",
+      "kapt_code": "A40673914",
+      "month": "202608",
+      "won_per_exclusive_m2": 5289,
+      "monthly_total_won": 304010936,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 87610378,
+        "individual": 198013108,
+        "reserve": 18387450
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 5289,
+          "monthly_total_won": 304010936,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 87610378,
+            "individual": 198013108,
+            "reserve": 18387450
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673915",
+      "kapt_code": "A40673915",
+      "month": "202608",
+      "won_per_exclusive_m2": 5256,
+      "monthly_total_won": 264249483,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 78268990,
+        "individual": 171817803,
+        "reserve": 14162690
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 5256,
+          "monthly_total_won": 264249483,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 78268990,
+            "individual": 171817803,
+            "reserve": 14162690
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673916",
+      "kapt_code": "A40673916",
+      "month": "202608",
+      "won_per_exclusive_m2": 4018,
+      "monthly_total_won": 240915100,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 94749128,
+        "individual": 134251162,
+        "reserve": 11914810
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4018,
+          "monthly_total_won": 240915100,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 94749128,
+            "individual": 134251162,
+            "reserve": 11914810
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673917",
+      "kapt_code": "A40673917",
+      "month": "202608",
+      "won_per_exclusive_m2": 3835,
+      "monthly_total_won": 268569312,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 94349827,
+        "individual": 160943895,
+        "reserve": 13275590
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3835,
+          "monthly_total_won": 268569312,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 94349827,
+            "individual": 160943895,
+            "reserve": 13275590
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673918",
+      "kapt_code": "A40673918",
+      "month": "202608",
+      "won_per_exclusive_m2": 2641,
+      "monthly_total_won": 66402196,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 46777226,
+        "individual": 9281860,
+        "reserve": 10343110
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 2641,
+          "monthly_total_won": 66402196,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 46777226,
+            "individual": 9281860,
+            "reserve": 10343110
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673920",
+      "kapt_code": "A40673920",
+      "month": "202608",
+      "won_per_exclusive_m2": 3663,
+      "monthly_total_won": 509329296,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 177107913,
+        "individual": 295677193,
+        "reserve": 36544190
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3663,
+          "monthly_total_won": 509329296,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 177107913,
+            "individual": 295677193,
+            "reserve": 36544190
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673921",
+      "kapt_code": "A40673921",
+      "month": "202608",
+      "won_per_exclusive_m2": 4103,
+      "monthly_total_won": 772856660,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 234654743,
+        "individual": 494413107,
+        "reserve": 43788810
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4103,
+          "monthly_total_won": 772856660,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 234654743,
+            "individual": 494413107,
+            "reserve": 43788810
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40673922",
+      "kapt_code": "A40673922",
+      "month": "202608",
+      "won_per_exclusive_m2": 4147,
+      "monthly_total_won": 595664730,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 196545656,
+        "individual": 364181674,
+        "reserve": 34937400
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4147,
+          "monthly_total_won": 595664730,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 196545656,
+            "individual": 364181674,
+            "reserve": 34937400
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40684004",
+      "kapt_code": "A40684004",
+      "month": "202608",
+      "won_per_exclusive_m2": 3359,
+      "monthly_total_won": 178347408,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 68307491,
+        "individual": 94882417,
+        "reserve": 15157500
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3359,
+          "monthly_total_won": 178347408,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 68307491,
+            "individual": 94882417,
+            "reserve": 15157500
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40684005",
+      "kapt_code": "A40684005",
+      "month": "202608",
+      "won_per_exclusive_m2": 3527,
+      "monthly_total_won": 235702223,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 90827803,
+        "individual": 114138430,
+        "reserve": 30735990
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3527,
+          "monthly_total_won": 235702223,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 90827803,
+            "individual": 114138430,
+            "reserve": 30735990
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40684007",
+      "kapt_code": "A40684007",
+      "month": "202608",
+      "won_per_exclusive_m2": 3555,
+      "monthly_total_won": 211075802,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 79219691,
+        "individual": 104985904,
+        "reserve": 26870207
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3555,
+          "monthly_total_won": 211075802,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 79219691,
+            "individual": 104985904,
+            "reserve": 26870207
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40684008",
+      "kapt_code": "A40684008",
+      "month": "202608",
+      "won_per_exclusive_m2": 2880,
+      "monthly_total_won": 209628013,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 78865324,
+        "individual": 105256523,
+        "reserve": 25506166
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 2880,
+          "monthly_total_won": 209628013,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 78865324,
+            "individual": 105256523,
+            "reserve": 25506166
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40684009",
+      "kapt_code": "A40684009",
+      "month": "202608",
+      "won_per_exclusive_m2": 3600,
+      "monthly_total_won": 345753218,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 117886209,
+        "individual": 190331689,
+        "reserve": 37535320
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3600,
+          "monthly_total_won": 345753218,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 117886209,
+            "individual": 190331689,
+            "reserve": 37535320
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40684011",
+      "kapt_code": "A40684011",
+      "month": "202608",
+      "won_per_exclusive_m2": 3416,
+      "monthly_total_won": 413380161,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 132548323,
+        "individual": 228372598,
+        "reserve": 52459240
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3416,
+          "monthly_total_won": 413380161,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 132548323,
+            "individual": 228372598,
+            "reserve": 52459240
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "kapt-a40684013",
+      "kapt_code": "A40684013",
+      "month": "202608",
+      "won_per_exclusive_m2": 5888,
+      "monthly_total_won": 1196285955,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 379383055,
+        "individual": 645260680,
+        "reserve": 171642220
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 5888,
+          "monthly_total_won": 1196285955,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 379383055,
+            "individual": 645260680,
+            "reserve": 171642220
+          }
+        }
+      ]
     },
     {
       "complex_id": "m21",
       "kapt_code": "A10027925",
       "month": "202608",
-      "won_per_exclusive_m2": 5100,
-      "monthly_total_won": 337535446,
-      "source_url": "https://apt.koreacharts.com/apt/A10027925/contents.html",
-      "method": "published_kapt_mirror_full_total_per_exclusive_m2",
-      "basis": "출처에 확인된 공용관리비·개별사용료·장기수선충당금 월부과액 합계 / 단지 주거전용면적. 평형별 실제 세대 고지액 아님.",
+      "won_per_exclusive_m2": 5091,
+      "monthly_total_won": 336930876,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
       "components_won": {
-        "common": 115618076,
+        "common": 115013506,
         "individual": 201903920,
         "reserve": 20013450
-      }
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 5091,
+          "monthly_total_won": 336930876,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 115013506,
+            "individual": 201903920,
+            "reserve": 20013450
+          }
+        }
+      ]
     },
     {
       "complex_id": "m22",
       "kapt_code": "A10027929",
-      "month": "202607",
-      "won_per_exclusive_m2": 4744,
-      "monthly_total_won": 313214635,
-      "source_url": "https://apt.koreacharts.com/apt/A10027929/contents.html",
-      "method": "published_kapt_mirror_full_total_per_exclusive_m2",
-      "basis": "출처에 확인된 공용관리비·개별사용료·장기수선충당금 월부과액 합계 / 단지 주거전용면적. 평형별 실제 세대 고지액 아님.",
+      "month": "202608",
+      "won_per_exclusive_m2": 5174,
+      "monthly_total_won": 341665518,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
       "components_won": {
-        "common": 124239895,
-        "individual": 168303410,
+        "common": 117626728,
+        "individual": 203367460,
         "reserve": 20671330
       },
       "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 5174,
+          "monthly_total_won": 341665518,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 117626728,
+            "individual": 203367460,
+            "reserve": 20671330
+          }
+        },
         {
           "month": "202607",
           "won_per_exclusive_m2": 4744,
@@ -231,20 +2169,108 @@
       ]
     },
     {
+      "complex_id": "prime20",
+      "kapt_code": "A10023693",
+      "month": "202608",
+      "won_per_exclusive_m2": 4846,
+      "monthly_total_won": 297961025,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 108218348,
+        "individual": 173081327,
+        "reserve": 16661350
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 4846,
+          "monthly_total_won": 297961025,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 108218348,
+            "individual": 173081327,
+            "reserve": 16661350
+          }
+        }
+      ]
+    },
+    {
+      "complex_id": "prime25",
+      "kapt_code": "A10024083",
+      "month": "202608",
+      "won_per_exclusive_m2": 5202,
+      "monthly_total_won": 106125756,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+      "components_won": {
+        "common": 45084857,
+        "individual": 54670059,
+        "reserve": 6370840
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 5202,
+          "monthly_total_won": 106125756,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 45084857,
+            "individual": 54670059,
+            "reserve": 6370840
+          }
+        }
+      ]
+    },
+    {
       "complex_id": "skcentral",
       "kapt_code": "A10024573",
-      "month": "202607",
-      "won_per_exclusive_m2": 3812,
-      "monthly_total_won": 96537459,
-      "source_url": "https://apt.koreacharts.com/apt/A10024573/202607.html",
-      "method": "published_kapt_mirror_full_total_per_exclusive_m2",
-      "basis": "출처에 확인된 공용관리비·개별사용료·장기수선충당금 월부과액 합계 / 단지 주거전용면적. 평형별 실제 세대 고지액 아님.",
+      "month": "202608",
+      "won_per_exclusive_m2": 3591,
+      "monthly_total_won": 90938627,
+      "source_url": "https://www.k-apt.go.kr/",
+      "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+      "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
       "components_won": {
-        "common": 38987990,
-        "individual": 51645589,
+        "common": 38734540,
+        "individual": 46300207,
         "reserve": 5903880
-      }
+      },
+      "monthly_history": [
+        {
+          "month": "202608",
+          "won_per_exclusive_m2": 3591,
+          "monthly_total_won": 90938627,
+          "source_url": "https://www.k-apt.go.kr/",
+          "method": "official_kapt_three_group_full_total_per_residential_exclusive_m2",
+          "basis": "공식 K-apt 공용관리비·개별사용료·장기수선충당금 합계 / 단지 주거전용면적; 실제 세대 고지액이 아닌 상담 참고액",
+          "components_won": {
+            "common": 38734540,
+            "individual": 46300207,
+            "reserve": 5903880
+          }
+        },
+        {
+          "month": "202607",
+          "won_per_exclusive_m2": 3812,
+          "monthly_total_won": 96537459,
+          "source_url": "https://apt.koreacharts.com/apt/A10024573/202607.html",
+          "method": "published_kapt_mirror_full_total_per_exclusive_m2",
+          "basis": "출처에 확인된 공용관리비·개별사용료·장기수선충당금 월부과액 합계 / 단지 주거전용면적. 평형별 실제 세대 고지액 아님.",
+          "components_won": {
+            "common": 38987990,
+            "individual": 51645589,
+            "reserve": 5903880
+          }
+        }
+      ]
     }
   ],
-  "note": "2026-10-24 공개 자료 개별 대조로 확정한 단지별 월별 참고단가. 게시된 9개 단지 외는 확인 중; 자동 API 전체 수집 성공을 뜻하지 않음. 원자료 월별 갱신이 필요. 실제 세대 청구액 아님."
+  "note": "공식 세 그룹과 검증한 기준 단지의 금액 오차가 허용범위일 때만 참고액 저장. 미검증 단지는 기존 자료 보존. 실제 세대별 고지액 아님."
 }
