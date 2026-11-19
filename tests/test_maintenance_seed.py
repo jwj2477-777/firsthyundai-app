@@ -44,7 +44,11 @@ class SeedValidation(unittest.TestCase):
  def test_original_f15_preserved(self):
   data=json.loads((ROOT/'data/maintenance_estimates.json').read_text(encoding='utf8'))
   r=next(x for x in data['records'] if x['complex_id']=='f15')
-  self.assertEqual((r['month'],r['won_per_exclusive_m2'],r['monthly_total_won']),
-                   ('202607',3831,270762294))
+  # The independently verified 2026-07 seed must survive in the history; newer
+  # official months (e.g. 2026-08 after the reserve API fix) may become current.
+  history={h['month']:(h['won_per_exclusive_m2'],h['monthly_total_won']) for h in r.get('monthly_history',[])}
+  current=(r['won_per_exclusive_m2'],r['monthly_total_won'])
+  self.assertEqual(history.get('202607',current if r['month']=='202607' else None),(3831,270762294))
+  self.assertGreaterEqual(r['month'],'202607')
 
 if __name__=='__main__':unittest.main()

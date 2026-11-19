@@ -32,6 +32,7 @@ on:
       - 'scripts/test_account_picker.js'
       - 'scripts/test_office_board.mjs'
       - 'scripts/test_office_device_approval.mjs'
+      - 'scripts/test_school_tab_zones.js'
       - 'scripts/test_office_board_images.mjs'
       - 'scripts/test_office_board_ui.js'
       - 'scripts/test_office_draft_lifecycle.js'
@@ -306,6 +307,7 @@ jobs:
           node scripts/test_account_picker.js
           node scripts/test_office_board.mjs
           node scripts/test_office_device_approval.mjs
+          node scripts/test_school_tab_zones.js
           node scripts/test_office_board_images.mjs
           node scripts/test_office_board_ui.js
           node scripts/test_office_draft_lifecycle.js
@@ -405,25 +407,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.94 contract memo accuracy APK
+      - name: Publish v2.1.95 school districts APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.94.apk
-          unzip -t FirstHyundai-v2.1.94.apk | grep 'No errors detected'
-          if gh release view v2.1.94 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.95.apk
+          unzip -t FirstHyundai-v2.1.95.apk | grep 'No errors detected'
+          if gh release view v2.1.95 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.1.94 FirstHyundai-v2.1.94.apk \
+            gh release create v2.1.95 FirstHyundai-v2.1.95.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.94 · 새 휴대폰 승인·30분 전 예비 알람·계약 메모 보완' \
-               --notes '① 보안: 처음 연결하는 휴대폰은 관리자가 관리자센터 "새 휴대폰 승인"에서 승인해야 공유메모를 볼 수 있습니다. 이미 연결된 휴대폰은 그대로 사용합니다. ② 30분 전 일정 알림: 서버 알림이 늦거나 서버 장애가 있어도 휴대폰에 저장된 일정으로 예비 알림을 띄웁니다(중복 알림 없음, Android 절전 상태에서는 몇 분 늦을 수 있음). ③ 실거래 자료 용량 여유 확보. ④ 계약 메모 인식: 가계약금/계약금 구분, "8억 일부"·"5억 일단" 거래금액 누락 수정, 3차 이상 중도금 확인 안내, 회차 없는 중도금 처리, 중복 안내 제거. v2.1.94/build245.'
+              --title '퍼스트현대 v2.1.95 · 초등 통학구역·중학교 학교군 정밀화' \
+               --notes '① 아파트정보 학교 탭: 공공데이터포털 공식 학구도(2026-09-20) 원본 경계로 다시 판정해 송도 단지 91곳의 초등 통학구역 학교를 표시합니다(기존 79곳). 학교 이름으로 바로 보여줍니다. ② 공동통학구역은 선택 가능한 학교를 모두 표시합니다. ③ 중학교 학교군(송도 7학교군)과 학교군 안 중학교 목록을 새로 표시합니다. ④ 관리비 공식 합계가 70개 단지로 늘어난 자료를 그대로 표시합니다. 실제 입학 배정은 교육지원청 확인이 필요합니다. v2.1.95/build246.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.94 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.94 --apk FirstHyundai-v2.1.94.apk
+          gh release upload v2.1.95 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.95 --apk FirstHyundai-v2.1.95.apk
 
 
 

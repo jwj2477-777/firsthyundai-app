@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'scripts/collect_schoolinfo.py'
+      - 'scripts/collect_school_zone_files.py'
+      - 'tests/test_school_zone_files.py'
       - 'tests/test_fee_school_gap_coverage.py'
       - 'data/school_zones_yeonsu.json'
       - 'data/school_districts.json'
@@ -29,6 +31,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Test original-precision school-district builder
+        run: python -m unittest discover -s tests -p test_school_zone_files.py -v
+      - name: Refresh official school-district geometry (data.go.kr 학구도, no keys; keeps last good files on failure)
+        run: |
+          pip install --quiet pyshp==2.3.1 pyproj==3.6.1
+          python scripts/collect_school_zone_files.py
       - name: Confirm shapefile-derived zone polygons and provider safeguards
         run: python -m unittest discover -s tests -p test_school_districts.py -v
       - name: Check unverified-school reason classification
@@ -42,7 +50,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/school_districts.json
+          git add data/school_districts.json data/school_zones_yeonsu.json $(ls data/school_middle_groups_yeonsu.json 2>/dev/null)
           if git diff --staged --quiet; then
             echo 'No newly verified school information; original snapshot preserved'; exit 0
           fi

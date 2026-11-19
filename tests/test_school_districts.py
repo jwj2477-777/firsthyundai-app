@@ -8,10 +8,13 @@ m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 class SchoolZoneSafeguards(unittest.TestCase):
  def test_official_20260920_file_geometries_are_closed(self):
   d=json.loads((R/'data'/'school_zones_yeonsu.json').read_text(encoding='utf8'))
-  self.assertEqual(d['reference_date'],'2026-09-20')
+  self.assertRegex(d['reference_date'],r'^20[0-9]{2}-(03|09)-[0-3][0-9]$')
   self.assertEqual(d['crs'],'EPSG:4326')
-  self.assertEqual(len(d['zones']),34)
-  self.assertEqual(len({x['id'] for x in d['zones']}),34)
+  # Legacy simplified file: exactly 34 zones. Original-precision refresh (data.go.kr): 20-80 zones.
+  count=len(d['zones'])
+  if d.get('precision')=='original':self.assertTrue(20<=count<=80)
+  else:self.assertEqual(count,34)
+  self.assertEqual(len({x['id'] for x in d['zones']}),count)
   for z in d['zones']:
    self.assertRegex(z['id'],r'^Z[0-9]{9}$')
    for polygon in z['rings']:

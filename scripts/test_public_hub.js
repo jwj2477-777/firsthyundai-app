@@ -70,8 +70,8 @@ assert(javascript.includes("공동통학구역은 여러 학교 선택 가능 �
  'Joint catchments must not be presented as one assigned school');
 assert(javascript.includes("x.reference_date===schoolDistrictData.zone_review.reference_date"),
  'Never show out-of-date review reason from a mismatched official zone snapshot');
-assert(javascript.includes("schoolReview.min_required_clearance_m===35"),
- 'Only source-validated 35m safety margin may show a boundary gap');
+assert(javascript.includes("[10,35].includes(schoolReview?.min_required_clearance_m)"),
+ 'Only source-validated safety margins (35 m legacy, 10 m original precision) may show a boundary gap');
 assert(javascript.includes("특정 학교 배정은 확인되지 않았습니다."),
  'Unverified school must remain explicit');
 const schoolSnapshot=JSON.parse(fs.readFileSync(path.join(root,'data/school_districts.json'),'utf8'));
