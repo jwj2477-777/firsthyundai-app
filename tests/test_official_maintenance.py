@@ -23,6 +23,14 @@ class OfficialFees(unittest.TestCase):
   row={'kaptCode':'A10026679','kaptName':'15BL','searchDate':'202607',
        'guardCost':'1,500,000','cleanCost':'250000', 'privArea':'70685.27'}
   self.assertEqual(mod.extract_amount([row],'A10026679','202607'),1750000)
+ def test_reserve_uses_real_levy_operation(self):
+  # Live-verified 2026-11-20: getHsmpMonthFeeInfoV3 returned sLevy=9841930 for F15 2026-07,
+  # exactly the independent calibration value. The old operation name does not exist.
+  self.assertEqual(mod.GROUPS['reserve'], ('AptRepairsCostServiceV3', ('getHsmpMonthFeeInfoV3',)))
+  row={'kaptCode':'A10026679','kaptName':'송도더샵퍼스트파크15단지','sLevy':'9841930'}
+  self.assertEqual(mod.extract_amount([row],'A10026679','202607'), mod.CALIBRATION['reserve'])
+  # An unpublished month comes back as empty fields: missing, never zero.
+  self.assertIsNone(mod.extract_amount([{'kaptCode':None,'kaptName':None,'sLevy':None}],'A10026679','202609'))
  def test_calibration_required(self):
   self.assertTrue(mod.calibration_passes(dict(mod.CALIBRATION), '70685.27'))
   self.assertTrue(mod.calibration_passes({'common': 115610191, 'individual':145310174,'reserve':9841930},'70685.27'))
