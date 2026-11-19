@@ -14,9 +14,9 @@ from collect_complexes import key_normalize
 RAW = os.environ.get('DATA_GO_KR_SERVICE_KEY', '').strip()
 KEY = key_normalize(RAW) if RAW else ''
 BASE = 'https://apis.data.go.kr/1613000/AptRepairsCostServiceV3/'
-OPS = ['getHsmpMonthRetalFeeInfoV3']
-CODES = {'F15': 'A10026679'}
-MONTHS = ['202606']
+OPS = ['getHsmpMonthFeeInfoV3', 'getHsmpReserveBalanceInfoV3', 'getHsmpAccumulationTariffInfoV3']
+CODES = {'F15': 'A10026679', 'F14': 'A10026681'}
+MONTHS = ['202607', '202609']
 
 def scrub(text):
     for secret in {KEY, RAW}:
@@ -58,9 +58,7 @@ if not KEY:
 for op in OPS:
     for name, code in CODES.items():
         for month in MONTHS:
-            for variant in ({'kaptCode': code, 'searchDate': month},
-                            {'kaptCode': code, 'searchDate': month, '_type': 'json'},
-                            {'kaptCode': code, 'searchDate': month, 'dataType': 'JSON'}):
+            for variant in ({'kaptCode': code, 'searchDate': month},):
                 status, body = call(op, variant)
                 keys = ','.join(k for k in variant if k != 'kaptCode')
                 print('RESERVE', op, name, month, keys, 'HTTP', status, '::', summarize(body), flush=True)
