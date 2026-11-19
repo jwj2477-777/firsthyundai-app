@@ -211,6 +211,20 @@ def public_identity(record):
                       ensure_ascii=False, separators=(',', ':'))
 
 
+def compact_feed(payload):
+    """One transaction per line, no indentation.
+
+    The Android app refuses public feeds above 8 MiB. Pretty-printed trades.json
+    reached ~7.0 MB; this format is ~24% smaller while keeping git diffs readable.
+    """
+    head = {k: v for k, v in payload.items() if k != 'records'}
+    records = payload.get('records') or []
+    body = json.dumps(head, ensure_ascii=False, separators=(',', ':'))[:-1]
+    lines = ',\n'.join(json.dumps(r, ensure_ascii=False, separators=(',', ':')) for r in records)
+    sep = ',' if head else ''
+    return body + sep + '"records":[\n' + lines + '\n]}\n'
+
+
 def newly_detected(previous, current):
     """동일 조건의 중복 신고가 추가되면 추가된 개수만 계산."""
     previous_counts = Counter(public_identity(record) for record in previous)
@@ -266,7 +280,7 @@ def publish_newly_detected(new_records, *, now, failed, missing):
         'records': combined,
     }
     NEW_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    NEW_OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + chr(10), encoding='utf-8')
+    NEW_OUTPUT.write_text(compact_feed(payload), encoding='utf-8')
     return payload
 
 
@@ -340,7 +354,7 @@ def update(*, months=12, key=None, request=http_request, now=None):
         'note': '신고 기준 공개 자료입니다. 실제 계약일과 공개일은 다르며, 반영 지연·정정·해제가 발생할 수 있습니다.'
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(out, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+    OUTPUT.write_text(compact_feed(out), encoding='utf-8')
     news = publish_newly_detected(newest, now=now, failed=failures, missing=missing)
     print(f"신규 공개 확인 {len(newest)}건 / 최근 31일 누적 {news['count']}건")
     return out
