@@ -6,12 +6,30 @@ permissions:
 jobs:
   verify-access:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install pyshp==2.3.1 pyproj==3.6.1
-      - name: Describe school-district files near Songdo (no keys)
-        run: python3 scripts/probe_school_zone_files.py
+      - run: pip install --quiet pyshp==2.3.1 pyproj==3.6.1
+      - name: Dry run original-precision school zones (branch only, nothing pushed)
+        env:
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+        run: |
+          python scripts/collect_school_zone_files.py
+          python -m unittest discover -s tests -p test_school_districts.py
+          python scripts/collect_schoolinfo.py
+          python - <<'PY'
+          import json
+          d=json.load(open('data/school_districts.json',encoding='utf-8'))
+          z=json.load(open('data/school_zones_yeonsu.json',encoding='utf-8'))
+          print('DRY zones',len(z['zones']),z.get('precision'),z['reference_date'])
+          ez=d['elementary_zones'];print('DRY elementary',len(ez['records']),ez['note'])
+          rv=d['zone_review']['records'];print('DRY pending',len(rv),[ (x['complex_id'],x['reason'],x.get('boundary_clearance_m'),x.get('schools')) for x in rv])
+          mg=d.get('middle_groups',{});print('DRY middle',len(mg.get('records',[])),sorted({(r['group_name'],len(r['schools'])) for r in mg.get('records',[])}))
+          fav=['f13','f14','f15','m21','m22','m23','avenue','centennial','prime20','prime25','skcentral','artwin','central3','kapt-a10027887']
+          by={r['complex_id']:r for r in ez['records']}
+          print('DRY fav',[(f,by.get(f,{}).get('zone_name'),by.get(f,{}).get('schools')) for f in fav])
+          print('DRY middle schools',(mg.get('records') or [{}])[0].get('schools'))
+          PY

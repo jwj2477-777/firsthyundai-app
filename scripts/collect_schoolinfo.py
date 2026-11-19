@@ -16,6 +16,13 @@ from urllib.error import HTTPError,URLError
 
 ROOT=Path(__file__).resolve().parents[1]
 ZONES=ROOT/'data'/'school_zones_yeonsu.json'
+MIDDLE=ROOT/'data'/'school_middle_groups_yeonsu.json'
+# Simplified (~10 m) legacy polygons need a 35 m margin; original-precision
+# polygons (≈1 m) only need to absorb road-address geocoding error.
+LEGACY_CLEARANCE_M=35
+ORIGINAL_CLEARANCE_M=10
+def required_clearance(zones_doc):
+    return ORIGINAL_CLEARANCE_M if (zones_doc or {}).get('precision')=='original' else LEGACY_CLEARANCE_M
 CATALOG=ROOT/'data'/'complexes.json'
 TARGET=ROOT/'data'/'school_districts.json'
 KST=timezone(timedelta(hours=9))
@@ -155,21 +162,36 @@ def collect_schoolinfo(key,opener=None):
     if not chosen:raise RuntimeError('Schoolinfo returned no validated Yeonsu schools')
     return sorted(chosen.values(),key=lambda x:(x['level'],x['name']))
 
-def build_assignments(zones,points):
+def build_assignments(zones,points,clearance=LEGACY_CLEARANCE_M,reference_date='2026-09-20'):
     rows=[]
     for p in points:
         matches=zone_matches(zones,p['lng'],p['lat'])
-        # Only a single ordinary polygon with >=35m clearance can be shown.
-        # The simplified original polygon has ~10m resolution; farther points are reliable.
-        if len(matches)!=1 or matches[0][0]['kind']!='0' or matches[0][1]<35:
+        # Only a single ordinary polygon with enough clearance for the geometry precision.
+        if len(matches)!=1 or matches[0][0]['kind']!='0' or matches[0][1]<clearance:
             continue
         zone,distance=matches[0]
-        rows.append({'complex_id':p['id'],'zone_id':zone['id'],'zone_name':zone['name'],
+        row={'complex_id':p['id'],'zone_id':zone['id'],'zone_name':zone['name'],
               'kind':'elementary_zone_reference','method':'verified_exact_kakao_road_address',
-              'boundary_clearance_m':int(distance),'reference_date':'2026-09-20'})
+              'boundary_clearance_m':int(distance),'min_required_clearance_m':clearance,
+              'reference_date':reference_date}
+        if zone.get('schools'):row['schools']=list(zone['schools'])[:4]
+        rows.append(row)
     return rows
 
-def review_unmatched_zones(zones, points, catalog, confirmed):
+def build_middle_groups(groups,points,clearance=ORIGINAL_CLEARANCE_M,reference_date=''):
+    """Middle schools are assigned within a 학교군 (several schools), never one fixed school."""
+    rows=[]
+    for p in points:
+        matches=zone_matches(groups,p['lng'],p['lat'])
+        if len(matches)!=1 or matches[0][1]<clearance:
+            continue
+        group,distance=matches[0]
+        rows.append({'complex_id':p['id'],'group_id':group['id'],'group_name':group['name'],
+              'schools':list(group.get('schools',[]))[:30],'kind':'middle_school_group',
+              'boundary_clearance_m':int(distance),'reference_date':reference_date})
+    return rows
+
+def review_unmatched_zones(zones, points, catalog, confirmed, clearance=LEGACY_CLEARANCE_M, reference_date='2026-09-20'):
     """Give each missing site a precise verification *reason*, not an invented school."""
     by_id={p['id']:p for p in points}
     confirmed_ids={row['complex_id'] for row in confirmed}
@@ -186,25 +208,36 @@ def review_unmatched_zones(zones, points, catalog, confirmed):
             if not matches:reason='outside_official_polygon'
             elif len(matches)>1:reason='overlapping_zones'
             elif matches[0][0].get('kind')!='0':reason='joint_zone'
-            elif matches[0][1]<35:reason='near_boundary'
+            elif matches[0][1]<clearance:reason='near_boundary'
             else:
                 # A verified normal polygon should have entered confirmed.
                 reason='requires_manual_review'
         item={'complex_id':ident,'reason':reason,
-              'reference_date':'2026-09-20'}
+              'reference_date':reference_date}
+        # A joint zone lists the schools a family may choose between (official link data).
+        if reason=='joint_zone' and matches[0][0].get('schools'):
+            item['schools']=list(matches[0][0]['schools'])[:4]
         # When an exactly geocoded address falls within the 35m uncertainty
         # buffer, record the measured gap without claiming school assignment.
         if reason=='near_boundary':
             item['boundary_clearance_m']=int(matches[0][1])
-            item['min_required_clearance_m']=35
+            item['min_required_clearance_m']=clearance
         reasons.append(item)
     return reasons
 
 
 def main():
     zones=json.loads(ZONES.read_text(encoding='utf-8'))
-    if len(zones.get('zones',[]))!=34 or zones.get('reference_date')!='2026-09-20':
+    reference=str(zones.get('reference_date',''))
+    if zones.get('precision')=='original':
+        if not 20<=len(zones.get('zones',[]))<=80 or not re.fullmatch(r'20[0-9]{2}-[01][0-9]-[0-3][0-9]',reference):
+            raise RuntimeError('Invalid official school zone source')
+    elif len(zones.get('zones',[]))!=34 or reference!='2026-09-20':
         raise RuntimeError('Invalid official 2026-09 school zone source')
+    clearance=required_clearance(zones)
+    middle=json.loads(MIDDLE.read_text(encoding='utf-8')) if MIDDLE.exists() else None
+    if middle and (middle.get('precision')!='original' or middle.get('reference_date')!=reference):
+        middle=None
     current=json.loads(TARGET.read_text(encoding='utf-8'))
     if current.get('schema_version')!=1:raise RuntimeError('Invalid cached school snapshot')
     updated=False
@@ -233,20 +266,30 @@ def main():
                   'note':'도로명주소 완전 일치 후 카카오 주소검색이 같은 건물의 지번을 반환한 경우만 기록.'}
                 updated=True
                 print('공식 도로명주소와 일치 확인된 지번',len(cadastral),'단지')
-            assigns=build_assignments(zones['zones'],points)
-            reasons=review_unmatched_zones(zones['zones'],points,catalog,assigns)
+            assigns=build_assignments(zones['zones'],points,clearance,reference)
+            reasons=review_unmatched_zones(zones['zones'],points,catalog,assigns,clearance,reference)
+            if middle:
+                groups=build_middle_groups(middle['groups'],points,clearance,reference)
+                if groups:
+                    current['middle_groups']={'state':'verified_partial','updated_at':stamp(),
+                      'reference_date':reference,'source_url':middle.get('source_url',ZONE_SOURCE),
+                      'records':groups,
+                      'note':'공식 중학교학교군 도형과 단지 도로명주소 좌표 대조. 중학교는 학교군 안에서 배정되며 특정 학교 확정 아님.'}
+                    updated=True
+                    print('중학교 학교군 확인 단지',len(groups))
             current['zone_review']={
               'state':'verification_pending','updated_at':stamp(),
               'reference_date':zones['reference_date'],
-              'source_url':ZONE_SOURCE,'records':reasons,
+              'source_url':zones.get('source_url',ZONE_SOURCE),'records':reasons,
               'note':'아파트 배정학교 정보가 아닙니다. 원본 경계와 주소 검증이 부족한 이유만 나타냅니다.'}
             updated=True
             print('초등 통학구역 보류 사유 분류',len(reasons),'단지')
             if assigns:
                 current['elementary_zones']={'state':'verified_partial','updated_at':stamp(),
-                  'reference_date':zones['reference_date'],'source_url':ZONE_SOURCE,
+                  'reference_date':zones['reference_date'],'source_url':zones.get('source_url',ZONE_SOURCE),
                   'geocoded_complex_count':len(points),'records':assigns,
-                  'note':'정확한 도로명주소 지오코딩 + 공식 통학구역 도형 내부 35m 이상 단지만 표시. 배정 보장 아님.'}
+                  'note':'정확한 도로명주소 지오코딩 + 공식 통학구역 도형 내부 '+str(clearance)+'m 이상 단지만 표시'+
+                          (' (원본 정밀도 경계).' if clearance==ORIGINAL_CLEARANCE_M else '.')+' 실제 입학은 교육지원청 확인.'}
                 updated=True
                 print('좌표 검증 단지',len(points),'· 통학구역 내부 충분히 이격된 단지',len(assigns))
             else:print('통학구역 경계와 충분히 이격된 단지 없음 · 기존 데이터 유지')
