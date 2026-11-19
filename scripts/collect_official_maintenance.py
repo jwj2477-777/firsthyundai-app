@@ -53,6 +53,13 @@ IDENTITY = {'kaptCode', 'kaptName', 'searchDate', 'date', 'year', 'month',
             'baseYear', 'baseMonth', 'yyyymm', 'sido', 'sigungu', 'resultCode',
             'resultMsg', 'numOfRows', 'pageNo', 'totalCount'}
 FINANCIAL = re.compile(r'(cost|fee|pay|bonus|pension|premium|benefit|amt|amount|wage|money|charge|levy|금액|비용|관리비|사용료|수선충당금)', re.I)
+# Live K-apt V3 field names whose names do not contain a cost word. Verified 2026-11-20 against
+# F15 2026-07: with these, the three group sums equal the independent calibration to the won.
+# *C = common-area usage, *P = household usage; both are billed as individual usage fees.
+KNOWN_FEE_FIELDS = frozenset({
+ 'heatC', 'heatP', 'waterCoolC', 'waterCoolP', 'electC', 'electP', 'waterHotC', 'waterHotP',
+ 'gasC', 'gasP', 'purifi', 'scrap', 'preMeet', 'buildInsu', 'electionMng',
+ 'bookSupply', 'sLevy'})
 DATE_KEYS = re.compile(r'(date|month|year|search|code|number|count|area|rate|ratio|per|unit|index|seq|id)$', re.I)
 
 def number(value):
@@ -91,10 +98,10 @@ def extract_amount(rows, code, month):
    continue
   amount = number(value)
   if amount is None:
-   if value not in ('', None) and FINANCIAL.search(k):
+   if value not in ('', None) and (k in KNOWN_FEE_FIELDS or FINANCIAL.search(k)):
     return None
    continue
-  if FINANCIAL.search(k):
+  if k in KNOWN_FEE_FIELDS or FINANCIAL.search(k):
    if amount != amount.to_integral_value() or amount > 100_000_000_000:
     return None
    fees.append(int(amount))

@@ -31,6 +31,24 @@ class OfficialFees(unittest.TestCase):
   self.assertEqual(mod.extract_amount([row],'A10026679','202607'), mod.CALIBRATION['reserve'])
   # An unpublished month comes back as empty fields: missing, never zero.
   self.assertIsNone(mod.extract_amount([{'kaptCode':None,'kaptName':None,'sLevy':None}],'A10026679','202609'))
+ def test_live_f15_july_rows_reproduce_calibration_exactly(self):
+  # Public K-apt V3 values for 송도더샵퍼스트파크15단지 2026-07 (Actions, 2026-11-20).
+  C='A10026679'
+  common=[{'pay':'27072900','sundryCost':'6793720','pension':'2934580','accidentPremium':'304250','employPremium':'368320','nationalPension':'1503480','healthPremium':'1272800','welfareBenefit':'1416700'},
+   {'guardCost':'22188900'},{'cleanCost':'29219060'},{'careItemCost':'367200','accountingCost':'198000','hiddenCost':'670530'},
+   {'disinfCost':'430000'},{'lrefCost1':'7101290'},{'elevCost':'7766000'},{'lrefCost2':'3784950'},{},
+   {'manageCost':'974320'},{'lrefCost4':'291970'},{'bookSupply':'394680','transportCost':'15000'},{'telCost':'314450'},{},{},{'clothesCost':'227090'}]
+  individual=[{'heatC':'5191350','heatP':'0'},{'waterCoolC':'1592001','waterCoolP':'17361470'},{'electC':'26569693','electP':'79590240'},
+   {'waterHotC':'0','waterHotP':'11543230'},{'gasC':'0','gasP':'0'},{'purifi':'0'},{'scrap':'0'},{'preMeet':'1418190'},{'buildInsu':'2044000'},{'electionMng':'0'}]
+  def total(rows):
+   return sum(x or 0 for x in (mod.extract_amount([{'kaptCode':C,'kaptName':'15단지',**r}],C,'202607') for r in rows))
+  self.assertEqual(total(common), mod.CALIBRATION['common'])
+  self.assertEqual(total(individual), mod.CALIBRATION['individual'])
+  self.assertEqual(total([{'sLevy':'9841930'}]), mod.CALIBRATION['reserve'])
+  totals={'common':total(common),'individual':total(individual),'reserve':9841930}
+  self.assertTrue(mod.calibration_passes(totals,'70685.27'))
+  # Still refuses a genuinely unknown non-zero numeric field.
+  self.assertIsNone(mod.extract_amount([{'kaptCode':C,'mysteryX':'5'}],C,'202607'))
  def test_calibration_required(self):
   self.assertTrue(mod.calibration_passes(dict(mod.CALIBRATION), '70685.27'))
   self.assertTrue(mod.calibration_passes({'common': 115610191, 'individual':145310174,'reserve':9841930},'70685.27'))
