@@ -12,5 +12,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Find school-district file links (no keys)
+      - run: pip install pyshp==2.3.1 pyproj==3.6.1
+      - name: Describe school-district files near Songdo (no keys)
         run: python3 scripts/probe_school_zone_files.py
