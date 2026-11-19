@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import svc from '../workers/shared-settings/src/index.mjs';
 const notes=new Map(),meta=new Map();
-const env={FIRSTHYUNDAI_ACCESS_CODE:'familycode2026',FIRSTHYUNDAI_ADMIN_CODE:'admincode-separate',
+const env={
+ BOARD_DEVICE_APPROVAL:'off', // device approval is covered by test_office_device_approval.mjs
+FIRSTHYUNDAI_ACCESS_CODE:'familycode2026',FIRSTHYUNDAI_ADMIN_CODE:'admincode-separate',
  SETTINGS:{
   async put(key,value,options={}){notes.set(key,value);meta.set(key,options.metadata||{});},
   async get(key,fmt){const v=notes.get(key);return fmt==='json'?(v?JSON.parse(v):null):v;},

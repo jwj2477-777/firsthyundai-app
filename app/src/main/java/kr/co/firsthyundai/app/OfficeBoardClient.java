@@ -23,6 +23,7 @@ final class OfficeBoardClient {
         p.edit().remove("token").remove("expiry").remove("member_id").remove("member_name").apply();
         // An explicitly revoked account must not continue reading its last snapshot.
         OfficeOfflineStore.clear(context,previous);
+        ScheduleBackupAlarms.cancelAll(context.getApplicationContext());
     }
     static String memberName(Context c){
         return c.getSharedPreferences(PREF,Context.MODE_PRIVATE).getString("member_name","");
@@ -157,8 +158,11 @@ final class OfficeBoardClient {
         boolean changing=!existing.isEmpty()&&!memberId.equals(memberId(context));
         JSONObject body=new JSONObject().put("code",new String(code))
                 .put("member_id",memberId).put("device",deviceId(context))
-                .put("reassign",changing);
+                .put("reassign",changing)
+                .put("device_label",(android.os.Build.MANUFACTURER+" "+android.os.Build.MODEL).trim());
         JSONObject data=request("POST","/board/session",body,changing?existing:null);
+        // New handsets wait until the administrator approves them in 관리자센터.
+        if("pending_approval".equals(data.optString("status","")))throw new Exception(PENDING_APPROVAL);
         String token=data.optString("token","");
         if(token.length()<40||token.length()>1100)throw new Exception("보안 인증 응답이 올바르지 않습니다.");
         JSONObject member=data.optJSONObject("member");
@@ -210,6 +214,13 @@ final class OfficeBoardClient {
         }
         if("archive".equals(action))return request("GET","/board/archive",null,auth,adminToken);
         if("devices".equals(action))return request("GET","/board/devices",null,auth,adminToken);
+        if("pendingDevices".equals(action))return request("GET","/board/devices/pending",null,auth,adminToken);
+        if("approveDevice".equals(action)||"rejectDevice".equals(action)){
+            String device=payload.optString("device","");
+            if(!device.matches("[a-f0-9]{32}"))throw new Exception("휴대폰 번호(기기 ID)가 올바르지 않습니다.");
+            return request("POST","/board/devices/"+device+("approveDevice".equals(action)?"/approve":"/reject"),
+                new JSONObject(),auth,adminToken);
+        }
         if("post".equals(action)){
             String text=payload.optString("text","");
             if(text.isEmpty()||text.length()>1600)throw new Exception("메모 내용은 1~1600자로 적어 주세요.");
@@ -336,5 +347,6 @@ final class OfficeBoardClient {
             return new JSONObject(bytes.toString("UTF-8"));
         }finally{if(connection!=null)connection.disconnect();}
     }
+    static final String PENDING_APPROVAL="새 휴대폰 승인 대기 중입니다. 관리자가 관리자센터의 '새 휴대폰 승인'에서 승인한 뒤, 이 화면에서 보안코드를 다시 입력해 주세요.";
     private OfficeBoardClient(){}
 }

@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import service from '../workers/shared-settings/src/index.mjs';
 const store=new Map(),expiryOptions=new Map();
 const events={reads:0};
-const env={SETTINGS:{
+const env={
+ BOARD_DEVICE_APPROVAL:'off', // device approval is covered by test_office_device_approval.mjs
+SETTINGS:{
  async get(k,format){events.reads++;const v=store.get(k);
   return v===undefined?null:format==='json'?JSON.parse(v):v},
  async put(k,v,options={}){store.set(k,v);expiryOptions.set(k,options)},async delete(k){store.delete(k)},

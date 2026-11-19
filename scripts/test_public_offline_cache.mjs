@@ -10,7 +10,7 @@ const css=fs.readFileSync(root+'assets/public-offline.css','utf8');
 const mainJs=html.split('<script>')[1].split('</script>')[0];
 new vm.Script(mainJs);
 assert(java.includes('AtomicFile') && java.includes('getNoBackupFilesDir()'));
-assert(java.includes('MAX_BYTES=8*1024*1024') && java.includes('MessageDigest.getInstance("SHA-256")'));
+assert(java.includes('MAX_BYTES=12*1024*1024') && java.includes('MessageDigest.getInstance("SHA-256")'));
 assert(java.includes('filename.matches(') && java.includes('repository.matches('));
 assert(java.includes('new JSONObject().put("schema",1)'));
 for(const name of ['trades','new_trades','news','complexes','school_districts',

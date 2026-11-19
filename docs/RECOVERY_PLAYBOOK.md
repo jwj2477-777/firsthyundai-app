@@ -106,6 +106,11 @@ python3 scripts/check_apk_version.py app/build/outputs/apk/debug/app-debug.apk
 | Android 알림 차단 | `AndroidManifest.xml`, `TradeNotifications.java`, OS 앱 알림 설정, `test_android_trade_notifications.js` |
 | NEIS 키를 등록했는데 학교 0 | API HTTP 진단, `NEIS_EDU_KEY` Secret, `sync-public-services.yml`, `schools.state` |
 
+## I-2. 새 휴대폰 승인 (v2.1.94~)
+- 새 휴대폰·재설치 휴대폰은 보안코드를 입력하면 `승인 대기`가 된다. 관리자 휴대폰 → 관리자센터 → `새 휴대폰 승인`에서 승인 후, 새 휴대폰에서 보안코드를 다시 입력하면 연결된다. 모르는 요청은 거절(영구 차단).
+- **관리자 휴대폰까지 잃어버린 경우:** Cloudflare 대시보드 → Workers → `firsthyundai-shared-settings` → 설정 → 변수에 `BOARD_DEVICE_APPROVAL` = `off` 추가 → 새 휴대폰 연결 → 즉시 변수 삭제(승인 다시 켜기). 또는 관리자 세션으로 연결하는 기기는 자동 승인된다.
+- 기존에 연결된 휴대폰은 영향 없음. 가족 보안코드 검증값은 공개돼 있으므로 코드는 충분히 길게(12자 이상 권장) 유지.
+
 ## J. AI 문서를 지속해서 최신화하는 규칙
 - 코드/기능이 변경되면 `docs/PRODUCT_REQUIREMENTS.md`의 해당 항목, `docs/PROJECT_HISTORY.md`의 릴리스 행, `docs/CHANGE_LOG_FOR_AI.md`에 **무엇/왜/검증/남은 일**을 적고 `docs/AI_HANDOFF.md`에 구조 변경을 기록.
 - 새 AI는 변경 요청을 받을 때 실무 사양이 빠지지 않았는지 위 문서를 보면서 테스트를 선행 수정한다. **실행 가능한 소스가 가장 최신 사실**이며 과거 기록과 다르면 이유를 명시.

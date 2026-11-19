@@ -234,6 +234,43 @@
     ' · 실제 휴대전화 알림 권한·수신 성공 여부는 각 기기에서 확인해야 합니다.';
   }catch(e){target.textContent='휴대전화 등록 상태를 확인하지 못했습니다. 관리자 인증과 서버 연결을 확인해 주세요.';}
  }
+ // New handsets wait here. Approve only phones a family member is holding right now.
+ async function checkPendingDevices(){
+  if(!permitted())return;
+  const target=get('adminPendingDevices');if(!target)return;
+  target.textContent='승인을 기다리는 휴대폰을 조회하는 중…';
+  try{
+   const data=await window.FirstHyundaiOfficeBoard?.pendingDevices?.();
+   if(!permitted())return;
+   if(!data||data.kind!=='pending_devices'||!Array.isArray(data.devices))throw Error('unexpected');
+   target.textContent='';
+   if(!data.devices.length){
+    target.textContent=data.approval_required===false?
+     '새 휴대폰 승인이 꺼져 있습니다(서버 비상 설정). 보안을 위해 다시 켜 두세요.':
+     '승인을 기다리는 휴대폰이 없습니다.';
+    return;
+   }
+   const note=document.createElement('p');note.className='tiny';
+   note.textContent='지금 가족이 들고 있는 휴대폰이 맞는지 확인한 뒤 승인하세요. 모르는 요청은 거절하세요.';
+   target.appendChild(note);
+   for(const row of data.devices){
+    const box=document.createElement('div');box.className='pendingDeviceRow';
+    const info=document.createElement('p');
+    const when=row.requested_at?new Date(row.requested_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour12:false}):'';
+    info.textContent=(row.account||'계정 미확인')+' · '+(row.label||'기종 정보 없음')+(when?' · 요청 '+when:'');
+    const approve=document.createElement('button');approve.type='button';approve.textContent='승인';
+    const reject=document.createElement('button');reject.type='button';reject.textContent='거절';
+    const decide=async ok=>{
+     if(!window.confirm?.(ok?'이 휴대폰을 승인할까요? 승인하면 공유메모를 볼 수 있습니다.':'이 휴대폰 요청을 거절할까요? 거절한 휴대폰은 다시 연결할 수 없습니다.'))return;
+     approve.disabled=reject.disabled=true;
+     try{await window.FirstHyundaiOfficeBoard.decideDevice(row.device,ok);info.textContent+=ok?' · 승인 완료':' · 거절 완료';}
+     catch(e){info.textContent+=' · 처리 실패: 관리자 인증과 연결을 확인해 주세요.';approve.disabled=reject.disabled=false;}
+    };
+    approve.onclick=()=>decide(true);reject.onclick=()=>decide(false);
+    box.append(info,approve,reject);target.appendChild(box);
+   }
+  }catch(e){target.textContent='승인 대기 목록을 확인하지 못했습니다. 관리자 인증과 서버 연결을 확인해 주세요.';}
+ }
  function checkUpdate(){
   if(!permitted())return;
   get('appUpdateCheck')?.click?.();
@@ -306,7 +343,7 @@
  }
  function publicError(text){publicIssue=String(text||'').slice(0,90);render();}
  window.FirstHyundaiAdminCenter={
-  render,refresh,retry,expand,go,detailToggled,checkUpdate,openAlerts,checkDevices,
+  render,refresh,retry,expand,go,detailToggled,checkUpdate,openAlerts,checkDevices,checkPendingDevices,
   levelChanged,resetLevel,detailsChanged,selfTest,copyReport,clearAudit,publicError,
   _test:{classify,rows,ageHours,qualityIssues,reportText}
  };

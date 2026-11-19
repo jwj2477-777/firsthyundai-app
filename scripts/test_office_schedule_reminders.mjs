@@ -7,6 +7,8 @@ const rsa=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLengt
 const pkcs8=new Uint8Array(await crypto.subtle.exportKey('pkcs8',rsa.privateKey));
 const pem='-----BEGIN PRIVATE KEY-----\n'+Buffer.from(pkcs8).toString('base64').match(/.{1,64}/g).join('\n')+'\n-----END PRIVATE KEY-----\n';
 const env={
+ BOARD_DEVICE_APPROVAL:'off', // device approval is covered by test_office_device_approval.mjs
+
  FIRSTHYUNDAI_ACCESS_CODE:'ScheduleTestFamilyCode2026',FIRSTHYUNDAI_ADMIN_CODE:'ScheduleTestAdminCode2026',
  FHD_FCM_SERVICE_ACCOUNT_JSON:JSON.stringify({type:'service_account',project_id:'firsthyundai-test-123',
  client_email:'firebase-adminsdk@firsthyundai-test-123.iam.gserviceaccount.com',private_key:pem}),

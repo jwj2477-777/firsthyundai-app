@@ -6,7 +6,11 @@ import android.app.job.JobService;
 public final class OfficeMemoJobService extends JobService {
     @Override public boolean onStartJob(JobParameters params){
         new Thread(()->{
-            try{OfficeMemoNotifications.check(getApplicationContext());}
+            try{
+                OfficeMemoNotifications.check(getApplicationContext());
+                // Persisted periodic job: also restores backup alarms after a reboot.
+                ScheduleBackupAlarms.reschedule(getApplicationContext());
+            }
             finally{jobFinished(params,false);}
         },"office-memo-background-check").start();
         return true;

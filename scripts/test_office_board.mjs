@@ -19,6 +19,18 @@ function send(path,method='GET',data=null,token='',webOrigin='',adminToken=''){
  if(webOrigin)headers.Origin=webOrigin;
  return service.fetch(new Request(origin+path,{method,headers,body:data===null?undefined:JSON.stringify(data)}),env);
 }
+// Full administrator approval flow for an additional handset.
+async function enrollApproved(memberId,dev,label='Galaxy 테스트'){
+ const first=await send('/board/session','POST',{code:'password8',member_id:memberId,device:dev,device_label:label});
+ assert.equal(first.status,202,'Additional handset waits for approval');
+ const listed=await (await send('/board/devices/pending','GET',null,token,'',adminToken)).json();
+ const row=listed.devices.find(x=>x.device===dev);
+ assert(row&&row.label===label&&row.requested_at,'Administrator sees the pending handset');
+ assert.equal((await send('/board/devices/pending','GET',null,token)).status,403,'Family token alone cannot list requests');
+ assert.equal((await send('/board/devices/'+dev+'/approve','POST',{},token)).status,403,'Family token alone cannot approve');
+ assert.equal((await send('/board/devices/'+dev+'/approve','POST',{},token,'',adminToken)).status,200);
+ return (await (await send('/board/session','POST',{code:'password8',member_id:memberId,device:dev})).json()).token;
+}
 assert.equal((await send('/board')).status,401,'Notes require a family token even for GET');
 assert.equal((await send('/board/session','POST',{code:'wrong-code'})).status,401);
 assert.equal((await send('/board/session','POST',{code:'password8'},'','https://thirdparty.invalid')).status,403);
@@ -31,7 +43,12 @@ const member=choice.accounts.find(a=>a.name==='관리자');
 assert(member?.id);
 const device='a'.repeat(32);
 assert.equal((await send('/board/session','POST',{code:'password8'})).status,400,'Account selection is mandatory');
-const session=await (await send('/board/session','POST',{code:'password8',member_id:member.id,device})).json();
+// A new handset waits for an administrator; the bootstrap device is approved by an admin session.
+const pendingFirst=await send('/board/session','POST',{code:'password8',member_id:member.id,device});
+assert.equal(pendingFirst.status,202,'New devices must wait for administrator approval');
+assert.equal((await pendingFirst.json()).token,undefined,'No token before approval');
+const bootstrapAdmin=(await (await send('/session','POST',{code:env.FIRSTHYUNDAI_ADMIN_CODE})).json()).token;
+const session=await (await send('/board/session','POST',{code:'password8',member_id:member.id,device},'','',bootstrapAdmin)).json();
 assert(session.token?.length>40);
 const token=session.token;
 const noteText='오늘 오후 3시 반 방문\\n퍼스트파크 1502동 3004호\\n손님 전화 010-1234-5678';
@@ -77,8 +94,7 @@ assert.equal((await (await send('/board','GET',null,token)).json()).notes[0].sch
 const momAccount=choice.accounts.find(x=>x.name==='엄마');
 const dadAccount=choice.accounts.find(x=>x.name==='아빠');
 const alternateDevice='c'.repeat(32);
-const momSession=(await (await send('/board/session','POST',
- {code:'password8',member_id:momAccount.id,device:alternateDevice})).json()).token;
+const momSession=await enrollApproved(momAccount.id,alternateDevice);
 assert.equal((await (await send('/board/accounts','GET',null,momSession)).json()).accounts.length,3);
 assert.equal((await send('/board','GET',null,momSession)).status,200,
  'All members may continue to read the shared memo');
@@ -113,7 +129,7 @@ const extra=await send('/board/members','POST',{name:'신규 구성원'},token,'
 assert.equal(extra.status,201);
 const newcomer=(await extra.json()).account;
 const extraDevice='b'.repeat(32);
-const extraToken=(await (await send('/board/session','POST',{code:'password8',member_id:newcomer.id,device:extraDevice})).json()).token;
+const extraToken=await enrollApproved(newcomer.id,extraDevice);
 assert(extraToken);
 assert.equal((await send('/board','GET',null,extraToken)).status,200);
 assert.equal((await send('/board/members/'+newcomer.id+'/rename','PATCH',

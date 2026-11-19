@@ -1085,6 +1085,9 @@ function imageUpdate(note){
 }
 window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDone,remove,toggleDone,authenticate,exportBackup,exportBackupWithPhotos,diagnostics,
  deviceHealth:()=>call('devices',{}),
+ pendingDevices:()=>call('pendingDevices',{}),
+ decideDevice:(device,approve)=>/^[a-f0-9]{32}$/.test(String(device))?
+  call(approve?'approveDevice':'rejectDevice',{device:String(device)}):Promise.reject(Error('기기 ID 오류')),
  toggleComposer,setStatus,setAuthor,setQuery,setSort,showMore,clearFilters,
  imageCall:call,imageUpdate,canEdit:canEditId,
  setView,chooseDay,changeMonth,today,addAtSelectedDay,clearScheduledDay,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,

@@ -3,6 +3,8 @@ import service from '../workers/shared-settings/src/index.mjs';
 
 const db=new Map();
 const env={
+ BOARD_DEVICE_APPROVAL:'off', // device approval is covered by test_office_device_approval.mjs
+
  SETTINGS:{
   async get(key,kind){const v=db.get(key);return v===undefined?null:kind==='json'?JSON.parse(v):v},
   async put(key,value){db.set(key,value)},
