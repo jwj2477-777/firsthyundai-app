@@ -82,7 +82,8 @@ public class MainActivity extends Activity {
     private String pendingContractLiveId="";
     private boolean pendingLivePermission=false;
     private ValueCallback<Uri[]> pendingMemoImages;
-    private static final int LIMIT = 8 * 1024 * 1024;
+    // trades.json is ~5.3 MB compact; keep generous headroom for busy months.
+    private static final int LIMIT = 12 * 1024 * 1024;
     private volatile String verifiedUpdateUrl = "";
     private volatile boolean updateDownloading = false;
     private final AtomicBoolean updateChecking = new AtomicBoolean(false);
@@ -805,16 +806,20 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public boolean saveOfficeMemoOfflineSnapshot(String snapshot){
             if(!OfficeBoardClient.enrolled(getApplicationContext()))return false;
-            return OfficeOfflineStore.save(getApplicationContext(),
+            boolean saved=OfficeOfflineStore.save(getApplicationContext(),
                 OfficeBoardClient.memberId(getApplicationContext()),snapshot);
+            // A complete sync refreshes the handset backup for T-30 schedule reminders.
+            if(saved)io.execute(()->ScheduleBackupAlarms.reschedule(getApplicationContext()));
+            return saved;
         }
         @JavascriptInterface public void officeBoardAction(String action,String payload,String requestId){
             if(requestId==null||!requestId.matches("[A-Za-z0-9_-]{1,30}"))return;
             if(action==null||!java.util.Arrays.asList("list","post","edit","done","schedule","delete","archive","restore",
-                "imageAdd","imageGet","imageRemove","preview","pin","devices").contains(action)||payload==null||
+                "imageAdd","imageGet","imageRemove","preview","pin","devices","pendingDevices","approveDevice","rejectDevice").contains(action)||payload==null||
                payload.length()>("imageAdd".equals(action)?200000:3000))return;
             final boolean needsAdmin="delete".equals(action)||"restore".equals(action)||
-                "archive".equals(action)||"devices".equals(action);
+                "archive".equals(action)||"devices".equals(action)||"pendingDevices".equals(action)||
+                "approveDevice".equals(action)||"rejectDevice".equals(action);
             final String adminIdentity=adminSessionIdentity;
             final String adminToken=sharedSettingsToken;
             io.execute(()->{
@@ -955,7 +960,7 @@ public class MainActivity extends Activity {
                         byte[] buffer = new byte[16384]; int n;
                         while ((n=in.read(buffer))!=-1) {
                             out.write(buffer,0,n);
-                            if(out.size()>LIMIT)throw new Exception("데이터 용량 제한(8MB) 초과");
+                            if(out.size()>LIMIT)throw new Exception("데이터 용량 제한(12MB) 초과");
                         }
                     }
                     JSONObject parsed = new JSONObject(out.toString("UTF-8"));

@@ -8,6 +8,8 @@ const keys=await crypto.subtle.generateKey({
 const pkcs8=new Uint8Array(await crypto.subtle.exportKey("pkcs8",keys.privateKey));
 const pem="-----BEGIN PRIVATE KEY-----\n"+Buffer.from(pkcs8).toString("base64").match(/.{1,64}/g).join("\n")+"\n-----END PRIVATE KEY-----\n";
 const env={
+ BOARD_DEVICE_APPROVAL:'off', // device approval is covered by test_office_device_approval.mjs
+
  FIRSTHYUNDAI_ADMIN_CODE:"AdminSecretForTest2026",
  FIRSTHYUNDAI_ACCESS_CODE:"familycode2026",
  FHD_FCM_SERVICE_ACCOUNT_JSON:JSON.stringify({

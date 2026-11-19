@@ -18,7 +18,7 @@ import org.json.JSONObject;
  * An atomic replacement preserves an earlier valid snapshot on failed refresh.
  */
 final class PublicOfflineCache {
-    private static final int MAX_BYTES=8*1024*1024;
+    private static final int MAX_BYTES=12*1024*1024;
     private static final String FILES="|trades.json|new_trades.json|news.json|complexes.json|"+
         "school_districts.json|maintenance_estimates.json|maintenance_partial.json|"+
         "public_services.json|";

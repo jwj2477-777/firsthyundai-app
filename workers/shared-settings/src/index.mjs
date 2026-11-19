@@ -31,6 +31,12 @@ const BOARD_LIFETIME_DAYS=365, BOARD_ARCHIVE_PREFIX="office-postit-archive-v1:",
 const BOARD_ORPHAN_PREFIX="office-postit-photo-cleanup-v1:", BOARD_ORPHAN_DELAY=31*86400;
 const BOARD_RETENTION_CURSOR_PREFIX="office-postit-retention-cursor-v1:";
 const MEMBER_PREFIX="office-member-v2:", DEVICE_PREFIX="office-member-device-v2:";
+// New handsets wait for an administrator. The shared family code alone (whose
+// offline verifier is public) must not be enough to read customer memos.
+const DEVICE_PENDING_PREFIX="office-member-device-pending-v1:";
+const devicePendingTtl=14*86400;
+const deviceApprovalRequired=env=>env?.BOARD_DEVICE_APPROVAL!=="off";
+const deviceLabel=v=>typeof v==="string"?v.replace(/[^\p{L}\p{N} ._()+-]/gu,"").trim().slice(0,40):"";
 const validMemberId=id=>typeof id==="string"&&/^[0-9a-f-]{36}$/.test(id);
 const validDeviceId=id=>typeof id==="string"&&/^[a-f0-9]{32}$/.test(id);
 function safeMemberName(v){
@@ -158,7 +164,7 @@ async function validBoardToken(value,secret,env){
      !validMemberId(p.member)||!validDeviceId(p.device)||!validMemberId(p.binding))return null;
   if(!await crypto.subtle.verify("HMAC",await hkey("board:"+secret),decoded(bits[1]),enc.encode(bits[0])))return null;
   const [member,device]=await Promise.all([env.SETTINGS.get(MEMBER_PREFIX+p.member,"json"),env.SETTINGS.get(DEVICE_PREFIX+p.device,"json")]);
-  if(member?.active!==true||device?.revoked===true||device?.member_id!==p.member||device?.binding!==p.binding)return null;
+  if(member?.active!==true||device?.revoked===true||device?.pending===true||device?.member_id!==p.member||device?.binding!==p.binding)return null;
   return {member,deviceId:p.device};
  }catch(e){return null}
 }
@@ -305,6 +311,22 @@ async function boardCommand(req,env,url,ctx){
   // A device may not silently change identity after it has been assigned.
   const existing=await env.SETTINGS.get(DEVICE_PREFIX+deviceId,"json");
   if(existing?.revoked===true)return res({error:"device_revoked"},403);
+  // A brand-new handset (or one still waiting) needs administrator approval.
+  // An already-approved device keeps the existing flow unchanged.
+  if((!existing||existing.pending===true)&&deviceApprovalRequired(env)){
+   const adminHeader=req.headers.get("x-fhd-admin-authorization")||"";
+   const adminApproved=!!env.FIRSTHYUNDAI_ADMIN_CODE&&adminHeader.startsWith("Bearer ")&&
+    await checkToken(adminHeader.slice(7),env.FIRSTHYUNDAI_ADMIN_CODE);
+   if(!adminApproved){
+    const requestedAt=existing?.requested_at||new Date().toISOString();
+    const label=deviceLabel(data?.device_label)||existing?.label||"";
+    await env.SETTINGS.put(DEVICE_PREFIX+deviceId,JSON.stringify({member_id:account,binding:existing?.binding||crypto.randomUUID(),
+     created_at:existing?.created_at||requestedAt,requested_at:requestedAt,pending:true,label}));
+    await env.SETTINGS.put(DEVICE_PENDING_PREFIX+deviceId,JSON.stringify({member_id:account,label,requested_at:requestedAt}),
+     {expirationTtl:devicePendingTtl});
+    return res({status:"pending_approval",member:{id:member.id,name:member.name}},202);
+   }
+  }
   // Existing members can choose a different account only on their already
   // authorized device AND after supplying the shared code again.
   // Rotating the binding invalidates the previous member's 60-day token.
@@ -317,7 +339,9 @@ async function boardCommand(req,env,url,ctx){
   }
   const binding=changing?crypto.randomUUID():(existing?.binding||crypto.randomUUID());
   await env.SETTINGS.put(DEVICE_PREFIX+deviceId,
-   JSON.stringify({member_id:account,binding,created_at:existing?.created_at||new Date().toISOString()}));
+   JSON.stringify({member_id:account,binding,created_at:existing?.created_at||new Date().toISOString(),
+    ...(existing?.label?{label:existing.label}:{}),...(existing?.approved_at?{approved_at:existing.approved_at}:{})}));
+  if(existing?.pending===true)await env.SETTINGS.delete(DEVICE_PENDING_PREFIX+deviceId);
   try{await touchMemberSeen(env,account,true)}catch(e){/* Presence is optional, not an enrollment blocker. */}
   return res({token:await boardToken(env.FIRSTHYUNDAI_ACCESS_CODE,account,deviceId,binding),
    member:{id:member.id,name:member.name},expires_in:5184000});
@@ -398,13 +422,44 @@ async function boardCommand(req,env,url,ctx){
   }
   return res({ok:true});
  }
+ if(url.pathname==="/board/devices/pending"&&req.method==="GET"){
+  if(!await isAdmin())return res({error:"admin_required"},403);
+  const rows=await boardKeys(env,DEVICE_PENDING_PREFIX,100);
+  const pending=[];
+  for(const row of rows){
+   const id=row.name.slice(DEVICE_PENDING_PREFIX.length);
+   const device=await env.SETTINGS.get(DEVICE_PREFIX+id,"json");
+   if(device?.pending!==true||device.revoked===true)continue;
+   const member=await env.SETTINGS.get(MEMBER_PREFIX+device.member_id,"json");
+   pending.push({device:id,account:member?.active===true?memberIdentity(member.name):"(삭제된 계정)",
+    label:device.label||"",requested_at:device.requested_at||device.created_at||""});
+  }
+  pending.sort((a,b)=>String(b.requested_at).localeCompare(String(a.requested_at)));
+  return res({schema:1,kind:"pending_devices",approval_required:deviceApprovalRequired(env),devices:pending});
+ }
+ const deviceDecision=url.pathname.match(/^\/board\/devices\/([^/]{8,80})\/(approve|reject)$/);
+ if(deviceDecision&&req.method==="POST"){
+  if(!await isAdmin())return res({error:"admin_required"},403);
+  const id=deviceDecision[1];
+  if(!validDeviceId(id))return res({error:"bad_device"},400);
+  const device=await env.SETTINGS.get(DEVICE_PREFIX+id,"json");
+  if(device?.pending!==true)return res({error:"not_pending"},409);
+  const now=new Date().toISOString();
+  const next=deviceDecision[2]==="approve"?
+   {...device,pending:false,approved_at:now}:
+   {...device,pending:false,revoked:true,revoked_at:now};
+  delete next.pending;
+  await env.SETTINGS.put(DEVICE_PREFIX+id,JSON.stringify(next));
+  await env.SETTINGS.delete(DEVICE_PENDING_PREFIX+id);
+  return res({ok:true,decision:deviceDecision[2]});
+ }
  if(url.pathname==="/board/devices"&&req.method==="GET"){
   if(!await isAdmin())return res({error:"admin_required"},403);
   const rows=await boardKeys(env,DEVICE_PREFIX,1000);
   const groups=new Map();
   for(const row of rows){
    const device=await env.SETTINGS.get(row.name,"json");
-   if(!device?.member_id||device.revoked===true)continue;
+   if(!device?.member_id||device.revoked===true||device.pending===true)continue;
    const member=await env.SETTINGS.get(MEMBER_PREFIX+device.member_id,"json");
    if(member?.active!==true)continue;
    // Report registration only. A token does NOT prove the phone has OS

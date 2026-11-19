@@ -31,6 +31,7 @@ on:
       - 'scripts/test_memo_dates.js'
       - 'scripts/test_account_picker.js'
       - 'scripts/test_office_board.mjs'
+      - 'scripts/test_office_device_approval.mjs'
       - 'scripts/test_office_board_images.mjs'
       - 'scripts/test_office_board_ui.js'
       - 'scripts/test_office_draft_lifecycle.js'
@@ -93,6 +94,7 @@ on:
       - 'scripts/test_contract_proposal_template.js'
       - 'scripts/test_contract_broker.js'
       - 'scripts/test_contract_transfer.js'
+      - 'scripts/test_contract_memo_regressions.js'
       - 'scripts/test_contract_image.js'
       - 'scripts/test_trade_contract_regression.js'
       - 'scripts/test_trade_contract_date_filter.js'
@@ -246,6 +248,7 @@ jobs:
           node scripts/test_contract_broker.js
           node --check app/src/main/assets/contracts-transfer.js
           node scripts/test_contract_transfer.js
+          node scripts/test_contract_memo_regressions.js
           node --check app/src/main/assets/contract-image.js
           node scripts/test_contract_image.js
           node scripts/test_trade_contract_regression.js
@@ -302,6 +305,7 @@ jobs:
           node scripts/test_memo_dates.js
           node scripts/test_account_picker.js
           node scripts/test_office_board.mjs
+          node scripts/test_office_device_approval.mjs
           node scripts/test_office_board_images.mjs
           node scripts/test_office_board_ui.js
           node scripts/test_office_draft_lifecycle.js
@@ -401,25 +405,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.93 contract post-approval correction APK
+      - name: Publish v2.1.94 contract memo accuracy APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.93.apk
-          unzip -t FirstHyundai-v2.1.93.apk | grep 'No errors detected'
-          if gh release view v2.1.93 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.94.apk
+          unzip -t FirstHyundai-v2.1.94.apk | grep 'No errors detected'
+          if gh release view v2.1.94 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.1.93 FirstHyundai-v2.1.93.apk \
+            gh release create v2.1.94 FirstHyundai-v2.1.94.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.93 · 확인 후 계약 내용 수정·다시 발행' \
-               --notes '계약 안내문을 내용 확인 완료 후에도 잔금일·계약일·중도금 지급일·금액·특약 등 특정 항목만 골라 수정하고, 다시 확인 후 새 이미지와 문자로 발행할 수 있습니다. 날짜 하나만 수정할 때는 기존 문구를 최대한 유지합니다. 수정본에는 이전 안내문 대신 수정본을 확인하라는 표시가 붙고, 조건을 바꾸면 이전 이미지 공유가 차단됩니다. 마지막으로 확인한 계약 안내문 1건은 해당 계정의 Android Keystore AES-GCM으로 단말 내부에만 암호화 보관해 오프라인에서 복원할 수 있습니다. 온라인 전송이나 브라우저 Web Storage 저장은 하지 않습니다. 저장된 확인본은 직접 삭제할 수 있습니다. v2.1.93/build244.'
+              --title '퍼스트현대 v2.1.94 · 새 휴대폰 승인·30분 전 예비 알람·계약 메모 보완' \
+               --notes '① 보안: 처음 연결하는 휴대폰은 관리자가 관리자센터 "새 휴대폰 승인"에서 승인해야 공유메모를 볼 수 있습니다. 이미 연결된 휴대폰은 그대로 사용합니다. ② 30분 전 일정 알림: 서버 알림이 늦거나 서버 장애가 있어도 휴대폰에 저장된 일정으로 예비 알림을 띄웁니다(중복 알림 없음, Android 절전 상태에서는 몇 분 늦을 수 있음). ③ 실거래 자료 용량 여유 확보. ④ 계약 메모 인식: 가계약금/계약금 구분, "8억 일부"·"5억 일단" 거래금액 누락 수정, 3차 이상 중도금 확인 안내, 회차 없는 중도금 처리, 중복 안내 제거. v2.1.94/build245.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.93 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.93 --apk FirstHyundai-v2.1.93.apk
+          gh release upload v2.1.94 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.94 --apk FirstHyundai-v2.1.94.apk
 
 
 

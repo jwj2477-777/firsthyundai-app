@@ -84,7 +84,9 @@ function tokenizeMoney(s){
   // List markers such as '3.계약금' are never monetary values.
   if(/^\d{1,2}\.$/.test(normalized)&&/^(?:매매|거래|계약금|중도금|잔금|기타|특약|계좌|주소|소재지)/.test(behind))continue;
   if(/^\d{1,2}$/.test(normalized)&&/^[.)]\s*(?:매매|거래|계약금|중도금|잔금|기타|특약|계좌|주소|소재지)/.test(behind))continue;
-  if(/^(?:동|호|월|일|년|블럭|블록|bl\b|층)/i.test(behind))continue;
+  // "8억 일부 계약금" / "5억 일단" / "5억 월세": an amount with a money unit is not a date piece.
+  if(/^(?:동|호|블럭|블록|bl\b|층)/i.test(behind))continue;
+  if(/^(?:월|일|년)/.test(behind)&&!/(?:억|만원|만|원)$/.test(normalized))continue;
   const amount=moneyPart(normalized);
   if(amount!==null&&amount>0)res.push({amount,start:m.index,end:rx.lastIndex,raw:normalized});
  }
@@ -192,10 +194,15 @@ function apply(id,newValue,found,source){
 // must not overwrite the earlier amount or due date.
 function numberedInterims(raw,found,review){
  const source=String(raw||'').normalize('NFKC').replace(/\r/g,'');
- const pattern=/(?:([12])\s*차\s*중도금|중도금\s*([12])\s*차)/g;
+ const pattern=/(?:([1-9])\s*차\s*중도금|중도금\s*([1-9])\s*차)/g;
  const matches=[...source.matchAll(pattern)];
+ const extraRounds=[...new Set(matches.map(m=>Number(m[1]||m[2])).filter(n=>n>2))];
+ // The app keeps two interim fields. A 3rd+ payment must never be dropped silently,
+ // because the balance would then be overstated.
+ if(extraRounds.length)review.push(extraRounds.join('·')+'차 중도금이 있습니다. 앱은 2차 중도금까지만 자동 입력합니다. 3차 이후 금액·지급일과 잔금을 직접 확인해 주세요.');
  for(let i=0;i<matches.length;i++){
   const match=matches[i],round=Number(match[1]||match[2]);
+  if(round>2)continue;
   const id=round===1?'interim':'interim2',dateId=round===1?'interimDate':'interimDate2';
   const following=source.slice(match.index+match[0].length,i+1<matches.length?matches[i+1].index:source.length);
   const segment=following.split(/\n|(?=\s*(?:잔금(?:일|은)?|계약금|계약일|이번\s*송금|특약(?:사항)?|계좌번호|은행|예금주)\s*[:：]?)/)[0].trim();
@@ -280,7 +287,8 @@ function recognize(raw){
  if(!price&&rentCombo)price={amount:moneyPart(rentCombo[1]),raw:rentCombo[1]};
  if(price?.amount!=null)apply('price',price.amount,found);
  const explicitTotal=amountAfter(s,['약정\\s*계약금','총\\s*계약금','전체\\s*계약금','계약금\\s*전체는','계약금\\s*전체','계약금\\s*총액']);
- let ordinaryDeposit=amountAfter(s,['계약금']);
+ // "가계약금 500" / "일부 계약금" / "선계약금" are advance payments, never the total deposit.
+ let ordinaryDeposit=amountAfter(s,['(?<![가선])(?<!일부\\s*)계약금']);
  // "계약금 500 먼저" means the advance, not the entire agreed deposit.
  if(ordinaryDeposit&&/^(?:\s|만원|원|정도)*(?:먼저|보내|송금|입금)/.test(s.slice(ordinaryDeposit.end,ordinaryDeposit.end+15)))ordinaryDeposit=null;
  let deposit=explicitTotal||ordinaryDeposit;
@@ -321,7 +329,19 @@ function recognize(raw){
  const explicitInterim=interimContext?moneyPart(interimContext[1]):null;
  const interim=explicitInterim!==null?{amount:explicitInterim,raw:interimContext[1]}:
   amountAfter(s,['중도금(?!\\s*(?:지급일|지급\\s*예정일|일정|날짜))']);
- if(interim?.amount!=null)apply('interim',interim.amount,found);
+ let plainInterim=interim;
+ if(plainInterim?.amount==null){
+  // "중도금 1월31일 1억" (date first) or "중도금 1월31일 1억, 3월31일 1억" (several, no rounds).
+  const seg=(s.match(/중도금(?!\s*(?:지급일|지급\s*예정일|일정|날짜))([\s\S]*?)(?=잔금|계약일|특약|기타사항|계좌|은행|예금주|$)/)||[])[1]||'';
+  const amountOnly=seg
+   .replace(/(?<!\d)(?:20\d{2}|\d{2})\s*년\s*\d{1,2}\s*월\s*\d{1,2}\s*일?/g,' ')
+   .replace(/(?<!\d)(?:20\d{2}|\d{2})[./-]\s*\d{1,2}[./-]\s*\d{1,2}(?!\d)/g,' ')
+   .replace(/(?<!\d)\d{1,2}\s*월\s*\d{1,2}\s*일?/g,' ');
+  const tokens=tokenizeMoney(amountOnly).filter(t=>/(?:억|천|백|만원|만|원)/.test(t.raw)&&t.amount>0);
+  if(tokens.length===1)plainInterim={amount:tokens[0].amount,raw:tokens[0].raw};
+  else if(tokens.length>1)review.push('중도금이 '+tokens.length+'건으로 보입니다. 회차가 없어 자동 입력하지 않았습니다. "1차 중도금 …, 2차 중도금 …"처럼 적거나 직접 입력해 주세요.');
+ }
+ if(plainInterim?.amount!=null)apply('interim',plainInterim.amount,found);
  const interimLines=String(raw||'').replace(/\r/g,'').split('\n').filter(line=>/중도금/.test(line));
  for(const sourceLine of interimLines){
   // An inline balance date is a separate field, never the interim due date.
@@ -331,7 +351,7 @@ function recognize(raw){
    const due=schedule[1].split(/(?=\s*(?:▶|잔금일|잔금\s*[:：]))/)[0].trim();
    if(due){apply('interimDate',due.slice(0,100),found);break;}
   }
-  if(!interim?.amount)continue;
+  if(!plainInterim?.amount)continue;
   const after=line.slice(line.indexOf('중도금')+3);
   const malformed=after.match(/(?:^|\s)(\d{1,2})\s*년\s*(\d{1,2})\s*일(?=\s|$|[,.;])/);
   if(malformed&&Number(malformed[1])<=12){
@@ -372,6 +392,7 @@ function recognize(raw){
    if(d.assumed)review.push('잔금일의 연도를 자동 추정했습니다. 실제 날짜를 확인해 주세요.');
   }
  }
+ const balanceYearNoted=!!(bareBalance&&review.some(x=>x.startsWith('잔금일의 연도')));
  for(const [id,terms] of [
   ['balanceDate',['잔금\\s*날','잔금일','잔금\\s*예정일','잔금은','잔금\\s*치르','잔금\\s*처리','잔금']],
   ['leaseStart',['입주일','입주\\s*날','입주\\s*예정','입주','이사\\s*날','이사일','이사','임대차\\s*시작','임대차\\s*개시']],
@@ -380,7 +401,7 @@ function recognize(raw){
  ]){
   const d=dateFor(s,terms);if(d){
    apply(id,d.value,found);
-   if(d.assumed)review.push((id==='balanceDate'?'잔금일':id==='leaseStart'?'입주일':id==='leaseEnd'?'만기일':'계약서 작성일')+'의 연도를 자동 추정했습니다. 확인하세요.');
+   if(d.assumed&&!(id==='balanceDate'&&balanceYearNoted))review.push((id==='balanceDate'?'잔금일':id==='leaseStart'?'입주일':id==='leaseEnd'?'만기일':'계약서 작성일')+'의 연도를 자동 추정했습니다. 확인하세요.');
   }else if(contextAfter(s,terms,40)&&/(?:말|초|중순|쯤|경|협의|미정)/.test(contextAfter(s,terms,40))){
    review.push((id==='balanceDate'?'잔금일':id==='leaseStart'?'입주일':'날짜')+'이 대략적으로 표현되어 정확한 날짜를 직접 선택해야 합니다.');
   }

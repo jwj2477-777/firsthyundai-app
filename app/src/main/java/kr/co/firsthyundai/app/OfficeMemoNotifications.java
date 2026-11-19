@@ -145,6 +145,33 @@ final class OfficeMemoNotifications {
      * older queued FCM messages.
      */
     static synchronized void receivedReminder(Context context,String id,String eventAt){
+        deliverReminder(context,id,eventAt,false);
+    }
+    /** Local backup alarm (ScheduleBackupAlarms). Shares the server push dedupe key. */
+    static synchronized void receivedBackupReminder(Context context,String id,String eventAt){
+        deliverReminder(context,id,eventAt,true);
+    }
+    /** Snapshot fallback used ONLY by the local backup when the server is unreachable. */
+    private static JSONObject snapshotNote(Context context,String id){
+        try{
+            JSONObject snapshot=new JSONObject(OfficeOfflineStore.read(context,OfficeBoardClient.memberId(context)));
+            JSONArray notes=snapshot.optJSONArray("notes");
+            if(notes==null)return null;
+            for(int i=0;i<notes.length();i++){
+                JSONObject n=notes.optJSONObject(i);
+                if(n==null||!id.equals(n.optString("id","")))continue;
+                JSONObject author=n.optJSONObject("author");
+                String text=n.optString("text","");
+                int cut=text.indexOf('\n');
+                return new JSONObject().put("preview",cut>0?text.substring(0,cut):text)
+                    .put("author",author==null?"":author.optString("name",""))
+                    .put("done",n.optBoolean("done",true)).put("all_day",n.optBoolean("all_day",false))
+                    .put("scheduled_at",n.optString("scheduled_at",""));
+            }
+        }catch(Exception ignored){}
+        return null;
+    }
+    private static void deliverReminder(Context context,String id,String eventAt,boolean backup){
         if(!"enabled".equals(status(context))||!OfficeBoardClient.enrolled(context)||
            id==null||!id.matches("[a-z0-9]{8,14}-[0-9a-f-]{36}")||
            eventAt==null||eventAt.length()>30)return;
@@ -159,7 +186,12 @@ final class OfficeMemoNotifications {
         if(eventAt.equals(prefs.getString(lastKey,"")))return;
         JSONObject note;
         try{note=OfficeBoardClient.preview(context,id);}
-        catch(Exception e){return;}
+        catch(Exception e){
+            // Server down: the backup alarm trusts the last complete encrypted sync.
+            if(!backup)return;
+            note=snapshotNote(context,id);
+            if(note==null)return;
+        }
         if(note.optBoolean("done",true)||note.optBoolean("all_day",true)||
            !eventAt.equals(note.optString("scheduled_at","")))return;
         if(!ScheduleReminderTiming.shouldNotify(System.currentTimeMillis(),startsAt))return;
