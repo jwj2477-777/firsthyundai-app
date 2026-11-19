@@ -39,7 +39,11 @@ GROUPS = {
   'getHsmpGasRentalFeeInfoV3', 'getHsmpWaterPurifierTankFeeInfoV3',
   'getHsmpDomesticWasteFeeInfoV3', 'getHsmpMovingInRepresentationMtgInfoV3',
   'getHsmpBuildingInsuranceFeeInfoV3', 'getHsmpElectionOrpnsInfoV3')),
- 'reserve': ('AptRepairsCostServiceV3', ('getHsmpMonthChargeAmtInfoV3',)),
+ # Official operation list (data.go.kr 15059160): getHsmpMonthFeeInfoV3 = monthly levy (sLevy),
+ # getHsmpMonthRetalFeeInfoV3 = monthly USE (sUse), getHsmpReserveBalanceInfoV3 = balance (sTot),
+ # getHsmpAccumulationTariffInfoV3 = rate % (sPer). Only the levy belongs in the monthly fee total.
+ # The previous getHsmpMonthChargeAmtInfoV3 never existed (HTTP 400, returnReasonCode 12).
+ 'reserve': ('AptRepairsCostServiceV3', ('getHsmpMonthFeeInfoV3',)),
 }
 F15 = 'A10026679'
 CALIBRATION_MONTH = '202607'
@@ -48,7 +52,7 @@ CALIBRATION_AREA = Decimal('70685.27')
 IDENTITY = {'kaptCode', 'kaptName', 'searchDate', 'date', 'year', 'month',
             'baseYear', 'baseMonth', 'yyyymm', 'sido', 'sigungu', 'resultCode',
             'resultMsg', 'numOfRows', 'pageNo', 'totalCount'}
-FINANCIAL = re.compile(r'(cost|fee|pay|bonus|pension|premium|benefit|amt|amount|wage|money|charge|금액|비용|관리비|사용료|수선충당금)', re.I)
+FINANCIAL = re.compile(r'(cost|fee|pay|bonus|pension|premium|benefit|amt|amount|wage|money|charge|levy|금액|비용|관리비|사용료|수선충당금)', re.I)
 DATE_KEYS = re.compile(r'(date|month|year|search|code|number|count|area|rate|ratio|per|unit|index|seq|id)$', re.I)
 
 def number(value):
