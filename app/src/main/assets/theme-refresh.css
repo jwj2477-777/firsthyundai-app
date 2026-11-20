@@ -97,4 +97,24 @@ body[data-season-theme]:not([data-season-theme="default"]) .sectionTitle h2{text
 /* High contrast (also part of "편하게 보기"): keep the quiet scene behind the logo side,
    but drop the rain streaks and the top sheen so the white brand text stays crisp. */
 body[data-app-contrast="high"][data-season-theme]{--theme-rain-layer:var(--theme-none);--theme-sheen:var(--theme-none)}
+
+/* 6) v2.2.3 — 알림함 as smoked glass (user: "알림함이 뒤배경을 가리고있다").
+      Same size, place, icon and label; only the fill turns see-through so the header
+      scene shows behind it. A light dark tint (not a white one) keeps the white label
+      at ≥4.5:1 on every season/time header (measured). High contrast keeps the original
+      solid button. Press = the tint deepens (colour only). */
+html body header #modeBar #favoriteAlertButton{
+ background:rgba(6,20,26,.18)!important;
+ border-color:rgba(255,255,255,.46)!important;
+ color:#FFFFFF!important;
+ text-shadow:0 1px 1px rgba(8,28,34,.22);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.16)!important;
+}
+html body header #modeBar #favoriteAlertButton:not(:disabled):active{
+ background:rgba(6,20,26,.34)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.2)!important}
+html body header #modeBar #favoriteAlertButton .headerAlertDot{border-color:rgba(255,255,255,.92)}
+html body[data-app-contrast="high"] header #modeBar #favoriteAlertButton{
+ background:#F7FBF8!important;border-color:#C9DFDA!important;color:#24575C!important;text-shadow:none;box-shadow:none!important}
+html body[data-app-contrast="high"] header #modeBar #favoriteAlertButton:not(:disabled):active{
+ box-shadow:inset 0 0 0 999px rgba(16,38,44,.07)!important}
 @media print{body[data-season-theme] header{background:#102D38}}

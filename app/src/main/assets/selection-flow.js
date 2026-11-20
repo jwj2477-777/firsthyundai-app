@@ -3,6 +3,9 @@
  * The ACTUAL button backgrounds are painted in place, behind original text.
  * Skipped peers on the SAME visual row receive a faint, sequential wash.
  * Trades ↔ Shared Memo routes through BOTH center-column buttons without changing pages.
+ * v14.2 (v2.2.3, user: "색이랑 글자까지 서서히 함께 옮겨가는"): the label, its count and
+ * icon, and the border now change colour exactly when the colour wave passes the text,
+ * instead of switching at once. Same real buttons, same inline-style painter, no clones.
  */
 (function(){
  'use strict';
@@ -64,6 +67,19 @@
   const color=match||(!/^(?:transparent|rgba\(0,\s*0,\s*0,\s*0\))$/.test(raw)?
    raw:'#FFFFFF');
   return {color,background:image||raw};
+ }
+ // Text/border colours of a button, plus descendants (counts, icons) that carry
+ // their own colour. Matched by position so a re-rendered row still lines up.
+ function getInk(button){
+  const style=window.getComputedStyle(button);
+  const color=style.color||'',parts=[];
+  const all=button.querySelectorAll?Array.from(button.querySelectorAll('*')):[];
+  all.forEach((el,i)=>{
+   if(el.parentElement?.closest?.('svg')&&el.tagName?.toLowerCase?.()!=='svg')return;
+   const c=window.getComputedStyle(el).color;
+   if(c&&c!==color)parts.push({i,color:c});
+  });
+  return {color,border:style.borderColor||'',parts};
  }
  function center(r){return {x:r.left+r.width/2,y:r.top+r.height/2}}
  function vector(a,b){
@@ -174,6 +190,19 @@
   const w=clamp(amount);
   return 'rgb('+a.map((v,i)=>Math.round(v*(1-w)+b[i]*w)).join(', ')+')';
  }
+ function mixColor(from,to,amount){
+  const w=clamp(amount);
+  if(!from||w>=1)return to;
+  if(!to||w<=0)return from;
+  const a=rgb(from),b=rgb(to);
+  if(!a||!b)return w<.5?from:to;
+  const alpha=c=>{const m=c.match(/rgba\([^)]*,\s*([\d.]+)\s*\)$/i);return m?+m[1]:1};
+  const A=alpha(from),B=alpha(to),mixed=a.map((v,i)=>Math.round(v*(1-w)+b[i]*w));
+  const o=A+(B-A)*w;
+  return o>=.999?'rgb('+mixed.join(', ')+')':'rgba('+mixed.join(', ')+', '+o.toFixed(3)+')';
+ }
+ // The label turns while the wave crosses the middle of the button (32%→68%).
+ const inkAt=front=>ease(clamp((front-32)/36));
  function middlePaint(angle,idle,highlight,center){
   return 'linear-gradient('+angle+'deg, '+
    idle+' '+pct(center-41)+', '+
@@ -202,11 +231,49 @@
    else button.style.removeProperty('background');
   }
  }
+ // Same idea for label colours: remember the element's own inline value once,
+ // set ours with !important, and put the original back at the end.
+ function useStyle(el,prop,value,record){
+  if(!el?.style||!value)return;
+  let props=record.get(el);
+  if(!props){props=new Map();record.set(el,props)}
+  if(!props.has(prop))props.set(prop,{
+   value:el.style.getPropertyValue(prop),priority:el.style.getPropertyPriority(prop)});
+  el.style.setProperty(prop,value,'important');
+ }
+ function restoreStyles(record){
+  // Colours first, the frozen transition last (same task, before the next paint).
+  const later=[];
+  for(const [el,props] of record){
+   for(const [prop,old] of props){
+    const put=()=>{if(old.value)el.style.setProperty(prop,old.value,old.priority);
+     else el.style.removeProperty(prop)};
+    if(prop==='transition')later.push(put);else put();
+   }
+  }
+  later.forEach(put=>put());
+ }
+ function inkParts(button){
+  return button?.querySelectorAll?Array.from(button.querySelectorAll('*')):[];
+ }
+ // Paint one button's label between two captured inks.
+ function paintInk(button,from,to,amount,record){
+  if(!button||!from||!to)return;
+  useStyle(button,'color',mixColor(from.color,to.color,amount),record);
+  if(from.border&&to.border&&from.border!==to.border)
+   useStyle(button,'border-color',mixColor(from.border,to.border,amount),record);
+  if(!from.parts.length&&!to.parts.length)return;
+  const all=inkParts(button);
+  const a=new Map(from.parts.map(p=>[p.i,p.color])),b=new Map(to.parts.map(p=>[p.i,p.color]));
+  for(const i of new Set([...a.keys(),...b.keys()])){
+   if(all[i])useStyle(all[i],'color',mixColor(a.get(i)||from.color,b.get(i)||to.color,amount),record);
+  }
+ }
  function stop(){
   if(!running)return;
   const prior=running;running=null;prior.cleanup();
  }
- function animate(group,key,previous,next,originalSelected,originalIdle){
+ function animate(group,key,previous,next,originalSelected,originalIdle,selectedInk,idleInk){
   const peers=buttons(group,key);
   const source=peers[previous],target=peers[next];
   if(!source||!target||source===target||reduceMotion()||
@@ -222,13 +289,19 @@
   const middles=middleIndices.map(index=>({button:peers[index],idle:getPaint(peers[index]).color}));
   const hasMiddle=middles.length>0;
   const totalDuration=hasMiddle?790+110*(middles.length-1):DURATION;
-  const saved=new Map();
+  const saved=new Map(),inks=new Map();
+  // Freeze the label's own CSS transition so our per-frame colour is exact, then
+  // read the colours the buttons will finally have.
+  const parts=[source,target].flatMap(b=>[b,...inkParts(b)]);
+  parts.forEach(el=>useStyle(el,'transition','none',inks));
+  const sourceInk=selectedInk&&getInk(source),targetInk=idleInk&&getInk(target);
   let raf=null,initial=null,finished=false;
   const cleanup=()=>{
    if(finished)return;
    finished=true;
    if(raf!=null)window.cancelAnimationFrame?.(raf);
    restore(saved);
+   restoreStyles(inks);
   };
   running={cleanup};
   stats.started++;
@@ -249,6 +322,8 @@
    const newFront=-14+128*ease(clamp((t-arrival)/(1-arrival)));
    useBackground(source,fromPaint(angle,afterSource.color,oldColor,oldFront),saved);
    useBackground(target,toPaint(angle,originalIdle.color,newColor,newFront),saved);
+   paintInk(source,selectedInk,sourceInk,inkAt(oldFront),inks);
+   paintInk(target,idleInk,targetInk,inkAt(newFront),inks);
    const windowLength=.68/(1+.55*Math.max(0,middles.length-1));
    middles.forEach(({button,idle},i)=>{
     const phase=(t-.16-i*.55*windowLength)/windowLength;
@@ -269,6 +344,8 @@
   // Immediate first paint. No RAF delays between new selected DOM and effect.
   useBackground(source,fromPaint(angle,afterSource.color,oldColor,-14),saved);
   useBackground(target,toPaint(angle,originalIdle.color,newColor,-14),saved);
+  paintInk(source,selectedInk,sourceInk,0,inks);
+  paintInk(target,idleInk,targetInk,0,inks);
   raf=window.requestAnimationFrame(paintFrame);
  }
  function onClick(event){
@@ -282,6 +359,7 @@
   const next=peers.indexOf(button),previous=peers.findIndex(chosen);
   if(next<0||previous<0||previous===next)return;
   const selected=getPaint(peers[previous]),idle=getPaint(button),id=++sequence;
+  const selectedInk=getInk(peers[previous]),idleInk=getInk(button);
   // Real pointer events may run a microtask checkpoint BETWEEN capture and
   // the inline onclick. Finish stable rows in BUBBLING, after their handler,
   // before browser paint. The main menu keeps its original RAF timing.
@@ -290,7 +368,7 @@
    const nextGroup=spec.stable
     ?(group.isConnected===false?document.getElementById?.(group.id):group)
     :document.querySelector(spec.selector);
-   if(nextGroup)animate(nextGroup,spec.key,previous,next,selected,idle);
+   if(nextGroup)animate(nextGroup,spec.key,previous,next,selected,idle,selectedInk,idleInk);
   };
   if(spec.stable)lowerClicks.set(event,start);
   else window.requestAnimationFrame?.(start);
@@ -301,7 +379,7 @@
   lowerClicks.delete(event);
   if(!event.defaultPrevented)start?.();
  });
- window.FirstHyundaiSelectionFlow={version:'14.1.0',
-  _test:{buttons,chosen,findGroup,getPaint,fromPaint,toPaint,
+ window.FirstHyundaiSelectionFlow={version:'14.2.0',
+  _test:{buttons,chosen,findGroup,getPaint,getInk,mixColor,inkAt,fromPaint,toPaint,
    vector,viaIndex,viaIndices,softlyMix,middlePaint,isLowerRow,stop,onClick,stats}};
 })();
