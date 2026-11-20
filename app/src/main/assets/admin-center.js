@@ -261,7 +261,7 @@
     const approve=document.createElement('button');approve.type='button';approve.textContent='승인';
     const reject=document.createElement('button');reject.type='button';reject.textContent='거절';
     const decide=async ok=>{
-     if(!window.confirm?.(ok?'이 휴대폰을 승인할까요? 승인하면 공유메모를 볼 수 있습니다.':'이 휴대폰 요청을 거절할까요? 거절한 휴대폰은 다시 연결할 수 없습니다.'))return;
+     if(!window.confirm?.(ok?'이 휴대폰을 승인할까요? 승인하면 공유메모를 볼 수 있습니다.':'이 휴대폰 요청을 거절할까요? 거절한 휴대폰은 앱 데이터를 지우고 새로 요청하기 전까지 연결할 수 없습니다.'))return;
      approve.disabled=reject.disabled=true;
      try{await window.FirstHyundaiOfficeBoard.decideDevice(row.device,ok);info.textContent+=ok?' · 승인 완료':' · 거절 완료';}
      catch(e){info.textContent+=' · 처리 실패: 관리자 인증과 연결을 확인해 주세요.';approve.disabled=reject.disabled=false;}
