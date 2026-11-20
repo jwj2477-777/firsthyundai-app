@@ -85,6 +85,7 @@ on:
       - 'scripts/test_contract_pyeong_live_browser.js'
       - 'scripts/test_season_weather_extras.js'
       - 'scripts/test_ui_motion_browser.js'
+      - 'scripts/test_theme_refresh_browser.js'
       - 'scripts/test_nav_scroll_collapse_browser.js'
       - 'scripts/test_overview_actions_browser.js'
       - 'scripts/test_officetel_heading_color.js'
@@ -250,6 +251,7 @@ jobs:
           node scripts/test_contract_pyeong_live_browser.js
           node scripts/test_season_weather_extras.js
           node scripts/test_ui_motion_browser.js
+          node scripts/test_theme_refresh_browser.js
           node scripts/test_nav_scroll_collapse_browser.js
           node scripts/test_device_display_mode.js
           node scripts/test_officetel_heading_color.js
@@ -415,25 +417,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.2.1 smooth APK
+      - name: Publish v2.2.2 theme refresh APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.1.apk
-          unzip -t FirstHyundai-v2.2.1.apk | grep 'No errors detected'
-          if gh release view v2.2.1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.2.apk
+          unzip -t FirstHyundai-v2.2.2.apk | grep 'No errors detected'
+          if gh release view v2.2.2 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.2.1 FirstHyundai-v2.2.1.apk \
+            gh release create v2.2.2 FirstHyundai-v2.2.2.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.2.1 · 화면 전환 버벅임 개선' \
-               --notes '① 실거래·아파트정보·뉴스로 넘어갈 때 잠깐 멈칫하던 원인(목록 한 줄마다 단지 목록 전체를 다시 계산)을 고쳐 화면 전환이 훨씬 빨라졌습니다. ② 뉴스 화면은 보이는 카드부터 먼저 그려 첫 화면이 빨리 뜹니다. ③ 전환 효과는 가볍게 바꿨습니다: 버튼은 누르는 순간 살짝 어두워지고 손을 떼면 부드럽게 돌아오며, 화면은 짧게 흐려졌다 선명해집니다(움직임·지연 없음). ④ 휴대폰 애니메이션 끄기·앱 움직임 줄이기를 그대로 따릅니다. v2.2.1/build252.'
+              --title '퍼스트현대 v2.2.2 · 기본·봄·여름·가을·겨울 테마 업그레이드' \
+               --notes '① 상단에 송도 바닷가 스카이라인과 계절 그림(기본 금빛 별·봄 벚꽃 가지·여름 해와 갈매기·가을 은행잎·겨울 눈꽃과 달)을 은은하게 넣었습니다. 글자 쪽은 비워 두어 잘 읽힙니다. ② 상단 아래 테두리를 계절 색으로 맞췄습니다. ③ 바탕색을 덜 진하고 차분하게 바꿔 흰 카드와 글씨가 더 깨끗하게 보입니다. ④ 카드와 메뉴판에 계절 색이 살짝 도는 그림자를 넣었습니다. ⑤ 여름 장식은 물방울 대신 햇빛 반짝임, 겨울은 더 부드러운 눈 알갱이로 바꿨습니다. 버튼 위치·크기, 매매·전세·월세 색, 진행 버튼 색은 그대로입니다. v2.2.2/build253.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.2.1 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.2.1 --apk FirstHyundai-v2.2.1.apk
+          gh release upload v2.2.2 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.2.2 --apk FirstHyundai-v2.2.2.apk
 
 
 
