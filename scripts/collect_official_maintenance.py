@@ -117,8 +117,19 @@ def fetch_groups(code, month, key, request=call_api, pause=0.025):
   amounts = []
   for op in operations:
    try:
-    response = request(BASE + service + '/' + op,
-                       {'kaptCode': code, 'searchDate': month, 'dataType': 'JSON'}, key)
+    # One retry absorbs a transient throttle/network blip between ~27 rapid calls
+    # (2026-11-20: every call succeeded singly while the batched run failed).
+    for attempt in (1, 2):
+     try:
+      response = request(BASE + service + '/' + op,
+                         {'kaptCode': code, 'searchDate': month, 'dataType': 'JSON'}, key)
+      break
+     except (PublicApiError, RuntimeError, ValueError, KeyError) as exc:
+      if attempt == 2:
+       # Fixed public-API error text only (never the URL or key).
+       print('KAPT_OFFICIAL op failed', code, month, op, type(exc).__name__, str(exc)[:80])
+       raise
+      time.sleep(OP_RETRY_SECONDS)
     rows, total = unpack(response)
     if total is not None and total > len(rows):
      return None
@@ -188,6 +199,9 @@ def available_months(now=None):
 # is already stored, and only for a bounded number of complexes per run
 # (20 x 2 x 27 calls stays well inside the 5,000-call daily quota).
 FALLBACK_MONTHS = 2
+CALIBRATION_ATTEMPTS = 3
+OP_RETRY_SECONDS = 1.5
+CALIBRATION_RETRY_SECONDS = 20
 FALLBACK_COMPLEX_LIMIT = 20
 
 def earlier_months(month, count=FALLBACK_MONTHS):
@@ -198,9 +212,23 @@ def collect(catalog, prior, key, *, get_groups=fetch_groups, get_basic=fetch_bas
  prior_records = prior.get('records', [])
  # Verify interpretation of live numeric fields against independent
  # published itemized K-apt totals before using the algorithm on ANY site.
- benchmark = get_groups(F15, CALIBRATION_MONTH, key)
- base = get_basic(key, F15)
- if not calibration_passes(benchmark, base.get('privArea')):
+ # One transient HTTP error among the benchmark's 27 calls used to abort the whole
+ # run (seen 2026-11-20; an immediate re-run passed). Retry the benchmark a few
+ # times; the parser check itself is unchanged and still fails closed.
+ for attempt in range(CALIBRATION_ATTEMPTS):
+  benchmark = get_groups(F15, CALIBRATION_MONTH, key)
+  try:
+   base = get_basic(key, F15)
+  except (PublicApiError, RuntimeError, ValueError, KeyError):
+   base = {}
+  if calibration_passes(benchmark, base.get('privArea')):
+   break
+  print('KAPT_OFFICIAL benchmark attempt', attempt + 1, 'failed:',
+        'no data' if benchmark is None else {k: v for k, v in benchmark.items()},
+        'area', base.get('privArea'))
+  if pause or attempt + 1 < CALIBRATION_ATTEMPTS:
+   time.sleep(CALIBRATION_RETRY_SECONDS if not pause else pause)
+ else:
   return None
  dates = months or available_months()
  verified = {}

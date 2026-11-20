@@ -60,8 +60,9 @@ class OfficialFees(unittest.TestCase):
   self.assertIsNone(mod.validated_rate({'common':10,'individual':12}, '70685.27'))
  def test_preserves_old_data_when_reference_not_verified(self):
   old={'records':[{'complex_id':'f15','won_per_exclusive_m2':3831,'month':'202607'}]}
-  out=mod.collect([],old,'FAKE',get_groups=lambda *a:None,
-                  get_basic=lambda *a:{'privArea':'70685.27'})
+  with patch.object(mod,'CALIBRATION_RETRY_SECONDS',0):
+   out=mod.collect([],old,'FAKE',get_groups=lambda *a:None,
+                   get_basic=lambda *a:{'privArea':'70685.27'})
   self.assertIsNone(out)
   self.assertEqual(old['records'][0]['won_per_exclusive_m2'],3831)
  def test_publish_only_exact_complex_and_official_month(self):
@@ -119,6 +120,39 @@ class OfficialFees(unittest.TestCase):
 
  def test_office_supply_field_is_a_fee(self):
   self.assertEqual(mod.extract_amount([{'kaptCode':'A10027930','officeSupply':'120000','bookSupply':'0'}],'A10027930','202607'),120000)
+
+ def test_benchmark_retries_transient_failure(self):
+  apt={'id':'f15','kapt_code':'A10026679'}
+  basic={'kaptCode':'A10026679','privArea':'70685.27'}
+  calls={'n':0}
+  def groups(code,month,key):
+   if code==mod.F15 and month==mod.CALIBRATION_MONTH:
+    calls['n']+=1
+    return None if calls['n']==1 else dict(mod.CALIBRATION)
+   return dict(mod.CALIBRATION)
+  with patch.object(mod,'upsert_complex_targets',return_value=[apt]),patch.object(mod,'CALIBRATION_RETRY_SECONDS',0):
+   out=mod.collect([apt],{'records':[]},'FAKE',get_groups=groups,get_basic=lambda key,code:basic,months=['202608'])
+  self.assertIsNotNone(out);self.assertEqual(calls['n'],2)
+
+ def test_benchmark_still_fails_closed_after_retries(self):
+  with patch.object(mod,'CALIBRATION_RETRY_SECONDS',0):
+   out=mod.collect([],{'records':[]},'FAKE',get_groups=lambda *a:None,get_basic=lambda *a:{'privArea':'70685.27'})
+  self.assertIsNone(out)
+
+ def test_single_transient_api_error_is_retried(self):
+  calls={'n':0}
+  def request(url,params,key):
+   calls['n']+=1
+   if calls['n']==3:raise mod.PublicApiError('K-apt 공개 API 연결 실패: 네트워크/서비스 점검')
+   return {'response':{'header':{'resultCode':'00'},'body':{'item':{'kaptCode':'A10026679','kaptName':'x','guardCost':'100'}}}}
+  with patch.object(mod,'OP_RETRY_SECONDS',0),patch.object(mod,'unpack',side_effect=lambda r:([r['response']['body']['item']],None)):
+   totals=mod.fetch_groups('A10026679','202607','FAKE',request=request,pause=0)
+  self.assertIsNotNone(totals)
+
+ def test_repeated_api_error_still_fails_closed(self):
+  def request(url,params,key):raise mod.PublicApiError('K-apt API HTTP 500')
+  with patch.object(mod,'OP_RETRY_SECONDS',0):
+   self.assertIsNone(mod.fetch_groups('A10026679','202607','FAKE',request=request,pause=0))
 
 if __name__=='__main__':
  unittest.main()
