@@ -613,3 +613,29 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
  font-size:14px;font-weight:800;border-radius:10px;border:1px solid #a77c50;
  background:#fff;color:#603f25;padding:10px 16px}
 #officeBoard .officeBoardOfflineBanner button:focus-visible{outline:3px solid #207a72;outline-offset:3px}
+
+/* v2.2.7 — simpler memo cards for everyday use (user: "공유메모 개선할점 샅샅이").
+   Card: 완료 + 수정 on the card, everything else behind 더보기. No label for ordinary
+   in-progress memos (the filter already says 진행 중); 완료 / ⚠ 일정 지남 stay. */
+#officeBoard .officeBoardNoteTop .officeBoardNoteLabelOverdue{color:#A24A33}
+#officeBoard .officeBoardNoteTop .officeBoardNoteLabelOverdue:before{background:#C9563F}
+#officeBoard .officeBoardNoteTop .officeBoardPinned{display:inline-flex;align-items:center;min-height:24px;padding:2px 8px;
+ border-radius:999px;background:#F7EBD1;color:#765724;font-size:11px;font-weight:800}
+#officeBoard .officeBoardMoreActions{grid-column:1 / -1;margin:0}
+#officeBoard .officeBoardMoreActions>summary{list-style:none;display:flex;align-items:center;justify-content:center;gap:6px;
+ min-height:40px;border-radius:9px;color:#5B6E6A;font-size:12px;font-weight:750;cursor:pointer}
+#officeBoard .officeBoardMoreActions>summary::-webkit-details-marker{display:none}
+#officeBoard .officeBoardMoreActions>summary::after{content:"▾";font-size:11px}
+#officeBoard .officeBoardMoreActions[open]>summary::after{content:"▴"}
+#officeBoard .officeBoardMoreList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:4px}
+#officeBoard .officeBoardMoreList .officeBoardPin{margin:0;min-height:42px;font-size:12px}
+/* Saving an edit is "continue", so it uses the app's deep teal, never the red of delete. */
+#officeBoard .officeBoardNoteActions .officeBoardSave{color:#fff;background:#1F5F5C;border-color:#1F5F5C}
+/* Read-only is a quiet note, not a big grey bar on every card. */
+#officeBoard .officeBoardReadOnly{min-height:0;padding:0;background:none;text-align:right;color:#7A8B87;font-size:11px}
+#officeBoard .officeBoardUndo{margin-left:6px;min-height:36px;padding:4px 12px;border-radius:999px;border:1px solid #9CB9B0;
+ background:#FFFFFF;color:#1F5F5C;font-size:13px;font-weight:800}
+/* Calendar: Sunday red, Saturday blue, as on a paper calendar. */
+#officeBoard .officeBoardCalendarWeekdays span:last-child{color:#4D72A8}
+#officeBoard .officeBoardCalendarDays>.officeBoardDay:nth-child(7n+1)>span:first-child{color:#B0574B}
+#officeBoard .officeBoardCalendarDays>.officeBoardDay:nth-child(7n)>span:first-child{color:#3D6BA8}

@@ -297,7 +297,7 @@ assert.match(element('fhc_feeCaption').textContent,/부가세 4% 포함/);
 element('fhc_feeVat').value='10';calc.update();assert.equal(element('fhc_feePrimary').textContent,'3,740,000원');
 element('fhc_feeVat').value='0';calc.update();assert.equal(element('fhc_feePrimary').textContent,'3,400,000원');
 {const m=read('app/src/main/assets/index.html');
- assert(m.includes('<option value="4">4% 더하기 (간이과세자)</option>')&&m.includes('<option value="10">10% 더하기 (일반과세자)</option>'),'Both VAT choices offered');
+ assert(/<option value="4"[^>]*>4% 더하기 \(간이과세자\)<\/option>/.test(m)&&/<option value="10"[^>]*>10% 더하기 \(일반과세자\)<\/option>/.test(m),'Both VAT choices offered');
  assert(!m.includes('부가세 10% 가정액도 보기'),'Old 10%-only checkbox removed');}
 // 전월세 전환 with the current monthly rent: 1억→5천만 at 4.5% adds 18만 7,500원 to 50만원.
 for(const id of ['fhc_currentRent','fhc_conversionCaption','fhc_conversionRead'])element(id);
