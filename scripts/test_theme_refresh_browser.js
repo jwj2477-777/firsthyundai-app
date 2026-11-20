@@ -55,8 +55,10 @@ for(const block of code.matchAll(/([^{}]+)\{([^{}]*)\}/g)){
 }
 assert(code.includes('body[data-app-contrast="high"][data-season-theme]{--theme-rain-layer:var(--theme-none)'),'High contrast drops rain streaks');
 // v2.2.3: see-through 알림함; motifs/night windows fade out under it; moons are real crescents.
+// v2.2.4: also glass in high contrast (편하게 보기), just a deeper tint — never the old solid fill.
 assert(code.includes('html body header #modeBar #favoriteAlertButton{')&&code.includes('html body[data-app-contrast="high"] header #modeBar #favoriteAlertButton{'),
- 'Glass 알림함 with a solid high-contrast fallback');
+ 'Glass 알림함 in standard and high contrast');
+assert(!/data-app-contrast="high"\] header #modeBar #favoriteAlertButton\{[^}]*#F7FBF8/.test(code),'High contrast must not bring back the solid 알림함');
 for(const t of SCENES){
  const svg=read('theme-scene-'+t+'.svg');
  if(t!=='night')assert(svg.includes('<g mask="url(#m)">'),t+' skyline fades in from the brand text');
@@ -124,15 +126,16 @@ async function verify(){
   bell.style.transition='none';
   document.body.setAttribute('data-app-contrast','high');
   const solid=getComputedStyle(bell),solidBg=solid.backgroundColor,solidBox=bellBox();
-  check(alpha(solidBg)===1,'High contrast: 알림함 stays solid · '+solidBg);
+  check(alpha(solidBg)<.5&&solid.color==='rgb(255, 255, 255)','High contrast (편하게 보기): 알림함 is glass too · '+solidBg+' '+solid.color);
   document.body.setAttribute('data-app-contrast','standard');
   const glass=getComputedStyle(bell),glassBg=glass.backgroundColor,glassInk=glass.color;
   bell.style.transition='';
   check(alpha(glassBg)<.5&&glassInk==='rgb(255, 255, 255)','알림함 is see-through glass with a white label · '+glassBg+' '+glassInk);
+  check(alpha(solidBg)>alpha(glassBg),'High contrast glass is a deeper tint than the standard glass');
   check(bellBox()===solidBox,'알림함 size/position unchanged by the glass look');
   if(contrastBefore===null)document.body.removeAttribute('data-app-contrast');else document.body.setAttribute('data-app-contrast',contrastBefore);
   check(document.documentElement.scrollWidth<=innerWidth+1,'No horizontal overflow');
-  out.textContent='PASS five scenes, hour/rain/occasion layers, 절기 chip, unchanged geometry, high-contrast streak removal, glass 알림함';
+  out.textContent='PASS five scenes, hour/rain/occasion layers, 절기 chip, unchanged geometry, high-contrast streak removal, glass 알림함 (also in high contrast)';
  }catch(e){out.textContent='FAIL '+e.message}
  document.body.innerHTML='';document.body.appendChild(out);
 }

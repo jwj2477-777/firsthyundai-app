@@ -417,25 +417,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.2.3 glass alert and label flow APK
+      - name: Publish v2.2.4 glass alert in high contrast APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.3.apk
-          unzip -t FirstHyundai-v2.2.3.apk | grep 'No errors detected'
-          if gh release view v2.2.3 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.4.apk
+          unzip -t FirstHyundai-v2.2.4.apk | grep 'No errors detected'
+          if gh release view v2.2.4 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.2.3 FirstHyundai-v2.2.3.apk \
+            gh release create v2.2.4 FirstHyundai-v2.2.4.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.2.3 · 알림함 반투명 · 버튼 글자도 함께 전환 · 상단 그림 다듬기' \
-               --notes '① 알림함 버튼을 반투명 유리처럼 바꿔 뒤의 상단 그림이 비쳐 보입니다. 글자는 모든 계절·시간대에서 또렷하게 읽히도록 맞췄고(대비 5:1 이상), 편하게 보기(고대비)에서는 예전처럼 불투명합니다. ② 메뉴·매매/전세/월세·아파트/오피스텔 같은 선택 버튼을 바꿀 때, 색이 옮겨가는 순간에 글자·숫자·아이콘 색도 함께 서서히 바뀝니다. ③ 상단 그림을 다듬었습니다: 건물 뒤로 낮은 건물 줄과 물에 비친 그림자, 지붕 모양을 더해 깊이를 주고, 기본·겨울에 초승달, 봄 꽃잎, 여름 돛단배, 가을 단풍잎을 넣었습니다. 꽃·잎·눈은 알림함 밑에서 자연스럽게 사라집니다. 버튼 위치·크기, 매매·전세·월세 색, 진행 버튼 색은 그대로이고 움직임 줄이기를 켜면 전환 효과는 꺼집니다. v2.2.3/build254.'
+              --title '퍼스트현대 v2.2.4 · 편하게 보기에서도 알림함 반투명' \
+               --notes '"편하게 보기(선명한 화면)"를 켠 상태에서는 알림함이 예전처럼 불투명하게 남아 있던 것을 고쳤습니다. 이제 이 모드에서도 뒤의 상단 그림이 비쳐 보이고, 글자가 또렷하도록 유리를 조금 더 진하게, 테두리를 조금 더 밝게 했습니다(모든 계절·시간대 글자 대비 6.6:1 이상). 버튼 크기·위치·기능은 그대로입니다. v2.2.4/build255.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.2.3 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.2.3 --apk FirstHyundai-v2.2.3.apk
+          gh release upload v2.2.4 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.2.4 --apk FirstHyundai-v2.2.4.apk
 
 
 
