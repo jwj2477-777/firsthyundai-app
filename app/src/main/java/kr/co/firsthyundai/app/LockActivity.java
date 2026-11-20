@@ -514,7 +514,7 @@ public class LockActivity extends Activity {
                                 openMain();
                             }else{
                                 restorePasswordPage();
-                                status.setText(OfficeBoardClient.PENDING_APPROVAL.equals(detail)?detail:
+                                status.setText(OfficeBoardClient.completeLoginMessage(detail)?detail:
                                     detail+" · 보안코드를 다시 입력해 주세요.");
                             }
                         });

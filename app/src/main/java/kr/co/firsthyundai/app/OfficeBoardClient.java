@@ -332,6 +332,17 @@ final class OfficeBoardClient {
             }
             if("/board/ai/live-token".equals(path) && (status<200||status>=300))
                 throw new Exception(LiveFailureReason.fromHttp(status,bytes.toString("UTF-8")));
+            // v2.2.8: login refusals carry a reason. The 보안코드 was already accepted at this
+            // point (a wrong code is 401), so never tell the user to retype it.
+            if(("/board/session".equals(path)||"/board/choices".equals(path))&&(status==403||status==409)){
+                String code="";
+                try{
+                    String candidate=new JSONObject(bytes.toString("UTF-8")).optString("error","");
+                    if(candidate.matches("[a-z_]{3,64}"))code=candidate;
+                }catch(Exception ignored){}
+                String reason=loginRefusal(status,code);
+                if(reason!=null)throw new Exception(reason);
+            }
             if(status==401){
                 if(path.startsWith("/board")&&!path.equals("/board/choices")&&!path.equals("/board/session"))
                     throw new Exception("account_revoked · 관리자에게 계정 상태를 확인해 주세요.");
@@ -346,6 +357,25 @@ final class OfficeBoardClient {
             if(status<200||status>=300)throw new Exception("게시판 서버에 연결할 수 없습니다. HTTP "+status);
             return new JSONObject(bytes.toString("UTF-8"));
         }finally{if(connection!=null)connection.disconnect();}
+    }
+    static final String DEVICE_REVOKED="이 휴대폰은 예전에 승인이 거절됐거나, 연결돼 있던 계정이 삭제되어 막혀 있습니다. "+
+        "보안코드는 맞습니다. 이 휴대폰의 앱 데이터를 삭제(설정 → 애플리케이션 → 퍼스트현대 → 저장공간 → 데이터 삭제)한 뒤 다시 로그인하면 새 승인 요청이 갑니다. "+
+        "관리자가 관리자센터 '새 휴대폰 승인'에서 승인하면 됩니다.";
+    static final String ACCOUNT_REMOVED="선택한 계정은 삭제된 계정입니다. 보안코드는 맞습니다. 목록에서 본인 계정을 다시 고르거나, "+
+        "관리자에게 관리자센터에서 계정을 만들어 달라고 한 뒤 다시 로그인해 주세요.";
+    static final String DEVICE_ASSIGNED="이 휴대폰은 이미 다른 계정으로 연결돼 있습니다. 보안코드는 맞습니다. 원래 계정을 고르거나, "+
+        "이 휴대폰의 앱 데이터를 삭제한 뒤 다시 로그인해 새 승인을 받아 주세요.";
+    /** Plain-language reason for a refused login, or null when the generic message applies. */
+    static String loginRefusal(int status,String code){
+        if(status==403&&"device_revoked".equals(code))return DEVICE_REVOKED;
+        if(status==403&&"account_removed".equals(code))return ACCOUNT_REMOVED;
+        if(status==409&&"device_already_assigned".equals(code))return DEVICE_ASSIGNED;
+        return null;
+    }
+    /** Messages that already say what to do; the lock screen shows them as they are. */
+    static boolean completeLoginMessage(String message){
+        return PENDING_APPROVAL.equals(message)||DEVICE_REVOKED.equals(message)||
+            ACCOUNT_REMOVED.equals(message)||DEVICE_ASSIGNED.equals(message);
     }
     static final String PENDING_APPROVAL="새 휴대폰 승인 대기 중입니다. 관리자가 관리자센터의 '새 휴대폰 승인'에서 승인한 뒤, 이 화면에서 보안코드를 다시 입력해 주세요.";
     private OfficeBoardClient(){}
