@@ -1,0 +1,100 @@
+/* v2.2.2 — Theme refresh for 기본 · 봄 · 여름 · 가을 · 겨울 (user request: "한층 업그레이드").
+ *
+ * Appearance only — nothing here moves, resizes or hides a business control.
+ *  · Header: soft top light + a quiet waterfront skyline with one seasonal motif
+ *    (theme-scene-*.svg, faded out under the brand text) + a fine seasonal edge.
+ *    Header base colours are unchanged so the native splash still matches.
+ *  · Page: calmer, less saturated seasonal washes that fade into warm paper,
+ *    so white cards and Korean text read cleaner (60s parents first).
+ *  · Decoration: summer bubbles → sunlight glints, softer winter specks.
+ *  · Deal colours (매매/전세/월세), the deep-teal "continue" button and menu
+ *    selection colours are untouched.
+ *  · Small touches: the header light follows the hour (sunrise glow, sunset band,
+ *    lit windows at night), fine rain streaks while it rains, a first-sunrise scene
+ *    on 1/1–1/3 and a small lit tree on 12/24–25, and today's 절기 by the date.
+ * Static images and gradients only (painted once; no animation added).
+ * Remove this file + theme-scene-*.svg to return to the v2.2.1 look.
+ */
+body{
+ --theme-scene:url("theme-scene-default.svg");
+ --theme-sheen:linear-gradient(180deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,.02) 46%,rgba(255,255,255,0) 60%);
+ --theme-hairline:#C8A56C;
+ --theme-weather-shade:linear-gradient(transparent,transparent);
+ --theme-header-base:linear-gradient(121deg,#102D38 0%,#183E49 57%,#23575D 100%);
+ --theme-none:linear-gradient(transparent,transparent);
+ --theme-time-layer:var(--theme-none);--theme-rain-layer:var(--theme-none);
+}
+/* The hour, in light only (same 5–10 / 10–17 / 17–20 / night split as the app's time tint). */
+body[data-theme-time="morning"]{--theme-time-layer:radial-gradient(ellipse 62% 105% at 84% 122%,rgba(255,206,150,.46),transparent 72%),
+ linear-gradient(0deg,rgba(255,214,170,.12),transparent 50%)}
+body[data-theme-time="evening"]{--theme-time-layer:radial-gradient(ellipse 60% 100% at 82% 120%,rgba(255,158,112,.48),transparent 72%),
+ linear-gradient(0deg,rgba(255,140,104,.24),transparent 62%)}
+body[data-theme-time="night"]{--theme-time-layer:url("theme-scene-night.svg") right 2px bottom 0/auto 58px no-repeat,
+ linear-gradient(rgba(4,12,26,.12),rgba(4,12,26,.12))}
+body[data-weather-effect="rain"]{--theme-rain-layer:repeating-linear-gradient(104deg,rgba(255,255,255,.075) 0 1px,transparent 1px 10px)}
+/* Fixed-date occasions replace the seasonal motif (the skyline stays the same). */
+body[data-theme-occasion="newyear"]{--theme-scene:url("theme-scene-newyear.svg")!important}
+body[data-theme-occasion="christmas"]{--theme-scene:url("theme-scene-christmas.svg")!important}
+body[data-theme-header="on"]:not([data-season-theme="default"]){--theme-header-base:var(--season-header)}
+body[data-season-theme="spring"]{--theme-scene:url("theme-scene-spring.svg");--theme-hairline:#E7AEC5;
+ --season-page:#FBF7F5;--season-haze:#F6E3EB;--season-paper:#FFFCFD;--season-line:#EBD4DE;--season-glow:#E4EFD8;--season-edge:#C46E93}
+body[data-season-theme="summer"]{--theme-scene:url("theme-scene-summer.svg");--theme-hairline:#88D2D7;
+ --season-page:#F5FAFA;--season-haze:#DBEFF1;--season-paper:#FBFEFE;--season-line:#C7E1E4;--season-glow:#DCF2E5;--season-edge:#2E8EA5}
+body[data-season-theme="autumn"]{--theme-scene:url("theme-scene-autumn.svg");--theme-hairline:#E0AE68;
+ --season-page:#FAF5ED;--season-haze:#F3E1C9;--season-paper:#FFFCF6;--season-line:#E5D2B4;--season-glow:#F2D6B5;--season-edge:#B06A2E}
+body[data-season-theme="winter"]{--theme-scene:url("theme-scene-winter.svg");--theme-hairline:#B7C8EB;
+ --season-page:#F6F7FB;--season-haze:#E1E7F5;--season-paper:#FCFDFF;--season-line:#D2DBEE;--season-glow:#E4DFF3;--season-edge:#6F86BE}
+body[data-weather-effect="rain"]{--theme-weather-shade:linear-gradient(#08283B29,#08283B29)}
+body[data-weather-effect="snow"]{--theme-weather-shade:linear-gradient(#FFFFFF0C,#FFFFFF0C)}
+
+/* 1) Header band. */
+body[data-season-theme][data-theme-header] header{
+ background:var(--theme-weather-shade),var(--theme-rain-layer),var(--theme-sheen),var(--theme-time-layer),
+  var(--theme-scene) right 2px bottom 0/auto 58px no-repeat,var(--theme-header-base);
+ border-bottom-color:var(--theme-hairline);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 8px 22px -12px rgba(10,30,38,.42);
+}
+body[data-theme-header="off"]:not([data-season-theme="default"]) header{border-bottom-color:#C8A56C}
+
+/* 2) Page wash: a gentle seasonal light at the top that settles into warm paper. */
+body[data-season-theme="default"]{
+ background:radial-gradient(ellipse at 100% 0,rgba(211,176,112,.15),transparent 420px),
+  linear-gradient(180deg,#EDF2EF 0,#F6F7F3 360px,#F7F7F4 100%);
+}
+body[data-season-theme]:not([data-season-theme="default"]):not([data-theme-intensity="soft"]):not([data-theme-intensity="vivid"]){
+ background:radial-gradient(ellipse at 90% 65px,var(--fhd-time-light,transparent),transparent 340px),
+  radial-gradient(ellipse at 100% 40px,var(--season-glow),transparent 400px),
+  radial-gradient(ellipse at 0 520px,color-mix(in srgb,var(--season-haze) 55%,transparent),transparent 360px),
+  linear-gradient(180deg,var(--season-haze) 0,var(--season-page) 400px,var(--season-page) 100%);
+}
+
+/* 3) Cards and the menu dock sit on the season like paper: hairline + soft depth. */
+body[data-season-theme]:not([data-season-theme="default"]) .panel,
+body[data-season-theme]:not([data-season-theme="default"]) :is(.nearbyCard,.newsCard,.officeMemoCard){
+ background-image:linear-gradient(170deg,#FFFFFF 0%,var(--season-paper) 100%);
+ box-shadow:0 1px 2px rgba(31,45,61,.04),0 10px 26px -16px color-mix(in srgb,var(--season-edge) 38%,transparent);
+}
+body[data-season-theme]:not([data-season-theme="default"]) #nav.tabs{
+ border-color:var(--season-line);
+ box-shadow:inset 0 1px 0 #FFFFFF,0 10px 26px -16px color-mix(in srgb,var(--season-edge) 45%,transparent);
+}
+body[data-season-theme]:not([data-season-theme="default"]) .sectionTitle h2{text-shadow:0 1px 0 #FFFFFFB3}
+
+/* 4) Decoration refinements (same counts, same motion). */
+.seasonParticle.summer{width:6px;height:6px;border:0;border-radius:50%;
+ background:radial-gradient(circle,#FFFFFF 0 28%,#C4F0F2 52%,transparent 72%);opacity:.6}
+.seasonParticle.summer:nth-child(4n){width:10px;height:10px;opacity:.42}
+.seasonParticle.winter{width:5px;height:5px;background:radial-gradient(circle,#FFFFFF 0 34%,#C8D6EE 58%,transparent 76%);opacity:.62}
+
+/* 5) Today's 절기 beside the briefing date: quiet every day, a soft pill on the day it begins. */
+.overviewBriefDate .overviewTermChip{margin-left:7px;color:#6B7A7E;font-weight:700}
+.overviewBriefDate .overviewTermChip::before{content:'·';margin-right:7px;color:#A5B0B2}
+.overviewBriefDate .overviewTermChip.is-today{display:inline-block;margin-left:6px;padding:1px 9px;border-radius:999px;
+ background:color-mix(in srgb,var(--theme-hairline) 22%,#FFFFFF);border:1px solid color-mix(in srgb,var(--theme-hairline) 70%,#FFFFFF);
+ color:#3F4A4C;font-weight:800}
+.overviewBriefDate .overviewTermChip.is-today::before{content:none}
+
+/* High contrast (also part of "편하게 보기"): keep the quiet scene behind the logo side,
+   but drop the rain streaks and the top sheen so the white brand text stays crisp. */
+body[data-app-contrast="high"][data-season-theme]{--theme-rain-layer:var(--theme-none);--theme-sheen:var(--theme-none)}
+@media print{body[data-season-theme] header{background:#102D38}}
