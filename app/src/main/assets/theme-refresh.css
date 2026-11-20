@@ -9,6 +9,9 @@
  *  · Decoration: summer bubbles → sunlight glints, softer winter specks.
  *  · Deal colours (매매/전세/월세), the deep-teal "continue" button and menu
  *    selection colours are untouched.
+ *  · Small touches: the header light follows the hour (sunrise glow, sunset band,
+ *    lit windows at night), fine rain streaks while it rains, a first-sunrise scene
+ *    on 1/1–1/3 and a small lit tree on 12/24–25, and today's 절기 by the date.
  * Static images and gradients only (painted once; no animation added).
  * Remove this file + theme-scene-*.svg to return to the v2.2.1 look.
  */
@@ -18,7 +21,20 @@ body{
  --theme-hairline:#C8A56C;
  --theme-weather-shade:linear-gradient(transparent,transparent);
  --theme-header-base:linear-gradient(121deg,#102D38 0%,#183E49 57%,#23575D 100%);
+ --theme-none:linear-gradient(transparent,transparent);
+ --theme-time-layer:var(--theme-none);--theme-rain-layer:var(--theme-none);
 }
+/* The hour, in light only (same 5–10 / 10–17 / 17–20 / night split as the app's time tint). */
+body[data-theme-time="morning"]{--theme-time-layer:radial-gradient(ellipse 62% 105% at 84% 122%,rgba(255,206,150,.46),transparent 72%),
+ linear-gradient(0deg,rgba(255,214,170,.12),transparent 50%)}
+body[data-theme-time="evening"]{--theme-time-layer:radial-gradient(ellipse 60% 100% at 82% 120%,rgba(255,158,112,.48),transparent 72%),
+ linear-gradient(0deg,rgba(255,140,104,.24),transparent 62%)}
+body[data-theme-time="night"]{--theme-time-layer:url("theme-scene-night.svg") right 2px bottom 0/auto 58px no-repeat,
+ linear-gradient(rgba(4,12,26,.12),rgba(4,12,26,.12))}
+body[data-weather-effect="rain"]{--theme-rain-layer:repeating-linear-gradient(104deg,rgba(255,255,255,.075) 0 1px,transparent 1px 10px)}
+/* Fixed-date occasions replace the seasonal motif (the skyline stays the same). */
+body[data-theme-occasion="newyear"]{--theme-scene:url("theme-scene-newyear.svg")!important}
+body[data-theme-occasion="christmas"]{--theme-scene:url("theme-scene-christmas.svg")!important}
 body[data-theme-header="on"]:not([data-season-theme="default"]){--theme-header-base:var(--season-header)}
 body[data-season-theme="spring"]{--theme-scene:url("theme-scene-spring.svg");--theme-hairline:#E7AEC5;
  --season-page:#FBF7F5;--season-haze:#F6E3EB;--season-paper:#FFFCFD;--season-line:#EBD4DE;--season-glow:#E4EFD8;--season-edge:#C46E93}
@@ -33,7 +49,7 @@ body[data-weather-effect="snow"]{--theme-weather-shade:linear-gradient(#FFFFFF0C
 
 /* 1) Header band. */
 body[data-season-theme][data-theme-header] header{
- background:var(--theme-weather-shade),var(--theme-sheen),
+ background:var(--theme-weather-shade),var(--theme-rain-layer),var(--theme-sheen),var(--theme-time-layer),
   var(--theme-scene) right 2px bottom 0/auto 58px no-repeat,var(--theme-header-base);
  border-bottom-color:var(--theme-hairline);
  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 8px 22px -12px rgba(10,30,38,.42);
@@ -69,6 +85,14 @@ body[data-season-theme]:not([data-season-theme="default"]) .sectionTitle h2{text
  background:radial-gradient(circle,#FFFFFF 0 28%,#C4F0F2 52%,transparent 72%);opacity:.6}
 .seasonParticle.summer:nth-child(4n){width:10px;height:10px;opacity:.42}
 .seasonParticle.winter{width:5px;height:5px;background:radial-gradient(circle,#FFFFFF 0 34%,#C8D6EE 58%,transparent 76%);opacity:.62}
+
+/* 5) Today's 절기 beside the briefing date: quiet every day, a soft pill on the day it begins. */
+.overviewBriefDate .overviewTermChip{margin-left:7px;color:#6B7A7E;font-weight:700}
+.overviewBriefDate .overviewTermChip::before{content:'·';margin-right:7px;color:#A5B0B2}
+.overviewBriefDate .overviewTermChip.is-today{display:inline-block;margin-left:6px;padding:1px 9px;border-radius:999px;
+ background:color-mix(in srgb,var(--theme-hairline) 22%,#FFFFFF);border:1px solid color-mix(in srgb,var(--theme-hairline) 70%,#FFFFFF);
+ color:#3F4A4C;font-weight:800}
+.overviewBriefDate .overviewTermChip.is-today::before{content:none}
 
 /* High contrast and print stay plain. */
 body[data-app-contrast="high"][data-season-theme] header{background:var(--theme-header-base)}

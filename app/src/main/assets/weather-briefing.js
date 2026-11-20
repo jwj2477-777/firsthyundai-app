@@ -213,6 +213,15 @@
    const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(calendarDay);
    const part=type=>parts.find(value=>value.type===type)?.value||'';
    titleDate.setAttribute?.('datetime',[part('year'),part('month'),part('day')].join('-'));
+   // v2.2.2: today's 24-solar-term (절기) beside the date; highlighted on the day it begins.
+   const term=window.FirstHyundaiThemes?.solarTerm?.(now);
+   if(term?.name&&document.createElement){
+    const chip=document.createElement('span');
+    chip.className='overviewTermChip'+(term.today?' is-today':'');
+    chip.textContent=term.today?'오늘 '+term.name:term.name;
+    titleDate.appendChild?.(chip);
+    titleDate.setAttribute?.('aria-label','오늘 날짜, 절기 '+term.name);
+   }
   }
   const extra=window.FirstHyundaiOfficeBoard?.closureDates?.()||[];
   const view=summarize(data,now,extra);

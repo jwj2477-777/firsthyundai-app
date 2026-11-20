@@ -92,6 +92,23 @@
   });
   cache.set(year,result);return result;
  }
+ // v2.2.2: the 24 solar terms (절기) by the same solar longitude, on Korean calendar
+ // days: the term of a KST day is the sun's 15° sector at that day's end.
+ const TERM_NAMES=['춘분','청명','곡우','입하','소만','망종','하지','소서','대서','입추','처서','백로',
+  '추분','한로','상강','입동','소설','대설','동지','소한','대한','입춘','우수','경칩'];
+ function solarTerm(now=Date.now()){
+  const k=new Date(now+9*HOUR),start=Date.UTC(k.getUTCFullYear(),k.getUTCMonth(),k.getUTCDate())-9*HOUR;
+  const at=ms=>Math.floor(longitude(ms)/15)%24;
+  const today=at(start+86400000-1),before=at(start-1);
+  return {name:TERM_NAMES[today],today:today!==before};
+ }
+ // v2.2.2: two fixed-date occasions only (no lunar calendar guessing).
+ function occasion(now=Date.now()){
+  const k=new Date(now+9*HOUR),md=(k.getUTCMonth()+1)*100+k.getUTCDate();
+  if(md>=101&&md<=103)return 'newyear';
+  if(md>=1224&&md<=1225)return 'christmas';
+  return '';
+ }
  function season(now=Date.now()){
   const year=new Date(now+9*HOUR).getUTCFullYear(),days=terms(year);
   let name='winter';days.forEach((day,i)=>{if(now>=day)name=THEMES[i+1]});return name;
@@ -123,6 +140,7 @@
   const peak=wet==='none'?seasonPeak(base,now):'',budget=particleBudget();
   document.body.setAttribute('data-season-peak',peak);
   document.body.setAttribute('data-theme-budget',budget.reason||'full');
+  document.body.setAttribute('data-theme-occasion',occasion(now));
   document.body.setAttribute('data-theme-paused',document.hidden?'true':'false');
   document.body.setAttribute('data-theme-intensity',options.themeIntensity);
   document.body.setAttribute('data-theme-decor',options.themeDecor);
@@ -192,8 +210,8 @@
   paint();refresh();
   try{document.dispatchEvent?.(new Event('firsthyundai-theme-configured'))}catch(e){}
  }
- window.FirstHyundaiThemes={configure,refresh,refreshObserved:()=>refresh(true),currentWeather:()=>fresh(weather)?weather:null,weatherMode:()=>options.weatherEffect,
-  _test:{terms,season,fresh,longitude,headerPalette,timeMood,ambientPalette,rainStrength,seasonPeak,particleBudget}};
+ window.FirstHyundaiThemes={configure,refresh,refreshObserved:()=>refresh(true),currentWeather:()=>fresh(weather)?weather:null,weatherMode:()=>options.weatherEffect,solarTerm,occasion,
+  _test:{terms,season,fresh,longitude,headerPalette,timeMood,ambientPalette,rainStrength,seasonPeak,particleBudget,solarTerm,occasion}};
  document.addEventListener('visibilitychange',()=>{paint();if(!document.hidden)refresh()});
  window.addEventListener('focus',()=>{paint();refresh()});
  window.addEventListener('resize',paint);
