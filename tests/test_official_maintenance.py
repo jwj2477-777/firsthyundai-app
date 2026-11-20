@@ -167,5 +167,17 @@ class OfficialFees(unittest.TestCase):
   self.assertIn('c00',ids);self.assertIn('c04',ids,'Unscanned complexes keep prior values')
   self.assertLess(out['checked_codes'],5)
 
+ def test_missing_or_oldest_complexes_are_scanned_first(self):
+  apts=[{'id':'a','kapt_code':'A10000001'},{'id':'b','kapt_code':'A10000002'},{'id':'c','kapt_code':'A10000003'}]
+  prior={'records':[{'complex_id':'a','month':'202608'},{'complex_id':'b','month':'202606'}]}
+  order=[]
+  def basic(key,code):
+   if code!=mod.F15:order.append(code)
+   return {'kaptCode':code,'privArea':'70685.27'}
+  def match(catalog,b):return [x for x in apts if x['kapt_code']==b['kaptCode']]
+  with patch.object(mod,'upsert_complex_targets',side_effect=match):
+   mod.collect(apts,prior,'FAKE',get_groups=lambda *a:dict(mod.CALIBRATION),get_basic=basic,months=['202608'])
+  self.assertEqual(order,['A10000003','A10000002','A10000001'])
+
 if __name__=='__main__':
  unittest.main()

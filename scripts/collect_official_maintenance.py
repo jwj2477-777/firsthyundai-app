@@ -247,8 +247,16 @@ def collect(catalog, prior, key, *, get_groups=fetch_groups, get_basic=fetch_bas
  for row in prior_records:
   if isinstance(row, dict) and row.get('complex_id'):
    stored_month[row['complex_id']] = max(stored_month.get(row['complex_id'], ''), str(row.get('month', '')))
- for code in sorted({str(p.get('kapt_code')) for p in catalog
-                     if not p.get('aggregate_only') and re.fullmatch(r'A[0-9]{8}', str(p.get('kapt_code', '')))}):
+ codes = {str(p.get('kapt_code')) for p in catalog
+          if not p.get('aggregate_only') and re.fullmatch(r'A[0-9]{8}', str(p.get('kapt_code', '')))}
+ # Missing or oldest data first: with a time budget, a fixed code order would let
+ # the same late-listed complexes (e.g. 마스터뷰23) miss every slow run.
+ code_month = {}
+ for p in catalog:
+  c = str(p.get('kapt_code', ''))
+  if c in codes:
+   code_month[c] = min(code_month.get(c, '999999'), stored_month.get(p.get('id'), ''))
+ for code in sorted(codes, key=lambda c: (code_month.get(c, ''), c)):
   if clock() - started > COLLECT_BUDGET_SECONDS:
    print('KAPT_OFFICIAL time budget reached; keeping', len(verified), 'newly verified, others keep prior values')
    break
