@@ -1,4 +1,7 @@
-/* 퍼스트현대 부동산 계산기: offline arithmetic only. No customer data is sent or stored. */
+/* 퍼스트현대 부동산 계산기: offline arithmetic only. No customer data is sent or stored.
+ * v2.2.5: every 만원 box reads its number back in words ("85000" → "8억 5,000만원"),
+ * results add a 만원 reading, 중개보수 shows its formula and both-sides total,
+ * 전월세 전환 takes the current monthly rent, 대출 shows the total repayment. */
 (function(root){
  'use strict';
  const $=id=>document.getElementById(id);
@@ -17,6 +20,41 @@
  function percent(v){return num(v,100,true);}
  function months(v){const n=num(v,600,false);return n!==null&&n>=1?n:null;}
  function money(won){return WON.format(Math.round(won))+'원';}
+ // 85000 (만원) → "8억 5,000만원"; 3100 → "3,100만원"; 10000 → "1억원".
+ function wanText(wan){
+  if(!Number.isFinite(wan)||wan<0)return '';
+  const eok=Math.floor(wan/10000),rest=Math.round(wan%10000);
+  if(!eok)return WON.format(rest)+'만원';
+  return WON.format(eok)+'억'+(rest?' '+WON.format(rest)+'만':'')+'원';
+ }
+ // 1,467,052원 → "146만 7,052원"; 3,400,000원 → "340만원"; 228,138,548원 → "2억 2,813만 8,548원".
+ function wonText(won){
+  if(!Number.isFinite(won)||won<0)return '';
+  const w=Math.round(won),eok=Math.floor(w/1e8),man=Math.floor((w%1e8)/1e4),rest=w%1e4;
+  const parts=[];
+  if(eok)parts.push(WON.format(eok)+'억');
+  if(man)parts.push(WON.format(man)+'만');
+  if(rest||!parts.length)parts.push(WON.format(rest));
+  return parts.join(' ')+'원';
+ }
+ // 360 → "30년", 30 → "2년 6개월".
+ function monthsText(n){
+  if(!Number.isSafeInteger(n)||n<1)return '';
+  const y=Math.floor(n/12),m=n%12;
+  return (y?y+'년':'')+(y&&m?' ':'')+(m?m+'개월':'');
+ }
+ // Read-back under each amount box, so a missing or extra zero is visible at once.
+ const READBACK={fhc_feeAmount:'wan',fhc_feeRent:'wan',fhc_oldDeposit:'wan',fhc_newDeposit:'wan',
+  fhc_currentRent:'wan',fhc_loanAmount:'wan',fhc_loanMonths:'months',fhc_taxAmount:'wan',
+  fhc_taxBuyAmt:'wan',fhc_taxSellAmt:'wan',fhc_taxCost:'wan'};
+ function readback(id){
+  const box=$(id+'Read');if(!box)return;
+  const raw=String($(id)?.value??'').trim(),n=/^\d+$/.test(raw)?Number(raw):NaN;
+  const text=!Number.isSafeInteger(n)?'':READBACK[id]==='months'?(n>=1&&n<=600?'= '+monthsText(n):''):
+   (n>=1&&n<=1e9?'= '+wanText(n):'');
+  box.textContent=text;box.hidden=!text;
+ }
+ function readbackAll(){for(const id of Object.keys(READBACK))readback(id);}
  function commission({kind,deal,amountWan,rentWan=0,vat=false}){
   const value=amount(amountWan),rent=amount(rentWan);
   if(value===null||value===0)throw Error('거래금액이나 보증금을 올바르게 입력해 주세요.');
@@ -72,11 +110,12 @@
   }
   return {first,last,totalInterest,principal:p,method};
  }
- function output(prefix,title,detail,caption){
+ function output(prefix,title,detail,caption,reading=''){
   const t=$(prefix+'Primary'),d=$(prefix+'Detail');
   if(t)t.textContent=title;
   if(d)d.textContent=detail||'';
   const c=$(prefix+'Caption');if(c&&caption)c.textContent=caption;
+  const r=$(prefix+'Read');if(r){r.textContent=reading;r.hidden=!reading;}
  }
  function update(){
   if(chosen==='fee'){
@@ -87,29 +126,44 @@
    try{
     const result=commission({kind,deal,amountWan:$('fhc_feeAmount').value,
      rentWan:deal==='rent' ? $('fhc_feeRent').value :0,vat:$('fhc_feeVat').checked});
-    const pieces=['적용 요율 상한 '+(result.rate*100).toFixed(1)+'%',
-     '거래금액 '+WON.format(result.baseWan)+'만원'];
-    if(result.capApplied)pieces.push('보수 한도액 적용');
-    if(result.vatWon>0)pieces.push('가정 부가세 '+money(result.vatWon));
-    output('fhc_fee',money(result.total),pieces.join(' · ')+(result.vatWon>0?' · 부가세 포함 합계':' · 부가세 제외'),result.vatWon>0?'부가세 포함 예상 합계':'예상 중개보수 상한');
-   }catch(e){output('fhc_fee','금액을 확인해 주세요',e.message,'예상 중개보수 상한');}
+    const deposit=amount($('fhc_feeAmount').value)||0,converted=deal==='rent'&&result.baseWan<5000&&result.baseWan!==deposit;
+    const base=(deal==='rent'?'환산 거래금액 '+wanText(result.baseWan)+(converted?'(보증금+월세×70)':'(보증금+월세×100)'):'거래금액 '+wanText(result.baseWan));
+    const pieces=[base+' × 상한 요율 '+(result.rate*100).toFixed(1)+'%'];
+    if(result.capApplied)pieces.push('한도액 '+wonText(result.cap)+' 적용');
+    pieces.push(result.vatWon>0?'부가세 '+wonText(result.vatWon)+' 포함':'부가세 제외');
+    const both='양쪽 의뢰인 모두 받으면 합계 '+wonText(result.total*2);
+    output('fhc_fee',money(result.total),pieces.join(' · ')+'\n'+both,result.vatWon>0?'한쪽 의뢰인 · 부가세 포함 예상 합계':'한쪽 의뢰인 · 예상 중개보수 상한',wonText(result.total));
+   }catch(e){output('fhc_fee','금액을 확인해 주세요',e.message,'한쪽 의뢰인 · 예상 중개보수 상한');}
   }else if(chosen==='conversion'){
    try{
-    const result=conversion({oldWan:$('fhc_oldDeposit').value,newWan:$('fhc_newDeposit').value,ratePct:$('fhc_conversionRate').value});
-    const direction=result.direction==='increase'?'월세가 늘어나는 가정':result.direction==='decrease'?'월세가 줄어드는 가정':'보증금 차이 없음';
-    output('fhc_conversion',result.direction==='same'?'변동 없음':money(result.monthlyWon)+' / 월',direction+' · 입력한 전환율의 단순 산술 결과');
-   }catch(e){output('fhc_conversion','조건을 확인해 주세요',e.message);}
+    const oldWan=$('fhc_oldDeposit').value,newWan=$('fhc_newDeposit').value,ratePct=$('fhc_conversionRate').value;
+    const result=conversion({oldWan,newWan,ratePct});
+    const diffWan=Math.abs(amount(oldWan)-amount(newWan)),rate=percent(ratePct);
+    const rentRaw=String($('fhc_currentRent')?.value??'').trim(),rentWan=rentRaw===''?null:amount(rentRaw);
+    if(rentRaw!==''&&rentWan===null)throw Error('현재 월세를 만원 단위로 입력해 주세요.');
+    const change=result.direction==='same'?'보증금 차이 없음':
+     '보증금 '+wanText(diffWan)+(result.direction==='increase'?' 줄면 월세 ':' 늘면 월세 ')+wonText(result.monthlyWon)+(result.direction==='increase'?' 늘어남':' 줄어듦');
+    const basis='연 '+rate+'% 가정 · 입력한 전환율의 단순 산술';
+    if(rentWan!==null){
+     const signed=result.direction==='increase'?result.monthlyWon:result.direction==='decrease'?-result.monthlyWon:0;
+     const next=rentWan*10000+signed;
+     if(next<0){
+      output('fhc_conversion','월세 0원',change+'\n늘린 보증금으로 월세를 모두 대신하고도 월 '+wonText(-next)+'만큼 남습니다 · '+basis,'변경 후 예상 월세','전세 전환 가능');
+     }else output('fhc_conversion',money(next)+' / 월',change+'\n현재 월세 '+wanText(rentWan)+(signed>=0?' + ':' − ')+wonText(Math.abs(signed))+' · '+basis,'변경 후 예상 월세',wonText(next));
+    }else output('fhc_conversion',result.direction==='same'?'변동 없음':money(result.monthlyWon)+' / 월',change+' · '+basis,'월세 조정 예상액',result.direction==='same'?'':wonText(result.monthlyWon));
+   }catch(e){output('fhc_conversion','조건을 확인해 주세요',e.message,'월세 조정 예상액');}
   }else if(chosen==='loan'){
    try{
     const result=loan({amountWan:$('fhc_loanAmount').value,ratePct:$('fhc_loanRate').value,
      monthsCount:$('fhc_loanMonths').value,method:$('fhc_loanMethod').value});
     const caption=result.method==='principal'?'첫 달 납입액':result.method==='bullet'?'매월 이자액':'매월 납입액';
-    let detail='총이자 약 '+money(result.totalInterest);
-    if(result.method==='principal')detail+=' · 마지막 달 약 '+money(result.last);
-    if(result.method==='bullet')detail+=' · 만기 원금·이자 약 '+money(result.last);
-    output('fhc_loan',money(result.first),detail,caption);
+    let detail='총이자 약 '+wonText(result.totalInterest)+' · 원금 포함 총 상환액 약 '+wonText(result.principal+result.totalInterest);
+    if(result.method==='principal')detail+='\n마지막 달 약 '+wonText(result.last)+'(매달 조금씩 줄어듦)';
+    if(result.method==='bullet')detail+='\n만기에 원금과 마지막 이자 약 '+wonText(result.last);
+    output('fhc_loan',money(result.first),detail,caption,wonText(result.first));
    }catch(e){output('fhc_loan','조건을 확인해 주세요',e.message,'월 납입 예상액');}
   }
+  readbackAll();
  }
  function taxValue(id){return String($(id)?.value||'').trim();}
  function taxWon(id,allowZero=false){
@@ -332,6 +386,10 @@
    const label=document.createElement('span'),value=document.createElement('strong');
    label.textContent=item.label.slice(0,100);value.textContent=item.value.slice(0,140);
    row.append(label,value);
+   const won=/^[\d,]+원$/.test(item.value)?Number(item.value.replace(/[,원]/g,'')):NaN;
+   if(item.label==='예상 합계'&&Number.isSafeInteger(won)&&won>=10000){
+    const read=document.createElement('small');read.className='fhcTaxRead';read.textContent=wonText(won);row.append(read);
+   }
    if(item.note){const note=document.createElement('small');note.textContent=String(item.note).slice(0,240);row.append(note);}
    container.append(row);
   }
@@ -377,7 +435,7 @@
    $('fhc_taxTransfer').hidden=type!=='transfer';
    updateTaxFields();taxStatus('');
   }
-  update();
+  update();readbackAll();
   $('fhc_detail').scrollIntoView?.({behavior:'smooth',block:'start'});
   return true;
  }
@@ -399,8 +457,9 @@
   return true;
  }
  root.onFirstHyundaiRealtyTaxResult=onTaxResult;
+ document.addEventListener?.('input',event=>{const id=event?.target?.id;if(id&&READBACK[id])readback(id);});
  $('fhc_taxPane')?.addEventListener?.('input',onTaxEdit);
  $('fhc_taxPane')?.addEventListener?.('change',onTaxEdit);
  root.FirstHyundaiCalculators={select,home,update,onOpen,onPageChange,useContractAmount,calculateTax,
-  _test:{commission,conversion,loan,num,simpleAcquisitionTax,simpleTransferTax,standardTaxByBase,heldFullYears,onTaxEdit}};
+  _test:{commission,conversion,loan,num,wanText,wonText,monthsText,readback,simpleAcquisitionTax,simpleTransferTax,standardTaxByBase,heldFullYears,onTaxEdit}};
 })(window);

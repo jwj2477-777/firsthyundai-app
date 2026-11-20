@@ -267,6 +267,46 @@ assert(styles.includes('.fhcTaxInputs{display:grid;grid-template-columns:repeat(
 assert(styles.includes('.fhcAttribution a{font-size:15px;'), 'Official provider attribution must be readable at ≥0.9rem');
 assert(styles.includes('.fhcTaxCalculate{margin-top:13px;min-height:56px'),'Keep primary action prominent');
 
+// v2.2.5: amounts are read back in words and results get a 만원 reading.
+assert.equal(fn.wanText(85000),'8억 5,000만원');assert.equal(fn.wanText(10000),'1억원');
+assert.equal(fn.wanText(3100),'3,100만원');assert.equal(fn.wanText(140000),'14억원');
+assert.equal(fn.wonText(3400000),'340만원');assert.equal(fn.wonText(1467052),'146만 7,052원');
+assert.equal(fn.wonText(228138548),'2억 2,813만 8,548원');assert.equal(fn.wonText(500),'500원');
+assert.equal(fn.monthsText(360),'30년');assert.equal(fn.monthsText(30),'2년 6개월');assert.equal(fn.monthsText(7),'7개월');
+element('fhc_feeAmountRead');element('fhc_loanMonthsRead');element('fhc_feeRead');
+element('fhc_feeAmount').value='85000';fn.readback('fhc_feeAmount');
+assert.equal(element('fhc_feeAmountRead').textContent,'= 8억 5,000만원');assert.equal(element('fhc_feeAmountRead').hidden,false);
+element('fhc_feeAmount').value='';fn.readback('fhc_feeAmount');assert.equal(element('fhc_feeAmountRead').hidden,true,'Empty box shows no reading');
+element('fhc_feeAmount').value='12.5';fn.readback('fhc_feeAmount');assert.equal(element('fhc_feeAmountRead').hidden,true,'Invalid number shows no reading');
+element('fhc_loanMonths').value='360';fn.readback('fhc_loanMonths');assert.equal(element('fhc_loanMonthsRead').textContent,'= 30년');
+calc.select('fee');element('fhc_feeDeal').value='sale';element('fhc_feeKind').value='house';element('fhc_feeAmount').value='85000';calc.update();
+assert.equal(element('fhc_feePrimary').textContent,'3,400,000원');assert.equal(element('fhc_feeRead').textContent,'340만원');
+assert.match(element('fhc_feeDetail').textContent,/거래금액 8억 5,000만원 × 상한 요율 0\.4%/);
+assert.match(element('fhc_feeDetail').textContent,/양쪽 의뢰인 모두 받으면 합계 680만원/);
+assert.match(element('fhc_feeCaption').textContent,/한쪽 의뢰인/);
+// 전월세 전환 with the current monthly rent: 1억→5천만 at 4.5% adds 18만 7,500원 to 50만원.
+for(const id of ['fhc_currentRent','fhc_conversionCaption','fhc_conversionRead'])element(id);
+calc.select('conversion');
+element('fhc_oldDeposit').value='10000';element('fhc_newDeposit').value='5000';element('fhc_conversionRate').value='4.5';
+element('fhc_currentRent').value='50';calc.update();
+assert.equal(element('fhc_conversionPrimary').textContent,'687,500원 / 월');
+assert.equal(element('fhc_conversionCaption').textContent,'변경 후 예상 월세');
+assert.equal(element('fhc_conversionRead').textContent,'68만 7,500원');
+element('fhc_oldDeposit').value='5000';element('fhc_newDeposit').value='30000';element('fhc_currentRent').value='50';calc.update();
+assert.equal(element('fhc_conversionPrimary').textContent,'월세 0원','Raising the deposit can replace the rent entirely');
+element('fhc_currentRent').value='';calc.update();
+assert.equal(element('fhc_conversionCaption').textContent,'월세 조정 예상액','Without current rent: adjustment only (unchanged behaviour)');
+assert.equal(element('fhc_conversionPrimary').textContent,'937,500원 / 월');
+element('fhc_currentRent').value='abc';calc.update();assert.match(element('fhc_conversionDetail').textContent,/현재 월세/);
+element('fhc_currentRent').value='';
+calc.select('loan');element('fhc_loanAmount').value='30000';element('fhc_loanRate').value='4.2';element('fhc_loanMonths').value='360';
+element('fhc_loanMethod').value='equal';calc.update();
+assert.match(element('fhc_loanDetail').textContent,/총 상환액 약 5억 2,813만/);
+const markup=read('app/src/main/assets/index.html');
+for(const id of ['fhc_feeAmount','fhc_feeRent','fhc_oldDeposit','fhc_newDeposit','fhc_currentRent','fhc_loanAmount','fhc_loanMonths','fhc_taxAmount','fhc_taxBuyAmt','fhc_taxSellAmt','fhc_taxCost'])
+ assert(markup.includes('id="'+id+'Read"'),id+' read-back missing');
+assert(markup.includes('한국은행 기준금리 + 연 2%'),'Statutory conversion-rate cap explained without a stale number');
+
 const source=read('app/src/main/assets/realty-calculators.js');
 assert(!/\b(fetch|XMLHttpRequest|localStorage|sessionStorage|api_key|Authorization)\b/.test(source),
  'Do not leak contracts or API secrets over network or store calculations');

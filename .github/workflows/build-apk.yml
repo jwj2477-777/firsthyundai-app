@@ -66,6 +66,7 @@ on:
       - 'scripts/test_page_title_parity.js'
       - 'scripts/test_segmented_switch_unity.js'
       - 'scripts/test_selection_flow.js'
+      - 'scripts/test_office_memo_real_estate_dates.js'
       - 'scripts/test_news_tab_wind_stability.js'
       - 'scripts/test_trade_type_direct_flow.js'
       - 'scripts/test_native_lower_tab_browser.js'
@@ -199,6 +200,7 @@ jobs:
           node --check /tmp/firsthyundai-ui.js
           node scripts/test_premium_motion.js
           node scripts/test_selection_flow.js
+          node scripts/test_office_memo_real_estate_dates.js
           node scripts/test_news_tab_wind_stability.js
           node scripts/test_trade_type_direct_flow.js
           node scripts/test_native_lower_tab_browser.js
@@ -417,25 +419,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.2.4 glass alert in high contrast APK
+      - name: Publish v2.2.5 memo dates and calculator readability APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.4.apk
-          unzip -t FirstHyundai-v2.2.4.apk | grep 'No errors detected'
-          if gh release view v2.2.4 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.5.apk
+          unzip -t FirstHyundai-v2.2.5.apk | grep 'No errors detected'
+          if gh release view v2.2.5 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.2.4 FirstHyundai-v2.2.4.apk \
+            gh release create v2.2.5 FirstHyundai-v2.2.5.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.2.4 · 편하게 보기에서도 알림함 반투명' \
-               --notes '"편하게 보기(선명한 화면)"를 켠 상태에서는 알림함이 예전처럼 불투명하게 남아 있던 것을 고쳤습니다. 이제 이 모드에서도 뒤의 상단 그림이 비쳐 보이고, 글자가 또렷하도록 유리를 조금 더 진하게, 테두리를 조금 더 밝게 했습니다(모든 계절·시간대 글자 대비 6.6:1 이상). 버튼 크기·위치·기능은 그대로입니다. v2.2.4/build255.'
+              --title '퍼스트현대 v2.2.5 · 공유메모 날짜 인식 개선 · 계산기 금액 읽기' \
+               --notes '① 공유메모: "84.9㎡ 매물", "13.5억 급매", "24.5평", "101-1502 손님", "다음주에 다시 연락", "준공 25년", "내년 3월 이사"처럼 숫자나 날짜 비슷한 말이 들어간 메모가 "날짜가 올바르지 않습니다"로 막히던 문제를 고쳤습니다. "8.5억", "2/3 지분"이 엉뚱한 날짜로 달력에 들어가던 문제도 고쳤습니다. ② "27일 오후 2시", "금요일 3시", "다음주 화 2시", "다다음주 월요일", "글피", "3일 후", "2주 뒤"도 일정으로 알아듣습니다. ③ 자동으로 잡힌 날짜 옆에 "일정 빼기" 버튼이 생겨, 달력에 넣고 싶지 않으면 한 번에 뺄 수 있습니다. 이미 잘못 들어간 일정은 메모의 "일정 해제"로 지울 수 있습니다. ④ 계산기: 만원 단위로 입력하면 바로 아래에 "= 8억 5,000만원"처럼 읽어 줍니다. 결과도 "340만원"처럼 함께 보여 줍니다. 중개보수는 계산식과 양쪽 의뢰인 합계를, 전월세 전환은 현재 월세를 넣으면 변경 후 월세를, 대출은 총 상환액을 보여 줍니다. 계산 방식과 세율은 그대로입니다. v2.2.5/build256.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.2.4 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.2.4 --apk FirstHyundai-v2.2.4.apk
+          gh release upload v2.2.5 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.2.5 --apk FirstHyundai-v2.2.5.apk
 
 
 

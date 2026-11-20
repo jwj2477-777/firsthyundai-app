@@ -114,3 +114,12 @@ body:not([data-office-role="admin"]) #calculators .fhcDetail{padding-top:12px}
 
 .fhcFamilyResultNote{margin:7px 0;font-size:12px;color:#65776e}
 body[data-office-role="admin"] .fhcFamilyResultNote{display:none}
+
+/* v2.2.5 — read-back of 만원 amounts and a 만원 reading of results (parents read "8억 5,000만원",
+   not "85000"). Text only: no size/position change of inputs or buttons. */
+.fhcAmountRead{display:block;margin:5px 2px 0;color:#2E6A55;font-size:15px;font-weight:800;line-height:1.4;letter-spacing:-.2px}
+.fhcAmountRead[hidden]{display:none}
+.fhcTaxField .fhcAmountRead{margin:0 2px;font-size:14px}
+.fhcResult .fhcRead{display:block;margin:-4px 0 8px;color:#2F5F47;font-size:16px;font-weight:800;letter-spacing:-.3px}
+.fhcResult .fhcRead[hidden]{display:none}
+.fhcTaxRow .fhcTaxRead{grid-column:1/-1;justify-self:end;color:#2F5F47;font-size:14px;font-weight:800}
