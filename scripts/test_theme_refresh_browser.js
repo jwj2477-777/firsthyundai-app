@@ -71,7 +71,9 @@ async function verify(){
   for(const theme of ['default','spring','summer','autumn','winter']){
    FirstHyundaiThemes.configure({...base,theme});await wait(80);
    const header=getComputedStyle(document.querySelector('header'));
-   check(header.backgroundImage.includes('theme-scene-'+theme+'.svg'),theme+': header scene missing');
+   check(header.backgroundImage.includes('theme-scene-'+theme+'.svg'),theme+': header scene missing · '+
+    header.backgroundImage.slice(0,160)+' · attrs '+['data-season-theme','data-theme-header','data-theme-time','data-theme-occasion','data-app-contrast']
+     .map(k=>k.replace('data-','')+'='+document.body.getAttribute(k)).join(' ')+' · '+navigator.userAgent.match(/Chrome\/[\d.]+/)?.[0]);
    const g=shape();if(!first)first=g;
    check(g===first,theme+': header/menu geometry changed '+g+' vs '+first);
    const bodyBg=getComputedStyle(document.body).backgroundImage;
