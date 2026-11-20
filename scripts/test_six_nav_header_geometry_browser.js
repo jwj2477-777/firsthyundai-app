@@ -26,6 +26,8 @@ async function verify(){
   for(const page of Object.keys(headings)){
    switchPage(page);
    await new Promise(resolve=>setTimeout(resolve,120));
+   // v2.2.0: measure the settled layout after the short page fade (ignore endless decoration).
+   await Promise.all(document.getAnimations().filter(a=>a.effect?.getTiming?.().iterations!==Infinity).map(a=>a.finished.catch(()=>{})));
    const buttons=[...document.querySelectorAll(selectors)];
    check(buttons.length===6,page+' should show exactly six common navigation actions');
    const bounds=buttons.map(rect),shapes=buttons.map(shape);

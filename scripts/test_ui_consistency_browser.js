@@ -11,7 +11,8 @@ const icons=fs.readFileSync(path.join(assets,'ui-icons.js'),'utf8');
 
 // Static guards: loaded last, reversible, and never shrinking touch targets.
 const links=[...html.matchAll(/<link rel="stylesheet" href="([^"]+)">/g)].map(m=>m[1]);
-assert.equal(links.at(-1),'ui-consistency.css','Consistency sheet must load after every other sheet');
+assert.equal(links.at(-2),'ui-consistency.css','Consistency sheet must load after every other look sheet');
+assert.equal(links.at(-1),'ui-motion.css','Only the motion sheet may load after it');
 assert(html.includes('<script src="ui-icons.js"></script>'),'Line icons module is loaded');
 assert(html.includes('.complexTabBar button:last-child:nth-child(odd){grid-column:1/-1}'),'Only an odd last tab may span');
 assert(!/#nav\.tabs\{background:[^}]*#[0-9A-Fa-f]{8}/.test(css),'Sticky menu surface must be opaque');
