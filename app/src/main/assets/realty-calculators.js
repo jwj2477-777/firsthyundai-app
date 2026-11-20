@@ -1,7 +1,8 @@
 /* 퍼스트현대 부동산 계산기: offline arithmetic only. No customer data is sent or stored.
  * v2.2.5: every 만원 box reads its number back in words ("85000" → "8억 5,000만원"),
  * results add a 만원 reading, 중개보수 shows its formula and both-sides total,
- * 전월세 전환 takes the current monthly rent, 대출 shows the total repayment. */
+ * 전월세 전환 takes the current monthly rent, 대출 shows the total repayment.
+ * v2.2.6: 중개보수 VAT is a choice — 없음 / 10% 일반과세자 / 4% 간이과세자 (user request). */
 (function(root){
  'use strict';
  const $=id=>document.getElementById(id);
@@ -55,6 +56,11 @@
   box.textContent=text;box.hidden=!text;
  }
  function readbackAll(){for(const id of Object.keys(READBACK))readback(id);}
+ // VAT added on top of the fee: 일반과세자 10%; 간이과세자 4% (부동산중개업 부가가치율 40% × 10%);
+ // 연 매출 4,800만원 미만 간이과세자는 받지 않음(0). `true` keeps the old 10% meaning.
+ const VAT_RATES={'0':0,'10':.1,'4':.04};
+ function vatRate(v){if(v===true)return .1;if(v===false||v==null||v==='')return 0;
+  return Object.prototype.hasOwnProperty.call(VAT_RATES,String(v))?VAT_RATES[String(v)]:0;}
  function commission({kind,deal,amountWan,rentWan=0,vat=false}){
   const value=amount(amountWan),rent=amount(rentWan);
   if(value===null||value===0)throw Error('거래금액이나 보증금을 올바르게 입력해 주세요.');
@@ -78,8 +84,8 @@
   // Korean won is integral. Round floating-point percentage arithmetic once.
   const rawFee=Math.round(tradeWan*10000*rate);
   const maximum=Math.min(rawFee,cap??Infinity);
-  const additional=vat?Math.round(maximum*.1):0;
-  return {baseWan:tradeWan,rate,maximum,vatWon:additional,total:maximum+additional,cap,
+  const vatPct=vatRate(vat),additional=Math.round(maximum*vatPct);
+  return {baseWan:tradeWan,rate,maximum,vatRate:vatPct,vatWon:additional,total:maximum+additional,cap,
    capApplied:cap!==null&&rawFee>cap};
  }
  function conversion({oldWan,newWan,ratePct}){
@@ -125,14 +131,14 @@
    $('fhc_officeNote').hidden=kind!=='office';
    try{
     const result=commission({kind,deal,amountWan:$('fhc_feeAmount').value,
-     rentWan:deal==='rent' ? $('fhc_feeRent').value :0,vat:$('fhc_feeVat').checked});
+     rentWan:deal==='rent' ? $('fhc_feeRent').value :0,vat:$('fhc_feeVat').type==='checkbox'?$('fhc_feeVat').checked:$('fhc_feeVat').value});
     const deposit=amount($('fhc_feeAmount').value)||0,converted=deal==='rent'&&result.baseWan<5000&&result.baseWan!==deposit;
     const base=(deal==='rent'?'환산 거래금액 '+wanText(result.baseWan)+(converted?'(보증금+월세×70)':'(보증금+월세×100)'):'거래금액 '+wanText(result.baseWan));
     const pieces=[base+' × 상한 요율 '+(result.rate*100).toFixed(1)+'%'];
     if(result.capApplied)pieces.push('한도액 '+wonText(result.cap)+' 적용');
-    pieces.push(result.vatWon>0?'부가세 '+wonText(result.vatWon)+' 포함':'부가세 제외');
+    pieces.push(result.vatWon>0?'부가세 '+Math.round(result.vatRate*100)+'% '+wonText(result.vatWon)+' 포함':'부가세 제외');
     const both='양쪽 의뢰인 모두 받으면 합계 '+wonText(result.total*2);
-    output('fhc_fee',money(result.total),pieces.join(' · ')+'\n'+both,result.vatWon>0?'한쪽 의뢰인 · 부가세 포함 예상 합계':'한쪽 의뢰인 · 예상 중개보수 상한',wonText(result.total));
+    output('fhc_fee',money(result.total),pieces.join(' · ')+'\n'+both,result.vatWon>0?'한쪽 의뢰인 · 부가세 '+Math.round(result.vatRate*100)+'% 포함 예상 합계':'한쪽 의뢰인 · 예상 중개보수 상한',wonText(result.total));
    }catch(e){output('fhc_fee','금액을 확인해 주세요',e.message,'한쪽 의뢰인 · 예상 중개보수 상한');}
   }else if(chosen==='conversion'){
    try{
