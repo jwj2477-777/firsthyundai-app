@@ -72,12 +72,12 @@ const win={innerWidth:415,innerHeight:980,requestAnimationFrame,
  getComputedStyle:b=>{
   const i=buttons.indexOf(b);
   return {backgroundColor:i===selected?colors[i]:'#FFFFFF',
-   backgroundImage:'none',color:i===selected?'white':'#233943'}
+   backgroundImage:'none',color:i===selected?'rgb(255, 255, 255)':'#233943'}
  }
 };
 vm.runInNewContext(code,{window:win,document:doc,Math,Number,Object,Array,Map});
 const api=win.FirstHyundaiSelectionFlow;
-assert.equal(api.version,'14.1.0');
+assert.equal(api.version,'14.2.0');
 assert.equal(api._test.buttons(nav,'top-five').length,6);
 assert(!('beginDirect' in api)&&!('endDirect' in api),'Removed non-working direct-hook branch');
 assert.equal(api._test.viaIndex('top-five',0,2),1);
@@ -102,6 +102,12 @@ assert.equal(api._test.viaIndex('news',0,2),-1);
 assert.equal(api._test.viaIndex('trade-types',0,2),-1);
 assert.equal(api._test.softlyMix('#FFFFFF','#2456AA',0),'rgb(255, 255, 255)');
 assert.equal(api._test.softlyMix('#FFFFFF','#2456AA',.2),'rgb(211, 221, 238)');
+// v14.2: label ink follows the wave. It turns while the wave crosses the middle (32%→68%).
+assert.equal(api._test.inkAt(32),0);assert.equal(api._test.inkAt(50),.5);assert.equal(api._test.inkAt(68),1);
+assert.equal(api._test.mixColor('rgb(0, 0, 0)','rgb(255, 255, 255)',.5),'rgb(128, 128, 128)');
+assert.equal(api._test.mixColor('rgba(255, 255, 255, 0.9)','rgb(101, 121, 131)',1),'rgb(101, 121, 131)');
+assert.equal(api._test.mixColor('rgba(255, 255, 255, 0.9)','rgb(101, 121, 131)',.5),'rgba(178, 188, 193, 0.950)');
+assert.equal(api._test.mixColor('#233943','rgb(255, 255, 255)',0),'#233943');
 const before=buttons.map(b=>({text:b.innerHTML,rect:{...b.rect}}));
 function complete(end){frame(end)}
 // TRADES → NEWS. The middle "Apartment Info" stays unselected,
@@ -112,8 +118,15 @@ frame(0); // post-click queue sets up actual selected/idle button colors
 assert.equal(buttons[0].style.getPropertyPriority('background'),'important');
 assert.equal(buttons[2].style.getPropertyPriority('background'),'important');
 assert.equal(nav.children.length,2,'No DOM, icon or row changes');
+// First painted frame: each label keeps the colour it had before the tap.
+assert.equal(buttons[0].style.getPropertyValue('color'),'rgb(255, 255, 255)','Old label stays white under its colour');
+assert.equal(buttons[2].style.getPropertyValue('color'),'#233943','New label stays dark until the colour arrives');
+assert.equal(buttons[0].style.getPropertyValue('transition'),'none');
+assert.equal(buttons[1].style.getPropertyValue('color'),'','A washed middle keeps its own label');
 frame(0);frame(395);
 assert.equal(api._test.stats.lastPath.join(','),'0,1,2');
+assert.equal(buttons[0].style.getPropertyValue('color'),'#233943','Old label has turned with the leaving colour');
+assert.equal(buttons[2].style.getPropertyValue('color'),'#233943','New label waits for the arriving colour');
 assert(buttons[1].style.getPropertyValue('background').includes('linear-gradient'),
  'Exactly one midpoint is visibly washed with color');
 assert(buttons[1].style.getPropertyValue('background').includes('rgb('),
@@ -124,6 +137,8 @@ for(const i of [3,4])assert.equal(buttons[i].style.getPropertyValue('background'
 assert.deepEqual(buttons.map(b=>({text:b.innerHTML,rect:{...b.rect}})),before);
 complete(790);
 assert(buttons.every(b=>b.style.getPropertyValue('background')===''));
+assert(buttons.every(b=>['color','transition','border-color'].every(k=>b.style.getPropertyValue(k)==='')),
+ 'Label colours and transitions are handed back to the stylesheet');
 assert.equal(api._test.stats.finished,1);
 // NEWS → TRADES in reverse. The middle hint follows the purple source.
 click({target:buttons[0],defaultPrevented:false});

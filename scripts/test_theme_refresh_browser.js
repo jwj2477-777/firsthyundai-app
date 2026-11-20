@@ -54,6 +54,22 @@ for(const block of code.matchAll(/([^{}]+)\{([^{}]*)\}/g)){
   'Business/selection colours untouched: '+selector.slice(0,70));
 }
 assert(code.includes('body[data-app-contrast="high"][data-season-theme]{--theme-rain-layer:var(--theme-none)'),'High contrast drops rain streaks');
+// v2.2.3: see-through 알림함; motifs/night windows fade out under it; moons are real crescents.
+assert(code.includes('html body header #modeBar #favoriteAlertButton{')&&code.includes('html body[data-app-contrast="high"] header #modeBar #favoriteAlertButton{'),
+ 'Glass 알림함 with a solid high-contrast fallback');
+for(const t of SCENES){
+ const svg=read('theme-scene-'+t+'.svg');
+ if(t!=='night')assert(svg.includes('<g mask="url(#m)">'),t+' skyline fades in from the brand text');
+ assert(svg.includes('<mask id="b">')&&svg.includes('<g mask="url(#b)">'),t+' motifs fade out under the see-through 알림함');
+}
+for(const t of ['default','winter']){
+ // Outer large arc + inner small arc whose chord fits the inner circle: a crescent with area,
+ // not two copies of the same semicircle (the invisible-moon bug fixed in v2.2.3).
+ const m=read('theme-scene-'+t+'.svg').match(/<path d="M([\d.]+) ([\d.]+) A([\d.]+) [\d.]+ 0 (\d) (\d) ([\d.]+) ([\d.]+) A([\d.]+) [\d.]+ 0 (\d) (\d) [\d.]+ [\d.]+ Z" fill="#F[14]/);
+ assert(m,t+' crescent moon present');
+ const chord=Math.hypot(m[6]-m[1],m[7]-m[2]);
+ assert(m[4]==='1'&&m[9]==='0'&&chord<=2*m[8]+.05&&+m[8]<+m[3],t+' crescent has visible area');
+}
 
 async function verify(){
  const out=document.createElement('pre');out.id='theme-refresh-test';
@@ -102,9 +118,21 @@ async function verify(){
   document.body.setAttribute('data-app-contrast','high');
   const hc=getComputedStyle(document.querySelector('header')).backgroundImage;
   check(hc.includes('theme-scene-autumn.svg')&&!hc.includes('repeating-linear-gradient'),'High contrast: scene kept, rain streaks removed');
+  const bell=document.getElementById('favoriteAlertButton'),bellBox=()=>{const r=bell.getBoundingClientRect();return [r.left,r.top,r.width,r.height].map(Math.round).join(',')};
+  const alpha=c=>{const m=c.match(/rgba?\(([^)]*)\)/);const v=m?m[1].split(/[ ,/]+/).filter(Boolean):[];return v.length>3?+v[3]:1};
+  // Read synchronously with the button's own 140ms colour transition switched off.
+  bell.style.transition='none';
+  document.body.setAttribute('data-app-contrast','high');
+  const solid=getComputedStyle(bell),solidBg=solid.backgroundColor,solidBox=bellBox();
+  check(alpha(solidBg)===1,'High contrast: 알림함 stays solid · '+solidBg);
+  document.body.setAttribute('data-app-contrast','standard');
+  const glass=getComputedStyle(bell),glassBg=glass.backgroundColor,glassInk=glass.color;
+  bell.style.transition='';
+  check(alpha(glassBg)<.5&&glassInk==='rgb(255, 255, 255)','알림함 is see-through glass with a white label · '+glassBg+' '+glassInk);
+  check(bellBox()===solidBox,'알림함 size/position unchanged by the glass look');
   if(contrastBefore===null)document.body.removeAttribute('data-app-contrast');else document.body.setAttribute('data-app-contrast',contrastBefore);
   check(document.documentElement.scrollWidth<=innerWidth+1,'No horizontal overflow');
-  out.textContent='PASS five scenes, hour/rain/occasion layers, 절기 chip, unchanged geometry, high-contrast streak removal';
+  out.textContent='PASS five scenes, hour/rain/occasion layers, 절기 chip, unchanged geometry, high-contrast streak removal, glass 알림함';
  }catch(e){out.textContent='FAIL '+e.message}
  document.body.innerHTML='';document.body.appendChild(out);
 }
