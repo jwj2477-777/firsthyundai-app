@@ -324,7 +324,9 @@ function makePreview(){
  if(field('exclusiveArea')){
   const area=Number(field('exclusiveArea'));
   if(Number.isFinite(area)&&area>0&&area<400){
-   out.push('▶ 전용면적 : '+String(area)+'㎡'+(field('supplyInfo')?' · '+field('supplyInfo'):''));
+   // v2.1.98: verified supply type → "(약 N평형)" beside the legal exclusive area.
+   const pyeong=field('supplyInfo')?window.FirstHyundaiAreaTypes?.pyeongForContract?.(field('property'),area,field('supplyInfo')):null;
+   out.push('▶ 전용면적 : '+String(area)+'㎡'+(pyeong?' (약 '+pyeong+'평형)':'')+(field('supplyInfo')?' · '+field('supplyInfo'):''));
   }
  }
  out.push('','▶ '+totalName+' : '+moneyOr(d.price));
@@ -461,6 +463,8 @@ function fromSelectedComplex(exclusiveM2=null,supplyLabel=''){
  if(lot&&record.address)parts.push('도로명주소(참고): '+record.address.trim());
  if(validArea)parts.push('전용면적: '+String(Math.round(area*100)/100)+'㎡');
  if(supply)parts.push('공급타입: '+supply);
+ const pyeong=selected&&typeof supplyPyeong==='function'?supplyPyeong(selected.supply_m2,selected.market_pyeong):null;
+ if(pyeong)parts.push('평형: 약 '+pyeong+'평형');
  clearForNewMemo();
  window.FirstHyundaiEasy?.reset?.();
  if(E('ct_specialMemo'))E('ct_specialMemo').value='';
@@ -475,7 +479,7 @@ function fromSelectedComplex(exclusiveM2=null,supplyLabel=''){
  if(context){
   context.textContent='✓ '+record.label+' 자동 입력 완료'+
    (validArea?' · 전용 '+String(Math.round(area*100)/100)+'㎡':'')+
-   (supply?' · '+supply:'')+
+   (pyeong?' (약 '+pyeong+'평형)':'')+(supply?' · '+supply:'')+
    ' · 동·호수와 계약조건을 추가해 주세요.';
   context.classList?.remove?.('hidden');
  }

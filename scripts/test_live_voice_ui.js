@@ -74,7 +74,11 @@ const micBuffer=read('app/src/main/java/kr/co/firsthyundai/app/LiveMicBuffer.jav
 assert(micBuffer.includes('MAX_BYTES=16_000*2')&&micBuffer.includes('Arrays.copyOf(samples,n)'),
  'One-second upper bound and defensive copy before reusing AudioRecord buffer');
 assert(!micBuffer.includes('Log.'),'Never log user audio');
-assert(native.includes('silenceDurationMs",700'),'Do not stop a Korean sentence during natural pauses');
+assert(native.includes('silenceDurationMs",contractMode?CONTRACT_SILENCE_MS:700'),'News keeps 0.7s; contract dictation uses its own pause');
+assert(native.includes('CONTRACT_SILENCE_MS=2000'),'Contract dictation must tolerate ~2s pauses while reading documents');
+assert(native.includes('boolean finishUserTurn()')&&native.includes('put("audioStreamEnd",true)'),'"다 말했어요" ends the turn with audioStreamEnd only');
+assert(native.includes('if(!contractTurnGate.microphoneAllowed())return false;'),'Finishing a turn is ignored while the AI is speaking');
+assert(read('app/src/main/java/kr/co/firsthyundai/app/MainActivity.java').includes('public void finishContractLiveTurn()'),'Bridge exposes the finish-turn call without payload');
 assert(native.includes('NO_INTERRUPTION'),'Contract model voice should not be cut off by speaker bleed');
 assert(native.includes('LivePcmQueue audioQueue=new LivePcmQueue()'),'Route Live output through a bounded ordered jitter queue');
 assert(native.includes('Thread.sleep(120)'),'Allow 120ms of voice prebuffer before playback');

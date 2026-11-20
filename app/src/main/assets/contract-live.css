@@ -39,3 +39,20 @@
 #cl_retry,#cl_leave{flex:1 1 180px;border:1px solid #b4cabb;background:#fffdf7;color:#265b4a}
 #cl_dialog[data-live-stage="review"] #cl_review{margin-top:14px}
 #cl_dialog[data-live-stage="review"] #cl_review h4{font-size:17px;margin-bottom:6px}
+
+/* v2.1.98 — whose turn it is, and one large "다 말했어요" button. */
+.contractLiveTurn{margin:4px 0 12px;padding:12px;border:1.5px solid #C9DCD4;border-radius:16px;background:#F4F9F6}
+.contractLiveTurnState{display:flex;align-items:center;gap:8px;margin:0 0 10px!important;font-weight:800;color:#24594F}
+.contractLiveTurnState::before{content:'';flex:none;width:12px;height:12px;border-radius:50%;background:#2E8A6F;box-shadow:0 0 0 4px #2E8A6F22}
+#cl_dialog[data-turn="ai"] .contractLiveTurn{border-color:#D8CDEA;background:#F7F4FC}
+#cl_dialog[data-turn="ai"] .contractLiveTurnState{color:#523D82}
+#cl_dialog[data-turn="ai"] .contractLiveTurnState::before{background:#7A62B0;box-shadow:0 0 0 4px #7A62B022}
+#cl_dialog[data-turn="thinking"] .contractLiveTurnState::before,
+#cl_dialog[data-turn="wait"] .contractLiveTurnState::before{background:#B8A27A;box-shadow:0 0 0 4px #B8A27A22}
+#cl_dialog #cl_done{width:100%;min-height:60px;font-size:18px;font-weight:850;color:#fff;background:#225A65;border:1px solid #1B4A53}
+#cl_dialog #cl_done:disabled{background:#E7ECEB;color:#71807F;border-color:#D3DCDA;opacity:1}
+#cl_dialog[data-live-stage="review"] .contractLiveTurn{display:none}
+@media(prefers-reduced-motion:no-preference){
+ #cl_dialog[data-turn="user"] .contractLiveTurnState::before{animation:clTurnPulse 1.6s ease-in-out infinite}
+}
+@keyframes clTurnPulse{50%{box-shadow:0 0 0 7px #2E8A6F11}}
