@@ -415,25 +415,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.2.0 calm motion APK
+      - name: Publish v2.2.1 smooth APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.0.apk
-          unzip -t FirstHyundai-v2.2.0.apk | grep 'No errors detected'
-          if gh release view v2.2.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.1.apk
+          unzip -t FirstHyundai-v2.2.1.apk | grep 'No errors detected'
+          if gh release view v2.2.1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.2.0 FirstHyundai-v2.2.0.apk \
+            gh release create v2.2.1 FirstHyundai-v2.2.1.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.2.0 · 버튼·화면 전환을 부드럽고 차분하게' \
-               --notes '① 버튼을 누르면 살짝 어두워졌다가 손을 떼면 부드럽게 돌아옵니다(크기·위치는 그대로라 흔들리지 않습니다). 카드는 누르는 동안 그림자가 내려앉습니다. ② 메뉴·탭을 고르면 선택 색이 뚝 바뀌지 않고 0.2초 동안 차오르듯 채워집니다. ③ 화면을 옮기면 내용이 살짝 떠오르듯 나타나고, 단지 상세는 조금 더 부드럽게 미끄러져 들어옵니다. ④ 알림함 같은 창과 펼치기 내용도 부드럽게 나타납니다. 모든 움직임은 같은 속도 규칙(누름 0.07초·전환 0.2초)을 쓰며, 휴대폰의 애니메이션 끄기와 앱의 움직임 줄이기 설정을 따릅니다. v2.2.0/build251.'
+              --title '퍼스트현대 v2.2.1 · 화면 전환 버벅임 개선' \
+               --notes '① 실거래·아파트정보·뉴스로 넘어갈 때 잠깐 멈칫하던 원인(목록 한 줄마다 단지 목록 전체를 다시 계산)을 고쳐 화면 전환이 훨씬 빨라졌습니다. ② 뉴스 화면은 보이는 카드부터 먼저 그려 첫 화면이 빨리 뜹니다. ③ 전환 효과는 가볍게 바꿨습니다: 버튼은 누르는 순간 살짝 어두워지고 손을 떼면 부드럽게 돌아오며, 화면은 짧게 흐려졌다 선명해집니다(움직임·지연 없음). ④ 휴대폰 애니메이션 끄기·앱 움직임 줄이기를 그대로 따릅니다. v2.2.1/build252.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.2.0 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.2.0 --apk FirstHyundai-v2.2.0.apk
+          gh release upload v2.2.1 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.2.1 --apk FirstHyundai-v2.2.1.apk
 
 
 

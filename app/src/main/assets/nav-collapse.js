@@ -101,6 +101,9 @@
  window.addEventListener('scroll',request,{passive:true});
  window.addEventListener('resize',request,{passive:true});
  window.addEventListener('pageshow',request,{passive:true});
- window.FirstHyundaiNavCollapse={update,progress,range:RANGE};
+ // Menu DOM was rebuilt: bind the new tiles to the shared size variables at once
+ // (no read), and measure scroll on the next frame together with everything else.
+ function rebind(){bindTiles();request();}
+ window.FirstHyundaiNavCollapse={update,rebind,progress,range:RANGE};
  update(true);
 })();
