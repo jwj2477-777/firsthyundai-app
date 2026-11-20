@@ -78,5 +78,47 @@ class OfficialFees(unittest.TestCase):
   self.assertEqual(set(row['components_won']),set(mod.CALIBRATION))
   self.assertTrue(row['source_url'].startswith('https://www.k-apt.go.kr/'))
 
+ def test_steps_back_when_newest_month_unpublished(self):
+  # 마스터뷰23 / 센터니얼 pattern: 2026-08 empty on K-apt, 2026-07 complete.
+  apt={'id':'m23','kapt_code':'A10027930'}
+  basic={'kaptCode':'A10027930','privArea':'70685.27'}
+  asked=[]
+  def groups(code,month,key):
+   asked.append((code,month))
+   if code==mod.F15:return dict(mod.CALIBRATION)
+   return dict(mod.CALIBRATION) if month=='202607' else None
+  with patch.object(mod,'upsert_complex_targets',return_value=[apt]):
+   out=mod.collect([apt],{'records':[]},'FAKE',get_groups=groups,get_basic=lambda key,code:basic,months=['202608'])
+  self.assertEqual(out['records'][0]['month'],'202607')
+  self.assertEqual([m for c,m in asked if c=='A10027930'],['202608','202607'])
+
+ def test_no_step_back_to_a_month_already_stored(self):
+  apt={'id':'f13','kapt_code':'A10026680'}
+  basic={'kaptCode':'A10026680','privArea':'70685.27'}
+  asked=[]
+  def groups(code,month,key):
+   asked.append((code,month))
+   return dict(mod.CALIBRATION) if code==mod.F15 else None
+  prior={'records':[{'complex_id':'f13','month':'202607'}]}
+  with patch.object(mod,'upsert_complex_targets',return_value=[apt]):
+   mod.collect([apt],prior,'FAKE',get_groups=groups,get_basic=lambda key,code:basic,months=['202608'])
+  self.assertEqual([m for c,m in asked if c=='A10026680'],['202608'],'Stored 2026-07 makes older fallbacks pointless')
+
+ def test_fallback_is_bounded_per_run(self):
+  apts=[{'id':'c%02d'%i,'kapt_code':'A1%07d'%i} for i in range(30)]
+  asked=[]
+  def groups(code,month,key):
+   asked.append((code,month))
+   return dict(mod.CALIBRATION) if code==mod.F15 else None
+  def basic(key,code):return {'kaptCode':code,'privArea':'70685.27'}
+  def match(catalog,b):return [a for a in apts if a['kapt_code']==b['kaptCode']]
+  with patch.object(mod,'upsert_complex_targets',side_effect=match):
+   mod.collect(apts,{'records':[]},'FAKE',get_groups=groups,get_basic=basic,months=['202608'])
+  older=[1 for c,m in asked if c!=mod.F15 and m!='202608']
+  self.assertEqual(len(older),mod.FALLBACK_COMPLEX_LIMIT*mod.FALLBACK_MONTHS)
+
+ def test_office_supply_field_is_a_fee(self):
+  self.assertEqual(mod.extract_amount([{'kaptCode':'A10027930','officeSupply':'120000','bookSupply':'0'}],'A10027930','202607'),120000)
+
 if __name__=='__main__':
  unittest.main()
