@@ -59,7 +59,7 @@ FINANCIAL = re.compile(r'(cost|fee|pay|bonus|pension|premium|benefit|amt|amount|
 KNOWN_FEE_FIELDS = frozenset({
  'heatC', 'heatP', 'waterCoolC', 'waterCoolP', 'electC', 'electP', 'waterHotC', 'waterHotP',
  'gasC', 'gasP', 'purifi', 'scrap', 'preMeet', 'buildInsu', 'electionMng',
- 'bookSupply', 'sLevy'})
+ 'bookSupply', 'officeSupply', 'sLevy'})
 DATE_KEYS = re.compile(r'(date|month|year|search|code|number|count|area|rate|ratio|per|unit|index|seq|id)$', re.I)
 
 def number(value):
@@ -182,6 +182,18 @@ def available_months(now=None):
  lag = 2 if today.day >= 26 else 3
  return [f'{(y-lag)//12:04d}{(y-lag)%12+1:02d}']
 
+# Some complexes publish on K-apt a month or two later than others (verified
+# 2026-11-20: 마스터뷰23·센터니얼 had no 2026-08 rows but complete 2026-07 rows).
+# When the newest month is empty, step back, but only to a month newer than what
+# is already stored, and only for a bounded number of complexes per run
+# (20 x 2 x 27 calls stays well inside the 5,000-call daily quota).
+FALLBACK_MONTHS = 2
+FALLBACK_COMPLEX_LIMIT = 20
+
+def earlier_months(month, count=FALLBACK_MONTHS):
+ index = int(month[:4]) * 12 + int(month[4:]) - 1
+ return [f'{(index-k)//12:04d}{(index-k)%12+1:02d}' for k in range(1, count + 1)]
+
 def collect(catalog, prior, key, *, get_groups=fetch_groups, get_basic=fetch_basic, months=None, pause=0):
  prior_records = prior.get('records', [])
  # Verify interpretation of live numeric fields against independent
@@ -193,6 +205,11 @@ def collect(catalog, prior, key, *, get_groups=fetch_groups, get_basic=fetch_bas
  dates = months or available_months()
  verified = {}
  tried = 0
+ fallback_used = 0
+ stored_month = {}
+ for row in prior_records:
+  if isinstance(row, dict) and row.get('complex_id'):
+   stored_month[row['complex_id']] = max(stored_month.get(row['complex_id'], ''), str(row.get('month', '')))
  for code in sorted({str(p.get('kapt_code')) for p in catalog
                      if not p.get('aggregate_only') and re.fullmatch(r'A[0-9]{8}', str(p.get('kapt_code', '')))}):
   basic = None
@@ -207,7 +224,14 @@ def collect(catalog, prior, key, *, get_groups=fetch_groups, get_basic=fetch_bas
   if area is None:
    continue
   tried += 1
-  for month in dates:
+  newest_stored = min((stored_month.get(p['id'], '') for p in matches), default='')
+  fallback = [x for x in earlier_months(min(dates)) if x > newest_stored and x not in dates]
+  candidates = list(dates) + (fallback if fallback_used < FALLBACK_COMPLEX_LIMIT else [])
+  stepped_back = False
+  for month in candidates:
+   if month not in dates and not stepped_back:
+    stepped_back = True
+    fallback_used += 1
    totals = get_groups(code, month, key)
    validated = validated_rate(totals, area)
    if not validated:
