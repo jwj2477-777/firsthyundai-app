@@ -276,7 +276,7 @@ body.apartmentSheetActive{overflow:hidden}
     <div id="overviewMemoBriefing" class="overviewMemoBriefing" hidden aria-labelledby="overviewMemoTitle">
       <div class="overviewMemoHead">
         <h3 id="overviewMemoTitle">오늘 일정 <small id="overviewMemoCount"></small></h3>
-        <button type="button" class="overviewMemoOpenCalendar" onclick="FirstHyundaiOfficeBoard.openBriefingCalendar()">캘린더 ›</button>
+        <button type="button" class="overviewMemoOpenCalendar" onclick="FirstHyundaiOfficeBoard.openBriefingCalendar()">달력 ›</button>
       </div>
       <div id="overviewMemoEntries" class="overviewMemoEntries" aria-live="polite"></div>
     </div>
@@ -317,7 +317,7 @@ body.apartmentSheetActive{overflow:hidden}
  </div>
 </section>
 <div id="officeBoard" class="page hidden">
- <div class="sectionTitle officeBoardTitle"><div><h2>사무실 메모</h2><p class="tiny">함께 쓰는 포스트잇 · <span id="officeBoardCurrentMember"></span></p></div>
+ <div class="sectionTitle officeBoardTitle"><div><h2>공유 메모</h2><p class="tiny">함께 쓰는 포스트잇 · <span id="officeBoardCurrentMember"></span></p></div>
   <button type="button" class="btn alt refreshAction" onclick="FirstHyundaiOfficeBoard.refresh()" aria-label="공유 메모 갱신"><span class="refreshGlyph" aria-hidden="true">↻</span> 갱신</button></div>
  <div class="officeMemoNotificationTools hidden" aria-label="알림 권한 요청">
   <span id="officeMemoNotificationStatus" class="tiny" role="status">새 메모 알림 확인 중</span>
@@ -381,7 +381,7 @@ body.apartmentSheetActive{overflow:hidden}
    <button id="officeBoardBirthdayAdd" type="button" class="officeBoardBirthdayAdd hidden" onclick="FirstHyundaiOfficeBoard.toggleBirthdayForm(true)">+ 매년 생일 등록</button>
    <div id="officeBoardBirthdayForm" class="officeBoardBirthdayForm hidden">
     <label id="officeBoardBirthdayFormTitle" for="officeBoardBirthdayInput">생일 일괄 등록</label>
-    <p class="tiny">한 줄에 한 명씩 입력 · 양력·음력 매년 반복 · 완료 없이 캘린더에만 표시됩니다.</p>
+    <p class="tiny">한 줄에 한 명씩 입력 · 양력·음력 매년 반복 · 완료 없이 달력에만 표시됩니다.</p>
     <textarea id="officeBoardBirthdayInput" rows="5" placeholder="가족1 양력 1월 3일&#10;가족2 음력 11월 11일" autocomplete="off"></textarea>
     <div class="officeBoardBirthdayActions"><button type="button" onclick="FirstHyundaiOfficeBoard.toggleBirthdayForm(false)">취소</button><button type="button" id="officeBoardBirthdaySave" onclick="FirstHyundaiOfficeBoard.addBirthdays()">반복 생일 저장</button></div>
    </div>
@@ -992,18 +992,17 @@ body.apartmentSheetActive{overflow:hidden}
   <h3 id="fhc_detailTitle" class="fhcDetailTitle">계산기</h3>
   <section class="fhcPane" id="fhc_feePane" hidden oninput="FirstHyundaiCalculators.update()" onchange="FirstHyundaiCalculators.update()">
    <label for="fhc_feeKind">부동산 종류</label>
-   <select id="fhc_feeKind"><option value="house">주택·아파트</option><option value="office">오피스텔(법정 조건 충족)</option><option value="other">상가·토지·기타</option></select>
+   <select id="fhc_feeKind"><option value="house">주택·아파트</option><option value="office" data-chip="오피스텔">오피스텔(법정 조건 충족)</option><option value="other">상가·토지·기타</option></select>
    <p class="fhcHint" id="fhc_officeNote" hidden>오피스텔은 전용 85㎡ 이하이며 전용입식 부엌·수세식 화장실·목욕시설 등 요건을 모두 충족할 때만 이 항목을 선택하세요. 그 외에는 '기타'로 계산하세요.</p>
    <label for="fhc_feeDeal">계약 종류</label><select id="fhc_feeDeal"><option value="sale">매매</option><option value="lease">전세</option><option value="rent">월세</option></select>
    <label for="fhc_feeAmount" id="fhc_feeAmountLabel">매매금액 (만원)</label>
    <input id="fhc_feeAmount" type="number" inputmode="numeric" min="1" max="1000000000" step="1" placeholder="예: 140000 → 14억원"><small class="fhcAmountRead" id="fhc_feeAmountRead" aria-live="polite" hidden></small>
-   <button class="fhcSubAction" type="button" onclick="FirstHyundaiCalculators.useContractAmount()">작성 중인 계약 금액 가져오기</button>
+   <button class="fhcSubAction" id="fhc_useContract" type="button" hidden onclick="FirstHyundaiCalculators.useContractAmount()">작성 중인 계약 금액 가져오기</button>
    <div id="fhc_feeRentWrap" hidden><label for="fhc_feeRent">월세 (만원)</label><input id="fhc_feeRent" type="number" inputmode="numeric" min="0" max="1000000000" step="1" placeholder="예: 150"><small class="fhcAmountRead" id="fhc_feeRentRead" aria-live="polite" hidden></small></div>
-   <label for="fhc_feeVat">부가세</label><select id="fhc_feeVat"><option value="0">부가세 없이 보기</option><option value="10">10% 더하기 (일반과세자)</option><option value="4">4% 더하기 (간이과세자)</option></select><p class="fhcHint fhcVatHint">간이과세자는 부가가치율 40%가 적용돼 4%입니다. 연 매출 4,800만원 미만 간이과세자는 부가세를 받지 않습니다.</p>
+   <label for="fhc_feeVat">부가세</label><select id="fhc_feeVat"><option value="0" data-chip="없음">부가세 없이 보기</option><option value="10" data-chip="10% 일반과세">10% 더하기 (일반과세자)</option><option value="4" data-chip="4% 간이과세">4% 더하기 (간이과세자)</option></select><p class="fhcHint fhcVatHint" id="fhc_feeVatHint" hidden>간이과세자는 부가가치율 40%가 적용돼 4%입니다. 연 매출 4,800만원 미만 간이과세자는 부가세를 받지 않습니다.</p>
    <div class="fhcResult" role="status" aria-live="polite"><small id="fhc_feeCaption">예상 중개보수 상한</small><strong id="fhc_feePrimary">금액을 입력해 주세요</strong><span class="fhcRead" id="fhc_feeRead" hidden></span><p id="fhc_feeDetail"></p></div>
-   <p class="fhcHint">인천시 요율표 기준, 의뢰인 한쪽이 내는 상한입니다. 실제 보수는 이 안에서 협의합니다.</p>
-    <p class="fhcHint adminExplain">인천광역시 공표 요율 기준의 의뢰인 한쪽 상한입니다. 실제 보수는 상한 내 협의하고, 부가세 및 특약은 별도로 확인합니다.</p>
-   <details class="fhcMore"><summary>계산 기준</summary><a class="fhcSource" href="https://www.incheon.go.kr/build/BU050301/2106584">인천시 요율표 ↗</a></details>
+       <p class="fhcHint adminExplain">인천광역시 공표 요율 기준의 의뢰인 한쪽 상한입니다. 실제 보수는 상한 내 협의하고, 부가세 및 특약은 별도로 확인합니다.</p>
+   <details class="fhcMore"><summary>계산 기준</summary><p class="fhcHint">인천시 요율표 기준, 의뢰인 한쪽이 내는 상한입니다. 실제 보수는 이 안에서 협의합니다.</p><a class="fhcSource" href="https://www.incheon.go.kr/build/BU050301/2106584">인천시 요율표 ↗</a></details>
   </section>
   <section class="fhcPane" id="fhc_conversionPane" hidden oninput="FirstHyundaiCalculators.update()" onchange="FirstHyundaiCalculators.update()">
    <label for="fhc_oldDeposit">현재 보증금 (만원)</label><input id="fhc_oldDeposit" type="number" inputmode="numeric" min="0" max="1000000000" step="1" placeholder="예: 10000"><small class="fhcAmountRead" id="fhc_oldDepositRead" aria-live="polite" hidden></small>
@@ -1026,7 +1025,7 @@ body.apartmentSheetActive{overflow:hidden}
    <div class="fhcTaxNotice adminExplain"><strong>세금 예상액 계산</strong><p>일반적인 조건은 기기에서 계산하고, 복잡한 세금은 외부 서비스에서 확인합니다. 신고 전 반드시 확인해 주세요.</p></div>
    <div id="fhc_taxAcquisition" class="fhcTaxInputs" hidden>
     <div class="fhcTaxField fhcWide"><label for="fhc_taxAmount">취득금액 (만원)</label><input id="fhc_taxAmount" type="number" min="1" max="1000000000" inputmode="numeric" placeholder="예: 140000 → 14억원"><small class="fhcAmountRead" id="fhc_taxAmountRead" aria-live="polite" hidden></small></div>
-    <div class="fhcTaxField"><label for="fhc_taxArea">전용면적</label><select id="fhc_taxArea"><option value="">선택해 주세요</option><option value="40">40㎡ 이하</option><option value="60">40㎡ 초과 ~ 60㎡ 이하</option><option value="85">60㎡ 초과 ~ 85㎡ 이하</option><option value="big">85㎡ 초과</option></select></div>
+    <div class="fhcTaxField"><label for="fhc_taxArea">전용면적</label><select id="fhc_taxArea"><option value="">선택해 주세요</option><option value="40" data-chip="40㎡ 이하">40㎡ 이하</option><option value="60" data-chip="40~60㎡">40㎡ 초과 ~ 60㎡ 이하</option><option value="85" data-chip="60~85㎡">60㎡ 초과 ~ 85㎡ 이하</option><option value="big">85㎡ 초과</option></select></div>
     <div class="fhcTaxField"><label for="fhc_taxOwn">취득 후 주택 수</label><select id="fhc_taxOwn"><option value="">선택해 주세요</option><option value="one">1주택</option><option value="two">2주택</option><option value="three">3주택</option><option value="more">4주택 이상</option></select></div>
     <div class="fhcTaxField" id="fhc_taxTempTwoField" hidden><label for="fhc_taxTemporaryTwo">일시적 2주택 요건</label><select id="fhc_taxTemporaryTwo"><option value="">확인 후 선택</option><option value="N">해당 없음 (중과 검토)</option><option value="Y">요건 확인함 (일반세율)</option></select></div>
     <div class="fhcTaxField"><label for="fhc_taxConArea">조정대상지역</label><select id="fhc_taxConArea"><option value="">확인 후 선택</option><option value="N">아니요</option><option value="Y">예</option></select></div>
@@ -1447,7 +1446,7 @@ body.apartmentSheetActive{overflow:hidden}
 const NOTE_KEY='firsthyundai-local-v04', REPO_KEY='firsthyundai-public-repo';
 const DEFAULT_REPOSITORY='jwj2477-777/firsthyundai-app';
 const PRIVATE_PAGES=new Set(['settings','notes','security','apiGuide','adminCenter']);
-const PAGES=[['calculators','부동산 계산기'],['overview','전체 브리핑'],['nearby','★ 주변단지'],['complexes','단지정보'],['new','새소식'],['trades','실거래가'],['officetel','오피스텔 전월세'],['news','뉴스 브리핑'],['contracts','계약문자 작성'],['officeBoard','사무실 메모'],['notes','내 자료'],['apiGuide','API 신청'],['settings','설정'],['security','보안 관리'],['adminCenter','시스템 관리센터']];
+const PAGES=[['calculators','부동산 계산기'],['overview','전체 브리핑'],['nearby','★ 주변단지'],['complexes','단지정보'],['new','새소식'],['trades','실거래가'],['officetel','오피스텔 전월세'],['news','뉴스 브리핑'],['contracts','계약문자 작성'],['officeBoard','공유 메모'],['notes','내 자료'],['apiGuide','API 신청'],['settings','설정'],['security','보안 관리'],['adminCenter','시스템 관리센터']];
 const $=id=>document.getElementById(id);
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeLink=url=>/^https:\/\/[a-z0-9.-]+(?:[:][0-9]+)?(?:[/?#]|$)/i.test(String(url||''))?String(url):'';

@@ -67,6 +67,8 @@ on:
       - 'scripts/test_segmented_switch_unity.js'
       - 'scripts/test_selection_flow.js'
       - 'scripts/test_office_memo_real_estate_dates.js'
+      - 'scripts/test_office_memo_cards_v227.js'
+      - 'scripts/test_calculator_choices_browser.js'
       - 'scripts/test_news_tab_wind_stability.js'
       - 'scripts/test_trade_type_direct_flow.js'
       - 'scripts/test_native_lower_tab_browser.js'
@@ -201,6 +203,8 @@ jobs:
           node scripts/test_premium_motion.js
           node scripts/test_selection_flow.js
           node scripts/test_office_memo_real_estate_dates.js
+          node scripts/test_office_memo_cards_v227.js
+          node scripts/test_calculator_choices_browser.js
           node scripts/test_news_tab_wind_stability.js
           node scripts/test_trade_type_direct_flow.js
           node scripts/test_native_lower_tab_browser.js
@@ -419,25 +423,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.2.6 fee VAT choice APK
+      - name: Publish v2.2.7 simpler calculator and memo cards APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.6.apk
-          unzip -t FirstHyundai-v2.2.6.apk | grep 'No errors detected'
-          if gh release view v2.2.6 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.7.apk
+          unzip -t FirstHyundai-v2.2.7.apk | grep 'No errors detected'
+          if gh release view v2.2.7 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.2.6 FirstHyundai-v2.2.6.apk \
+            gh release create v2.2.7 FirstHyundai-v2.2.7.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.2.6 · 중개보수 부가세 10%·4% 선택' \
-               --notes '중개보수 계산기의 부가세를 "부가세 없이 / 10% 더하기(일반과세자) / 4% 더하기(간이과세자)" 중에서 고를 수 있게 했습니다. 간이과세자는 부동산중개업 부가가치율 40%가 적용돼 4%이고, 연 매출 4,800만원 미만 간이과세자는 부가세를 받지 않는다는 안내도 함께 보여 줍니다. 결과에는 고른 비율과 부가세 금액이 함께 표시됩니다. 요율·한도는 그대로입니다. v2.2.6/build257.'
+              --title '퍼스트현대 v2.2.7 · 계산기 한 번에 고르기 · 공유메모 정리' \
+               --notes '① 계산기: 매매/전세/월세, 부가세, 주택 수, 예/아니요 같은 선택을 목록 창 대신 버튼 한 번으로 고릅니다. 4% 부가세 안내는 4%를 고를 때만, 계약서 금액 넣기 버튼은 계약 화면에 금액이 있을 때만 보입니다. 계산 방식은 그대로입니다. ② 공유메모 카드: 완료·수정만 크게 두고 일정 해제·사진 추가·중요 고정·삭제는 더보기 안으로 옮겨 카드가 짧아졌습니다. 진행 중 표시는 빼고, 완료와 일정 지남만 표시합니다. ③ 수정 버그: 내일 오후 3시처럼 적은 메모를 다음 날 고치면 일정이 하루 밀리던 문제를 고쳤습니다. ④ 완료를 잘못 눌렀을 때 되돌리기 버튼이 나옵니다. 등록·수정·고정 후 무엇이 됐는지 알려 줍니다. ⑤ 오늘 요약에서 지난 일정은 어제 16:00처럼 날짜를 함께 보여 줍니다. 지난 종일 일정도 일정 지남으로 표시합니다. ⑥ 저장 버튼을 청록색으로, 달력 일요일·토요일을 빨강·파랑으로, 화면 이름을 메뉴와 같은 공유 메모로 맞췄습니다. v2.2.7/build258.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.2.6 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.2.6 --apk FirstHyundai-v2.2.6.apk
+          gh release upload v2.2.7 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.2.7 --apk FirstHyundai-v2.2.7.apk
 
 
 

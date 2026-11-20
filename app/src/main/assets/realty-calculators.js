@@ -2,7 +2,10 @@
  * v2.2.5: every 만원 box reads its number back in words ("85000" → "8억 5,000만원"),
  * results add a 만원 reading, 중개보수 shows its formula and both-sides total,
  * 전월세 전환 takes the current monthly rent, 대출 shows the total repayment.
- * v2.2.6: 중개보수 VAT is a choice — 없음 / 10% 일반과세자 / 4% 간이과세자 (user request). */
+ * v2.2.6: 중개보수 VAT is a choice — 없음 / 10% 일반과세자 / 4% 간이과세자 (user request).
+ * v2.2.7 (user: "계산기 ui도 조금더 심플하게"): small drop-downs become one-tap choice buttons
+ * (the <select> stays as the single source of value, hidden), helper text appears only when
+ * it applies, and the contract-amount button only when the contract screen has an amount. */
 (function(root){
  'use strict';
  const $=id=>document.getElementById(id);
@@ -56,6 +59,56 @@
   box.textContent=text;box.hidden=!text;
  }
  function readbackAll(){for(const id of Object.keys(READBACK))readback(id);}
+ // One-tap choices. Each button sets the hidden <select> and fires the same input/change
+ // events a person would, so every existing rule (resets, validation, results) still runs.
+ const CHOICES=['fhc_feeKind','fhc_feeDeal','fhc_feeVat','fhc_loanMethod','fhc_taxArea','fhc_taxOwn',
+  'fhc_taxTemporaryTwo','fhc_taxConArea','fhc_taxFirstLife','fhc_taxFirstHomeType','fhc_taxMetro',
+  'fhc_taxTransferOwn','fhc_taxExemptionVerified','fhc_taxTransferConArea'];
+ function chipGroup(select){const next=select?.nextElementSibling;return next?.classList?.contains?.('fhcChips')?next:null;}
+ function syncChips(){
+  for(const id of CHOICES){
+   const select=$(id),group=chipGroup(select);if(!group)continue;
+   for(const button of group.children){
+    const on=button.dataset.value===select.value;
+    button.setAttribute('aria-pressed',String(on));
+   }
+  }
+ }
+ function buildChips(){
+  if(typeof document.createElement!=='function')return;
+  for(const id of CHOICES){
+   const select=$(id);
+   if(!select?.options||chipGroup(select)||typeof select.insertAdjacentElement!=='function')continue;
+   const options=Array.from(select.options).filter(o=>o.value!=='');
+   const group=document.createElement('div');
+   group.className='fhcChips';group.setAttribute('role','group');
+   const label=document.querySelector?.('label[for="'+id+'"]');
+   if(label){if(!label.id)label.id=id+'Label';group.setAttribute('aria-labelledby',label.id);}
+   const long=options.some(o=>(o.dataset.chip||o.textContent).trim().length>9);
+   group.dataset.count=String(options.length);
+   if(long)group.dataset.layout='stack';
+   for(const option of options){
+    const button=document.createElement('button');
+    button.type='button';button.className='fhcChip';button.dataset.value=option.value;
+    button.textContent=(option.dataset.chip||option.textContent).trim();
+    button.setAttribute('aria-pressed','false');
+    button.addEventListener('click',()=>{
+     if(select.value===option.value)return;
+     select.value=option.value;
+     select.dispatchEvent(new Event('input',{bubbles:true}));
+     select.dispatchEvent(new Event('change',{bubbles:true}));
+     syncChips();
+    });
+    group.append(button);
+   }
+   select.classList.add('fhcChipSource');select.setAttribute('aria-hidden','true');select.tabIndex=-1;
+   select.insertAdjacentElement('afterend',group);
+   // A field with three or more (or long) choices gets the full row in the tax grid.
+   const field=select.closest?.('.fhcTaxField');
+   if(field&&(options.length>=3||long))field.classList.add('fhcWide');
+  }
+  syncChips();
+ }
  // VAT added on top of the fee: 일반과세자 10%; 간이과세자 4% (부동산중개업 부가가치율 40% × 10%);
  // 연 매출 4,800만원 미만 간이과세자는 받지 않음(0). `true` keeps the old 10% meaning.
  const VAT_RATES={'0':0,'10':.1,'4':.04};
@@ -129,6 +182,10 @@
    $('fhc_feeAmountLabel').textContent=deal==='sale'?'매매금액 (만원)':'보증금 (만원)';
    $('fhc_feeRentWrap').hidden=deal!=='rent';
    $('fhc_officeNote').hidden=kind!=='office';
+   const vatHint=$('fhc_feeVatHint');if(vatHint)vatHint.hidden=$('fhc_feeVat').value!=='4';
+   const fromContract=$('fhc_useContract'),contractPrice=amount($('ct_price')?.value);
+   if(fromContract){fromContract.hidden=!contractPrice;
+    if(contractPrice)fromContract.textContent='계약서 금액 넣기 ('+wanText(contractPrice)+')';}
    try{
     const result=commission({kind,deal,amountWan:$('fhc_feeAmount').value,
      rentWan:deal==='rent' ? $('fhc_feeRent').value :0,vat:$('fhc_feeVat').type==='checkbox'?$('fhc_feeVat').checked:$('fhc_feeVat').value});
@@ -169,7 +226,7 @@
     output('fhc_loan',money(result.first),detail,caption,wonText(result.first));
    }catch(e){output('fhc_loan','조건을 확인해 주세요',e.message,'월 납입 예상액');}
   }
-  readbackAll();
+  readbackAll();syncChips();
  }
  function taxValue(id){return String($(id)?.value||'').trim();}
  function taxWon(id,allowZero=false){
@@ -350,7 +407,7 @@
   }else if(changed==='fhc_taxTransferOwn'){
    const verified=$('fhc_taxExemptionVerified');if(verified)verified.value='';
   }
-  clearTax();updateTaxFields();
+  clearTax();updateTaxFields();syncChips();
  }
  function calculateTax(){
   if(!['acquisition','transfer'].includes(chosen))return false;
@@ -441,7 +498,7 @@
    $('fhc_taxTransfer').hidden=type!=='transfer';
    updateTaxFields();taxStatus('');
   }
-  update();readbackAll();
+  buildChips();update();readbackAll();
   $('fhc_detail').scrollIntoView?.({behavior:'smooth',block:'start'});
   return true;
  }
@@ -467,5 +524,5 @@
  $('fhc_taxPane')?.addEventListener?.('input',onTaxEdit);
  $('fhc_taxPane')?.addEventListener?.('change',onTaxEdit);
  root.FirstHyundaiCalculators={select,home,update,onOpen,onPageChange,useContractAmount,calculateTax,
-  _test:{commission,conversion,loan,num,wanText,wonText,monthsText,readback,simpleAcquisitionTax,simpleTransferTax,standardTaxByBase,heldFullYears,onTaxEdit}};
+  _test:{commission,conversion,loan,num,wanText,wonText,monthsText,readback,buildChips,syncChips,simpleAcquisitionTax,simpleTransferTax,standardTaxByBase,heldFullYears,onTaxEdit}};
 })(window);

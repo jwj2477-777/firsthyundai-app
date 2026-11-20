@@ -8,7 +8,7 @@ const main=html.split('<script>')[1].split('</script>')[0];
 new vm.Script(main);new vm.Script(js);
 const page=html.slice(html.indexOf('<div id="officeBoard" class="page hidden">'),
  html.indexOf('<div id="adminCenter" class="page hidden">'));
-assert(page.includes('<h2>사무실 메모</h2>'));
+assert(page.includes('<h2>공유 메모</h2>'),'Page title matches the menu name (v2.2.7)');
 assert(page.includes('id="officeBoardDraft"')&&page.includes('id="officeBoardPost"'));
 for(const id of ['officeBoardComposeView','officeBoardNotesView','officeBoardCalendarView','officeBoardComposer','officeBoardSearch',
  'officeBoardStatusActive','officeBoardStatusDone','officeBoardStatusAll',

@@ -24,7 +24,7 @@ assert(html.includes('id="officeFooterMember"'),
  'Footer quietly shows the native currently selected account');
 for(const field of ['officeBoard','officeBoardDraft','officeBoardPost','officeBoardList','officeBoardAuth'])
  assert(html.includes('id="'+field+'"'),field+' missing');
-assert(html.includes("['officeBoard','사무실 메모']"));
+assert(html.includes("['officeBoard','공유 메모']"),'Same name as the menu tile');
 assert(css.includes('.officeBoardNote'));
 assert(!/localStorage|sessionStorage|\bfetch\(/.test(js),'Sensitive note content must not go to public storage/fetch');
 let userMode='family',userId='11111111-1111-1111-1111-111111111111';
