@@ -17,7 +17,7 @@ for code in ('A10027930', 'A10023207'):
         print('FEEGAP', code, 'catalog matches', [p.get('id') for p in matches] if isinstance(matches, list) else matches)
     except Exception as e:
         print('FEEGAP', code, 'match ERR', type(e).__name__, str(e)[:120])
-    for month in m.available_months()[:3]:
+    for month in ('202607', '202606'):
         for group, (service, ops) in m.GROUPS.items():
             got, unknown = [], set()
             for op in ops:
