@@ -88,3 +88,9 @@ body[data-app-motion="reduced"] main .refreshFeedback.success{animation:none!imp
  main .refreshFeedback.success{animation:none!important}
  #nav .primaryNav>button:active,#nav .utilityNav>button:active{filter:none}
 }
+
+/* v2.1.98 — short peak scenes (decoration only). */
+body[data-season-peak="blossom"] .seasonParticle.spring{background:linear-gradient(135deg,#FFE3EC,#E79BBB);opacity:.7}
+body[data-season-peak="blossom"] .seasonParticle.spring:nth-child(3n){width:8px;height:11px;opacity:.55}
+body[data-season-peak="foliage"] .seasonParticle.autumn:nth-child(3n){filter:hue-rotate(-28deg) saturate(1.25);opacity:.66}
+body[data-season-peak="foliage"] .seasonParticle.autumn:nth-child(4n+1){filter:hue-rotate(14deg) saturate(1.1)}
