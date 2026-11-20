@@ -999,7 +999,7 @@ body.apartmentSheetActive{overflow:hidden}
    <input id="fhc_feeAmount" type="number" inputmode="numeric" min="1" max="1000000000" step="1" placeholder="예: 140000 → 14억원"><small class="fhcAmountRead" id="fhc_feeAmountRead" aria-live="polite" hidden></small>
    <button class="fhcSubAction" type="button" onclick="FirstHyundaiCalculators.useContractAmount()">작성 중인 계약 금액 가져오기</button>
    <div id="fhc_feeRentWrap" hidden><label for="fhc_feeRent">월세 (만원)</label><input id="fhc_feeRent" type="number" inputmode="numeric" min="0" max="1000000000" step="1" placeholder="예: 150"><small class="fhcAmountRead" id="fhc_feeRentRead" aria-live="polite" hidden></small></div>
-   <label class="fhcCheck" for="fhc_feeVat"><input id="fhc_feeVat" type="checkbox"> 부가세 10% 가정액도 보기</label>
+   <label for="fhc_feeVat">부가세</label><select id="fhc_feeVat"><option value="0">부가세 없이 보기</option><option value="10">10% 더하기 (일반과세자)</option><option value="4">4% 더하기 (간이과세자)</option></select><p class="fhcHint fhcVatHint">간이과세자는 부가가치율 40%가 적용돼 4%입니다. 연 매출 4,800만원 미만 간이과세자는 부가세를 받지 않습니다.</p>
    <div class="fhcResult" role="status" aria-live="polite"><small id="fhc_feeCaption">예상 중개보수 상한</small><strong id="fhc_feePrimary">금액을 입력해 주세요</strong><span class="fhcRead" id="fhc_feeRead" hidden></span><p id="fhc_feeDetail"></p></div>
    <p class="fhcHint">인천시 요율표 기준, 의뢰인 한쪽이 내는 상한입니다. 실제 보수는 이 안에서 협의합니다.</p>
     <p class="fhcHint adminExplain">인천광역시 공표 요율 기준의 의뢰인 한쪽 상한입니다. 실제 보수는 상한 내 협의하고, 부가세 및 특약은 별도로 확인합니다.</p>

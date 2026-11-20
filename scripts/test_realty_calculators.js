@@ -37,6 +37,12 @@ assert.equal(fee('office','sale',140000).maximum,7000000,'요건충족 오피스
 assert.equal(fee('office','lease',80000).maximum,3200000,'요건충족 오피스텔 임대차 0.4%');
 assert.equal(fee('other','sale',140000).maximum,12600000,'기타 0.9%');
 assert.equal(fn.commission({kind:'house',deal:'sale',amountWan:140000,vat:true}).total,9240000);
+// v2.2.6: 간이과세자 4% (부동산중개업 부가가치율 40%) and 일반과세자 10% as a choice.
+assert.equal(fn.commission({kind:'house',deal:'sale',amountWan:140000,vat:'10'}).total,9240000);
+assert.equal(fn.commission({kind:'house',deal:'sale',amountWan:140000,vat:'4'}).total,8736000,'14억 840만원 + 4% 33만6천원');
+assert.equal(fn.commission({kind:'house',deal:'sale',amountWan:140000,vat:'0'}).total,8400000);
+assert.equal(fn.commission({kind:'house',deal:'sale',amountWan:140000,vat:'7'}).total,8400000,'Unknown VAT choice adds nothing');
+assert.equal(fn.commission({kind:'house',deal:'lease',amountWan:9000,vat:'4'}).total,312000,'Capped 30만원 + 4%');
 assert.equal(fn.commission({kind:'house',deal:'sale',amountWan:4000}).capApplied,false,'Do not describe unused cap as applied');
 assert.equal(fn.commission({kind:'house',deal:'sale',amountWan:19999}).capApplied,true,'Enforced 80만원 cap');
 assert.equal(fn.commission({kind:'house',deal:'lease',amountWan:9000}).capApplied,true,'Enforced 30만원 cap');
@@ -284,6 +290,15 @@ assert.equal(element('fhc_feePrimary').textContent,'3,400,000원');assert.equal(
 assert.match(element('fhc_feeDetail').textContent,/거래금액 8억 5,000만원 × 상한 요율 0\.4%/);
 assert.match(element('fhc_feeDetail').textContent,/양쪽 의뢰인 모두 받으면 합계 680만원/);
 assert.match(element('fhc_feeCaption').textContent,/한쪽 의뢰인/);
+element('fhc_feeVat').value='4';calc.update();
+assert.equal(element('fhc_feePrimary').textContent,'3,536,000원','8억 5,000만원: 340만원 + 4% 13만6천원');
+assert.match(element('fhc_feeDetail').textContent,/부가세 4% 13만 6,000원 포함/);
+assert.match(element('fhc_feeCaption').textContent,/부가세 4% 포함/);
+element('fhc_feeVat').value='10';calc.update();assert.equal(element('fhc_feePrimary').textContent,'3,740,000원');
+element('fhc_feeVat').value='0';calc.update();assert.equal(element('fhc_feePrimary').textContent,'3,400,000원');
+{const m=read('app/src/main/assets/index.html');
+ assert(m.includes('<option value="4">4% 더하기 (간이과세자)</option>')&&m.includes('<option value="10">10% 더하기 (일반과세자)</option>'),'Both VAT choices offered');
+ assert(!m.includes('부가세 10% 가정액도 보기'),'Old 10%-only checkbox removed');}
 // 전월세 전환 with the current monthly rent: 1억→5천만 at 4.5% adds 18만 7,500원 to 50만원.
 for(const id of ['fhc_currentRent','fhc_conversionCaption','fhc_conversionRead'])element(id);
 calc.select('conversion');
