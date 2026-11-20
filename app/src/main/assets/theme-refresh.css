@@ -101,8 +101,9 @@ body[data-app-contrast="high"][data-season-theme]{--theme-rain-layer:var(--theme
 /* 6) v2.2.3 — 알림함 as smoked glass (user: "알림함이 뒤배경을 가리고있다").
       Same size, place, icon and label; only the fill turns see-through so the header
       scene shows behind it. A light dark tint (not a white one) keeps the white label
-      at ≥4.5:1 on every season/time header (measured). High contrast keeps the original
-      solid button. Press = the tint deepens (colour only). */
+      at ≥4.5:1 on every season/time header (measured). Press = the tint deepens (colour only).
+      v2.2.4: high contrast (편하게 보기·선명한 화면) is glass too (user: "투명으로 안바뀌었는데"
+      — v2.2.3 kept it solid there), with a deeper tint and a brighter edge. */
 html body header #modeBar #favoriteAlertButton{
  background:rgba(6,20,26,.18)!important;
  border-color:rgba(255,255,255,.46)!important;
@@ -114,7 +115,8 @@ html body header #modeBar #favoriteAlertButton:not(:disabled):active{
  background:rgba(6,20,26,.34)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.2)!important}
 html body header #modeBar #favoriteAlertButton .headerAlertDot{border-color:rgba(255,255,255,.92)}
 html body[data-app-contrast="high"] header #modeBar #favoriteAlertButton{
- background:#F7FBF8!important;border-color:#C9DFDA!important;color:#24575C!important;text-shadow:none;box-shadow:none!important}
+ background:rgba(6,20,26,.32)!important;border-color:rgba(255,255,255,.74)!important;
+ text-shadow:0 1px 1px rgba(8,28,34,.34)}
 html body[data-app-contrast="high"] header #modeBar #favoriteAlertButton:not(:disabled):active{
- box-shadow:inset 0 0 0 999px rgba(16,38,44,.07)!important}
+ background:rgba(6,20,26,.48)!important}
 @media print{body[data-season-theme] header{background:#102D38}}
