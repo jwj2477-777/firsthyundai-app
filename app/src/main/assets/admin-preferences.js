@@ -115,10 +115,12 @@
   const sets={
    comfortable:{density:'roomy',reading:'xlarge',contrast:'high',tapSize:'large'},
    compact:{density:'compact',reading:'standard',contrast:'standard',tapSize:'standard'},
-   default:{density:'standard',reading:'standard',contrast:'standard',tapSize:'standard'}
+   default:{density:'standard',reading:'standard',contrast:'standard',tapSize:'standard'},
+   // v2.1.98: one tap for "계절은 절기에 맞춰, 비·눈은 송도 실제 날씨에 맞춰".
+   natureAuto:{themeMode:'season',weatherEffect:'auto'}
   };
   if(!Object.prototype.hasOwnProperty.call(sets,which))return false;
-  const title={comfortable:'편하게 보기',compact:'한눈에 보기',default:'화면 기본형'}[which];
+  const title={comfortable:'편하게 보기',compact:'한눈에 보기',default:'화면 기본형',natureAuto:'계절·날씨 자동'}[which];
   return commit({...state,...sets[which]},title+' 프리셋 적용 · 공통 서버에 게시합니다.');
  }
  function undo(){

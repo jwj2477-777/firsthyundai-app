@@ -1,3 +1,12 @@
+## 2026-11-20 · v2.1.99 · 계절·날씨 효과 개선 (사용자 요청)
+- **확인한 현재 상태:** 절기 자동 테마(`themeMode=season`)와 송도 날씨 자동 효과(`weatherEffect=auto`)는 이미 있으나 기본값이 수동/없음. 날씨 효과는 기상청 초단기실황 PTY 기준 비/눈 2종, 예보 미반영.
+- **사용자 결정:** 진눈깨비는 실황 값이 비/눈 경계를 오가 헷갈릴 수 있으므로 **별도 효과로 만들지 않음**(PTY 2·6은 기존대로 눈).
+- **관리자 한 번에 켜기:** `FirstHyundaiUIOptions.preset('natureAuto')` = `{themeMode:'season',weatherEffect:'auto'}`. 기본값 자체는 바꾸지 않음(사무실 공통 설정을 관리자가 선택).
+- **상단 예보 안내(`weather-briefing.js` `upcomingHint`):** 송도 날씨 자동일 때만, 6시간 이내 비·눈(혼합 포함) 예보가 있고 지금 비·눈이 아닐 때 "오늘 오후 3시경 비 예보" 표시(누르면 오늘 요약). 예보는 효과(`data-weather-effect`)를 바꾸지 않음.
+- **시기 장식(`seasonPeak`):** 봄 테마 4/1–4/14 벚꽃, 가을 테마 10/20–11/10 단풍(대략적 인천 기준, 장식만). 입자 20→30, 22→30.
+- **입자 예산(`particleBudget`):** Android 절전 모드(신규 브리지 `isPowerSaveMode()`)=0, 배터리 15% 이하·미충전=절반, 메모리 2GB/코어 2개 이하=60%. 앱이 숨겨지면 1분 주기 재그리기 생략.
+- **검증:** 신규 `scripts/test_season_weather_extras.js`. 기존 `test_season_themes.js` 통과. 실기기 절전 모드·배터리 API 동작 확인 전.
+
 ## 2026-11-20 · v2.1.98 · Live 끊김 개선 · 평형 함께 쓰기 (사용자 요청)
 - **Live 끊김 원인(코드 확인):** 계약 모드 VAD `silenceDurationMs=700`. 서류를 보며 0.7초만 멈춰도 차례가 끝나고, 모델이 답하기 시작하면 `ContractLiveTurnGate`가 마이크를 막아 이어 말한 내용이 버려짐.
 - **수정(`PublicLiveVoice`):** 계약 모드만 `CONTRACT_SILENCE_MS=2000`(뉴스 Live는 700 유지). `finishUserTurn()`이 Gemini `realtimeInput.audioStreamEnd=true`만 보내 즉시 정리(AI 발화 중에는 무시, 이후 1초 마이크 보류). 브리지 `finishContractLiveTurn()`(인자 없음).

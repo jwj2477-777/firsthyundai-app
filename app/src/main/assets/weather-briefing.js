@@ -76,6 +76,23 @@
   }
   return result;
  }
+ // v2.1.98: a small header hint on every page, only when "송도 날씨 자동" is on.
+ // Forecast never draws rain/snow effects; it only says when it is expected.
+ function upcomingHint(doc,now=Date.now(),obs=null){
+  if(!valid(doc,now)||obs?.effect==='rain'||obs?.effect==='snow')return '';
+  const next=[...doc.hours].filter(h=>h.type!=='none'&&Date.parse(h.at)+HOUR>now&&Date.parse(h.at)<=now+6*HOUR)
+   .sort((a,b)=>a.at.localeCompare(b.at))[0];
+  if(!next)return '';
+  return (Date.parse(next.at)<=now?'곧 ':timeLabel(next.at,now)+'경 ')+kinds[next.type]+' 예보';
+ }
+ function renderHint(){
+  const box=$('headerForecastHint'),text=$('headerForecastHintText');if(!box)return;
+  const auto=window.FirstHyundaiThemes?.weatherMode?.()==='auto';
+  const message=auto?upcomingHint(data,Date.now(),window.FirstHyundaiThemes?.currentWeather?.()):'';
+  if(text)text.textContent=message;
+  box.hidden=!message;
+  box.setAttribute?.('aria-label',message?message+' · 오늘 요약에서 자세히 보기':'날씨 예보 안내');
+ }
  function forecastTemperature(now){
   if(!valid(data,now))return null;
   const current=data.hours.find(h=>{
@@ -179,6 +196,7 @@
   return hourlyExpanded;
  }
   function render(){
+  renderHint();
   if(!$('overviewWeatherMessage'))return;
   const now=Date.now(),obs=window.FirstHyundaiThemes?.currentWeather?.();
   const curr=$('overviewWeatherMessage'),icon=$('overviewWeatherIcon'),source=$('overviewWeatherSource');
@@ -239,8 +257,9 @@
   forecast:()=>valid(data)?{...data,hours:data.hours.map(h=>({...h}))}:null,
   getHourly:(limit=12)=>hourlyCards(data,Date.now(),limit),
   forecastStatus:()=>summarize(data,Date.now(),window.FirstHyundaiOfficeBoard?.closureDates?.()||[]),
-  _test:{valid,summarize,isClosed,nextOpen,timeLabel,atKst,nextDay,weatherDisplay,forecastTemperature,hourlyRows,hourlyCondition,hourlyDayHour,hourlyCards}};
+  _test:{upcomingHint,valid,summarize,isClosed,nextOpen,timeLabel,atKst,nextDay,weatherDisplay,forecastTemperature,hourlyRows,hourlyCondition,hourlyDayHour,hourlyCards}};
  document.addEventListener('firsthyundai-observed-weather',render);
+ document.addEventListener('firsthyundai-theme-configured',render);
  document.addEventListener('firsthyundai-office-schedule-updated',render);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
  window.setInterval(()=>{render();if(typeof currentPage!=='undefined'&&currentPage==='overview')refresh()},60000);

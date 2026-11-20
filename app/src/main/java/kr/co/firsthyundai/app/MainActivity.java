@@ -867,6 +867,13 @@ public class MainActivity extends Activity {
                 deliver("onFirstHyundaiSharedSettingsFetched",response);
             });
         }
+        // Decoration only: fewer seasonal particles while Android battery saver is on.
+        @JavascriptInterface public boolean isPowerSaveMode() {
+            try{
+                android.os.PowerManager power=(android.os.PowerManager)getSystemService(Context.POWER_SERVICE);
+                return power!=null&&power.isPowerSaveMode();
+            }catch(Exception ignored){return false;}
+        }
         @JavascriptInterface public void cacheThemeAppearance(String json) {
             ThemeAppearance.cache(getApplicationContext(),json);
         }

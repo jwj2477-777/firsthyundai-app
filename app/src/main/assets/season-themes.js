@@ -26,6 +26,33 @@
   const [tint,mix]=ambientTints[timeMood(now)];
   return headerPalette(theme,strength).map(c=>blend(c,tint,mix));
  }
+ // v2.1.98: short "peak" scenes inside a season (approximate Incheon climatology,
+ // decoration only): cherry blossoms in early April, autumn leaves late Oct–early Nov.
+ function seasonPeak(base,now=Date.now()){
+  const d=new Date(now+9*HOUR),md=(d.getUTCMonth()+1)*100+d.getUTCDate();
+  if(base==='spring'&&md>=401&&md<=414)return 'blossom';
+  if(base==='autumn'&&md>=1020&&md<=1110)return 'foliage';
+  return '';
+ }
+ // Fewer moving particles when the phone is saving power, low on battery or modest.
+ // Business controls never change; only decoration is reduced.
+ let battery=null;
+ try{
+  if(typeof navigator!=='undefined'&&navigator.getBattery)navigator.getBattery().then(b=>{
+   battery=b;b.addEventListener?.('levelchange',paint);b.addEventListener?.('chargingchange',paint);paint();
+  }).catch(()=>{});
+ }catch(e){}
+ function particleBudget(env={}){
+  let saver=env.saver;
+  if(saver===undefined){try{saver=!!window.FirstHyundaiNative?.isPowerSaveMode?.()}catch(e){saver=false}}
+  if(saver)return {factor:0,reason:'saver'};
+  const bat=env.battery!==undefined?env.battery:battery;
+  if(bat&&!bat.charging&&Number(bat.level)<=.15)return {factor:.5,reason:'battery'};
+  const nav=env.navigator!==undefined?env.navigator:(typeof navigator!=='undefined'?navigator:{});
+  const memory=Number(nav?.deviceMemory),cores=Number(nav?.hardwareConcurrency);
+  if((memory>0&&memory<=2)||(cores>0&&cores<=2))return {factor:.6,reason:'device'};
+  return {factor:1,reason:''};
+ }
  function rainStrength(wet,measured){
   if(wet!=='rain'||!fresh(measured)||!Number.isFinite(measured.precip_mm))return 'normal';
   return measured.precip_mm<.5?'light':measured.precip_mm>=3?'heavy':'normal';
@@ -93,6 +120,9 @@
   document.body.setAttribute('data-weather-strength',strength);
   document.body.setAttribute('data-season-theme',base);
   document.body.setAttribute('data-weather-effect',wet);
+  const peak=wet==='none'?seasonPeak(base,now):'',budget=particleBudget();
+  document.body.setAttribute('data-season-peak',peak);
+  document.body.setAttribute('data-theme-budget',budget.reason||'full');
   document.body.setAttribute('data-theme-paused',document.hidden?'true':'false');
   document.body.setAttribute('data-theme-intensity',options.themeIntensity);
   document.body.setAttribute('data-theme-decor',options.themeDecor);
@@ -107,7 +137,7 @@
   if(nativeValue!==nativeSnapshot){
    try{window.FirstHyundaiNative?.cacheThemeAppearance?.(nativeValue);nativeSnapshot=nativeValue}catch(e){}
   }
-  const scene=base+'/'+wet+'/'+strength+'/'+options.themeDecor;
+  const scene=base+'/'+wet+'/'+strength+'/'+options.themeDecor+'/'+peak+'/'+budget.factor;
   if(scene!==lastScene){
    if(!layer){
     layer=document.createElement('div');layer.id='seasonAtmosphere';
@@ -117,8 +147,9 @@
    layer.replaceChildren();
    const kind=wet!=='none'?wet:base;
    const amount=kind==='rain'?({light:18,normal:32,heavy:46}[strength]||32):
-    {default:0,spring:20,summer:14,autumn:22,winter:18,snow:30}[kind];
-   const count=options.themeDecor==='off'?0:options.themeDecor==='subtle'?Math.ceil(amount/2):amount;
+    {default:0,spring:peak==='blossom'?30:20,summer:14,autumn:peak==='foliage'?30:22,winter:18,snow:30}[kind];
+   const decor=options.themeDecor==='off'?0:options.themeDecor==='subtle'?Math.ceil(amount/2):amount;
+   const count=Math.round(decor*budget.factor);
    for(let i=0;i<count;i++){
     const part=document.createElement('i');part.className='seasonParticle '+kind;
     part.style.setProperty('--x',(i%2?(84+(i*13%150)/10):(i*17%150)/10)+'vw');
@@ -159,13 +190,16 @@
    themeHeader:value?.themeHeader==='off'?'off':'on',themeIntro:value?.themeIntro==='off'?'off':'on',themeLogo:value?.themeLogo==='off'?'off':'on',themeCaption:value?.themeCaption==='off'?'off':'on'};
   if(previous!==options.weatherEffect){generation++;lastAttempt=0}
   paint();refresh();
+  try{document.dispatchEvent?.(new Event('firsthyundai-theme-configured'))}catch(e){}
  }
- window.FirstHyundaiThemes={configure,refresh,refreshObserved:()=>refresh(true),currentWeather:()=>fresh(weather)?weather:null,_test:{terms,season,fresh,longitude,headerPalette,timeMood,ambientPalette,rainStrength}};
+ window.FirstHyundaiThemes={configure,refresh,refreshObserved:()=>refresh(true),currentWeather:()=>fresh(weather)?weather:null,weatherMode:()=>options.weatherEffect,
+  _test:{terms,season,fresh,longitude,headerPalette,timeMood,ambientPalette,rainStrength,seasonPeak,particleBudget}};
  document.addEventListener('visibilitychange',()=>{paint();if(!document.hidden)refresh()});
  window.addEventListener('focus',()=>{paint();refresh()});
  window.addEventListener('resize',paint);
  window.addEventListener('scroll',()=>{if(options.themeHeader==='off')paint()},{passive:true});
- window.setInterval(()=>{paint();refresh()},60000);
+ // Hidden app: nothing to repaint; the visibilitychange handler catches up on return.
+ window.setInterval(()=>{if(!document.hidden){paint();refresh()}},60000);
  configure(window.FirstHyundaiUIOptions?.get?.());
 })();
 
