@@ -1,121 +1,76 @@
-/* v2.2.0 — One calm motion language (user request: "더 고급스럽고 깔끔하게").
+/* v2.2.1 — Light, smooth motion (user: v2.2.0 felt a little stuttery → "부드럽게").
  *
- * Rules (kept from earlier decisions):
- *  · Button feedback is COLOUR and SHADOW only — never size or position
- *    (no scale, no bounce, no ripple). The six menu tiles keep their geometry.
- *  · One curve and three durations for everything:
- *      press-in 70ms · release/state 200ms · enter 220ms, decelerating curve.
- *  · Respect both Android "remove animations" and the app's "움직임 줄이기".
+ * Measured on a 4×-slowed phone profile:
+ *  · The real stall was list rendering (fixed in index.html: catalog/name caches),
+ *    not the CSS. A fade that starts after a stall only made the stall visible.
+ *  · v2.2.0 used filter (saturate/brightness) and moved many page blocks at once,
+ *    which forces extra layers and repaints. Both are gone.
  *
+ * Rules now:
+ *  · Button feedback is colour/shade only (never size or position), and it is
+ *    instant on touch and fades out gently on release.
+ *  · Only compositor-friendly opacity/transform on SMALL things; a screen change is
+ *    a short opacity fade with no stagger and no movement.
+ *  · Android "remove animations" and the app's 움직임 줄이기 turn everything off.
  * Loaded last. Deleting this file returns to the v2.1.99 motion.
  */
-:root{
- --m-press:70ms;--m-state:200ms;--m-enter:220ms;
- --m-ease:cubic-bezier(.2,0,0,1);          /* standard */
- --m-out:cubic-bezier(.22,1,.36,1);        /* decelerate */
-}
+:root{--m-state:140ms;--m-enter:160ms;--m-ease:cubic-bezier(.2,0,0,1)}
 
-/* 1) Press: a quick, even dimming + the lift (shadow) settles. Same for every control. */
+/* 1) Press: an even shade appears at once, and fades out when the finger lifts.
+      Painted as an inset shade (no filter layer, no movement). */
 :is(button,.btn,summary,[role="button"],a.overviewNewsEntry,.nearbyCard,.complexTap,
  .favoriteSummaryCard,.complexSummaryCard,.overviewActionCard,.fhcMode):not(:disabled){
  -webkit-tap-highlight-color:transparent;
- transition-property:background-color,border-color,color,box-shadow,opacity,filter;
- transition-duration:var(--m-state);
- transition-timing-function:var(--m-ease);
 }
 :is(button,.btn,summary,[role="button"],a.overviewNewsEntry,.nearbyCard,.complexTap,
  .favoriteSummaryCard,.complexSummaryCard,.overviewActionCard,.fhcMode):not(:disabled):active{
- filter:brightness(.94) saturate(1.04);
- transition-duration:var(--m-press);
+ box-shadow:inset 0 0 0 999px rgba(16,38,44,.07)!important;
+ transition-duration:0s!important;
 }
-/* Solid, dark buttons read the same dimming a little more clearly. */
-:is(.btn:not(.alt),.contractOneTap,.contractPrimary,#cl_done,#officeBoardPost,.scrollToTopFab):not(:disabled):active{
- filter:brightness(.88);
-}
-/* Raised cards settle onto the page while pressed (shadow only, no movement). */
-:is(.nearbyCard,.complexSummaryCard,.favoriteSummaryCard,.overviewActionCard,a.overviewNewsEntry,.fhcMode):active{
- box-shadow:0 0 0 #0000!important;
-}
-#nav .primaryNav>button,#nav .utilityNav>button:not(.adminCenterNav){
- transition-property:background-color,color,border-color,box-shadow,filter!important;
- transition-duration:var(--m-state)!important;
- transition-timing-function:var(--m-ease)!important;
-}
-#nav .primaryNav>button:active,#nav .utilityNav>button:active{
- filter:brightness(.93);transition-duration:var(--m-press)!important;
+:is(.btn:not(.alt),.contractOneTap,.contractPrimary,#cl_done,#officeBoardPost,.scrollToTopFab,
+ #nav .primaryNav>button.active,#nav .utilityNav>button.active):not(:disabled):active{
+ box-shadow:inset 0 0 0 999px rgba(0,0,0,.14)!important;
 }
 
-/* 2) Choosing something: the newly selected tile/tab "fills in" its colour
-      (the menu and tabs are redrawn on every choice, so this replaces a hard cut). */
-@keyframes fhd-select-fill{
- from{filter:saturate(.25) brightness(1.22)}
- to{filter:none}
-}
-:is(#nav .primaryNav>button.active,#nav .utilityNav>button.active:not(.adminCenterNav),
- .complexTabBar button.active,.sectionModeSwitch>button.selected,
- .sectionModeSwitch>button[aria-selected="true"],.officeBoardViewToggle>button.selected,
- .tradeStarter>button.active,#contracts .contractFlowStep.is-current){
- animation:fhd-select-fill var(--m-state) var(--m-out) 1;
-}
-
-/* 3) Changing screens: content fades up 6px instead of cutting.
-      Fixed detail sheets are excluded so their own slide stays exact. */
-@keyframes fhd-page-in{
- from{opacity:0;transform:translate3d(0,6px,0)}
- to{opacity:1;transform:none}
-}
+/* 2) Changing screens: a short fade only (no movement, no stagger).
+      Fixed detail sheets keep their own slide. */
+@keyframes fhd-fade-in{from{opacity:.25}to{opacity:1}}
 .page:not(.hidden)>:not(.apartmentSheet):not(script):not(style),
 .page:not(.hidden)>.sectionTitle:first-child:not(.apartmentSheet){
- animation:fhd-page-in var(--m-enter) var(--m-out) backwards!important;
-}
-.page:not(.hidden)>:nth-child(n+3):not(.apartmentSheet){animation-delay:40ms!important}
-
-/* 4) Detail sheet: same decelerating curve, a touch longer for a softer arrival. */
-#complexSheet.apartmentSheet.panel,#nearbyDetails.apartmentSheet.panel,
-#complexSheet.apartmentSheet.panel.detailOpen,#nearbyDetails.apartmentSheet.panel.detailOpen{
- transition-duration:280ms,220ms,0s;
- transition-timing-function:var(--m-out),var(--m-ease),linear;
+ animation:fhd-fade-in var(--m-enter) var(--m-ease) backwards!important;
 }
 
-/* 5) Dialogs and their dimmed backdrop arrive together. */
-@keyframes fhd-dialog-in{
- from{opacity:0;transform:translate3d(0,10px,0)}
- to{opacity:1;transform:none}
-}
-@keyframes fhd-fade-in{from{opacity:0}to{opacity:1}}
-dialog[open]:not(.apartmentSheet){animation:fhd-dialog-in var(--m-enter) var(--m-out)}
-dialog[open]:not(.apartmentSheet)::backdrop{animation:fhd-fade-in var(--m-enter) var(--m-ease)}
+/* 3) Dialogs: small lift + fade; the dimmed backdrop fades with it. */
+@keyframes fhd-dialog-in{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:none}}
+@keyframes fhd-backdrop-in{from{opacity:0}to{opacity:1}}
+dialog[open]:not(.apartmentSheet){animation:fhd-dialog-in 180ms var(--m-ease)}
+dialog[open]:not(.apartmentSheet)::backdrop{animation:fhd-backdrop-in 180ms var(--m-ease)}
 
-/* 6) Opening a section: chevron turns smoothly, the content eases in. */
+/* 4) Opening a section: only the small chevron turns. */
 :is(#trades,#officetel) .tradeAdvanced>summary::after,
 #contracts :is(.contractManual,.contractCompactDetails)>summary::after{
- transition:transform var(--m-state) var(--m-out),margin-top var(--m-state) var(--m-out)}
-@keyframes fhd-reveal{
- from{opacity:0;transform:translate3d(0,-4px,0)}
- to{opacity:1;transform:none}
-}
-details[open]>:not(summary){animation:fhd-reveal var(--m-state) var(--m-out) backwards}
+ transition:transform var(--m-state) var(--m-ease),margin-top var(--m-state) var(--m-ease)}
 
-/* 7) Small status lines (refresh result, forecast hint, update banner) fade in. */
+/* 5) Small status lines appear softly. */
 #refreshFeedback:not(.hidden),header .headerForecastHint:not([hidden]),#appUpdateBanner:not([hidden]),
 #ct_selectedComplexContext:not(.hidden){animation:fhd-fade-in var(--m-enter) var(--m-ease)}
 
+/* 6) Long news lists: cards far below the screen are laid out only when they come
+      near (Chrome content-visibility). Measured first frame of the news screen on a
+      4×-slowed phone profile: 284ms → 115ms. Sizes are remembered once seen. */
+#newsContent>.newsCard,#publicSubscriptions>.subscriptionListingCard{
+ content-visibility:auto;contain-intrinsic-size:auto 260px}
+
 /* Respect "animations off" (Android) and the app's own 움직임 줄이기. */
 @media(prefers-reduced-motion:reduce){
- :is(button,.btn,summary,[role="button"],a.overviewNewsEntry,.nearbyCard,.complexTap,
-  .favoriteSummaryCard,.complexSummaryCard,.overviewActionCard,.fhcMode),
- #nav .primaryNav>button,#nav .utilityNav>button{transition-duration:0s!important}
- .page:not(.hidden)>*,dialog[open],dialog[open]::backdrop,details[open]>:not(summary),
- #nav button.active,.complexTabBar button.active,.sectionModeSwitch>button,.officeBoardViewToggle>button,
- .tradeStarter>button,#contracts .contractFlowStep,#refreshFeedback,header .headerForecastHint,
+ .page:not(.hidden)>:not(.apartmentSheet):not(script):not(style),
+ .page:not(.hidden)>.sectionTitle:first-child:not(.apartmentSheet),dialog[open],dialog[open]::backdrop,#refreshFeedback,header .headerForecastHint,
  #appUpdateBanner,#ct_selectedComplexContext{animation:none!important}
+ :is(#trades,#officetel) .tradeAdvanced>summary::after,
+ #contracts :is(.contractManual,.contractCompactDetails)>summary::after{transition:none!important}
 }
-body[data-app-motion="reduced"] :is(button,.btn,summary,[role="button"],a.overviewNewsEntry,.nearbyCard,.complexTap,
- .favoriteSummaryCard,.complexSummaryCard,.overviewActionCard,.fhcMode),
-body[data-app-motion="reduced"] #nav .primaryNav>button,
-body[data-app-motion="reduced"] #nav .utilityNav>button{transition-duration:0s!important}
-body[data-app-motion="reduced"] :is(.page:not(.hidden)>*,dialog[open],details[open]>:not(summary),
- #nav button.active,.complexTabBar button.active,.sectionModeSwitch>button,.officeBoardViewToggle>button,
- .tradeStarter>button,#contracts .contractFlowStep,#refreshFeedback,header .headerForecastHint,
- #appUpdateBanner,#ct_selectedComplexContext){animation:none!important}
+body[data-app-motion="reduced"] :is(.page:not(.hidden)>*,dialog[open],#refreshFeedback,
+ header .headerForecastHint,#appUpdateBanner,#ct_selectedComplexContext){animation:none!important}
 body[data-app-motion="reduced"] dialog[open]::backdrop{animation:none!important}
+body[data-app-motion="reduced"] :is(#trades,#officetel) .tradeAdvanced>summary::after,
+body[data-app-motion="reduced"] #contracts :is(.contractManual,.contractCompactDetails)>summary::after{transition:none!important}
