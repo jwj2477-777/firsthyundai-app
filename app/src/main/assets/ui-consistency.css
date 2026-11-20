@@ -1,0 +1,127 @@
+/* v2.1.97 — One visual grammar for family users (60s parents first).
+ *
+ *  1. Same colour = same meaning.
+ *     · Page colour (the selected main-menu tile) = "where am I". Tabs/segments
+ *       inside a page use only that colour.
+ *     · Deep teal button = "press to continue" on every page.
+ *     · 매매/전세/월세 keep their own deal colours (unchanged).
+ *  2. One line-icon style (see ui-icons.js), always next to a word.
+ *  3. Never smaller: touch targets and type sizes are kept or enlarged.
+ *
+ * Loaded last. Deleting this file and ui-icons.js returns to the v2.1.96 look.
+ */
+body{
+ --fh-primary:#225A65;--fh-primary-border:#1B4A53;--fh-primary-ink:#FFFFFF;
+ --fh-secondary-bg:#FFFFFF;--fh-secondary-border:#C5D6D6;--fh-secondary-ink:#27525B;
+ --fh-page:#225A65;--fh-page-border:#1B4A53;--fh-page-soft:#E8F1F0;--fh-page-ink:#1D4A52;
+ --fh-icon-accent:#C9913F;
+}
+body:is([data-section="trades"],[data-section="nearby"],[data-section="new"],[data-section="officetel"]){
+ --fh-page:#28618B;--fh-page-border:#204A6B;--fh-page-soft:#E9F0F7;--fh-page-ink:#1F4C6E}
+body[data-section="complexes"]{--fh-page:#166D64;--fh-page-border:#125149;--fh-page-soft:#E5F2EF;--fh-page-ink:#145A52}
+body[data-section="news"]{--fh-page:#68509B;--fh-page-border:#513C80;--fh-page-soft:#F0ECF8;--fh-page-ink:#523D82}
+body[data-section="overview"]{--fh-page:#525EA0;--fh-page-border:#3E4B88;--fh-page-soft:#ECEEF8;--fh-page-ink:#3D4886}
+body[data-section="contracts"]{--fh-page:#A15738;--fh-page-border:#7C412E;--fh-page-soft:#FBEFE8;--fh-page-ink:#83432A}
+body[data-section="officeBoard"]{--fh-page:#87651A;--fh-page-border:#6D5011;--fh-page-soft:#F7F0DF;--fh-page-ink:#6A4F14}
+
+/* 1) Sticky main menu: an opaque surface, so page text never shows through. */
+#nav.tabs{background:linear-gradient(155deg,#FFFEF9,#F5F2EA)}
+body[data-season-theme]:not([data-season-theme="default"]) #nav.tabs{
+ background:linear-gradient(155deg,#FFFFFF,var(--season-paper,#FFFCF7))}
+#nav.tabs:is([data-nav-density="compact"],[data-nav-density="transitioning"]){
+ border-top-left-radius:0;border-top-right-radius:0;border-top-color:transparent;
+ box-shadow:0 6px 14px #2B3A3A1F}
+
+/* 2) Every menu icon uses the same gold accent (was gold/lavender/terracotta). */
+#nav .primaryNav>button:nth-child(n),#nav .utilityNav>button:nth-child(n){--tile-accent:var(--fh-icon-accent)}
+
+/* 3) Line icons swapped in by ui-icons.js. */
+.uiIcon{display:inline-block;width:1.15em;height:1.15em;flex:none;vertical-align:-.2em}
+.uiIconLead{margin-right:.34em}
+:is(.starterIcon,.refreshGlyph,.adminHubIcon,.favoriteCardStar,.inboxKind)>.uiIcon{width:1em;height:1em;vertical-align:middle}
+.refreshGlyph>.uiIcon{width:19px;height:19px}
+.hasUiIcon:is(button,summary,label){align-items:center}
+#trades .apartmentTradeNav>button .starterIcon,#nearby .apartmentTradeNav>button .starterIcon,
+#new .apartmentTradeNav>button .starterIcon,#officetel .tradeStarter>button .starterIcon{
+ display:flex;justify-content:center;line-height:1}
+.uiIcon[data-icon="starFill"]{color:var(--fh-icon-accent)}
+.active .uiIcon[data-icon="starFill"],[aria-pressed="true"] .uiIcon[data-icon="starFill"],
+.selected .uiIcon[data-icon="starFill"]{color:inherit}
+
+/* 4) Selected tabs/segments inside a page use the page colour only. */
+.page .propertyTypeSwitch.sectionModeSwitch[data-tone="teal"]{
+ --segment-bg:#E9F0F7;--segment-border:#CBD9E8;--segment-ink:#2E4E6A;--segment-idle:#FAFCFE;
+ --segment-active:#28618B;--segment-active-border:#204A6B;--segment-focus:#8EB0D3}
+#contracts .contractFlowStep.is-current{
+ border-color:var(--fh-page);background:var(--fh-page-soft);color:var(--fh-page-ink);font-weight:850}
+#contracts .contractFlowStep.is-complete{border-color:#E3CFC3;background:#FCF7F3;color:#7A5643}
+
+/* 5) "Press to continue" is the same deep teal everywhere; secondary actions are white. */
+body:not([data-ui-accent="teal"]):not([data-ui-accent="bronze"]) #officeBoard #officeBoardPost{
+ background:var(--fh-primary);border-color:var(--fh-primary-border);color:var(--fh-primary-ink)}
+#officeBoard .officeBoardImageAdd,#officeBoard .officeBoardImageRetry{
+ background:var(--fh-secondary-bg);border:1.5px solid var(--fh-secondary-border);color:var(--fh-secondary-ink)}
+
+/* 6) Header right button: calculator matches the "갱신" button exactly. */
+#contracts .contractHero .fhcContractEntry{
+ box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:5px;
+ flex:0 0 auto;align-self:flex-start;height:49px;min-height:49px;min-width:81px;padding:8px 11px;
+ border:1.5px solid var(--fh-secondary-border);border-radius:11px;background:#FFFFFF;
+ color:var(--fh-secondary-ink);font-size:13px;font-weight:750;line-height:1.3;white-space:nowrap;box-shadow:none}
+#contracts .contractHero .fhcContractEntry svg{width:19px;height:19px;flex:none}
+
+/* 7) Contracts: "음성 입력" and "Live" are one pair of equal buttons. */
+#contracts .contractMemoCard .contractEasyActions{grid-template-columns:minmax(0,1fr)}
+#contracts .contractMemoCard .contractInputModes{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0}
+#contracts .contractMemoCard .contractEasyActions .contractInputModes .btn{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+ min-height:72px;margin:0;padding:9px 6px;border-radius:13px;
+ background:var(--fh-secondary-bg);border:1.5px solid var(--fh-secondary-border);color:var(--fh-secondary-ink);
+ font-size:15px;font-weight:800;line-height:1.3;text-align:center;word-break:keep-all;white-space:normal}
+#contracts .contractInputModes .btn small{display:block;font-size:12px;font-weight:650;color:#5D7477}
+#contracts .contractInputModes .btn svg{width:24px;height:24px}
+#contracts .contractInputModes .btn .uiIconLead{margin:0}
+
+/* 8) Section-level disclosures share one style: title left, chevron right.
+   (Small inline "▸ 원문 안내" toggles in news stay as the quieter info level.) */
+:is(#trades,#officetel).page>.panel>.tradeAdvanced,:is(#trades,#officetel) .tradeAdvanced{padding:0;overflow:hidden;border-radius:13px}
+:is(#trades,#officetel) .tradeAdvanced>summary{
+ display:flex;align-items:center;justify-content:space-between;gap:10px;
+ min-height:50px;padding:12px 15px;list-style:none;cursor:pointer;
+ font-size:15px;font-weight:800;line-height:1.4;color:var(--fh-page-ink)}
+:is(#trades,#officetel) .tradeAdvanced>summary::-webkit-details-marker{display:none}
+:is(#trades,#officetel) .tradeAdvanced>summary small{margin-left:6px;font-size:12px;font-weight:600;color:#6A7B80}
+:is(#trades,#officetel) .tradeAdvanced>summary::after{
+ content:'';flex:none;width:9px;height:9px;margin:-4px 3px 0 auto;
+ border-right:2.2px solid currentColor;border-bottom:2.2px solid currentColor;transform:rotate(45deg)}
+:is(#trades,#officetel) .tradeAdvanced[open]>summary::after{margin-top:4px;transform:rotate(-135deg)}
+:is(#trades,#officetel) .tradeAdvanced[open]>:not(summary){margin-left:15px;margin-right:15px}
+:is(#trades,#officetel) .tradeAdvanced[open]>:last-child{margin-bottom:14px}
+#contracts :is(.contractManual,.contractCompactDetails)>summary{justify-content:flex-start;gap:8px}
+#contracts :is(.contractManual,.contractCompactDetails)>summary::after{
+ content:'';flex:none;width:9px;height:9px;margin:-4px 3px 0 auto;font-size:0;
+ border-right:2.2px solid currentColor;border-bottom:2.2px solid currentColor;transform:rotate(45deg)}
+#contracts :is(.contractManual,.contractCompactDetails)[open]>summary::after{margin-top:4px;transform:rotate(-135deg)}
+
+/* 9) "더보기" links look the same everywhere: small outlined pill with ›. */
+#overview .overviewMemoOpenCalendar{
+ min-height:38px;flex:0 0 auto;padding:6px 10px;border-radius:9px;
+ border:1px solid #CFDED9;background:#FFFFFF;color:#355E62;font-size:12px;font-weight:750}
+
+/* 10) Footer: brand never breaks; both tool rows are equal halves. */
+.compactAppFooter .appFooterVersion small{flex:none;white-space:nowrap}
+.compactAppFooter .appFooterVersion strong{min-width:0}
+.compactAppFooter .appFooterDisplayRow{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;align-items:stretch}
+.compactAppFooter .appFooterDisplayRow>small{grid-column:1/-1;margin-top:-2px}
+.compactAppFooter .appFooterDisplayRow :is(#deviceDisplayOpen,#fhc_quickOpen){
+ box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ width:100%;min-width:0;height:45px;min-height:45px;margin:0;padding:9px 7px;
+ border:1.5px solid #CCD9DB;border-radius:11px;background:#FFFFFF;color:#315B68;
+ font-size:13px;font-weight:800;line-height:1.3;white-space:nowrap;box-shadow:none}
+.compactAppFooter #deviceDisplayOpen svg{width:19px;height:19px;flex:none}
+
+@media(prefers-reduced-motion:reduce){
+ :is(#trades,#officetel) .tradeAdvanced>summary::after{transition:none}
+}

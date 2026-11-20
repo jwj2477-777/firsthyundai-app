@@ -16,7 +16,10 @@ assert(contract.indexOf('메모 정리하고 다음 단계 →')<contract.indexO
 assert(contract.includes('aria-describedby="ct_memoHelp ct_memoWriteTip"'),'Accessible explanatory text');
 assert(contract.includes('메모 정리하고 다음 단계 →'),'Descriptive primary action');
 assert(contract.includes('onclick="FirstHyundaiEasy.compose()"'),'One-memo composition hook still works');
-assert(contract.includes('음성으로 메모 입력')&&contract.includes('onclick="FirstHyundaiContracts.voice()"'),'Voice entry remains');
+assert(contract.includes('음성으로 입력')&&contract.includes('onclick="FirstHyundaiContracts.voice()"'),'Voice entry remains');
+// v2.1.97: voice and Live are one equal pair, not two differently styled buttons.
+const modes=contract.slice(contract.indexOf('class="contractInputModes"'),contract.indexOf('</div>',contract.indexOf('class="contractInputModes"')));
+assert(modes.includes('contractVoice')&&modes.includes('id="ct_liveOpen"'),'Voice and Live share one input-mode group');
 assert(contract.includes('id="ct_polishTerms"')&&contract.includes('ct_termOriginal'),'Clause review remains');
 assert(contract.includes('id="ct_manualPanel"')&&contract.includes('id="ct_resultPanel"'),'Manual review/result remain');
 assert(!/<details id="ct_manualPanel"[^>]*\sopen(?:\s|>)/.test(contract),'Advanced entry remains closed');

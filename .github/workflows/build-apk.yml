@@ -81,6 +81,7 @@ on:
       - 'scripts/test_six_nav_header_geometry_browser.js'
       - 'scripts/test_notification_inbox_browser.js'
       - 'scripts/test_compact_nav_dock_browser.js'
+      - 'scripts/test_ui_consistency_browser.js'
       - 'scripts/test_nav_scroll_collapse_browser.js'
       - 'scripts/test_overview_actions_browser.js'
       - 'scripts/test_officetel_heading_color.js'
@@ -242,6 +243,7 @@ jobs:
           node scripts/test_six_nav_header_geometry_browser.js
           node scripts/test_notification_inbox_browser.js
           node scripts/test_compact_nav_dock_browser.js
+          node scripts/test_ui_consistency_browser.js
           node scripts/test_nav_scroll_collapse_browser.js
           node scripts/test_device_display_mode.js
           node scripts/test_officetel_heading_color.js
@@ -407,25 +409,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.1.96 school districts APK
+      - name: Publish v2.1.97 UI consistency APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.96.apk
-          unzip -t FirstHyundai-v2.1.96.apk | grep 'No errors detected'
-          if gh release view v2.1.96 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.1.97.apk
+          unzip -t FirstHyundai-v2.1.97.apk | grep 'No errors detected'
+          if gh release view v2.1.97 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.1.96 FirstHyundai-v2.1.96.apk \
+            gh release create v2.1.97 FirstHyundai-v2.1.97.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.1.96 · 초등 통학구역·중학교 학교군 정밀화' \
-               --notes '① 아파트정보 학교 탭: 공공데이터포털 공식 학구도(2026-09-20) 원본 경계로 다시 판정해 송도 단지 91곳의 초등 통학구역 학교를 표시합니다(기존 79곳). 학교 이름으로 바로 보여줍니다. ② 공동통학구역은 선택 가능한 학교를 모두 표시합니다. ③ 중학교 학교군(송도 7학교군)과 학교군 안 중학교 목록을 새로 표시합니다. ④ 관리비 공식 합계가 70개 단지로 늘어난 자료를 그대로 표시합니다. 학교 카드 아래 상충 안내 문구를 정리했습니다. 실제 입학 배정은 교육지원청 확인이 필요합니다. v2.1.96/build247.'
+              --title '퍼스트현대 v2.1.97 · 화면 통일감 정리' \
+               --notes '① 위로 내렸을 때 상단 메뉴 뒤로 글자가 비치던 문제를 고쳤습니다. ② 메뉴 아이콘 강조색, 화면별 선택 색(실거래 파랑·계약 갈색 등)을 하나로 맞췄습니다. 진한 청록 버튼은 어느 화면에서나 "누르면 다음으로" 입니다. ③ 버튼·제목의 이모지 기호를 같은 선 굵기의 아이콘으로 바꿨습니다(글자는 그대로). ④ 계약 화면의 음성 입력과 Live 버튼을 같은 크기 한 쌍으로, 계산기 버튼을 갱신 버튼과 같은 모양으로 맞췄습니다. ⑤ 상세 검색 조건 펼치기, 단지 상세 탭 배치, 하단 버튼 줄을 정리했습니다. 기능·글자 크기는 줄이지 않았습니다. v2.1.97/build248.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.1.96 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.1.96 --apk FirstHyundai-v2.1.96.apk
+          gh release upload v2.1.97 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.1.97 --apk FirstHyundai-v2.1.97.apk
 
 
 
