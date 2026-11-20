@@ -64,6 +64,9 @@ async function verify(){
   const base={themeMode:'manual',weatherEffect:'none',motion:'full',themeIntensity:'balanced',themeDecor:'full',
    themeHeader:'on',themeIntro:'on',themeLogo:'on',themeCaption:'on'};
   switchPage('trades');await wait(200);
+  // Some CI browsers report a system high-contrast preference; check the themed look explicitly.
+  const contrastBefore=document.body.getAttribute('data-app-contrast');
+  document.body.setAttribute('data-app-contrast','standard');
   const shape=()=>{const h=document.querySelector('header').getBoundingClientRect(),n=document.getElementById('nav').getBoundingClientRect(),
    t=document.querySelector('#trades .sectionTitle').getBoundingClientRect();
    return [h.height,n.top,n.height,t.top].map(v=>Math.round(v)).join(',')};
@@ -96,7 +99,7 @@ async function verify(){
   check(getComputedStyle(document.querySelector('header')).backgroundImage.includes('theme-scene-autumn.svg'),'Header off keeps the scene on the base colours');
   document.body.setAttribute('data-app-contrast','high');
   check(!getComputedStyle(document.querySelector('header')).backgroundImage.includes('theme-scene'),'High contrast: plain header');
-  document.body.removeAttribute('data-app-contrast');
+  if(contrastBefore===null)document.body.removeAttribute('data-app-contrast');else document.body.setAttribute('data-app-contrast',contrastBefore);
   check(document.documentElement.scrollWidth<=innerWidth+1,'No horizontal overflow');
   out.textContent='PASS five scenes, hour/rain/occasion layers, 절기 chip, unchanged geometry, high-contrast fallback';
  }catch(e){out.textContent='FAIL '+e.message}
@@ -113,8 +116,9 @@ try{
  markup=markup.replace('</body>','<script>addEventListener("load",()=>('+verify.toString()+')());</script></body>');
  const file=path.join(tmp,'index.html');fs.writeFileSync(file,markup);
  for(const width of [320,360,412]){
+  // Own profile: file:// localStorage from other browser tests must not leak in (e.g. high contrast).
   const r=child.spawnSync(chrome,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage',
-   '--hide-scrollbars','--window-size='+width+',1000','--virtual-time-budget=15000','--dump-dom','file://'+file],
+   '--user-data-dir='+path.join(tmp,'profile-'+width),'--hide-scrollbars','--window-size='+width+',1000','--virtual-time-budget=15000','--dump-dom','file://'+file],
    {encoding:'utf8',timeout:40000,maxBuffer:8*1024*1024});
   assert.equal(r.status,0,r.stderr.slice(-600));
   const found=r.stdout.match(/<pre id="theme-refresh-test">([\s\S]*?)<\/pre>/);
