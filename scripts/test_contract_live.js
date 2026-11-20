@@ -209,7 +209,7 @@ assert.equal(valid({balanceDate:'2028-02-29'}).balanceDate,'2028-02-29');
 const html=read('app/src/main/assets/index.html');
 assert(html.includes('FirstHyundaiEasy.compose()')&&html.includes('FirstHyundaiContracts.voice()'));
 assert(!/<dialog id="cl_dialog"[^>]*\sopen/.test(html));
-assert(html.includes('Live로 작성 · 선택')&&html.includes('FirstHyundaiContractLive?.onPageChange?.(id)'));
+assert(html.includes('Live 대화로 작성')&&html.includes('AI가 묻고 정리 · 선택')&&html.includes('FirstHyundaiContractLive?.onPageChange?.(id)'));
 assert(html.includes('id="cl_deferred" class="tiny" role="status"'),'Checklist is announced accessibly');
 const source=read('app/src/main/assets/contract-live.js');
 assert(!/\b(fetch|XMLHttpRequest|localStorage|sessionStorage)\b/.test(source));
