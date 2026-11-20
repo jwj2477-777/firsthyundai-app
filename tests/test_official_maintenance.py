@@ -139,5 +139,20 @@ class OfficialFees(unittest.TestCase):
    out=mod.collect([],{'records':[]},'FAKE',get_groups=lambda *a:None,get_basic=lambda *a:{'privArea':'70685.27'})
   self.assertIsNone(out)
 
+ def test_single_transient_api_error_is_retried(self):
+  calls={'n':0}
+  def request(url,params,key):
+   calls['n']+=1
+   if calls['n']==3:raise mod.PublicApiError('K-apt 공개 API 연결 실패: 네트워크/서비스 점검')
+   return {'response':{'header':{'resultCode':'00'},'body':{'item':{'kaptCode':'A10026679','kaptName':'x','guardCost':'100'}}}}
+  with patch.object(mod,'OP_RETRY_SECONDS',0),patch.object(mod,'unpack',side_effect=lambda r:([r['response']['body']['item']],None)):
+   totals=mod.fetch_groups('A10026679','202607','FAKE',request=request,pause=0)
+  self.assertIsNotNone(totals)
+
+ def test_repeated_api_error_still_fails_closed(self):
+  def request(url,params,key):raise mod.PublicApiError('K-apt API HTTP 500')
+  with patch.object(mod,'OP_RETRY_SECONDS',0):
+   self.assertIsNone(mod.fetch_groups('A10026679','202607','FAKE',request=request,pause=0))
+
 if __name__=='__main__':
  unittest.main()

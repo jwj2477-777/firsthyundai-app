@@ -117,8 +117,19 @@ def fetch_groups(code, month, key, request=call_api, pause=0.025):
   amounts = []
   for op in operations:
    try:
-    response = request(BASE + service + '/' + op,
-                       {'kaptCode': code, 'searchDate': month, 'dataType': 'JSON'}, key)
+    # One retry absorbs a transient throttle/network blip between ~27 rapid calls
+    # (2026-11-20: every call succeeded singly while the batched run failed).
+    for attempt in (1, 2):
+     try:
+      response = request(BASE + service + '/' + op,
+                         {'kaptCode': code, 'searchDate': month, 'dataType': 'JSON'}, key)
+      break
+     except (PublicApiError, RuntimeError, ValueError, KeyError) as exc:
+      if attempt == 2:
+       # Fixed public-API error text only (never the URL or key).
+       print('KAPT_OFFICIAL op failed', code, month, op, type(exc).__name__, str(exc)[:80])
+       raise
+      time.sleep(OP_RETRY_SECONDS)
     rows, total = unpack(response)
     if total is not None and total > len(rows):
      return None
@@ -189,6 +200,7 @@ def available_months(now=None):
 # (20 x 2 x 27 calls stays well inside the 5,000-call daily quota).
 FALLBACK_MONTHS = 2
 CALIBRATION_ATTEMPTS = 3
+OP_RETRY_SECONDS = 1.5
 CALIBRATION_RETRY_SECONDS = 20
 FALLBACK_COMPLEX_LIMIT = 20
 

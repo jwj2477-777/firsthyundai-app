@@ -19,5 +19,6 @@ try:
     base = m.fetch_basic(KEY, m.F15); print('CALIB area', base.get('privArea'))
 except Exception as e:
     print('CALIB basic ERROR', type(e).__name__, str(e).replace(KEY, '[KEY]')[:160])
-totals = m.fetch_groups(m.F15, m.CALIBRATION_MONTH, KEY)
-print('CALIB fetch_groups', totals, 'passes', m.calibration_passes(totals, '70685.27'))
+
+print("CALIB fetch_groups", m.fetch_groups(m.F15, m.CALIBRATION_MONTH, KEY))
+print("CALIB collect-style benchmark passes", m.calibration_passes(m.fetch_groups(m.F15, m.CALIBRATION_MONTH, KEY), "70685.27"))
