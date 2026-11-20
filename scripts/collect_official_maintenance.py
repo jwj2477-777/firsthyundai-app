@@ -201,6 +201,10 @@ def available_months(now=None):
 FALLBACK_MONTHS = 2
 CALIBRATION_ATTEMPTS = 3
 OP_RETRY_SECONDS = 1.5
+# A flaky K-apt API (connection failures, HTTP 500, 35 s timeouts) once pushed the
+# job past its limit and the cancel also skipped the later fee steps. Stop scanning
+# after this budget; verified rows so far are merged, the rest keep prior values.
+COLLECT_BUDGET_SECONDS = 15 * 60
 CALIBRATION_RETRY_SECONDS = 20
 FALLBACK_COMPLEX_LIMIT = 20
 
@@ -208,7 +212,9 @@ def earlier_months(month, count=FALLBACK_MONTHS):
  index = int(month[:4]) * 12 + int(month[4:]) - 1
  return [f'{(index-k)//12:04d}{(index-k)%12+1:02d}' for k in range(1, count + 1)]
 
-def collect(catalog, prior, key, *, get_groups=fetch_groups, get_basic=fetch_basic, months=None, pause=0):
+def collect(catalog, prior, key, *, get_groups=fetch_groups, get_basic=fetch_basic, months=None, pause=0,
+            clock=time.monotonic):
+ started = clock()
  prior_records = prior.get('records', [])
  # Verify interpretation of live numeric fields against independent
  # published itemized K-apt totals before using the algorithm on ANY site.
@@ -216,6 +222,9 @@ def collect(catalog, prior, key, *, get_groups=fetch_groups, get_basic=fetch_bas
  # run (seen 2026-11-20; an immediate re-run passed). Retry the benchmark a few
  # times; the parser check itself is unchanged and still fails closed.
  for attempt in range(CALIBRATION_ATTEMPTS):
+  if clock() - started > COLLECT_BUDGET_SECONDS:
+   print('KAPT_OFFICIAL time budget reached during benchmark')
+   return None
   benchmark = get_groups(F15, CALIBRATION_MONTH, key)
   try:
    base = get_basic(key, F15)
@@ -240,6 +249,9 @@ def collect(catalog, prior, key, *, get_groups=fetch_groups, get_basic=fetch_bas
    stored_month[row['complex_id']] = max(stored_month.get(row['complex_id'], ''), str(row.get('month', '')))
  for code in sorted({str(p.get('kapt_code')) for p in catalog
                      if not p.get('aggregate_only') and re.fullmatch(r'A[0-9]{8}', str(p.get('kapt_code', '')))}):
+  if clock() - started > COLLECT_BUDGET_SECONDS:
+   print('KAPT_OFFICIAL time budget reached; keeping', len(verified), 'newly verified, others keep prior values')
+   break
   basic = None
   try:
    basic = get_basic(key, code)

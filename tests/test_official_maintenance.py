@@ -154,5 +154,18 @@ class OfficialFees(unittest.TestCase):
   with patch.object(mod,'OP_RETRY_SECONDS',0):
    self.assertIsNone(mod.fetch_groups('A10026679','202607','FAKE',request=request,pause=0))
 
+ def test_time_budget_stops_scan_but_keeps_verified_and_prior_rows(self):
+  apts=[{'id':'c%02d'%i,'kapt_code':'A1%07d'%i} for i in range(5)]
+  ticks=iter([0,0]+[0,0,mod.COLLECT_BUDGET_SECONDS+1]+[mod.COLLECT_BUDGET_SECONDS+1]*20)
+  def basic(key,code):return {'kaptCode':code,'privArea':'70685.27'}
+  def match(catalog,b):return [a for a in apts if a['kapt_code']==b['kaptCode']]
+  prior={'records':[{'complex_id':'c04','kapt_code':'A10000004','month':'202606','won_per_exclusive_m2':3000,'monthly_total_won':1,
+    'source_url':'https://www.k-apt.go.kr/','method':'official_kapt_three_group_full_total_per_residential_exclusive_m2'}]}
+  with patch.object(mod,'upsert_complex_targets',side_effect=match):
+   out=mod.collect(apts,prior,'FAKE',get_groups=lambda *a:dict(mod.CALIBRATION),get_basic=basic,months=['202608'],clock=lambda:next(ticks))
+  ids={r['complex_id'] for r in out['records']}
+  self.assertIn('c00',ids);self.assertIn('c04',ids,'Unscanned complexes keep prior values')
+  self.assertLess(out['checked_codes'],5)
+
 if __name__=='__main__':
  unittest.main()
