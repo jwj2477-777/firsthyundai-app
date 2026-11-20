@@ -14,7 +14,7 @@ const expandedNotes=new Set();
 let historyLoaded=false,historyLoading=false,refreshCycle=0,lastFullHistory=0;
 let lastBriefing=0,briefingBusy=false;
 const startKst=()=>kstDate(new Date());
-let selectedDate='',calendarMonth='',editingBirthday='',calendarDraftDay='';
+let selectedDate='',calendarMonth='',editingBirthday='',calendarDraftDay='',skippedSchedule='';
 let draftTimer=null,draftRestoredMember='',draftRevision=0;
 function draftMember(){
  try{return String(bridge?.getOfficeMemberId?.()||'')}catch(e){return ''}
@@ -106,7 +106,7 @@ function restoreDraft(){
  const account=draftMember();
  if(!account||account===draftRestoredMember||!bridge?.getOfficeMemoDraft)return;
  if(draftRestoredMember&&draftRestoredMember!==account){
-  $('officeBoardDraft').value='';calendarDraftDay='';ambiguousPost=null;++draftRevision;
+  $('officeBoardDraft').value='';calendarDraftDay='';skippedSchedule='';ambiguousPost=null;++draftRevision;
  }
  if(String($('officeBoardDraft')?.value||'')||calendarDraftDay){draftRestoredMember=account;return;}
  try{
@@ -127,7 +127,7 @@ function finishPostedDraft(snapshot){
  // calendar edits made while waiting remain available for the next memo.
  if(snapshot.revision!==draftRevision||snapshot.text!==String(input.value||'')||
     snapshot.day!==calendarDraftDay){saveDraftNow();return false;}
- input.value='';calendarDraftDay='';clearDraft();checkSuggestion();
+ input.value='';calendarDraftDay='';skippedSchedule='';clearDraft();checkSuggestion();
  return true;
 }
 function focusNote(id){
@@ -243,6 +243,10 @@ function toIso(value){
 }
 function extracted(text){return window.FirstHyundaiMemoDates?.parse?.(text)||null}
 function hasDateCue(text){
+ // v2.2.5: one definition shared with the parser — only a specific day counts, so
+ // "84.9㎡", "8.5억", "다음주에", "준공 25년" no longer block or misdate a memo.
+ const shared=window.FirstHyundaiMemoDates?.cue;
+ if(typeof shared==='function')return shared(text);
  return /오늘|내일|모레|(?:이번|다음)\s*주|(?:이번|다음|다다음)\s*달|(?:올해|내년|내후년)\s*\d|(?:20\d{2}|2\d|3\d)\s*년|\d{1,2}\s*월\s*\d{1,2}\s*일|(?:20\d{2}\s*[.\/-]\s*)?\d{1,2}\s*[.\/-]\s*\d{1,2}/.test(String(text||''));
 }
 function draftSchedule(text){
@@ -252,17 +256,38 @@ function draftSchedule(text){
  return extracted(calendarDraftDay+' '+text);
 }
 function scheduleSuggestion(text){return draftSchedule(text)?.local||''}
+// The date the composer will actually save: the detected one, unless the user
+// tapped "일정 빼기" for exactly that date (a later different date shows again).
+function postSchedule(text){
+ const result=draftSchedule(text);
+ return result&&skippedSchedule&&result.local===skippedSchedule?null:result;
+}
 function checkSuggestion(){
- const text=String($('officeBoardDraft')?.value||''),result=draftSchedule(text);
+ const text=String($('officeBoardDraft')?.value||''),detected=draftSchedule(text),result=postSchedule(text);
  const el=$('officeBoardScheduleSuggestion');if(!el)return;
- const clear=$('officeBoardScheduleClear');
+ const clear=$('officeBoardScheduleClear'),skip=$('officeBoardScheduleSkip');
+ const fromCalendar=Boolean(calendarDraftDay&&!hasDateCue(text));
  if(clear)clear.hidden=!calendarDraftDay;
- el.classList?.toggle?.('hidden',!result&&!calendarDraftDay);
- if(result)el.textContent='▦ '+(calendarDraftDay&&!hasDateCue(text)?'달력에서 선택한 일정':'자동 일정')+
+ if(skip){
+  // Only for a date read from the text; a calendar-chosen day has its own 해제 button.
+  skip.hidden=!detected||fromCalendar;
+  skip.textContent=result?'일정 빼기':'일정 다시 넣기';
+  skip.setAttribute?.('aria-pressed',String(Boolean(detected&&!result)));
+ }
+ el.classList?.toggle?.('hidden',!detected&&!calendarDraftDay);
+ el.classList?.toggle?.('is-skipped',Boolean(detected&&!result));
+ if(detected&&!result)el.textContent='▦ 일정 없이 등록 · 적힌 날짜('+detected.local.slice(0,10).replace(/-/g,'.')+')는 달력에 넣지 않아요';
+ else if(result)el.textContent='▦ '+(fromCalendar?'달력에서 선택한 일정':'자동 일정')+
   ' · '+result.local.slice(0,10).replace(/-/g,'.')+
   (result.all_day?' · 종일':' · '+result.local.slice(11));
  else if(calendarDraftDay)el.textContent='선택한 날짜 '+calendarDraftDay.replace(/-/g,'.')+
   ' · 메모에 적힌 날짜가 올바른지 확인해 주세요.';
+}
+function toggleScheduleSkip(){
+ const detected=draftSchedule(String($('officeBoardDraft')?.value||''));
+ if(!detected){skippedSchedule='';checkSuggestion();return}
+ skippedSchedule=skippedSchedule===detected.local?'':detected.local;
+ checkSuggestion();
 }
 function annualCalendar(){return window.FirstHyundaiAnnualCalendar}
 function birthdayOf(note){return annualCalendar()?.parseNote?.(note?.text)||null}
@@ -867,7 +892,8 @@ async function post(){
   msg('메모의 날짜가 올바르지 않습니다. 날짜를 다시 확인한 후 등록해 주세요.');
   return;
  }
- const data={text,scheduled_at:parsed?.scheduled_at||null,all_day:parsed?.all_day||false};
+ const scheduled=postSchedule(text);
+ const data={text,scheduled_at:scheduled?.scheduled_at||null,all_day:scheduled?.all_day||false};
  let result=null;
  if(ambiguousPost){
   const prior=ambiguousPost;
@@ -1090,7 +1116,7 @@ window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDo
   call(approve?'approveDevice':'rejectDevice',{device:String(device)}):Promise.reject(Error('기기 ID 오류')),
  toggleComposer,setStatus,setAuthor,setQuery,setSort,showMore,clearFilters,
  imageCall:call,imageUpdate,canEdit:canEditId,
- setView,chooseDay,changeMonth,today,addAtSelectedDay,clearScheduledDay,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
+ setView,chooseDay,changeMonth,today,addAtSelectedDay,clearScheduledDay,toggleScheduleSkip,openCalendarNote,toggleArchive,toggleBirthdayForm,addBirthdays,editBirthday,deleteBirthday,
  saveDraftNow,
  onResume(){syncNotificationStatus();if(currentPage==='officeBoard'&&Date.now()-lastCheck>10000)refresh(true);
   else if(currentPage==='overview')openBriefing(true)},
@@ -1098,5 +1124,5 @@ window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDo
   else if(currentPage==='overview')openBriefing(true)},
  syncNotificationStatus,enableNotifications,settingsChanged,focusNote,
  openBriefing,openBriefingNote,openBriefingCalendar,renderBriefing,closureDates,weatherAppointments,
- _test:{phones,merge,scheduleSuggestion,draftSchedule,toIso,dateKey,briefingRows,nextDay,calendarEntries,memoItems,birthdayOf,canEditNote,filteredMemos}};
+ _test:{phones,merge,scheduleSuggestion,draftSchedule,postSchedule,hasDateCue,toIso,dateKey,briefingRows,nextDay,calendarEntries,memoItems,birthdayOf,canEditNote,filteredMemos}};
 })();

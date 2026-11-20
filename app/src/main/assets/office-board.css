@@ -593,6 +593,9 @@ body[data-memo-layout="roomy"] #officeBoard .officeBoardList{gap:15px!important}
 #officeBoard .officeBoardScheduleLine{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 #officeBoard .officeBoardScheduleLine .officeBoardAutoSchedule{flex:1;min-width:190px}
 #officeBoard .officeBoardScheduleClear[hidden]{display:none!important}
+/* v2.2.5: an auto-read date can be left out of the calendar with one tap. */
+#officeBoard .officeBoardAutoSchedule.is-skipped{background:#F4F1EC;color:#6A6258;text-decoration:none}
+#officeBoard .officeBoardScheduleSkip[aria-pressed="true"]{background:#FFFFFF;border-color:#B9A27F}
 
 /* Reliable office agenda: overdue work is visible without a full-screen alert. */
 .officeBoardOverdueHint{display:block;margin:6px 0;color:#9e481f;font-weight:650;font-size:.82rem}
