@@ -53,7 +53,7 @@ for(const block of code.matchAll(/([^{}]+)\{([^{}]*)\}/g)){
  assert(!/\.btn|dealType|tradeType|\.active|\.selected|contractOneTap|officeBoardPost/.test(selector),
   'Business/selection colours untouched: '+selector.slice(0,70));
 }
-assert(code.includes('body[data-app-contrast="high"][data-season-theme] header'),'High contrast keeps a plain header');
+assert(code.includes('body[data-app-contrast="high"][data-season-theme]{--theme-rain-layer:var(--theme-none)'),'High contrast drops rain streaks');
 
 async function verify(){
  const out=document.createElement('pre');out.id='theme-refresh-test';
@@ -98,10 +98,13 @@ async function verify(){
   FirstHyundaiThemes.configure({...base,theme:'autumn',themeHeader:'off'});await wait(60);
   check(getComputedStyle(document.querySelector('header')).backgroundImage.includes('theme-scene-autumn.svg'),'Header off keeps the scene on the base colours');
   document.body.setAttribute('data-app-contrast','high');
-  check(!getComputedStyle(document.querySelector('header')).backgroundImage.includes('theme-scene'),'High contrast: plain header');
+  FirstHyundaiThemes.configure({...base,theme:'autumn',weatherEffect:'rain'});await wait(40);
+  document.body.setAttribute('data-app-contrast','high');
+  const hc=getComputedStyle(document.querySelector('header')).backgroundImage;
+  check(hc.includes('theme-scene-autumn.svg')&&!hc.includes('repeating-linear-gradient'),'High contrast: scene kept, rain streaks removed');
   if(contrastBefore===null)document.body.removeAttribute('data-app-contrast');else document.body.setAttribute('data-app-contrast',contrastBefore);
   check(document.documentElement.scrollWidth<=innerWidth+1,'No horizontal overflow');
-  out.textContent='PASS five scenes, hour/rain/occasion layers, 절기 chip, unchanged geometry, high-contrast fallback';
+  out.textContent='PASS five scenes, hour/rain/occasion layers, 절기 chip, unchanged geometry, high-contrast streak removal';
  }catch(e){out.textContent='FAIL '+e.message}
  document.body.innerHTML='';document.body.appendChild(out);
 }

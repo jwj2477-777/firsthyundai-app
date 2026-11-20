@@ -94,6 +94,7 @@ body[data-season-theme]:not([data-season-theme="default"]) .sectionTitle h2{text
  color:#3F4A4C;font-weight:800}
 .overviewBriefDate .overviewTermChip.is-today::before{content:none}
 
-/* High contrast and print stay plain. */
-body[data-app-contrast="high"][data-season-theme] header{background:var(--theme-header-base)}
+/* High contrast (also part of "편하게 보기"): keep the quiet scene behind the logo side,
+   but drop the rain streaks and the top sheen so the white brand text stays crisp. */
+body[data-app-contrast="high"][data-season-theme]{--theme-rain-layer:var(--theme-none);--theme-sheen:var(--theme-none)}
 @media print{body[data-season-theme] header{background:#102D38}}
