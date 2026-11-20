@@ -477,6 +477,15 @@ function recognize(raw){
  }
  if(val('price'))smart.changed({target:E('price')}); // Derive the 10% default when missing.
  if(val('property')&&!validAddress)smart.onOpen();
+ // v2.1.98: "34평", "35평 A타입", "117A타입" → exactly ONE verified type of the
+ // resolved complex. Several A/B types or no verified pair: ask, never guess.
+ const areaQuery=window.FirstHyundaiAreaTypes?.parse?.(s);
+ if(areaQuery&&!val('exclusiveArea')){
+  const linked=window.FirstHyundaiAreaTypes.applyTo(val('property'),areaQuery,(exclusive,supply)=>{
+   apply('exclusiveArea',exclusive,found,'평형');apply('supplyInfo',supply,found,'평형');
+  });
+  if(linked.status!=='one'&&linked.message)review.push(linked.message);
+ }
  base.updateSummary();
  return {found,review};
 }
@@ -487,7 +496,8 @@ function report(data){
   const labels={dealType:'거래유형',property:'아파트',unit:'동·호수',price:'총 금액',contractDeposit:'약정 계약금',
    advance:'선송금액',interim:'중도금',interim2:'2차 중도금',monthlyRent:'월세',balanceDate:'잔금일',leaseStart:'입주일',
    leaseEnd:'종료일',contractDate:'본계약일',leaseDuration:'임대차 기간',bank:'은행',account:'계좌번호',
-   accountHolder:'예금주',interimDate:'중도금 지급일',interimDate2:'2차 중도금 지급일',address:'소재지',terms:'특약'};
+   accountHolder:'예금주',interimDate:'중도금 지급일',interimDate2:'2차 중도금 지급일',address:'소재지',terms:'특약',
+   exclusiveArea:'전용면적',supplyInfo:'평형·타입'};
   view.textContent=data.found.length?
    '✓ 자동 인식: '+data.found.map(x=>labels[x.id]||x.id).join(' · '):
    '자동으로 확정할 수 있는 항목을 찾지 못했습니다. 아래 입력란에서 직접 확인해 주세요.';

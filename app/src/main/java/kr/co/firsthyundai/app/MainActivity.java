@@ -569,6 +569,13 @@ public class MainActivity extends Activity {
                 MainActivity.this.startContractLiveVoice(requestId);
             });
         }
+        // "다 말했어요" ends the current spoken turn early. Nothing but the call crosses the bridge.
+        @JavascriptInterface public void finishContractLiveTurn(){
+            runOnUiThread(()->{
+                PublicLiveVoice session=liveSession;
+                if(session!=null)session.finishUserTurn();
+            });
+        }
         @JavascriptInterface public void stopContractLiveVoice(){
             runOnUiThread(()->{
                 String id=pendingContractLiveId;pendingContractLiveId="";

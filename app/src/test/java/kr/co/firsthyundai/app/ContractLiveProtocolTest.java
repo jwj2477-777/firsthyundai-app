@@ -115,12 +115,24 @@ public class ContractLiveProtocolTest {
         JSONObject tool=ContractLiveProtocol.tools().getJSONObject(0).getJSONArray("functionDeclarations").getJSONObject(0);
         assertEquals(ContractLiveProtocol.FUNCTION,tool.getString("name"));
         JSONObject fields=tool.getJSONObject("parameters").getJSONObject("properties");
-        assertEquals(20,fields.length());
+        assertEquals(21,fields.length());
+        assertTrue(fields.has("areaType"));
         assertTrue(fields.has("interim2"));
         assertTrue(fields.has("interimDate2"));
         assertTrue(fields.has("reviewField"));
         assertTrue(fields.has("reviewStatus"));
         for(String k:new String[]{"account","bank","address","owner","buyer","send","save","rough"})assertFalse(fields.has(k));
         assertTrue(ContractLiveProtocol.prompt().contains("기존 메모나 계약 입력란은 볼 수 없습니다"));
+    }
+    @Test public void spokenPyeongIsKeptAsWordsAndNeverAsInventedArea() throws Exception {
+        for(String ok:new String[]{"34평","35평형","35평 A타입","35평 a","117A타입","117 A 타입","84.92타입"}){
+            assertEquals(ok,ContractLiveProtocol.validated(new JSONObject().put("areaType",ok)).getString("areaType"));
+        }
+        for(String bad:new String[]{"84.92","전용 84.92㎡","3평","120평","34평 010-1234-5678","34평 계좌","평형"}){
+            reject(new JSONObject().put("areaType",bad));
+        }
+        String prompt=ContractLiveProtocol.prompt();
+        assertTrue(prompt.contains("areaType"));
+        assertTrue(prompt.contains("계산하거나 추측하지"));
     }
 }

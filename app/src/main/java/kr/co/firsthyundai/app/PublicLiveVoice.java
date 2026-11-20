@@ -72,6 +72,11 @@ final class PublicLiveVoice {
     private boolean playbackDrainScheduled=false;
     private boolean playbackResetPending=false;
     private volatile AcousticEchoCanceler echoCanceler;
+    // v2.1.98: 0.7s cut contract dictation whenever parents paused to read a
+    // document; anything said after the cut was dropped by the half-duplex gate.
+    // Contract mode waits 2s of silence, and "다 말했어요" ends the turn at once.
+    static final int CONTRACT_SILENCE_MS=2000;
+    private volatile long holdMicrophoneUntil=0;
     private static final int PCM_PRIME_BYTES=24_000*2*120/1000; // 120ms of 24kHz mono PCM16
     private static final int PCM_OUTPUT_BUFFER_BYTES=24_000*2; // 1-second hardware buffer
     PublicLiveVoice(Context context,Events events){this.context=context.getApplicationContext();this.events=events;}
@@ -140,7 +145,7 @@ final class PublicLiveVoice {
                                 .put("automaticActivityDetection",new JSONObject()
                                     .put("startOfSpeechSensitivity","START_SENSITIVITY_LOW")
                                     .put("endOfSpeechSensitivity","END_SENSITIVITY_LOW")
-                                    .put("silenceDurationMs",700));
+                                    .put("silenceDurationMs",contractMode?CONTRACT_SILENCE_MS:700));
                             if(contractMode)vad.put("activityHandling","NO_INTERRUPTION");
                             setup.put("realtimeInputConfig",vad);
                             setup.put("inputAudioTranscription",new JSONObject());
@@ -332,7 +337,7 @@ final class PublicLiveVoice {
                 }catch(Exception ignored){ /* Existing VOICE_COMMUNICATION capture still works. */ }
             }
             microphone=recorder;recorder.startRecording();
-            event("listening",contractMode?"계약 조건을 말씀하세요. 이름·주소·계좌는 말하지 마세요.":"말씀하세요. 공개된 뉴스에 대해서만 질문해 주세요.");
+            event("listening",contractMode?"계약 조건을 말씀하세요. 다 말한 뒤 '다 말했어요'를 누르면 바로 정리합니다. 이름·주소·계좌는 말하지 마세요.":"말씀하세요. 공개된 뉴스에 대해서만 질문해 주세요.");
             Thread reader=new Thread(()->{
                 // 40ms of 16kHz mono PCM16; Google's Live guidance recommends 20–40ms.
                 // A 100ms chunk can slow turn detection and feel like clipped speech.
@@ -350,6 +355,10 @@ final class PublicLiveVoice {
                     // Contract mode never forwards buffered user audio after the
                     // AI starts talking; that would become a stale imaginary reply.
                     if(contractMode&&!contractTurnGate.microphoneAllowed()){
+                        pending.clear();continue;
+                    }
+                    // Right after "다 말했어요" give Google a moment to answer the flushed turn.
+                    if(contractMode&&android.os.SystemClock.uptimeMillis()<holdMicrophoneUntil){
                         pending.clear();continue;
                     }
                     // Keep short, real user speech in memory while OkHttp is
@@ -540,6 +549,23 @@ final class PublicLiveVoice {
                 playbackResetPending=false;
             }
         }
+    }
+    /** "다 말했어요": end the user's spoken turn now instead of waiting for silence.
+     * Sends only Gemini's audioStreamEnd signal (no audio, text or contract data).
+     * Ignored while the AI is speaking or outside contract mode.
+     */
+    boolean finishUserTurn(){
+        WebSocket ws=socket;
+        if(!contractMode||!running||closed||ws==null||microphone==null)return false;
+        if(!contractTurnGate.microphoneAllowed())return false;
+        try{
+            holdMicrophoneUntil=android.os.SystemClock.uptimeMillis()+1000L;
+            boolean sent=ws.send(new JSONObject().put("realtimeInput",
+                new JSONObject().put("audioStreamEnd",true)).toString());
+            if(sent)event("thinking","말씀하신 내용을 정리하고 있습니다…");
+            else holdMicrophoneUntil=0;
+            return sent;
+        }catch(Exception e){holdMicrophoneUntil=0;return false;}
     }
     synchronized void stop(){
         if(closed)return;

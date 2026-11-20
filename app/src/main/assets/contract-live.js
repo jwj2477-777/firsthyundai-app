@@ -5,12 +5,32 @@
  const $=id=>document.getElementById(id), field=k=>$('ct_'+k);
  const LABELS={property:'아파트명 / 단지명',unit:'동·호수',dealType:'계약 유형',price:'거래금액 / 보증금',contractDeposit:'계약금',advance:'이번 송금액',
   interim:'1차 중도금',interim2:'2차 중도금',monthlyRent:'월세',contractDate:'계약일',interimDate:'1차 중도금 지급일',interimDate2:'2차 중도금 지급일',balanceDate:'잔금일',
-  leaseStart:'입주일',leaseEnd:'임대차 종료일',leaseDuration:'임대차 기간',balanceTime:'잔금 시간',terms:'특약 (기존 특약에 추가)'};
+  leaseStart:'입주일',leaseEnd:'임대차 종료일',leaseDuration:'임대차 기간',balanceTime:'잔금 시간',terms:'특약 (기존 특약에 추가)',
+  areaType:'평형·타입'};
  const MONEY=new Set(['price','contractDeposit','advance','interim','interim2','monthlyRent']);
  const DATES=new Set(['contractDate','interimDate','interimDate2','balanceDate','leaseStart','leaseEnd']);
  let active=false,stopping=false,reviewing=false,requestId='',sequence=0,proposals={},reviewStates={},selected={},failed=false;
  const REVIEW_STATES={pending:'미정',discussion:'협의 중',manual:'직접 입력',not_applicable:'해당 없음'};
  function status(text){$('cl_status').textContent=text;}
+ // v2.1.98: whose turn it is, in words parents can act on, plus "다 말했어요".
+ const TURN_TEXT={user:'듣고 있어요 · 말씀이 끝나면 아래 버튼을 눌러 주세요',ai:'AI가 말하는 중 · 끝나면 이어서 말씀하세요',
+  thinking:'정리하는 중 · 잠시만 기다려 주세요',wait:'연결하는 중…'};
+ function turn(state){
+  const dialog=$('cl_dialog'),box=$('cl_turnBox'),label=$('cl_turn'),done=$('cl_done');
+  if(dialog)dialog.dataset.turn=state||'';
+  if(box)box.hidden=!state;
+  if(label)label.textContent=TURN_TEXT[state]||'';
+  if(done)done.disabled=state!=='user';
+ }
+ function finishTurn(){
+  if(!active||stopping)return false;
+  if(!root.FirstHyundaiNative?.finishContractLiveTurn){
+   status('앱을 업데이트하면 버튼으로 바로 정리할 수 있습니다. 지금은 2초 정도 멈추면 정리합니다.');return false;
+  }
+  try{root.FirstHyundaiNative.finishContractLiveTurn();}catch(e){return false;}
+  turn('thinking');status('말씀하신 내용을 정리하고 있습니다…');
+  return true;
+ }
  function validDate(s){
   if(!/^\d{4}-\d{2}-\d{2}$/.test(s))return false;
   const d=new Date(s+'T12:00:00Z');
@@ -47,6 +67,7 @@
     }
     if(k==='leaseDuration'&&s&&!/^\d{1,3}\s*(?:년|개월)(?:\s*\d{1,2}\s*개월)?$/.test(s))return null;
     if(k==='balanceTime'&&s&&!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(s))return null;
+    if(k==='areaType'&&(s.length>20||!root.FirstHyundaiAreaTypes?.parse?.(s)))return null;
     // Defense in depth on model output; this cannot redact microphone audio already sent.
     if(/(?:계좌|예금주|주민등록|전화번호|연락처|비밀번호|은행|\d{2,4}-\d{3,4}-\d{4}|\d{10,})/.test(s))return null;
     out[k]=s;
@@ -183,7 +204,7 @@
  function open(){
   const dialog=$('cl_dialog');
   if(dialog.open)return;
-  requestId='';active=false;stopping=false;failed=false;proposals={};reviewStates={};selected={};showTalk();
+  requestId='';active=false;stopping=false;failed=false;proposals={};reviewStates={};selected={};showTalk();turn('');
   $('cl_consent').checked=false;$('cl_transcript').textContent='';render();
   status('기존 메모는 보내지 않습니다. 이번 대화에서 말씀하신 조건만 정리합니다.');
   dialog.showModal();$('cl_close').focus();
@@ -196,7 +217,7 @@
   if(Object.keys(proposals).length&&!root.confirm('새 대화는 이전 Live 검토 후보를 지웁니다. 새로 시작할까요?'))return;
   proposals={};reviewStates={};selected={};failed=false;active=true;requestId='cl-'+Date.now()+'-'+(++sequence);showTalk();render();
   root.FirstHyundaiLive?.stop?.();
-  status('Live 연결 중입니다…');
+  status('Live 연결 중입니다…');turn('wait');
   try{root.FirstHyundaiNative.startContractLiveVoice(requestId);}
   catch(e){active=false;buttons();status('연결하지 못했습니다. 기존 메모 입력을 이용해 주세요.');}
  }
@@ -210,7 +231,7 @@
   if(!force&&(Object.keys(proposals).length||Object.keys(reviewStates).length)&&
      !root.confirm('음성으로 정리한 조건이 아직 계약에 반영되지 않았습니다. 반영하지 않고 닫을까요?'))return false;
   // Invalidate request before stopping: late native/tool callbacks cannot revive the draft.
-  requestId='';
+  requestId='';turn('');
   if(active||stopping){try{root.FirstHyundaiNative?.stopContractLiveVoice?.();}catch(e){}}
   active=false;stopping=false;proposals={};reviewStates={};selected={};$('cl_transcript').textContent='';showTalk();render();
   $('cl_dialog').close();$('ct_liveOpen')?.focus?.();
@@ -240,10 +261,10 @@
    for(const key of Object.keys(p))delete reviewStates[key];
    Object.assign(proposals,p);render();return;
   }
-  if(state==='error'){active=false;stopping=true;failed=true;status(message);buttons();return;}
+  if(state==='error'){active=false;stopping=true;failed=true;turn('');status(message);buttons();return;}
   if(state==='ended'){
    if(reviewing)return; // Late/duplicate stop acknowledgements cannot reset review.
-   active=false;stopping=false;buttons();$('cl_transcript').textContent='';
+   active=false;stopping=false;turn('');buttons();$('cl_transcript').textContent='';
    if(!failed)status(Object.keys(proposals).length
     ?'음성 대화가 종료됐습니다. 아래 계약조건을 검토한 뒤 반영 여부를 결정해 주세요.'
     :'음성 대화는 종료됐지만 인식해 정리한 조건이 없습니다.');
@@ -252,8 +273,12 @@
    return;
   }
   if(!active||stopping)return;
-  if(['connecting','connected','listening','ai_speaking'].includes(state))status(message.slice(0,300));
+  if(['connecting','connected','listening','ai_speaking','thinking'].includes(state))status(message.slice(0,300));
   if(['heard','transcript'].includes(state))$('cl_transcript').textContent=(state==='heard'?'내 말: ':'AI: ')+message.slice(0,500);
+  if(state==='listening'||state==='heard')turn('user');
+  else if(state==='ai_speaking'||state==='transcript')turn('ai');
+  else if(state==='thinking')turn('thinking');
+  else if(state==='connecting'||state==='connected')turn('wait');
  }
  function apply(){
   if(active||stopping)return false;
@@ -269,7 +294,18 @@
   // Explicit deposit before price preserves the existing 10% auto-calc safeguard.
   const rank={property:0,unit:1,contractDeposit:2};
   chosen.sort(([a],[b])=>(rank[a]??3)-(rank[b]??3));
+  let areaNote='';
   for(const [k,v] of chosen){
+   if(k==='areaType'){
+    // Property is applied first (rank), so the verified catalog row is known here.
+    const areas=root.FirstHyundaiAreaTypes,query=areas?.parse?.(v);
+    const linked=query?areas.applyTo(field('property')?.value,query,(exclusive,supply)=>{
+     if(field('exclusiveArea'))field('exclusiveArea').value=exclusive;
+     if(field('supplyInfo'))field('supplyInfo').value=supply;
+    }):null;
+    areaNote=linked?.message||'';
+    continue;
+   }
    const target=field(k);if(!target)continue;
    if(k==='terms'){
     const lines=String(target.value||'').split('\n').filter(Boolean);
@@ -281,6 +317,8 @@
   root.FirstHyundaiContracts.updateSummary();
   root.FirstHyundaiEasy.afterManualEdit();
   close(true); // Already applied by an explicit user confirmation.
+  const context=$('ct_selectedComplexContext');
+  if(areaNote&&context){context.textContent='평형: '+areaNote;context.classList?.remove?.('hidden');}
   $('ct_resultPanel')?.scrollIntoView?.({behavior:'smooth',block:'start'});
   return true;
  }
@@ -308,7 +346,7 @@
  }
  root.onFirstHyundaiLiveQuotaStatus=showQuota;
  root.onFirstHyundaiContractLiveStatus=incoming;
- root.FirstHyundaiContractLive={open,start,stop,close,apply,
+ root.FirstHyundaiContractLive={open,start,stop,close,apply,finishTurn,
   onPageChange(page){if(page!=='contracts'&&$('cl_dialog').open)close(true);},
   _test:{normalize,validDate,consistency,missingConditions}};
 })(window);

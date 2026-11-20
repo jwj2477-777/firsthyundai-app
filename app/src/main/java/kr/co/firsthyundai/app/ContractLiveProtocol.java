@@ -10,7 +10,9 @@ final class ContractLiveProtocol {
     static final String FUNCTION="propose_contract_conditions";
     static final String[] MONEY={"price","contractDeposit","advance","interim","interim2","monthlyRent"};
     static final String[] DATES={"contractDate","interimDate","interimDate2","balanceDate","leaseStart","leaseEnd"};
-    static final String[] TEXT={"dealType","property","unit","leaseDuration","balanceTime","terms"};
+    static final String[] TEXT={"dealType","property","unit","areaType","leaseDuration","balanceTime","terms"};
+    // "34평", "35평 A타입", "117A타입" only. The app maps it to ONE verified type or asks.
+    static final String AREA_TYPE="(?:[1-9][0-9]\\s*평형?(?:\\s*[A-Za-z]\\s*(?:타입)?)?|[0-9]{2,3}(?:\\.[0-9]{1,2})?\\s*[A-Za-z]{0,2}\\s*타입)";
     private static boolean contains(String[] list,String key){for(String s:list)if(s.equals(key))return true;return false;}
     static String prompt(){
         return "당신은 퍼스트현대의 선택형 계약조건 음성 작성 도우미입니다. 한국어 존댓말로 짧게 대화하세요. "
@@ -41,6 +43,8 @@ final class ContractLiveProtocol {
             +"단지명과 동·호수는 필수 거래 대상 정보입니다. 개인정보라는 이유로 거절하지 마세요. "
             +"예: '송도 파크애비뉴 1604동 2101호' → property='파크애비뉴', unit='1604동 2101호'. "
             +"'동·호수'를 말씀하시면 숫자를 한 번만 또박또박 읽어 확인하세요. 단지명·동·호수를 임의로 만들지 마세요. "
+            +"사용자가 '34평', '35평 A타입', '117A타입'처럼 평형이나 타입을 말하면 들은 그대로 areaType으로 제안하세요. "
+            +"전용면적·공급면적을 계산하거나 추측하지 말고, 평형을 묻는 질문을 따로 하지 마세요. "
             +"고객 이름, 전화번호, 상세 지번·도로명주소, 은행, 계좌, 예금주, 비밀번호, 기밀은 묻거나 도구에 넣지 마세요. "
             +"그런 정보가 나오면 반복하지 말고 음성을 종료한 뒤 직접 입력하도록 안내하세요. "
             +"금액과 날짜가 불명확하면 한 번에 하나씩 되물으세요. 연도 없는 월일은 가까운 미래로 해석하되 "
@@ -80,6 +84,8 @@ final class ContractLiveProtocol {
             "아파트 단지명만. 예: 퍼스트파크 15블럭 또는 파크애비뉴. 고객명·계좌·상세 주소는 제외."));
         properties.put("unit",new JSONObject().put("type","STRING").put("description",
             "계약 대상 동·호수, 정확히 '1604동 2101호' 형식. 동과 호가 모두 확인된 경우에만 제안."));
+        properties.put("areaType",new JSONObject().put("type","STRING").put("description",
+            "사용자가 말한 평형·타입 그대로. 예: 34평, 35평 A타입, 117A타입. 면적 계산·추측 금지. 말하지 않았으면 생략."));
         properties.put("leaseDuration",new JSONObject().put("type","STRING").put("description","임대차 기간, 예: 2년 또는 24개월"));
         properties.put("balanceTime",new JSONObject().put("type","STRING").put("description","확인한 잔금 시간 HH:mm"));
         properties.put("terms",new JSONObject().put("type","STRING").put("description","이번 대화의 특약 전체. 개인정보 제외, 사용자 발언 의미 보존, 한 줄 한 항목."));
@@ -181,6 +187,7 @@ final class ContractLiveProtocol {
                         ||!java.util.regex.Pattern.compile("협의|미정|추후|초순|중순|하순|월말|월초|전후|사이|~|～").matcher(s).find())
                         throw new Exception("invalid date");
                 }
+                if(k.equals("areaType")&&!s.matches(AREA_TYPE))throw new Exception("invalid area type");
                 if(k.equals("leaseDuration")&&!s.isEmpty()&&!s.matches("[0-9]{1,3}\\s*(?:년|개월)(?:\\s*[0-9]{1,2}\\s*개월)?"))throw new Exception("invalid duration");
                 if(k.equals("balanceTime")&&!s.isEmpty()&&!s.matches("(?:[01][0-9]|2[0-3]):[0-5][0-9]"))throw new Exception("invalid time");
                 if(java.util.regex.Pattern.compile("계좌|예금주|주민등록|전화번호|연락처|비밀번호|은행|[0-9]{2,4}-[0-9]{3,4}-[0-9]{4}|[0-9]{10,}").matcher(s).find())throw new Exception("private text");
