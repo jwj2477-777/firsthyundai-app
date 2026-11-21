@@ -97,6 +97,8 @@ body:not([data-ui-accent="teal"]):not([data-ui-accent="bronze"]) #officeBoard #o
  border-right:2.2px solid currentColor;border-bottom:2.2px solid currentColor;transform:rotate(45deg)}
 :is(#trades,#officetel) .tradeAdvanced[open]>summary::after{margin-top:4px;transform:rotate(-135deg)}
 :is(#trades,#officetel) .tradeAdvanced[open]>:not(summary){margin-left:15px;margin-right:15px}
+/* v2.2.9: the 15px inset above plus width:100% pushed the name box and selects past the panel edge. */
+:is(#trades,#officetel) .tradeAdvanced[open]>:is(input,select){width:calc(100% - 30px);max-width:calc(100% - 30px);box-sizing:border-box}
 :is(#trades,#officetel) .tradeAdvanced[open]>:last-child{margin-bottom:14px}
 #contracts :is(.contractManual,.contractCompactDetails)>summary{justify-content:flex-start;gap:8px}
 #contracts :is(.contractManual,.contractCompactDetails)>summary::after{
@@ -125,3 +127,15 @@ body:not([data-ui-accent="teal"]):not([data-ui-accent="bronze"]) #officeBoard #o
 @media(prefers-reduced-motion:reduce){
  :is(#trades,#officetel) .tradeAdvanced>summary::after{transition:none}
 }
+
+/* v2.2.9 sweep — readable small text (≥4.5:1 on its card) and 44px taps.
+   Colour/size only; no layout or menu geometry change. */
+#overview .overviewNewsEntry em{color:#5A706B}
+#overview .overviewNewsEntry small{color:#4E625D}
+#overview .overviewMemoOpenCalendar,#overview .overviewNewsMore{min-height:44px}
+#news .newsLiveVoiceHeading small,#news #newsAiOfficeMeta{color:#655570}
+.complexSummaryMeta .summaryMetaLabel{color:#566A64}
+#contracts .contractSpecialMemoArea label small,#contracts .contractManual>summary small{color:#6B5948}
+#contracts .contractFlowStep{color:#5F6F6A}
+#trades .tradeAdvanced>summary small,#officetel .tradeAdvanced>summary small{color:#5A6B76}
+#officeBoard .officeBoardComposeHelp{color:#55665F}

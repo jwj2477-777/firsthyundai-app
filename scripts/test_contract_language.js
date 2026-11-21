@@ -31,6 +31,18 @@ assert.equal(language._test.moneyPart('3억 9000만원'),39000);
 assert.equal(language._test.moneyPart('오백'),500);
 assert.equal(language._test.moneyPart('2억5천5백만원'),25500);
 assert.equal(language._test.moneyPart('500만원'),500);
+// v2.2.9: digits and spoken Korean numerals mixed in one amount.
+const mixed=t=>JSON.parse(JSON.stringify(language._test.tokenizeMoney(t).map(x=>x.amount)));
+assert.deepEqual(mixed('전세 3억 구천만원'),[39000]);
+assert.deepEqual(mixed('매매 3억구천만원'),[39000]);
+assert.deepEqual(mixed('매매 12억 오천'),[125000]);
+assert.deepEqual(mixed('전세 삼억 9천만원'),[39000]);
+assert.deepEqual(mixed('보증금 1억 오백만원'),[10500]);
+assert.deepEqual(mixed('매매 3억이상'),[30000]);
+assert.deepEqual(mixed('2억 이상'),[20000]);
+assert.deepEqual(mixed('8억 일부 계약금'),[80000]);
+assert.deepEqual(mixed('계약금 1억 1차 중도금 2억'),[10000,20000]);
+assert.deepEqual(mixed('보증금 1억 월세 100'),[10000,100]);
 assert.equal(language._test.dateIn('12월 말'),null);
 assert.equal(language._test.dateIn('2026년 2월 31일'),null);
 tryNote('파크애비뉴 1604동 2101호 매매 14.3억 계약금 2억 1차 중도금 1억 1월31일');

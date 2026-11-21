@@ -13,6 +13,8 @@ import time
 from urllib.parse import urlencode, unquote
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
+from urllib.error import URLError
+import http.client
 from xml.etree import ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -290,7 +292,31 @@ def load_existing():
     return old if isinstance(old, dict) else {}
 
 
-def update(*, months=12, key=None, request=http_request, now=None):
+# 2026-11 runs ended "partial" almost every time from a single URLError (e.g. 202605:매매),
+# which put "일부 수집 실패" on the 실거래 screen although nothing was missing.
+# Network blips are retried; key/permission/API errors are never retried.
+TRANSIENT_RETRIES = 2
+TRANSIENT_PAUSES = (8, 20)
+
+
+def is_transient(exc):
+    if isinstance(exc, RuntimeError):
+        return False
+    return isinstance(exc, (URLError, TimeoutError, ConnectionError, OSError, http.client.HTTPException))
+
+
+def fetch_with_retry(request, category, month, key, *, pauses=TRANSIENT_PAUSES, sleep=time.sleep):
+    for attempt in range(TRANSIENT_RETRIES + 1):
+        try:
+            return fetch_month(request, category, month, key)
+        except Exception as exc:
+            if attempt >= TRANSIENT_RETRIES or not is_transient(exc):
+                raise
+            print(f'[RETRY] {month}:{category} {type(exc).__name__} → {attempt + 1}차 재시도', file=sys.stderr)
+            sleep(pauses[min(attempt, len(pauses) - 1)])
+
+
+def update(*, months=12, key=None, request=http_request, now=None, retry_pauses=TRANSIENT_PAUSES):
     key = key or os.getenv('DATA_GO_KR_SERVICE_KEY', '').strip()
     if not key:
         raise RuntimeError('DATA_GO_KR_SERVICE_KEY GitHub Secret을 먼저 등록하세요.')
@@ -314,7 +340,7 @@ def update(*, months=12, key=None, request=http_request, now=None):
                 continue
             bucket = f'{month}:{category}'
             try:
-                raw = fetch_month(request, category, month, key)
+                raw = fetch_with_retry(request, category, month, key, pauses=retry_pauses)
                 normalized = [result for row in raw if (result := normalize(row, category, month))]
                 normalized = unique_ids(normalized)
                 # 기존 자료가 없는 처음 조회나 빠져 있던 과거 월은 일일 신규로 오판하지 않음.

@@ -50,6 +50,17 @@ jobs:
                   return e.code,body
               except Exception:
                   return 0,{}
+          import time
+          _once=get
+          def get(url,headers=None):
+              # A dropped connection (HTTP 0) or a passing 5xx/429 from the runner's
+              # network is retried twice; a real key/config error (4xx) is not.
+              status,body=_once(url,headers)
+              for pause in (4,10):
+                  if status and status<500 and status!=429:break
+                  print('RETRY_AFTER_TRANSIENT: HTTP',status,'wait',pause,'s')
+                  time.sleep(pause);status,body=_once(url,headers)
+              return status,body
           secret=os.environ.get('KAKAO_REST_API_KEY','').strip()
           ok=True
           if not secret:
