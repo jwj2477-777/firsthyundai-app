@@ -69,6 +69,7 @@ on:
       - 'scripts/test_office_memo_real_estate_dates.js'
       - 'scripts/test_office_memo_cards_v227.js'
       - 'scripts/test_calculator_choices_browser.js'
+      - 'scripts/test_trade_sweep_v229_browser.js'
       - 'scripts/test_news_tab_wind_stability.js'
       - 'scripts/test_trade_type_direct_flow.js'
       - 'scripts/test_native_lower_tab_browser.js'
@@ -205,6 +206,7 @@ jobs:
           node scripts/test_office_memo_real_estate_dates.js
           node scripts/test_office_memo_cards_v227.js
           node scripts/test_calculator_choices_browser.js
+          node scripts/test_trade_sweep_v229_browser.js
           node scripts/test_news_tab_wind_stability.js
           node scripts/test_trade_type_direct_flow.js
           node scripts/test_native_lower_tab_browser.js
@@ -423,25 +425,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.2.8 clear login reasons APK
+      - name: Publish v2.2.9 sweep fixes APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.8.apk
-          unzip -t FirstHyundai-v2.2.8.apk | grep 'No errors detected'
-          if gh release view v2.2.8 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.9.apk
+          unzip -t FirstHyundai-v2.2.9.apk | grep 'No errors detected'
+          if gh release view v2.2.9 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.2.8 FirstHyundai-v2.2.8.apk \
+            gh release create v2.2.9 FirstHyundai-v2.2.9.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.2.8 · 로그인 안 될 때 정확한 이유 안내' \
-               --notes '새 사용자가 보안코드를 맞게 입력했는데도 요청 권한이 없습니다 · 보안코드를 다시 입력해 주세요가 뜨던 경우, 이제 정확한 이유와 해결 방법을 보여 줍니다. ① 예전에 거절됐거나 연결된 계정이 삭제된 휴대폰: 앱 데이터를 삭제하고 다시 로그인하면 새 승인 요청이 가고, 관리자센터 새 휴대폰 승인에서 승인하면 됩니다. ② 삭제된 계정을 고른 경우: 본인 계정을 다시 고르거나 관리자에게 계정을 만들어 달라고 안내합니다. ③ 이미 다른 계정으로 연결된 휴대폰: 원래 계정을 고르거나 앱 데이터를 삭제한 뒤 새로 승인받도록 안내합니다. 보안코드가 맞은 경우에는 더 이상 보안코드를 다시 입력하라고 하지 않습니다. 승인 절차와 보안 규칙은 그대로입니다. v2.2.8/build259.'
+              --title '퍼스트현대 v2.2.9 · 화면·금액 인식·수집 안정성 점검' \
+               --notes '전체 점검에서 찾은 문제를 고쳤습니다. ① 새 거래: 오늘(주말·이른 시간) 확인분이 없으면 가장 최근 거래가 있는 날을 자동으로 보여 주고, 날짜 목록에 요일과 건수(37건/없음)를 함께 표시합니다. 직접 고른 날짜는 그대로 유지됩니다. ② 실거래: 한 달 자료만 수집에 실패하고 이전 자료가 있을 때는 주황색 최신성 주의 대신 어느 달이 실패했는지 차분하게 안내합니다. ③ 상세 검색 조건: 이름 입력칸과 해제 거래 선택칸이 카드 오른쪽 밖으로 잘리던 문제와, 오피스텔 날짜 버튼이 작은 회색 기본 버튼으로 보이던 문제를 고쳤습니다. ④ 계약 메모: 3억 구천만원, 3억구천만원, 12억 오천처럼 숫자와 한글이 섞인 금액을 3억만으로 읽던 문제를 고쳤습니다. 3억 이상, 1억 1차 중도금은 그대로 따로 읽습니다. ⑤ 오늘 요약의 작은 글씨를 더 진하게 하고 달력·뉴스 더보기 버튼을 손가락으로 누르기 쉬운 크기로 키웠습니다. ⑥ 실거래 수집이 일시적인 네트워크 끊김에 두 번 다시 시도하고, 카카오 키 점검도 일시 오류에 다시 시도합니다. 고객 정보는 전송하지 않습니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.2.8 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.2.8 --apk FirstHyundai-v2.2.8.apk
+          gh release upload v2.2.9 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.2.9 --apk FirstHyundai-v2.2.9.apk
 
 
 

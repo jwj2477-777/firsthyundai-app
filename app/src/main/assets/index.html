@@ -788,7 +788,7 @@ body.apartmentSheetActive{overflow:hidden}
    </div>
   <div class="newSimpleFilters">
    <label class="newDateLabel" for="newDate">새 거래 확인일</label>
-   <select id="newDate" aria-label="신규 공개 거래 확인 날짜" onchange="clearNewAlertFocus()"></select>
+   <select id="newDate" aria-label="신규 공개 거래 확인 날짜" onchange="newDateTouched=true;clearNewAlertFocus()"></select>
    <button id="newAlertFocusReset" type="button" class="btn alt hidden" onclick="clearNewAlertFocus()">알림에서 본 거래 · 날짜별 목록으로</button>
    <div class="newQuickSearch">
     <input id="newAptFilter" placeholder="⌕ 아파트 이름 검색" aria-label="신규 거래 아파트 이름 검색" oninput="renderNew()">
@@ -3108,7 +3108,7 @@ function renderTrades(){
  const rows=records.slice(0,70);
  $('tradesContent').innerHTML=
   '<p class="tiny">검색 결과 <b>'+number(records.length)+'건</b> · '+number(rows.length)+'건 표시'+
-  (payload.state==='partial'?' <span class="pill orange">일부 수집 실패: 최신성 주의</span>':'')+'</p>'+
+  partialTradeNote(payload)+'</p>'+
   (rows.length?rows.map(x=>{
    return '<article class="'+dealArticleClass(x)+'"><div class="tagbox">'+dealBadge(x.type)+
     tradeStatusBadge(x)+tradeExtraBadges(x)+'</div>'+
@@ -3365,8 +3365,8 @@ async function refreshOne(filename,manual=false){
       $('newType').value='';$('newAptFilter').value='';
       $('newFavoriteFilter').value='favorites';
       switchPage('new');
-      if(Array.from($('newDate').options||[]).some(opt=>opt.value===date))
-       $('newDate').value=date;
+      if(Array.from($('newDate').options||[]).some(opt=>opt.value===date)){
+       $('newDate').value=date;newDateTouched=true;}
       renderNew();
      }
     });
@@ -3431,6 +3431,9 @@ function kstDateOffset(daysAgo){
  return date.toISOString().slice(0,10);
 }
 let newAlertFocusIds=null;
+// v2.2.9: until someone picks a date, 새 거래 opens on the latest day that has new trades
+// (weekends and early mornings used to open on an empty "오늘 · 0건").
+let newDateTouched=false;
 function clearNewAlertFocus(){newAlertFocusIds=null;renderNew();}
 function chooseNewType(type){
  if(!['','매매','전세','월세'].includes(type))return;
@@ -3466,8 +3469,17 @@ function openTodayNewTrades(){
  $('newFavoriteFilter').value='';
  $('newAptFilter').value='';
  switchPage('new');
- $('newDate').value=kstDateOffset(0);
+ $('newDate').value=kstDateOffset(0);newDateTouched=true;
  renderNew();
+}
+// v2.2.9: a failed month whose earlier data is still shown is not "최신성 주의" for everything.
+function partialTradeNote(payload){
+ if(payload?.state!=='partial')return '';
+ const missing=Array.isArray(payload.missing_buckets)&&payload.missing_buckets.length>0;
+ if(missing)return ' <span class="pill orange">일부 수집 실패: 최신성 주의</span>';
+ const months=(Array.isArray(payload.errors)?payload.errors:[]).map(e=>String(e).match(/^(\d{4})(\d{2}):(매매|임대)/)).filter(Boolean)
+  .map(m=>m[1].slice(2)+'년 '+Number(m[2])+'월 '+(m[3]==='임대'?'전월세':'매매')).slice(0,2);
+ return ' <span class="pill">일부 수집 실패'+(months.length?'('+escapeHtml(months.join(', '))+')':'')+' · 이전 자료로 표시</span>';
 }
 function renderNew(){
  const select=$('newDate');
@@ -3478,8 +3490,30 @@ function renderNew(){
    return '<option value="'+d+'">'+label+d+'</option>';
   }).join('');
  }
- const day=select.value||kstDateOffset(0);
+ let day=select.value||kstDateOffset(0);
  const data=remote.new_trades;
+ let autoPicked='';
+ if(data&&Array.isArray(data.records)){
+  // Day labels carry the count once the data is in: "2026-11-21 (토) · 37건".
+  const per={};for(const x of data.records){const d=x.first_seen_date;if(d)per[d]=(per[d]||0)+1}
+  const sig=String(data.checked_at||'')+'|'+kstDateOffset(0);
+  if(select.dataset&&select.dataset.newSig!==sig){
+   const keep=select.value,week='일월화수목금토';
+   select.innerHTML=Array.from({length:31},(_,i)=>{
+    const d=kstDateOffset(i),label=i===0?'오늘 · ':i===1?'어제 · ':'';
+    const dow=week[new Date(d+'T00:00:00Z').getUTCDay()]||'';
+    return '<option value="'+d+'">'+label+d+(dow?' ('+dow+')':'')+(per[d]?' · '+per[d]+'건':' · 없음')+'</option>';
+   }).join('');
+   if(keep&&Array.from(select.options).some(o=>o.value===keep))select.value=keep;
+   select.dataset.newSig=sig;
+  }
+  if(!newDateTouched&&!newAlertFocusIds&&!per[day]){
+   const latest=Object.keys(per).filter(d=>d<=kstDateOffset(0)&&d>=kstDateOffset(30)).sort().pop();
+   if(latest&&Array.from(select.options||[]).some(o=>o.value===latest)){select.value=latest;day=latest;}
+  }
+  // Keep the explanation on every re-render (filters, refresh) until the user picks a date.
+  if(!newDateTouched&&!newAlertFocusIds&&day!==kstDateOffset(0)&&!per[kstDateOffset(0)])autoPicked=day;
+ }
  updateNewQuickFilters();
  const status=$('newStatus');
  if(!data){
@@ -3489,7 +3523,8 @@ function renderNew(){
   $('newContent').innerHTML='<div class="empty">새 거래 자료를 불러오는 중입니다. 갱신 버튼을 눌러보세요.</div>';
   return;
  }
- $('newMeta').textContent='송도동 · 확인 '+compactTradeCollectedAt(data.checked_at);
+ $('newMeta').textContent='송도동 · 확인 '+compactTradeCollectedAt(data.checked_at)+
+  (autoPicked?' · 오늘 확인분이 아직 없어 '+Number(autoPicked.slice(5,7))+'월 '+Number(autoPicked.slice(8))+'일 표시':'');
  if(data.state==='not_started'){
   status.classList.toggle('hidden',true);
   status.textContent='';

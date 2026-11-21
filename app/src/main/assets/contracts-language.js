@@ -69,7 +69,7 @@ function moneyPart(text){
 function tokenizeMoney(s){
  const text=String(s||'');
  // Units written as separate Korean speech words are still part of the amount.
- const rx=/(?<![가-힣])(\d[\d,.]*(?:\s*(?:억|천|백|십|만|원))?(?:\s*\d[\d,.]*(?:\s*(?:억|천|백|십|만|원))?)*|[일이삼사오육륙칠팔구한십백천]+(?:\s*(?:억|만원|만|원))?(?:\s*[일이삼사오육륙칠팔구한십백천]+(?:천|백|십|만|원)?)*)/g;
+ const rx=/(?:(?<![가-힣])|(?<=[\d일이삼사오육륙칠팔구]억))(\d[\d,.]*(?:\s*(?:억|천|백|십|만|원))?(?:\s*\d[\d,.]*(?:\s*(?:억|천|백|십|만|원))?)*|[일이삼사오육륙칠팔구한십백천]+(?:\s*(?:억|만원|만|원))?(?:\s*[일이삼사오육륙칠팔구한십백천]+(?:천|백|십|만|원)?)*)/g;
  let m,res=[];
  while((m=rx.exec(text))!==null){
   let normalized=m[0].trim();
@@ -90,7 +90,21 @@ function tokenizeMoney(s){
   const amount=moneyPart(normalized);
   if(amount!==null&&amount>0)res.push({amount,start:m.index,end:rx.lastIndex,raw:normalized});
  }
- return res;
+ // "3억 구천만원", "3억구천만원", "12억 오천", "삼억 9천만원": digits and spoken
+ // Korean numerals mixed in one amount. The pieces arrive as two tokens; join
+ // them only when nothing but spacing separates them and the second piece has
+ // its own 천/백/십/만 unit, so "3억 이상", "1억 1차" and "3억 삼일" stay apart.
+ const merged=[];
+ for(const t of res){
+  const prev=merged[merged.length-1];
+  if(prev&&/억$/.test(prev.raw)&&!/억/.test(t.raw)&&/[천백십만]/.test(t.raw)&&t.amount<10000&&
+   /^\s{0,2}$/.test(text.slice(prev.end,t.start))){
+   merged[merged.length-1]={amount:prev.amount+t.amount,start:prev.start,end:t.end,raw:text.slice(prev.start,t.end).trim()};
+   continue;
+  }
+  merged.push(t);
+ }
+ return merged;
 }
 function amountAfter(text,terms){
  const positions=[];
