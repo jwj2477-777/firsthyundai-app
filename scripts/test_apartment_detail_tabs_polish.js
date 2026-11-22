@@ -28,7 +28,8 @@ for(const feature of [
  '실제 평균 고지서가 아니며',
  '관리사무소 전화 걸기',
  'K-apt에서 단지명으로 관리비 조회',
- '원본 사이트에서 확인할 수 있습니다'
+ '단지 원본 자료', // v2.2.12 평면도 찾기 tab keeps the source links
+ '평면도 사진 찾기'
 ])assert(script.includes(feature),'Business-critical detail functionality must remain: '+feature);
 assert(script.includes("(ready?'카카오맵 시설정보를 필요할 때 조회합니다. 거리는 직선거리입니다.':'선택한 시설을 카카오맵에서 바로 검색할 수 있습니다.')"),
  'Do not promise a live in-app lookup when only a Kakao Map search is available');

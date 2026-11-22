@@ -139,3 +139,18 @@ body:not([data-ui-accent="teal"]):not([data-ui-accent="bronze"]) #officeBoard #o
 #contracts .contractFlowStep{color:#5F6F6A}
 #trades .tradeAdvanced>summary small,#officetel .tradeAdvanced>summary small{color:#5A6B76}
 #officeBoard .officeBoardComposeHelp{color:#55665F}
+
+/* v2.2.12 · 아파트정보 > 평면도 찾기: pick a type, then one large search button. */
+#complexSheet .complexPlanStep{margin:12px 0 6px;color:#304D55;font-weight:800;font-size:.95rem;line-height:1.45;word-break:keep-all}
+#complexSheet .complexPlanStep strong{display:block;margin-top:2px;color:#137167;font-weight:800;font-size:.88rem}
+#complexSheet .complexPlanTypes{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin:0 0 6px}
+#complexSheet .complexPlanTypes button{min-height:44px;padding:8px 6px;border:1px solid #CFE0DA;border-radius:11px;
+ background:#FFFFFF;color:#304D55;font-weight:780;font-size:.9rem;line-height:1.25;word-break:keep-all}
+#complexSheet .complexPlanTypes button.active{background:#137167;border-color:#116A61;color:#FFFFFF}
+#complexSheet .complexPlanSearch{display:flex;flex-direction:column;gap:3px;min-height:56px;padding:12px 14px;border-radius:14px;
+ border:1px solid #116A61;background:#137167;color:#FFFFFF;text-decoration:none;box-shadow:0 2px 7px #1569611E}
+#complexSheet .complexPlanSearch strong{font-size:1rem;font-weight:800;color:#FFFFFF}
+#complexSheet .complexPlanSearch small{color:#D9F0EA;font-size:.8rem;line-height:1.35;word-break:break-all}
+#complexSheet .complexPlanSaved{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:#F3F8F6;border:1px solid #D9E6E1}
+#complexSheet .complexPlanSaved strong{display:block;margin-bottom:6px;color:#304D55}
+#complexSheet .complexPlanEdit{width:100%;min-height:44px;margin-top:12px}

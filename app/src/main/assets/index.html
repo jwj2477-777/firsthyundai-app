@@ -1959,6 +1959,73 @@ function displaySupplyType(apt,label){
 function displayComplexValue(v,suffix=''){
  return v===null||v===undefined||v===''?'확인 전':String(v)+suffix;
 }
+// v2.2.12 · 평면도 찾기. The app stores no floor-plan images; it lists the complex's
+// types, opens an image search for the chosen one, and names each source plainly.
+let complexPlanType='';
+function complexPlanTypes(p){
+ const out=[],seen=new Set();
+ // Shown in pyeong order (supply area), the way customers ask: "30평", "35평".
+ const verified=canonicalAreaTypes(p).slice().sort((a,b)=>a.supply_m2-b.supply_m2||a.supply_label.localeCompare(b.supply_label,'ko'));
+ for(const t of verified){
+  const py=supplyPyeong(t.supply_m2,t.market_pyeong);
+  const key=t.supply_label;
+  if(seen.has(key))continue;seen.add(key);
+  out.push({key,chip:(py?py+'평 · ':'')+t.supply_label,
+   detail:t.supply_label+'타입 · 전용 '+number(Math.round(t.exclusive_m2*100)/100)+'㎡ · 공급 '+number(t.supply_m2)+'㎡'+(py?' · 약 '+py+'평':''),
+   terms:t.supply_label+(py?' '+py+'평':'')});
+ }
+ for(const area of observedExclusiveTypes(p)){
+  const key='e'+area;
+  if(seen.has(key))continue;seen.add(key);
+  const m2=number(Math.round(area*100)/100);
+  out.push({key,chip:'전용 '+m2+'㎡',detail:'전용 '+m2+'㎡ (실거래 면적 · 공급·평형은 확인 중)',terms:Math.floor(area)+'㎡'});
+ }
+ return out.slice(0,24);
+}
+function setComplexPlanType(key){
+ complexPlanType=complexPlanType===String(key||'')?'':String(key||'');
+ renderComplexes();
+}
+// Where a link really goes, in words a parent understands.
+function sourceSiteName(url){
+ const host=(()=>{try{return new URL(url).hostname.replace(/^www\./,'')}catch(e){return ''}})();
+ return ({'k-apt.go.kr':'K-apt 공동주택관리정보','kbland.kr':'KB부동산','realty.daangn.com':'당근부동산',
+  'apt.hilite.co.kr':'하이라이트 아파트정보','fin.land.naver.com':'네이버페이 부동산','new.land.naver.com':'네이버페이 부동산'})[host]||host||'출처';
+}
+function naverImageSearch(query){
+ return 'https://search.naver.com/search.naver?where=image&query='+encodeURIComponent(query);
+}
+function renderFloorplanFinder(p,source){
+ const types=complexPlanTypes(p);
+ const chosen=types.find(t=>t.key===complexPlanType)||null;
+ const name='송도 '+p.label;
+ const saved=(Array.isArray(p.floorplans)?p.floorplans:[]).filter(v=>v&&safeLink(v.url)).slice(0,30);
+ const savedHtml=saved.length?'<div class="complexPlanSaved"><strong>사무실에 저장한 평면도</strong><div class="complexQuickLinks">'+
+  saved.map(v=>'<a href="'+escapeHtml(safeLink(v.url))+'">'+escapeHtml(v.label||'평면도')+' ↗</a>').join('')+'</div></div>':'';
+ const chips=types.length?'<div class="complexPlanTypes" role="group" aria-label="평면도 볼 타입">'+types.map(t=>
+  '<button type="button" class="'+(chosen&&chosen.key===t.key?'active':'')+'" aria-pressed="'+(chosen&&chosen.key===t.key?'true':'false')+
+  '" onclick="setComplexPlanType(\''+escapeHtml(t.key)+'\')">'+escapeHtml(t.chip)+'</button>').join('')+'</div>':
+  '<p class="tiny">이 단지는 확인된 평형 자료가 아직 없어 단지 전체 평면도로 찾아요.</p>';
+ const query=name+' '+(chosen?chosen.terms+' ':'')+'평면도';
+ const find='<a class="complexPlanSearch" href="'+escapeHtml(naverImageSearch(query))+'">'+
+  '<strong>'+escapeHtml(chosen?chosen.chip+' 평면도 사진 찾기':'이 단지 평면도 사진 찾기')+' ↗</strong>'+
+  '<small>네이버 이미지 검색 · “'+escapeHtml(query)+'”</small></a>';
+ const direct=/^https:\/\/(?:new|fin)\.land\.naver\.com\/complexes\/[0-9]{1,12}(?:[/?#]|$)/.test(p.naver_complex_url||'');
+ const naver=direct?p.naver_complex_url:
+  'https://search.naver.com/search.naver?query='+encodeURIComponent('네이버페이 부동산 '+p.label+' 송도 아파트');
+ // A saved 단지 address opens the 네이버 부동산 complex (its 평면도 tab is one tap away).
+ const links=[[direct?'네이버 부동산 단지 페이지':'네이버 부동산에서 단지 찾기',naver]];
+ const add=(label,url)=>{const safe=safeLink(url);if(safe&&!links.some(x=>x[1]===safe))links.push([label,safe])};
+ if(source)add('단지 기본정보 · '+sourceSiteName(source),source);
+ if(p.detail_source_url)add('상세 정보 · '+sourceSiteName(p.detail_source_url),p.detail_source_url);
+ return '<h3>평면도 찾기</h3>'+savedHtml+
+  '<p class="complexPlanStep">① 볼 타입을 고르세요'+(chosen?'<strong>'+escapeHtml(chosen.detail)+'</strong>':'')+'</p>'+chips+
+  '<p class="complexPlanStep">② 평면도 사진 보기</p>'+find+
+  '<p class="tiny">평면도 사진은 블로그·분양 자료 등 바깥 자료라 실제 집과 다를 수 있어요. 확장·구조 변경 여부는 분양 공고나 관리사무소로 확인해 주세요.</p>'+
+  '<h3>단지 원본 자료</h3><div class="complexQuickLinks">'+links.map(([label,url])=>
+   '<a href="'+escapeHtml(url)+'">'+escapeHtml(label)+' ↗</a>').join('')+'</div>'+
+  (role==='admin'?'<button type="button" class="btn alt complexPlanEdit" onclick="openComplexEditor();setTimeout(()=>$(\'complexFloorplans\')?.focus?.(),60)">평면도·네이버 단지 링크 저장 (관리자)</button>':'');
+}
 function setComplexDetailTab(tab){
  if(!['basic','types','schools','deals','trends','public','nearby','sources'].includes(tab))return;
  complexDetailTab=tab;
@@ -2134,6 +2201,7 @@ function renderComplexes(){
    ...matchedTypes.map(t=>({area:t.exclusive_m2,pair:t,label:t.supply_label})),
    ...observedOnly.map(area=>({area,pair:null,label:''}))
   ].sort((a,b)=>a.area-b.area||(a.label||'').localeCompare(b.label||'','ko'));
+  const planShortcut='<button type="button" class="complexPriceTrendShortcut" onclick="setComplexDetailTab(&quot;sources&quot;)">▦ 타입별 평면도 사진 찾기 ›</button>';
   const typeRows=rows.length?'<div class="complexTypeRows">'+rows.map(t=>{
    const area='전용 '+number(Math.round(t.area*100)/100)+'㎡';
    const code=t.pair?' · '+t.pair.supply_label+'타입 · 공급 '+number(t.pair.supply_m2)+'㎡':'';
@@ -2154,7 +2222,7 @@ function renderComplexes(){
     (p.supply_type_source_url?sourceLink(p.supply_type_source_url,'단지 공급타입 목록'):'');
   const areaView='<p class="complexAreaGuide">확인된 면적을 한 번씩 보여드립니다. <strong>평형은 공급면적이 확인된 경우에만</strong> 표시합니다.</p>'+
    '<p class="complexAreaCounts">공급·전용 확인 '+matchedTypes.length+'종 · 실거래 전용 추가 '+observedOnly.length+'종</p>'+
-   typeRows+typeSources;
+   typeRows+(rows.length?planShortcut:'')+typeSources;
   const stats=complexAreaStats(p),active=complexDealType;
   const dealButtons=[['','전체'],['매매','매매'],['전세','전세'],['월세','월세']]
    .map(([v,label])=>'<button type="button" class="'+(active===v?'active':'')+'" onclick="setComplexDealType(\''+v+'\')">'+label+'</button>').join('');
@@ -2169,17 +2237,7 @@ function renderComplexes(){
      '<span><strong>'+number(cnt)+'건</strong> <span class="sub">보기 ›</span></span></button>';
    }).join(''):'<div class="empty">해당 조건에 기록된 거래가 없습니다.</div>')+
    (dealRows.length>35?'<p class="tiny">목록이 길어 앞의 35개 면적만 표시했습니다. 전체 실거래가 탭을 이용해 주세요.</p>':'');
-  const floorplans=(Array.isArray(p.floorplans)?p.floorplans:[]).filter(v=>v&&safeLink(v.url)).slice(0,30);
-  const planLinks=floorplans.length?'<div class="complexQuickLinks">'+floorplans.map(v=>
-   '<a href="'+escapeHtml(safeLink(v.url))+'">'+escapeHtml(v.label||'평면도')+' ↗</a>').join('')+'</div>':
-   '<p class="tiny">직접 저장된 평면도는 없습니다. 아래 원본 사이트에서 확인할 수 있습니다.</p>';
-  const naver=/^https:\/\/(?:new|fin)\.land\.naver\.com\/complexes\/[0-9]{1,12}(?:[/?#]|$)/.test(p.naver_complex_url||'')?p.naver_complex_url:
-   'https://search.naver.com/search.naver?query='+encodeURIComponent('네이버페이 부동산 '+p.label+' 송도 아파트');
-  const doc='<h3>평면도·원본 조회</h3>'+planLinks+
-   '<div class="complexQuickLinks"><a href="'+escapeHtml(naver)+'">네이버페이 부동산 ↗</a>'+
-   (source?'<a href="'+escapeHtml(source)+'">단지정보 출처 ↗</a>':'')+
-   (safeLink(p.detail_source_url)?'<a href="'+escapeHtml(safeLink(p.detail_source_url))+'">K-apt 기반 기본정보 ↗</a>':'')+'</div>'+
-   '<p class="tiny">원본 사이트로 연결됩니다. 해당 동·블럭을 확인해 주세요. 평면도는 권한이 확인된 자료만 직접 등록합니다.</p>';
+  const doc=renderFloorplanFinder(p,source);
   const schools=Array.isArray(p.schools)?p.schools.filter(x=>x&&typeof x.name==='string'&&x.name.length<=80&&['assigned','nearby'].includes(x.classification)&&typeof x.level==='string'): [];
   const district=schoolDistrictData?.elementary_zones;
   const match=district?.state==='verified_partial' && Array.isArray(district.records)?
@@ -2846,7 +2904,7 @@ let tradeFocus=null;
 function selectComplex(id){
  const match=catalogRows().find(x=>x.id===id);
  if(!match)return;
- complexSelected=id;complexDetailTab='basic';complexDealType='';complexTrendType='매매';complexTrendArea='';complexTrendMonths=12;complexTrendIncludeRenewals=false;nearbyLiveResult=null;nearbyError='';nearbySerial++;nearbyLoading=false;
+ complexSelected=id;complexDetailTab='basic';complexPlanType='';complexDealType='';complexTrendType='매매';complexTrendArea='';complexTrendMonths=12;complexTrendIncludeRenewals=false;nearbyLiveResult=null;nearbyError='';nearbySerial++;nearbyLoading=false;
  renderComplexes();
  // Favorites can launch from a previous search without losing the target.
  if(complexSelected!==id){
