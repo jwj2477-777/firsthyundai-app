@@ -73,7 +73,13 @@ async function verify(){
    check(size(count)>=11,'Trade count text is at least 11px ('+size(count)+')');
   const idle=document.querySelector('#tradeTypeBar>button:not(.active) .typeCount');
   if(idle)check(ratio(getComputedStyle(idle).color,'rgb(255,255,255)')>=4.5,'Trade count contrast ≥ 4.5');
-  check(getComputedStyle(document.querySelector('#tradeTypeBar>button')).height==='50px','Type buttons keep their fixed height');
+  // The bigger count must still fit inside its button (office-wide reading settings
+  // may change the button height, so compare against the button itself).
+  for(const b of document.querySelectorAll('#tradeTypeBar>button')){
+   const c=b.querySelector('.typeCount');if(!c)continue;
+   const br=b.getBoundingClientRect(),cr=c.getBoundingClientRect();
+   check(cr.bottom<=br.bottom+0.5&&cr.right<=br.right+0.5&&c.scrollWidth<=c.clientWidth+1,'Count fits its button ('+c.textContent+')');
+  }
   const probe=document.createElement('span');probe.className='summaryMetaLabel';
   const card=document.createElement('span');card.className='complexSummaryMeta';card.appendChild(probe);
   const host=document.getElementById('complexCards');host.appendChild(card);
