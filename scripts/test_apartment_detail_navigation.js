@@ -38,7 +38,7 @@ const ctx=vm.createContext({
  window:{},document:{getElementById:element,body,activeElement:element('complexSearch')},
  localStorage:{getItem:()=>null,setItem(){}},
  fetch:async url=>({ok:true,json:async()=>payload[url.split('/').pop().split('?')[0]]}),
- alert(){},confirm:()=>true,console,URL,Blob
+ alert(){},confirm:()=>true,console,URL,Blob,setTimeout,clearTimeout
 });
 vm.runInContext(js,ctx);
 (async()=>{
@@ -62,7 +62,12 @@ vm.runInContext(js,ctx);
  assert.equal(element('complexSheet').getAttribute('aria-hidden'),'true');
  assert.equal(element('complexSearch').value,'프라임뷰','Previous search restored unchanged');
  assert.equal(body.classList.contains('apartmentSheetActive'),false);
- assert.equal(run('window.firstHyundaiGoBack()'),false,'Back should fall through without detail open');
+ // v2.2.13: with nothing open, Back walks back through the visited screens to the
+ // home screen, shows "한 번 더 누르면 앱이 닫혀요", and only the next press falls through.
+ let presses=0;
+ while(run('window.firstHyundaiGoBack()')!==false&&presses<25)presses++;
+ assert(presses>=1&&presses<25,'Back reaches the home screen and then leaves the app ('+presses+')');
+ assert.equal(run('currentPage'),run('appHomePage()'),'Back ends on the home screen');
  run("switchPage('nearby')");
  run("chooseNearby('all')");
  assert.equal(element('nearbyDetails').classList.contains('detailOpen'),true);

@@ -154,3 +154,40 @@ body:not([data-ui-accent="teal"]):not([data-ui-accent="bronze"]) #officeBoard #o
 #complexSheet .complexPlanSaved{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:#F3F8F6;border:1px solid #D9E6E1}
 #complexSheet .complexPlanSaved strong{display:block;margin-bottom:6px;color:#304D55}
 #complexSheet .complexPlanEdit{width:100%;min-height:44px;margin-top:12px}
+
+/* v2.2.13 · readability floor (measured on every screen at 360px): nothing a parent has
+   to read is smaller than 11px, and helper text keeps at least 4.5:1 contrast.
+   Header, menu geometry and the 매매/전세/월세 colours are untouched. */
+#overview .overviewWeatherMore{font-size:12px;color:#5A706B}
+#overview #overviewWeatherSource{font-size:11.5px;color:#5F7375}
+#overview .overviewHourlyToggleCopy small{font-size:11.5px;color:#5F7375}
+#overview .overviewHourlyHead>strong{font-size:12px;color:#50676B}
+#overview .overviewHourlyHead>small{font-size:11px;color:#62777A}
+#overview .overviewHourDate{font-size:11px;color:#5F7374}
+#overview .overviewNewsHead h3 small{font-size:12px;color:#62756F}
+#overview .overviewNewsEntry em{font-size:12px}
+:is(#trades #tradeTypeBar,#officetel #officeTypeBar,#new #newTypeBar) .typeCount{font-size:11px;color:#556B75}
+:is(#trades #tradeTypeBar,#officetel #officeTypeBar,#new #newTypeBar)>button.active .typeCount{color:#FFFFFF}
+#complexCards .complexSummaryMeta .summaryMetaLabel,#nearbyCards .summaryMetaLabel{font-size:12px;color:#4E625D}
+#officeBoard .officeBoardDay small{font-size:11px}
+#officeBoard .officeBoardCalendarWeekdays span{font-size:12px}
+#news .newsLiveVoiceHeading small,#news #newsAiOfficeMeta,#news .newsAiOfficePanel p.tiny{font-size:12px}
+#contracts #ct_manualPanel>summary small{font-size:12px}
+.inboxItem time{font-size:11.5px}
+.fhdWeatherBlockHead small{font-size:11.5px;color:#62777A}
+#adminCenter .adminPresets small{font-size:11.5px;color:#5F7171}
+/* The 15px-tall "기사 원문 확인 ›" link was hard to hit. */
+.newsAiOfficeItem a{display:inline-flex;align-items:center;min-height:40px;padding:2px 0}
+/* Back on the home screen: "한 번 더 누르면 닫혀요" */
+.fhdBackToast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9999;
+ max-width:calc(100vw - 40px);padding:11px 18px;border-radius:999px;background:#1E3438;color:#FFFFFF;font-size:14px;font-weight:700;
+ line-height:1.4;text-align:center;box-shadow:0 6px 18px rgba(12,32,36,.28);word-break:keep-all;pointer-events:none}
+.fhdBackToast[hidden]{display:none}
+/* At 320–350px "계약문자 만들기" was cut to "계약문자 만들7". Let a too-long menu label
+   wrap at the space instead; tile size and positions stay exactly as they are. */
+@media(max-width:350px){
+ #nav .primaryNav>button .navLabel,#nav .utilityNav>button:not(.adminCenterNav) .navLabel{white-space:normal;word-break:keep-all;overflow-wrap:normal}
+}
+/* Korean sentences broke inside words ("없습니 / 다"). Break between words instead;
+   a single over-long word (URL, 단지 코드) may still wrap so nothing spills sideways. */
+body{word-break:keep-all;overflow-wrap:break-word}

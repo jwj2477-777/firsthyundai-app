@@ -1452,6 +1452,9 @@ const PAGES=[['calculators','부동산 계산기'],['overview','전체 브리핑
 const $=id=>document.getElementById(id);
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeLink=url=>/^https:\/\/[a-z0-9.-]+(?:[:][0-9]+)?(?:[/?#]|$)/i.test(String(url||''))?String(url):'';
+// v2.2.13 · screens visited, for Android Back (see firstHyundaiGoBack).
+const pageTrail=[];
+let pageBackStep=false,backExitArmedAt=0,backToastTimer=null;
 let currentPage='nearby', remote={trades:null,new_trades:null,news:null,complexes:null}, issues={trades:'',new_trades:'',news:'',complexes:''}, notes=[], editing=null;
 const NATIVE=window.FirstHyundaiNative;
 let role=NATIVE?.getMode?.()==='admin'?'admin':'family';
@@ -1504,7 +1507,7 @@ window.onRoleChanged=function(next){
  }
  updateRoleBar();
  window.FirstHyundaiUIOptions?.apply?.();
- switchPage(role==='admin'?'adminCenter':generalStartPage());
+ switchPage(role==='admin'?'adminCenter':generalStartPage());pageTrail.length=0;
  refreshAll();
 };
 const NAV_CATEGORIES=[
@@ -1587,11 +1590,53 @@ function closeApartmentSheet(restoreFocus=true){
  window.FirstHyundaiScrollTop?.update?.();
  return true;
 }
+// v2.2.13 · Android Back: close what is open, then walk back through the screens the
+// user visited, then the home screen; only a second press there leaves the app.
+// (Before, Back closed the whole app from any screen, even with 알림함 or a photo open.)
+function appHomePage(){return role==='admin'?'adminCenter':generalStartPage();}
+function closeTopDialog(){
+ const open=Array.from(document.querySelectorAll?.('dialog[open]')||[]);
+ const top=open[open.length-1];
+ if(!top)return false;
+ // The same path as the Escape key, so each dialog's own cancel handler runs.
+ const cancel=new Event('cancel',{cancelable:true});
+ top.dispatchEvent(cancel);
+ if(!cancel.defaultPrevented&&top.open)top.close();
+ return true;
+}
+function showBackToast(text){
+ let toast=$('fhdBackToast');
+ if(!toast&&document.createElement){
+  toast=document.createElement('div');toast.id='fhdBackToast';toast.className='fhdBackToast';
+  toast.setAttribute('role','status');toast.setAttribute('aria-live','polite');document.body.appendChild(toast);
+ }
+ if(!toast)return;
+ toast.textContent=text;toast.hidden=false;
+ clearTimeout(backToastTimer);backToastTimer=setTimeout(()=>{toast.hidden=true},2400);
+}
+function goBackToPage(id){
+ pageBackStep=true;
+ try{switchPage(id)}finally{pageBackStep=false}
+ if(typeof scrollTo==='function')scrollTo(0,0);
+ return true;
+}
 window.firstHyundaiGoBack=function(){
  if($('fhdWeatherDialog')?.hidden===false){window.FirstHyundaiWeatherDetail?.close?.();return true;}
  if($('favoriteAlertSettingsDialog')?.open){window.FirstHyundaiTradeAlerts?.closeSettings();return true;}
  if($('favoriteTradeAlertDialog')?.open){window.FirstHyundaiTradeAlerts?.later();return true;}
- return closeApartmentSheet();
+ if(closeTopDialog())return true;
+ if(closeApartmentSheet())return true;
+ const allowed=id=>activePages().some(([key])=>key===id);
+ while(pageTrail.length){
+  const previous=pageTrail.pop();
+  if(previous!==currentPage&&allowed(previous))return goBackToPage(previous);
+ }
+ const home=appHomePage();
+ if(currentPage!==home&&allowed(home))return goBackToPage(home);
+ if(Date.now()-backExitArmedAt<2500)return false;
+ backExitArmedAt=Date.now();
+ showBackToast('뒤로 버튼을 한 번 더 누르면 앱이 닫혀요');
+ return true;
 };
 function openFavoritePriceTrend(){
  const id=nearbySelected;
@@ -1648,6 +1693,7 @@ function switchPage(id){
   trades:'전체 실거래',officetel:'오피스텔 실거래',complexes:'아파트정보',news:'뉴스',contracts:'계약문자',calculators:'부동산 계산기',
   notes:'내 자료',officeBoard:'사무실 메모',settings:'설정',security:'보안',apiGuide:'API 연결 안내',adminCenter:'시스템 관리센터'};
  if(pageNames[id])document.title='퍼스트현대 · '+pageNames[id];
+ if(!pageBackStep&&currentPage&&currentPage!==id){pageTrail.push(currentPage);if(pageTrail.length>20)pageTrail.shift();}
  currentPage=id;
  window.FirstHyundaiLive?.onPageChange?.(id);
  window.FirstHyundaiContractLive?.onPageChange?.(id);
@@ -2527,7 +2573,7 @@ function officeVerifiedRows(){
 function officeCollectionLabel(type){
  const keys=type==='매매'?['office_sales']:type?['office_rents']:['office_sales','office_rents'];
  const sources=keys.map(key=>publicServices?.[key]).filter(p=>p?.state==='verified'&&Array.isArray(p.records));
- if(!sources.length)return publicServices?'아직 수집 전':'수집 시각 확인 중';
+ if(!sources.length)return publicServices?'아직 수집 전':typeof dataNotLoaded==='function'&&dataNotLoaded('public_services')?'자료를 아직 받지 못함 · 인터넷 연결 후 ↻':'수집 시각 확인 중';
  const times=sources.map(p=>Date.parse(p.updated_at||''));
  if(times.some(t=>!Number.isFinite(t)))return '수집 시각 확인 필요';
  // All types: report the older included snapshot, never a school refresh time.
@@ -2588,7 +2634,10 @@ function renderOfficeRentals(){
  renderTypeButtons('officeTypeBar',chosenType,counts);
  const selected=scoped.filter(x=>!chosenType||x.type===chosenType)
   .sort((a,b)=>String(b.contract_date||'').localeCompare(String(a.contract_date||'')));
- const status=(salePending?'<div class="officePending">오피스텔 매매 API 활용승인·첫 수집 확인 중입니다. 아직 매매 0건으로 판단할 수 없습니다.</div>':'')+
+ // v2.2.13: with no data at all because the phone is offline, say that once instead of
+ // "확인 중" lines that never change.
+ const status=typeof dataNotLoaded==='function'&&dataNotLoaded('public_services')?'<div class="officePending">'+escapeHtml(NOT_LOADED_TEXT)+'</div>':
+  (salePending?'<div class="officePending">오피스텔 매매 API 활용승인·첫 수집 확인 중입니다. 아직 매매 0건으로 판단할 수 없습니다.</div>':'')+
   (rentPending?'<div class="officePending">오피스텔 전월세 공식 자료 확인 중입니다. 아직 거래 0건으로 판단할 수 없습니다.</div>':'');
  const hasVerified=(needsSale&&!!sales)||(needsRent&&!!rental);
  const rows=selected.slice(0,officeVisibleLimit);
@@ -2704,7 +2753,7 @@ async function refreshPublicServices(manual=false){
     schoolDistrictData=district;clearPublicOffline('school_districts');
   }
   if(doc?.schema_version!==1||!doc.schools||!doc.office_rents)throw Error('자료 형식 오류');
-  publicServices=doc;
+  publicServices=doc;publicServicesFailed=false;
   clearPublicOffline('public_services');
   window.FirstHyundaiAdminCenter?.publicError?.('');
   if(manual)showRefreshFeedback('공공정보 게시자료를 확인했습니다. 미승인 서비스는 연동 대기로 표시합니다.','success');
@@ -2713,6 +2762,7 @@ async function refreshPublicServices(manual=false){
    if(!publicOfflineStatus[name])showPublicOffline(name,0);
   window.FirstHyundaiAdminCenter?.publicError?.('공공자료 요청 또는 형식 확인 실패');
   if(manual)showRefreshFeedback('공공정보 요청 실패 · 이전 정보 유지','error');
+  publicServicesFailed=!publicServices;
  }
  renderOfficeRentals();renderPublicSubscriptions();
  window.FirstHyundaiAdminCenter?.render?.();
@@ -2934,7 +2984,7 @@ function nearbyAllRows(){
  return (remote.trades?.records||[]).filter(rec=>favoriteIdForBuilding(rec.building));
 }
 function favoriteCollectionScope(snapshot){
- if(!snapshot||snapshot.state==='not_started')return '거래 집계기간 확인 중 · 매매·전월세 합산';
+ if(!snapshot||snapshot.state==='not_started')return typeof dataNotLoaded==='function'&&dataNotLoaded('trades')?NOT_LOADED_TEXT:'거래 집계기간 확인 중 · 매매·전월세 합산';
  const date=String(snapshot.checked_at||'').match(/^(20\d{2})-(0[1-9]|1[0-2])/);
  if(!date)return '집계기간 확인 중 · 매매·전월세 합산';
  const endMonth=Number(date[1])*12+Number(date[2])-1;
@@ -3185,7 +3235,7 @@ function renderNews(){
  if(insightItems)insightItems.innerHTML='';
  if(!payload){
   $('newsMeta').textContent='AI 기사 요약 자료 확인 전';
-  if($('newsFamilyMeta'))$('newsFamilyMeta').textContent='뉴스 · 수집 확인 중';
+  if($('newsFamilyMeta'))$('newsFamilyMeta').textContent=typeof dataNotLoaded==='function'&&dataNotLoaded('news')?'뉴스 · 자료를 아직 받지 못함 · 인터넷 연결 후 ↻':'뉴스 · 수집 확인 중';
   $('newsContent').innerHTML='<div class="empty">‘설정’에서 공개 GitHub 저장소를 연결하세요.</div>';
   return;
  }
@@ -3352,6 +3402,24 @@ return fetch(target+'?t='+Date.now(),{cache:'no-store'}).then(async r=>{if(!r.ok
 // Government open-data/RSS collection happens separately in scheduled workflows.
 const refreshRunning=Object.create(null),refreshGeneration=Object.create(null);
 let refreshFeedbackSerial=0;
+// v2.2.13 · nothing published has reached this phone yet (first start without internet).
+// Replace the "확인 중" placeholders, which would otherwise never change.
+const NOT_LOADED_TEXT='인터넷 연결이 안 돼 아직 자료를 받지 못했어요 · 연결되면 ↻ 갱신을 눌러 주세요';
+let publicServicesFailed=false;
+function dataNotLoaded(name){
+ try{
+  if(name==='public_services')return !publicServices&&publicServicesFailed;
+  return !!issues[name]&&!remote[name];
+ }catch(e){return false}
+}
+function showNotLoaded(filename){
+ const short='송도동 · 자료를 아직 받지 못함 · 인터넷 연결 후 ↻';
+ const set=(id,text)=>{const el=$(id);if(el)el.textContent=text};
+ if(filename==='trades'){set('tradesMeta',short);set('nearbyCollectionMeta',short);set('nearbyPeriod',NOT_LOADED_TEXT);}
+ else if(filename==='new_trades'){set('newMeta',short);}
+ else if(filename==='news'){set('newsFamilyMeta','뉴스 · 자료를 아직 받지 못함 · 인터넷 연결 후 ↻');}
+ else if(filename==='complexes'){set('complexCollectionMeta',short);}
+}
 function setRefreshBusy(filename,busy){
  if(!document.querySelectorAll)return;
  const buttons=document.querySelectorAll('[data-refresh="'+filename+'"]');
@@ -3442,6 +3510,7 @@ async function refreshOne(filename,manual=false){
   if(seq!==refreshGeneration[filename])return {ok:false,superseded:true,filename};
   issues[filename]=e.message||String(e);
   if(remote[filename])showPublicOffline(filename,publicOfflineStatus[filename]?.savedAt||0);
+  else showNotLoaded(filename);
   result={ok:false,error:issues[filename],filename};
   if(manual)showRefreshFeedback('자료 확인 실패: '+result.error+' · 기존 화면 자료는 유지합니다.','error');
  }finally{
@@ -3580,7 +3649,7 @@ function renderNew(){
   status.classList.toggle('hidden',false);
   status.textContent='최신 자료를 아직 불러오지 못했습니다.';
   $('newCounts').innerHTML='';
-  $('newContent').innerHTML='<div class="empty">새 거래 자료를 불러오는 중입니다. 갱신 버튼을 눌러보세요.</div>';
+  $('newContent').innerHTML='<div class="empty">'+(typeof dataNotLoaded==='function'&&dataNotLoaded('new_trades')?escapeHtml(NOT_LOADED_TEXT):'새 거래 자료를 불러오는 중입니다. 갱신 버튼을 눌러보세요.')+'</div>';
   return;
  }
  $('newMeta').textContent='송도동 · 확인 '+compactTradeCollectedAt(data.checked_at)+
@@ -3624,7 +3693,7 @@ function renderNew(){
   }).join('');
 }
 
-window.FirstHyundaiTradeAlerts?.syncOption();renderInstalledAppVersion();updateRoleBar();switchPage(role==='admin'?'adminCenter':generalStartPage());refreshAll();refreshPublicServices();refreshNearbyConfig();
+window.FirstHyundaiTradeAlerts?.syncOption();renderInstalledAppVersion();updateRoleBar();switchPage(role==='admin'?'adminCenter':generalStartPage());pageTrail.length=0;refreshAll();refreshPublicServices();refreshNearbyConfig();
 
 // FirstHyundai v1.4 - Admin-only draft editor for PUBLIC apartment reference data.
 'use strict';
