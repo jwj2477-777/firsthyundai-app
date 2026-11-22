@@ -72,6 +72,7 @@ on:
       - 'scripts/test_trade_sweep_v229_browser.js'
       - 'scripts/test_office_memo_offline_browser.js'
       - 'scripts/test_floorplan_finder_browser.js'
+      - 'scripts/test_back_and_readability_browser.js'
       - 'scripts/test_news_tab_wind_stability.js'
       - 'scripts/test_trade_type_direct_flow.js'
       - 'scripts/test_native_lower_tab_browser.js'
@@ -211,6 +212,7 @@ jobs:
           node scripts/test_trade_sweep_v229_browser.js
           node scripts/test_office_memo_offline_browser.js
           node scripts/test_floorplan_finder_browser.js
+          node scripts/test_back_and_readability_browser.js
           node scripts/test_news_tab_wind_stability.js
           node scripts/test_trade_type_direct_flow.js
           node scripts/test_native_lower_tab_browser.js
@@ -429,25 +431,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.2.12 floor plan finder APK
+      - name: Publish v2.2.13 back and readability APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.12.apk
-          unzip -t FirstHyundai-v2.2.12.apk | grep 'No errors detected'
-          if gh release view v2.2.12 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.13.apk
+          unzip -t FirstHyundai-v2.2.13.apk | grep 'No errors detected'
+          if gh release view v2.2.13 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.2.12 FirstHyundai-v2.2.12.apk \
+            gh release create v2.2.13 FirstHyundai-v2.2.13.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.2.12 · 아파트정보 평면도 찾기' \
-               --notes '아파트정보의 평면도·원문 탭을 평면도 찾기로 바꿨습니다. ① 단지의 타입을 30평 · 98B, 35평 · 117A처럼 평형 순서로 보여 주고, 하나를 누르면 전용·공급 면적과 함께 그 타입의 평면도 사진을 네이버 이미지 검색으로 바로 엽니다. 확인된 평형이 없는 단지는 실거래 전용면적으로 찾습니다. ② 원본 자료 버튼이 어느 사이트로 가는지 KB부동산, K-apt 공동주택관리정보처럼 이름을 붙였습니다. 네이버 부동산 단지 주소가 저장된 단지는 단지 페이지로 바로 갑니다. ③ 사무실에 저장한 평면도 링크가 있으면 맨 위에 보여 주고, 관리자는 평면도·네이버 단지 링크를 바로 저장할 수 있습니다. 평형·타입 탭에서도 평면도 찾기로 바로 넘어갑니다. 평면도 사진은 앱에 저장하지 않고 외부 검색으로 엽니다.'
+              --title '퍼스트현대 v2.2.13 · 뒤로 버튼·읽기 쉬운 글씨' \
+               --notes '앱 전체를 다시 점검해 고쳤습니다. ① 휴대폰 뒤로 버튼을 누르면 어느 화면에서든 앱이 바로 꺼졌습니다. 이제 알림함·사진 같은 열린 창을 먼저 닫고, 그다음 방금 보던 화면으로 차례로 돌아가며, 첫 화면에서는 한 번 더 누르면 닫힌다고 알려 준 뒤 다시 눌러야 닫힙니다. ② 실거래 건수(10px), 아파트정보 주소 표시, 날씨 시간별 예보, 달력 건수 등 너무 작거나 흐린 글씨를 키우고 진하게 했습니다(메뉴·색상 배치는 그대로). ③ 좁은 휴대폰에서 메뉴의 계약문자 만들기 글자가 잘리던 것을 두 줄로 보이게 했습니다. ④ 한글 문장이 낱말 중간에서 줄바꿈되던 것을 낱말 사이에서 바뀌게 했습니다. ⑤ 처음 켰을 때 인터넷이 없으면 수집 시각 확인 중 같은 문구가 계속 남던 것을, 자료를 아직 받지 못했으니 연결 후 갱신해 달라고 알려 주도록 바꿨습니다. ⑥ 뉴스 AI 정리의 기사 원문 확인 링크를 누르기 쉬운 크기로 키웠습니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.2.12 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.2.12 --apk FirstHyundai-v2.2.12.apk
+          gh release upload v2.2.13 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.2.13 --apk FirstHyundai-v2.2.13.apk
 
 
 
