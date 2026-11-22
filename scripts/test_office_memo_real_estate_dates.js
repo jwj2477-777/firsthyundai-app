@@ -84,6 +84,17 @@ const type=text=>{el('officeBoardDraft').value=text;api._test.hasDateCue(text);}
  // Auto date shown with a skip button; skipping posts without a schedule.
  const text='27일 오후 2시 퍼스트파크 손님 8.5억';
  type(text);
+ // v2.2.11: the suggestion reads like speech, with the weekday.
+ const refresh=()=>{api.toggleScheduleSkip();api.toggleScheduleSkip();};
+ refresh();
+ const said=el('officeBoardScheduleSuggestion').textContent;
+ assert(said.includes('11월 27일 (금) 오후 2시')&&said.startsWith('▦ 자동 일정'),'Suggestion with weekday: '+said);
+ type('11월 19일 계약 완료 가상단지');refresh();
+ const past=el('officeBoardScheduleSuggestion').textContent;
+ assert(past.includes('지난 날짜')&&past.includes('11월 19일 (목)')&&past.includes('일정 빼기'),'Past date is flagged: '+past);
+ assert.equal(api._test.localDayLabel('2027-01-05T12:00'),'2027년 1월 5일 (화)','Another year is spelled out');
+ assert.equal(api._test.localClock('2026-11-27T09:30'),'오전 9:30');
+ type(text);
  const skip=el('officeBoardScheduleSkip');
  assert.equal(api._test.postSchedule(text).local,'2026-11-27T14:00');
  api.toggleScheduleSkip();

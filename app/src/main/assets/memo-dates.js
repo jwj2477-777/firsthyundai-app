@@ -81,7 +81,13 @@ function parse(text,now=new Date()){
   y=firstDay.getUTCFullYear();m=firstDay.getUTCMonth()+1;d=+relativeMonth[2];matched=true;
  }
  else if(korean||short){const x=korean||short;m=+x[1];d=+(korean?x[2]:x[3]);matched=true;
-  if(m<val('month')||(m===val('month')&&d<val('day')))y++;
+  // v2.2.11: a yearless date is the coming one, unless it fell within the last two
+  // months. "11월 21일" written on 11월 22일 is yesterday (a record), not next November;
+  // "12월 28일" written on 1월 3일 is last week; "1월 5일" in December and "6월 1일 입주"
+  // in November are still ahead.
+  const today=Date.UTC(y,val('month')-1,val('day')),at=year=>Date.UTC(year,m-1,d);
+  const future=at(y)>=today?y:y+1,past=at(y)<today?y:y-1;
+  y=today-at(past)<=62*864e5&&at(future)-today>62*864e5?past:future;
  }else if(week){
   const weeks=week[1]==='다다음'?2:week[1]==='다음'?1:0;
   shift(weeks*7+DAYS[week[2]]-baseDow);

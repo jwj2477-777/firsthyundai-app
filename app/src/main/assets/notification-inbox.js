@@ -32,7 +32,7 @@
    bell.setAttribute('title','알림함');
   }
   const count=by('notificationInboxCount');
-  if(count)count.textContent=entries.length?'최근 알림 '+entries.length+'건':'아직 받은 알림이 없습니다';
+  if(count)count.textContent=entries.length?'최근 알림 '+entries.length+'건':'최근 알림 0건';
   const list=by('notificationInboxList');
   if(list){
    list.innerHTML=entries.length?entries.map((x,index)=>'<button type="button" class="inboxItem" data-index="'+index+'" data-kind="'+

@@ -392,12 +392,31 @@ function checkSuggestion(){
  }
  el.classList?.toggle?.('hidden',!detected&&!calendarDraftDay);
  el.classList?.toggle?.('is-skipped',Boolean(detected&&!result));
- if(detected&&!result)el.textContent='▦ 일정 없이 등록 · 적힌 날짜('+detected.local.slice(0,10).replace(/-/g,'.')+')는 달력에 넣지 않아요';
- else if(result)el.textContent='▦ '+(fromCalendar?'달력에서 선택한 일정':'자동 일정')+
-  ' · '+result.local.slice(0,10).replace(/-/g,'.')+
-  (result.all_day?' · 종일':' · '+result.local.slice(11));
+ if(detected&&!result)el.textContent='▦ 일정 없이 등록 · 적힌 날짜('+localDayLabel(detected.local)+')는 달력에 넣지 않아요';
+ else if(result){
+  // v2.2.11: weekday and (when not this year) the year, so "내년 1월" or a past day is obvious.
+  const past=!fromCalendar&&result.local.slice(0,10)<todayKey();
+  el.textContent='▦ '+(fromCalendar?'달력에서 선택한 일정':past?'지난 날짜':'자동 일정')+
+   ' · '+localDayLabel(result.local)+(result.all_day?' 종일':' '+localClock(result.local))+
+   (past?' · 기록용이면 ‘일정 빼기’':'');
+ }
  else if(calendarDraftDay)el.textContent='선택한 날짜 '+calendarDraftDay.replace(/-/g,'.')+
   ' · 메모에 적힌 날짜가 올바른지 확인해 주세요.';
+}
+function todayKey(){
+ return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+}
+// "11월 21일 (토)", or "2027년 1월 5일 (화)" outside this year.
+function localDayLabel(local){
+ const [y,m,d]=String(local||'').slice(0,10).split('-').map(Number);
+ if(!y||!m||!d)return String(local||'');
+ const week='일월화수목금토'[new Date(Date.UTC(y,m-1,d)).getUTCDay()];
+ return (String(y)===todayKey().slice(0,4)?'':y+'년 ')+m+'월 '+d+'일 ('+week+')';
+}
+function localClock(local){
+ const [h,min]=String(local||'').slice(11,16).split(':').map(Number);
+ if(!Number.isFinite(h)||!Number.isFinite(min))return '';
+ return (h<12?'오전 ':'오후 ')+((h%12)||12)+(min?':'+String(min).padStart(2,'0'):'시');
 }
 function toggleScheduleSkip(){
  const detected=draftSchedule(String($('officeBoardDraft')?.value||''));
@@ -1308,5 +1327,5 @@ window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDo
   else if(currentPage==='overview')openBriefing(true)},
  syncNotificationStatus,enableNotifications,settingsChanged,focusNote,
  openBriefing,openBriefingNote,openBriefingCalendar,renderBriefing,closureDates,weatherAppointments,
- _test:{networkKindOf,ageWords,allDayText,filteredMemos,phones,merge,scheduleSuggestion,draftSchedule,postSchedule,hasDateCue,pastDue,sameDateWording,scheduleWords,toIso,dateKey,briefingRows,nextDay,calendarEntries,memoItems,birthdayOf,canEditNote,filteredMemos}};
+ _test:{localDayLabel,localClock,networkKindOf,ageWords,allDayText,filteredMemos,phones,merge,scheduleSuggestion,draftSchedule,postSchedule,hasDateCue,pastDue,sameDateWording,scheduleWords,toIso,dateKey,briefingRows,nextDay,calendarEntries,memoItems,birthdayOf,canEditNote,filteredMemos}};
 })();
