@@ -21,7 +21,7 @@ assert(page.includes("setView('compose')")&&page.includes("setView('notes')")&&p
 assert(page.indexOf('officeBoardComposeView')<page.indexOf('officeBoardNotesView')&&
  page.indexOf('officeBoardNotesView')<page.indexOf('officeBoardCalendarView'),
  'Tab order must be write, library, calendar');
-assert(js.includes('function filteredMemos()')&&js.includes('function showMore()')&&
+assert(/function filteredMemos\(/.test(js)&&js.includes('function showMore()')&&
  js.includes("call('list',{offset})"),'Search must reach older server records, not just a tiny visible page');
 assert(page.includes('메모 붙이기'));
 assert(page.includes('officeBoardCalendarDays')&&page.includes('officeBoardScheduleSuggestion'));

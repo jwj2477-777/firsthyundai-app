@@ -16,6 +16,9 @@ let lastBriefing=0,briefingBusy=false;
 const startKst=()=>kstDate(new Date());
 let selectedDate='',calendarMonth='',editingBirthday='',calendarDraftDay='',skippedSchedule='';
 let draftTimer=null,draftRestoredMember='',draftRevision=0;
+// v2.2.10: a memo the user tried to send without internet waits as the draft;
+// when the connection is back a "지금 보내기" button is offered (never sent silently).
+let sendWhenOnline=false,pendingOffered=false,offlineRetryTimer=null;
 function draftMember(){
  try{return String(bridge?.getOfficeMemberId?.()||'')}catch(e){return ''}
 }
@@ -30,6 +33,24 @@ function snapshotOffline(){
   return data;
  }catch(e){return null}
 }
+// "3시간 전" — how old the phone copy is, in words a glance can read.
+function ageWords(ms){
+ const diff=Date.now()-Number(ms);
+ if(!Number.isFinite(diff)||diff<0)return '';
+ const min=Math.floor(diff/60000);
+ if(min<1)return '방금';
+ if(min<60)return min+'분 전';
+ const hours=Math.floor(min/60);
+ return hours<24?hours+'시간 전':Math.floor(hours/24)+'일 전';
+}
+function savedWhen(ms){
+ if(!ms)return '저장 시각 정보 없음';
+ let when='';
+ try{when=new Date(ms).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'})}
+ catch(e){when=new Date(ms).toLocaleString('ko-KR')}
+ const age=ageWords(ms);
+ return when+' 저장'+(age?' ('+age+')':'');
+}
 function offlineBanner(missing=false){
  const panel=$('officeBoardOfflineBanner');if(!panel)return;
  const shouldHide=!offlineMode&&!missing;
@@ -38,13 +59,12 @@ function offlineBanner(missing=false){
  else panel.classList?.remove?.('hidden');
  if(!offlineMode&&!missing)return;
  const title=$('officeBoardOfflineTitle'),detail=$('officeBoardOfflineDetail');
- if(title)title.textContent=missing?'서버 연결 안 됨 · 보관된 메모 없음':
-  offlineChecking?'저장된 메모 · 최신 정보 확인 중':'오프라인 보관본 · 읽기 전용';
- const time=offlineCachedAt?new Date(offlineCachedAt).toLocaleString('ko-KR',
-  {year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'정보 없음';
+ if(title)title.textContent=missing?'연결 안 됨 · 이 휴대폰에 저장된 메모 없음':
+  offlineChecking?'저장된 메모를 먼저 보여 드려요 · 최신 메모 확인 중':'연결 안 됨 · 저장된 메모 보는 중';
  if(detail)detail.textContent=missing?
-  '온라인에서 메모함을 한 번 완전히 열면 다음부터 암호화된 오프라인 보관본을 이용할 수 있습니다.':
-  '마지막 동기화 '+time+' · 최신 수정·완료 여부는 반영되지 않았을 수 있습니다. 수정·삭제·전송은 온라인에서만 가능합니다.';
+  '인터넷이 될 때 공유 메모를 한 번 열어 두면, 다음부터는 인터넷이 없어도 이 휴대폰에서 볼 수 있어요.':
+  offlineChecking?savedWhen(offlineCachedAt)+' · 최신 메모를 불러오면 이 안내는 사라져요.':
+  savedWhen(offlineCachedAt)+' · 그 뒤에 바뀐 내용은 안 보일 수 있어요. 새 메모 보내기·수정·완료는 인터넷이 연결되면 할 수 있어요.';
 }
 function restoreOffline(force=false){
  const member=draftMember();
@@ -75,13 +95,65 @@ function storeOffline(notes){
 }
 function liveConnected(){
  offlineMode=false;offlineUnavailable=false;offlineChecking=false;offlineBanner();
+ if(offlineRetryTimer){clearTimeout(offlineRetryTimer);offlineRetryTimer=null;}
 }
 function useOffline(){
+ // Notes already on screen from a live sync are at least as new as the phone copy:
+ // a dropped connection must not swap them for an older copy or an empty list.
+ const member=draftMember();
+ if(!offlineMode&&historyLoaded&&items.length&&lastCheck&&member&&offlineCachedMember===member){
+  offlineMode=true;offlineUnavailable=false;offlineChecking=false;offlineCachedAt=lastCheck;
+  pendingOffered=false;offlineBanner();scheduleOfflineRetry();
+  return true;
+ }
  const exists=restoreOffline(true);
  offlineMode=!!exists;offlineUnavailable=!exists;offlineChecking=false;
  if(!exists){items=[];historyLoaded=false;}
- offlineBanner(!exists);
+ pendingOffered=false;offlineBanner(!exists);scheduleOfflineRetry();
  return exists;
+}
+// While disconnected, look again every 20 seconds on the memo or 오늘 요약 screen
+// (only while the app is on screen), and at once when the phone reports a network.
+function retryConnection(){
+ if(!offlineMode&&!offlineUnavailable)return;
+ const page=typeof currentPage==='undefined'?'':currentPage;
+ if(page==='officeBoard')refresh(true);
+ else if(page==='overview')openBriefing(true);
+}
+function scheduleOfflineRetry(){
+ if(offlineRetryTimer)clearTimeout(offlineRetryTimer);
+ offlineRetryTimer=setTimeout(()=>{
+  offlineRetryTimer=null;
+  if(!offlineMode&&!offlineUnavailable)return;
+  scheduleOfflineRetry();
+  if(typeof document==='undefined'||document.visibilityState!=='hidden')retryConnection();
+ },20000);
+ // Never keep a Node test process alive; browsers return a plain number.
+ offlineRetryTimer?.unref?.();
+}
+if(typeof window!=='undefined')window.addEventListener?.('online',()=>setTimeout(retryConnection,800));
+// v2.2.10: why a bridge call failed. The app reports a kind; older app builds only text.
+function networkKindOf(e){
+ if(typeof e?.network==='string')
+  return ['offline','timeout','interrupted','server'].includes(e.network)?e.network:'';
+ const text=String(e?.message||'');
+ if(/Unable to resolve host|No address associated|Network is unreachable|failed to connect|Connection refused|인터넷에 연결되어 있지 않습니다/i.test(text))return 'offline';
+ if(/시간 초과|timed? ?out|timeout/i.test(text))return 'timeout';
+ if(/HTTP (?:3\d\d|5\d\d|408|429)\b|연결할 수 없습니다|연결 오류|응답을 읽지 못했습니다/.test(text))return 'server';
+ if(/Connection (?:reset|closed|abort)|unexpected end of stream|SSL|Software caused|끊겼습니다/i.test(text))return 'interrupted';
+ return '';
+}
+function holdForConnection(){
+ sendWhenOnline=true;pendingOffered=false;saveDraftNow();
+ msg('인터넷이 연결되지 않아 아직 보내지 않았어요. 적은 내용은 이 휴대폰에 그대로 있어요. 연결되면 ‘지금 보내기’ 버튼이 나와요.');
+}
+function offerPendingSend(){
+ if(!sendWhenOnline||offlineMode||offlineUnavailable||pendingOffered)return false;
+ const text=String($('officeBoardDraft')?.value||'').trim();
+ if(!text&&!window.FirstHyundaiBoardImages?.pendingCount?.()){sendWhenOnline=false;return false}
+ pendingOffered=true;
+ msg('인터넷이 다시 연결됐어요. 아직 보내지 않은 메모가 있어요.',{label:'지금 보내기',run:()=>post(),keep:true});
+ return true;
 }
 function saveDraftNow(){
  if(draftTimer){clearTimeout(draftTimer);draftTimer=null;}
@@ -128,6 +200,7 @@ function finishPostedDraft(snapshot){
  if(snapshot.revision!==draftRevision||snapshot.text!==String(input.value||'')||
     snapshot.day!==calendarDraftDay){saveDraftNow();return false;}
  input.value='';calendarDraftDay='';skippedSchedule='';clearDraft();checkSuggestion();
+ sendWhenOnline=false;pendingOffered=false;
  return true;
 }
 function focusNote(id){
@@ -196,6 +269,12 @@ function canEditNote(note){
  // Do not use display names: they can change and are not unique.
  return !!ownId&&note.author?.id===ownId;
 }
+function ownOrAdmin(note){
+ if(!note)return false;
+ if(bridge?.getMode?.()==='admin')return true;
+ const ownId=String(bridge?.getOfficeMemberId?.()||'');
+ return !!ownId&&note.author?.id===ownId;
+}
 function canEditId(id){return canEditNote(items.find(note=>note.id===id))}
 function denied(){msg('이 메모는 최초 작성자 또는 관리자만 수정할 수 있습니다.')}
 let undoAction=null,undoTimer=null;
@@ -206,9 +285,9 @@ function msg(text,undo){
  // v2.2.7: an accidental 완료 tap can be undone right where the message appears.
  if(undo&&typeof document.createElement==='function'&&typeof box.append==='function'){
   const button=document.createElement('button');
-  button.type='button';button.className='officeBoardUndo';button.textContent=undo.label||'되돌리기';
+  button.type='button';button.className='officeBoardUndo'+(undo.keep?' officeBoardSendNow':'');button.textContent=undo.label||'되돌리기';
   box.append(' ',button);undoAction=undo.run;
-  undoTimer=setTimeout(()=>{undoAction=null;button.remove?.()},12000);
+  if(!undo.keep)undoTimer=setTimeout(()=>{undoAction=null;button.remove?.()},12000);
  }
 }
 $('officeBoardFeedback')?.addEventListener?.('click',e=>{
@@ -233,6 +312,14 @@ function dateText(value){
  if(!Number.isFinite(d.getTime()))return '';
  return d.toLocaleString('ko-KR',{timeZone:'Asia/Seoul',month:'numeric',day:'numeric',
   hour:'numeric',minute:'2-digit',hour12:preferences().memoClock!=='24'});
+}
+// "11. 30. (월) 종일" — the same shape as timed schedules ("11. 23. 오후 2:00").
+function allDayText(value){
+ const day=kstDate(value);
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(day))return '종일';
+ const [y,m,d]=day.split('-').map(Number);
+ const week='일월화수목금토'[new Date(Date.UTC(y,m-1,d)).getUTCDay()];
+ return m+'. '+d+'. ('+week+') 종일';
 }
 function phones(value){
  if(window.FirstHyundaiPhones?.linkify)
@@ -474,10 +561,10 @@ function clearFilters(){
  draw();
 }
 function showMore(){memoLimit+=PAGE_SIZE;draw()}
-function filteredMemos(){
+function filteredMemos(status=memoStatus){
  const q=memoQuery;
  return memoItems().filter(note=>{
-  if(memoStatus==='active'&&note.done||memoStatus==='done'&&!note.done)return false;
+  if(status==='active'&&note.done||status==='done'&&!note.done)return false;
   if(memoAuthor&&note.author?.id!==memoAuthor)return false;
   if(q){
    const source=[note.text,note.author?.name,dateText(note.created_at),
@@ -513,6 +600,13 @@ function syncFinder(memos,filtered){
  setText('officeBoardDoneCount',done);
  setText('officeBoardTotalCount',memos.length);
  setText('officeBoardListResult',historyLoading?'이전 메모 검색 범위까지 불러오는 중…':filtered.length+'건 중 '+Math.min(filtered.length,memoLimit)+'건 표시');
+ // v2.2.10: a search on "진행 중" used to hide a finished customer's memo silently.
+ const elsewhere=$('officeBoardSearchElsewhere');
+ if(elsewhere){
+  const hidden=memoQuery&&memoStatus!=='all'?filteredMemos('all').length-filtered.length:0;
+  elsewhere.hidden=!(hidden>0);
+  if(hidden>0)elsewhere.textContent=(memoStatus==='active'?'완료된 메모':'진행 중 메모')+'에도 '+hidden+'건 있어요 · 전체 보기';
+ }
  for(const [mode,id] of [['active','officeBoardStatusActive'],['done','officeBoardStatusDone'],['all','officeBoardStatusAll']]){
   const e=$(id);if(!e)continue;
   e.classList?.toggle?.('selected',memoStatus===mode);
@@ -587,14 +681,14 @@ function draw(){
     '<button class="officeBoardDoneAction" data-action="done" data-id="'+id+'">'+(note.done?'완료 취소':'완료')+'</button>'+
     '<button data-action="edit" data-id="'+id+'">수정</button>'+
     (more.length?'<details class="officeBoardMoreActions"><summary>더보기</summary><div class="officeBoardMoreList">'+more.join('')+'</div></details>':'')
-    :'<span class="officeBoardReadOnly">작성자·관리자만 수정 가능</span>');
+    :'<span class="officeBoardReadOnly">'+(offlineMode&&ownOrAdmin(note)?'인터넷 연결 후 수정 가능':'작성자·관리자만 수정 가능')+'</span>');
   const label=note.done?'<span class="officeBoardNoteLabel">✓ 완료</span>':
    overdue?'<span class="officeBoardNoteLabel officeBoardNoteLabelOverdue">⚠ 일정 지남</span>':'';
   return '<article class="officeBoardNote'+(note.done?' completed':'')+(overdue?' overdue':'')+'" data-note="'+id+'">'+
    '<div class="officeBoardNoteTop">'+label+
     (note.pinned?'<span class="officeBoardPinned">📌 중요</span>':'')+
    '<span class="officeBoardAuthor">'+esc(note.author?.name||'작성자 미기록')+'</span><time>'+esc(dateText(note.created_at))+'</time></div>'+
-   body+(note.scheduled_at?'<div class="officeBoardNoteSchedule">▦ '+esc(note.all_day?kstDate(note.scheduled_at)+' · 종일':dateText(note.scheduled_at))+
+   body+(note.scheduled_at?'<div class="officeBoardNoteSchedule">▦ '+esc(note.all_day?allDayText(note.scheduled_at):dateText(note.scheduled_at))+
      (!note.all_day&&!note.done&&!overdue?'<small class="officeBoardReminderHint">🔔 시작 30분 전 알림</small>':'')+'</div>':'')+
    (overdue?'<small class="officeBoardOverdueHint">'+(editable?'일정이 지났어요 · 끝났으면 ‘완료’를 눌러 주세요.':'일정이 지났어요.')+'</small>':'')+
     (offlineMode&&Array.isArray(note.images)&&note.images.length?'<small class="officeBoardReminderHint">사진은 인터넷에 연결되면 볼 수 있습니다.</small>':'')+
@@ -619,7 +713,7 @@ function call(action,payload){
  if(typeof bridge?.officeBoardAction!=='function')return Promise.reject(Error('메모 공유는 최신 안드로이드 앱에서 지원합니다.'));
  const id='postit'+(++sequence);
  return new Promise((resolve,reject)=>{
-  const timeout=setTimeout(()=>{requests.delete(id);reject(Error('서버 응답 시간 초과'))},16000);
+  const timeout=setTimeout(()=>{requests.delete(id);const late=Error('서버 응답 시간 초과');late.network='timeout';reject(late)},16000);
   requests.set(id,{resolve:x=>{clearTimeout(timeout);resolve(x)},reject:e=>{clearTimeout(timeout);reject(e)}});
   try{bridge.officeBoardAction(action,JSON.stringify(payload||{}),id)}
   catch(e){clearTimeout(timeout);requests.delete(id);reject(e)}
@@ -648,7 +742,9 @@ window.onFirstHyundaiOfficeBoardResult=e=>{
  if(e.ok)result.resolve(e.data);
  else{
   if(e.needsAuth)$('officeBoardAuth')?.classList?.remove?.('hidden');
-  result.reject(Error(e.error||'게시판을 읽을 수 없습니다.'));
+  const error=Error(e.error||'게시판을 읽을 수 없습니다.');
+  if(typeof e.network==='string')error.network=e.network;
+  result.reject(error);
  }
 };
 function merge(server){
@@ -735,7 +831,10 @@ function renderBriefing(){
    '<span class="overviewMemoCopy">'+esc(title)+'</span>'+
    '<span class="overviewMemoArrow" aria-hidden="true">›</span></button>';
  }).join('');
- target.innerHTML=(overdue.length?
+ // v2.2.10: 오늘 요약 must say when it is showing the phone copy, not live data.
+ const stale=offlineMode&&!offlineChecking&&offlineCachedAt?
+  '<p class="overviewMemoOffline">연결 안 됨 · 휴대폰에 저장된 일정 ('+esc(savedWhen(offlineCachedAt).replace(' 저장 (',', ').replace(/\)$/,''))+')</p>':'';
+ target.innerHTML=stale+(overdue.length?
    '<div class="officeBoardOverdueHeading">⚠ 지난 미완료 일정 '+overdue.length+'건 · 확인 필요</div>'+
    row(overdue.slice(0,5)):'')+row(todayNotes);
 }
@@ -747,11 +846,12 @@ function openBriefing(force=false){
  if(target&&!lastBriefing)target.textContent='공유 일정을 확인하는 중…';
  readAllBoard().then(notes=>{
   liveConnected();merge(notes);
-  lastBriefing=Date.now();
+  lastBriefing=Date.now();offerPendingSend();
  },()=>{
   if(restoreOffline(true)){
-   offlineChecking=false;offlineBanner();renderBriefing();
+   offlineChecking=false;offlineBanner();renderBriefing();scheduleOfflineRetry();
   }else if(target&&!lastBriefing){
+   scheduleOfflineRetry();
    $('overviewMemoBriefing').hidden=false;
    target.textContent='일정 연결이 되지 않고 휴대폰 저장본도 없습니다.';
   }
@@ -791,7 +891,8 @@ async function refresh(silent=false){
   if(!first.has_more){
    historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;
    const saved=storeOffline(items);liveConnected();draw();
-   if(!silent)msg(saved?'최신 메모를 불러왔어요 · '+clockNow():'최신 메모를 불러왔어요 · 휴대폰 보관은 실패해 인터넷이 끊기면 볼 수 없어요.');return}
+   if(!silent)msg(saved?'최신 메모를 불러왔어요 · '+clockNow():'최신 메모를 불러왔어요 · 휴대폰 보관은 실패해 인터넷이 끊기면 볼 수 없어요.');
+   offerPendingSend();return}
   if(silent&&historyLoaded&&Date.now()-lastFullHistory<5*60000)return;
   historyLoaded=false;historyLoading=true;draw();
   const seen=new Map(recent.map(n=>[n.id,n]));
@@ -813,6 +914,7 @@ async function refresh(silent=false){
   historyLoaded=true;lastFullHistory=Date.now();historyLoading=false;
   const saved=storeOffline(items);liveConnected();draw();
   if(!silent)msg(saved?'최신 메모를 불러왔어요 · '+clockNow():'최신 메모를 불러왔어요 · 휴대폰 보관은 실패해 인터넷이 끊기면 볼 수 없어요.');
+  offerPendingSend();
  }catch(e){
   if(cycle===refreshCycle){
    historyLoading=false;
@@ -822,10 +924,12 @@ async function refresh(silent=false){
     draw();if(!silent)msg('메모 공유는 안드로이드 앱에서 지원합니다.');
     return;
    }
+   const kind=networkKindOf(e);
    const cached=useOffline();draw();
-   if(!silent||!cached)msg(cached?
-    '서버 연결 실패 · 휴대폰에 저장된 마지막 메모를 읽기 전용으로 표시합니다.':
-    '메모 연결 실패 · 휴대폰에 보관된 메모가 없습니다. 인터넷 연결 후 다시 확인해 주세요.');
+   if(!silent||!cached)msg(kind||!e?.message?
+    (cached?'인터넷에 연결되지 않았어요. 이 휴대폰에 저장된 메모를 보여 드려요.':
+     '인터넷에 연결되지 않았고 이 휴대폰에 저장된 메모도 없어요. 연결되면 다시 확인해 주세요.'):
+    String(e.message)+(cached?' · 이 휴대폰에 저장된 메모를 보여 드려요.':''));
   }
  }
 }
@@ -877,7 +981,7 @@ function open(){
  restoreDraft();checkSuggestion();refresh();
 }
 async function mutate(action,data){
- if(offlineMode){msg('오프라인 보관본은 읽기 전용입니다. 수정·완료·삭제는 연결 후 가능합니다.');return null}
+ if(offlineMode){msg('인터넷이 연결되지 않아 지금은 볼 수만 있어요. 수정·완료·삭제는 연결되면 할 수 있어요.');return null}
  if(busy)return null;
  busy=true;$('officeBoardPost').disabled=true;
  try{
@@ -903,15 +1007,24 @@ async function mutate(action,data){
   else msg(text);
   return result;
  }catch(e){
-  if(/HTTP 5\d\d|연결할 수 없습니다|시간 초과/i.test(String(e.message||'')))useOffline();
-   // A timeout after sending does NOT prove the server rejected the memo.
-  // Retain only volatile text/date metadata for verification on a retry.
-  if(action==='post'&&/시간 초과|연결|HTTP 5\d\d/i.test(String(e.message||'')))
-   ambiguousPost={data:{...data},startedAt:postStartedAt};
+  const kind=networkKindOf(e);
+  // Only a missing network (or a server/Wi-Fi page without board data) switches to the
+  // phone copy. One slow answer does not: the next tap simply tries again.
+  if(kind==='offline'||kind==='server')useOffline();
+  // A timeout or a broken connection after sending does NOT prove the server
+  // rejected the memo ("offline" means nothing left the phone). Retain only
+  // volatile text/date metadata for verification on a retry.
+  if(action==='post'&&kind&&kind!=='offline'){
+   ambiguousPost={data:{...data},startedAt:postStartedAt};sendWhenOnline=true;pendingOffered=false;
+  }
   const conflict=action!=='post'&&/HTTP 409|edit_conflict/.test(String(e.message||''));
-  msg(ambiguousPost&&action==='post'?
+  if(action==='post'&&kind==='offline')holdForConnection();
+  else msg(ambiguousPost&&action==='post'?
    '전송 결과를 확인하지 못했습니다. 다시 누르면 최근 등록 여부부터 확인합니다.':
-   conflict?'다른 휴대전화에서 먼저 수정했습니다. 최신 메모를 다시 불러온 뒤 변경해 주세요.':e.message);
+   conflict?'다른 휴대전화에서 먼저 수정했습니다. 최신 메모를 다시 불러온 뒤 변경해 주세요.':
+   kind==='offline'?'인터넷이 연결되지 않아 반영하지 못했어요. 연결되면 다시 눌러 주세요.':
+   kind?'인터넷 연결이 불안정해 반영됐는지 확인하지 못했어요. 연결되면 메모를 다시 불러와 확인해 주세요.':
+   e.message);
   if(conflict){editing='';editDraft='';setTimeout(()=>refresh(true),0);}
   return null;
  }
@@ -921,7 +1034,10 @@ let postStartedAt=0;
 async function post(){
  // Covers the entire compose -> server post -> optional photo upload flow.
  // The generic mutation lock ends before optional photo upload completes.
- if(offlineMode){msg('오프라인에서는 전송하지 않습니다. 작성 중인 내용은 휴대폰에 보관됩니다.');saveDraftNow();return}
+ if(offlineMode){
+  if(offlineChecking){msg('최신 메모를 확인하는 중이에요. 잠시 후 다시 눌러 주세요.');return}
+  if(!String($('officeBoardDraft')?.value||'').trim()&&!window.FirstHyundaiBoardImages?.pendingCount?.()){msg('메모를 적거나 사진을 첨부해 주세요.');return}
+  holdForConnection();return}
  if(postInFlight||busy){msg('메모 등록이 진행 중입니다. 중복으로 올리지 않도록 잠시 확인해 주세요.');return}
  postInFlight=true;
  try{
@@ -951,7 +1067,11 @@ async function post(){
   if(same){
    let recent;
    try{recent=await call('list',{offset:0})}
-   catch(e){msg('이전 등록 여부를 확인하지 못했습니다. 연결 후 다시 눌러 주세요.');return}
+   catch(e){
+    const kind=networkKindOf(e);
+    if(kind==='offline'||kind==='server')useOffline();
+    sendWhenOnline=true;pendingOffered=false;
+    msg('이전 등록 여부를 확인하지 못했습니다. 연결 후 다시 눌러 주세요.');return}
    const member=String(bridge?.getOfficeMemberId?.()||'');
    const found=(recent.notes||[]).find(n=>n?.text===data.text&&
     n?.scheduled_at===data.scheduled_at&&n?.all_day===data.all_day&&
@@ -1188,5 +1308,5 @@ window.FirstHyundaiOfficeBoard={open,refresh,post,edit,cancelEdit,saveEdit,setDo
   else if(currentPage==='overview')openBriefing(true)},
  syncNotificationStatus,enableNotifications,settingsChanged,focusNote,
  openBriefing,openBriefingNote,openBriefingCalendar,renderBriefing,closureDates,weatherAppointments,
- _test:{phones,merge,scheduleSuggestion,draftSchedule,postSchedule,hasDateCue,pastDue,sameDateWording,scheduleWords,toIso,dateKey,briefingRows,nextDay,calendarEntries,memoItems,birthdayOf,canEditNote,filteredMemos}};
+ _test:{networkKindOf,ageWords,allDayText,filteredMemos,phones,merge,scheduleSuggestion,draftSchedule,postSchedule,hasDateCue,pastDue,sameDateWording,scheduleWords,toIso,dateKey,briefingRows,nextDay,calendarEntries,memoItems,birthdayOf,canEditNote,filteredMemos}};
 })();

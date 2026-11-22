@@ -844,9 +844,14 @@ public class MainActivity extends Activity {
                         (needsAdmin||editAction)&&authorizedAdmin?adminToken:null);
                     event.put("requestId",requestId).put("ok",true).put("data",data);
                 }catch(Exception e){
+                    // v2.2.10: network failures arrive as a kind plus Korean text, never as
+                    // raw English exception text ("Unable to resolve host ...").
+                    String kind=OfficeBoardClient.networkKind(e);
+                    String friendly=OfficeBoardClient.networkMessage(kind);
                     try{event.put("requestId",requestId).put("ok",false)
                         .put("needsAuth",!OfficeBoardClient.enrolled(getApplicationContext()))
-                        .put("error",e.getMessage()==null?"메모 공유 연결 실패":e.getMessage());}
+                        .put("network",kind)
+                        .put("error",friendly!=null?friendly:e.getMessage()==null?"메모 공유 연결 실패":e.getMessage());}
                     catch(Exception ignored){}
                 }
                 deliver("onFirstHyundaiOfficeBoardResult",event);
