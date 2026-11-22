@@ -42,5 +42,7 @@ const js=html.split('<script>')[1].split('</script>')[0];
 new vm.Script(js);
 assert(js.includes('자료 차이·확인사항 보기'),'Conflicts must be visible in the app');
 assert(js.includes('parking_alt_total:p.parking_alt_total??null'),'Export must preserve alternate source amounts');
-assert(js.includes('K-apt 기반 기본정보'),'Users need source link for K-apt figures');
+// v2.2.12: source links are named by the site they open (K-apt, KB부동산, 당근부동산...).
+assert(js.includes("'k-apt.go.kr':'K-apt 공동주택관리정보'")&&js.includes("add('상세 정보 · '+sourceSiteName(p.detail_source_url)"),
+ 'Users need source link for K-apt figures');
 console.log('Verified 13-complex completion, four parking conflicts, heating uncertainty and visible audit links');

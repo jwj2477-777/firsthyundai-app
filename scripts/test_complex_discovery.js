@@ -52,7 +52,7 @@ vm.runInContext(js,ctx);
  el('complexSearch').value='';
  run('renderComplexes()');
  run("setComplexDetailTab('sources')");
- assert(el('complexDetails').innerHTML.includes('네이버페이 부동산'));
+ assert(el('complexDetails').innerHTML.includes('네이버 부동산'));// v2.2.12 label
  assert(!html.includes('id="complexScope"'),'Apartment search must not show a redundant scope dropdown');
  el('complexSearch').value='퍼스트파크';run('renderComplexes()');
  assert(!el('complexCards').innerHTML.includes('송도테스트신규아파트'),'Name filtering still applies');
