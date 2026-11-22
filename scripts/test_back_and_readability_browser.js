@@ -29,7 +29,10 @@ async function verify(){
   const trailBefore=pageTrail.join('>');
   // Something in the page may switch screens on its own (CI showed home=overview);
   // start the home-screen check from a clean history.
-  if(currentPage!==home)switchPage(home);
+  // Office-wide settings can change the start page after load (CI is online and
+  // received start=overview), so ask for the home screen again here.
+  const homeNow=appHomePage();
+  if(currentPage!==homeNow)switchPage(homeNow);
   const sheetBefore=String(activeApartmentSheet||'');
   closeApartmentSheet(false);
   pageTrail.length=0;
