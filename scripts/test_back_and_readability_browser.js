@@ -26,11 +26,16 @@ async function verify(){
   for(const d of document.querySelectorAll('dialog[open]'))d.close();
   const weather=document.getElementById('fhdWeatherDialog');if(weather)weather.hidden=true;
   backExitArmedAt=0;
-  check(back()===true,'First Back on home is kept');
+  const trailBefore=pageTrail.join('>');
+  // Something in the page may switch screens on its own (CI showed home=overview);
+  // start the home-screen check from a clean history.
+  if(currentPage!==home)switchPage(home);
+  pageTrail.length=0;
+  check(back()===true,'First Back on home is kept (trail was '+trailBefore+')');
   const toast=document.getElementById('fhdBackToast');
   check(toast&&!toast.hidden&&toast.textContent.includes('한 번 더 누르면'),'Exit warning shown · open='+
    [...document.querySelectorAll('dialog[open]')].map(d=>d.id).join(',')+' page='+currentPage+' home='+appHomePage()+
-   ' toast='+(toast?toast.hidden+'/'+toast.textContent:'none'));
+   ' toast='+(toast?toast.hidden+'/'+toast.textContent:'none')+' trail='+trailBefore);
   check(back()===false,'Second Back leaves the app');
   // 3) An open dialog closes first and the screen stays.
   await wait(2600);
