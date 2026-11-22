@@ -78,3 +78,20 @@ assert.equal(parse('퍼스트파크 1502동 3004호 연락처',at),null);
 assert.equal(parse('일반 공지 메모',at),null);
 assert.equal(parse('2월 30일',at),null);
 console.log('Natural Korean relative dates, weekdays, explicit dates, all-day and KST conversion passed.');
+
+// v2.2.11: a yearless date is the coming one unless it fell within the last two months.
+{
+ const on=(day,text)=>parse(text,new Date(day+'T10:00:00+09:00'))?.local.slice(0,10);
+ assert.equal(on('2026-12-20','1월 5일 잔금'),'2027-01-05','January written in December is next year');
+ assert.equal(on('2026-11-22','11월 21일 잔금 완료'),'2026-11-21','Yesterday stays yesterday, not next November');
+ assert.equal(on('2026-12-20','12월 1일 계약'),'2026-12-01','Earlier this month is a record');
+ assert.equal(on('2027-01-03','12월 28일 잔금'),'2026-12-28','Last week across New Year');
+ assert.equal(on('2026-11-22','10월 1일 계약'),'2026-10-01','Within two months back');
+ assert.equal(on('2026-11-22','9월 15일 입주'),'2027-09-15','More than two months back means next year');
+ assert.equal(on('2026-11-22','6월 1일 입주'),'2027-06-01','A move-in in June is ahead');
+ assert.equal(on('2026-11-22','2월 28일 잔금'),'2027-02-28');
+ assert.equal(on('2026-11-22','12/24 방문'),'2026-12-24');
+ assert.equal(on('2026-11-22','11월 22일 오후 3시'),'2026-11-22','Today is today');
+}
+console.log('memo yearless dates: nearest sensible year');
+

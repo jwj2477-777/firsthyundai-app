@@ -13,6 +13,7 @@ import re
 from pathlib import Path
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
+import time
 from xml.etree import ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -183,8 +184,24 @@ def make_briefs(news):
     return groups[:MAX_BRIEFS]
 
 
-def update(*, request=http_request, now=None):
+# Google 뉴스가 몇 분간 모든 피드에 503을 주는 일이 있다(2026-11-21 19:09 UTC 실패).
+# 전부 실패한 경우에만 잠시 쉬고 한 번 더 시도한다.
+ALL_FAILED_RETRY_PAUSE=45
+
+
+def update(*, request=http_request, now=None, sleep=time.sleep, retry_pause=ALL_FAILED_RETRY_PAUSE):
     now=now or datetime.now(KST)
+    out=_collect(request, now)
+    if out is None and retry_pause:
+        print(f'[WARN] 모든 RSS 실패 · {retry_pause}초 뒤 한 번 더 시도')
+        sleep(retry_pause)
+        out=_collect(request, now)
+    if out is None:
+        raise RuntimeError('모든 RSS 수집 실패: 기존 뉴스 자료 유지')
+    return out
+
+
+def _collect(request, now):
     all_rows=[]; errors=[]; success=0
     for category,queries in TOPICS.items():
         for query in queries:
@@ -201,7 +218,7 @@ def update(*, request=http_request, now=None):
                 errors.append(f'{category}/{query}: {type(exc).__name__}')
                 print(f'[WARN] RSS 실패: {category} / {query}: {exc}')
     if success==0:
-        raise RuntimeError('모든 RSS 수집 실패: 기존 뉴스 자료 유지')
+        return None
     news=deduplicate(all_rows)[:MAX_ENTRIES]
     briefs=make_briefs(news)
     out={
