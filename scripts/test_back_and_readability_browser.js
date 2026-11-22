@@ -30,12 +30,14 @@ async function verify(){
   // Something in the page may switch screens on its own (CI showed home=overview);
   // start the home-screen check from a clean history.
   if(currentPage!==home)switchPage(home);
+  const sheetBefore=String(activeApartmentSheet||'');
+  closeApartmentSheet(false);
   pageTrail.length=0;
   check(back()===true,'First Back on home is kept (trail was '+trailBefore+')');
   const toast=document.getElementById('fhdBackToast');
   check(toast&&!toast.hidden&&toast.textContent.includes('한 번 더 누르면'),'Exit warning shown · open='+
    [...document.querySelectorAll('dialog[open]')].map(d=>d.id).join(',')+' page='+currentPage+' home='+appHomePage()+
-   ' toast='+(toast?toast.hidden+'/'+toast.textContent:'none')+' trail='+trailBefore);
+   ' toast='+(toast?toast.hidden+'/'+toast.textContent:'none')+' trail='+trailBefore+' sheet='+sheetBefore+' weather='+(weather?weather.hidden:'-')+' cl='+(document.getElementById('cl_dialog')?.open));
   check(back()===false,'Second Back leaves the app');
   // 3) An open dialog closes first and the screen stays.
   await wait(2600);
