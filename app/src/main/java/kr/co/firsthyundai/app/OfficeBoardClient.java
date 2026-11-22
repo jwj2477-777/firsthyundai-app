@@ -355,7 +355,9 @@ final class OfficeBoardClient {
                 throw new Exception("요청 권한이 없습니다. 관리자에게 계정 상태를 확인해 주세요.");
             }
             if(status<200||status>=300)throw new Exception("게시판 서버에 연결할 수 없습니다. HTTP "+status);
-            return new JSONObject(bytes.toString("UTF-8"));
+            // A Wi-Fi sign-in page can answer 200 with HTML instead of the board's JSON.
+            try{return new JSONObject(bytes.toString("UTF-8"));}
+            catch(org.json.JSONException notJson){throw new Exception(BAD_RESPONSE);}
         }finally{if(connection!=null)connection.disconnect();}
     }
     static final String DEVICE_REVOKED="이 휴대폰은 예전에 승인이 거절됐거나, 연결돼 있던 계정이 삭제되어 막혀 있습니다. "+
@@ -376,6 +378,34 @@ final class OfficeBoardClient {
     static boolean completeLoginMessage(String message){
         return PENDING_APPROVAL.equals(message)||DEVICE_REVOKED.equals(message)||
             ACCOUNT_REMOVED.equals(message)||DEVICE_ASSIGNED.equals(message);
+    }
+    static final String BAD_RESPONSE="게시판 서버 응답을 읽지 못했습니다. 와이파이 로그인 화면이나 인터넷 연결을 확인해 주세요.";
+    /**
+     * v2.2.10: why a request failed, by exception type rather than by English text.
+     * "offline"     nothing reached the server (no DNS, no route, refused);
+     * "timeout"     no answer in time (the request may still have arrived);
+     * "interrupted" the connection broke midway (SSL, reset, early end);
+     * "server"      the server or a Wi-Fi sign-in page answered without board data;
+     * ""            the board itself answered (wrong code, no permission, conflict...).
+     */
+    static String networkKind(Throwable error){
+        for(Throwable t=error;t!=null;t=t.getCause()){
+            if(t instanceof java.net.UnknownHostException||t instanceof java.net.ConnectException||
+               t instanceof java.net.NoRouteToHostException||t instanceof java.net.PortUnreachableException)
+                return "offline";
+            if(t instanceof java.net.SocketTimeoutException)return "timeout";
+            if(t instanceof java.io.IOException)return "interrupted";
+        }
+        String message=error==null||error.getMessage()==null?"":error.getMessage();
+        if(BAD_RESPONSE.equals(message)||message.matches(".*HTTP (3\\d\\d|5\\d\\d|408|429)$"))return "server";
+        return "";
+    }
+    /** Korean wording for a network failure; null when the server's own reason applies. */
+    static String networkMessage(String kind){
+        if("offline".equals(kind))return "인터넷에 연결되어 있지 않습니다.";
+        if("timeout".equals(kind))return "서버 응답 시간 초과 · 인터넷 연결이 느립니다.";
+        if("interrupted".equals(kind))return "인터넷 연결이 중간에 끊겼습니다.";
+        return null;
     }
     static final String PENDING_APPROVAL="새 휴대폰 승인 대기 중입니다. 관리자가 관리자센터의 '새 휴대폰 승인'에서 승인한 뒤, 이 화면에서 보안코드를 다시 입력해 주세요.";
     private OfficeBoardClient(){}

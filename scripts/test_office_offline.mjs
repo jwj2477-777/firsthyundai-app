@@ -78,8 +78,9 @@ await new Promise(resolve=>setTimeout(resolve,90));
 assert(roundTrips>0,'Attempt live refresh first');
 assert(el('officeBoardList').innerHTML.includes('032-123-4567'),
  'Server HTTP 500 must not hide the emergency cached telephone number');
-assert(el('officeBoardOfflineTitle').textContent.includes('읽기 전용'));
-assert(el('officeBoardOfflineDetail').textContent.includes('마지막 동기화'));
+assert(el('officeBoardOfflineTitle').textContent.includes('저장된 메모 보는 중'));// v2.2.10 wording
+assert(/저장( \(|$)/.test(el('officeBoardOfflineDetail').textContent.split(' · ')[0]),'Banner says when the copy was saved');
+assert(el('officeBoardOfflineDetail').textContent.includes('인터넷이 연결되면'));
 assert(!el('officeBoardList').innerHTML.includes('data-action="delete"'));
 assert(!el('officeBoardList').innerHTML.includes('data-action="done"'));
 assert(!api._test.canEditNote(note),'Even admin cannot edit an old snapshot');
@@ -97,7 +98,7 @@ online=false;
 await api.refresh();
 assert(el('officeBoardList').innerHTML.includes('서버 최신 방문 예약'),
  'After a later outage, fallback uses the most recently saved full snapshot');
-assert(el('officeBoardOfflineTitle').textContent.includes('읽기 전용'));
+assert(el('officeBoardOfflineTitle').textContent.includes('저장된 메모 보는 중'));// v2.2.10 wording
 // A second family identity without its own encrypted backup must never see
 // the first account's customer notes, and an outage is NOT an empty board.
 accountId='22222222-2222-2222-2222-222222222222';

@@ -70,6 +70,7 @@ on:
       - 'scripts/test_office_memo_cards_v227.js'
       - 'scripts/test_calculator_choices_browser.js'
       - 'scripts/test_trade_sweep_v229_browser.js'
+      - 'scripts/test_office_memo_offline_browser.js'
       - 'scripts/test_news_tab_wind_stability.js'
       - 'scripts/test_trade_type_direct_flow.js'
       - 'scripts/test_native_lower_tab_browser.js'
@@ -207,6 +208,7 @@ jobs:
           node scripts/test_office_memo_cards_v227.js
           node scripts/test_calculator_choices_browser.js
           node scripts/test_trade_sweep_v229_browser.js
+          node scripts/test_office_memo_offline_browser.js
           node scripts/test_news_tab_wind_stability.js
           node scripts/test_trade_type_direct_flow.js
           node scripts/test_native_lower_tab_browser.js
@@ -425,25 +427,25 @@ jobs:
           path: app/build/outputs/apk/*/*.apk
           if-no-files-found: error
           retention-days: 7
-      - name: Publish v2.2.9 sweep fixes APK
+      - name: Publish v2.2.10 memo offline APK
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.9.apk
-          unzip -t FirstHyundai-v2.2.9.apk | grep 'No errors detected'
-          if gh release view v2.2.9 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          cp app/build/outputs/apk/release/app-release.apk FirstHyundai-v2.2.10.apk
+          unzip -t FirstHyundai-v2.2.10.apk | grep 'No errors detected'
+          if gh release view v2.2.10 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release already exists; leaving its signed APK unchanged and treating the duplicate build as a harmless skip."
             exit 0
           else
-            gh release create v2.2.9 FirstHyundai-v2.2.9.apk \
+            gh release create v2.2.10 FirstHyundai-v2.2.10.apk \
               --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-              --title '퍼스트현대 v2.2.9 · 화면·금액 인식·수집 안정성 점검' \
-               --notes '전체 점검에서 찾은 문제를 고쳤습니다. ① 새 거래: 오늘(주말·이른 시간) 확인분이 없으면 가장 최근 거래가 있는 날을 자동으로 보여 주고, 날짜 목록에 요일과 건수(37건/없음)를 함께 표시합니다. 직접 고른 날짜는 그대로 유지됩니다. ② 실거래: 한 달 자료만 수집에 실패하고 이전 자료가 있을 때는 주황색 최신성 주의 대신 어느 달이 실패했는지 차분하게 안내합니다. ③ 상세 검색 조건: 이름 입력칸과 해제 거래 선택칸이 카드 오른쪽 밖으로 잘리던 문제와, 오피스텔 날짜 버튼이 작은 회색 기본 버튼으로 보이던 문제를 고쳤습니다. ④ 계약 메모: 3억 구천만원, 3억구천만원, 12억 오천처럼 숫자와 한글이 섞인 금액을 3억만으로 읽던 문제를 고쳤습니다. 3억 이상, 1억 1차 중도금은 그대로 따로 읽습니다. ⑤ 오늘 요약의 작은 글씨를 더 진하게 하고 달력·뉴스 더보기 버튼을 손가락으로 누르기 쉬운 크기로 키웠습니다. ⑥ 실거래 수집이 일시적인 네트워크 끊김에 두 번 다시 시도하고, 카카오 키 점검도 일시 오류에 다시 시도합니다. 고객 정보는 전송하지 않습니다.'
+              --title '퍼스트현대 v2.2.10 · 인터넷 없을 때 공유 메모' \
+               --notes '공유 메모를 인터넷 없이 볼 때와 다시 연결될 때를 손봤습니다. ① 인터넷이 없으면 휴대폰에 저장된 메모를 보여 주고, 메모작성·메모함·달력 위에 언제 저장된 메모인지(예: 3시간 전) 크게 알려 줍니다. 오늘 요약에도 저장된 일정이라고 표시합니다. ② 인터넷 없이 메모 붙이기를 누르면 보내지 않고 적은 내용을 그대로 둡니다. 다시 연결되면 지금 보내기 버튼이 나오고, 한 번 누르면 한 번만 보내집니다. 연결이 돌아오면 20초 안에 저절로 다시 확인합니다. ③ 메모를 보던 중 인터넷이 끊겨도 화면의 메모가 사라지지 않습니다. 영어 오류 문구 대신 쉬운 한국어로 안내합니다. ④ 와이파이 로그인 화면, 약한 신호, 연결 끊김처럼 인터넷이 실제로 안 되는 경우에도 저장된 메모로 앱에 들어갈 수 있게 했습니다(보안코드·승인·24시간 확인 조건은 그대로). ⑤ 메모함에서 진행 중만 보고 검색할 때 완료된 메모에 결과가 있으면 알려 주고 한 번에 전체를 볼 수 있습니다. 종일 일정 날짜도 11. 30. (월) 종일처럼 같은 모양으로 표시합니다.'
           fi
           python3 scripts/export_ai_handoff.py --out dist/ai-handoff
-          gh release upload v2.2.9 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
-          python3 scripts/publish_app_release_index.py --tag v2.2.9 --apk FirstHyundai-v2.2.9.apk
+          gh release upload v2.2.10 dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.md dist/ai-handoff/FirstHyundai-AI-Handoff-Complete.zip --repo "$GITHUB_REPOSITORY"
+          python3 scripts/publish_app_release_index.py --tag v2.2.10 --apk FirstHyundai-v2.2.10.apk
 
 
 

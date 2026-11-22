@@ -596,9 +596,17 @@ public class LockActivity extends Activity {
                         status.setText("사무실 계정 상태를 확인하는 중입니다.");
                         new Thread(()->{
                             String error="";
+                            boolean network=false;
                             try{OfficeBoardClient.checkAccount(getApplicationContext());}
-                            catch(Exception e){error=e.getMessage()==null?"계정 확인 실패":e.getMessage();}
+                            catch(Exception e){
+                                error=e.getMessage()==null?"계정 확인 실패":e.getMessage();
+                                // v2.2.10: decide by exception type. Weak signal, a Wi-Fi sign-in
+                                // page, SSL resets or "Failed to connect" used to block the
+                                // encrypted read-only copy because their text did not match.
+                                network=!OfficeBoardClient.networkKind(e).isEmpty();
+                            }
                             final String problem=error;
+                            final boolean networkProblem=network;
                             runOnUiThread(()->{
                                 if(isFinishing()||isDestroyed())return;
                                 if(problem.isEmpty()){
@@ -609,7 +617,8 @@ public class LockActivity extends Activity {
                                     AccessPolicy.authorized(getApplicationContext(),result.policy)&&
                                     OfficeOfflineStore.has(getApplicationContext(),
                                         OfficeBoardClient.memberId(getApplicationContext()))&&
-                                    (problem.contains("HTTP 5")||
+                                    (networkProblem||
+                                     problem.contains("HTTP 5")||
                                      problem.contains("연결 오류")||
                                      problem.contains("연결할 수 없습니다")||
                                      problem.contains("timed out")||
