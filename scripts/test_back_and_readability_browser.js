@@ -33,7 +33,15 @@ async function verify(){
   const sheetBefore=String(activeApartmentSheet||'');
   closeApartmentSheet(false);
   pageTrail.length=0;
-  check(back()===true,'First Back on home is kept (trail was '+trailBefore+')');
+  const state=()=>JSON.stringify({w:document.getElementById('fhdWeatherDialog')?.hidden,
+   fa:document.getElementById('favoriteAlertSettingsDialog')?.open,ft:document.getElementById('favoriteTradeAlertDialog')?.open,
+   dlg:document.querySelectorAll('dialog[open]').length,sheet:activeApartmentSheet,trail:pageTrail.length,page:currentPage,home:appHomePage(),
+   allowed:activePages().some(([k])=>k===appHomePage()),armed:Date.now()-backExitArmedAt,
+   fn:String(window.firstHyundaiGoBack).slice(0,60)});
+  const before=state();let toastCalls=0;const realToast=showBackToast;showBackToast=t=>{toastCalls++;realToast(t)};
+  const firstHome=back();
+  check(firstHome===true,'First Back on home is kept (trail was '+trailBefore+') '+before);
+  check(toastCalls===1,'Home press reaches the exit warning · before='+before+' after='+state());
   const toast=document.getElementById('fhdBackToast');
   check(toast&&!toast.hidden&&toast.textContent.includes('한 번 더 누르면'),'Exit warning shown · open='+
    [...document.querySelectorAll('dialog[open]')].map(d=>d.id).join(',')+' page='+currentPage+' home='+appHomePage()+
